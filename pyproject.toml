@@ -20,6 +20,7 @@ dependencies = [
   "pydub",
   "ubelt",
   "rich",
+  "pyloudnorm",
 ]
 
 [project.scripts]
@@ -29,3 +30,12 @@ render-ambition-music = "ambition_music_renderer.musicir_renderer:main"
 [tool.setuptools.packages.find]
 include = ["ambition_music_renderer*"]
 exclude = ["scores*", "tests*"]
+
+[project.optional-dependencies]
+pro-audio = [
+  "pedalboard",
+]
+
+# sfizz_render, lv2proc, Guitarix, and NAM are external command/plugin installs,
+# not Python package dependencies. The renderer probes for them only when YAML
+# explicitly requests those optional backends.

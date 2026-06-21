@@ -53,6 +53,28 @@ The renderer can use multiple backends depending on local setup:
 | `fluidsynth-cli` | the `fluidsynth` binary + SoundFont | Useful when Python FluidSynth bindings misbehave. |
 | `fallback` | additive synth fallback | Diagnostic/sketch fallback only; request explicitly with `--backend fallback`. Can contain synthetic bow/breath/noise artifacts. |
 | `auto` | backend selection/fallback policy | Use only when fallback behavior is acceptable and explicitly reported. |
+| `sfizz` / `sfizz-render` | optional `sfizz_render` CLI + SFZ instrument files | Use for better open sample instruments from YAML; requires `render.sfizz.default_sfz` or per-instrument `instrument_backend.sfz`. |
+
+Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making GPL/Pedalboard part of the light renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML uses `external_effects` / `external_chain`.
+
+Example optional processing block:
+
+```yaml
+postprocess:
+  target_lufs: -16
+  true_peak_db: -1.5
+  pedalboard_effects:
+    - {effect: compressor, threshold_db: -18, ratio: 2.5}
+    - {effect: vst3, path: local/plugins/MyAmp.vst3, parameters: {}}
+
+group_postprocess:
+  guitars:
+    highpass_hz: 80
+    lowpass_hz: 9000
+    external_effects:
+      - kind: command
+        command: [my-offline-amp, --input, "{input}", --output, "{output}"]
+```
 
 SoundFont preference is defined in the renderer code. Prefer high-quality MuseScore/FluidR3 style General MIDI SoundFonts when available. Override per-cue with `render.soundfont` in YAML or per invocation with a backend-specific CLI flag when supported. Normal authoring defaults should prefer `pretty-midi`; fallback should never appear because a prompt or lower-level script quietly picked it.
 
@@ -192,8 +214,11 @@ Common layer kinds include:
 - `root_hits`
 - `drums`
 - `automation`
+- `guitar_strum` - chord-symbol input compiled to plausible six-string down/up strums.
+- `guitar_chug` - power-chord/palm-muted rhythm guitar with optional separate take definitions.
+- `guitar_lead` - motif input compiled to monophonic guitar-like lead notes with position-aware scoops.
 
-Most note-producing layers accept timing and velocity humanization. Motif layers can also carry pitch-bend curves for slides or bends.
+Most note-producing layers accept timing and velocity humanization. Motif layers can also carry pitch-bend curves for slides or bends. Guitar layers add a tiny custom performance compiler: it assigns notes to six strings, staggers strums physically, and makes double-tracking explicit as separate takes rather than generic stereo widening.
 
 ## Constraint flags
 

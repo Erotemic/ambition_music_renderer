@@ -1,0 +1,152 @@
+id: guitar_backend_demo
+title: Guitar Backend Demo
+seed: 11
+
+tempo: {bpm: 126}
+meter: {beats_per_bar: 4}
+
+render:
+  sample_rate: 48000
+  backend: pretty-midi
+  ogg_quality: 5
+  # Optional SFZ path. Leave unset for the light SoundFont path.
+  # sfizz:
+  #   default_sfz: local_samples/guitars/example.sfz
+
+postprocess:
+  gain_db: -3
+  target_lufs: -16
+  true_peak_db: -1.5
+  reverb_wet: 0.08
+  stereo_width: 0.05
+
+stem_postprocess:
+  highpass_hz: 45
+  reverb_wet: 0.10
+  stereo_width: 0.05
+  target_peak_db: -2.5
+  normalize: false
+
+group_postprocess:
+  guitars:
+    highpass_hz: 80
+    lowpass_hz: 9000
+    transient_tame: 0.12
+    compressor_threshold_db: -18
+    compressor_ratio: 2.5
+    reverb_wet: 0.06
+    stereo_width: 0.0
+    # Optional VST3/Pedalboard path:
+    # pedalboard_effects:
+    #   - {effect: distortion, drive_db: 6}
+    #   - {effect: vst3, path: local/plugins/Amp.vst3, parameters: {}}
+    # Optional LV2/NAM/Guitarix path via file command:
+    # external_effects:
+    #   - kind: command
+    #     command: [my-offline-amp, --input, "{input}", --output, "{output}"]
+  bass:
+    highpass_hz: 38
+    lowpass_hz: 4200
+    reverb_wet: 0.03
+  drums:
+    highpass_hz: 35
+    reverb_wet: 0.10
+    stereo_width: 0.04
+
+instruments:
+  - name: rhythm_guitar_L
+    group: guitars
+    program: muted_guitar
+    volume: 104
+    pan: 24
+    instrument_backend:
+      kind: gm
+      # kind: sfz
+      # sfz: local_samples/guitars/rhythm_left.sfz
+  - name: rhythm_guitar_R
+    group: guitars
+    program: muted_guitar
+    volume: 102
+    pan: 104
+  - name: clean_strum
+    group: guitars
+    program: clean_guitar
+    volume: 80
+    pan: 64
+  - name: bass
+    group: bass
+    program: picked_bass
+    volume: 92
+    pan: 64
+  - name: kit
+    group: drums
+    is_drum: true
+    volume: 92
+    pan: 64
+
+motifs:
+  - id: lead_hook
+    root: E4
+    intervals: [0, 3, 5, 7, 10, 7]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 1.0]
+    velocities: [1.0, 0.82, 0.9, 0.86, 1.0, 0.72]
+
+state_map:
+  default:
+    section: loop
+    stems:
+      guitars: 1.0
+      bass: 0.9
+      drums: 0.85
+
+sections:
+  - id: loop
+    label: Guitar compiler loop
+    bars: 8
+    loopable: true
+    harmony: [Em, C, G, D]
+    layers:
+      - kind: guitar_chug
+        takes:
+          - {instrument: rhythm_guitar_L, timing_offset_ms: -7, velocity_offset: 0}
+          - {instrument: rhythm_guitar_R, timing_offset_ms: 11, velocity_offset: -3}
+        octave: 2
+        shape: fifth_octave
+        pattern:
+          - [0, 0.0, 0.42, 1.0]
+          - [0, 0.5, 0.38, 0.72]
+          - [7, 1.0, 0.42, 0.95]
+          - [0, 1.5, 0.38, 0.70]
+          - [0, 2.0, 0.42, 1.0]
+          - [0, 2.5, 0.38, 0.70]
+          - [7, 3.0, 0.42, 0.95]
+          - [12, 3.5, 0.38, 0.82]
+        velocity: 84
+        spread_ms: 7
+        gate: 0.44
+        humanize_ms: 0.8
+        humanize_velocity_pct: 2.5
+      - kind: guitar_strum
+        instrument: clean_strum
+        hits: [[0, 0.0, down], [0, 2.0, up]]
+        every_bars: 1
+        duration_beats: 1.75
+        spread_ms: 42
+        max_span: 5
+        max_notes: 5
+        velocity: 56
+        velocity_slope: -1.5
+        humanize_ms: 1.5
+        humanize_velocity_pct: 3.0
+      - kind: bassline
+        instrument: bass
+        octave: 1
+        velocity: 72
+        articulation: marcato
+        pattern: [[0, 0.0, 0.75], [0, 1.0, 0.45], [7, 2.0, 0.75], [5, 3.0, 0.45]]
+      - kind: drums
+        instrument: kit
+        events:
+          - {drum: kick, beats: [0.0, 2.0], velocity: 78}
+          - {drum: snare, beats: [1.0, 3.0], velocity: 74}
+          - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 42, humanize_ms: 1.5}
