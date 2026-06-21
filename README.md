@@ -55,26 +55,53 @@ The renderer can use multiple backends depending on local setup:
 | `auto` | backend selection/fallback policy | Use only when fallback behavior is acceptable and explicitly reported. |
 | `sfizz` / `sfizz-render` | optional `sfizz_render` CLI + SFZ instrument files | Use for better open sample instruments from YAML; requires `render.sfizz.default_sfz` or per-instrument `instrument_backend.sfz`. |
 
-Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making GPL/Pedalboard part of the light renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML uses `external_effects` / `external_chain`.
+Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making GPL/Pedalboard part of the light renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML explicitly requests those optional backends.
 
-Example optional processing block:
+Use the plugin diagnostics before authoring a score that depends on local plugins:
+
+```bash
+PYTHONPATH=tools/ambition_music_renderer python -m ambition_music_renderer plugins doctor
+PYTHONPATH=tools/ambition_music_renderer python -m ambition_music_renderer plugins list-vst3
+PYTHONPATH=tools/ambition_music_renderer python -m ambition_music_renderer plugins list-lv2 --limit 40
+PYTHONPATH=tools/ambition_music_renderer python -m ambition_music_renderer plugins validate-score guitar_backend_demo
+```
+
+For new work, prefer the explicit `effect_chain` surface. Each step states the host family. This keeps the default render path lightweight while making DAW-like processing reproducible from YAML/Python.
 
 ```yaml
 postprocess:
   target_lufs: -16
   true_peak_db: -1.5
-  pedalboard_effects:
-    - {effect: compressor, threshold_db: -18, ratio: 2.5}
-    - {effect: vst3, path: local/plugins/MyAmp.vst3, parameters: {}}
+  effect_chain:
+    - kind: pedalboard
+      effects:
+        - {effect: compressor, threshold_db: -18, ratio: 2.5}
+        - {effect: reverb, room_size: 0.18, wet_level: 0.08}
 
+# VST3 effects are loaded through Pedalboard when the optional package and
+# local plugin are installed. Relative paths are resolved against the score.
 group_postprocess:
   guitars:
     highpass_hz: 80
     lowpass_hz: 9000
-    external_effects:
+    effect_chain:
+      - kind: vst3
+        path: local/plugins/MyAmp.vst3
+        parameters: {}
+
+      # Simple LV2 file effects use lv2proc. Use `plugins list-lv2` and
+      # `plugins lv2-info <URI>` to discover plugin URIs/ports locally.
+      - kind: lv2proc
+        plugin_uri: http://example.invalid/my-lv2-plugin
+        params: {gain: 0.5}
+
+      # NAM/Guitarix setups vary, so command adapters are first-class. The
+      # renderer writes a WAV, substitutes placeholders, then reads the output.
       - kind: command
-        command: [my-offline-amp, --input, "{input}", --output, "{output}"]
+        command: [my-offline-amp, --input, "{input}", --output, "{output}", --sample-rate, "{sample_rate}"]
 ```
+
+Legacy `pedalboard_effects`, `vst3_effects`, `external_effects`, and `external_chain` still work. Use `effect_chain` when combining multiple host families because ordering is explicit.
 
 SoundFont preference is defined in the renderer code. Prefer high-quality MuseScore/FluidR3 style General MIDI SoundFonts when available. Override per-cue with `render.soundfont` in YAML or per invocation with a backend-specific CLI flag when supported. Normal authoring defaults should prefer `pretty-midi`; fallback should never appear because a prompt or lower-level script quietly picked it.
 

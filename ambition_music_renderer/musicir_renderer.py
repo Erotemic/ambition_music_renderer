@@ -2162,7 +2162,15 @@ def post_process(
 
     # Optional pro/post-DAW style extensions. These remain opt-in so normal
     # lightweight renders do not need Pedalboard, LV2, Guitarix, NAM, or any
-    # local plugin inventory.
+    # local plugin inventory. Prefer the explicit cross-backend `effect_chain`
+    # surface for new work; legacy `pedalboard_effects` and `external_effects`
+    # are still supported.
+    effect_chain = settings.get("effect_chain") or settings.get("effects_chain") or []
+    if effect_chain:
+        from .backends.plugin_chain import apply_effect_chain
+
+        audio = apply_effect_chain(audio, sample_rate, list(effect_chain), base_dir=base_dir)
+
     pedalboard_effects = (
         settings.get("pedalboard_effects")
         or settings.get("vst3_effects")
@@ -2176,7 +2184,19 @@ def post_process(
             audio, sample_rate, list(pedalboard_effects), base_dir=base_dir
         )
 
-    external_effects = settings.get("external_effects") or settings.get("external_chain") or []
+    lv2_effects = settings.get("lv2_effects") or settings.get("nam_lv2_effects") or []
+    if lv2_effects:
+        from .backends.lv2_backend import apply_lv2_effects
+
+        audio = apply_lv2_effects(audio, sample_rate, list(lv2_effects))
+
+    external_effects = (
+        settings.get("external_effects")
+        or settings.get("external_chain")
+        or settings.get("nam_effects")
+        or settings.get("guitarix_effects")
+        or []
+    )
     if external_effects:
         from .backends.external_fx import apply_external_effects
 

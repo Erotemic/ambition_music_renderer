@@ -573,6 +573,70 @@ def cmd_bundle(args: argparse.Namespace) -> int:
     return 0 if report.get("ok", True) else 1
 
 
+
+
+def cmd_plugins_doctor(args: argparse.Namespace) -> int:
+    from .audio_plugins import collect_plugin_diagnostics
+
+    report = collect_plugin_diagnostics(probe_counts=not args.fast)
+    print(json.dumps(report, indent=2))
+    return 0
+
+
+def cmd_plugins_list_vst3(args: argparse.Namespace) -> int:
+    from .audio_plugins import discover_vst3_plugins
+
+    roots = [Path(p) for p in args.path] if args.path else None
+    plugins = discover_vst3_plugins(roots)
+    if args.json:
+        print(json.dumps(plugins, indent=2))
+    else:
+        for plugin in plugins:
+            print(plugin["path"])
+    return 0
+
+
+def cmd_plugins_list_lv2(args: argparse.Namespace) -> int:
+    from .audio_plugins import discover_lv2_plugins
+
+    uris = discover_lv2_plugins(limit=args.limit)
+    if args.json:
+        print(json.dumps(uris, indent=2))
+    else:
+        for uri in uris:
+            print(uri)
+    return 0
+
+
+def cmd_plugins_lv2_info(args: argparse.Namespace) -> int:
+    from .audio_plugins import lv2_info
+
+    report = lv2_info(args.uri)
+    if args.raw:
+        print(report.get("stdout", ""), end="")
+        if report.get("stderr"):
+            print(report["stderr"], file=sys.stderr, end="")
+    else:
+        print(json.dumps(report, indent=2))
+    return 0 if report.get("ok") else 1
+
+
+def cmd_plugins_validate_score(args: argparse.Namespace) -> int:
+    from .audio_plugins import load_score, validate_score_plugins
+
+    score = find_score(args.score)
+    if score is None:
+        p = Path(args.score)
+        if p.exists():
+            score = p.resolve()
+        else:
+            print(f"error: score not found: {args.score}", file=sys.stderr)
+            return 2
+    report = validate_score_plugins(load_score(score), base_dir=score.parent)
+    print(json.dumps(report, indent=2))
+    return 0 if report.get("ok") or args.warn_only else 1
+
+
 def add_bundle_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("cue", help="cue id or .music.yaml path")
     p.add_argument(
@@ -817,6 +881,34 @@ def build_parser() -> argparse.ArgumentParser:
         add_publish_args(sp)
         sp.set_defaults(func=cmd_radio)
     p_radio.set_defaults(func=cmd_radio)
+
+
+    p_plugins = sub.add_parser("plugins", help="Inspect optional LV2/VST3/SFZ rendering infrastructure")
+    plugin_sub = p_plugins.add_subparsers(dest="plugin_action", required=True)
+
+    p_pd = plugin_sub.add_parser("doctor", help="print optional backend diagnostics as JSON")
+    p_pd.add_argument("--fast", action="store_true", help="skip plugin-count probes")
+    p_pd.set_defaults(func=cmd_plugins_doctor)
+
+    p_pv = plugin_sub.add_parser("list-vst3", help="list discovered VST3 bundle paths")
+    p_pv.add_argument("--path", action="append", default=[], help="additional/override search root; repeatable")
+    p_pv.add_argument("--json", action="store_true", help="emit JSON instead of one path per line")
+    p_pv.set_defaults(func=cmd_plugins_list_vst3)
+
+    p_pl = plugin_sub.add_parser("list-lv2", help="list installed LV2 plugin URIs via lv2ls")
+    p_pl.add_argument("--limit", type=int, default=None)
+    p_pl.add_argument("--json", action="store_true", help="emit JSON instead of one URI per line")
+    p_pl.set_defaults(func=cmd_plugins_list_lv2)
+
+    p_pi = plugin_sub.add_parser("lv2-info", help="inspect one LV2 plugin URI via lv2info")
+    p_pi.add_argument("uri")
+    p_pi.add_argument("--raw", action="store_true", help="print raw lv2info text instead of JSON")
+    p_pi.set_defaults(func=cmd_plugins_lv2_info)
+
+    p_ps = plugin_sub.add_parser("validate-score", help="preflight optional plugin/effect references in a score")
+    p_ps.add_argument("score", help="cue id or score YAML path")
+    p_ps.add_argument("--warn-only", action="store_true", help="return success even if missing optional tools are reported")
+    p_ps.set_defaults(func=cmd_plugins_validate_score)
 
     return ap
 

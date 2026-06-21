@@ -23,6 +23,22 @@ dependencies = [
   "pyloudnorm",
 ]
 
+[project.optional-dependencies]
+
+optional = [
+    "pedalboard",
+    "dawdreamer",
+]
+dev = ["pytest", "ruff", "line_profiler"]
+all = [
+    "ambition-music-renderer[optional]",
+    "ambition-music-renderer[dev]",
+]
+
+# sfizz_render, lv2proc, Guitarix, and NAM are external command/plugin installs,
+# not Python package dependencies. The renderer probes for them only when YAML
+# explicitly requests those optional backends.
+
 [project.scripts]
 ambition-music-renderer = "ambition_music_renderer.cli:main"
 render-ambition-music = "ambition_music_renderer.musicir_renderer:main"
@@ -31,11 +47,3 @@ render-ambition-music = "ambition_music_renderer.musicir_renderer:main"
 include = ["ambition_music_renderer*"]
 exclude = ["scores*", "tests*"]
 
-[project.optional-dependencies]
-pro-audio = [
-  "pedalboard",
-]
-
-# sfizz_render, lv2proc, Guitarix, and NAM are external command/plugin installs,
-# not Python package dependencies. The renderer probes for them only when YAML
-# explicitly requests those optional backends.

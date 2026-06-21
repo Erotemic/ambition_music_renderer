@@ -56,16 +56,9 @@ def _run_file_command(audio: np.ndarray, sample_rate: int, spec: dict[str, Any])
         if command:
             cmd = _format_command(command, mapping)
         elif kind in {"lv2proc", "lv2"}:
-            binary = str(spec.get("binary", "lv2proc"))
-            if not shutil.which(binary):
-                raise FileNotFoundError(f"{binary!r} not found for LV2 postprocess")
-            plugin_uri = str(spec.get("plugin_uri") or spec.get("uri") or "")
-            if not plugin_uri:
-                raise ValueError("lv2proc external effect requires plugin_uri")
-            cmd = [binary, "-i", str(input_path), "-o", str(output_path)]
-            for key, value in dict(spec.get("params") or spec.get("parameters") or {}).items():
-                cmd.extend(["-c", f"{key}={value}"])
-            cmd.append(plugin_uri)
+            from .lv2_backend import build_lv2proc_command
+
+            cmd = build_lv2proc_command(input_path, output_path, spec)
         elif kind in {"nam", "nam_lv2", "neural_amp_modeler"}:
             raise ValueError(
                 "NAM/LV2 setups need a command override or a host-specific adapter. "
