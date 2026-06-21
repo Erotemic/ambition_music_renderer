@@ -1,0 +1,2049 @@
+schema: ambition.musicir.v1
+id: flying_spaghetti_monster_roots_boss_choir_backing
+title: One Noodle Rises - Rooted Low Gregorian Chorale r12
+seed: 2026060412
+notes: 'Revision r12: redesigns the monk choir away from common-tone suspension drones. The choir now follows each local A/D/E
+  harmony with sustained root/fifth tones, compressing repeated tones into longer holds where possible and resolving phrase
+  endings back to A/E. It keeps the r10/r11 renderer same-pitch-overlap safety while avoiding the unresolved B/A holds that
+  felt detached.'
+tempo:
+  bpm: 104
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: 0.35
+  highpass_hz: 32
+  lowpass_hz: 10600
+  presence_low_hz: 1300
+  presence_high_hz: 3900
+  presence_db: 1.05
+  reverb_wet: 0.082
+  reverb_decay_seconds: 1.05
+  reverb_damping_hz: 5400
+  stereo_width: 0.14
+  compressor_threshold_db: -17.2
+  compressor_ratio: 3.5
+  compressor_attack_ms: 7.5
+  compressor_release_ms: 92.0
+  compressor_makeup_db: 1.9
+  compressor_knee_db: 5.0
+  limiter_drive: 1.04
+  normalize: true
+  target_peak_db: -4.5
+stem_postprocess:
+  gain_db: 0.75
+  highpass_hz: 30
+  reverb_wet: 0.052
+  reverb_decay_seconds: 0.7
+  reverb_damping_hz: 5800
+  stereo_width: 0.12
+  limiter_drive: 0.94
+  normalize: false
+  target_peak_db: -2.6
+instruments:
+- name: skank_guitar
+  group: skank
+  program: muted_guitar
+  volume: 82
+  pan: 32
+  expression: 96
+  chorus: 7
+  reverb: 9
+- name: scratch_guitar
+  group: skank
+  program: clean_guitar
+  volume: 60
+  pan: 88
+  expression: 78
+  chorus: 12
+  reverb: 10
+- name: bubble_organ
+  group: keys
+  program: drawbar_organ
+  volume: 82
+  pan: 58
+  expression: 96
+  modulation: 5
+  chorus: 12
+  reverb: 14
+- name: warm_epiano
+  group: keys
+  program: electric_piano_1
+  volume: 52
+  pan: 72
+  expression: 76
+  chorus: 14
+  reverb: 11
+- name: dub_bass
+  group: bass
+  program: fingered_bass
+  volume: 102
+  pan: 48
+  expression: 112
+- name: picked_bass_shadow
+  group: bass
+  program: picked_bass
+  volume: 46
+  pan: 42
+  expression: 76
+- name: lead_noodle_guitar
+  group: jam_guitar
+  program: overdrive_guitar
+  volume: 82
+  pan: 80
+  expression: 98
+  modulation: 4
+  chorus: 8
+  reverb: 12
+- name: slide_answer_guitar
+  group: jam_guitar
+  program: steel_guitar
+  volume: 72
+  pan: 24
+  expression: 96
+  modulation: 8
+  chorus: 18
+  reverb: 24
+- name: low_monk_oohs
+  group: holy_chant
+  program: voice_oohs
+  volume: 110
+  pan: 46
+  expression: 116
+  modulation: 1
+  chorus: 1
+  reverb: 54
+- name: low_monk_aahs
+  group: holy_chant
+  program: choir_aahs
+  volume: 98
+  pan: 57
+  expression: 108
+  modulation: 1
+  chorus: 1
+  reverb: 52
+- name: brass_amen
+  group: brass
+  program: brass_section
+  volume: 54
+  pan: 52
+  expression: 76
+  reverb: 10
+- name: trombone_amen
+  group: brass
+  program: trombone
+  volume: 48
+  pan: 40
+  expression: 72
+  reverb: 8
+- name: boss_kit
+  group: drums
+  is_drum: true
+  volume: 102
+  pan: 58
+  expression: 114
+motifs:
+- id: rising_noodle_command
+  root: A4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 12
+  - 10
+  - 9
+  - 7
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.5
+  velocities:
+  - 0.8
+  - 0.64
+  - 0.68
+  - 0.84
+  - 0.96
+  - 0.76
+  - 0.82
+  - 0.72
+  - 0.66
+  - 0.76
+  - 0.82
+  - 0.7
+  - 0.62
+  - 0.58
+  - 0.48
+- id: deadhead_safe_solo
+  root: A4
+  intervals:
+  - 7
+  - 9
+  - 12
+  - 14
+  - 12
+  - 10
+  - 9
+  - 7
+  - 9
+  - 12
+  - 14
+  - 16
+  - 14
+  - 12
+  - 10
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.7
+  - 0.74
+  - 0.88
+  - 0.94
+  - 0.76
+  - 0.7
+  - 0.76
+  - 0.7
+  - 0.72
+  - 0.84
+  - 0.92
+  - 0.98
+  - 0.8
+  - 0.78
+  - 0.72
+  - 0.68
+  - 0.66
+  - 0.58
+  - 0.54
+  - 0.44
+- id: amen_stabs
+  root: A3
+  intervals:
+  - 0
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.82
+  - 0.72
+  - 0.86
+  - 0.72
+  - 0.66
+  - 0.62
+  - 0.5
+- id: overdrive_guitar_call_phrase
+  root: A4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.7
+  - 0.76
+  - 0.82
+  - 0.92
+  - 0.78
+  - 0.7
+  - 0.62
+  - 0.5
+- id: steel_guitar_answer_phrase
+  root: A4
+  intervals:
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.62
+  - 0.74
+  - 0.7
+  - 0.66
+  - 0.6
+  - 0.56
+  - 0.52
+  - 0.44
+- id: low_monk_intro_bass_chorale_v3
+  notes:
+  - A3
+  - D3
+  - E3
+  rhythm:
+  - 8.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.64
+  - 0.64
+  - 0.64
+- id: low_monk_intro_baritone_chorale_v3
+  notes:
+  - E3
+  - A3
+  - B3
+  rhythm:
+  - 8.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.5
+  - 0.5
+  - 0.5
+- id: low_monk_loop_bass_chorale_v3
+  notes:
+  - A3
+  - D3
+  - A3
+  - E3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - A3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - A3
+  - E3
+  - D3
+  - A3
+  - E3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - A3
+  - E3
+  - A3
+  rhythm:
+  - 8.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+- id: low_monk_loop_baritone_chorale_v3
+  notes:
+  - E3
+  - A3
+  - E3
+  - B3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - E3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - E3
+  - B3
+  - A3
+  - E3
+  - B3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - E3
+  - B3
+  - E3
+  rhythm:
+  - 8.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+- id: low_monk_solo_bass_chorale_v3
+  notes:
+  - A3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - E3
+  - A3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - A3
+  - D3
+  - A3
+  - E3
+  - D3
+  - A3
+  - E3
+  - D3
+  - A3
+  - E3
+  - A3
+  - D3
+  - A3
+  - E3
+  - A3
+  rhythm:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 16.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+- id: low_monk_solo_baritone_chorale_v3
+  notes:
+  - E3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - B3
+  - E3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - E3
+  - A3
+  - E3
+  - B3
+  - A3
+  - E3
+  - B3
+  - A3
+  - E3
+  - B3
+  - E3
+  - A3
+  - E3
+  - B3
+  - E3
+  rhythm:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 8.0
+  - 4.0
+  - 4.0
+  - 16.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+- id: low_monk_tag_bass_chorale_v3
+  notes:
+  - D3
+  - A3
+  - E3
+  - A3
+  rhythm:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.64
+  - 0.64
+  - 0.64
+  - 0.64
+- id: low_monk_tag_baritone_chorale_v3
+  notes:
+  - A3
+  - E3
+  - B3
+  - E3
+  rhythm:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+layer_templates:
+  skank_drive:
+    kind: chord_hits
+    instruments:
+    - skank_guitar
+    - scratch_guitar
+    hits:
+    - - 0
+      - 0.5
+    - - 0
+      - 1.5
+    - - 0
+      - 2.5
+    - - 0
+      - 3.5
+    - - 1
+      - 0.5
+    - - 1
+      - 1.5
+    - - 1
+      - 2.5
+    - - 1
+      - 3.5
+    - - 2
+      - 0.5
+    - - 2
+      - 1.5
+    - - 2
+      - 2.5
+    - - 2
+      - 3.5
+    - - 3
+      - 0.5
+    - - 3
+      - 1.5
+    - - 3
+      - 2.5
+    - - 3
+      - 3.5
+    - - 4
+      - 0.5
+    - - 4
+      - 1.5
+    - - 4
+      - 2.5
+    - - 4
+      - 3.5
+    - - 5
+      - 0.5
+    - - 5
+      - 1.5
+    - - 5
+      - 2.5
+    - - 5
+      - 3.5
+    - - 6
+      - 0.5
+    - - 6
+      - 1.5
+    - - 6
+      - 2.5
+    - - 6
+      - 3.5
+    - - 7
+      - 0.5
+    - - 7
+      - 1.5
+    - - 7
+      - 2.5
+    - - 7
+      - 3.5
+    - - 8
+      - 0.5
+    - - 8
+      - 1.5
+    - - 8
+      - 2.5
+    - - 8
+      - 3.5
+    - - 9
+      - 0.5
+    - - 9
+      - 1.5
+    - - 9
+      - 2.5
+    - - 9
+      - 3.5
+    - - 10
+      - 0.5
+    - - 10
+      - 1.5
+    - - 10
+      - 2.5
+    - - 10
+      - 3.5
+    - - 11
+      - 0.5
+    - - 11
+      - 1.5
+    - - 11
+      - 2.5
+    - - 11
+      - 3.5
+    - - 12
+      - 0.5
+    - - 12
+      - 1.5
+    - - 12
+      - 2.5
+    - - 12
+      - 3.5
+    - - 13
+      - 0.5
+    - - 13
+      - 1.5
+    - - 13
+      - 2.5
+    - - 13
+      - 3.5
+    - - 14
+      - 0.5
+    - - 14
+      - 1.5
+    - - 14
+      - 2.5
+    - - 14
+      - 3.5
+    - - 15
+      - 0.5
+    - - 15
+      - 1.5
+    - - 15
+      - 2.5
+    - - 15
+      - 3.5
+    - - 16
+      - 0.5
+    - - 16
+      - 1.5
+    - - 16
+      - 2.5
+    - - 16
+      - 3.5
+    - - 17
+      - 0.5
+    - - 17
+      - 1.5
+    - - 17
+      - 2.5
+    - - 17
+      - 3.5
+    - - 18
+      - 0.5
+    - - 18
+      - 1.5
+    - - 18
+      - 2.5
+    - - 18
+      - 3.5
+    - - 19
+      - 0.5
+    - - 19
+      - 1.5
+    - - 19
+      - 2.5
+    - - 19
+      - 3.5
+    - - 20
+      - 0.5
+    - - 20
+      - 1.5
+    - - 20
+      - 2.5
+    - - 20
+      - 3.5
+    - - 21
+      - 0.5
+    - - 21
+      - 1.5
+    - - 21
+      - 2.5
+    - - 21
+      - 3.5
+    - - 22
+      - 0.5
+    - - 22
+      - 1.5
+    - - 22
+      - 2.5
+    - - 22
+      - 3.5
+    - - 23
+      - 0.5
+    - - 23
+      - 1.5
+    - - 23
+      - 2.5
+    - - 23
+      - 3.5
+    - - 24
+      - 0.5
+    - - 24
+      - 1.5
+    - - 24
+      - 2.5
+    - - 24
+      - 3.5
+    - - 25
+      - 0.5
+    - - 25
+      - 1.5
+    - - 25
+      - 2.5
+    - - 25
+      - 3.5
+    - - 26
+      - 0.5
+    - - 26
+      - 1.5
+    - - 26
+      - 2.5
+    - - 26
+      - 3.5
+    - - 27
+      - 0.5
+    - - 27
+      - 1.5
+    - - 27
+      - 2.5
+    - - 27
+      - 3.5
+    - - 28
+      - 0.5
+    - - 28
+      - 1.5
+    - - 28
+      - 2.5
+    - - 28
+      - 3.5
+    - - 29
+      - 0.5
+    - - 29
+      - 1.5
+    - - 29
+      - 2.5
+    - - 29
+      - 3.5
+    - - 30
+      - 0.5
+    - - 30
+      - 1.5
+    - - 30
+      - 2.5
+    - - 30
+      - 3.5
+    - - 31
+      - 0.5
+    - - 31
+      - 1.5
+    - - 31
+      - 2.5
+    - - 31
+      - 3.5
+    - - 32
+      - 0.5
+    - - 32
+      - 1.5
+    - - 32
+      - 2.5
+    - - 32
+      - 3.5
+    - - 33
+      - 0.5
+    - - 33
+      - 1.5
+    - - 33
+      - 2.5
+    - - 33
+      - 3.5
+    - - 34
+      - 0.5
+    - - 34
+      - 1.5
+    - - 34
+      - 2.5
+    - - 34
+      - 3.5
+    - - 35
+      - 0.5
+    - - 35
+      - 1.5
+    - - 35
+      - 2.5
+    - - 35
+      - 3.5
+    - - 36
+      - 0.5
+    - - 36
+      - 1.5
+    - - 36
+      - 2.5
+    - - 36
+      - 3.5
+    - - 37
+      - 0.5
+    - - 37
+      - 1.5
+    - - 37
+      - 2.5
+    - - 37
+      - 3.5
+    - - 38
+      - 0.5
+    - - 38
+      - 1.5
+    - - 38
+      - 2.5
+    - - 38
+      - 3.5
+    - - 39
+      - 0.5
+    - - 39
+      - 1.5
+    - - 39
+      - 2.5
+    - - 39
+      - 3.5
+    duration_beats: 0.16
+    octave: 3
+    velocity: 58
+    articulation: hit
+    voicing: closed
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+    instrument_velocity_offsets:
+      skank_guitar: 0
+      scratch_guitar: -11
+  organ_bubble_fight:
+    kind: chord_hits
+    instruments:
+    - bubble_organ
+    - warm_epiano
+    hits:
+    - - 0
+      - 1.0
+    - - 0
+      - 1.75
+    - - 0
+      - 3.0
+    - - 0
+      - 3.75
+    - - 1
+      - 1.0
+    - - 1
+      - 1.75
+    - - 1
+      - 3.0
+    - - 1
+      - 3.75
+    - - 2
+      - 1.0
+    - - 2
+      - 1.75
+    - - 2
+      - 3.0
+    - - 2
+      - 3.75
+    - - 3
+      - 1.0
+    - - 3
+      - 1.75
+    - - 3
+      - 3.0
+    - - 3
+      - 3.75
+    - - 4
+      - 1.0
+    - - 4
+      - 1.75
+    - - 4
+      - 3.0
+    - - 4
+      - 3.75
+    - - 5
+      - 1.0
+    - - 5
+      - 1.75
+    - - 5
+      - 3.0
+    - - 5
+      - 3.75
+    - - 6
+      - 1.0
+    - - 6
+      - 1.75
+    - - 6
+      - 3.0
+    - - 6
+      - 3.75
+    - - 7
+      - 1.0
+    - - 7
+      - 1.75
+    - - 7
+      - 3.0
+    - - 7
+      - 3.75
+    - - 8
+      - 1.0
+    - - 8
+      - 1.75
+    - - 8
+      - 3.0
+    - - 8
+      - 3.75
+    - - 9
+      - 1.0
+    - - 9
+      - 1.75
+    - - 9
+      - 3.0
+    - - 9
+      - 3.75
+    - - 10
+      - 1.0
+    - - 10
+      - 1.75
+    - - 10
+      - 3.0
+    - - 10
+      - 3.75
+    - - 11
+      - 1.0
+    - - 11
+      - 1.75
+    - - 11
+      - 3.0
+    - - 11
+      - 3.75
+    - - 12
+      - 1.0
+    - - 12
+      - 1.75
+    - - 12
+      - 3.0
+    - - 12
+      - 3.75
+    - - 13
+      - 1.0
+    - - 13
+      - 1.75
+    - - 13
+      - 3.0
+    - - 13
+      - 3.75
+    - - 14
+      - 1.0
+    - - 14
+      - 1.75
+    - - 14
+      - 3.0
+    - - 14
+      - 3.75
+    - - 15
+      - 1.0
+    - - 15
+      - 1.75
+    - - 15
+      - 3.0
+    - - 15
+      - 3.75
+    - - 16
+      - 1.0
+    - - 16
+      - 1.75
+    - - 16
+      - 3.0
+    - - 16
+      - 3.75
+    - - 17
+      - 1.0
+    - - 17
+      - 1.75
+    - - 17
+      - 3.0
+    - - 17
+      - 3.75
+    - - 18
+      - 1.0
+    - - 18
+      - 1.75
+    - - 18
+      - 3.0
+    - - 18
+      - 3.75
+    - - 19
+      - 1.0
+    - - 19
+      - 1.75
+    - - 19
+      - 3.0
+    - - 19
+      - 3.75
+    - - 20
+      - 1.0
+    - - 20
+      - 1.75
+    - - 20
+      - 3.0
+    - - 20
+      - 3.75
+    - - 21
+      - 1.0
+    - - 21
+      - 1.75
+    - - 21
+      - 3.0
+    - - 21
+      - 3.75
+    - - 22
+      - 1.0
+    - - 22
+      - 1.75
+    - - 22
+      - 3.0
+    - - 22
+      - 3.75
+    - - 23
+      - 1.0
+    - - 23
+      - 1.75
+    - - 23
+      - 3.0
+    - - 23
+      - 3.75
+    - - 24
+      - 1.0
+    - - 24
+      - 1.75
+    - - 24
+      - 3.0
+    - - 24
+      - 3.75
+    - - 25
+      - 1.0
+    - - 25
+      - 1.75
+    - - 25
+      - 3.0
+    - - 25
+      - 3.75
+    - - 26
+      - 1.0
+    - - 26
+      - 1.75
+    - - 26
+      - 3.0
+    - - 26
+      - 3.75
+    - - 27
+      - 1.0
+    - - 27
+      - 1.75
+    - - 27
+      - 3.0
+    - - 27
+      - 3.75
+    - - 28
+      - 1.0
+    - - 28
+      - 1.75
+    - - 28
+      - 3.0
+    - - 28
+      - 3.75
+    - - 29
+      - 1.0
+    - - 29
+      - 1.75
+    - - 29
+      - 3.0
+    - - 29
+      - 3.75
+    - - 30
+      - 1.0
+    - - 30
+      - 1.75
+    - - 30
+      - 3.0
+    - - 30
+      - 3.75
+    - - 31
+      - 1.0
+    - - 31
+      - 1.75
+    - - 31
+      - 3.0
+    - - 31
+      - 3.75
+    - - 32
+      - 1.0
+    - - 32
+      - 1.75
+    - - 32
+      - 3.0
+    - - 32
+      - 3.75
+    - - 33
+      - 1.0
+    - - 33
+      - 1.75
+    - - 33
+      - 3.0
+    - - 33
+      - 3.75
+    - - 34
+      - 1.0
+    - - 34
+      - 1.75
+    - - 34
+      - 3.0
+    - - 34
+      - 3.75
+    - - 35
+      - 1.0
+    - - 35
+      - 1.75
+    - - 35
+      - 3.0
+    - - 35
+      - 3.75
+    - - 36
+      - 1.0
+    - - 36
+      - 1.75
+    - - 36
+      - 3.0
+    - - 36
+      - 3.75
+    - - 37
+      - 1.0
+    - - 37
+      - 1.75
+    - - 37
+      - 3.0
+    - - 37
+      - 3.75
+    - - 38
+      - 1.0
+    - - 38
+      - 1.75
+    - - 38
+      - 3.0
+    - - 38
+      - 3.75
+    - - 39
+      - 1.0
+    - - 39
+      - 1.75
+    - - 39
+      - 3.0
+    - - 39
+      - 3.75
+    duration_beats: 0.22
+    octave: 3
+    velocity: 58
+    articulation: staccato
+    voicing: closed
+    humanize_ms: 5
+    humanize_velocity_pct: 5
+    instrument_velocity_offsets:
+      bubble_organ: 0
+      warm_epiano: -12
+  boss_bass_step:
+    kind: bassline
+    instrument: dub_bass
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+    - - 12
+      - 1.25
+      - 0.22
+    - - -2
+      - 1.75
+      - 0.34
+    - - 0
+      - 2.0
+      - 0.68
+    - - 7
+      - 3.0
+      - 0.32
+    - - 10
+      - 3.5
+      - 0.28
+    velocity: 78
+    articulation: marcato
+    humanize_ms: 4
+    humanize_velocity_pct: 5
+  picked_bass_click:
+    kind: bassline
+    instrument: picked_bass_shadow
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 0.3
+    - - -2
+      - 1.75
+      - 0.24
+    - - 0
+      - 2.0
+      - 0.35
+    - - 7
+      - 3.5
+      - 0.2
+    velocity: 45
+    articulation: staccato
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+  guitar_boss_hook:
+    kind: motif
+    instruments:
+    - lead_noodle_guitar
+    motif: rising_noodle_command
+    roots:
+    - A4
+    - D4
+    - E4
+    - D4
+    every_bars: 4
+    repeats: 10
+    starts:
+    - - 0
+      - 0.0
+    velocity: 80
+    articulation: normal
+    rhythm_scale: 1.0
+    pitch_scoop_cents: 8
+    humanize_ms: 8
+    humanize_velocity_pct: 7
+  guitar_solo_fire:
+    kind: motif
+    instruments:
+    - lead_noodle_guitar
+    - slide_answer_guitar
+    motif: deadhead_safe_solo
+    roots:
+    - A4
+    - D4
+    - E4
+    - A4
+    every_bars: 4
+    repeats: 8
+    starts:
+    - - 1
+      - 0.0
+    velocity: 82
+    articulation: normal
+    rhythm_scale: 0.82
+    instrument_octave_offsets:
+      lead_noodle_guitar: 0
+      slide_answer_guitar: -1
+    instrument_velocity_offsets:
+      lead_noodle_guitar: 0
+      slide_answer_guitar: -18
+    instrument_pitch_scoop_cents:
+      lead_noodle_guitar: 10
+      slide_answer_guitar: 16
+    humanize_ms: 9
+    humanize_velocity_pct: 8
+  amen_brass_hits:
+    kind: motif
+    instruments:
+    - brass_amen
+    - trombone_amen
+    motif: amen_stabs
+    roots:
+    - A3
+    - D3
+    - E3
+    - A3
+    every_bars: 4
+    repeats: 10
+    starts:
+    - - 2
+      - 2.0
+    velocity: 58
+    articulation: marcato
+    instrument_octave_offsets:
+      brass_amen: 0
+      trombone_amen: -1
+    instrument_velocity_offsets:
+      brass_amen: 0
+      trombone_amen: -6
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  rockers_boss_drums:
+    kind: drums
+    instrument: boss_kit
+    velocity: 76
+    humanize_ms: 4
+    humanize_velocity_pct: 6
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      - 3.0
+      velocity: 74
+    - drum: snare
+      beats:
+      - 2.0
+      velocity: 82
+    - drum: side_stick
+      beats:
+      - 1.5
+      - 3.5
+      velocity: 44
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 38
+    - drum: open_hat
+      beats:
+      - 3.75
+      velocity: 42
+    - drum: tambourine
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 36
+    - drum: conga_hi
+      beats:
+      - 0.75
+      - 2.75
+      velocity: 33
+    - drum: conga_low
+      beats:
+      - 1.25
+      - 3.25
+      velocity: 34
+    - drum: crash
+      beats:
+      - 0.0
+      velocity: 54
+      every: 8
+  dub_alarm_drums:
+    kind: drums
+    instrument: boss_kit
+    velocity: 70
+    humanize_ms: 3
+    humanize_velocity_pct: 5
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.75
+      - 2.0
+      - 3.0
+      velocity: 80
+    - drum: snare
+      beats:
+      - 2.0
+      - 3.5
+      velocity: 78
+    - drum: closed_hat
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      - 3.75
+      velocity: 36
+    - drum: ride
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 30
+    - drum: crash
+      beats:
+      - 0.0
+      velocity: 62
+      every: 4
+    - drum: china
+      beats:
+      - 3.75
+      velocity: 34
+      every: 8
+      offset: 7
+  guitar_solo_call:
+    kind: motif
+    instruments:
+    - lead_noodle_guitar
+    motif: overdrive_guitar_call_phrase
+    roots:
+    - A4
+    - D4
+    - E4
+    - A4
+    every_bars: 4
+    repeats: 8
+    starts:
+    - - 0
+      - 0.0
+    - - 2
+      - 0.0
+    velocity: 82
+    articulation: normal
+    rhythm_scale: 1.0
+    pitch_scoop_cents: 8
+    humanize_ms: 8
+    humanize_velocity_pct: 7
+    label: overdrive guitar call phrases for the boss solo battle
+  guitar_solo_response:
+    kind: motif
+    instruments:
+    - slide_answer_guitar
+    motif: steel_guitar_answer_phrase
+    roots:
+    - A4
+    - D4
+    - E4
+    - A4
+    every_bars: 4
+    repeats: 8
+    starts:
+    - - 1
+      - 0.0
+    - - 3
+      - 0.0
+    velocity: 74
+    articulation: normal
+    rhythm_scale: 1.0
+    pitch_scoop_cents: 22
+    humanize_ms: 10
+    humanize_velocity_pct: 8
+    label: steel guitar response phrases with a different timbre and no overlap
+  low_monk_intro_chorale_bass:
+    kind: motif
+    instrument: low_monk_oohs
+    motif: low_monk_intro_bass_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 76
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous legato bass monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
+    gate: 1.0
+  low_monk_intro_chorale_baritone:
+    kind: motif
+    instrument: low_monk_aahs
+    motif: low_monk_intro_baritone_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 64
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous legato baritone monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
+    gate: 1.0
+  low_monk_loop_chorale_bass:
+    kind: motif
+    instrument: low_monk_oohs
+    motif: low_monk_loop_bass_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 76
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous root-resolving low monk bass voice following loop harmony (gate 1.0: continuous without same-pitch
+      overlap)'
+    gate: 1.0
+  low_monk_loop_chorale_baritone:
+    kind: motif
+    instrument: low_monk_aahs
+    motif: low_monk_loop_baritone_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 64
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous fifth-resolving low baritone monk voice following loop harmony (gate 1.0: continuous without same-pitch
+      overlap)'
+    gate: 1.0
+  low_monk_solo_chorale_bass:
+    kind: motif
+    instrument: low_monk_oohs
+    motif: low_monk_solo_bass_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 76
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous root-resolving low monk bass voice following solo harmony (gate 1.0: continuous without same-pitch
+      overlap)'
+    gate: 1.0
+  low_monk_solo_chorale_baritone:
+    kind: motif
+    instrument: low_monk_aahs
+    motif: low_monk_solo_baritone_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 64
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous fifth-resolving low baritone monk voice following solo harmony (gate 1.0: continuous without same-pitch
+      overlap)'
+    gate: 1.0
+  low_monk_tag_chorale_bass:
+    kind: motif
+    instrument: low_monk_oohs
+    motif: low_monk_tag_bass_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 76
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous legato low monk bass voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
+    gate: 1.0
+  low_monk_tag_chorale_baritone:
+    kind: motif
+    instrument: low_monk_aahs
+    motif: low_monk_tag_baritone_chorale_v3
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 64
+    articulation: legato
+    rhythm_scale: 1.0
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    label: 'continuous legato low baritone monk voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
+    gate: 1.0
+playback:
+  mode: section_stem_matrix
+  intro: roots_boss_intro
+  loop_components:
+  - roots_boss_loop
+  - roots_boss_solo_loop
+  outro: roots_boss_tag
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 3
+    bridge_stems:
+    - bass
+    - skank
+    - holy_chant
+    fade_stems:
+    - jam_guitar
+    - keys
+    - brass
+    - drums
+state_map:
+  default:
+    section: roots_boss_loop
+    stems:
+      skank: 0.86
+      keys: 0.74
+      bass: 0.92
+      jam_guitar: 0.68
+      holy_chant: 0.7
+      brass: 0.42
+      drums: 0.88
+  solo:
+    preferred_section: roots_boss_solo_loop
+    stems:
+      skank: 0.82
+      keys: 0.7
+      bass: 0.94
+      jam_guitar: 0.88
+      holy_chant: 0.7
+      brass: 0.48
+      drums: 0.92
+  chant_high:
+    section: roots_boss_loop
+    stems:
+      skank: 0.72
+      keys: 0.62
+      bass: 0.82
+      jam_guitar: 0.56
+      holy_chant: 0.7
+      brass: 0.36
+      drums: 0.78
+sections:
+- id: roots_boss_intro
+  kind: intro
+  label: dread skank count-in with sacred choir answering from above
+  bars: 4
+  intensity: 0.72
+  density: 0.72
+  loopable: false
+  harmony:
+  - A7sus4
+  - A7
+  - D6
+  - E7
+  layers:
+  - skank_drive
+  - organ_bubble_fight
+  - boss_bass_step
+  - picked_bass_click
+  - low_monk_intro_chorale_bass
+  - low_monk_intro_chorale_baritone
+  - rockers_boss_drums
+- id: roots_boss_loop
+  kind: loop_component
+  label: roots-reggae boss groove with holy ramen call-response
+  bars: 32
+  intensity: 0.92
+  density: 0.88
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  - 24
+  - 32
+  harmony:
+  - A7sus4
+  - A7
+  - D6
+  - A7
+  - E7sus4
+  - D6
+  - A7
+  - E7
+  - A7
+  - D6
+  - A7/E
+  - A7
+  - D6
+  - A7
+  - E7sus4
+  - E7
+  - A7sus4
+  - A7
+  - D6
+  - A7
+  - E7
+  - D6
+  - A7
+  - E7
+  - D6
+  - A7
+  - E7
+  - A7
+  - D6
+  - A7/E
+  - E7
+  - A7
+  layers:
+  - skank_drive
+  - organ_bubble_fight
+  - boss_bass_step
+  - picked_bass_click
+  - low_monk_loop_chorale_bass
+  - low_monk_loop_chorale_baritone
+  - guitar_boss_hook
+  - amen_brass_hits
+  - rockers_boss_drums
+- id: roots_boss_solo_loop
+  kind: loop_component
+  label: call-and-response guitar sermon over a harder rockers/dub boss pocket
+  bars: 32
+  intensity: 1.0
+  density: 0.94
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  - 24
+  - 32
+  harmony:
+  - A7
+  - D6
+  - A7
+  - E7
+  - A7
+  - D6
+  - E7
+  - A7
+  - D6
+  - A7
+  - E7sus4
+  - E7
+  - A7
+  - D6
+  - A7/E
+  - A7
+  - A7sus4
+  - A7
+  - D6
+  - A7
+  - E7
+  - D6
+  - A7
+  - E7
+  - D6
+  - A7
+  - E7
+  - A7
+  - D6
+  - A7
+  - E7
+  - A7
+  layers:
+  - skank_drive
+  - organ_bubble_fight
+  - boss_bass_step
+  - picked_bass_click
+  - low_monk_solo_chorale_bass
+  - low_monk_solo_chorale_baritone
+  - guitar_solo_call
+  - guitar_solo_response
+  - amen_brass_hits
+  - dub_alarm_drums
+- id: roots_boss_tag
+  kind: outro
+  label: full-energy amen cadence that preserves loop momentum
+  bars: 4
+  intensity: 0.88
+  density: 0.84
+  loopable: false
+  harmony:
+  - D6
+  - A7/E
+  - E7
+  - A7
+  layers:
+  - skank_drive
+  - organ_bubble_fight
+  - boss_bass_step
+  - picked_bass_click
+  - low_monk_tag_chorale_bass
+  - low_monk_tag_chorale_baritone
+  - guitar_boss_hook
+  - amen_brass_hits
+  - rockers_boss_drums

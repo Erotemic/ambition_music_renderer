@@ -1,0 +1,192 @@
+schema: ambition.musicir.v1
+id: luddites_guild_loom_and_liberty
+title: Loom and Liberty - Luddites Guild Theme
+seed: 2026050919
+notes: >-
+  Luddites Guild faction loop. Historically sympathetic folk-industrial music:
+  dulcimer loom ostinato, fiddle solidarity tune, hand-drum work pulse, and
+  warm strings. The mood is craft, labor rights, and resistance to exploitation,
+  not anti-intellectual caricature.
+tempo:
+  bpm: 92
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.6
+  highpass_hz: 30
+  lowpass_hz: 9800
+  presence_low_hz: 1500
+  presence_high_hz: 3600
+  presence_db: 0.3
+  reverb_wet: 0.13
+  reverb_decay_seconds: 1.25
+  reverb_damping_hz: 5000
+  stereo_width: 0.14
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 110.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 6.0
+  limiter_drive: 0.98
+  normalize: true
+  target_peak_db: -7.0
+stem_postprocess:
+  highpass_hz: 28
+  reverb_wet: 0.05
+  reverb_decay_seconds: 0.78
+  reverb_damping_hz: 5200
+  stereo_width: 0.08
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: dulcimer, group: loom, program: dulcimer, volume: 70, pan: 42, expression: 82}
+  - {name: fiddle, group: fiddle, program: fiddle, volume: 64, pan: 76, expression: 80, modulation: 7}
+  - {name: accordion, group: squeeze, program: accordion, volume: 52, pan: 56, expression: 70}
+  - {name: warm_strings, group: strings, program: string_ensemble_1, volume: 44, pan: 50, expression: 64, modulation: 5}
+  - {name: acoustic_bass, group: bass, program: acoustic_bass, volume: 60, pan: 38, expression: 76}
+  - {name: hand_loom_kit, group: percussion, is_drum: true, volume: 52, pan: 64, expression: 82}
+motifs:
+  - id: liberty_tune
+    root: G4
+    intervals: [0, 2, 4, 7, 9, 7, 4, 2, 0]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 0.75, 0.25, 0.5, 0.5, 1.0]
+    velocities: [0.60, 0.56, 0.66, 0.76, 0.84, 0.58, 0.52, 0.48, 0.42]
+  - id: mill_answer
+    root: D4
+    intervals: [0, -2, -5, -7, -5, -2, 0, 2]
+    rhythm: [0.75, 0.25, 0.5, 0.75, 0.25, 0.5, 0.5, 1.0]
+    velocities: [0.52, 0.44, 0.58, 0.70, 0.52, 0.46, 0.50, 0.38]
+layer_templates:
+  warm_union_pad:
+    kind: pad_chords
+    instruments: [warm_strings, accordion]
+    instrument_velocity_offsets: {warm_strings: -6, accordion: -10}
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 34
+    articulation: pad
+    voicing: open
+    humanize_ms: 18
+    humanize_velocity_pct: 5
+  loom_ostinato:
+    kind: arpeggio
+    instrument: dulcimer
+    octave: 4
+    pattern: [0, 1, 2, 1, 3, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.34
+    velocity: 38
+    density: 0.82
+    articulation: pluck
+    humanize_ms: 7
+    humanize_velocity_pct: 8
+  worker_bass:
+    kind: bassline
+    instrument: acoustic_bass
+    octave: 2
+    pattern: [[0, 0.0, 0.9], [7, 2.0, 0.55], [12, 3.0, 0.45]]
+    velocity: 52
+    articulation: tenuto
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+  fiddle_liberty:
+    kind: motif
+    instruments: [fiddle, accordion]
+    motif: liberty_tune
+    root: G4
+    every_bars: 8
+    repeats: 4
+    starts: [[0, 0.0]]
+    velocity: 54
+    articulation: legato
+    instrument_velocity_offsets: {fiddle: 0, accordion: -8}
+    humanize_ms: 10
+    humanize_velocity_pct: 5
+  mill_reply:
+    kind: motif
+    instrument: dulcimer
+    motif: mill_answer
+    root: D4
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 42
+    articulation: pluck
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+  loom_pulse:
+    kind: drums
+    instrument: hand_loom_kit
+    velocity: 36
+    humanize_ms: 10
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0, 2.0], velocity: 34}
+      - {drum: woodblock_low, beats: [0.5, 1.5, 2.5, 3.5], velocity: 20}
+      - {drum: side_stick, beats: [1.0, 3.0], velocity: 24, probability: 0.65}
+      - {drum: tambourine, beats: [3.5], velocity: 18, probability: 0.38}
+playback:
+  mode: section_stem_matrix
+  loop_components: [loom_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [loom, fiddle, bass]
+    fade_stems: [squeeze, strings, percussion]
+state_map:
+  default:
+    section: loom_loop
+    stems: {loom: 0.78, fiddle: 0.72, squeeze: 0.52, strings: 0.48, bass: 0.68, percussion: 0.48}
+sections:
+  - id: loom_loop
+    kind: loop_component
+    label: luddites guild mill yard
+    bars: 32
+    intensity: 0.60
+    density: 0.68
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Gmaj9
+      - D/F#
+      - Em9
+      - Cmaj7
+      - G/B
+      - Am9
+      - D13
+      - Gmaj9
+      - Cmaj7
+      - G/B
+      - Am9
+      - D13
+      - Em9
+      - Cmaj7
+      - D13
+      - Gmaj9
+      - Gmaj9
+      - D/F#
+      - Em9
+      - Cmaj7
+      - G/B
+      - Am9
+      - D13
+      - Gmaj9
+      - Cmaj7
+      - G/B
+      - Am9
+      - D13
+      - Em9
+      - Cmaj7
+      - D13
+      - Gmaj9
+    layers: [warm_union_pad, loom_ostinato, worker_bass, fiddle_liberty, mill_reply, loom_pulse]

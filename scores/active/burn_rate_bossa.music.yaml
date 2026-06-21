@@ -1,0 +1,465 @@
+schema: ambition.musicir.v1
+id: burn_rate_bossa
+title: Burn Rate Bossa
+seed: 2026062034
+notes: 'New cue: sunny corporate bossa/elevator-villain music with a sinister undertone. It gives the tech biome
+  a lighter, ironic room tone instead of another aggressive synth track.'
+tempo:
+  bpm: 104
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 28
+  lowpass_hz: 10500
+  presence_low_hz: 1200
+  presence_high_hz: 5200
+  presence_db: 0.2
+  reverb_wet: 0.12
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 6500
+  stereo_width: 0.13
+  compressor_threshold_db: -17.5
+  compressor_ratio: 3.1
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 105.0
+  compressor_makeup_db: 1.4
+  compressor_knee_db: 5.5
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -3.2
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.4
+  reverb_damping_hz: 6500
+  stereo_width: 0.04
+  limiter_drive: 0.9
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: rhodes
+  group: mallets
+  program: electric_piano_1
+  volume: 66
+  pan: 58
+  expression: 78
+- name: nylon_guitar
+  group: strings
+  program: nylon_guitar
+  volume: 66
+  pan: 42
+  expression: 78
+- name: fretless
+  group: strings
+  program: fretless_bass
+  volume: 76
+  pan: 50
+  expression: 86
+- name: warm_pad
+  group: choir_pad
+  program: pad_warm
+  volume: 36
+  pan: 66
+  expression: 54
+  modulation: 5
+- name: vibes
+  group: mallets
+  program: vibraphone
+  volume: 46
+  pan: 78
+  expression: 62
+- name: flute
+  group: winds
+  program: flute
+  volume: 50
+  pan: 72
+  expression: 66
+- name: soft_brass
+  group: brass
+  program: muted_trumpet
+  volume: 52
+  pan: 48
+  expression: 66
+- name: kit
+  group: percussion
+  is_drum: true
+  volume: 68
+  pan: 64
+  expression: 90
+motifs:
+- id: smile_motif
+  root: E5
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.54
+  - 0.5
+  - 0.6
+  - 0.62
+  - 0.52
+  - 0.48
+  - 0.46
+  - 0.54
+- id: hold_music
+  root: B4
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 2
+  - 0
+  - -1
+  - 0
+  rhythm:
+  - 0.75
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 1.0
+  velocities:
+  - 0.5
+  - 0.42
+  - 0.48
+  - 0.44
+  - 0.46
+  - 0.4
+  - 0.52
+layer_templates:
+  elevator_pad:
+    kind: pad_chords
+    instruments:
+    - warm_pad
+    octave: 3
+    duration_beats: 4
+    velocity: 32
+    articulation: pad
+    voicing: wide
+    humanize_ms: 16
+  rhodes_comp:
+    kind: chord_hits
+    instruments:
+    - rhodes
+    octave: 4
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.5
+    - - 0
+      - 2.5
+    - - 0
+      - 3.5
+    - - 2
+      - 1.0
+    - - 2
+      - 2.5
+    duration_beats: 0.55
+    velocity: 44
+    articulation: normal
+    voicing: shell
+    humanize_ms: 14
+  guitar_bossa:
+    kind: chord_hits
+    instruments:
+    - nylon_guitar
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.0
+    - - 0
+      - 2.5
+    - - 0
+      - 3.0
+    - - 1
+      - 0.5
+    - - 1
+      - 2.0
+    - - 1
+      - 3.0
+    duration_beats: 0.28
+    velocity: 42
+    articulation: pluck
+    voicing: closed
+    humanize_ms: 10
+  bass_bossa:
+    kind: bassline
+    instrument: fretless
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.65
+    - - 7
+      - 1.5
+      - 0.45
+    - - 0
+      - 2.0
+      - 0.55
+    - - 10
+      - 3.5
+      - 0.35
+    velocity: 56
+    articulation: normal
+    humanize_ms: 10
+  bossa_kit:
+    kind: drums
+    instrument: kit
+    humanize_ms: 12
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 46
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 24
+    - drum: shaker
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 22
+    - drum: side_stick
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 34
+    - drum: agogo_hi
+      beats:
+      - 3.5
+      velocity: 30
+      probability: 0.45
+  flute_smile:
+    kind: motif
+    instrument: flute
+    motif: smile_motif
+    velocity: 42
+    articulation: normal
+    starts:
+    - - 0
+      - 0.5
+    repeats: 2
+    every_bars: 4
+    humanize_ms: 18
+  brass_hold:
+    kind: motif
+    instrument: soft_brass
+    motif: hold_music
+    velocity: 38
+    articulation: tenuto
+    starts:
+    - - 2
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    humanize_ms: 16
+  vibe_receipts:
+    kind: texture
+    instruments:
+    - vibes
+    root: E5
+    scale:
+    - 0
+    - 2
+    - 4
+    - 7
+    - 9
+    - 11
+    - 12
+    events_per_bar: 0.55
+    duration_beats: 0.35
+    velocity: 26
+    humanize_ms: 30
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - bossa_loop
+  - upsell_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems:
+    - strings
+    - mallets
+    - choir_pad
+    fade_stems:
+    - winds
+    - brass
+    - percussion
+state_map:
+  default:
+    section: bossa_loop
+    stems:
+      strings: 0.75
+      mallets: 0.75
+      choir_pad: 0.45
+      percussion: 0.55
+  combat:
+    section: upsell_loop
+    stems:
+      strings: 0.85
+      mallets: 0.85
+      choir_pad: 0.55
+      percussion: 0.75
+      winds: 0.65
+      brass: 0.5
+sections:
+- id: reception
+  kind: intro
+  bars: 4
+  intensity: 0.38
+  harmony:
+  - Em9
+  - A13
+  - Dmaj9
+  - B7
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp
+- id: bossa_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.52
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Em9
+  - A13
+  - Dmaj9
+  - B7
+  - Em9
+  - A13
+  - F#m7
+  - B7
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp
+  - guitar_bossa
+  - bossa_kit
+  - vibe_receipts
+- id: upsell_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.68
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Em9
+  - A13
+  - Dmaj9
+  - B7
+  - Gmaj7
+  - F#7
+  - Bm9
+  - B7
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp
+  - guitar_bossa
+  - bossa_kit
+  - flute_smile
+  - brass_hold
+  - vibe_receipts
+- id: hold_please
+  kind: bridge
+  bars: 8
+  intensity: 0.42
+  harmony:
+  - Gmaj7
+  - F#7
+  - Bm9
+  - E13
+  - Em9
+  - A13
+  - Dmaj9
+  - B7
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp
+  - vibe_receipts
+- id: premium_tier
+  kind: loop_component
+  bars: 8
+  intensity: 0.72
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Em9
+  - A13
+  - Dmaj9
+  - B7
+  - Em9
+  - F#7
+  - Bm9
+  - B7
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp
+  - guitar_bossa
+  - bossa_kit
+  - flute_smile
+  - brass_hold
+- id: please_hold
+  kind: outro
+  bars: 4
+  intensity: 0.34
+  harmony:
+  - Gmaj7
+  - F#7
+  - Bm9
+  - Em9
+  layers:
+  - elevator_pad
+  - bass_bossa
+  - rhodes_comp

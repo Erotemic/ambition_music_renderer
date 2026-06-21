@@ -1,0 +1,489 @@
+schema: ambition.musicir.v1
+id: series_a_bloodbath
+title: Series A Bloodbath - The Term Sheet Has Teeth
+seed: 71330027
+notes: >-
+  The venture-capital boss fight, rebuilt in 7/8 so it never sits comfortably.
+  C minor, 138 BPM, meter felt as 2+2+3 (beats_per_bar 3.5). The emotional shape
+  is the opposite of a quiet->build->climax arc: it is relentless PRESSURE the
+  whole way. There is no soft breakdown — even the thinned-out section (where
+  most cues relax) stays coiled and tense, a predator holding still. The cue
+  stalks, strikes, stalks tighter, then kills. Harmony stays modal and consonant
+  (no Neapolitan, no chromatic slides); the only bite is the harmonic-minor V (G)
+  at the strikes.
+
+  Stem groups (electronic, dark):
+    strings    -> warm pad + sub-bass (pad_warm, pad_poly, synth_bass_1)
+    winds      -> the predator leads (lead_saw + a grittier lead_charang)
+    brass      -> synth-brass strike stabs (synth_brass_1/2)
+    mallets    -> a 7-step sequencer (synth_bass_2) + cold fx_crystal
+    percussion -> heavy kit phrased in 2+2+3, kicks on the group starts
+    choir_pad  -> dread bed (fx_atmosphere + pad_metallic)
+  Form: coil -> stalk_a -> strike -> stalk_b (tense, not calm) -> kill -> snap.
+
+tempo:
+  bpm: 138
+meter:
+  beats_per_bar: 3.5
+  beat_unit: 8
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.024
+  reverb_decay_seconds: 0.68
+  reverb_damping_hz: 6200
+  stereo_width: 0.05
+  compressor_threshold_db: -17.0
+  compressor_ratio: 3.4
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.95
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.004
+  reverb_decay_seconds: 0.34
+  reverb_damping_hz: 6200
+  stereo_width: 0.035
+  limiter_drive: 0.93
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: pad_warm,     group: strings,    program: pad_warm,      volume: 78, pan: 70, expression: 90, modulation: 4}
+  - {name: pad_poly,     group: strings,    program: pad_poly,      volume: 72, pan: 56, expression: 84, modulation: 4}
+  - {name: sub_bass,     group: strings,    program: synth_bass_1,  volume: 100, pan: 64, expression: 102}
+
+  - {name: lead_saw,     group: winds,      program: lead_saw,      volume: 94, pan: 68, expression: 100, modulation: 6}
+  - {name: lead_grit,    group: winds,      program: lead_charang,  volume: 88, pan: 52, expression: 96,  modulation: 5}
+
+  - {name: synth_brass_a, group: brass,     program: synth_brass_1, volume: 92, pan: 72, expression: 100, modulation: 3}
+  - {name: synth_brass_b, group: brass,     program: synth_brass_2, volume: 86, pan: 48, expression: 96,  modulation: 3}
+
+  - {name: arp_synth,    group: mallets,    program: synth_bass_2,  volume: 86, pan: 60, expression: 96}
+  - {name: bell_synth,   group: mallets,    program: fx_crystal,    volume: 64, pan: 82, expression: 80}
+
+  - {name: atmos,        group: choir_pad,  program: fx_atmosphere, volume: 62, pan: 64, expression: 78, modulation: 4}
+  - {name: pad_metallic, group: choir_pad,  program: pad_metallic,  volume: 54, pan: 64, expression: 74, modulation: 3}
+
+  - {name: kit,          group: percussion, is_drum: true,          volume: 104, pan: 64, expression: 110}
+
+motifs:
+  # Stalk — a coiling 7-eighth phrase, accents on the 2+2+3 group starts.
+  # G4 Bb4 C5 Bb4 G4 F4 Eb4
+  - id: stalk
+    root: C5
+    intervals: [-5, -2, 0, -2, -5, -7, -9]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [1.00, 0.78, 0.94, 0.80, 0.92, 0.76, 0.82]
+
+  # Strike — a rising lunge, tops at Eb5, 7 eighths.
+  # G4 C5 Eb5 D5 C5 G4 Ab4
+  - id: strike
+    root: C5
+    intervals: [-5, 0, 3, 2, 0, -5, -4]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.92, 0.84, 1.00, 0.86, 0.90, 0.82, 0.86]
+
+  # Kill — reaches G5 once at the apex, then drops back.
+  # C5 Eb5 G5 F5 Eb5 C5 G4
+  - id: kill
+    root: C5
+    intervals: [0, 3, 7, 5, 3, 0, -5]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.95, 0.85, 1.00, 0.90, 0.88, 0.86, 0.84]
+
+  # Sub-bass stalk pulse — 2+2+3 (C, C, G held long). Sums to 3.5.
+  - id: sub_pulse
+    root: C1
+    intervals: [0, 0, 7]
+    rhythm:    [1.0, 1.0, 1.5]
+    velocities: [1.00, 0.86, 0.92]
+
+  # Sub-bass motion — C, Ab, G (bVI -> V). Sums to 3.5.
+  - id: sub_motion
+    root: C1
+    intervals: [0, 8, 7]
+    rhythm:    [1.0, 1.0, 1.5]
+    velocities: [1.00, 0.90, 0.94]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+      - {group: winds,     cc: expression, from: 70, to: 106, curve: smooth, points: 14}
+      - {group: brass,     cc: expression, from: 60, to: 104, curve: smooth, points: 14}
+      - {group: strings,   cc: expression, from: 70, to: 100, curve: smooth, points: 14}
+      - {group: mallets,   cc: expression, from: 70, to: 102, curve: smooth, points: 14}
+      - {group: choir_pad, cc: expression, from: 50, to: 84,  curve: smooth, points: 10}
+
+  sub_pulse_voice:
+    kind: motif
+    instrument: sub_bass
+    motif: sub_pulse
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  sub_motion_voice:
+    kind: motif
+    instrument: sub_bass
+    motif: sub_motion
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # 7-step sequencer fills the 7/8 bar (step 0.5 x 7).
+  arp_7:
+    kind: arpeggio
+    instrument: arp_synth
+    octave: 3
+    pattern: [0, 2, 1, 2, 0, 1, 2]
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 76
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  synth_pad:
+    kind: pad_chords
+    instruments: [pad_warm, pad_poly]
+    instrument_octave_offsets: {pad_warm: 0, pad_poly: 1}
+    instrument_velocity_offsets: {pad_warm: 0, pad_poly: -8}
+    octave: 3
+    duration_beats: 3.5
+    velocity: 66
+    articulation: pad
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  stalk_voice:
+    kind: motif
+    instrument: lead_saw
+    motif: stalk
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  strike_voice:
+    kind: motif
+    instrument: lead_grit
+    motif: strike
+    velocity: 90
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  kill_voice:
+    kind: motif
+    instrument: lead_saw
+    motif: kill
+    velocity: 94
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  brass_strike:
+    kind: chord_hits
+    instruments: [synth_brass_a, synth_brass_b]
+    instrument_octave_offsets: {synth_brass_a: 0, synth_brass_b: -1}
+    octave: 3
+    velocity: 90
+    duration_beats: 1.0
+    articulation: marcato
+    voicing: closed
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  brass_pad:
+    kind: pad_chords
+    instruments: [synth_brass_a, synth_brass_b]
+    instrument_octave_offsets: {synth_brass_a: 0, synth_brass_b: -1}
+    octave: 3
+    duration_beats: 3.5
+    velocity: 74
+    articulation: legato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  bell_sparkle:
+    kind: chord_hits
+    instrument: bell_synth
+    octave: 5
+    velocity: 70
+    duration_beats: 3.5
+    articulation: bell
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  atmos_wash:
+    kind: pad_chords
+    instrument: atmos
+    octave: 4
+    every_bars: 4
+    duration_beats: 14.0
+    velocity: 58
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  metallic_layer:
+    kind: pad_chords
+    instrument: pad_metallic
+    octave: 3
+    every_bars: 4
+    duration_beats: 14.0
+    velocity: 44
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # 2+2+3 stalk groove — kicks on the group starts (beats 0,1,2).
+  drums_stalk:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,           beats: [0.0, 1.0, 2.0],                 velocity: 90}
+      - {drum: electric_snare, beats: [1.0, 2.5],                      velocity: 76}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0], velocity: 28}
+      - {drum: low_tom,        beat: 3.0,                              velocity: 42, probability: 0.5}
+
+  # Strike groove — syncopated kick, tom pickup into the long group.
+  drums_strike:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,           beats: [0.0, 0.75, 2.0],                velocity: 92}
+      - {drum: electric_snare, beats: [1.0, 2.5],                      velocity: 80}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0], velocity: 26}
+      - {drum: open_hat,       beat: 1.5,                              velocity: 30}
+      - {drum: floor_tom,      beat: 3.0,                              velocity: 46}
+
+  # Kill groove — kick on every quarter (0,1,2,3), full pressure.
+  drums_kill:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,           beats: [0.0, 1.0, 2.0, 3.0],            velocity: 96}
+      - {drum: electric_snare, beats: [1.0, 2.5],                      velocity: 84}
+      - {drum: hand_clap,      beats: [1.0, 2.5],                      velocity: 48}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0], velocity: 36}
+      - {drum: floor_tom,      beat: 3.0,                              velocity: 48}
+      - {drum: crash,          beat: 0.0, velocity: 86, bars: [0, 4]}
+
+playback:
+  mode: section_stem_matrix
+  intro: coil
+  loop_components: [stalk_a, strike, stalk_b, kill]
+  outro: snap
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, choir_pad]
+    fade_stems: [winds, brass, mallets, percussion]
+
+state_map:
+  starting: {section: coil}
+
+  exploring:
+    preferred_section: stalk_a
+    stems: {strings: 1.0, mallets: 0.80, percussion: 0.65, winds: 0.55, brass: 0.0, choir_pad: 0.60}
+
+  hacking:
+    preferred_section: strike
+    stems: {strings: 1.0, mallets: 1.0, percussion: 0.85, winds: 0.70, brass: 0.45, choir_pad: 0.55}
+
+  # NOTE: ambushed stays TENSE here, not calm — thinned drive but high dread.
+  ambushed:
+    preferred_section: stalk_b
+    stems: {strings: 1.0, mallets: 0.70, percussion: 0.45, winds: 0.55, brass: 0.0, choir_pad: 0.95}
+
+  confrontation:
+    preferred_section: kill
+    stems: {strings: 1.0, mallets: 1.0, percussion: 1.0, winds: 1.0, brass: 1.0, choir_pad: 0.55}
+
+  retreating:
+    transition: outro_at_next_valid_exit_bar
+    outro: snap
+
+sections:
+  - id: coil
+    kind: intro
+    label: coil - the 7/8 limp establishes, low and patient
+    bars: 4
+    intensity: 0.56
+    density: 0.42
+    loopable: false
+    harmony: ["Cm", "Cm", "Ab", "G"]
+    postprocess:
+      reverb_wet: 0.058
+      reverb_decay_seconds: 1.05
+    layers:
+      - expression_swell
+      - {template: sub_pulse_voice, repeats: 4, velocity: 84}
+      - {template: arp_7, density: 1.0, velocity: 58}
+      - {template: synth_pad, velocity: 58}
+      - {template: atmos_wash, velocity: 50}
+      - {template: metallic_layer, velocity: 38}
+      - {template: bell_sparkle, hits: [[0, 0.0], [3, 0.0]], velocity: 60}
+
+  - id: stalk_a
+    kind: loop_component
+    label: stalk - the predator paces in 2+2+3
+    bars: 8
+    intensity: 0.72
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Cm", "Bb", "Ab", "Gm", "Cm", "Eb", "Fm", "G"]
+    layers:
+      - {template: stalk_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 88}
+      - {template: arp_7, density: 1.0, velocity: 76}
+      - {template: sub_pulse_voice, repeats: 8, velocity: 90}
+      - {template: synth_pad, velocity: 64}
+      - drums_stalk
+      - {template: atmos_wash, velocity: 54}
+      - {template: metallic_layer, velocity: 40}
+
+  - id: strike
+    kind: loop_component
+    label: strike - the lunge, brass stabs on the group starts
+    bars: 8
+    intensity: 0.84
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Cm", "Ab", "Bb", "G", "Cm", "Fm", "Bb", "G"]
+    layers:
+      - {template: strike_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 90}
+      - {template: stalk_voice, starts: [[1, 0.0], [3, 0.0], [5, 0.0], [7, 0.0]], velocity: 78}
+      - {template: arp_7, density: 1.0, velocity: 80}
+      - {template: sub_motion_voice, repeats: 8, velocity: 92}
+      - {template: synth_pad, velocity: 66}
+      - {template: brass_strike, hits: [[0, 0.0], [0, 2.0], [2, 0.0], [4, 0.0], [4, 2.0], [6, 0.0]], velocity: 84}
+      - drums_strike
+      - {template: bell_sparkle, hits: [[0, 0.0], [4, 0.0]], velocity: 60}
+      - {template: atmos_wash, velocity: 58}
+      - {template: metallic_layer, velocity: 42}
+
+  - id: stalk_b
+    kind: loop_component
+    label: stalk tighter - it holds still, coiled, dread high
+    bars: 8
+    intensity: 0.62
+    density: 0.46
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Fm", "Cm", "Ab", "G", "Fm", "Bb", "Eb", "G"]
+    postprocess:
+      reverb_wet: 0.030
+      reverb_decay_seconds: 0.72
+    layers:
+      - {template: stalk_voice, starts: [[0, 0.0], [4, 0.0]], velocity: 76}
+      - {template: arp_7, density: 0.85, velocity: 60}
+      - {template: sub_pulse_voice, repeats: 8, velocity: 82}
+      - {template: synth_pad, velocity: 64}
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: kick, beats: [0.0, 2.0], velocity: 64}
+          - {drum: side_stick, beats: [1.0, 2.5], velocity: 30}
+          - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0], velocity: 20}
+      - {template: atmos_wash, velocity: 78}
+      - {template: metallic_layer, velocity: 54}
+
+  - id: kill
+    kind: loop_component
+    label: kill - kick on every quarter, full pressure, the apex
+    bars: 8
+    intensity: 0.94
+    density: 0.86
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Cm", "Ab", "Bb", "G", "Cm", "Fm", "G", "Cm"]
+    postprocess:
+      reverb_wet: 0.055
+      reverb_decay_seconds: 1.05
+    layers:
+      - {template: kill_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 94}
+      - {template: strike_voice, starts: [[1, 0.0], [3, 0.0], [5, 0.0], [7, 0.0]], velocity: 84}
+      - {template: arp_7, density: 1.0, velocity: 84}
+      - {template: sub_pulse_voice, repeats: 8, velocity: 96}
+      - {template: synth_pad, velocity: 70}
+      - {template: brass_pad, velocity: 74}
+      - {template: brass_strike, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 90}
+      - drums_kill
+      - {template: bell_sparkle, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 70}
+      - {template: atmos_wash, velocity: 56}
+      - {template: metallic_layer, velocity: 42}
+
+  - id: snap
+    kind: outro
+    label: snap - the strike lands, abrupt
+    bars: 3
+    intensity: 0.62
+    density: 0.44
+    loopable: false
+    harmony: ["Cm", "G", "Cm"]
+    layers:
+      - {template: strike_voice, starts: [[0, 0.0]], velocity: 86}
+      - {template: arp_7, density: 0.7, velocity: 58}
+      - {template: sub_pulse_voice, repeats: 3, velocity: 84}
+      - {template: synth_pad, velocity: 62}
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: floor_tom, beats: [0.0, 1.0, 2.0], velocity: 44, bars: [1]}
+          - {drum: kick, beat: 0.0, velocity: 96, bars: [2]}
+          - {drum: crash, beat: 0.0, velocity: 86, bars: [2]}
+      - {template: brass_strike, hits: [[2, 0.0]], velocity: 90}
+      - {template: atmos_wash, velocity: 48}
+      - {template: metallic_layer, velocity: 36}
+
+group_postprocess:
+  strings:    {gain_db: 0.0,  lowpass_hz: 13000, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.05, reverb_wet: 0.005}
+  winds:      {gain_db: 1.0,  lowpass_hz: 12500, high_shelf_hz: 4800, high_shelf_db: 0.6, presence_low_hz: 1400, presence_high_hz: 5000, presence_db: 1.2, transient_tame: 0.03, reverb_wet: 0.005}
+  brass:      {gain_db: 0.0,  lowpass_hz: 11500, high_shelf_hz: 5000, high_shelf_db: 0.2, transient_tame: 0.05, reverb_wet: 0.005}
+  mallets:    {gain_db: -0.5, lowpass_hz: 12500, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.05, reverb_wet: 0.006}
+  percussion: {gain_db: -0.5, lowpass_hz: 11000, high_shelf_hz: 5200, high_shelf_db: 0.0, transient_tame: 0.04, reverb_wet: 0.003}
+  choir_pad:  {gain_db: -2.0, lowpass_hz: 10500, high_shelf_hz: 5200, high_shelf_db: -0.4, transient_tame: 0.05, reverb_wet: 0.013}

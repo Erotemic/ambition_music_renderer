@@ -1,0 +1,643 @@
+schema: ambition.musicir.v1
+id: first_goblin_encounter_orchestra
+title: First Goblin Encounter - Classic Adaptive Regression
+seed: 42024051
+notes: >-
+  Data-driven reproduction of the original goblin orchestra cue.  This version
+  restores the original motif shapes, percussion feel, section lengths, and
+  orchestration profile while keeping the MusicIR section x stem export model.
+tempo:
+  bpm: 132
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.21
+  reverb_decay_seconds: 1.65
+  reverb_damping_hz: 7600
+  stereo_width: 0.15
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 1.12
+  normalize: true
+  target_peak_db: -1.0
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.055
+  reverb_decay_seconds: 1.1
+  reverb_damping_hz: 7000
+  stereo_width: 0.06
+  limiter_drive: 1.02
+  normalize: false
+  target_peak_db: -2.5
+instruments:
+  - {name: violins_i,    group: strings,    program: string_ensemble_1, volume: 100, pan: 78, expression: 94, modulation: 18}
+  - {name: violins_ii,   group: strings,    program: string_ensemble_2, volume: 94,  pan: 42, expression: 88, modulation: 12}
+  - {name: violas,       group: strings,    program: viola,             volume: 92,  pan: 54, expression: 88, modulation: 10}
+  - {name: celli,        group: strings,    program: cello,             volume: 98,  pan: 36, expression: 90, modulation: 8}
+  - {name: contrabass,   group: strings,    program: contrabass,        volume: 104, pan: 30, expression: 88, modulation: 5}
+
+  - {name: horns,        group: brass,      program: french_horn,       volume: 104, pan: 72, expression: 92, modulation: 10}
+  - {name: trumpets,     group: brass,      program: trumpet,           volume: 96,  pan: 84, expression: 88, modulation: 6}
+  - {name: trombones,    group: brass,      program: trombone,          volume: 104, pan: 44, expression: 90, modulation: 4}
+  - {name: tuba,         group: brass,      program: tuba,              volume: 102, pan: 34, expression: 88}
+  - {name: brass_section, group: brass,     program: brass_section,     volume: 88,  pan: 64, expression: 84, modulation: 4}
+
+  - {name: flute,        group: winds,      program: flute,             volume: 82,  pan: 82, expression: 86, modulation: 12}
+  - {name: oboe,         group: winds,      program: oboe,              volume: 88,  pan: 73, expression: 88, modulation: 7}
+  - {name: english_horn, group: winds,      program: english_horn,      volume: 82,  pan: 48, expression: 86, modulation: 7}
+  - {name: clarinet,     group: winds,      program: clarinet,          volume: 88,  pan: 55, expression: 88, modulation: 7}
+  - {name: bassoon,      group: winds,      program: bassoon,           volume: 92,  pan: 38, expression: 88, modulation: 4}
+
+  - {name: choir,        group: choir_pad,  program: choir_aahs,        volume: 78,  pan: 64, expression: 78, modulation: 14}
+  - {name: pad_subtle,   group: choir_pad,  program: pad_bowed,         volume: 60,  pan: 64, expression: 72, modulation: 18}
+
+  - {name: harp,         group: mallets,    program: orchestral_harp,   volume: 84,  pan: 70, expression: 88}
+  - {name: marimba,      group: mallets,    program: marimba,           volume: 78,  pan: 78, expression: 88}
+  - {name: xylophone,    group: mallets,    program: xylophone,         volume: 82,  pan: 85, expression: 92}
+
+  - {name: timpani,      group: percussion, program: timpani,           volume: 100, pan: 52, expression: 92}
+  - {name: war_drums,    group: percussion, is_drum: true,              volume: 96,  pan: 64, expression: 100}
+
+motifs:
+  - id: goblin_normal
+    root: D4
+    intervals: [0, 3, 2, -1, 0, 6, 5, 3]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 1.0]
+    velocities: [1.00, 0.96, 0.90, 1.00, 0.96, 0.90, 1.00, 0.96]
+  - id: goblin_heavy
+    root: D3
+    intervals: [0, 0, -2, 3, 5, 3, 0, -5]
+    rhythm: [0.5, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 0.5]
+    velocities: [1.00, 0.96, 0.90, 1.00, 0.96, 0.90, 1.00, 0.96]
+  - id: goblin_panic
+    root: D5
+    intervals: [0, 3, 6, 5, 3, 2, -1, 0, 8, 6]
+    rhythm: [0.25, 0.25, 0.5, 0.25, 0.25, 0.5, 0.5, 0.25, 0.25, 1.0]
+    velocities: [1.00, 0.96, 0.90, 1.00, 0.96, 0.90, 1.00, 0.96, 0.92, 0.88]
+  - id: goblin_inverted
+    root: D4
+    intervals: [0, -3, -2, 1, 0, -6, -5, -3]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 1.0]
+    velocities: [1.00, 0.96, 0.90, 1.00, 0.96, 0.90, 1.00, 0.96]
+  - id: hero_answer
+    root: D4
+    intervals: [0, 5, 7, 10, 9, 7, 5, 3]
+    rhythm: [0.75, 0.25, 0.5, 0.75, 0.25, 0.5, 0.5, 0.5]
+    velocities: [1.00, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    group: strings
+    automation:
+      - {group: strings, cc: expression, from: 80, to: 105, curve: smooth, points: 12}
+      - {group: brass, cc: expression, from: 76, to: 104, curve: smooth, points: 12}
+      - {group: choir_pad, cc: expression, from: 68, to: 100, curve: smooth, points: 12}
+
+  strings_long_high:
+    kind: pad_chords
+    instrument: violins_i
+    octave: 4
+    duration_beats: 4.0
+    velocity: 58
+    articulation: legato
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  violas_long:
+    kind: pad_chords
+    instrument: violas
+    octave: 3
+    duration_beats: 4.0
+    velocity: 52
+    articulation: legato
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  celli_long:
+    kind: pad_chords
+    instrument: celli
+    octave: 2
+    duration_beats: 4.0
+    velocity: 54
+    articulation: legato
+    voicing: open
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  choir_long:
+    kind: pad_chords
+    instrument: choir
+    octave: 3
+    duration_beats: 4.0
+    velocity: 42
+    articulation: pad
+    voicing: open
+    humanize_ms: 11
+    humanize_velocity_pct: 3
+  horns_long:
+    kind: pad_chords
+    instrument: horns
+    octave: 3
+    duration_beats: 2.0
+    velocity: 56
+    articulation: tenuto
+    voicing: closed
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+
+  classic_string_ostinato:
+    kind: arpeggio
+    instruments: [violins_ii, violas]
+    instrument_octave_offsets: {violins_ii: 1, violas: 0}
+    instrument_velocity_offsets: {violins_ii: 0, violas: -8}
+    octave: 3
+    pattern: [0, 2, 1, 2, 0, 1, 2, 3]
+    step: 0.5
+    duration_beats: 0.5
+    velocity: 58
+    density: 1.0
+    articulation: spiccato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  panic_string_ostinato:
+    kind: arpeggio
+    instruments: [violins_ii, violas]
+    instrument_octave_offsets: {violins_ii: 1, violas: 0}
+    instrument_velocity_offsets: {violins_ii: 0, violas: -8}
+    octave: 3
+    pattern: [0, 2, 4, 2, 0, 3, 2, 1]
+    step: 0.25
+    duration_beats: 0.25
+    velocity: 62
+    density: 0.82
+    articulation: spiccato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  classic_bass_pulse:
+    kind: bassline
+    instrument: contrabass
+    octave: 2
+    velocity: 76
+    articulation: marcato
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+    pattern:
+      - [0, 0.0, 0.75]
+      - [7, 1.5, 0.5]
+      - [12, 2.5, 0.5]
+      - [7, 3.25, 0.45]
+  timpani_roots:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 78
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    hits:
+      - [0, 0.0, 0, 0.75]
+      - [0, 2.5, 7, 0.55]
+
+  classic_percussion:
+    kind: drums
+    instrument: war_drums
+    humanize_ms: 0.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beat: 0.0, velocity: 78}
+      - {drum: snare, beat: 2.0, velocity: 68, every: 2, offset: 1}
+      - {drum: low_tom, beats: [1.0, 1.75, 3.0], velocity: 58, probability: 0.62}
+      - {drum: shaker, beats: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 36, probability: 0.36}
+  heavy_percussion:
+    kind: drums
+    instrument: war_drums
+    humanize_ms: 0.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beat: 0.0, velocity: 88}
+      - {drum: snare, beat: 2.0, velocity: 78}
+      - {drum: low_tom, beats: [1.0, 1.75, 3.0], velocity: 70, probability: 0.82}
+      - {drum: shaker, beats: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 42, probability: 0.50}
+      - {drum: crash, beat: 0.0, velocity: 94, bars: [0]}
+
+  mallet_harp_classic:
+    kind: arpeggio
+    instruments: [marimba]
+    octave: 4
+    pattern: [0, 1, 2, 3, 2, 1]
+    step: 0.5
+    duration_beats: 0.25
+    velocity: 52
+    density: 0.72
+    articulation: staccato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  harp_marks:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern: [0, 2, 1, 3, 4]
+    step: 0.28
+    duration_beats: 1.0
+    velocity: 50
+    density: 0.35
+    articulation: normal
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+
+  brass_hits_classic:
+    kind: chord_hits
+    instruments: [trumpets, trombones]
+    octave: 3
+    velocity: 86
+    duration_beats: 0.8
+    articulation: marcato
+    voicing: closed
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+    hits: [[0, 0.0], [4, 0.0], [8, 0.0]]
+  tuba_roots:
+    kind: root_hits
+    instrument: tuba
+    octave: 2
+    velocity: 84
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+    hits: [[0, 0.0, -12, 1.0], [4, 0.0, -12, 1.0], [8, 0.0, -12, 1.0]]
+
+  atmosphere_pad:
+    kind: pad_chords
+    instrument: pad_subtle
+    octave: 3
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 34
+    articulation: pad
+    voicing: wide
+    humanize_ms: 20
+    humanize_velocity_pct: 3
+
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components: [wave1, wave2, wave3, recap_loop]
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 8
+    bridge_stems: [strings, winds]
+    fade_stems: [brass, percussion, choir_pad, mallets]
+state_map:
+  starting: {section: intro}
+  wave_1:
+    preferred_section: wave1
+    stems: {strings: 1.0, winds: 0.85, mallets: 0.45, percussion: 0.38, brass: 0.22, choir_pad: 0.0}
+  wave_2:
+    preferred_section: wave2
+    stems: {strings: 1.0, winds: 0.95, mallets: 0.65, percussion: 0.72, brass: 0.55, choir_pad: 0.22}
+  large_brute_spawned:
+    fade_in: {brass: 0.95, choir_pad: 0.55, percussion: 0.85}
+    fade_beats: 4
+  wave_3:
+    preferred_section: wave3
+    stems: {strings: 1.0, winds: 0.65, mallets: 0.5, percussion: 0.95, brass: 1.0, choir_pad: 0.75}
+  long_active_fallback: {preferred_section: recap_loop}
+  cleared:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+
+sections:
+  - id: intro
+    kind: intro
+    label: doors slam; the arena breathes
+    bars: 4
+    intensity: 0.34
+    density: 0.28
+    loopable: false
+    harmony: ["Dm(add9)", "Bbmaj7(#11)", "Gm9", "A7"]
+    # Intimate ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.30
+    layers:
+      - expression_swell
+      - {template: strings_long_high, velocity: 50}
+      - {template: violas_long, velocity: 45}
+      - {template: celli_long, velocity: 47}
+      - {template: atmosphere_pad, velocity: 28}
+      - kind: motif
+        instruments: [bassoon, clarinet]
+        motif: goblin_heavy
+        root: D3
+        starts: [[1, 0.5]]
+        velocity: 54
+        articulation: marcato
+        instrument_velocity_offsets: {bassoon: 0, clarinet: -8}
+        instrument_pitch_scoop_cents: {bassoon: 2, clarinet: 2}
+      - kind: arpeggio
+        instrument: harp
+        octave: 4
+        pattern: [0, 2, 1, 3]
+        step: 0.28
+        duration_beats: 1.0
+        velocity: 52
+        density: 0.22
+        articulation: normal
+      - kind: drums
+        instrument: war_drums
+        humanize_ms: 0.0
+        events:
+          - {drum: concert_bass_drum, bars: [0, 2], beat: 0.0, velocity: 60}
+          - {drum: triangle, bars: [0, 2], beat: 3.5, velocity: 34}
+
+  - id: wave1
+    kind: loop_component
+    label: wave 1 - flank the doorway
+    bars: 8
+    intensity: 0.58
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Dm", "Bbmaj7", "C", "A7", "Dm", "F", "Gm", "A7"]
+    layers:
+      - expression_swell
+      - strings_long_high
+      - violas_long
+      - celli_long
+      - {template: horns_long, velocity: 56}
+      - classic_string_ostinato
+      - classic_bass_pulse
+      - timpani_roots
+      - classic_percussion
+      - kind: motif
+        instruments: [oboe, clarinet]
+        motif: goblin_normal
+        root: D4
+        starts: [[0, 0.0], [2, 0.0], [5, 0.0]]
+        velocity: 66
+        articulation: staccato
+        instrument_velocity_offsets: {oboe: 0, clarinet: -8}
+        instrument_pitch_scoop_cents: {oboe: 2, clarinet: 2}
+      - kind: motif
+        instruments: [horns, celli, violins_i]
+        motif: hero_answer
+        root: D4
+        starts: [[6, 0.0]]
+        velocity: 68
+        articulation: tenuto
+        instrument_octave_offsets: {horns: 0, celli: -1, violins_i: 1}
+        instrument_velocity_offsets: {horns: 0, celli: -12, violins_i: -15}
+        instrument_pitch_scoop_cents: {horns: 1.5}
+      - {template: mallet_harp_classic, every: 2, offset: 0}
+      - {template: harp_marks, every: 7, offset: 0}
+      - {template: brass_hits_classic, hits: [[0, 0.0], [7, 0.0]]}
+      - {template: tuba_roots, hits: [[0, 0.0, -12, 1.0], [7, 0.0, -12, 1.0]]}
+      - kind: motif
+        instrument: flute
+        motif: hero_answer
+        root: D5
+        starts: [[1, 2.0], [4, 2.0]]
+        velocity: 48
+        articulation: legato
+      - atmosphere_pad
+
+  - id: wave2
+    kind: loop_component
+    label: wave 2 - goblins plus a heavy reinforcement
+    bars: 12
+    intensity: 0.78
+    density: 0.82
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12]
+    reinforcement_bar: 6
+    harmony: ["Dm", "C", "Bb", "A7", "Gm", "F", "C#dim7", "A7", "Dm", "Ebmaj7", "Bb", "A7"]
+    layers:
+      - expression_swell
+      - strings_long_high
+      - violas_long
+      - celli_long
+      - choir_long
+      - {template: horns_long, velocity: 61}
+      - panic_string_ostinato
+      - {template: classic_bass_pulse, velocity: 85}
+      - {template: timpani_roots, velocity: 82}
+      - heavy_percussion
+      - kind: motif
+        instruments: [xylophone, oboe, flute]
+        motif: goblin_panic
+        root: D5
+        starts: [[0, 0.0], [2, 0.0], [4, 0.0], [8, 0.0]]
+        velocity: 70
+        articulation: staccato
+        instrument_octave_offsets: {flute: 1}
+        instrument_velocity_offsets: {xylophone: 0, oboe: -8, flute: -16}
+        instrument_pitch_scoop_cents: {oboe: 2}
+      - kind: drums
+        instrument: war_drums
+        humanize_ms: 0.0
+        events:
+          - {drum: crash, bars: [6], beat: 0.0, velocity: 102}
+      - kind: root_hits
+        instrument: timpani
+        hits: [[6, 0.0, 0, 1.0]]
+        octave: 2
+        velocity: 105
+        articulation: marcato
+      - kind: chord_hits
+        instrument: trombones
+        hits: [[6, 0.0]]
+        octave: 3
+        velocity: 98
+        duration_beats: 1.5
+        articulation: marcato
+        voicing: closed
+      - kind: motif
+        instruments: [trombones, bassoon]
+        motif: goblin_heavy
+        root: D3
+        starts: [[6, 1.5]]
+        velocity: 86
+        articulation: marcato
+        instrument_velocity_offsets: {trombones: 0, bassoon: -8}
+        instrument_pitch_scoop_cents: {bassoon: 2}
+      - kind: motif
+        instruments: [horns, celli, violins_i]
+        motif: hero_answer
+        root: D4
+        starts: [[10, 0.0]]
+        velocity: 78
+        articulation: tenuto
+        instrument_octave_offsets: {horns: 0, celli: -1, violins_i: 1}
+        instrument_velocity_offsets: {horns: 0, celli: -12, violins_i: -15}
+        instrument_pitch_scoop_cents: {horns: 1.5}
+      - {template: mallet_harp_classic, density: 1.0, velocity: 65}
+      - {template: harp_marks, density: 0.4}
+      - {template: brass_hits_classic, hits: [[0,0], [4,0], [8,0], [11,0]]}
+      - {template: tuba_roots, hits: [[0,0,-12,1], [4,0,-12,1], [8,0,-12,1], [11,0,-12,1]]}
+      - atmosphere_pad
+
+  - id: wave3
+    kind: loop_component
+    label: wave 3 - heavy duo
+    bars: 12
+    intensity: 0.94
+    density: 0.98
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12]
+    harmony: ["Dm", "C#dim7", "Dm", "F", "Bb", "Gm", "A7", "A7", "Dm", "Ebmaj7", "Gm9", "A7"]
+    # Cathedral ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.40
+    layers:
+      - expression_swell
+      - strings_long_high
+      - violas_long
+      - celli_long
+      - choir_long
+      - {template: horns_long, velocity: 64}
+      - {template: panic_string_ostinato, density: 1.0, velocity: 72}
+      - {template: classic_bass_pulse, velocity: 92}
+      - {template: timpani_roots, velocity: 88}
+      - heavy_percussion
+      - kind: motif
+        instruments: [trombones, trumpets]
+        motif: goblin_heavy
+        root: D4
+        starts: [[0,0], [4,0], [8,0]]
+        velocity: 92
+        articulation: marcato
+        instrument_octave_offsets: {trumpets: 1}
+        instrument_velocity_offsets: {trombones: 0, trumpets: -8}
+      - kind: motif
+        instruments: [horns, celli, violins_i]
+        motif: hero_answer
+        root: D4
+        starts: [[2,0], [6,0], [10,0]]
+        velocity: 86
+        articulation: tenuto
+        instrument_octave_offsets: {horns: 0, celli: -1, violins_i: 1}
+        instrument_velocity_offsets: {horns: 0, celli: -12, violins_i: -15}
+        instrument_pitch_scoop_cents: {horns: 1.5}
+      - {template: mallet_harp_classic, density: 1.0, velocity: 70}
+      - {template: brass_hits_classic, hits: [[0,0], [4,0], [8,0], [11,0], [2,2.5], [6,2.5], [10,2.5]]}
+      - {template: tuba_roots, hits: [[0,0,-12,1], [4,0,-12,1], [8,0,-12,1], [11,0,-12,1]]}
+      - atmosphere_pad
+
+  - id: recap_loop
+    kind: loop_component
+    label: loop recap - goblin joke turns back into danger
+    bars: 8
+    intensity: 0.66
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Dm", "Bbmaj7", "C", "A7", "Dm", "Gm9", "Bb", "A7"]
+    # Drier, more intimate ambience.
+    postprocess:
+      reverb_wet: 0.025
+      reverb_decay_seconds: 0.70
+    layers:
+      - expression_swell
+      - strings_long_high
+      - violas_long
+      - celli_long
+      - {template: horns_long, velocity: 54}
+      - {template: classic_string_ostinato, density: 0.62}
+      - classic_bass_pulse
+      - {template: timpani_roots, velocity: 76}
+      - classic_percussion
+      - kind: motif
+        instruments: [clarinet, oboe]
+        motif: goblin_inverted
+        root: D4
+        starts: [[0,0]]
+        velocity: 64
+        articulation: staccato
+        instrument_velocity_offsets: {clarinet: 0, oboe: -8}
+        instrument_pitch_scoop_cents: {clarinet: 2, oboe: 2}
+      - kind: motif
+        instruments: [horns, celli, violins_i]
+        motif: hero_answer
+        root: D4
+        starts: [[2,0]]
+        velocity: 72
+        articulation: tenuto
+        instrument_octave_offsets: {horns: 0, celli: -1, violins_i: 1}
+        instrument_velocity_offsets: {horns: 0, celli: -12, violins_i: -15}
+        instrument_pitch_scoop_cents: {horns: 1.5}
+      - kind: motif
+        instruments: [xylophone, flute]
+        motif: goblin_normal
+        root: D5
+        starts: [[5,0]]
+        velocity: 58
+        articulation: staccato
+        instrument_octave_offsets: {flute: 1}
+        instrument_velocity_offsets: {xylophone: 0, flute: -8}
+      - {template: mallet_harp_classic, every: 2, offset: 0}
+      - {template: harp_marks, density: 0.55}
+      - atmosphere_pad
+
+  - id: outro
+    kind: outro
+    label: clear tag - the room exhales
+    bars: 8
+    intensity: 0.50
+    density: 0.32
+    loopable: false
+    harmony: ["Dm", "Bbmaj7(#11)", "F/A", "Gm9", "Bb", "A7sus4", "Dm(add9)", "Dm(add9)"]
+    layers:
+      - kind: automation
+        group: strings
+        automation:
+          - {group: strings, cc: expression, from: 105, to: 58, curve: smooth, points: 12}
+          - {group: brass, cc: expression, from: 92, to: 50, curve: smooth, points: 12}
+          - {group: choir_pad, cc: expression, from: 94, to: 52, curve: smooth, points: 12}
+      - {template: strings_long_high, velocity: 52}
+      - {template: violas_long, velocity: 48}
+      - {template: celli_long, velocity: 50}
+      - {template: choir_long, velocity: 38}
+      - kind: motif
+        instrument: horns
+        motif: hero_answer
+        root: D4
+        starts: [[0,0]]
+        velocity: 70
+        articulation: tenuto
+      - kind: drums
+        instrument: war_drums
+        humanize_ms: 0.0
+        events:
+          - {drum: concert_bass_drum, bars: [0], beat: 0.0, velocity: 100}
+          - {drum: crash, bars: [0], beat: 0.0, velocity: 90}
+          - {drum: low_tom, bars: [2, 5], beat: 0.0, velocity: 52}
+      - atmosphere_pad
+
+group_postprocess:
+  strings: {gain_db: 0.0, reverb_wet: 0.055}
+  winds: {gain_db: -0.4, reverb_wet: 0.045, transient_tame: 0.05}
+  mallets: {gain_db: -1.2, reverb_wet: 0.03, transient_tame: 0.12}
+  percussion: {gain_db: -0.6, reverb_wet: 0.025, transient_tame: 0.04}
+  brass: {gain_db: -0.2, reverb_wet: 0.05}
+  choir_pad: {gain_db: -0.4, reverb_wet: 0.06}

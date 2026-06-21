@@ -1,0 +1,215 @@
+schema: ambition.musicir.v1
+id: artists_guild_chiaroscuro
+title: Chiaroscuro Atelier - Artists Guild Theme
+seed: 2026050921
+notes: >-
+  Revised Artists Guild faction loop. The earlier draft leaned too hard on
+  altered color tones; this version stays warmly consonant and memorable:
+  a singable 6/8 gallery theme, harp brushstrokes, pizzicato underpainting,
+  soft strings, flute and oboe in parallel, and only gentle add9/6 colors.
+tempo:
+  bpm: 96
+meter:
+  beats_per_bar: 6
+  beat_unit: 8
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 30
+  lowpass_hz: 11200
+  high_shelf_hz: 6200
+  high_shelf_db: -0.4
+  reverb_wet: 0.16
+  reverb_decay_seconds: 1.7
+  reverb_damping_hz: 5700
+  stereo_width: 0.20
+  compressor_threshold_db: -18.5
+  compressor_ratio: 2.3
+  compressor_attack_ms: 16.0
+  compressor_release_ms: 130.0
+  compressor_makeup_db: 0.8
+  compressor_knee_db: 6.0
+  limiter_drive: 0.96
+  normalize: true
+  target_peak_db: -7.0
+stem_postprocess:
+  highpass_hz: 28
+  reverb_wet: 0.07
+  reverb_decay_seconds: 1.05
+  reverb_damping_hz: 5600
+  stereo_width: 0.10
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: warm_strings, group: strings, program: string_ensemble_1, volume: 56, pan: 44, expression: 74, modulation: 8}
+  - {name: pizz_canvas, group: pluck, program: pizzicato_strings, volume: 50, pan: 36, expression: 72}
+  - {name: harp, group: harp, program: orchestral_harp, volume: 58, pan: 74, expression: 78}
+  - {name: flute, group: winds, program: flute, volume: 60, pan: 78, expression: 80, modulation: 5}
+  - {name: oboe, group: winds, program: oboe, volume: 54, pan: 58, expression: 76, modulation: 5}
+  - {name: glockenspiel, group: glimmer, program: glockenspiel, volume: 34, pan: 84, expression: 58}
+  - {name: cello, group: bass, program: cello, volume: 52, pan: 38, expression: 74}
+  - {name: soft_frame_drum, group: percussion, is_drum: true, volume: 38, pan: 64, expression: 72}
+motifs:
+  - id: open_canvas_hook
+    root: C5
+    intervals: [0, 2, 4, 7, 9, 7, 5, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.75, 0.25, 0.5, 1.0]
+    velocities: [0.58, 0.54, 0.62, 0.78, 0.66, 0.58, 0.56, 0.50, 0.48, 0.40]
+  - id: gallery_smile_reply
+    root: G4
+    intervals: [0, 2, 4, 5, 7, 5, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 1.5]
+    velocities: [0.50, 0.48, 0.54, 0.58, 0.68, 0.52, 0.48, 0.44, 0.34]
+layer_templates:
+  gallery_pad:
+    kind: pad_chords
+    instruments: [warm_strings]
+    octave: 3
+    every_bars: 1
+    duration_beats: 6.0
+    velocity: 32
+    articulation: pad
+    voicing: wide
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+  cello_underpainting:
+    kind: bassline
+    instrument: cello
+    octave: 2
+    pattern: [[0, 0.0, 1.5], [7, 2.0, 1.0], [12, 4.0, 1.0]]
+    velocity: 42
+    articulation: tenuto
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+  pizz_easel:
+    kind: ostinato
+    instruments: [pizz_canvas]
+    octave: 3
+    intervals: [0, 7, 12, 7, 5, 7]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 0.5, 3.0]
+    velocity: 32
+    articulation: pluck
+    humanize_ms: 10
+    humanize_velocity_pct: 5
+  harp_brushstrokes:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern: [0, 2, 1, 2, 3, 2]
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 34
+    density: 0.70
+    articulation: normal
+    voicing: open
+    humanize_ms: 16
+    humanize_velocity_pct: 6
+  tiny_gold_leaf:
+    kind: arpeggio
+    instrument: glockenspiel
+    octave: 6
+    pattern: [0, 1, 2, 1]
+    step: 1.5
+    duration_beats: 0.55
+    velocity: 20
+    density: 0.30
+    articulation: bell
+    humanize_ms: 20
+    humanize_velocity_pct: 7
+  canvas_hook:
+    kind: motif
+    instruments: [flute, oboe]
+    motif: open_canvas_hook
+    root: C5
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 54
+    articulation: legato
+    instrument_velocity_offsets: {flute: 2, oboe: -8}
+    instrument_octave_offsets: {flute: 0, oboe: -1}
+    humanize_ms: 16
+    humanize_velocity_pct: 4
+  smile_answer:
+    kind: motif
+    instrument: flute
+    motif: gallery_smile_reply
+    root: G4
+    every_bars: 8
+    repeats: 4
+    starts: [[2, 0.0]]
+    velocity: 42
+    articulation: legato
+    humanize_ms: 14
+    humanize_velocity_pct: 4
+  frame_pulse:
+    kind: drums
+    instrument: soft_frame_drum
+    velocity: 22
+    humanize_ms: 14
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0], velocity: 24}
+      - {drum: side_stick, beats: [3.0], velocity: 18}
+      - {drum: shaker, beats: [1.5, 4.5], velocity: 12, probability: 0.45}
+playback:
+  mode: section_stem_matrix
+  loop_components: [gallery_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [harp, strings, winds]
+    fade_stems: [pluck, glimmer, bass, percussion]
+state_map:
+  default:
+    section: gallery_loop
+    stems: {strings: 0.62, pluck: 0.46, harp: 0.72, winds: 0.72, glimmer: 0.34, bass: 0.48, percussion: 0.26}
+sections:
+  - id: gallery_loop
+    kind: loop_component
+    label: artists guild golden gallery
+    bars: 32
+    intensity: 0.58
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Cadd9
+      - G6
+      - Am7
+      - Fadd9
+      - Cadd9
+      - G
+      - Fadd9
+      - G6
+      - Cadd9
+      - Em7
+      - Fadd9
+      - G
+      - Am7
+      - Fadd9
+      - Dm7
+      - G6
+      - Cadd9
+      - G6
+      - Am7
+      - Fadd9
+      - Cadd9
+      - Em7
+      - Fadd9
+      - G
+      - Am7
+      - Em7
+      - Fadd9
+      - Cadd9
+      - Dm7
+      - G6
+      - Cadd9
+      - Cadd9
+    layers: [gallery_pad, cello_underpainting, pizz_easel, harp_brushstrokes, tiny_gold_leaf, canvas_hook, smile_answer, frame_pulse]

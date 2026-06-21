@@ -1,0 +1,392 @@
+schema: ambition.musicir.v1
+id: standing_on_shoulders
+title: Standing on Shoulders
+seed: 2026051802
+notes: >-
+  GNU-ton boss battle. Scholar on a giant wildebeest — heavy progressive rock
+  at 88 BPM in E minor. Two voices compete: a slow stomping foundation (the
+  giant — heavy bass, massive kick, low guitar riff) and a quick recursive
+  harpsichord/organ figure (the scholar — ascending E minor scale that returns
+  to its root, just like GNU is Not Unix). Brass hits for pomposity. Structure
+  is intentionally self-similar: the scholar motif recurs at every section
+  start, just like a recursive function. Total: 44 bars ≈ 90 seconds.
+
+tempo:
+  bpm: 88
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 38
+  reverb_wet: 0.055
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 5200
+  stereo_width: 0.085
+  compressor_threshold_db: -17.0
+  compressor_ratio: 4.5
+  compressor_attack_ms: 11.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 3.2
+  compressor_knee_db: 6.0
+  limiter_drive: 0.91
+  normalize: true
+  target_peak_db: -2.6
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 36
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 5800
+  stereo_width: 0.040
+  limiter_drive: 0.88
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  # Scholar voice — academic above the fray
+  - {name: organ_scholar,     group: scholar,  program: drawbar_organ,       volume: 84,  pan: 68,  expression: 96,  modulation: 5, chorus: 10, reverb: 22}
+  - {name: harpsichord_voice, group: scholar,  program: harpsichord,         volume: 70,  pan: 78,  expression: 88,  reverb: 18}
+  # Giant voice — immovable bulk
+  - {name: heavy_distortion,  group: giant,    program: distortion_guitar,   volume: 112, pan: 42,  expression: 114, chorus: 5}
+  - {name: low_guitar,        group: giant,    program: overdrive_guitar,    volume: 94,  pan: 56,  expression: 102, chorus: 4}
+  # Bass — the beast's weight
+  - {name: giant_bass,        group: bass,     program: picked_bass,         volume: 110, pan: 50,  expression: 112}
+  - {name: synth_low,         group: bass,     program: synth_bass_2,        volume: 88,  pan: 46,  expression: 98}
+  # Brass — pompous scholar declarations
+  - {name: brass_pompous,     group: brass,    program: brass_section,       volume: 90,  pan: 64,  expression: 98,  reverb: 14}
+  # Strings — academic gravity
+  - {name: strings_academic,  group: strings,  program: string_ensemble_1,   volume: 68,  pan: 64,  expression: 84,  modulation: 6, reverb: 24}
+  # Drums — giant's footfalls; slow and massive
+  - {name: stomp_kit,         group: drums,    is_drum: true,                volume: 124, pan: 64,  expression: 120}
+
+motifs:
+  # Scholar's recursive motif: E minor scale run that ends where it started.
+  # "I can see further — standing on the shoulders of giants."
+  # Two bars of academic quickness atop the slow giant below.
+  - id: scholar_recursive
+    root: E4
+    intervals: [0, 2, 3, 5, 7, 10, 12, 10, 7, 5, 3, 2, 0, 2, 3, 0]
+    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 2.0]
+    velocities: [0.88, 0.78, 0.82, 0.86, 0.90, 0.94, 1.00, 0.90, 0.86, 0.80, 0.78, 0.80, 0.84, 0.88, 0.90, 0.78]
+
+  # Harpsichord quip: a shorter 1-bar version — muttering under breath
+  - id: scholar_quip
+    root: E5
+    intervals: [0, 3, 5, 7, 5, 3, 0, 3]
+    rhythm:    [0.25, 0.25, 0.25, 0.5, 0.25, 0.5, 0.5, 1.5]
+    velocities: [0.90, 0.80, 0.86, 0.96, 0.86, 0.80, 0.84, 0.72]
+
+  # Pompous brass declaration — scholar interrupting the battle to state something obvious
+  - id: brass_declaration
+    root: E4
+    intervals: [0, 0, 7, 5, 3, 0, 12, 7]
+    rhythm:    [0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0, 3.0]
+    velocities: [0.90, 0.88, 1.00, 0.92, 0.86, 0.90, 1.00, 0.82]
+
+  # Giant tread: descending power chord roots — B A G E, one step per beat
+  - id: giant_tread_lead
+    root: B3
+    intervals: [0, 10, 7, 3, 0, 10, 7, 3]
+    rhythm:    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    velocities: [1.00, 0.84, 0.96, 0.80, 0.98, 0.82, 0.94, 0.78]
+
+  # Final charge: ascending brass fanfare before the last stand
+  - id: final_charge
+    root: E4
+    intervals: [0, 3, 7, 10, 12, 15, 12, 10, 7, 5, 3, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.86, 0.90, 0.94, 0.98, 1.00, 1.00, 0.92, 0.88, 0.86, 0.84, 0.90, 0.96]
+
+layer_templates:
+  # Giant's footfall drum — kick on 1 and 3 (massive, deliberate), snare on 2 and 4
+  stomp_beat:
+    kind: drums
+    instrument: stomp_kit
+    humanize_ms: 3.0
+    events:
+      - {drum: kick,       beats: [0.0, 2.0],         velocity: 122, duration_beats: 0.14}
+      - {drum: snare,      beats: [1.0, 3.0],         velocity: 118, duration_beats: 0.14}
+      - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 64, duration_beats: 0.07}
+      - {drum: crash,      beat: 0.0, every: 4,       velocity: 108, duration_beats: 0.40}
+
+  # Enrage stomp: adds extra kick sub-beats and open hat pressure
+  stomp_beat_enrage:
+    kind: drums
+    instrument: stomp_kit
+    humanize_ms: 2.5
+    events:
+      - {drum: kick,       beats: [0.0, 0.75, 2.0, 2.75], velocity: 124, duration_beats: 0.12}
+      - {drum: snare,      beats: [1.0, 3.0],              velocity: 120, duration_beats: 0.12}
+      - {drum: closed_hat, beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75], velocity: 58, duration_beats: 0.05}
+      - {drum: open_hat,   beats: [1.75, 3.75],            velocity: 80,  duration_beats: 0.09}
+      - {drum: crash,      beat: 0.0, every: 4,            velocity: 112, duration_beats: 0.40}
+      - {drum: china,      beat: 2.0, every: 4,            velocity: 90,  duration_beats: 0.22}
+
+  # Bass riff: low E pedal with 5th-root movement
+  giant_bassline:
+    kind: bassline
+    instruments: [giant_bass, synth_low]
+    octave: 2
+    velocity: 98
+    articulation: marcato
+    humanize_ms: 3.0
+    humanize_velocity_pct: 2
+    instrument_velocity_offsets: {giant_bass: 0, synth_low: -14}
+    pattern:
+      - [0, 0.0, 0.75]
+      - [0, 1.0, 0.75]
+      - [7, 2.0, 0.75]
+      - [0, 3.0, 0.75]
+
+  # Heavy guitar chunk — the wildebeest's mass
+  giant_riff:
+    kind: ostinato
+    instruments: [heavy_distortion, low_guitar]
+    octave: 2
+    intervals: [0, 0, 7, 0, 7, 0, 0, 7]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 92
+    articulation: staccato
+    humanize_ms: 3.5
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets: {heavy_distortion: 0, low_guitar: -10}
+
+  # Strings holding academic tension
+  strings_sustain:
+    kind: pad_chords
+    instruments: [strings_academic]
+    every_bars: 2
+    duration_beats: 7.35
+    octave: 4
+    velocity: 58
+    articulation: pad
+    voicing: open
+    # Keep the academic gravity pad from voice-leading itself into the C7+ range.
+    # This cue wants weight and tension, not isolated whistle-string notes.
+    constraints: {max_pitch: 84}
+    humanize_ms: 18
+
+  # Scholar recursive motif — organ + harpsichord in parallel
+  scholar_voice:
+    kind: motif
+    instruments: [organ_scholar, harpsichord_voice]
+    motif: scholar_recursive
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 2.5
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets: {organ_scholar: 0, harpsichord_voice: -14}
+    instrument_octave_offsets: {organ_scholar: 0, harpsichord_voice: 1}
+
+  # Shorter harpsichord quip in odd bars
+  harpsichord_quip:
+    kind: motif
+    instrument: harpsichord_voice
+    motif: scholar_quip
+    starts: [[0, 0.0], [2, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 78
+    articulation: staccato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 4
+
+  # Brass: pompous one-shots at section starts
+  brass_hit:
+    kind: chord_hits
+    instruments: [brass_pompous]
+    hits: [[0, 0.0], [2, 0.0]]
+    duration_beats: 0.60
+    octave: 3
+    velocity: 86
+    articulation: marcato
+    voicing: power
+
+  # Giant tread melody on low guitar — sparse, heavy, deliberate
+  tread_voice:
+    kind: motif
+    instrument: low_guitar
+    motif: giant_tread_lead
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 86
+    articulation: legato
+    transpose: -12
+    humanize_ms: 4.0
+    humanize_velocity_pct: 3
+
+sections:
+  # Intro: giant alone — just bass, drums, low riff. Scholar absent.
+  # The beast is enormous; it hasn't noticed you yet.
+  - id: the_giant_approaches
+    bars: 4
+    intensity: 0.88
+    harmony: [Em, Em, G, D]
+    layers:
+      - stomp_beat
+      - giant_bassline
+      - giant_riff
+      - strings_sustain
+      - kind: chord_hits
+        instruments: [heavy_distortion, low_guitar]
+        hits: [[0, 0.0], [0, 2.0], [2, 0.0], [3, 2.0]]
+        duration_beats: 0.80
+        octave: 2
+        velocity: 96
+        articulation: marcato
+        voicing: power
+
+  # Phase 1: scholar appears — hands-only pressure while head stays high.
+  # Academic muttering over heavy riff. Scholar motif starts recurring.
+  - id: hands_of_gnu
+    bars: 12
+    intensity: 1.00
+    harmony: [Em, G, D, Em, Em, G, Bm, Em, Em, G, Am, Em]
+    layers:
+      - stomp_beat
+      - giant_bassline
+      - giant_riff
+      - strings_sustain
+      - {template: scholar_voice, repeats: 3}
+      - {template: harpsichord_quip, repeats: 3}
+      - {template: brass_hit, hits: [[0,0.0], [4,0.0], [8,0.0]]}
+      - {template: tread_voice, repeats: 3}
+
+  # Bridge: the head descends — SpikeHalo vulnerability window.
+  # Scholar screams a license clause; strings swell; the heavy riff drops out briefly.
+  - id: head_descends
+    bars: 8
+    intensity: 1.10
+    harmony: [Am, G, Em, Bm, C, G, D, Em]
+    layers:
+      - stomp_beat
+      - giant_bassline
+      - strings_sustain
+      - {template: scholar_voice, repeats: 2, velocity: 96}
+      - kind: motif
+        instruments: [brass_pompous, strings_academic]
+        motif: brass_declaration
+        starts: [[0, 0.0], [4, 0.0]]
+        repeats: 1
+        every_bars: 4
+        velocity: 96
+        articulation: marcato
+        instrument_velocity_offsets: {brass_pompous: 0, strings_academic: -20}
+        humanize_ms: 4
+      - kind: automation
+        group: strings
+        automation:
+          - {group: strings, cc: expression, from: 72, to: 104, curve: smooth, points: 16}
+
+  # Phase 2: both hands and head — full pressure. Scholar's voice quickens.
+  - id: the_weight_of_knowledge
+    bars: 12
+    intensity: 1.14
+    harmony: [Em, D, G, Bm, Em, D, Am, Em, Em, G, D, Em]
+    layers:
+      - stomp_beat
+      - giant_bassline
+      - giant_riff
+      - strings_sustain
+      - {template: scholar_voice, repeats: 3, velocity: 96}
+      - {template: harpsichord_quip, repeats: 3, velocity: 84}
+      - {template: brass_hit, hits: [[0,0.0], [2,0.0], [4,0.0], [6,0.0], [8,0.0], [10,0.0]], velocity: 94}
+      - {template: tread_voice, repeats: 3, velocity: 92}
+      - kind: chord_hits
+        instruments: [heavy_distortion, low_guitar]
+        hits: [[0,0.0], [1,0.0], [2,0.0], [4,0.0], [5,0.0], [6,0.0], [8,0.0], [9,0.0], [10,0.0]]
+        duration_beats: 0.55
+        octave: 2
+        velocity: 104
+        articulation: marcato
+        voicing: power
+
+  # Enrage: scholar and giant at full intensity. Scholar motif plays every 2 bars.
+  # Final chance to end this — the wildebeest's stomps double.
+  - id: recursive_crescendo
+    bars: 4
+    intensity: 1.24
+    harmony: [Em, Bm, G, Em]
+    layers:
+      - stomp_beat_enrage
+      - giant_bassline
+      - giant_riff
+      - strings_sustain
+      - kind: motif
+        instruments: [organ_scholar, harpsichord_voice, brass_pompous]
+        motif: scholar_recursive
+        starts: [[0, 0.0], [2, 0.0]]
+        repeats: 1
+        every_bars: 2
+        velocity: 106
+        articulation: tenuto
+        instrument_velocity_offsets: {organ_scholar: 0, harpsichord_voice: -12, brass_pompous: -10}
+        instrument_octave_offsets: {organ_scholar: 0, harpsichord_voice: 1, brass_pompous: -1}
+        humanize_ms: 2.0
+        humanize_velocity_pct: 2
+      - kind: chord_hits
+        instruments: [heavy_distortion, low_guitar, brass_pompous]
+        hits: [[0,0.0], [0,1.0], [0,2.0], [0,3.0], [1,0.0], [1,1.0], [1,2.0], [1,3.0], [2,0.0], [2,1.0], [2,2.0], [2,3.0], [3,0.0], [3,1.0], [3,2.0], [3,3.0]]
+        duration_beats: 0.45
+        octave: 2
+        velocity: 112
+        articulation: marcato
+        voicing: power
+        instrument_velocity_offsets: {heavy_distortion: 0, low_guitar: -8, brass_pompous: -16}
+
+  # Tag: final hard stop. Scholar takes one last bow.
+  - id: final_footnote
+    bars: 4
+    intensity: 1.20
+    harmony: [Em, G, D, Em]
+    layers:
+      - stomp_beat_enrage
+      - giant_bassline
+      - giant_riff
+      - kind: motif
+        instruments: [organ_scholar, harpsichord_voice, strings_academic]
+        motif: final_charge
+        starts: [[0, 0.0]]
+        repeats: 1
+        every_bars: 4
+        velocity: 112
+        articulation: marcato
+        instrument_velocity_offsets: {organ_scholar: 0, harpsichord_voice: -8, strings_academic: -22}
+        instrument_octave_offsets: {organ_scholar: 0, harpsichord_voice: 1, strings_academic: -1}
+        humanize_ms: 2.5
+        humanize_velocity_pct: 2
+      - kind: chord_hits
+        instruments: [heavy_distortion, low_guitar, brass_pompous, strings_academic]
+        hits: [[0,0.0], [1,0.0], [2,0.0], [2,2.0], [3,0.0], [3,2.0], [3,3.0]]
+        duration_beats: 0.90
+        octave: 2
+        velocity: 116
+        articulation: marcato
+        voicing: wide
+        instrument_velocity_offsets: {heavy_distortion: 0, low_guitar: -8, brass_pompous: -14, strings_academic: -28}
+        instrument_octave_offsets: {heavy_distortion: 0, low_guitar: 0, brass_pompous: 0, strings_academic: -1}
+        constraints: {max_pitch: 84}
+      - kind: root_hits
+        instruments: [giant_bass, synth_low]
+        hits: [[3, 3.5, 0, 0.75]]
+        octave: 2
+        velocity: 120
+        articulation: hit

@@ -1,0 +1,1127 @@
+schema: ambition.musicir.v1
+id: first_goblin_tune_v2
+title: First Goblin Tune v2 - Clean Demo Mix
+seed: 42024093
+notes: 'Clean demo revision of first_goblin_tune_v2.  This version deliberately simplifies the adaptive
+  arrangement so the demo checks the important boxes: intro, loopable waves, outro, six stems, a clear
+  wave-2 intensity lift, and calmer percussion.  The synthetic fast-renderer score avoids noisy hats,
+  crashes, dense string saw layers, and overlapping short attacks that were causing buzz/popping when
+  stems were layered in-game.  2026-05-10 pass: keep full-section loudness matched in the renderer and
+  avoid noisy reverb/normalizer tails so runtime gains can stay near unity.
+
+
+  2026-05-10 transition pass: ported the transition-lab intro->wave1 handoff. The intro tail now keeps
+  a dark low/mid bed through the runtime crossfade, wave1 starts with enough sustained low-string support
+  to avoid a perceived dip, and high-frequency hiss/reverb remain intentionally restrained.'
+tempo:
+  bpm: 132
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+    notes: >-
+      Goblin ships as one mastered full layer per encounter section. Master the
+      full composition once and slice section files from that master so the Rust
+      crossfades hear one coherent loudness/noise floor instead of separately
+      normalized mini-masters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -1.8
+  highpass_hz: 35
+  reverb_wet: 0.018
+  reverb_decay_seconds: 0.36
+  reverb_damping_hz: 3900
+  stereo_width: 0.018
+  post_reverb_high_shelf_hz: 4800
+  post_reverb_high_shelf_db: -1.2
+  compressor_threshold_db: -20.0
+  compressor_ratio: 2.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 0.2
+  compressor_knee_db: 8.0
+  limiter_drive: 0.66
+  normalize: true
+  target_peak_db: -4.8
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.001
+  reverb_decay_seconds: 0.18
+  reverb_damping_hz: 4200
+  stereo_width: 0.012
+  limiter_drive: 0.7
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: violins_i
+  group: strings
+  program: string_ensemble_1
+  volume: 74
+  pan: 78
+  expression: 80
+  modulation: 10
+- name: violas
+  group: strings
+  program: viola
+  volume: 70
+  pan: 50
+  expression: 78
+  modulation: 8
+- name: celli
+  group: strings
+  program: cello
+  volume: 72
+  pan: 38
+  expression: 78
+  modulation: 7
+- name: contrabass
+  group: strings
+  program: contrabass
+  volume: 72
+  pan: 34
+  expression: 78
+- name: horns
+  group: brass
+  program: french_horn
+  volume: 62
+  pan: 72
+  expression: 68
+  modulation: 3
+- name: trombones
+  group: brass
+  program: trombone
+  volume: 60
+  pan: 44
+  expression: 66
+- name: tuba
+  group: brass
+  program: tuba
+  volume: 58
+  pan: 34
+  expression: 64
+- name: flute
+  group: winds
+  program: flute
+  volume: 80
+  pan: 84
+  expression: 84
+  modulation: 7
+- name: oboe
+  group: winds
+  program: oboe
+  volume: 82
+  pan: 72
+  expression: 86
+  modulation: 6
+- name: clarinet
+  group: winds
+  program: clarinet
+  volume: 82
+  pan: 54
+  expression: 86
+  modulation: 6
+- name: bassoon
+  group: winds
+  program: bassoon
+  volume: 78
+  pan: 38
+  expression: 82
+  modulation: 3
+- name: pad_subtle
+  group: choir_pad
+  program: pad_bowed
+  volume: 60
+  pan: 64
+  expression: 78
+  modulation: 4
+- name: choir
+  group: choir_pad
+  program: choir_aahs
+  volume: 64
+  pan: 64
+  expression: 80
+  modulation: 3
+- name: harp
+  group: mallets
+  program: orchestral_harp
+  volume: 44
+  pan: 70
+  expression: 60
+- name: marimba
+  group: mallets
+  program: marimba
+  volume: 34
+  pan: 78
+  expression: 54
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 60
+  pan: 52
+  expression: 78
+- name: war_drums
+  group: percussion
+  is_drum: true
+  volume: 96
+  pan: 64
+  expression: 102
+motifs:
+- id: goblin_short
+  root: D4
+  intervals:
+  - 0
+  - 3
+  - 2
+  - -1
+  - 0
+  - 6
+  - 5
+  - 3
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  velocities:
+  - 1.0
+  - 0.94
+  - 0.88
+  - 0.98
+  - 0.92
+  - 0.86
+  - 0.96
+  - 0.88
+- id: goblin_low
+  root: D3
+  intervals:
+  - 0
+  - 0
+  - -2
+  - 3
+  - 5
+  - 3
+  - 0
+  - -5
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.75
+  - 0.5
+  velocities:
+  - 0.96
+  - 0.9
+  - 0.84
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.94
+  - 0.88
+- id: hero_answer
+  root: D4
+  intervals:
+  - 0
+  - 5
+  - 7
+  - 10
+  - 9
+  - 7
+  - 5
+  - 3
+  rhythm:
+  - 0.75
+  - 0.25
+  - 0.5
+  - 0.75
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.92
+  - 0.9
+  - 0.88
+  - 0.86
+  - 0.84
+  - 0.82
+  - 0.8
+  - 0.78
+layer_templates:
+  expression_gentle:
+    kind: automation
+    group: strings
+    automation:
+    - group: strings
+      cc: expression
+      from: 62
+      to: 78
+      curve: smooth
+      points: 8
+    - group: brass
+      cc: expression
+      from: 52
+      to: 72
+      curve: smooth
+      points: 8
+    - group: winds
+      cc: expression
+      from: 72
+      to: 96
+      curve: smooth
+      points: 8
+    - group: choir_pad
+      cc: expression
+      from: 34
+      to: 54
+      curve: smooth
+      points: 8
+  string_pad:
+    kind: pad_chords
+    instruments:
+    - violins_i
+    - violas
+    - celli
+    instrument_octave_offsets:
+      violins_i: 0
+      violas: 0
+      celli: -1
+    instrument_velocity_offsets:
+      violins_i: -14
+      violas: -16
+      celli: -18
+    octave: 3
+    duration_beats: 3.55
+    velocity: 30
+    articulation: legato
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  low_string_pulse:
+    kind: bassline
+    instrument: contrabass
+    octave: 2
+    velocity: 38
+    articulation: tenuto
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.85
+    - - 7
+      - 2.0
+      - 0.5
+    - - 12
+      - 3.0
+      - 0.45
+  quiet_pad:
+    kind: pad_chords
+    instrument: pad_subtle
+    octave: 3
+    every_bars: 4
+    duration_beats: 8.0
+    velocity: 20
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  choir_wash:
+    kind: pad_chords
+    instrument: choir
+    octave: 4
+    every_bars: 2
+    duration_beats: 4.5
+    velocity: 26
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  wind_goblin:
+    kind: motif
+    instruments:
+    - flute
+    - oboe
+    - clarinet
+    motif: goblin_short
+    root: D4
+    velocity: 70
+    articulation: staccato
+    instrument_velocity_offsets:
+      flute: 4
+      oboe: 0
+      clarinet: -3
+    instrument_pitch_scoop_cents:
+      flute: 0.0
+      oboe: 0.0
+      clarinet: 0.0
+  low_goblin:
+    kind: motif
+    instruments:
+    - bassoon
+    - celli
+    motif: goblin_low
+    root: D3
+    velocity: 42
+    articulation: marcato
+    instrument_velocity_offsets:
+      bassoon: -2
+      celli: -10
+    instrument_pitch_scoop_cents:
+      bassoon: 0.5
+  hero_horns:
+    kind: motif
+    instruments:
+    - horns
+    - violins_i
+    motif: hero_answer
+    root: D4
+    velocity: 46
+    articulation: tenuto
+    instrument_octave_offsets:
+      horns: 0
+      violins_i: 1
+    instrument_velocity_offsets:
+      horns: 0
+      violins_i: -18
+  harp_murmur:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    step: 0.5
+    duration_beats: 0.38
+    velocity: 32
+    density: 0.24
+    articulation: normal
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  marimba_echo:
+    kind: arpeggio
+    instrument: marimba
+    octave: 4
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    step: 1.0
+    duration_beats: 0.28
+    velocity: 30
+    density: 0.20
+    articulation: staccato
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  brass_soft_hits:
+    kind: chord_hits
+    instruments:
+    - horns
+    - trombones
+    octave: 3
+    velocity: 42
+    duration_beats: 0.75
+    articulation: tenuto
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+  tuba_roots_light:
+    kind: root_hits
+    instrument: tuba
+    octave: 2
+    velocity: 42
+    articulation: tenuto
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 0.85
+    - - 4
+      - 0.0
+      - -12
+      - 0.85
+  timpani_roots:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 42
+    articulation: tenuto
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 0.85
+    - - 4
+      - 0.0
+      - -12
+      - 0.85
+  pulse_drums_light:
+    kind: drums
+    instrument: war_drums
+    humanize_ms: 1.0
+    humanize_velocity_pct: 3
+    events:
+    - drum: concert_bass_drum
+      beat: 0.0
+      velocity: 32
+  pulse_drums_medium:
+    kind: drums
+    instrument: war_drums
+    humanize_ms: 1.0
+    humanize_velocity_pct: 3
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 48
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 4
+    - drum: low_tom
+      beats:
+      - 3.5
+      velocity: 38
+      probability: 0.7
+    - drum: floor_tom
+      beat: 0.0
+      velocity: 44
+      bars:
+      - 0
+      - 4
+  pulse_drums_heavy:
+    kind: drums
+    instrument: war_drums
+    humanize_ms: 1.0
+    humanize_velocity_pct: 3
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 48
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 4
+    - drum: low_tom
+      beat: 3.5
+      velocity: 38
+    - drum: mid_tom
+      beat: 3.75
+      velocity: 36
+    - drum: floor_tom
+      beat: 0.0
+      velocity: 44
+      bars:
+      - 0
+      - 4
+    - drum: crash
+      beat: 0.0
+      velocity: 18
+      bars:
+      - 0
+      - 4
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components:
+  - wave1
+  - wave2
+  - wave3
+  - recap_loop
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 2
+    bridge_stems:
+    - strings
+    - winds
+    fade_stems:
+    - brass
+    - percussion
+    - choir_pad
+    - mallets
+state_map:
+  # Keep these IDs aligned with `crates/ambition_content/src/music.rs` so
+  # renderer previews and in-game encounter states use the same vocabulary.
+  # The current Rust catalog plays one mastered `full` layer per section; these
+  # stem weights are diagnostic previews for authoring, not live game gains.
+  intro:
+    section: intro
+  wave1:
+    preferred_section: wave1
+    stems:
+      strings: 1.0
+      winds: 0.45
+      mallets: 0.03
+      percussion: 0.1
+      brass: 0.08
+      choir_pad: 0.0
+  wave2:
+    preferred_section: wave2
+    stems:
+      strings: 1.0
+      winds: 0.82
+      mallets: 0.18
+      percussion: 0.3
+      brass: 0.34
+      choir_pad: 0.04
+  wave2_brute:
+    preferred_section: wave2
+    stems:
+      strings: 1.0
+      winds: 0.82
+      mallets: 0.18
+      percussion: 0.42
+      brass: 0.52
+      choir_pad: 0.1
+    fade_beats: 4
+  wave3:
+    preferred_section: wave3
+    stems:
+      strings: 0.9
+      winds: 0.92
+      mallets: 0.1
+      percussion: 0.38
+      brass: 0.52
+      choir_pad: 0.08
+  cleared_bridge:
+    preferred_section: recap_loop
+    stems:
+      strings: 0.85
+      winds: 0.45
+      mallets: 0.02
+      percussion: 0.04
+      brass: 0.06
+      choir_pad: 0.0
+  outro:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+sections:
+- id: intro
+  kind: intro
+  label: transition lab - quiet pickup warning
+  bars: 4
+  intensity: 0.34
+  density: 0.16
+  loopable: false
+  harmony:
+  - Dm
+  - Bbmaj7
+  - Gm
+  - A7
+  layers:
+  - kind: automation
+    group: strings
+    automation:
+    - group: strings
+      cc: expression
+      from: 58
+      to: 66
+      curve: smooth
+      points: 8
+    - group: brass
+      cc: expression
+      from: 24
+      to: 18
+      curve: smooth
+      points: 8
+    - group: winds
+      cc: expression
+      from: 28
+      to: 20
+      curve: smooth
+      points: 8
+    - group: choir_pad
+      cc: expression
+      from: 6
+      to: 2
+      curve: smooth
+      points: 8
+  - kind: pad_chords
+    # Avoid the airy violin-ensemble pad in the exposed intro; it was the
+    # highest section high-band/noise suspect after normalization.
+    instruments:
+    - violas
+    - celli
+    instrument_octave_offsets:
+      violas: 0
+      celli: -1
+    instrument_velocity_offsets:
+      violas: -4
+      celli: -8
+    octave: 3
+    duration_beats: 3.75
+    velocity: 60
+    articulation: legato
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+  - template: low_goblin
+    starts:
+    - - 1
+      - 0.5
+    velocity: 28
+  - template: harp_murmur
+    density: 0.06
+    velocity: 18
+  - kind: drums
+    instrument: war_drums
+    humanize_ms: 1.0
+    events:
+    - drum: concert_bass_drum
+      bars:
+      - 0
+      - 2
+      beat: 0.0
+      velocity: 22
+  - kind: root_hits
+    instrument: contrabass
+    octave: 2
+    velocity: 56
+    articulation: tenuto
+    humanize_ms: 0.0
+    humanize_velocity_pct: 0.0
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 1.65
+    - - 3
+      - 2.25
+      - -12
+      - 2.20
+  - kind: root_hits
+    instrument: celli
+    octave: 2
+    velocity: 50
+    articulation: tenuto
+    humanize_ms: 0.0
+    humanize_velocity_pct: 0.0
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 1.60
+    - - 3
+      - 2.25
+      - 0
+      - 2.20
+- id: wave1
+  kind: loop_component
+  label: transition lab - wave 1 pickup handoff
+  bars: 8
+  intensity: 0.5
+  density: 0.4
+  loopable: true
+  valid_exit_local_bars:
+  - 2
+  - 4
+  - 8
+  harmony:
+  - Dm
+  - Bbmaj7
+  - C
+  - A7
+  - Dm
+  - F
+  - Gm
+  - A7
+  layers:
+  - expression_gentle
+  - template: string_pad
+    velocity: 48
+  - template: low_string_pulse
+    velocity: 68
+  - template: wind_goblin
+    starts:
+    - - 0
+      - 0.0
+    - - 2
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 38
+  - template: harp_murmur
+    density: 0.06
+    velocity: 14
+  - pulse_drums_light
+  - kind: drums
+    instrument: war_drums
+    humanize_ms: 0.0
+    events:
+    - drum: concert_bass_drum
+      bars:
+      - 0
+      beat: 0.0
+      velocity: 74
+    - drum: floor_tom
+      bars:
+      - 0
+      beat: 0.0
+      velocity: 48
+    - drum: low_tom
+      bars:
+      - 0
+      beat: 0.5
+      velocity: 28
+  - template: low_goblin
+    starts:
+    - - 0
+      - 0.0
+    velocity: 38
+  - template: tuba_roots_light
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 0.95
+    velocity: 48
+  - template: timpani_roots
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 0.9
+    velocity: 44
+  - kind: root_hits
+    instrument: contrabass
+    octave: 2
+    velocity: 66
+    articulation: tenuto
+    humanize_ms: 0.0
+    humanize_velocity_pct: 0.0
+    hits:
+    - - 0
+      - 0.0
+      - -12
+      - 1.7
+  - kind: root_hits
+    instrument: celli
+    octave: 2
+    velocity: 58
+    articulation: tenuto
+    humanize_ms: 0.0
+    humanize_velocity_pct: 0.0
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 1.6
+  - kind: pad_chords
+    instruments:
+    - violas
+    - celli
+    instrument_octave_offsets:
+      violas: 0
+      celli: -1
+    instrument_velocity_offsets:
+      violas: -8
+      celli: -12
+    octave: 3
+    duration_beats: 4.0
+    velocity: 40
+    articulation: legato
+    voicing: open
+    humanize_ms: 0.0
+    humanize_velocity_pct: 0.0
+    every_bars: 8
+- id: wave2
+  kind: loop_component
+  label: wave 2 - clear lift, still simple
+  bars: 8
+  intensity: 0.64
+  density: 0.42
+  loopable: true
+  valid_exit_local_bars:
+  - 2
+  - 4
+  - 8
+  reinforcement_bar: 4
+  harmony:
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Gm
+  - F
+  - C
+  - A7
+  layers:
+  - expression_gentle
+  - template: string_pad
+    velocity: 34
+  - template: low_string_pulse
+    velocity: 40
+  - template: wind_goblin
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 44
+  - template: hero_horns
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    velocity: 42
+  - template: brass_soft_hits
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 44
+  - template: tuba_roots_light
+    velocity: 42
+  - template: timpani_roots
+    velocity: 38
+  - template: harp_murmur
+    density: 0.14
+    velocity: 20
+  - pulse_drums_medium
+  - template: quiet_pad
+    velocity: 18
+  - template: choir_wash
+    velocity: 24
+- id: wave3
+  kind: loop_component
+  label: wave 3 - heavy, no noisy hats
+  bars: 8
+  intensity: 0.76
+  density: 0.46
+  loopable: true
+  valid_exit_local_bars:
+  - 2
+  - 4
+  - 8
+  harmony:
+  - Dm
+  - C#dim7
+  - Dm
+  - F
+  - Bb
+  - Gm
+  - A7
+  - A7
+  layers:
+  - expression_gentle
+  - template: string_pad
+    velocity: 34
+  - template: low_string_pulse
+    velocity: 42
+  - template: low_goblin
+    starts:
+    - - 0
+      - 1.0
+    - - 4
+      - 1.0
+    velocity: 40
+  - template: wind_goblin
+    starts:
+    - - 0
+      - 0.0
+    - - 3
+      - 0.0
+    - - 6
+      - 0.0
+    velocity: 46
+  - template: hero_horns
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 44
+  - template: brass_soft_hits
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 48
+  - template: tuba_roots_light
+    velocity: 46
+  - template: timpani_roots
+    velocity: 44
+  - template: harp_murmur
+    density: 0.22
+    velocity: 28
+  - template: marimba_echo
+    density: 0.18
+    velocity: 26
+  - pulse_drums_heavy
+  - template: quiet_pad
+    velocity: 22
+  - template: choir_wash
+    velocity: 32
+- id: recap_loop
+  kind: loop_component
+  label: fallback loop if the fight drags
+  bars: 8
+  intensity: 0.5
+  density: 0.3
+  loopable: true
+  valid_exit_local_bars:
+  - 2
+  - 4
+  - 8
+  harmony:
+  - Dm
+  - Bbmaj7
+  - C
+  - A7
+  - Dm
+  - Gm
+  - Bb
+  - A7
+  layers:
+  - expression_gentle
+  - template: string_pad
+    velocity: 30
+  - template: low_string_pulse
+    velocity: 34
+  - template: wind_goblin
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    velocity: 38
+  - template: hero_horns
+    starts:
+    - - 2
+      - 0.0
+    velocity: 38
+  - pulse_drums_light
+- id: outro
+  kind: outro
+  label: short clear tag
+  bars: 4
+  intensity: 0.3
+  density: 0.2
+  loopable: false
+  harmony:
+  - Dm
+  - Bbmaj7
+  - A7sus4
+  - Dm(add9)
+  layers:
+  - kind: automation
+    group: strings
+    automation:
+    - group: strings
+      cc: expression
+      from: 72
+      to: 42
+      curve: smooth
+      points: 8
+    - group: brass
+      cc: expression
+      from: 64
+      to: 34
+      curve: smooth
+      points: 8
+  - template: string_pad
+    velocity: 28
+  - template: hero_horns
+    starts:
+    - - 0
+      - 0.0
+    velocity: 34
+  - template: quiet_pad
+    velocity: 10
+  - kind: drums
+    instrument: war_drums
+    humanize_ms: 0.0
+    events:
+    - drum: concert_bass_drum
+      bars:
+      - 0
+      beat: 0.0
+      velocity: 32
+group_postprocess:
+  strings:
+    gain_db: 0.0
+    lowpass_hz: 10500
+    high_shelf_hz: 5200
+    high_shelf_db: -0.3
+    transient_tame: 0.02
+    reverb_wet: 0.001
+  winds:
+    gain_db: 3.5
+    lowpass_hz: 7800
+    high_shelf_hz: 3600
+    high_shelf_db: -1.0
+    presence_low_hz: 1500
+    presence_high_hz: 5000
+    presence_db: 0.5
+    transient_tame: 0.04
+    reverb_wet: 0.001
+  mallets:
+    gain_db: -1.5
+    lowpass_hz: 6800
+    high_shelf_hz: 5200
+    high_shelf_db: -1.4
+    transient_tame: 0.12
+    reverb_wet: 0.001
+  percussion:
+    gain_db: -5.0
+    lowpass_hz: 6500
+    high_shelf_hz: 3600
+    high_shelf_db: -1.6
+    transient_tame: 0.18
+    reverb_wet: 0.004
+    reverb_decay_seconds: 0.28
+  brass:
+    gain_db: 0.5
+    lowpass_hz: 7800
+    high_shelf_hz: 5200
+    high_shelf_db: -0.8
+    transient_tame: 0.04
+    reverb_wet: 0.001
+  choir_pad:
+    gain_db: -6.0
+    lowpass_hz: 5600
+    high_shelf_hz: 3600
+    high_shelf_db: -2.0
+    transient_tame: 0.06
+    reverb_wet: 0.002

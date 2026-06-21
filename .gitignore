@@ -1,0 +1,99 @@
+# proptest writes regression seeds when a property fails. Useful
+# locally to reproduce a flake but shouldn't go to git.
+**/*.proptest-regressions
+
+# Keep Cargo.lock for this game/application workspace.
+# Cargo.lock
+
+# Local editor / IDE state
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs and crash dumps
+*.log
+*.dmp
+
+# Local env/config files
+.env
+.env.*
+*.local
+
+# Generated captures / recordings / profiling output
+captures/
+recordings/
+profiles/
+screenshots/
+traces/
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Backup / patch artifacts
+*.bak
+*.orig
+*.rej
+**/*.rs.bk
+
+# Rust analyzer local project file
+rust-project.json
+
+debug_traces
+__pycache__
+*.png
+
+assets/fonts
+crates/ambition_gameplay_core/assets/fonts/
+crates/ambition_gameplay_core/assets/audio/
+
+# Standalone tool projects: generated outputs and per-tool venvs/caches.
+target/generated-audio/
+bundles/
+output/
+generated/
+.venv/
+__pycache__/
+.egg-info/
+*.ogg
+*.wav
+*.mid
+*.flac
+*.mp3
+*.tar.gz
+*.AppImage
+.cargo/*
+!.cargo/config.toml
+.x86_64
+
+# Agent/worktree scratch (must never be committed)
+.worktrees/
+
+ref
+profile_output*
+batch_logs/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+*.wav
+*.flac
+*.ogg
+*.mp3
+*.mid
+*.midi
+generated/
+tmp/

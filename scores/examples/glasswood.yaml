@@ -1,0 +1,407 @@
+schema: ambition.musicir.v1
+id: glasswood_canopy
+title: Glasswood Canopy - High Branches and Old Light
+seed: 73190417
+notes: >-
+  Area music for a luminous forest-canopy / arboretum zone: spacious,
+  curious, slightly magical, and loopable for exploration.  The cue is not
+  combat music.  It uses clear mallet and wind motifs over warm strings,
+  with optional mystery and threat states that can be faded in as the player
+  enters ruins, discovers secrets, or approaches danger.
+
+tempo:
+  bpm: 96
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.070
+  reverb_decay_seconds: 1.15
+  reverb_damping_hz: 7200
+  stereo_width: 0.055
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.86
+  normalize: true
+  target_peak_db: -2.5
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.004
+  reverb_decay_seconds: 0.42
+  reverb_damping_hz: 7200
+  stereo_width: 0.030
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: violins_i,    group: strings,    program: string_ensemble_1, volume: 66, pan: 78, expression: 76, modulation: 10}
+  - {name: violas,       group: strings,    program: viola,             volume: 62, pan: 50, expression: 74, modulation: 8}
+  - {name: celli,        group: strings,    program: cello,             volume: 64, pan: 36, expression: 74, modulation: 7}
+  - {name: contrabass,   group: strings,    program: contrabass,        volume: 48, pan: 32, expression: 62}
+
+  - {name: flute,        group: winds,      program: flute,             volume: 72, pan: 84, expression: 82, modulation: 7}
+  - {name: oboe,         group: winds,      program: oboe,              volume: 66, pan: 70, expression: 78, modulation: 5}
+  - {name: clarinet,     group: winds,      program: clarinet,          volume: 68, pan: 50, expression: 78, modulation: 5}
+  - {name: bassoon,      group: winds,      program: bassoon,           volume: 54, pan: 36, expression: 68}
+
+  - {name: harp,         group: mallets,    program: orchestral_harp,   volume: 60, pan: 70, expression: 76}
+  - {name: celesta,      group: mallets,    program: celesta,           volume: 44, pan: 82, expression: 66}
+  - {name: marimba,      group: mallets,    program: marimba,           volume: 38, pan: 46, expression: 60}
+
+  - {name: choir,        group: choir_pad,  program: choir_aahs,        volume: 26, pan: 64, expression: 44, modulation: 4}
+  - {name: pad_glass,    group: choir_pad,  program: pad_warm,          volume: 30, pan: 64, expression: 48, modulation: 5}
+
+  - {name: horns,        group: brass,      program: french_horn,       volume: 40, pan: 74, expression: 54, modulation: 3}
+  - {name: low_bells,    group: percussion, program: tubular_bells,     volume: 36, pan: 56, expression: 56}
+  - {name: hand_perc,    group: percussion, is_drum: true,              volume: 30, pan: 64, expression: 52}
+
+motifs:
+  - id: canopy_call
+    root: G4
+    intervals: [0, 2, 7, 9, 7, 4, 2, 0]
+    rhythm: [0.75, 0.25, 0.5, 1.0, 0.5, 0.5, 0.75, 1.75]
+    velocities: [0.78, 0.72, 0.82, 0.76, 0.70, 0.74, 0.68, 0.62]
+
+  - id: glass_answer
+    root: D5
+    intervals: [0, -2, 0, 5, 4, 2, -3, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 0.75, 1.25]
+    velocities: [0.68, 0.64, 0.72, 0.62, 0.70, 0.66, 0.60, 0.58]
+
+  - id: root_breath
+    root: G3
+    intervals: [0, 7, 5, 2, 0, -5]
+    rhythm: [1.0, 0.5, 0.5, 1.0, 1.5, 0.5]
+    velocities: [0.62, 0.56, 0.54, 0.58, 0.52, 0.50]
+
+  - id: shadow_hint
+    root: E4
+    intervals: [0, 1, 5, 6, 5, 1, -2, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 1.5]
+    velocities: [0.66, 0.62, 0.70, 0.64, 0.60, 0.58, 0.54, 0.50]
+
+layer_templates:
+  expression_breathe:
+    kind: automation
+    group: strings
+    automation:
+      - {group: strings, cc: expression, from: 58, to: 78, curve: smooth, points: 12}
+      - {group: winds, cc: expression, from: 64, to: 88, curve: smooth, points: 12}
+      - {group: mallets, cc: expression, from: 54, to: 74, curve: smooth, points: 10}
+      - {group: choir_pad, cc: expression, from: 30, to: 52, curve: smooth, points: 10}
+      - {group: brass, cc: expression, from: 34, to: 54, curve: smooth, points: 8}
+
+  string_canopy_pad:
+    kind: pad_chords
+    instruments: [violins_i, violas, celli]
+    instrument_octave_offsets: {violins_i: 1, violas: 0, celli: -1}
+    instrument_velocity_offsets: {violins_i: -10, violas: -12, celli: -14}
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 32
+    articulation: legato
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  root_breath_bass:
+    kind: motif
+    instruments: [celli, bassoon]
+    motif: root_breath
+    root: G3
+    velocity: 36
+    articulation: tenuto
+    instrument_octave_offsets: {celli: -1, bassoon: -1}
+    instrument_velocity_offsets: {celli: -8, bassoon: -10}
+
+  flute_canopy_call:
+    kind: motif
+    instruments: [flute, clarinet]
+    motif: canopy_call
+    root: G4
+    velocity: 48
+    articulation: legato
+    instrument_velocity_offsets: {flute: 2, clarinet: -8}
+    instrument_pitch_scoop_cents: {flute: 0.0, clarinet: 0.0}
+
+  oboe_glass_answer:
+    kind: motif
+    instruments: [oboe, celesta]
+    motif: glass_answer
+    root: D5
+    velocity: 40
+    articulation: tenuto
+    instrument_octave_offsets: {oboe: 0, celesta: 1}
+    instrument_velocity_offsets: {oboe: 0, celesta: -12}
+
+  harp_leaf_arps:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern: [0, 2, 1, 3, 2, 1]
+    step: 0.5
+    duration_beats: 0.46
+    velocity: 34
+    density: 0.58
+    articulation: normal
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  celesta_sparks:
+    kind: arpeggio
+    instrument: celesta
+    octave: 5
+    pattern: [0, 1, 2, 4, 2, 1]
+    step: 1.0
+    duration_beats: 0.35
+    velocity: 24
+    density: 0.28
+    articulation: bell
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  marimba_woodpulse:
+    kind: arpeggio
+    instrument: marimba
+    octave: 3
+    pattern: [0, 0, 2, 1]
+    step: 1.0
+    duration_beats: 0.34
+    velocity: 26
+    density: 0.30
+    articulation: staccato
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  choir_light:
+    kind: pad_chords
+    instruments: [choir, pad_glass]
+    instrument_velocity_offsets: {choir: -12, pad_glass: -8}
+    octave: 4
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 18
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  horn_far_answer:
+    kind: chord_hits
+    instruments: [horns]
+    octave: 3
+    velocity: 28
+    duration_beats: 1.5
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    hits: [[2, 0.0], [6, 0.0]]
+
+  shadow_wind_hint:
+    kind: motif
+    instruments: [clarinet, bassoon]
+    motif: shadow_hint
+    root: E4
+    velocity: 34
+    articulation: marcato
+    instrument_octave_offsets: {clarinet: 0, bassoon: -1}
+    instrument_velocity_offsets: {clarinet: -2, bassoon: -8}
+
+  low_bell_markers:
+    kind: chord_hits
+    instruments: [low_bells]
+    octave: 3
+    velocity: 26
+    duration_beats: 1.0
+    articulation: bell
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    hits: [[0, 0.0], [8, 0.0]]
+
+  leaf_percussion_soft:
+    kind: drums
+    instrument: hand_perc
+    humanize_ms: 0.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: shaker, beats: [1.0, 3.0], velocity: 18, probability: 0.45}
+      - {drum: triangle_mute, beats: [2.5], velocity: 14, probability: 0.25}
+
+  leaf_percussion_motion:
+    kind: drums
+    instrument: hand_perc
+    humanize_ms: 0.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: shaker, beats: [0.5, 1.5, 2.5, 3.5], velocity: 18, probability: 0.55}
+      - {drum: triangle_mute, beats: [2.0], velocity: 16, probability: 0.35}
+      - {drum: woodblock_hi, beats: [3.0], velocity: 14, probability: 0.30}
+
+playback:
+  mode: section_stem_matrix
+  intro: arrival
+  loop_components: [explore_loop, discovery_loop, shadow_loop]
+  outro: exit_glow
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, winds, mallets]
+    fade_stems: [brass, percussion, choir_pad]
+
+state_map:
+  entering: {section: arrival}
+  exploration:
+    preferred_section: explore_loop
+    stems: {strings: 0.85, winds: 0.72, mallets: 0.70, choir_pad: 0.22, brass: 0.00, percussion: 0.12}
+  secret_nearby:
+    preferred_section: discovery_loop
+    stems: {strings: 0.84, winds: 0.82, mallets: 0.95, choir_pad: 0.34, brass: 0.12, percussion: 0.14}
+  danger_nearby:
+    preferred_section: shadow_loop
+    stems: {strings: 0.88, winds: 0.76, mallets: 0.45, choir_pad: 0.26, brass: 0.26, percussion: 0.30}
+  leaving:
+    transition: outro_at_next_valid_exit_bar
+    outro: exit_glow
+
+sections:
+  - id: arrival
+    kind: intro
+    label: first step onto the glasswood bridges
+    bars: 4
+    intensity: 0.24
+    density: 0.20
+    loopable: false
+    harmony: ["Gmaj9", "D/F#", "Em9", "Cmaj7"]
+    # Intimate ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.30
+    layers:
+      - expression_breathe
+      - {template: string_canopy_pad, velocity: 26}
+      - {template: harp_leaf_arps, density: 0.18, velocity: 24}
+      - {template: flute_canopy_call, starts: [[2, 0.0]], velocity: 34}
+      - {template: choir_light, velocity: 10}
+
+  - id: explore_loop
+    kind: loop_component
+    label: high branches exploration loop
+    bars: 8
+    intensity: 0.42
+    density: 0.44
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Gmaj9", "D/F#", "Em9", "Cmaj7", "Am9", "G/B", "Cmaj7", "Dsus4"]
+    layers:
+      - expression_breathe
+      - {template: string_canopy_pad, velocity: 30}
+      - {template: root_breath_bass, starts: [[0, 0.0], [4, 0.0]], velocity: 32}
+      - {template: flute_canopy_call, starts: [[0, 0.0], [4, 0.0]], velocity: 42}
+      - {template: harp_leaf_arps, density: 0.46, velocity: 32}
+      - {template: celesta_sparks, density: 0.22, velocity: 20}
+      - leaf_percussion_soft
+
+  - id: discovery_loop
+    kind: loop_component
+    label: secret visible through leaves and glass
+    bars: 8
+    intensity: 0.50
+    density: 0.50
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Cmaj9", "G/B", "Am9", "Em7", "Fmaj7#11", "C/E", "D7sus4", "Gmaj9"]
+    # Drier, more intimate ambience.
+    postprocess:
+      reverb_wet: 0.025
+      reverb_decay_seconds: 0.70
+    layers:
+      - expression_breathe
+      - {template: string_canopy_pad, velocity: 30}
+      - {template: flute_canopy_call, starts: [[0, 0.0]], root: C5, velocity: 44}
+      - {template: oboe_glass_answer, starts: [[2, 0.0], [6, 0.0]], velocity: 38}
+      - {template: harp_leaf_arps, density: 0.62, velocity: 34}
+      - {template: celesta_sparks, density: 0.44, velocity: 24}
+      - {template: choir_light, velocity: 14}
+      - {template: horn_far_answer, velocity: 24}
+      - leaf_percussion_soft
+
+  - id: shadow_loop
+    kind: loop_component
+    label: old machinery under the living canopy
+    bars: 8
+    intensity: 0.58
+    density: 0.48
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Em9", "Cmaj7", "B7sus4", "B7", "Em9", "G/D", "Cmaj7", "B7"]
+    # Cathedral ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.40
+    layers:
+      - expression_breathe
+      - {template: string_canopy_pad, velocity: 32}
+      - {template: root_breath_bass, starts: [[0, 0.0], [4, 0.0]], root: E3, velocity: 36}
+      - {template: shadow_wind_hint, starts: [[1, 0.0], [5, 0.0]], velocity: 34}
+      - {template: flute_canopy_call, starts: [[4, 0.0]], root: G4, velocity: 34}
+      - {template: harp_leaf_arps, density: 0.34, velocity: 28}
+      - {template: marimba_woodpulse, density: 0.28, velocity: 24}
+      - {template: low_bell_markers, velocity: 24}
+      - {template: horn_far_answer, hits: [[0, 0.0], [4, 0.0]], velocity: 30}
+      - leaf_percussion_motion
+      - {template: choir_light, velocity: 12}
+
+  - id: exit_glow
+    kind: outro
+    label: resolve through the treeline
+    bars: 4
+    intensity: 0.26
+    density: 0.22
+    loopable: false
+    harmony: ["Cmaj7", "D6", "Gmaj9", "Gmaj9"]
+    layers:
+      - kind: automation
+        group: strings
+        automation:
+          - {group: strings, cc: expression, from: 72, to: 42, curve: smooth, points: 8}
+          - {group: winds, cc: expression, from: 78, to: 44, curve: smooth, points: 8}
+          - {group: mallets, cc: expression, from: 70, to: 36, curve: smooth, points: 8}
+          - {group: choir_pad, cc: expression, from: 50, to: 26, curve: smooth, points: 8}
+      - {template: string_canopy_pad, velocity: 24}
+      - {template: oboe_glass_answer, starts: [[0, 0.0]], root: G4, velocity: 30}
+      - {template: harp_leaf_arps, density: 0.16, velocity: 22}
+      - {template: choir_light, velocity: 10}
+
+group_postprocess:
+  strings: {gain_db: 0.0, lowpass_hz: 13000, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.02, reverb_wet: 0.003}
+  winds: {gain_db: 2.0, lowpass_hz: 12500, high_shelf_hz: 4600, high_shelf_db: 0.8, presence_low_hz: 1600, presence_high_hz: 5200, presence_db: 1.4, transient_tame: 0.02, reverb_wet: 0.003}
+  mallets: {gain_db: -1.5, lowpass_hz: 10500, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.10, reverb_wet: 0.003}
+  choir_pad: {gain_db: -8.0, lowpass_hz: 8500, high_shelf_hz: 4800, high_shelf_db: -0.8, transient_tame: 0.04, reverb_wet: 0.006}
+  brass: {gain_db: -4.5, lowpass_hz: 9500, high_shelf_hz: 5200, high_shelf_db: -0.6, transient_tame: 0.03, reverb_wet: 0.003}
+  percussion: {gain_db: -6.0, lowpass_hz: 9000, high_shelf_hz: 5200, high_shelf_db: -0.6, transient_tame: 0.12, reverb_wet: 0.001}

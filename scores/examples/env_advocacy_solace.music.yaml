@@ -1,0 +1,576 @@
+schema: ambition.musicir.v1
+id: env_advocacy_solace
+title: Solace at the Watershed - Environmental Advocacy HQ
+seed: 60419722
+notes: >-
+  Environmental-advocacy headquarters theme. G Mixolydian (G A B C D E F)
+  at 84 BPM in 6/8 — the lilting compound triple feel + the b7 modal color
+  give a Ghibli/Copland pastoral character. Flute + oboe carry the melody;
+  harp and nylon guitar provide flowing arpeggios; strings sustain warm
+  pads underneath. NO heavy percussion — only tambourine, hand claps,
+  light kick on bar 1, and finger cymbals on phrase tops. NO brass except
+  french horn on the climactic main_c. Long-form layout (intro + four
+  loop sections + outro = ~165 s) so in-game repetition is less obvious.
+
+tempo:
+  bpm: 84
+meter:
+  beats_per_bar: 6
+  beat_unit: 8
+
+
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.060
+  reverb_decay_seconds: 1.40
+  reverb_damping_hz: 7000
+  stereo_width: 0.06
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.88
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 7000
+  stereo_width: 0.035
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  # Winds — the foreground.
+  - {name: flute,        group: winds,      program: flute,             volume: 96, pan: 78, expression: 100, modulation: 8}
+  - {name: oboe,         group: winds,      program: oboe,              volume: 92, pan: 64, expression: 96,  modulation: 7}
+  - {name: english_horn, group: winds,      program: english_horn,      volume: 88, pan: 50, expression: 92,  modulation: 5}
+  - {name: clarinet,     group: winds,      program: clarinet,          volume: 86, pan: 40, expression: 92,  modulation: 5}
+  - {name: bassoon,      group: winds,      program: bassoon,           volume: 78, pan: 30, expression: 86,  modulation: 3}
+
+  # Strings — sustained pads only, no melodic role.
+  - {name: violins,      group: strings,    program: string_ensemble_1, volume: 80, pan: 70, expression: 86, modulation: 6}
+  - {name: violas,       group: strings,    program: viola,             volume: 76, pan: 50, expression: 84, modulation: 5}
+  - {name: celli,        group: strings,    program: cello,             volume: 78, pan: 38, expression: 86, modulation: 5}
+  - {name: contrabass,   group: strings,    program: contrabass,        volume: 72, pan: 30, expression: 80}
+
+  # Brass — only french horn, only in main_c.
+  - {name: horns,        group: brass,      program: french_horn,       volume: 78, pan: 64, expression: 86, modulation: 4}
+
+  # Mallets — harp, nylon guitar, celesta. The motoric layer.
+  - {name: harp,         group: mallets,    program: orchestral_harp,   volume: 90, pan: 56, expression: 96}
+  - {name: nylon_guitar, group: mallets,    program: nylon_guitar,      volume: 82, pan: 70, expression: 90}
+  - {name: piano,        group: mallets,    program: acoustic_grand_piano, volume: 78, pan: 60, expression: 88}
+  - {name: celesta,      group: mallets,    program: celesta,           volume: 64, pan: 80, expression: 80}
+
+  # Choir — soft mixed choir, very subtle.
+  - {name: choir,        group: choir_pad,  program: choir_aahs,        volume: 64, pan: 64, expression: 80, modulation: 4}
+  - {name: pad_atmos,    group: choir_pad,  program: fx_atmosphere,     volume: 50, pan: 64, expression: 70, modulation: 3}
+
+  # Percussion — light only.
+  - {name: kit,          group: percussion, is_drum: true,              volume: 76, pan: 64, expression: 88}
+
+motifs:
+  # Flute pastoral phrase — ascending G-Mixolydian pentatonic.
+  # G4 A4 B4 D5 E5 G5 B5 A5
+  - id: pastoral_phrase
+    root: G4
+    intervals: [0, 2, 4, 7, 9, 12, 16, 14]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 1.5, 1.0, 1.5]
+    velocities: [0.86, 0.88, 0.92, 0.94, 0.96, 1.00, 0.92, 0.88]
+
+  # Oboe answer — descending lyrical, lands on the b7 (F).
+  # D5 C5 B4 G4 A4 B4 D5 G4
+  - id: oboe_answer_pastoral
+    root: D5
+    intervals: [0, -2, -3, -7, -5, -3, 0, -7]
+    rhythm:    [1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.92, 0.86, 0.88, 0.86, 0.84, 0.86, 0.92, 0.84]
+
+  # English horn / clarinet bridge — slow Copland-like ascending fifths.
+  # G4 D5 C5 G4 A4 E5 D5 G4
+  - id: bridge_chorale
+    root: G4
+    intervals: [0, 7, 5, 0, 2, 9, 7, 0]
+    rhythm:    [1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 3.0]
+    velocities: [0.86, 0.92, 0.90, 0.84, 0.88, 0.94, 0.92, 0.78]
+
+  # Harp / piano flowing arpeggio motif (used inside arpeggio layers).
+  # Climactic flute line for main_c — quasi-folk dance, rising.
+  # D5 G5 B5 A5 G5 E5 D5 B4
+  - id: climax_dance
+    root: D5
+    intervals: [0, 5, 9, 7, 5, 2, 0, -3]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.92, 0.94, 1.00, 0.96, 0.92, 0.92, 0.94, 0.88]
+
+  # Bass: gentle root + fifth alternation, downbeat-and-three feel for 6/8.
+  # G2 - D3 - G2 - D3 (in 6/8: hits land on beats 0, 1.5, 3, 4.5)
+  - id: bass_pastoral
+    root: G2
+    intervals: [0, 7, 0, 7]
+    rhythm:    [1.5, 1.5, 1.5, 1.5]
+    velocities: [0.94, 0.78, 0.92, 0.78]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+      - {group: winds,     cc: expression, from: 70, to: 105, curve: smooth, points: 12}
+      - {group: strings,   cc: expression, from: 60, to: 92,  curve: smooth, points: 12}
+      - {group: mallets,   cc: expression, from: 70, to: 100, curve: smooth, points: 12}
+      - {group: choir_pad, cc: expression, from: 50, to: 86,  curve: smooth, points: 8}
+
+  # Sustained warm string pad.
+  warm_string_pad:
+    kind: pad_chords
+    instruments: [violins, violas, celli, contrabass]
+    instrument_octave_offsets: {violins: 1, violas: 0, celli: -1, contrabass: -2}
+    instrument_velocity_offsets: {violins: -4, violas: -4, celli: -4, contrabass: -8}
+    octave: 3
+    duration_beats: 6.0
+    velocity: 64
+    articulation: legato
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+
+  # Bass figure (cellos + contrabass + bassoon doubled).
+  bass_pastoral_voice:
+    kind: motif
+    instruments: [contrabass, celli, bassoon]
+    motif: bass_pastoral
+    velocity: 70
+    articulation: tenuto
+    instrument_octave_offsets: {contrabass: 0, celli: 1, bassoon: 1}
+    instrument_velocity_offsets: {contrabass: 0, celli: -8, bassoon: -10}
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 16
+    every_bars: 1
+
+  # Flute pastoral phrase.
+  flute_voice:
+    kind: motif
+    instrument: flute
+    motif: pastoral_phrase
+    velocity: 86
+    articulation: legato
+    instrument_pitch_scoop_cents: {flute: 4.0}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  # Oboe answer.
+  oboe_voice:
+    kind: motif
+    instrument: oboe
+    motif: oboe_answer_pastoral
+    velocity: 84
+    articulation: legato
+    instrument_pitch_scoop_cents: {oboe: 4.0}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  # English horn / clarinet bridge chorale.
+  reed_chorale:
+    kind: motif
+    instruments: [english_horn, clarinet]
+    motif: bridge_chorale
+    velocity: 80
+    articulation: legato
+    instrument_octave_offsets: {english_horn: 0, clarinet: 0}
+    instrument_velocity_offsets: {english_horn: 0, clarinet: -8}
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  # Climactic flute dance (main_c).
+  climax_flute:
+    kind: motif
+    instrument: flute
+    motif: climax_dance
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Climactic oboe doubling the dance an octave below.
+  climax_oboe:
+    kind: motif
+    instrument: oboe
+    motif: climax_dance
+    transpose: -12
+    velocity: 80
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Harp flowing arpeggio — 16th-feel in 6/8 (each "step" is an 8th note).
+  harp_arpeggio:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern: [0, 1, 2, 3, 2, 1]
+    step: 0.5
+    duration_beats: 0.40
+    velocity: 70
+    density: 0.95
+    voicing: open
+    articulation: pluck
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+
+  # Nylon guitar arpeggio — slower, picks chord tones in 6/8 strum pattern.
+  guitar_arpeggio:
+    kind: arpeggio
+    instrument: nylon_guitar
+    octave: 3
+    pattern: [0, 2, 1, 3, 2, 0]
+    step: 1.0
+    duration_beats: 0.85
+    velocity: 64
+    density: 1.0
+    voicing: open
+    articulation: pluck
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Piano sustained chord on phrase boundaries.
+  piano_voicing:
+    kind: chord_hits
+    instrument: piano
+    octave: 4
+    velocity: 68
+    duration_beats: 6.0
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Celesta sparkle.
+  celesta_chime:
+    kind: chord_hits
+    instrument: celesta
+    octave: 5
+    velocity: 70
+    duration_beats: 4.0
+    articulation: bell
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Horn chord pad — climax only.
+  horn_pad:
+    kind: pad_chords
+    instrument: horns
+    octave: 3
+    duration_beats: 6.0
+    velocity: 64
+    articulation: legato
+    voicing: closed
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  # Choir wash.
+  choir_wash:
+    kind: pad_chords
+    instrument: choir
+    octave: 4
+    every_bars: 4
+    duration_beats: 24.0
+    velocity: 50
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Atmosphere pad — very quiet bed, gives the hall ambience.
+  atmos_pad:
+    kind: pad_chords
+    instrument: pad_atmos
+    octave: 3
+    every_bars: 4
+    duration_beats: 24.0
+    velocity: 38
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Light percussion — tambourine + hand claps + soft kick on bar 1.
+  perc_pastoral:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beat: 0.0, velocity: 50}
+      - {drum: tambourine,        beats: [1.5, 3.0, 4.5], velocity: 36}
+      - {drum: hand_clap,         beat: 3.0, velocity: 28, probability: 0.5}
+
+  perc_pastoral_warm:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 3.0], velocity: 56}
+      - {drum: tambourine,        beats: [1.0, 1.5, 2.0, 4.0, 4.5, 5.0], velocity: 36}
+      - {drum: hand_clap,         beats: [1.5, 4.5], velocity: 38, probability: 0.7}
+      - {drum: triangle,          beat: 0.0, velocity: 44, bars: [0, 4]}
+
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components: [main_a, main_b, bridge, main_c]
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [winds, mallets]
+    fade_stems: [strings, brass, percussion, choir_pad]
+
+state_map:
+  starting: {section: intro}
+
+  ambient:
+    preferred_section: main_a
+    stems: {winds: 1.0, mallets: 0.85, strings: 0.55, percussion: 0.30, brass: 0.0, choir_pad: 0.40}
+
+  conversation:
+    preferred_section: main_b
+    stems: {winds: 1.0, mallets: 0.95, strings: 0.65, percussion: 0.40, brass: 0.0, choir_pad: 0.45}
+
+  contemplation:
+    preferred_section: bridge
+    stems: {winds: 1.0, mallets: 0.45, strings: 0.85, percussion: 0.10, brass: 0.0, choir_pad: 0.65}
+
+  uplifting:
+    preferred_section: main_c
+    stems: {winds: 1.0, mallets: 0.95, strings: 0.85, percussion: 0.55, brass: 0.65, choir_pad: 0.55}
+
+  leaving:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+
+sections:
+  - id: intro
+    kind: intro
+    label: morning at the watershed - solo flute over harp
+    bars: 4
+    intensity: 0.50
+    density: 0.30
+    loopable: false
+    harmony: ["G", "C", "Am", "D"]
+    # Intimate ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.30
+    layers:
+      - expression_swell
+      # Solo flute carries a single phrase across bars 1-3.
+      - {template: flute_voice, starts: [[1, 0.0]], velocity: 78}
+      # Harp arpeggio quietly the entire intro.
+      - {template: harp_arpeggio, density: 0.7, velocity: 56}
+      # Sustained low strings pad.
+      - kind: pad_chords
+        instruments: [violas, celli, contrabass]
+        instrument_octave_offsets: {violas: 0, celli: -1, contrabass: -2}
+        octave: 3
+        duration_beats: 6.0
+        velocity: 50
+        articulation: legato
+        voicing: open
+        humanize_ms: 8
+      # Single celesta chime on bar 0.
+      - kind: chord_hits
+        instrument: celesta
+        octave: 5
+        velocity: 60
+        duration_beats: 4.0
+        articulation: bell
+        humanize_ms: 0
+        hits: [[0, 0.0]]
+      - {template: choir_wash, velocity: 38}
+      - {template: atmos_pad, velocity: 30}
+
+  - id: main_a
+    kind: loop_component
+    label: ambient main - flute leads, harp + guitar arpeggios
+    bars: 8
+    intensity: 0.65
+    density: 0.50
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["G", "C", "Em", "D", "G", "Am", "C", "D"]
+    layers:
+      - {template: flute_voice, starts: [[0, 0.0], [4, 0.0]], velocity: 86}
+      - {template: oboe_voice,  starts: [[2, 0.0], [6, 0.0]], velocity: 80}
+      - {template: harp_arpeggio, density: 0.92, velocity: 68}
+      - {template: guitar_arpeggio, density: 1.0, velocity: 60}
+      - {template: bass_pastoral_voice, repeats: 8, velocity: 68}
+      - {template: warm_string_pad, velocity: 56}
+      - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0]], velocity: 60}
+      - perc_pastoral
+      - {template: choir_wash, velocity: 42}
+      - {template: atmos_pad, velocity: 32}
+
+  - id: main_b
+    kind: loop_component
+    label: variation - oboe lead, english-horn countermelody
+    bars: 8
+    intensity: 0.68
+    density: 0.55
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["C", "G", "D", "Em", "C", "G", "Am", "D"]
+    layers:
+      - {template: oboe_voice,  starts: [[0, 0.0], [4, 0.0]], velocity: 88}
+      # English horn weaves a countermelody.
+      - kind: motif
+        instrument: english_horn
+        motif: pastoral_phrase
+        velocity: 80
+        articulation: legato
+        humanize_ms: 5
+        starts: [[2, 0.0], [6, 0.0]]
+      # Flute fills with high pastoral phrases.
+      - {template: flute_voice, starts: [[3, 0.0], [7, 0.0]], velocity: 78}
+      - {template: harp_arpeggio, density: 0.95, velocity: 70}
+      - {template: guitar_arpeggio, density: 1.0, velocity: 64}
+      - {template: bass_pastoral_voice, repeats: 8, velocity: 70}
+      - {template: warm_string_pad, velocity: 60}
+      - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0]], velocity: 62}
+      - perc_pastoral
+      - {template: celesta_chime, hits: [[0, 0.0], [4, 0.0]], velocity: 56}
+      - {template: choir_wash, velocity: 46}
+      - {template: atmos_pad, velocity: 32}
+
+  - id: bridge
+    kind: loop_component
+    label: contemplation - reed chorale over sparse texture
+    bars: 6
+    intensity: 0.55
+    density: 0.35
+    loopable: true
+    valid_exit_local_bars: [3, 6]
+    harmony: ["Am", "C", "G", "D", "Am", "G"]
+    # Drier, more intimate ambience for the bridge.
+    postprocess:
+      reverb_wet: 0.025
+      reverb_decay_seconds: 0.70
+    layers:
+      - {template: reed_chorale, starts: [[0, 0.0]], velocity: 84}
+      # Harp arpeggio softer.
+      - {template: harp_arpeggio, density: 0.65, velocity: 52}
+      # Piano accents only on bar 0 and bar 3.
+      - {template: piano_voicing, hits: [[0, 0.0], [3, 0.0]], velocity: 56}
+      # Sustained string pad — wider voicing.
+      - kind: pad_chords
+        instruments: [violins, violas, celli]
+        instrument_octave_offsets: {violins: 1, violas: 0, celli: -1}
+        octave: 3
+        duration_beats: 6.0
+        velocity: 56
+        articulation: legato
+        voicing: wide
+        humanize_ms: 8
+      # No drums.
+      - {template: choir_wash, velocity: 56}
+      - {template: atmos_pad, velocity: 40}
+
+  - id: main_c
+    kind: loop_component
+    label: uplifting - climactic flute dance with horns and full ensemble
+    bars: 8
+    intensity: 0.86
+    density: 0.72
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["G", "D", "Em", "C", "G", "C", "D", "G"]
+    # Cathedral ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.40
+    layers:
+      - {template: climax_flute, starts: [[0, 0.0], [4, 0.0]], velocity: 92}
+      - {template: climax_oboe,  starts: [[0, 0.0], [4, 0.0]], velocity: 82}
+      # English horn descant.
+      - kind: motif
+        instrument: english_horn
+        motif: pastoral_phrase
+        velocity: 78
+        articulation: legato
+        humanize_ms: 4
+        starts: [[2, 0.0], [6, 0.0]]
+      - {template: harp_arpeggio, density: 0.95, velocity: 76}
+      - {template: guitar_arpeggio, density: 1.0, velocity: 68}
+      - {template: bass_pastoral_voice, repeats: 8, velocity: 76}
+      - {template: warm_string_pad, velocity: 70}
+      - {template: horn_pad, velocity: 64}
+      - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0]], velocity: 70}
+      - {template: celesta_chime, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 64}
+      - perc_pastoral_warm
+      - {template: choir_wash, velocity: 56}
+      - {template: atmos_pad, velocity: 40}
+
+  - id: outro
+    kind: outro
+    label: resolution - cadence and silence
+    bars: 4
+    intensity: 0.50
+    density: 0.30
+    loopable: false
+    harmony: ["C", "D", "G", "G"]
+    layers:
+      # Final flute phrase.
+      - {template: flute_voice, starts: [[0, 0.0]], velocity: 76}
+      # Final oboe answer.
+      - {template: oboe_voice,  starts: [[1, 0.0]], velocity: 72}
+      - {template: harp_arpeggio, density: 0.6, velocity: 50}
+      - {template: warm_string_pad, velocity: 56}
+      - {template: bass_pastoral_voice, repeats: 4, velocity: 56}
+      # Final celesta chime + triangle.
+      - kind: chord_hits
+        instrument: celesta
+        octave: 5
+        velocity: 70
+        duration_beats: 6.0
+        articulation: bell
+        humanize_ms: 0
+        hits: [[3, 0.0]]
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: triangle, beat: 0.0, velocity: 56, bars: [3]}
+          - {drum: concert_bass_drum, beat: 0.0, velocity: 56, bars: [3]}
+      - {template: choir_wash, velocity: 50}
+      - {template: atmos_pad, velocity: 36}
+
+group_postprocess:
+  winds:      {gain_db: 1.5,  lowpass_hz: 13500, high_shelf_hz: 5000, high_shelf_db: 1.0, presence_low_hz: 1500, presence_high_hz: 5500, presence_db: 1.4, transient_tame: 0.02, reverb_wet: 0.008}
+  strings:    {gain_db: 0.0,  lowpass_hz: 13000, high_shelf_hz: 5500, high_shelf_db: 0.4, transient_tame: 0.04, reverb_wet: 0.008}
+  brass:      {gain_db: -1.0, lowpass_hz: 11000, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.04, reverb_wet: 0.008}
+  mallets:    {gain_db: 0.5,  lowpass_hz: 13000, high_shelf_hz: 5500, high_shelf_db: 0.6, transient_tame: 0.06, reverb_wet: 0.012}
+  percussion: {gain_db: -3.0, lowpass_hz: 11000, high_shelf_hz: 5500, high_shelf_db: 0.0, transient_tame: 0.08, reverb_wet: 0.006}
+  choir_pad:  {gain_db: -3.0, lowpass_hz: 9500,  high_shelf_hz: 5000, high_shelf_db: -0.4, transient_tame: 0.04, reverb_wet: 0.014}

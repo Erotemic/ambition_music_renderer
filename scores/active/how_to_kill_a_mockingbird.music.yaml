@@ -1,0 +1,444 @@
+schema: ambition.musicir.v1
+id: how_to_kill_a_mockingbird
+title: How to Kill a Mockingbird
+seed: 2026051004
+notes: >-
+  Short, continuous boss-battle glam-metal / arena-rock cue. Built from scratch
+  around a legally distinct F# minor synth-brass fanfare: bright 80s brass lead,
+  stacked power guitars, picked bass, gated drums, choir pads, and a final heroic
+  tag. No fade-in/fade-out structure; it starts hot and ends on a hard boss-hit.
+  Total form: 48 bars at 150 BPM = about 76.8 seconds before release tails.
+
+tempo:
+  bpm: 150
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 34
+  reverb_wet: 0.030
+  reverb_decay_seconds: 0.85
+  reverb_damping_hz: 6400
+  stereo_width: 0.075
+  compressor_threshold_db: -15.0
+  compressor_ratio: 3.8
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 70.0
+  compressor_makeup_db: 2.4
+  compressor_knee_db: 5.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.4
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 34
+  reverb_wet: 0.004
+  reverb_decay_seconds: 0.36
+  reverb_damping_hz: 7000
+  stereo_width: 0.035
+  limiter_drive: 0.90
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  guitars:
+    # Keep arena crunch but remove the standalone whistle/fizz bands that showed
+    # up as bright guitar ridges in the chorus/bridge spectrogram. This is
+    # group bus tone shaping, not section-local normalization.
+    high_shelf_hz: 4300
+    high_shelf_db: -2.8
+    lowpass_hz: 8600
+    transient_tame: 0.06
+    transient_lowpass_hz: 6200
+
+instruments:
+  - {name: neon_brass_lead, group: lead, program: synth_brass_1, volume: 104, pan: 70, expression: 106, modulation: 6, chorus: 14, reverb: 18}
+  - {name: razor_saw_answer, group: lead, program: lead_saw, volume: 78, pan: 52, expression: 88, modulation: 4, chorus: 10, reverb: 12}
+  - {name: hero_brass_stack, group: brass, program: synth_brass_2, volume: 92, pan: 64, expression: 102, modulation: 6, chorus: 10, reverb: 10}
+  - {name: rhythm_guitars, group: guitars, program: distortion_guitar, volume: 108, pan: 44, expression: 110, chorus: 8}
+  - {name: wide_guitars, group: guitars, program: overdrive_guitar, volume: 92, pan: 86, expression: 104, chorus: 10}
+  - {name: lead_guitar, group: guitar_lead, program: overdrive_guitar, volume: 96, pan: 78, expression: 106, modulation: 10, chorus: 10, reverb: 12}
+  - {name: picked_bass, group: bass, program: picked_bass, volume: 104, pan: 50, expression: 108}
+  - {name: synth_bass, group: bass, program: synth_bass_1, volume: 78, pan: 46, expression: 92}
+  - {name: choir_stadium, group: pads, program: choir_aahs, volume: 56, pan: 64, expression: 76, modulation: 4, reverb: 26}
+  - {name: warm_pad, group: pads, program: pad_warm, volume: 50, pan: 64, expression: 72, modulation: 3, reverb: 24}
+  - {name: bell_flash, group: sparkle, program: tubular_bells, volume: 50, pan: 76, expression: 76, reverb: 22}
+  - {name: gated_arena_kit, group: drums, is_drum: true, volume: 118, pan: 64, expression: 116}
+
+motifs:
+  # Two-bar bright synth hook: F# minor, arching upward and answering down.
+  # It evokes the era with fast high synth-brass motion, but uses a new contour.
+  - id: brass_boss_hook
+    root: F#4
+    intervals: [0, 7, 5, 7, 10, 7, 3, 5, 7, 5, 2, 3, 5, 7, 12, 10]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.92, 0.82, 0.86, 0.84, 0.90, 0.84, 0.80, 0.84, 0.92, 0.84, 0.82, 0.84, 0.86, 0.88, 0.90, 0.84]
+
+  # Second two-bar answer, more triumphant and less busy, ending downward.
+  - id: brass_boss_answer
+    root: F#4
+    intervals: [7, 10, 12, 10, 7, 5, 3, 0, 5, 7, 8, 7, 5, 3, 2, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.94, 0.90, 1.00, 0.90, 0.92, 0.86, 0.84, 0.88, 0.92, 0.96, 1.00, 0.92, 0.88, 0.84, 0.82, 0.90]
+
+  # Pre-chorus ascent: simple crowd-chant shape for brass/guitar doubling.
+  - id: prechorus_lift
+    root: F#4
+    intervals: [0, 0, 3, 5, 7, 7, 10, 12, 14, 12, 10, 7]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.86, 0.84, 0.88, 0.90, 0.96, 0.88, 0.92, 1.00, 0.96, 0.90, 0.86, 0.94]
+
+  # Lead guitar boss-battle run, one bar ascending and one bar bending home.
+  - id: guitar_skyline_run
+    root: F#4
+    intervals: [0, 2, 3, 5, 7, 10, 12, 14, 15, 14, 12, 10, 7, 5, 3, 2, 0]
+    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.92, 0.82, 0.84, 0.86, 0.90, 0.94, 1.00, 0.96, 1.00, 0.94, 0.90, 0.88, 0.86, 0.84, 0.82, 0.88, 0.92]
+
+  - id: final_boss_call
+    root: F#5
+    intervals: [0, 5, 7, 5, 3, 5, 7, 0]
+    rhythm:    [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 4.0]
+    velocities: [1.00, 0.92, 1.00, 0.92, 0.90, 0.88, 0.96, 1.00]
+
+  # Two-bar Final Countdown reference: B-A-B-E / C#-B-C#-A in F# minor.
+  # Iconic 80s lift riff used as a connecting motif; rooted at E4 so all
+  # offsets stay positive while the riff sits in its original octave.
+  - id: final_countdown_riff
+    root: E4
+    intervals: [7, 5, 7, 0, 9, 7, 9, 5]
+    rhythm:    [1.5, 0.5, 0.5, 1.5, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.96, 0.84, 0.94, 1.00, 0.88, 0.84, 0.96, 0.94]
+
+layer_templates:
+  arena_drums:
+    kind: drums
+    instrument: gated_arena_kit
+    humanize_ms: 1.8
+    events:
+      - {drum: kick, beats: [0.0, 1.5, 2.0, 3.5], velocity: 112, duration_beats: 0.12}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 114, duration_beats: 0.12}
+      - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 70, duration_beats: 0.06}
+      - {drum: open_hat, beats: [3.75], velocity: 78, duration_beats: 0.08}
+      - {drum: crash, beat: 0.0, every: 4, velocity: 104, duration_beats: 0.35}
+      - {drum: low_tom, beats: [2.75, 3.0, 3.25], every: 8, offset: 7, velocity: 96, duration_beats: 0.12}
+
+  arena_drums_big:
+    kind: drums
+    instrument: gated_arena_kit
+    humanize_ms: 1.5
+    events:
+      - {drum: kick, beats: [0.0, 0.75, 1.5, 2.0, 2.75, 3.5], velocity: 116, duration_beats: 0.10}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 118, duration_beats: 0.12}
+      - {drum: closed_hat, beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75], velocity: 60, duration_beats: 0.05}
+      - {drum: open_hat, beats: [1.75, 3.75], velocity: 76, duration_beats: 0.07}
+      - {drum: crash, beat: 0.0, every: 4, velocity: 108, duration_beats: 0.35}
+      - {drum: china, beat: 2.0, every: 4, velocity: 86, duration_beats: 0.20}
+      - {drum: low_tom, beats: [2.5, 2.75, 3.0, 3.25], every: 8, offset: 7, velocity: 100, duration_beats: 0.10}
+
+  bass_drive:
+    kind: bassline
+    instruments: [picked_bass, synth_bass]
+    octave: 2
+    velocity: 95
+    articulation: marcato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 2
+    instrument_velocity_offsets: {picked_bass: 0, synth_bass: -12}
+    pattern:
+      - [0, 0.0, 0.50]
+      - [0, 0.5, 0.50]
+      - [7, 1.0, 0.50]
+      - [0, 1.5, 0.50]
+      - [0, 2.0, 0.50]
+      - [0, 2.5, 0.50]
+      - [7, 3.0, 0.50]
+      - [12, 3.5, 0.50]
+
+  guitar_chug:
+    kind: ostinato
+    instruments: [rhythm_guitars, wide_guitars]
+    octave: 2
+    intervals: [0, 0, 7, 0, 12, 0, 7, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 90
+    articulation: staccato
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+
+  power_hits:
+    kind: chord_hits
+    instruments: [rhythm_guitars, hero_brass_stack]
+    hits: [[0, 0.0], [1, 0.0], [2, 0.0], [3, 0.0], [4, 0.0], [5, 0.0], [6, 0.0], [7, 0.0]]
+    duration_beats: 0.85
+    octave: 3
+    velocity: 88
+    articulation: marcato
+    voicing: wide
+    # Keep generated arena-guitar hits below whistle-register. The high
+    # bridge/chorus spikes were generated chord voicings, not intentional notes.
+    instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
+    constraints: {min_pitch: 40, max_pitch: 95}
+    humanize_ms: 4
+
+  stadium_pads:
+    kind: pad_chords
+    instruments: [choir_stadium, warm_pad]
+    every_bars: 1
+    duration_beats: 3.25
+    # Keep this as arena glue, not a whistle-tone pad. The old octave/open
+    # voicing produced clipped G9 sour-note candidates in the bridge/chorus.
+    octave: 3
+    velocity: 38
+    articulation: pad
+    voicing: drop2
+    constraints:
+      max_pitch: 84
+      min_pitch: 38
+    humanize_ms: 12
+
+  hook_voice:
+    kind: motif
+    instrument: neon_brass_lead
+    motif: brass_boss_hook
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 108
+    articulation: tenuto
+    humanize_ms: 2.0
+    humanize_velocity_pct: 2
+    pitch_scoop_cents: 4.0
+
+  answer_voice:
+    kind: motif
+    instrument: neon_brass_lead
+    motif: brass_boss_answer
+    starts: [[2, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 106
+    articulation: tenuto
+    humanize_ms: 2.0
+    humanize_velocity_pct: 2
+    pitch_scoop_cents: 4.0
+
+  saw_shadow:
+    kind: motif
+    instrument: razor_saw_answer
+    motif: brass_boss_hook
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 74
+    articulation: staccato
+    transpose: -12
+    humanize_ms: 3.0
+    humanize_velocity_pct: 3
+
+  prechorus_lift_voice:
+    kind: motif
+    instruments: [hero_brass_stack, rhythm_guitars]
+    motif: prechorus_lift
+    starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]]
+    repeats: 1
+    every_bars: 8
+    velocity: 92
+    articulation: marcato
+    instrument_velocity_offsets: {hero_brass_stack: 0, rhythm_guitars: -8}
+    instrument_octave_offsets: {hero_brass_stack: 0, rhythm_guitars: -1}
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+
+  guitar_solo:
+    kind: motif
+    instrument: lead_guitar
+    motif: guitar_skyline_run
+    starts: [[0, 0.0], [4, 0.0]]
+    repeats: 1
+    every_bars: 8
+    velocity: 102
+    articulation: legato
+    humanize_ms: 3.5
+    humanize_velocity_pct: 4
+    pitch_scoop_cents: 6.0
+    pitch_bend_curve: [[0.0, 0], [0.35, 70], [0.70, 0]]
+
+  sparkle_downbeat:
+    kind: root_hits
+    instruments: [bell_flash]
+    hits: [[0, 0.0, 0, 1.0], [4, 0.0, 0, 1.0]]
+    octave: 4
+    velocity: 64
+    articulation: bell
+    humanize_ms: 5
+
+  final_call:
+    kind: motif
+    instruments: [neon_brass_lead, hero_brass_stack, lead_guitar]
+    motif: final_boss_call
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 112
+    articulation: marcato
+    instrument_velocity_offsets: {neon_brass_lead: 0, hero_brass_stack: -8, lead_guitar: -4}
+    instrument_octave_offsets: {neon_brass_lead: 0, hero_brass_stack: -1, lead_guitar: -1}
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+
+  countdown_voice:
+    kind: motif
+    instruments: [hero_brass_stack, neon_brass_lead]
+    motif: final_countdown_riff
+    starts: [[0, 0.0]]
+    repeats: 1
+    every_bars: 4
+    velocity: 100
+    articulation: tenuto
+    instrument_velocity_offsets: {hero_brass_stack: 0, neon_brass_lead: -14}
+    humanize_ms: 2.5
+    humanize_velocity_pct: 2
+    pitch_scoop_cents: 4.0
+
+sections:
+  - id: boss_entry
+    bars: 4
+    intensity: 1.10
+    harmony: [F#m, F#m, D, E]
+    layers:
+      - arena_drums_big
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - hook_voice
+      - answer_voice
+      - sparkle_downbeat
+      - kind: chord_hits
+        instruments: [rhythm_guitars, wide_guitars, hero_brass_stack]
+        hits: [[0, 0.0], [0, 2.0], [2, 0.0], [3, 0.0]]
+        duration_beats: 0.65
+        octave: 3
+        velocity: 100
+        articulation: marcato
+        voicing: wide
+        instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
+        constraints: {min_pitch: 40, max_pitch: 95}
+
+  - id: main_assault
+    bars: 12
+    intensity: 1.02
+    harmony: [F#m, D, A, E, F#m, D, A, E, F#m, D, A, E]
+    layers:
+      - arena_drums
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - {template: power_hits, hits: [[0,0.0], [2,0.0], [4,0.0], [6,0.0], [8,0.0], [10,0.0]]}
+      - {template: hook_voice, repeats: 3}
+      - {template: answer_voice, repeats: 3}
+      - {template: saw_shadow, repeats: 3}
+      - {template: sparkle_downbeat, hits: [[0,0.0,0,1.0], [4,0.0,0,1.0], [8,0.0,0,1.0]]}
+
+  - id: lift_bridge
+    bars: 8
+    intensity: 1.08
+    harmony: [Bm, D, F#m, E, C#m, D, E, E]
+    layers:
+      - arena_drums_big
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - {template: countdown_voice, starts: [[0, 0.0], [4, 0.0]]}
+      - {template: prechorus_lift_voice, starts: [[6, 0.0]], velocity: 84}
+      - kind: chord_hits
+        instruments: [rhythm_guitars, wide_guitars, hero_brass_stack]
+        hits: [[0,0.0], [1,0.0], [2,0.0], [3,0.0], [4,0.0], [5,0.0], [6,0.0], [6,2.0], [7,0.0], [7,2.0], [7,3.0]]
+        duration_beats: 0.70
+        octave: 3
+        velocity: 98
+        articulation: marcato
+        voicing: wide
+        instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
+        constraints: {min_pitch: 40, max_pitch: 95}
+      - kind: automation
+        group: lead
+        automation:
+          - {group: lead, cc: expression, from: 84, to: 116, curve: smooth, points: 12}
+          - {group: guitars, cc: expression, from: 88, to: 112, curve: smooth, points: 12}
+
+  - id: chorus_fight
+    bars: 12
+    intensity: 1.16
+    harmony: [F#m, D, A, E, F#m, D, A, C#7, F#m, D, E, F#m]
+    layers:
+      - arena_drums_big
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - {template: power_hits, hits: [[0,0.0], [1,0.0], [2,0.0], [3,0.0], [4,0.0], [5,0.0], [6,0.0], [7,0.0], [8,0.0], [9,0.0], [10,0.0], [11,0.0]], duration_beats: 0.40, velocity: 72, instruments: [rhythm_guitars]}
+      - {template: hook_voice, repeats: 3, velocity: 100}
+      - {template: answer_voice, repeats: 3, velocity: 98}
+      - {template: saw_shadow, repeats: 3, velocity: 56}
+
+  - id: shred_break
+    bars: 8
+    intensity: 1.12
+    harmony: [F#m, E, D, C#7, F#m, E, D, C#7]
+    layers:
+      - arena_drums_big
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - guitar_solo
+      - {template: prechorus_lift_voice, starts: [[2,0.0], [6,0.0]], velocity: 84}
+      - kind: chord_hits
+        instruments: [rhythm_guitars, wide_guitars, hero_brass_stack]
+        hits: [[0,0.0], [1,0.0], [2,0.0], [3,0.0], [4,0.0], [5,0.0], [6,0.0], [7,0.0], [7,2.0], [7,3.0]]
+        duration_beats: 0.62
+        octave: 3
+        velocity: 104
+        articulation: marcato
+        voicing: wide
+        instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
+        constraints: {min_pitch: 40, max_pitch: 95}
+
+  - id: boss_tag
+    bars: 4
+    intensity: 1.22
+    harmony: [F#m, D, E, F#m]
+    layers:
+      - arena_drums_big
+      - bass_drive
+      - guitar_chug
+      - stadium_pads
+      - {template: countdown_voice, starts: [[0, 0.0]], velocity: 96}
+      - {template: final_call, starts: [[2, 0.0]]}
+      - kind: chord_hits
+        instruments: [rhythm_guitars, wide_guitars, hero_brass_stack, choir_stadium]
+        hits: [[0,0.0], [1,0.0], [2,0.0], [3,0.0], [3,2.0], [3,3.0]]
+        duration_beats: 0.85
+        octave: 3
+        velocity: 112
+        articulation: marcato
+        voicing: wide
+        instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
+        constraints: {min_pitch: 40, max_pitch: 95}
+      - kind: root_hits
+        instruments: [picked_bass, synth_bass]
+        hits: [[3, 3.5, 0, 0.50]]
+        octave: 2
+        velocity: 116
+        articulation: hit

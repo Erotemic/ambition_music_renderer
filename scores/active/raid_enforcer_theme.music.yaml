@@ -1,0 +1,243 @@
+schema: ambition.musicir.v1
+id: raid_enforcer_theme
+title: Black Pennant March - Raid Enforcer Theme
+seed: 2026051601
+notes: >-
+  Fictional villain cue for the Raid Enforcer enemy. This is not based on
+  any real-world anthem or propaganda song: it uses an invented minor-key
+  march, harsh snare cadence, low brass pressure, and cold choir/strings to
+  make the character read as authoritarian, cruel, and dangerous in-game.
+  The hook is intentionally coercive and angular rather than triumphant.
+tempo:
+  bpm: 104
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 30
+  lowpass_hz: 8600
+  presence_low_hz: 1050
+  presence_high_hz: 3100
+  presence_db: 1.2
+  reverb_wet: 0.075
+  reverb_decay_seconds: 0.92
+  reverb_damping_hz: 4100
+  stereo_width: 0.06
+  compressor_threshold_db: -16.0
+  compressor_ratio: 4.5
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 130.0
+  compressor_makeup_db: 1.2
+  compressor_knee_db: 4.0
+  limiter_drive: 1.05
+  normalize: true
+  target_peak_db: -6.0
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.018
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 4300
+  stereo_width: 0.035
+  limiter_drive: 0.92
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: horns_low, group: brass, program: french_horn, volume: 68, pan: 48, expression: 82, modulation: 3}
+  - {name: trombones, group: brass, program: trombone, volume: 70, pan: 38, expression: 84, modulation: 2}
+  - {name: tuba, group: bass, program: tuba, volume: 72, pan: 31, expression: 86}
+  - {name: contrabass, group: bass, program: contrabass, volume: 62, pan: 40, expression: 78}
+  - {name: violins, group: strings, program: string_ensemble_1, volume: 58, pan: 72, expression: 72, modulation: 4}
+  - {name: celli, group: strings, program: cello, volume: 62, pan: 38, expression: 76, modulation: 3}
+  - {name: male_choir, group: choir_pad, program: choir_aahs, volume: 48, pan: 62, expression: 62, modulation: 2}
+  - {name: iron_bells, group: mallets, program: tubular_bells, volume: 54, pan: 70, expression: 72}
+  - {name: kit, group: percussion, is_drum: true, volume: 82, pan: 56, expression: 98}
+motifs:
+  - id: black_pennant_hook
+    root: D3
+    intervals: [0, 1, 7, 6, 3, 1, 0, -1]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.86, 0.74, 0.92, 0.70, 0.80, 0.70, 0.76, 0.54]
+  - id: order_call
+    root: A3
+    intervals: [0, 3, 1, 0, -1, 0]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.82, 0.68, 0.74, 0.70, 0.78, 0.50]
+  - id: knife_string_counter
+    root: D4
+    intervals: [12, 10, 7, 6, 7, 3, 1, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.68, 0.62, 0.66, 0.62, 0.66, 0.58, 0.56, 0.52]
+layer_templates:
+  command_swell:
+    kind: automation
+    automation:
+      - {group: brass, cc: expression, from: 70, to: 96, curve: smooth, points: 10}
+      - {group: strings, cc: expression, from: 58, to: 84, curve: smooth, points: 10}
+      - {group: choir_pad, cc: expression, from: 42, to: 68, curve: smooth, points: 8}
+  iron_chord_floor:
+    kind: pad_chords
+    instruments: [horns_low, trombones, male_choir]
+    instrument_octave_offsets: {horns_low: 0, trombones: -1, male_choir: 0}
+    instrument_velocity_offsets: {horns_low: 0, trombones: 3, male_choir: -18}
+    octave: 2
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 48
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  boot_bass:
+    kind: bassline
+    instrument: tuba
+    octave: 1
+    pattern: [[0, 0.0, 0.55], [0, 1.0, 0.45], [7, 2.0, 0.55], [1, 3.0, 0.45]]
+    velocity: 66
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  contrabass_shadow:
+    kind: bassline
+    instrument: contrabass
+    octave: 1
+    pattern: [[0, 0.0, 0.85], [-1, 1.5, 0.35], [0, 2.0, 0.85], [-5, 3.5, 0.35]]
+    velocity: 48
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  hook_brass:
+    kind: motif
+    instruments: [trombones, horns_low]
+    motif: black_pennant_hook
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 72
+    articulation: marcato
+    instrument_octave_offsets: {trombones: 0, horns_low: 1}
+    instrument_velocity_offsets: {trombones: 0, horns_low: -8}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  barked_order:
+    kind: motif
+    instruments: [horns_low, iron_bells]
+    motif: order_call
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 58
+    articulation: marcato
+    instrument_octave_offsets: {horns_low: 1, iron_bells: 2}
+    instrument_velocity_offsets: {horns_low: 0, iron_bells: -10}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  saw_strings:
+    kind: ostinato
+    instruments: [violins, celli]
+    instrument_octave_offsets: {violins: 1, celli: -1}
+    intervals: [0, 1, 0, 6, 0, 3, 1, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    octave: 3
+    velocity: 42
+    articulation: spiccato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  counter_knives:
+    kind: motif
+    instruments: [violins]
+    motif: knife_string_counter
+    every_bars: 8
+    repeats: 4
+    starts: [[2, 0.0]]
+    velocity: 44
+    articulation: spiccato
+    instrument_octave_offsets: {violins: 0}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  parade_snare:
+    kind: drums
+    instrument: kit
+    velocity: 58
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 64}
+      - {drum: snare, beats: [1.0, 1.5, 3.0, 3.5], velocity: 48}
+      - {drum: closed_hat, beats: [0.5, 2.5], velocity: 26}
+      - {drum: crash, beats: [0.0], velocity: 34, every: 8}
+playback:
+  mode: section_stem_matrix
+  loop_components: [enforcer_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [brass, bass]
+    fade_stems: [strings, choir_pad, mallets, percussion]
+state_map:
+  default:
+    section: enforcer_loop
+    stems: {brass: 0.80, bass: 0.76, strings: 0.46, choir_pad: 0.34, mallets: 0.26, percussion: 0.58}
+  pursuit:
+    section: enforcer_loop
+    stems: {brass: 0.92, bass: 0.86, strings: 0.72, choir_pad: 0.46, mallets: 0.40, percussion: 0.78}
+sections:
+  - id: enforcer_loop
+    kind: loop_component
+    label: fictional raid enforcer march loop
+    bars: 32
+    intensity: 0.78
+    density: 0.80
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Dm
+      - Eb
+      - Dm
+      - C#dim
+      - Dm
+      - Bb
+      - A7
+      - Dm
+      - Gm
+      - Dm/A
+      - Eb
+      - A7
+      - Dm
+      - Fm
+      - Ebdim
+      - A7
+      - Dm
+      - Eb
+      - Dm
+      - C#dim
+      - Gm
+      - Dm/A
+      - Bb
+      - A7
+      - Dm
+      - Fm
+      - Eb
+      - C#dim
+      - Dm
+      - Bb
+      - A7
+      - Dm
+    layers:
+      - command_swell
+      - iron_chord_floor
+      - boot_bass
+      - contrabass_shadow
+      - hook_brass
+      - barked_order
+      - saw_strings
+      - counter_knives
+      - parade_snare

@@ -1,0 +1,252 @@
+schema: ambition.musicir.v1
+id: lofi_study_loop
+title: Lofi Beats to Study and Relax To
+seed: 20260507
+notes: >-
+  Single-section, loopable lofi cue for non-combat ambient play. Replaces
+  the procedural `render_lofi_theme` synth path which historically blocked
+  startup for ~2.4 seconds doing per-sample sin() math. Same musical role
+  ("default" sandbox music when no encounter is active); rendered once via
+  the music_renderer pipeline, loaded as a static OGG at runtime.
+
+  Style targets: ~75 BPM, jazzy F-minor changes (ii-V-i with extensions),
+  felt piano + Rhodes core, brushed jazz drums, upright bass, soft pad,
+  gentle lowpass + tape-style postprocess. Single 32-bar loop section.
+
+tempo:
+  bpm: 75
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+
+postprocess:
+  gain_db: -0.6
+  highpass_hz: 28
+  lowpass_hz: 8200
+  high_shelf_hz: 4200
+  high_shelf_db: -3.5
+  presence_low_hz: 1800
+  presence_high_hz: 3800
+  presence_db: -1.4
+  reverb_wet: 0.18
+  reverb_decay_seconds: 1.6
+  reverb_damping_hz: 4400
+  post_reverb_high_shelf_hz: 5200
+  post_reverb_high_shelf_db: -1.6
+  stereo_width: 0.10
+  compressor_threshold_db: -16.0
+  compressor_ratio: 3.5
+  compressor_attack_ms: 12.0
+  compressor_release_ms: 110.0
+  compressor_makeup_db: 1.6
+  compressor_knee_db: 6.0
+  limiter_drive: 1.0
+  normalize: true
+  # Master peak intentionally low so music sits under the SFX bus
+  # (see settings/audio.rs music_volume default = 0.65). Standard
+  # lofi mastering aims for -8 to -12 LUFS; -8 dB peak gets us in
+  # range without making the music inaudible.
+  target_peak_db: -8.0
+
+stem_postprocess:
+  highpass_hz: 26
+  reverb_wet: 0.06
+  reverb_decay_seconds: 1.0
+  reverb_damping_hz: 4400
+  stereo_width: 0.05
+  limiter_drive: 1.0
+  normalize: false
+  target_peak_db: -2.6
+
+instruments:
+  - {name: felt_piano,    group: piano,      program: acoustic_grand_piano, volume: 70, pan: 56, expression: 78}
+  - {name: rhodes,        group: piano,      program: electric_piano_1,     volume: 64, pan: 70, expression: 74}
+  - {name: warm_pad,      group: pad,        program: pad_warm,             volume: 50, pan: 64, expression: 72, modulation: 14}
+  - {name: upright_bass,  group: bass,       program: acoustic_bass,        volume: 74, pan: 50, expression: 82}
+  - {name: vibraphone,    group: glimmer,    program: vibraphone,           volume: 58, pan: 38, expression: 72}
+  - {name: jazz_drums,    group: percussion, is_drum: true,                 volume: 62, pan: 64, expression: 78}
+
+motifs:
+  - id: piano_line_a
+    root: F4
+    intervals: [0, 3, 5, 7, 8, 7, 5, 3]
+    rhythm:    [0.5, 0.5, 1.0, 0.5, 1.0, 0.5, 1.0, 1.0]
+    velocities: [0.62, 0.58, 0.70, 0.66, 0.74, 0.62, 0.66, 0.58]
+  - id: piano_line_b
+    root: Eb4
+    intervals: [0, 2, 5, 3, 0, -2, 0, 3]
+    rhythm:    [0.75, 0.25, 0.5, 0.5, 1.0, 0.5, 0.5, 2.0]
+    velocities: [0.68, 0.56, 0.66, 0.62, 0.72, 0.58, 0.62, 0.66]
+  - id: vibe_glints
+    root: F5
+    intervals: [0, 7, 12, 7, 0, 5, 8]
+    rhythm:    [0.5, 1.0, 1.0, 0.5, 1.5, 0.5, 1.0]
+    velocities: [0.50, 0.46, 0.62, 0.50, 0.42, 0.46, 0.54]
+
+layer_templates:
+  warm_pad_chords:
+    kind: pad_chords
+    instruments: [warm_pad]
+    octave: 3
+    duration_beats: 4
+    velocity: 38
+    articulation: pad
+    voicing: drop2
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  rhodes_chords:
+    kind: pad_chords
+    instruments: [rhodes]
+    octave: 4
+    duration_beats: 2
+    velocity: 50
+    articulation: normal
+    voicing: shell
+    humanize_ms: 14
+    humanize_velocity_pct: 6
+  bass_walk:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    # Root on 1, fifth on 2, octave on 3, fifth on 4-and. Classic
+    # lofi walking-bass shape inside a single bar.
+    pattern:
+      - [0, 0.0, 0.85]
+      - [7, 1.5, 0.55]
+      - [12, 2.5, 0.55]
+      - [7, 3.25, 0.40]
+    velocity: 68
+    articulation: normal
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+  brushed_loop:
+    kind: drums
+    instrument: jazz_drums
+    velocity: 56
+    humanize_ms: 12
+    humanize_velocity_pct: 6
+    # Lo-fi brushes: side-stick on 1+3, soft snare on 2+4, kick on 1
+    # with occasional pickup, closed hat eighths through the bar.
+    events:
+      - {drum: kick,        beats: [0.0],                          velocity: 58}
+      - {drum: side_stick,  beats: [0.0, 2.0],                     velocity: 36, probability: 0.45}
+      - {drum: snare,       beats: [1.0, 3.0],                     velocity: 44}
+      - {drum: closed_hat,  beats: [0.5, 1.5, 2.5, 3.5],           velocity: 30}
+      - {drum: closed_hat,  beats: [0.0, 1.0, 2.0, 3.0],           velocity: 26, probability: 0.55}
+      - {drum: kick,        beats: [2.5],                          velocity: 46, probability: 0.40}
+
+playback:
+  mode: section_stem_matrix
+  loop_components:
+    - lofi_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [piano, pad, bass]
+    fade_stems: [glimmer, percussion]
+
+state_map:
+  default:
+    section: lofi_loop
+    stems:
+      piano: 0.85
+      pad: 0.72
+      bass: 0.72
+      glimmer: 0.58
+      percussion: 0.55
+
+sections:
+  - id: lofi_loop
+    kind: loop_component
+    label: chill changes
+    bars: 32
+    intensity: 0.40
+    density: 0.50
+    loopable: true
+    valid_exit_local_bars: [16, 32]
+    # Jazzy F-minor: i - iv - bVII - bIII - VI - V - i variants. Eight
+    # 4-bar harmonic units repeated and varied across 32 bars so the
+    # loop doesn't feel mechanical.
+    harmony:
+      - Fm9
+      - Bbm9
+      - Eb9
+      - Abmaj7
+      - Dbmaj7
+      - C7b9
+      - Fm9
+      - Csus4
+      - Fm9
+      - Bbm11
+      - Eb13
+      - Abmaj9
+      - Dbmaj7(#11)
+      - Bbm9
+      - C7sus4
+      - Fm(add9)
+      - Fm9
+      - Bbm9
+      - Eb9
+      - Abmaj7
+      - Dbmaj7
+      - Bbm9
+      - C7b9
+      - Fm9
+      - Bbm11
+      - Fm/Ab
+      - Dbmaj7
+      - Eb
+      - Bbm9
+      - Csus4
+      - C7b9
+      - Fm(add9)
+    layers:
+      - warm_pad_chords
+      - rhodes_chords
+      - bass_walk
+      - brushed_loop
+      - kind: motif
+        instrument: felt_piano
+        motif: piano_line_a
+        roots: [F4, Eb4, Bb4, F4]
+        starts:
+          - [4, 0.0]
+          - [12, 0.0]
+          - [20, 0.0]
+          - [28, 0.0]
+        velocity: 56
+        articulation: normal
+        humanize_ms: 18
+        humanize_velocity_pct: 5
+      - kind: motif
+        instrument: felt_piano
+        motif: piano_line_b
+        roots: [Eb4, Db4]
+        starts:
+          - [8, 0.0]
+          - [24, 0.0]
+        velocity: 52
+        articulation: normal
+        humanize_ms: 18
+        humanize_velocity_pct: 5
+      - kind: motif
+        instrument: vibraphone
+        motif: vibe_glints
+        roots: [F5, Bb5]
+        starts:
+          - [16, 1.0]
+          - [30, 0.5]
+        velocity: 44
+        articulation: bell
+        humanize_ms: 24
+        humanize_velocity_pct: 8

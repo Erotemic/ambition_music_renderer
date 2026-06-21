@@ -1,0 +1,217 @@
+schema: ambition.musicir.v1
+id: physicists_guild_event_horizon_waltz
+title: Event Horizon Waltz - Physicists Guild Theme
+seed: 2026050916
+notes: >-
+  Physicists Guild faction loop. Cosmic 11/8 pulse with vibraphone equations,
+  synth-pad spacetime curvature, bass pulses, and a horn/theremin-like lead.
+  It leans into wonder, Nobel-prize weirdness, and dangerous elegance.
+tempo:
+  bpm: 176
+meter:
+  beats_per_bar: 11
+  beat_unit: 8
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 28
+  lowpass_hz: 10800
+  high_shelf_hz: 6000
+  high_shelf_db: -1.2
+  reverb_wet: 0.22
+  reverb_decay_seconds: 2.3
+  reverb_damping_hz: 5000
+  stereo_width: 0.24
+  compressor_threshold_db: -18.5
+  compressor_ratio: 2.6
+  compressor_attack_ms: 14.0
+  compressor_release_ms: 120.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 6.0
+  limiter_drive: 0.95
+  normalize: true
+  target_peak_db: -7.5
+stem_postprocess:
+  highpass_hz: 26
+  reverb_wet: 0.09
+  reverb_decay_seconds: 1.2
+  reverb_damping_hz: 5200
+  stereo_width: 0.11
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: spacetime_pad, group: pad, program: pad_sweep, volume: 50, pan: 64, expression: 70, modulation: 18}
+  - {name: halo_pad, group: pad, program: pad_halo, volume: 40, pan: 76, expression: 62, modulation: 14}
+  - {name: vibraphone, group: glimmer, program: vibraphone, volume: 56, pan: 40, expression: 74}
+  - {name: electric_piano, group: keys, program: electric_piano_1, volume: 58, pan: 54, expression: 76}
+  - {name: french_horn, group: brass, program: french_horn, volume: 54, pan: 74, expression: 70, modulation: 5}
+  - {name: lead_voice, group: lead, program: lead_voice, volume: 44, pan: 82, expression: 62, modulation: 18}
+  - {name: synth_bass, group: bass, program: synth_bass_1, volume: 64, pan: 44, expression: 78}
+  - {name: gravity_kit, group: percussion, is_drum: true, volume: 50, pan: 64, expression: 80}
+motifs:
+  - id: horizon_signal
+    root: E4
+    intervals: [0, 7, 11, 14, 18, 14, 11, 7, 5, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 1.5]
+    velocities: [0.48, 0.54, 0.62, 0.70, 0.84, 0.62, 0.58, 0.52, 0.48, 0.44, 0.38]
+  - id: particle_reply
+    root: B4
+    intervals: [0, -1, -5, -7, -5, -1, 2, 6]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 1.5]
+    velocities: [0.52, 0.46, 0.62, 0.58, 0.52, 0.46, 0.54, 0.40]
+layer_templates:
+  curved_space_pad:
+    kind: pad_chords
+    instruments: [spacetime_pad, halo_pad]
+    # Keep the halo as color inside the pad instead of a separate octave
+    # above; the bundle flagged curved_space_pad as the source of most
+    # sour-note/dissonance pressure.
+    instrument_octave_offsets: {spacetime_pad: 0, halo_pad: 0}
+    instrument_velocity_offsets: {spacetime_pad: 0, halo_pad: -14}
+    octave: 3
+    every_bars: 1
+    duration_beats: 8.0
+    velocity: 30
+    articulation: pad
+    voicing: drop2
+    humanize_ms: 16
+    humanize_velocity_pct: 4
+  invariant_bass:
+    kind: bassline
+    instrument: synth_bass
+    octave: 2
+    pattern: [[0, 0.0, 1.0], [7, 3.0, 0.55], [12, 5.5, 0.5], [7, 8.0, 0.55], [14, 10.0, 0.45]]
+    velocity: 56
+    articulation: staccato
+    humanize_ms: 5
+    humanize_velocity_pct: 5
+  equation_vibes:
+    kind: arpeggio
+    instrument: vibraphone
+    octave: 5
+    pattern: [0, 2, 1, 3, 4, 3, 1, 2, 0, 4, 2]
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 34
+    density: 0.62
+    articulation: bell
+    voicing: open
+    humanize_ms: 9
+    humanize_velocity_pct: 6
+  keys_orbit:
+    kind: arpeggio
+    instrument: electric_piano
+    octave: 4
+    pattern: [0, 1, 2, 3, 2, 1]
+    step: 1.0
+    duration_beats: 0.72
+    velocity: 34
+    density: 0.72
+    articulation: normal
+    humanize_ms: 10
+    humanize_velocity_pct: 5
+  horizon_lead:
+    kind: motif
+    instruments: [lead_voice, french_horn]
+    motif: horizon_signal
+    root: E4
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 48
+    articulation: legato
+    instrument_velocity_offsets: {lead_voice: -2, french_horn: -8}
+    instrument_octave_offsets: {lead_voice: 1, french_horn: 0}
+    pitch_bend_curve: [[0.0, 0], [0.25, 30], [0.75, -15], [1.0, 0]]
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  particle_answer:
+    kind: motif
+    instrument: vibraphone
+    motif: particle_reply
+    root: B4
+    every_bars: 8
+    repeats: 4
+    starts: [[2, 0.0]]
+    velocity: 36
+    articulation: bell
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+  gravity_ticks:
+    kind: drums
+    instrument: gravity_kit
+    velocity: 32
+    humanize_ms: 8
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0, 5.5], velocity: 34}
+      - {drum: low_tom, beats: [3.0, 8.0], velocity: 24, probability: 0.65}
+      - {drum: ride, beats: [0.0, 2.5, 5.5, 8.0, 10.0], velocity: 16, probability: 0.55}
+      - {drum: triangle_mute, beats: [10.5], velocity: 14, probability: 0.45}
+  modulation_orbit:
+    kind: automation
+    group: pad
+    automation:
+      - {group: pad, cc: modulation, from: 8, to: 34, curve: lfo, cycles: 4, points: 96}
+      - {group: lead, cc: expression, from: 54, to: 80, curve: smooth, points: 16}
+playback:
+  mode: section_stem_matrix
+  loop_components: [horizon_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 8
+    bridge_stems: [pad, bass, keys]
+    fade_stems: [glimmer, brass, lead, percussion]
+state_map:
+  default:
+    section: horizon_loop
+    stems: {pad: 0.72, glimmer: 0.64, keys: 0.58, brass: 0.50, lead: 0.60, bass: 0.70, percussion: 0.35}
+sections:
+  - id: horizon_loop
+    kind: loop_component
+    label: physicists guild observatory
+    bars: 32
+    intensity: 0.58
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Emaj9(#11)
+      - B/D#
+      - C#m11
+      - Amaj7(#11)
+      - F#m9
+      - B13
+      - Emaj9(#11)
+      - Gmaj7(#11)
+      - F#13
+      - Bmaj9
+      - Emaj9(#11)
+      - C#m11
+      - Amaj9
+      - F#m9
+      - B13
+      - Emaj9(#11)
+      - Emaj9(#11)
+      - B/D#
+      - C#m11
+      - Amaj7(#11)
+      - F#m9
+      - G#7(b9)
+      - C#m9
+      - F#13
+      - Bmaj9
+      - Amaj9(#11)
+      - E/G#
+      - F#m9
+      - B13
+      - Emaj9(#11)
+      - Gmaj7(#11)
+      - Emaj9(#11)
+    layers: [curved_space_pad, invariant_bass, equation_vibes, keys_orbit, horizon_lead, particle_answer, gravity_ticks, modulation_orbit]

@@ -1,0 +1,361 @@
+schema: ambition.musicir.v1
+id: long_lofi_drift
+title: Long Lofi Drift
+seed: 20260507_3
+notes: >-
+  Default sandbox music. Recomposed to feel more like classic
+  "lofi beats to study/relax to": Rhodes-led melodic line over a
+  sustained warm pad, half-time brushed jazz kit, walking-but-sparse
+  upright bass, with vibraphone glints and felt piano as a textural
+  bed only. Slower-moving harmony than the previous version (one
+  chord per 2 bars on average) leaves more breathing room.
+
+  Hiss flagged in the previous version is addressed by:
+  - cleaner soundfont programs (pad_new_age, clarinet, vs noisy
+    pad_warm + pan_flute);
+  - lower pad volumes;
+  - lower master target_peak_db so the pad noise floor isn't pushed
+    up by makeup gain;
+  - shorter reverb decay so the noise tail doesn't accumulate.
+
+tempo:
+  bpm: 70
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+
+postprocess:
+  # Darker, quieter master. Lofi character lives in what's NOT
+  # there: less treble, less peak, less compression.
+  gain_db: -1.0
+  highpass_hz: 36
+  lowpass_hz: 6800
+  high_shelf_hz: 3400
+  high_shelf_db: -5.5
+  presence_low_hz: 1500
+  presence_high_hz: 3400
+  presence_db: -1.8
+  reverb_wet: 0.11
+  reverb_decay_seconds: 1.0
+  reverb_damping_hz: 3600
+  post_reverb_high_shelf_hz: 4400
+  post_reverb_high_shelf_db: -2.6
+  stereo_width: 0.10
+  compressor_threshold_db: -20.0
+  compressor_ratio: 2.4
+  compressor_attack_ms: 16.0
+  compressor_release_ms: 160.0
+  compressor_makeup_db: 0.4
+  compressor_knee_db: 6.0
+  limiter_drive: 1.0
+  normalize: true
+  # Music sits well under SFX. Standard lofi mastering: -8 to -12
+  # LUFS; this targets the lower end of that for the sandbox bus.
+  target_peak_db: -9.0
+
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.04
+  reverb_decay_seconds: 0.8
+  reverb_damping_hz: 3600
+  stereo_width: 0.05
+  limiter_drive: 1.0
+  normalize: false
+  target_peak_db: -3.5
+
+instruments:
+  # Rhodes is the lead voice. Felt piano stays in the mix as a
+  # textural bed (chord pad, never the melody). This is the main
+  # "more lofi" lever -- Rhodes lead is the genre's signature.
+  - {name: rhodes,        group: piano,      program: electric_piano_1,     volume: 78, pan: 60, expression: 84}
+  - {name: felt_piano,    group: piano,      program: acoustic_grand_piano, volume: 38, pan: 48, expression: 60}
+  - {name: warm_pad,      group: pad,        program: pad_new_age,          volume: 44, pan: 64, expression: 68, modulation: 8}
+  # Bass dropped to octave 1 (sub feel) on alternating bars; root
+  # at octave 2 keeps the line audible over phone speakers.
+  - {name: upright_bass,  group: bass,       program: acoustic_bass,        volume: 76, pan: 50, expression: 82}
+  - {name: vibraphone,    group: glimmer,    program: vibraphone,           volume: 64, pan: 36, expression: 76}
+  - {name: jazz_drums,    group: percussion, is_drum: true,                 volume: 50, pan: 64, expression: 72}
+
+motifs:
+  # Rhodes-led melodic phrases: shorter, more space between phrases,
+  # slightly looser rhythm than the previous version.
+  - id: rhodes_phrase_a
+    root: A4
+    intervals: [0, 3, 5, 3, 0]
+    rhythm:    [1.5, 1.0, 1.5, 2.0, 2.0]
+    velocities: [0.62, 0.58, 0.66, 0.54, 0.50]
+  - id: rhodes_phrase_b
+    root: G4
+    intervals: [0, 2, 5, 2, -2]
+    rhythm:    [1.0, 1.0, 2.0, 1.0, 3.0]
+    velocities: [0.60, 0.56, 0.66, 0.54, 0.50]
+  - id: rhodes_phrase_c
+    root: F4
+    intervals: [0, 4, 7, 4]
+    rhythm:    [1.5, 1.5, 2.0, 3.0]
+    velocities: [0.58, 0.62, 0.68, 0.54]
+  # Vibraphone glints: slow + bell-like. One per 8-bar window.
+  - id: vibe_glint_high
+    root: A5
+    intervals: [0, 5, 0]
+    rhythm:    [1.0, 2.0, 3.0]
+    velocities: [0.46, 0.54, 0.40]
+  - id: vibe_glint_low
+    root: E5
+    # Use C natural instead of C# for the low glint; the previous
+    # minor-third drop was the little sour color against the Cmaj return.
+    intervals: [0, -4, 0]
+    rhythm:    [1.5, 2.5, 3.0]
+    velocities: [0.42, 0.50, 0.38]
+
+layer_templates:
+  warm_pad_chords:
+    kind: pad_chords
+    instruments: [warm_pad]
+    octave: 3
+    duration_beats: 8       # 2-bar pad swells, slower than before
+    velocity: 32
+    articulation: pad
+    voicing: drop2
+    humanize_ms: 14
+    humanize_velocity_pct: 4
+  rhodes_chord_bed:
+    kind: pad_chords
+    instruments: [rhodes]
+    octave: 4
+    duration_beats: 4       # 1-bar Rhodes chord stabs
+    velocity: 38
+    articulation: normal
+    voicing: shell
+    humanize_ms: 18
+    humanize_velocity_pct: 8
+  felt_piano_pad:
+    # Felt piano as TEXTURE only -- chord notes per bar at low velocity,
+    # feels like distant comping under the Rhodes lead.
+    kind: pad_chords
+    instruments: [felt_piano]
+    octave: 3
+    duration_beats: 4
+    velocity: 26
+    articulation: normal
+    voicing: shell
+    humanize_ms: 24
+    humanize_velocity_pct: 10
+  walking_bass:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    # Half-time bassline: root on 1, fifth on 3, occasional walk
+    # to the next chord on 4. Sparser than the previous version.
+    pattern:
+      - [0, 0.0, 1.6]
+      - [7, 2.0, 1.4]
+      - [10, 3.5, 0.4]
+    velocity: 64
+    articulation: normal
+    humanize_ms: 12
+    humanize_velocity_pct: 6
+  half_time_brushes:
+    kind: drums
+    instrument: jazz_drums
+    velocity: 44
+    humanize_ms: 16
+    humanize_velocity_pct: 8
+    # Half-time feel: kick on 1, snare on 3 (instead of 2+4). Hat
+    # eighths give the pulse but stay way under the mix. Side stick
+    # ghosts on 2 and 4 land just at the edge of audibility.
+    events:
+      - {drum: kick,        beats: [0.0],                          velocity: 48}
+      - {drum: snare,       beats: [2.0],                          velocity: 38}
+      - {drum: side_stick,  beats: [1.0, 3.0],                     velocity: 22, probability: 0.35}
+      - {drum: closed_hat,  beats: [0.5, 1.5, 2.5, 3.5],           velocity: 18}
+      - {drum: ride,        beats: [0.0, 2.0],                     velocity: 14, probability: 0.25}
+
+playback:
+  mode: section_stem_matrix
+  loop_components:
+    - drift_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [piano, pad, bass]
+    fade_stems: [glimmer, percussion]
+
+state_map:
+  default:
+    section: drift_loop
+    stems:
+      piano: 0.85
+      pad: 0.70
+      bass: 0.70
+      glimmer: 0.60
+      percussion: 0.45
+
+sections:
+  - id: drift_loop
+    kind: loop_component
+    label: long lofi drift
+    bars: 64
+    intensity: 0.36
+    density: 0.42
+    loopable: true
+    valid_exit_local_bars: [16, 32, 48, 64]
+    # 64-bar A-minor loop, slower harmonic motion than the previous
+    # version. Each chord lasts 2 bars (instead of 1), so we visit
+    # 32 chords across 4 phrases of 16 bars each. Phrases drift
+    # through home Am, brighter Cmaj, sub-mediant Fmaj, and a return
+    # via Dm9. Less harmonic activity = more lofi headspace.
+    harmony:
+      # Phrase A: home (Am) -- ii V i sit
+      - Am9
+      - Am9
+      - Dm9
+      - Dm9
+      - G9sus4
+      - G9
+      - Cmaj7
+      - Cmaj7
+      - Fmaj7
+      - Fmaj7
+      - Bm7b5
+      - E7b9
+      - Am9
+      - Am9
+      - Dm11
+      - E7sus4
+      # Phrase B: bright pivot to C
+      - Cmaj9
+      - Cmaj9
+      - Em7
+      - Em7
+      - Am9
+      - Am9
+      - Dm9
+      - G9sus4
+      - Cmaj9
+      - Cmaj9
+      - Fmaj7
+      - Fmaj7
+      - Bm7b5
+      - E7b9
+      - Am9
+      - Am9
+      # Phrase C: sub-mediant Fmaj wash
+      - Fmaj9
+      - Fmaj9
+      - Bbmaj7
+      - Bbmaj7
+      - Em7
+      - A7sus4
+      - Dm9
+      - Dm9
+      - Gm9
+      - C7sus4
+      - Fmaj7
+      - Fmaj7
+      - Em7b5
+      - A7b9
+      - Dm9
+      - G7sus4
+      # Phrase D: return home
+      - Cmaj7
+      - Am9
+      - Dm9
+      - G9
+      - Cmaj7
+      - Fmaj7
+      - Bm7b5
+      - E7b9
+      - Am9
+      - Am9
+      - Dm11
+      - Dm11
+      - Em7
+      - E7sus4
+      - Am(add9)
+      - Am(add9)
+    layers:
+      - warm_pad_chords
+      - rhodes_chord_bed
+      - felt_piano_pad
+      - walking_bass
+      - half_time_brushes
+      - kind: motif
+        instrument: rhodes
+        motif: rhodes_phrase_a
+        roots: [A4, A4, A4]
+        # One Rhodes phrase per 16-bar phrase, hitting around bar 4
+        # so the listener gets ~2 bars of pad+bass before the lead
+        # arrives.
+        starts:
+          - [4, 0.0]
+          - [36, 0.0]
+        velocity: 64
+        articulation: normal
+        humanize_ms: 22
+        humanize_velocity_pct: 8
+      - kind: motif
+        instrument: rhodes
+        motif: rhodes_phrase_b
+        roots: [G4, G4]
+        starts:
+          - [12, 1.0]
+          - [44, 1.0]
+        velocity: 60
+        articulation: normal
+        humanize_ms: 22
+        humanize_velocity_pct: 8
+      - kind: motif
+        instrument: rhodes
+        motif: rhodes_phrase_c
+        roots: [F4]
+        starts:
+          - [20, 0.0]
+        velocity: 60
+        articulation: normal
+        humanize_ms: 24
+        humanize_velocity_pct: 9
+      - kind: motif
+        instrument: rhodes
+        motif: rhodes_phrase_a
+        transform: down_octave
+        roots: [A4]
+        starts:
+          - [56, 0.5]
+        velocity: 56
+        articulation: normal
+        humanize_ms: 24
+        humanize_velocity_pct: 9
+      # Vibraphone: distant glints, twice per 32 bars (so once per
+      # ~50s at 70 BPM). These are the little "twinkles" lofi tracks
+      # use to break up the harmonic bed.
+      - kind: motif
+        instrument: vibraphone
+        motif: vibe_glint_high
+        roots: [A5]
+        starts:
+          - [16, 2.0]
+        velocity: 42
+        articulation: bell
+        humanize_ms: 28
+        humanize_velocity_pct: 10
+      - kind: motif
+        instrument: vibraphone
+        motif: vibe_glint_low
+        roots: [E5]
+        starts:
+          - [48, 1.5]
+        velocity: 38
+        articulation: bell
+        humanize_ms: 28
+        humanize_velocity_pct: 10

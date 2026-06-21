@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ambition-music-renderer"
+version = "0.4.0"
+description = "Data-driven adaptive music renderer for Ambition MusicIR YAML scores"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "scipy",
+  "pretty_midi",
+  "pyfluidsynth",
+  "soundfile",
+  "PyYAML",
+  "music21",
+  "midiutil",
+  "mido",
+  "pydub",
+  "ubelt",
+  "rich",
+]
+
+[project.scripts]
+ambition-music-renderer = "ambition_music_renderer.cli:main"
+render-ambition-music = "ambition_music_renderer.musicir_renderer:main"
+
+[tool.setuptools.packages.find]
+include = ["ambition_music_renderer*"]
+exclude = ["scores*", "tests*"]

@@ -1,0 +1,1417 @@
+schema: ambition.musicir.v1
+id: solo_soar_9m08_loud
+title: Solo Soar - Long-Form Southern Flight
+seed: 20260507
+notes: >-
+  Long-form rock anthem in D major at 91 BPM, 4/4. 208 bars = 9:08 exactly.
+  This is a rewrite of the previous "Solo Soar" cue: the old version had
+  pure 16th-note scalar runs reaching C7 across all four solo sections,
+  which is what made the solo difficult to listen to. This version uses
+  proper phrasing — sustained notes with pitch-bend curves, two-bar
+  call-and-response, twin-lead harmonization in thirds, and explicit
+  rests between phrases — and keeps the lead instruments inside E5-E6
+  for almost everything.
+
+  Layout:
+    intro       (8 bars  / 20.9 s)  clean guitar arpeggio + slide swells
+    verse_a     (16 bars / 41.7 s)  call_phrase on overdrive lead
+    verse_b     (16 bars / 41.7 s)  response_phrase, fuller drums
+    prechorus   (8 bars  / 20.9 s)  prechorus_lift, builds into chorus
+    chorus_a    (16 bars / 41.7 s)  chorus_anthem, full ensemble
+    verse_c     (16 bars / 41.7 s)  variation
+    chorus_b    (16 bars / 41.7 s)  second chorus, horn weight
+    bridge      (16 bars / 41.7 s)  bridge_lyrical, oboe + slide swells
+    solo_a      (24 bars / 62.6 s)  sparse lyrical solo, single voice
+    solo_b      (24 bars / 62.6 s)  twin-lead harmonized in thirds
+    solo_c      (24 bars / 62.6 s)  upper-register variation, fiddle joins
+    solo_climax (16 bars / 41.7 s)  peak intensity
+    outro       (8 bars  / 20.9 s)  cadence to D, final hit
+
+  Uses the v0.8.0 renderer features: master bus compressor for glue,
+  per-section ambience overrides (intro intimate, climax cathedral),
+  voice-leading + cluster constraints on chord pads, velocity humanization,
+  and continuous pitch-bend curves on the slide-guitar swells and solo
+  bend gestures.
+
+tempo:
+  bpm: 91
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+
+# Spec-level constraints — apply to every chord layer unless overridden.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+  min_pitch: 36
+  max_pitch: 96
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.040
+  reverb_decay_seconds: 1.20
+  reverb_damping_hz: 6800
+  stereo_width: 0.05
+  compressor_threshold_db: -16.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 80.0
+  compressor_makeup_db: 2.0
+  compressor_knee_db: 6.0
+  limiter_drive: 0.92
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.005
+  reverb_decay_seconds: 0.45
+  reverb_damping_hz: 6800
+  stereo_width: 0.030
+  limiter_drive: 0.90
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+- {name: bass, group: strings, program: fingered_bass, volume: 96, pan: 64, 
+    expression: 100}
+- {name: string_pad, group: strings, program: string_ensemble_1, volume: 60, pan: 
+    64, expression: 76, modulation: 4}
+
+- {name: horn, group: brass, program: french_horn, volume: 76, pan: 56, 
+    expression: 84, modulation: 3}
+
+- {name: violin, group: winds, program: violin, volume: 90, pan: 78, expression: 
+    96, modulation: 12}
+- {name: oboe, group: winds, program: oboe, volume: 84, pan: 70, expression: 92, 
+    modulation: 7}
+
+- {name: rhythm_gtr, group: mallets, program: clean_guitar, volume: 92, pan: 36, 
+    expression: 100, modulation: 0}
+- {name: lead_gtr, group: mallets, program: overdrive_guitar, volume: 90, pan: 
+    76, expression: 96, modulation: 48}
+- {name: solo_gtr, group: mallets, program: distortion_guitar, volume: 88, pan: 
+    50, expression: 92, modulation: 52}
+- {name: slide_gtr, group: mallets, program: steel_guitar, volume: 86, pan: 64, 
+    expression: 98, modulation: 0}
+- {name: piano, group: mallets, program: acoustic_grand_piano, volume: 80, pan: 
+    60, expression: 92}
+
+- {name: organ, group: choir_pad, program: drawbar_organ, volume: 78, pan: 64, 
+    expression: 86, modulation: 6}
+- {name: warm_pad, group: choir_pad, program: pad_warm, volume: 52, pan: 64, 
+    expression: 66}
+
+- {name: kit, group: percussion, is_drum: true, volume: 100, pan: 64, expression: 
+    108}
+
+motifs:
+  # Verse "call" phrase — 4 bars in D major. Lyrical descending shape with
+  # long notes; D as the anchor pitch. Inspired by the contour of country-
+  # rock vocal lines (Eagles, Allman) without quoting any specific melody.
+  # Bar 1: D5 (whole)
+  # Bar 2: F#5 - E5 - D5 (h, q, q)
+  # Bar 3: A4 - D5 - E5 - F#5 (q, q, q, q)
+  # Bar 4: E5 (h) - D5 (h)
+- id: call_phrase
+  root: D5
+  intervals: [0, 4, 2, 0, -5, 0, 2, 4, 2, 0]
+  rhythm: [4.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.92, 0.94, 0.92, 0.88, 0.84, 0.88, 0.90, 0.94, 0.92, 0.86]
+
+  # Verse "response" phrase — answers the call by reaching up to A5 and
+  # falling back. 4 bars.
+  # Bar 1: E5 (whole)
+  # Bar 2: D5 - F#5 - A5 - F#5 (q,q,q,q)
+  # Bar 3: G5 - F#5 - E5 - D5 (q,q,q,q)
+  # Bar 4: A4 (h) - D5 (h)
+- id: response_phrase
+  root: D5
+  intervals: [2, 0, 4, 7, 4, 5, 4, 2, 0, -5, 0]
+  rhythm: [4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.92, 0.88, 0.94, 0.96, 0.92, 0.94, 0.92, 0.88, 0.86, 0.84, 0.88]
+
+  # Pre-chorus lift — 4-bar ascending sequence that resolves up into the
+  # chorus. Lots of stepwise motion landing on a high A5.
+  # F#5 - G5 - A5 - B5 (h, h)
+  # A5 - F#5 - A5 - B5 (q,q,q,q)
+  # D5 - F#5 - A5 - D6 (q,q,q,q)
+  # A5 (whole, sustained into the chorus)
+- id: prechorus_lift
+  root: D5
+  intervals: [4, 5, 7, 9, 7, 4, 7, 9, 0, 4, 7, 12, 7]
+  rhythm: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 4.0]
+  velocities: [0.86, 0.88, 0.92, 0.96, 0.94, 0.90, 0.94, 0.96, 0.92, 0.94, 0.96, 
+      1.00, 0.96]
+
+  # Chorus anthem hook — the memorable refrain. 4-bar phrase, big leap up
+  # to high A and back. Rhythm has a clear "soar" feel: long anchor + leap.
+  # D5 (h) - A5 (h)
+  # B5 - A5 - F#5 (q, q, h)
+  # D5 - E5 - F#5 - E5 (q, q, q, q)
+  # E5 (h) - D5 (h)
+- id: chorus_anthem
+  root: D5
+  intervals: [0, 7, 9, 7, 4, 0, 2, 4, 2, 2, 0]
+  rhythm: [2.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.94, 1.00, 0.96, 0.92, 0.92, 0.88, 0.92, 0.94, 0.92, 0.92, 0.88]
+
+  # Bridge lyrical phrase — slow contemplative descent. Goes lower than
+  # the verse for pulled-back contrast. Feels like the bridge of a ballad.
+  # B4 (h) - A4 (h)
+  # B4 - D5 - F#5 - E5 (q,q,q,q)
+  # D5 (h) - B4 (h)
+  # A4 (whole)
+- id: bridge_lyrical
+  root: D5
+  intervals: [-3, -5, -3, 0, 4, 2, 0, -3, -5]
+  rhythm: [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 4.0]
+  velocities: [0.84, 0.82, 0.84, 0.86, 0.88, 0.86, 0.84, 0.82, 0.78]
+
+  # Solo A replacement: an 8-bar chord-aware story phrase. This keeps the
+  # lead inside a playable guitar register, lines up with D-A-G-D / Bm-A-G-A,
+  # and ends every phrase with a short shred flourish instead of looping the
+  # old awkward four-bar cells over unrelated chords.
+- id: solo_a_story
+  root: D5
+  intervals: [7, 4, 2, 11, 9, 7, 9, 7, 5, 0, 4, 7, 12, 11, 9, 7, 4, 2, 11, 9, 7, 
+      5, 9, 12, 9, 0, 2, 4, 7, 9, 7, 4, 2]
+  rhythm: [2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
+      2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 
+      0.5, 0.5, 0.5, 0.5]
+  velocities: [0.92, 0.86, 0.82, 0.96, 0.88, 0.86, 0.90, 0.84, 0.82, 0.78, 0.86, 
+      0.92, 0.98, 0.84, 0.94, 0.88, 0.84, 0.82, 0.96, 0.88, 0.84, 0.82, 0.90, 
+      0.96, 0.88, 0.82, 0.84, 0.88, 0.94, 1.00, 0.94, 0.88, 0.84]
+
+  # Solo opening — sparse, sustained, with bend gestures. 4 bars.
+  # Bar 1: A5 (whole — held with vibrato, this is THE "soar" anchor)
+  # Bar 2: G5 (h) - F#5 (h)  — descending sigh
+  # Bar 3: A5 - F#5 - D5 - F#5 (q,q,q,q) — punch back up
+  # Bar 4: E5 (h) - D5 (h)
+- id: solo_open
+  root: D5
+  intervals: [7, 5, 4, 7, 4, 0, 4, 2, 0]
+  rhythm: [4.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.94, 0.88, 0.86, 0.96, 0.92, 0.88, 0.94, 0.92, 0.88]
+
+  # Solo "build" phrase — 4 bars of more active material with a scalar run.
+  # Stays under D6.
+  # Bar 1: F#5 - A5 - B5 - A5 (q,q,q,q)
+  # Bar 2: G5 - F#5 - E5 - D5 (q,q,q,q)
+  # Bar 3: A4 - D5 - F#5 - A5 (q,q,q,q)
+  # Bar 4: B5 (h) - A5 (q) - F#5 (q)
+- id: solo_build
+  root: D5
+  intervals: [4, 7, 9, 7, 5, 4, 2, 0, -5, 0, 4, 7, 9, 7, 4]
+  rhythm: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 
+      1.0]
+  velocities: [0.88, 0.92, 0.96, 0.94, 0.90, 0.88, 0.86, 0.84, 0.84, 0.88, 0.92, 
+      0.96, 1.00, 0.96, 0.92]
+
+  # Twin-lead UPPER voice (used by lead_gtr in solo_b) — 4 bars.
+  # D5 (h) - F#5 (h)
+  # A5 - F#5 - D5 - A4 (q,q,q,q)
+  # F#5 - A5 - B5 - A5 (q,q,q,q)
+  # G5 (h) - F#5 (h)
+- id: twin_upper
+  root: D5
+  intervals: [0, 4, 7, 4, 0, -5, 4, 7, 9, 7, 5, 2]
+  rhythm: [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.90, 0.94, 0.96, 0.92, 0.88, 0.84, 0.92, 0.96, 1.00, 0.96, 0.92, 
+      0.88]
+
+  # Twin-lead LOWER voice — same shape, a third below. Sounds like one of
+  # the lead pair from a southern-rock dual-guitar passage.
+  # B4 (h) - D5 (h)
+  # F#5 - D5 - B4 - F#4 (q,q,q,q)
+  # D5 - F#5 - G5 - F#5 (q,q,q,q)
+  # E5 (h) - D5 (h)
+- id: twin_lower
+  root: D5
+  intervals: [-3, 0, 4, 0, -3, -8, 0, 4, 5, 4, 2, 0]
+  rhythm: [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.86, 0.90, 0.92, 0.88, 0.84, 0.80, 0.88, 0.92, 0.96, 0.92, 0.88, 
+      0.84]
+
+  # Solo upper-register variation — same melodic skeleton as solo_build but
+  # an octave higher in the most active region. Used in solo_c only.
+  # Bar 1: F#6 - A6 (oh wait — A6 = MIDI 93, very high; let me cap)
+  # Actually I'll keep this in 5th/6th octave but use higher harmonic line.
+  # F#5 - A5 - D6 - A5 (q,q,q,q)
+  # B5 - A5 - F#5 - E5 (q,q,q,q)
+  # D5 - F#5 - A5 - D6 (q,q,q,q)
+  # B5 (h) - A5 (h)
+- id: solo_upper
+  root: D5
+  intervals: [4, 7, 12, 7, 9, 7, 4, 2, 0, 4, 7, 12, 9, 7]
+  rhythm: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.94, 0.96, 1.00, 0.96, 0.94, 0.92, 0.88, 0.86, 0.88, 0.92, 0.96, 
+      1.00, 0.96, 0.92]
+
+  # Solo climax phrase — peak gesture, octave-high anchor, then resolve.
+  # D6 (whole — sustained with bend)
+  # B5 - A5 - F#5 - A5 (q,q,q,q)
+  # D6 - B5 - A5 - F#5 (q,q,q,q)
+  # E5 (h) - D5 (h)
+- id: solo_climax
+  root: D5
+  intervals: [12, 9, 7, 4, 7, 12, 9, 7, 4, 2, 0]
+  rhythm: [4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0]
+  velocities: [0.98, 0.94, 0.92, 0.88, 0.92, 1.00, 0.96, 0.92, 0.88, 0.92, 0.88]
+
+  # Slide-guitar swell — 1-2 notes per bar, used as fills. The pitch_bend
+  # curves on the layer template give it the slide feel.
+- id: slide_swell
+  root: D5
+  intervals: [7, 9]
+  rhythm: [3.0, 1.0]
+  velocities: [0.78, 0.82]
+
+  # Outro resolution phrase — 4 bars resolving to held D5.
+  # D5 (h) - F#5 (h)
+  # A5 - D6 - A5 - F#5 (q,q,q,q)
+  # E5 (h) - D5 (whole, held)
+- id: outro_resolve
+  root: D5
+  intervals: [0, 4, 7, 12, 7, 4, 2, 0]
+  rhythm: [2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 6.0]
+  velocities: [0.84, 0.88, 0.92, 0.96, 0.92, 0.88, 0.84, 0.78]
+
+  # Fast ascending burst — 12 16ths up + held quarter. 1-bar interjection
+  # used at the end of solo phrases for "flair" without making the whole
+  # solo a continuous run.
+  # A4 B4 D5 E5 F#5 A5 B5 D6 A5 F#5 E5 D5 - F#5 (q held)
+- id: flair_burst_ascend
+  root: D5
+  intervals: [-5, -3, 0, 2, 4, 7, 9, 12, 7, 4, 2, 0, 4]
+  rhythm: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 
+      0.25, 1.0]
+  velocities: [0.86, 0.82, 0.86, 0.84, 0.90, 0.92, 0.96, 1.00, 0.92, 0.88, 0.86, 
+      0.84, 0.92]
+
+  # Fast descending burst — held first note, then 12 16ths descending and
+  # turning back up. 1-bar interjection.
+  # D6 (q held) - C#6 B5 A5 F#5 E5 D5 B4 A4 D5 F#5 A5 B5
+- id: flair_burst_descend
+  root: D5
+  intervals: [12, 11, 9, 7, 4, 2, 0, -3, -5, 0, 4, 7, 9]
+  rhythm: [1.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
+    0.25]
+  velocities: [0.96, 0.88, 0.84, 0.86, 0.84, 0.86, 0.84, 0.86, 0.84, 0.88, 0.92, 
+      0.96, 0.94]
+
+  # 2-bar virtuosic flourish — D mixolydian scalar run, peaks on D6, then
+  # descends and resolves. Used twice across the long solo so the listener
+  # has a "moment" to hang on without it ever becoming wallpaper.
+- id: flair_virtuoso_run
+  root: D5
+  intervals: [0, 2, 4, 5, 7, 9, 11, 12, 11, 9, 7, 5, 4, 2, 0, -3, -5, -3, 0, 4, 
+      7, 12, 7, 4, 2, 0]
+  rhythm: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 
+      0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 
+      0.25, 2.0, 2.0]
+  velocities: [0.92, 0.84, 0.88, 0.86, 0.92, 0.88, 0.94, 1.00, 0.94, 0.88, 0.92, 
+      0.86, 0.88, 0.84, 0.86, 0.82, 0.84, 0.84, 0.88, 0.92, 0.96, 1.00, 0.94, 
+      0.90, 0.88, 0.84]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+    - {group: mallets, cc: expression, from: 80, to: 108, curve: smooth, points: 
+        12}
+    - {group: choir_pad, cc: expression, from: 70, to: 96, curve: smooth, points: 
+        12}
+    - {group: strings, cc: expression, from: 80, to: 100, curve: smooth, points: 
+        12}
+    - {group: brass, cc: expression, from: 60, to: 92, curve: smooth, points: 12}
+    - {group: winds, cc: expression, from: 70, to: 100, curve: smooth, points: 
+        12}
+
+  # Slow modulation LFO on the lead/solo guitars — vibrato that grows
+  # through the section.
+  guitar_vibrato:
+    kind: automation
+    automation:
+    - {instruments: [lead_gtr, solo_gtr, slide_gtr], cc: modulation, curve: lfo, 
+        from: 10, to: 80, cycles: 14}
+
+  # Clean rhythm-guitar arpeggio: 8th-note pattern across whichever chord
+  # the bar holds. Closed voicing keeps the guitar shape compact.
+  rhythm_arpeggio:
+    kind: arpeggio
+    instrument: rhythm_gtr
+    octave: 3
+    pattern: [0, 1, 2, 1, 0, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.40
+    velocity: 70
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+
+  # Bass: half-note plus octave reinforcement. Avoid fifths against slash
+  # chords: A/C# + +7 produced G# bass stabs that read as sour notes.
+  bass_walk:
+    kind: bassline
+    instrument: bass
+    octave: 2
+    velocity: 82
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    pattern:
+    - [0, 0.0, 1.8]
+    - [12, 2.0, 0.9]
+    - [0, 3.0, 0.9]
+
+  # Bass: 8th-note drive for chorus/solo.
+  bass_drive:
+    kind: bassline
+    instrument: bass
+    octave: 2
+    velocity: 86
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    pattern:
+    - [0, 0.0, 0.45]
+    - [0, 0.5, 0.45]
+    - [0, 1.0, 0.45]
+    - [0, 1.5, 0.45]
+    - [0, 2.0, 0.45]
+    - [0, 2.5, 0.45]
+    - [0, 3.0, 0.45]
+    - [0, 3.5, 0.45]
+
+  # Sustained string-pad backing — feels like a small string section
+  # supporting the band. Voice-leading constraint is on by default.
+  string_backing:
+    kind: pad_chords
+    instrument: string_pad
+    octave: 3
+    duration_beats: 2.6
+    velocity: 48
+    articulation: pad
+    voicing: closed
+    constraints:
+      max_pitch: 72
+      min_pitch: 38
+    humanize_ms: 8
+    humanize_velocity_pct: 2
+
+  # Hammond-organ chord pad — the "warmth" through the whole song.
+  organ_pad:
+    kind: pad_chords
+    instrument: organ
+    octave: 3
+    duration_beats: 2.6
+    velocity: 60
+    articulation: pad
+    voicing: closed
+    constraints:
+      max_pitch: 72
+      min_pitch: 36
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+
+  # Hammond stab on phrase tops — short attack, builds energy.
+  organ_stab:
+    kind: chord_hits
+    instrument: organ
+    octave: 3
+    velocity: 74
+    duration_beats: 0.85
+    articulation: marcato
+    voicing: closed
+    constraints:
+      max_pitch: 72
+      min_pitch: 36
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Piano comping on phrase boundaries.
+  piano_voicing:
+    kind: chord_hits
+    instrument: piano
+    octave: 3
+    velocity: 56
+    duration_beats: 1.6
+    articulation: tenuto
+    voicing: closed
+    constraints:
+      max_pitch: 76
+      min_pitch: 36
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Warm-pad bed.
+  warm_pad_layer:
+    kind: pad_chords
+    instrument: warm_pad
+    octave: 2
+    every_bars: 4
+    duration_beats: 2.5
+    velocity: 22
+    articulation: pad
+    voicing: open
+    constraints:
+      max_pitch: 67
+      min_pitch: 36
+    humanize_ms: 0
+
+  # French horn pad — chorus + climax weight only.
+  horn_pad:
+    kind: pad_chords
+    instrument: horn
+    octave: 3
+    duration_beats: 3.6
+    velocity: 60
+    articulation: legato
+    voicing: closed
+    constraints: {max_pitch: 76, min_pitch: 43}
+    humanize_ms: 6
+    humanize_velocity_pct: 2
+
+  # ---- Melodic voice templates ----
+
+  call_voice:
+    kind: motif
+    instrument: lead_gtr
+    motif: call_phrase
+    velocity: 86
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0}
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  response_voice:
+    kind: motif
+    instrument: lead_gtr
+    motif: response_phrase
+    velocity: 88
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0}
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  prechorus_voice:
+    kind: motif
+    instrument: lead_gtr
+    motif: prechorus_lift
+    velocity: 92
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {lead_gtr: 6.0}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  chorus_voice:
+    kind: motif
+    instruments: [lead_gtr, solo_gtr]
+    motif: chorus_anthem
+    velocity: 94
+    articulation: tenuto
+    instrument_octave_offsets: {lead_gtr: 0, solo_gtr: 0}
+    instrument_velocity_offsets: {lead_gtr: 0, solo_gtr: -8}
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0, solo_gtr: 6.0}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  bridge_voice_oboe:
+    kind: motif
+    instrument: oboe
+    motif: bridge_lyrical
+    velocity: 80
+    articulation: legato
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  bridge_voice_violin:
+    kind: motif
+    instrument: violin
+    motif: bridge_lyrical
+    transpose: 12
+    velocity: 76
+    articulation: legato
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  # ---- Solo voices ----
+
+  solo_open_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: solo_open
+    velocity: 88
+    articulation: tenuto
+    # Continuous pitch-bend curve on the held A5 — bends up a quarter-tone
+    # at attack, holds, then releases. Real guitar bend gesture.
+    pitch_bend_curve: [[0.0, 50], [0.2, 80], [0.7, 80], [1.0, 0]]
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  solo_build_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: solo_build
+    velocity: 80
+    articulation: tenuto
+    instrument_pitch_scoop_cents:
+      solo_gtr: 5.0
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  solo_a_story_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: solo_a_story
+    velocity: 92
+    articulation: tenuto
+    pitch_bend_curve: [[0.0, 20], [0.16, 55], [0.65, 35], [1.0, 0]]
+    instrument_pitch_scoop_cents: {solo_gtr: 8.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+
+  twin_lead_voice:
+    kind: motif
+    instruments: [lead_gtr, solo_gtr]
+    # Each instrument plays a different motif (the harmonized parts).
+    # The renderer does not natively support per-instrument motif IDs in
+    # one layer, so we rely on calling this template twice with different
+    # `motif` overrides per use.
+    motif: twin_upper
+    velocity: 92
+    articulation: tenuto
+    instrument_velocity_offsets: {lead_gtr: 0, solo_gtr: -6}
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0, solo_gtr: 6.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Lower harmony voice (use as a separate layer call alongside
+  # twin_lead_voice).
+  twin_lead_lower:
+    kind: motif
+    instrument: solo_gtr
+    motif: twin_lower
+    velocity: 86
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {solo_gtr: 6.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  solo_upper_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: solo_upper
+    velocity: 80
+    articulation: tenuto
+    instrument_pitch_scoop_cents:
+      solo_gtr: 5.0
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  solo_climax_voice:
+    kind: motif
+    instruments: [lead_gtr, solo_gtr]
+    motif: solo_climax
+    velocity: 82
+    articulation: tenuto
+    instrument_octave_offsets:
+      lead_gtr: -1
+      solo_gtr: -1
+    instrument_velocity_offsets:
+      lead_gtr: 0
+      solo_gtr: -12
+    # The held D6 at the start: bend up a quarter-tone on attack, hold,
+    # release at the end of the held portion.
+    pitch_bend_curve: [[0.0, 30], [0.3, 60], [3.5, 60], [3.95, 0]]
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  fiddle_soar:
+    kind: motif
+    instrument: violin
+    motif: solo_upper
+    velocity: 86
+    articulation: legato
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+
+  # ---- Flair / virtuoso bursts (sparse interjections) ----
+
+  flair_ascend_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: flair_burst_ascend
+    velocity: 82
+    articulation: spiccato
+    instrument_pitch_scoop_cents:
+      solo_gtr: 5.0
+    humanize_ms: 2
+    humanize_velocity_pct: 4
+
+  flair_descend_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: flair_burst_descend
+    velocity: 82
+    articulation: spiccato
+    instrument_pitch_scoop_cents:
+      solo_gtr: 5.0
+    humanize_ms: 2
+    humanize_velocity_pct: 4
+
+  virtuoso_run_voice:
+    kind: motif
+    instrument: solo_gtr
+    motif: flair_virtuoso_run
+    velocity: 84
+    articulation: spiccato
+    instrument_pitch_scoop_cents:
+      solo_gtr: 5.0
+    humanize_ms: 2
+    humanize_velocity_pct: 4
+
+  # ---- Slide / atmosphere ----
+
+  slide_gesture:
+    kind: motif
+    instrument: slide_gtr
+    motif: slide_swell
+    velocity: 78
+    articulation: legato
+    # Long sustained pitch-bend curves give the slide feel: rises a
+    # whole tone over the first half-bar, holds, then resolves down.
+    pitch_bend_curve: [[0.0, -100], [0.4, 0], [2.5, 0], [3.5, -100]]
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+
+  # ---- Drum patterns ----
+
+  drums_intro:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beat: 0.0, velocity: 50, bars: [6, 7]}
+    - {drum: side_stick, beat: 2.0, velocity: 32, bars: [6, 7]}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 24, bars: [7]}
+
+  drums_verse:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 78}
+    - {drum: side_stick, beats: [1.0, 3.0], velocity: 50}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 26}
+
+  drums_prechorus:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 82}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 72}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 30}
+    - {drum: low_tom, beat: 3.5, velocity: 50, probability: 0.7}
+
+  drums_chorus:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 0.75, 2.0], velocity: 86}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 84}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 32}
+    - {drum: ride, beats: [0.0, 1.0, 2.0, 3.0], velocity: 28, probability: 0.6}
+    - {drum: crash, beat: 0.0, velocity: 84, bars: [0, 8]}
+
+  drums_bridge:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 64}
+    - {drum: side_stick, beats: [1.0, 3.0], velocity: 38}
+    - {drum: ride, beats: [0.0, 1.0, 2.0, 3.0], velocity: 24}
+
+  drums_solo_a:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 78}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 76}
+    - {drum: ride, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 30}
+    - {drum: crash, beat: 0.0, velocity: 78, bars: [0, 12]}
+
+  drums_solo_b:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 0.75, 2.0], velocity: 84}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 80}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 30}
+    - {drum: ride, beats: [0.0, 1.0, 2.0, 3.0], velocity: 32}
+    - {drum: crash, beat: 0.0, velocity: 84, bars: [0, 8, 16]}
+
+  drums_solo_c:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 0.75, 2.0, 2.75], velocity: 86}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 84}
+    - {drum: closed_hat, beats: [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75],
+      velocity: 28}
+    - {drum: ride, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 32}
+    - {drum: crash, beat: 0.0, velocity: 86, bars: [0, 8, 16]}
+
+  drums_climax:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 1.0, 2.0, 3.0], velocity: 90}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 88}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 34}
+    - {drum: ride, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 38}
+    - {drum: crash, beat: 0.0, velocity: 90, bars: [0, 4, 8, 12]}
+    - {drum: low_tom, beat: 3.5, velocity: 60}
+    - {drum: floor_tom, beat: 0.0, velocity: 60, bars: [0, 8]}
+
+  drums_outro:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 76}
+    - {drum: snare, beats: [1.0, 3.0], velocity: 70, probability: 0.6}
+    - {drum: ride, beats: [0.0, 1.0, 2.0, 3.0], velocity: 28}
+    - {drum: crash, beat: 0.0, velocity: 86, bars: [7]}
+
+  solo_a_chord_melody:
+    kind: arpeggio
+    instrument: solo_gtr
+    octave: 4
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.44
+    velocity: 80
+    density: 0.78
+    voicing: closed
+    articulation: tenuto
+    humanize_ms: 5
+    humanize_velocity_pct: 5
+  solo_a_shred_burst:
+    kind: arpeggio
+    instrument: solo_gtr
+    octave: 4
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    step: 0.25
+    duration_beats: 0.21
+    velocity: 84
+    density: 1.0
+    voicing: closed
+    articulation: spiccato
+    every: 4
+    offset: 3
+    humanize_ms: 2
+    humanize_velocity_pct: 5
+  solo_climax_chord_drive:
+    kind: arpeggio
+    instruments:
+    - lead_gtr
+    - solo_gtr
+    octave: 4
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 82
+    density: 0.86
+    voicing: closed
+    articulation: tenuto
+    instrument_velocity_offsets:
+      lead_gtr: 0
+      solo_gtr: -10
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  solo_climax_shred_burst:
+    kind: arpeggio
+    instrument: solo_gtr
+    octave: 4
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    step: 0.25
+    duration_beats: 0.2
+    velocity: 88
+    density: 1.0
+    voicing: closed
+    articulation: spiccato
+    every: 4
+    offset: 3
+    humanize_ms: 2
+    humanize_velocity_pct: 5
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components: [verse_a, verse_b, prechorus, chorus_a, verse_c, chorus_b, 
+      bridge, solo_a, solo_b, solo_c, solo_climax]
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, choir_pad]
+    fade_stems: [mallets, brass, percussion, winds]
+
+state_map:
+  starting: {section: intro}
+  contemplative: {preferred_section: verse_a, stems: {strings: 1.0, mallets: 
+        0.85, choir_pad: 0.55, percussion: 0.40, brass: 0.0, winds: 0.0}}
+  melodic_main: {preferred_section: chorus_a, stems: {strings: 1.0, mallets: 1.0,
+      choir_pad: 0.75, percussion: 0.85, brass: 0.45, winds: 0.0}}
+  reflective: {preferred_section: bridge, stems: {strings: 1.0, mallets: 0.65, 
+        choir_pad: 0.85, percussion: 0.30, brass: 0.0, winds: 0.55}}
+  soaring_solo: {preferred_section: solo_b, stems: {strings: 1.0, mallets: 1.0, 
+        choir_pad: 0.75, percussion: 1.0, brass: 0.45, winds: 0.0}}
+  full_bombast: {preferred_section: solo_climax, stems: {strings: 1.0, mallets: 
+        1.0, choir_pad: 0.85, percussion: 1.0, brass: 0.65, winds: 0.55}}
+  exiting: {transition: outro_at_next_valid_exit_bar, outro: outro}
+
+sections:
+- id: intro
+  kind: intro
+  label: clean guitar arpeggio + slide swells - drums fade in late
+  bars: 8
+  intensity: 0.55
+  density: 0.35
+  loopable: false
+  harmony: ["D", "A/C#", "Bm", "G", "D", "A/C#", "Bm", "G"]
+    # Per-section ambience: longer reverb, drier dry signal — feels like
+    # the band is approaching the listener from a distance.
+  postprocess:
+    reverb_wet: 0.060
+    reverb_decay_seconds: 1.50
+    reverb_damping_hz: 7000
+  layers:
+  - expression_swell
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 64}
+  - {template: bass_walk, velocity: 70}
+  - {template: organ_pad, velocity: 56}
+  - {template: string_backing, velocity: 50}
+  - {template: warm_pad_layer, velocity: 32}
+      # Single slide swell on bar 4 to anticipate the verse.
+  - {template: slide_gesture, starts: [[3, 0.0], [6, 0.0]], velocity: 76}
+  - drums_intro
+
+- id: verse_a
+  kind: loop_component
+  label: verse 1 - call_phrase on overdrive lead
+  bars: 16
+  intensity: 0.68
+  density: 0.50
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "F#m", "G", "D", "Bm", "A", "G", "A", "D", "F#m", "G", "D", "Em",
+    "A", "G", "A"]
+  layers:
+  - expression_swell
+  - guitar_vibrato
+  - {template: call_voice, starts: [[0, 0.0], [8, 0.0]], velocity: 84}
+  - {template: response_voice, starts: [[4, 0.0], [12, 0.0]], velocity: 86}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 68}
+  - {template: bass_walk, velocity: 76}
+  - {template: organ_pad, velocity: 64}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 60}
+  - {template: string_backing, velocity: 52}
+  - drums_verse
+  - {template: warm_pad_layer, velocity: 32}
+
+- id: verse_b
+  kind: loop_component
+  label: verse 2 - response_phrase opens, slide-guitar fills
+  bars: 16
+  intensity: 0.72
+  density: 0.55
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "F#m", "Bm", "A", "G", "D", "G", "A", "D", "F#m", "Bm", "A", "G",
+    "Em", "A", "A"]
+  layers:
+  - guitar_vibrato
+  - {template: response_voice, starts: [[0, 0.0], [8, 0.0]], velocity: 88}
+  - {template: call_voice, starts: [[4, 0.0], [12, 0.0]], velocity: 86}
+  - {template: slide_gesture, starts: [[3, 0.0], [7, 0.0], [11, 0.0], [15, 0.0]],
+    velocity: 80}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 70}
+  - {template: bass_walk, velocity: 78}
+  - {template: organ_pad, velocity: 66}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 62}
+  - {template: string_backing, velocity: 54}
+  - drums_verse
+  - {template: warm_pad_layer, velocity: 34}
+
+- id: prechorus
+  kind: loop_component
+  label: prechorus - lift into chorus
+  bars: 8
+  intensity: 0.80
+  density: 0.65
+  loopable: true
+  valid_exit_local_bars: [4, 8]
+  harmony: ["G", "A", "Bm", "A", "G", "A", "D", "A"]
+  layers:
+  - guitar_vibrato
+  - {template: prechorus_voice, starts: [[0, 0.0]], velocity: 90}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 76}
+  - {template: bass_drive, velocity: 82}
+  - {template: organ_stab, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], 
+      velocity: 80}
+  - {template: organ_pad, velocity: 70}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0]], velocity: 64}
+  - {template: string_backing, velocity: 60}
+  - drums_prechorus
+  - {template: warm_pad_layer, velocity: 36}
+
+- id: chorus_a
+  kind: loop_component
+  label: chorus 1 - chorus_anthem hook, full ensemble
+  bars: 16
+  intensity: 0.86
+  density: 0.72
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "A", "Bm", "G", "D", "A", "Bm", "G", "D", "A", "Bm", "G", "G", "A",
+    "D", "D"]
+  postprocess:
+    reverb_wet: 0.050
+    reverb_decay_seconds: 1.30
+  layers:
+  - guitar_vibrato
+  - {template: chorus_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 94}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 78}
+  - {template: bass_drive, velocity: 86}
+  - {template: organ_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 88}
+  - {template: organ_pad, velocity: 72}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 68}
+  - {template: horn_pad, velocity: 60}
+  - {template: string_backing, velocity: 60}
+  - drums_chorus
+  - {template: warm_pad_layer, velocity: 38}
+
+- id: verse_c
+  kind: loop_component
+  label: verse 3 - call + response with slide accents
+  bars: 16
+  intensity: 0.74
+  density: 0.58
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "F#m", "G", "Bm", "G", "D", "Em", "A", "D", "F#m", "G", "Bm", "G",
+    "D", "A", "A"]
+  layers:
+  - guitar_vibrato
+  - {template: call_voice, starts: [[0, 0.0]], velocity: 88}
+  - {template: response_voice, starts: [[4, 0.0]], velocity: 90}
+  - {template: call_voice, starts: [[8, 0.0]], velocity: 90}
+  - {template: response_voice, starts: [[12, 0.0]], velocity: 92}
+  - {template: slide_gesture, starts: [[2, 2.0], [6, 2.0], [10, 2.0], [14, 2.0]],
+    velocity: 82}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 72}
+  - {template: bass_walk, velocity: 80}
+  - {template: organ_pad, velocity: 68}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 64}
+  - {template: horn_pad, velocity: 50}
+  - {template: string_backing, velocity: 56}
+  - drums_verse
+  - {template: warm_pad_layer, velocity: 36}
+
+- id: chorus_b
+  kind: loop_component
+  label: chorus 2 - bigger, horn weight prominent
+  bars: 16
+  intensity: 0.90
+  density: 0.78
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "A", "Bm", "G", "D", "A", "Bm", "G", "Em", "A", "D", "Bm", "G", "A",
+    "D", "D"]
+  postprocess:
+    reverb_wet: 0.050
+    reverb_decay_seconds: 1.30
+  layers:
+  - guitar_vibrato
+  - {template: chorus_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 96}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 80}
+  - {template: bass_drive, velocity: 88}
+  - {template: organ_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 90}
+  - {template: organ_pad, velocity: 74}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 70}
+  - {template: horn_pad, velocity: 64}
+  - {template: string_backing, velocity: 62}
+  - drums_chorus
+  - {template: warm_pad_layer, velocity: 40}
+
+- id: bridge
+  kind: loop_component
+  label: bridge - oboe + violin lyrical, drums pulled back
+  bars: 16
+  intensity: 0.62
+  density: 0.45
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["Bm", "G", "D", "A", "Em", "G", "D", "A", "Bm", "G", "D", "A", "Em", "A",
+    "G", "A"]
+    # Drier ambience for the bridge — feels intimate.
+  postprocess:
+    reverb_wet: 0.025
+    reverb_decay_seconds: 0.80
+  layers:
+  - guitar_vibrato
+  - {template: bridge_voice_oboe, starts: [[0, 0.0], [8, 0.0]], velocity: 80}
+  - {template: bridge_voice_violin, starts: [[4, 0.0], [12, 0.0]], velocity: 76}
+  - {template: slide_gesture, starts: [[2, 2.0], [6, 2.0], [10, 2.0], [14, 2.0]],
+    velocity: 74}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 64}
+  - {template: bass_walk, velocity: 70}
+  - {template: organ_pad, velocity: 76}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], 
+      velocity: 64}
+  - {template: string_backing, velocity: 60}
+  - drums_bridge
+  - {template: warm_pad_layer, velocity: 44}
+
+- id: solo_a
+  kind: loop_component
+  label: solo phase 1 - sparse, sustained, single voice
+  bars: 24
+  intensity: 0.76
+  density: 0.6
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16, 20, 24]
+  harmony: ["D", "A", "G", "D", "Bm", "A", "G", "A", "D", "A", "G", "D", "Bm", "A",
+    "G", "A", "D", "A", "G", "D", "Bm", "A", "G", "A"]
+  layers:
+  - guitar_vibrato
+  - template: solo_a_chord_melody
+    velocity: 78
+    density: 0.78
+  - template: solo_a_shred_burst
+    starts:
+    - - 0
+      - 0.0
+    velocity: 82
+  - template: slide_gesture
+    starts:
+    - - 3
+      - 0.0
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    - - 15
+      - 0.0
+    - - 19
+      - 0.0
+    - - 23
+      - 0.0
+    velocity: 68
+  - template: rhythm_arpeggio
+    density: 0.85
+    velocity: 66
+  - template: bass_drive
+    velocity: 80
+  - template: organ_pad
+    velocity: 56
+  - template: piano_voicing
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    - - 12
+      - 0.0
+    - - 16
+      - 0.0
+    - - 20
+      - 0.0
+    velocity: 54
+  - template: string_backing
+    velocity: 48
+  - drums_solo_a
+  - template: warm_pad_layer
+    velocity: 24
+- id: solo_b
+  kind: loop_component
+  label: solo phase 2 - twin-lead harmonized in thirds
+  bars: 24
+  intensity: 0.82
+  density: 0.68
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16, 20, 24]
+  harmony: ["D", "A", "Bm", "G", "D", "A", "Bm", "G", "D", "A", "Bm", "G", "Em", "A",
+    "D", "G", "D", "A", "Bm", "G", "Em", "G", "A", "A"]
+  layers:
+  - guitar_vibrato
+      # Twin-lead pair: lead_gtr plays twin_upper, solo_gtr plays twin_lower.
+      # Both fire at the same start times so they're locked together.
+  - kind: motif
+    instrument: lead_gtr
+    motif: twin_upper
+    velocity: 92
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [16, 0.0], [20, 0.0]]
+  - kind: motif
+    instrument: solo_gtr
+    motif: twin_lower
+    velocity: 88
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {solo_gtr: 6.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [16, 0.0], [20, 0.0]]
+      # Virtuoso runs between twin-lead phrases.
+  - {template: virtuoso_run_voice, starts: [[6, 0.0], [18, 0.0]], velocity: 82}
+      # Bursts cap phrases 3 (bar 15) and 5 (bar 23).
+  - {template: flair_descend_voice, starts: [[15, 0.0]], velocity: 82}
+  - {template: flair_ascend_voice, starts: [[23, 0.0]], velocity: 82}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 76}
+  - {template: bass_drive, velocity: 86}
+  - {template: organ_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [16, 
+          0.0], [20, 0.0]], velocity: 64}
+  - {template: organ_pad, velocity: 64}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [
+          16, 0.0], [20, 0.0]], velocity: 64}
+  - {template: horn_pad, velocity: 56}
+  - {template: string_backing, velocity: 60}
+  - drums_solo_b
+  - {template: warm_pad_layer, velocity: 38}
+
+- id: solo_c
+  kind: loop_component
+  label: solo phase 3 - upper-register variation, fiddle joins
+  bars: 24
+  intensity: 0.84
+  density: 0.78
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16, 20, 24]
+  harmony: ["D", "A", "Bm", "G", "D", "F#m", "Bm", "A", "D", "A", "G", "D", "Bm",
+    "G", "A", "A", "D", "Bm", "G", "A", "D", "G", "A", "A"]
+  layers:
+  - guitar_vibrato
+  - {template: solo_upper_voice, starts: [[0, 0.0], [8, 0.0], [16, 0.0]], 
+      velocity: 92}
+  - {template: solo_build_voice, starts: [[4, 0.0], [12, 0.0], [20, 0.0]], 
+      velocity: 90}
+      # Peak shred moments, spaced so they read as hooks rather than wallpaper.
+  - {template: virtuoso_run_voice, starts: [[6, 0.0], [14, 0.0]], velocity: 78}
+      # Quick burst caps on bars 7 and 23.
+  - {template: flair_ascend_voice, starts: [[7, 0.0]], velocity: 78}
+  - {template: flair_descend_voice, starts: [[23, 0.0]], velocity: 78}
+      # Fiddle (violin) doubles the upper line — country-rock soaring voice.
+  - {template: fiddle_soar, starts: [[0, 0.0], [8, 0.0], [16, 0.0]], velocity: 
+      78}
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 78}
+  - {template: bass_drive, velocity: 88}
+  - {template: organ_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [16, 
+          0.0], [20, 0.0]], velocity: 64}
+  - {template: organ_pad, velocity: 64}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0], [
+          16, 0.0], [20, 0.0]], velocity: 66}
+  - {template: horn_pad, velocity: 60}
+  - {template: string_backing, velocity: 62}
+  - drums_solo_c
+  - {template: warm_pad_layer, velocity: 40}
+
+- id: solo_climax
+  kind: loop_component
+  label: solo climax - octave-doubled climax phrase, full ensemble
+  bars: 16
+  intensity: 0.86
+  density: 0.78
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["D", "A", "Bm", "G", "D", "A", "Bm", "G", "Em", "A", "D", "Bm", "G", "A",
+    "D", "D"]
+    # Cathedral ambience for the peak.
+  postprocess:
+    reverb_wet: 0.060
+    reverb_decay_seconds: 1.50
+    reverb_damping_hz: 7000
+  layers:
+  - guitar_vibrato
+  - template: solo_climax_chord_drive
+    velocity: 80
+    density: 0.84
+  - template: solo_climax_shred_burst
+    starts:
+    - - 0
+      - 0.0
+    velocity: 84
+  - template: rhythm_arpeggio
+    density: 0.75
+    velocity: 72
+  - template: bass_drive
+    velocity: 84
+  - template: organ_stab
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 68
+  - template: organ_pad
+    velocity: 58
+  - template: piano_voicing
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 54
+  - template: horn_pad
+    velocity: 58
+  - template: string_backing
+    velocity: 50
+  - drums_climax
+  - template: warm_pad_layer
+    velocity: 24
+- id: outro
+  kind: outro
+  label: outro - resolution to D, final hit
+  bars: 8
+  intensity: 0.70
+  density: 0.55
+  loopable: false
+  harmony: ["D", "G", "A", "D", "G", "A", "D", "D"]
+    # Long tail on the outro reverb.
+  postprocess:
+    reverb_wet: 0.060
+    reverb_decay_seconds: 1.80
+  layers:
+  - guitar_vibrato
+      # Final lead phrase resolves up to D6 then back to D5.
+  - kind: motif
+    instrument: lead_gtr
+    motif: outro_resolve
+    velocity: 86
+    articulation: tenuto
+    instrument_pitch_scoop_cents: {lead_gtr: 8.0}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+      # Distorted lead one octave below.
+  - kind: motif
+    instrument: solo_gtr
+    motif: outro_resolve
+    transpose: -12
+    velocity: 76
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+  - {template: rhythm_arpeggio, density: 1.0, velocity: 74}
+  - {template: bass_walk, velocity: 80}
+  - {template: organ_pad, velocity: 76}
+  - {template: piano_voicing, hits: [[0, 0.0], [4, 0.0], [7, 0.0]], velocity: 70}
+  - {template: horn_pad, velocity: 64}
+  - {template: string_backing, velocity: 62}
+  - drums_outro
+  - {template: warm_pad_layer, velocity: 42}
+
+group_postprocess:
+  mallets: {gain_db: -1.5, lowpass_hz: 8200, high_shelf_hz: 4200, high_shelf_db: 
+      -2.2, presence_low_hz: 1800, presence_high_hz: 4800, presence_db: -1.2, 
+      transient_tame: 0.04, reverb_wet: 0.005}
+  strings: {gain_db: 0.0, lowpass_hz: 8500, high_shelf_hz: 5500, high_shelf_db: 
+      -1.2, transient_tame: 0.04, reverb_wet: 0.005}
+  brass: {gain_db: -1.0, lowpass_hz: 11000, high_shelf_hz: 5200, high_shelf_db: 
+      0.2, transient_tame: 0.04, reverb_wet: 0.006}
+  winds: {gain_db: 0.5, lowpass_hz: 13000, high_shelf_hz: 5000, high_shelf_db: 
+      0.6, transient_tame: 0.02, reverb_wet: 0.006}
+  percussion: {gain_db: -1.0, lowpass_hz: 11000, high_shelf_hz: 5500, 
+      high_shelf_db: 0.0, transient_tame: 0.05, reverb_wet: 0.004}
+  choir_pad: {gain_db: -4.0, lowpass_hz: 7600, high_shelf_hz: 4500, 
+      high_shelf_db: -1.6, transient_tame: 0.04, reverb_wet: 0.012}

@@ -1,0 +1,631 @@
+schema: ambition.musicir.v1
+id: smirking_behemoth_boss
+title: You Have To Cut The Rope
+seed: 2026053006
+notes: 'Original parody-boss cue for Smirking Behemoth. It is meant to rhyme with the Grinning Colossus / rope-cut boss energy without quoting a melody: goofy minor rock stomp, cheap organ grin, bubble-laser bell hits, and a sing-song contour that keeps answering itself like a nursery rhyme gone wrong. Built as a legally distinct instrumental boss loop for authoring previews. Mix pass 2 raises the intro/outro floor and keeps the minimum rhythmic business higher so loop boundaries feel less exposed. Mix pass 3 removes the soft wobbling synth/choir whirr by dropping the sine-like sub layer, replacing the bubble synth doubling with bells only, and pulling the pad out of sustained loop sections.'
+tempo:
+  bpm: 116
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: 1.8
+  highpass_hz: 34
+  lowpass_hz: 9800
+  presence_low_hz: 1400
+  presence_high_hz: 3800
+  presence_db: 1.0
+  reverb_wet: 0.048
+  reverb_decay_seconds: 0.88
+  reverb_damping_hz: 5600
+  stereo_width: 0.07
+  compressor_threshold_db: -17.0
+  compressor_ratio: 4.0
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 82.0
+  compressor_makeup_db: 3.0
+  compressor_knee_db: 4.5
+  limiter_drive: 1.02
+  normalize: true
+  target_peak_db: -2.2
+stem_postprocess:
+  gain_db: 0.7
+  highpass_hz: 32
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.36
+  reverb_damping_hz: 6200
+  stereo_width: 0.035
+  limiter_drive: 0.94
+  normalize: false
+  target_peak_db: -2.4
+instruments:
+- name: smirk_organ
+  group: lead
+  program: drawbar_organ
+  volume: 88
+  pan: 68
+  expression: 102
+  modulation: 8
+  chorus: 12
+  reverb: 14
+- name: toy_bells
+  group: sparkle
+  program: glockenspiel
+  volume: 86
+  pan: 78
+  expression: 96
+  reverb: 18
+- name: bubble_synth
+  group: sparkle
+  program: synth_bass_1
+  volume: 0
+  pan: 82
+  expression: 0
+  chorus: 0
+  reverb: 0
+  notes: 'Disabled in mix pass 3: soft wobbling synth was too audible in the loop.'
+- name: grimy_guitar
+  group: guitar
+  program: overdrive_guitar
+  volume: 96
+  pan: 42
+  expression: 108
+  chorus: 4
+- name: fuzz_guitar
+  group: guitar
+  program: distortion_guitar
+  volume: 88
+  pan: 54
+  expression: 102
+  chorus: 6
+- name: monolith_bass
+  group: bass
+  program: picked_bass
+  volume: 104
+  pan: 48
+  expression: 110
+- name: sub_square
+  group: bass
+  program: synth_bass_2
+  volume: 0
+  pan: 44
+  expression: 0
+  chorus: 0
+  notes: 'Disabled in mix pass 3: removed sine-like whirr under bassline.'
+- name: wink_brass
+  group: brass
+  program: synth_brass_1
+  volume: 81
+  pan: 66
+  expression: 94
+  modulation: 5
+  chorus: 8
+  reverb: 8
+- name: cheap_choir
+  group: choir_pad
+  program: choir_aahs
+  volume: 42
+  pan: 64
+  expression: 58
+  reverb: 12
+  notes: Reduced and limited to short outro texture; removed from sustained loops.
+- name: rope_kit
+  group: percussion
+  is_drum: true
+  volume: 107
+  pan: 58
+  expression: 118
+motifs:
+- id: smirk_hook
+  root: E4
+  intervals:
+  - 0
+  - 3
+  - 5
+  - 3
+  - 0
+  - -2
+  - 0
+  - 7
+  - 5
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.9
+  - 0.78
+  - 0.86
+  - 0.8
+  - 0.9
+  - 0.78
+  - 0.84
+  - 1.0
+  - 0.82
+  - 0.78
+  - 0.92
+- id: rope_answer
+  root: B3
+  intervals:
+  - 0
+  - 5
+  - 3
+  - 0
+  - -2
+  - 0
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 1.5
+  velocities:
+  - 0.78
+  - 0.86
+  - 0.76
+  - 0.82
+  - 0.76
+  - 0.88
+  - 0.78
+  - 0.76
+- id: bubble_beam_call
+  root: E5
+  intervals:
+  - 0
+  - 7
+  - 12
+  - 10
+  - 7
+  - 3
+  - 0
+  - 12
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.5
+  velocities:
+  - 0.8
+  - 0.82
+  - 1.0
+  - 0.8
+  - 0.8
+  - 0.86
+  - 0.8
+  - 0.96
+layer_templates:
+  rope_stomp:
+    kind: drums
+    instrument: rope_kit
+    humanize_ms: 3.0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 106
+      duration_beats: 0.11
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 96
+      duration_beats: 0.1
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 56
+      duration_beats: 0.06
+    - drum: crash
+      beat: 0.0
+      every: 8
+      velocity: 88
+      duration_beats: 0.35
+  rope_stomp_busy:
+    kind: drums
+    instrument: rope_kit
+    humanize_ms: 2.0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 0.75
+      - 2.0
+      - 2.75
+      velocity: 112
+      duration_beats: 0.1
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 104
+      duration_beats: 0.1
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.25
+      - 0.5
+      - 0.75
+      - 1.0
+      - 1.25
+      - 1.5
+      - 1.75
+      - 2.0
+      - 2.25
+      - 2.5
+      - 2.75
+      - 3.0
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 42
+      duration_beats: 0.05
+    - drum: open_hat
+      beats:
+      - 1.75
+      - 3.75
+      velocity: 66
+      duration_beats: 0.07
+  bass_smirk:
+    kind: bassline
+    instruments:
+    - monolith_bass
+    octave: 2
+    velocity: 100
+    articulation: marcato
+    humanize_ms: 2.5
+    instrument_velocity_offsets:
+      monolith_bass: 0
+    pattern:
+    - - 0
+      - 0.0
+      - 0.75
+    - - 0
+      - 1.0
+      - 0.5
+    - - 7
+      - 1.5
+      - 0.5
+    - - 5
+      - 2.0
+      - 0.5
+    - - 3
+      - 2.5
+      - 0.5
+    - - 0
+      - 3.0
+      - 0.75
+  guitar_chug:
+    kind: ostinato
+    instruments:
+    - grimy_guitar
+    - fuzz_guitar
+    octave: 2
+    intervals:
+    - 0
+    - 0
+    - 7
+    - 0
+    - 5
+    - 0
+    - 3
+    - 0
+    rhythm:
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    velocity: 80
+    articulation: staccato
+    humanize_ms: 3.0
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      grimy_guitar: 0
+      fuzz_guitar: -10
+  organ_smirk:
+    kind: motif
+    instrument: smirk_organ
+    motif: smirk_hook
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 94
+    articulation: tenuto
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+  rope_answer_voice:
+    kind: motif
+    instruments:
+    - wink_brass
+    - grimy_guitar
+    motif: rope_answer
+    starts:
+    - - 2
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 80
+    articulation: marcato
+    instrument_velocity_offsets:
+      wink_brass: 0
+      grimy_guitar: -10
+    instrument_octave_offsets:
+      wink_brass: 0
+      grimy_guitar: -1
+  bubble_beams:
+    kind: motif
+    instruments:
+    - toy_bells
+    motif: bubble_beam_call
+    starts:
+    - - 1
+      - 0.0
+    - - 3
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 92
+    articulation: staccato
+    instrument_velocity_offsets:
+      toy_bells: 0
+    instrument_octave_offsets:
+      toy_bells: 0
+  crooked_pad:
+    kind: pad_chords
+    instruments:
+    - cheap_choir
+    every_bars: 2
+    duration_beats: 2.0
+    octave: 3
+    velocity: 30
+    articulation: pad
+    voicing: open
+    humanize_ms: 6
+  brass_wink_hits:
+    kind: chord_hits
+    instruments:
+    - wink_brass
+    hits:
+    - - 0
+      - 0.0
+    - - 3
+      - 2.0
+    duration_beats: 0.45
+    octave: 3
+    velocity: 72
+    articulation: marcato
+    voicing: power
+playback:
+  mode: section_stem_matrix
+  intro: grin_intro
+  loop_components:
+  - smirk_loop
+  - beam_loop
+  outro: rope_cut_tag
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 2
+    bridge_stems:
+    - lead
+    - bass
+    fade_stems:
+    - sparkle
+    - guitar
+    - brass
+    - choir_pad
+    - percussion
+state_map:
+  default:
+    section: smirk_loop
+    stems:
+      lead: 0.96
+      sparkle: 0.78
+      guitar: 0.9
+      bass: 0.94
+      brass: 0.7
+      choir_pad: 0.18
+      percussion: 0.92
+  eye_beam:
+    preferred_section: beam_loop
+    stems:
+      lead: 0.84
+      sparkle: 1.0
+      guitar: 0.84
+      bass: 0.92
+      brass: 0.62
+      choir_pad: 0.18
+      percussion: 0.94
+  rope_cut:
+    transition: outro_at_next_valid_exit_bar
+    outro: rope_cut_tag
+sections:
+- id: grin_intro
+  kind: intro
+  label: cheap organ grin before the monolith starts stomping
+  bars: 4
+  intensity: 0.72
+  density: 0.66
+  loopable: false
+  harmony:
+  - Em
+  - Em
+  - B7
+  - Em
+  layers:
+  - bass_smirk
+  - guitar_chug
+  - organ_smirk
+  - brass_wink_hits
+  - rope_stomp
+- id: smirk_loop
+  kind: loop_component
+  label: side-to-side stomping smirk hook
+  bars: 16
+  intensity: 0.8
+  density: 0.78
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  - 16
+  harmony:
+  - Em
+  - C
+  - B7
+  - Em
+  - Em
+  - G
+  - D
+  - B7
+  - Em
+  - C
+  - B7
+  - Em
+  - G
+  - F
+  - B7
+  - Em
+  layers:
+  - bass_smirk
+  - guitar_chug
+  - organ_smirk
+  - rope_answer_voice
+  - brass_wink_hits
+  - rope_stomp
+- id: beam_loop
+  kind: loop_component
+  label: eye-beam bubble laser chorus
+  bars: 16
+  intensity: 0.9
+  density: 0.9
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  - 16
+  harmony:
+  - Em
+  - Em
+  - C
+  - B7
+  - Em
+  - G
+  - C
+  - B7
+  - Em
+  - Em
+  - D
+  - B7
+  - G
+  - F
+  - B7
+  - Em
+  layers:
+  - bass_smirk
+  - guitar_chug
+  - organ_smirk
+  - bubble_beams
+  - rope_answer_voice
+  - brass_wink_hits
+  - rope_stomp_busy
+- id: rope_cut_tag
+  kind: outro
+  label: anvil punchline cadence
+  bars: 4
+  intensity: 0.66
+  density: 0.64
+  loopable: false
+  harmony:
+  - Em
+  - C
+  - B7
+  - Em
+  layers:
+  - bass_smirk
+  - template: guitar_chug
+    velocity: 66
+  - template: organ_smirk
+    starts:
+    - - 0
+      - 0.0
+    velocity: 82
+  - template: brass_wink_hits
+    velocity: 68
+  - kind: drums
+    instrument: rope_kit
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 108
+      duration_beats: 0.12
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 92
+      duration_beats: 0.1
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 48
+      duration_beats: 0.05
+    - drum: concert_bass_drum
+      beats:
+      - 3.5
+      velocity: 104
+      duration_beats: 0.2
+    - drum: crash
+      beats:
+      - 3.5
+      velocity: 86
+      duration_beats: 0.35

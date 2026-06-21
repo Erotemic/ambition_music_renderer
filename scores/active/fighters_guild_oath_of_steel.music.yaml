@@ -1,0 +1,202 @@
+schema: ambition.musicir.v1
+id: fighters_guild_oath_of_steel
+title: Oath of Steel - Fighters Guild Theme
+seed: 2026050913
+notes: >-
+  Fighters Guild faction loop. A compact heroic march with a singable horn
+  motto, shield-wall low strings, snare/timpani cadence, and a bright second
+  phrase. Less grim than the military example: this is disciplined mentorship,
+  training halls, and reliable courage.
+tempo:
+  bpm: 116
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 35
+  lowpass_hz: 11200
+  presence_low_hz: 1800
+  presence_high_hz: 4200
+  presence_db: 0.8
+  reverb_wet: 0.12
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 5600
+  stereo_width: 0.12
+  compressor_threshold_db: -17.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.3
+  compressor_knee_db: 5.0
+  limiter_drive: 1.0
+  normalize: true
+  target_peak_db: -6.8
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.05
+  reverb_decay_seconds: 0.75
+  reverb_damping_hz: 5800
+  stereo_width: 0.07
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: horns, group: brass, program: french_horn, volume: 72, pan: 72, expression: 82, modulation: 4}
+  - {name: trumpets, group: brass, program: trumpet, volume: 62, pan: 80, expression: 74}
+  - {name: trombones, group: brass, program: trombone, volume: 62, pan: 42, expression: 74}
+  - {name: low_strings, group: strings, program: string_ensemble_1, volume: 66, pan: 44, expression: 78, modulation: 6}
+  - {name: celli, group: strings, program: cello, volume: 66, pan: 38, expression: 80}
+  - {name: basses, group: bass, program: contrabass, volume: 64, pan: 34, expression: 76}
+  - {name: timpani, group: percussion, program: timpani, volume: 60, pan: 52, expression: 82}
+  - {name: field_drums, group: percussion, is_drum: true, volume: 72, pan: 64, expression: 94}
+motifs:
+  - id: oath_motto
+    root: G4
+    intervals: [0, 7, 9, 12, 11, 7, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.72, 0.78, 0.82, 0.92, 0.78, 0.70, 0.64, 0.58, 0.54]
+  - id: shield_answer
+    root: D4
+    intervals: [0, 2, 4, 5, 7, 5, 4, 2]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 1.0]
+    velocities: [0.62, 0.64, 0.68, 0.72, 0.80, 0.60, 0.58, 0.48]
+layer_templates:
+  steel_pad:
+    kind: pad_chords
+    instruments: [low_strings, horns]
+    instrument_octave_offsets: {low_strings: -1, horns: 0}
+    instrument_velocity_offsets: {low_strings: -8, horns: -12}
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 46
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+  shield_bass:
+    kind: bassline
+    instrument: basses
+    octave: 2
+    pattern: [[0, 0.0, 0.7], [0, 1.0, 0.45], [7, 2.0, 0.65], [12, 3.0, 0.45]]
+    velocity: 58
+    articulation: marcato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  cello_drive:
+    kind: ostinato
+    instruments: [celli]
+    octave: 3
+    intervals: [0, 7, 12, 7]
+    rhythm: [0.5, 0.5, 0.5, 0.5]
+    velocity: 42
+    articulation: spiccato
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  oath_horns:
+    kind: motif
+    instruments: [horns, trumpets]
+    motif: oath_motto
+    root: G4
+    every_bars: 8
+    repeats: 4
+    starts: [[0, 0.0]]
+    velocity: 62
+    articulation: marcato
+    instrument_velocity_offsets: {horns: 0, trumpets: -8}
+    instrument_octave_offsets: {horns: 0, trumpets: 1}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+  shield_trombones:
+    kind: motif
+    instruments: [trombones, celli]
+    motif: shield_answer
+    root: D3
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 54
+    articulation: tenuto
+    instrument_velocity_offsets: {trombones: 0, celli: -10}
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  timpani_oath:
+    kind: root_hits
+    instruments: [timpani]
+    octave: 2
+    velocity: 48
+    articulation: marcato
+    hits: [[0, 0.0, 0, 0.7], [1, 2.0, 7, 0.55], [2, 0.0, 0, 0.7], [3, 3.0, 12, 0.45]]
+  field_cadence:
+    kind: drums
+    instrument: field_drums
+    velocity: 54
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+    events:
+      - {drum: kick, beats: [0.0, 2.0], velocity: 54}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 48}
+      - {drum: side_stick, beats: [0.5, 1.5, 2.5, 3.5], velocity: 24, probability: 0.55}
+      - {drum: crash, beats: [0.0], velocity: 32, every: 8}
+playback:
+  mode: section_stem_matrix
+  loop_components: [oath_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [brass, strings, bass]
+    fade_stems: [percussion]
+state_map:
+  default:
+    section: oath_loop
+    stems: {brass: 0.82, strings: 0.72, bass: 0.72, percussion: 0.62}
+sections:
+  - id: oath_loop
+    kind: loop_component
+    label: fighters guild training hall
+    bars: 32
+    intensity: 0.68
+    density: 0.70
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Gm
+      - Ebmaj7
+      - Bb/D
+      - Fsus4
+      - Gm
+      - Cm9
+      - D7
+      - Gm
+      - Bbmaj7
+      - F/A
+      - Gm
+      - D7
+      - Ebmaj7
+      - Cm9
+      - D7
+      - Gm
+      - Gm
+      - Ebmaj7
+      - Bb/D
+      - Fsus4
+      - Gm
+      - Cm9
+      - D7
+      - Gm
+      - Ebmaj7
+      - F13
+      - Gm
+      - Bbmaj7
+      - Cm9
+      - D7
+      - Gm
+      - Gm
+    layers: [steel_pad, shield_bass, cello_drive, oath_horns, shield_trombones, timpani_oath, field_cadence]

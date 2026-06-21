@@ -1,0 +1,193 @@
+schema: ambition.musicir.v1
+id: liberated_dinosaur_libertarians
+title: Liberated Dinosaur Stomp - Libertarian Faction Theme
+seed: 2026051004
+notes: >-
+  Libertarian faction loop using the liberated dinosaur idea: a loose southern
+  rock freedom anthem with fiddle, guitars, organ, and a big stomp. It nods to
+  the existing dinosaur liberators cue but is a compact active-loop variant.
+tempo:
+  bpm: 110
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 34
+  lowpass_hz: 10000
+  presence_low_hz: 1600
+  presence_high_hz: 4600
+  presence_db: 0.8
+  reverb_wet: 0.10
+  reverb_decay_seconds: 1.0
+  reverb_damping_hz: 5200
+  stereo_width: 0.13
+  compressor_threshold_db: -16.0
+  compressor_ratio: 3.4
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 95.0
+  compressor_makeup_db: 1.3
+  compressor_knee_db: 5.0
+  limiter_drive: 1.05
+  normalize: true
+  target_peak_db: -6.5
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.032
+  reverb_decay_seconds: 0.62
+  reverb_damping_hz: 5200
+  stereo_width: 0.07
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: fiddle, group: fiddle, program: fiddle, volume: 62, pan: 76, expression: 78, modulation: 6}
+  - {name: clean_guitar, group: guitars, program: clean_guitar, volume: 58, pan: 38, expression: 72}
+  - {name: overdrive_guitar, group: guitars, program: overdrive_guitar, volume: 58, pan: 78, expression: 72}
+  - {name: organ, group: keys, program: drawbar_organ, volume: 54, pan: 56, expression: 70}
+  - {name: bass, group: bass, program: picked_bass, volume: 68, pan: 46, expression: 84}
+  - {name: drums, group: percussion, is_drum: true, volume: 60, pan: 64, expression: 88}
+motifs:
+  - id: free_dino_hook
+    root: A4
+    intervals: [0, 3, 5, 7, 10, 7, 5, 3, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 1.0]
+    velocities: [0.70, 0.54, 0.58, 0.74, 0.86, 0.64, 0.56, 0.50, 0.40]
+  - id: open_road_answer
+    root: E4
+    intervals: [0, 5, 7, 10, 12, 10, 7, 5]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5, 1.5]
+    velocities: [0.60, 0.50, 0.58, 0.72, 0.82, 0.62, 0.54, 0.42]
+layer_templates:
+  guitar_chug:
+    kind: arpeggio
+    instruments: [clean_guitar, overdrive_guitar]
+    instrument_velocity_offsets: {clean_guitar: -3, overdrive_guitar: 0}
+    octave: 3
+    pattern: [0, 1, 2, 1, 0, 1, 3, 1]
+    step: 0.5
+    duration_beats: 0.34
+    velocity: 44
+    density: 0.88
+    articulation: pluck
+    humanize_ms: 8
+    humanize_velocity_pct: 7
+  organ_glue:
+    kind: pad_chords
+    instrument: organ
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 34
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 4
+  bass_boogie:
+    kind: bassline
+    instrument: bass
+    octave: 2
+    pattern: [[0, 0.0, 0.45], [3, 0.5, 0.35], [5, 1.0, 0.45], [6, 1.5, 0.35], [7, 2.0, 0.45], [10, 2.5, 0.35], [12, 3.0, 0.45], [10, 3.5, 0.35]]
+    velocity: 56
+    articulation: normal
+    humanize_ms: 6
+    humanize_velocity_pct: 5
+  fiddle_free:
+    kind: motif
+    instruments: [fiddle, overdrive_guitar]
+    motif: free_dino_hook
+    root: A4
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 58
+    articulation: legato
+    instrument_velocity_offsets: {fiddle: 0, overdrive_guitar: -10}
+    instrument_octave_offsets: {fiddle: 1, overdrive_guitar: 0}
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+  road_answer:
+    kind: motif
+    instruments: [organ, clean_guitar]
+    motif: open_road_answer
+    root: E4
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 48
+    articulation: tenuto
+    instrument_velocity_offsets: {organ: 0, clean_guitar: -8}
+    humanize_ms: 9
+    humanize_velocity_pct: 5
+  stomp_drums:
+    kind: drums
+    instrument: drums
+    velocity: 48
+    humanize_ms: 7
+    humanize_velocity_pct: 7
+    events:
+      - {drum: kick, beats: [0.0, 2.0, 3.0], velocity: 48}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 40}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 22, probability: 0.78}
+      - {drum: crash, beats: [0.0], velocity: 30, every: 8}
+playback:
+  mode: section_stem_matrix
+  loop_components: [stomp_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [guitars, bass, keys]
+    fade_stems: [fiddle, percussion]
+state_map:
+  default:
+    section: stomp_loop
+    stems: {fiddle: 0.70, guitars: 0.76, keys: 0.58, bass: 0.72, percussion: 0.58}
+sections:
+  - id: stomp_loop
+    kind: loop_component
+    label: libertarian liberated dinosaur stomp
+    bars: 32
+    intensity: 0.76
+    density: 0.78
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - A
+      - D
+      - A
+      - E7
+      - A
+      - D
+      - E7
+      - A
+      - D
+      - A/C#
+      - Bm
+      - E7
+      - A
+      - G
+      - D
+      - A
+      - A
+      - C
+      - D
+      - A
+      - A
+      - D
+      - E7
+      - A
+      - F
+      - G
+      - A
+      - A
+      - D
+      - A/E
+      - E7
+      - A
+    layers: [guitar_chug, organ_glue, bass_boogie, fiddle_free, road_answer, stomp_drums]

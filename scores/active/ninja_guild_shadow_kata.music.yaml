@@ -1,0 +1,219 @@
+schema: ambition.musicir.v1
+id: ninja_guild_shadow_kata
+title: Shadow Kata - Ninja Guild Theme
+seed: 2026050922
+notes: >-
+  Revised Ninja Guild faction loop. This version avoids the broad Chinese
+  pentatonic flavor and leans into Japanese in-sen / hirajoshi color:
+  shakuhachi breath tones with scoops, koto punctuation, dry shamisen cuts,
+  noh-like negative space, woodblock time, and restrained taiko accents.
+tempo:
+  bpm: 92
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -1.1
+  highpass_hz: 34
+  lowpass_hz: 8600
+  high_shelf_hz: 5100
+  high_shelf_db: -2.1
+  reverb_wet: 0.14
+  reverb_decay_seconds: 1.55
+  reverb_damping_hz: 3900
+  stereo_width: 0.14
+  compressor_threshold_db: -19.5
+  compressor_ratio: 2.4
+  compressor_attack_ms: 12.0
+  compressor_release_ms: 95.0
+  compressor_makeup_db: 0.6
+  compressor_knee_db: 6.0
+  limiter_drive: 0.92
+  normalize: true
+  target_peak_db: -7.8
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.05
+  reverb_decay_seconds: 0.85
+  reverb_damping_hz: 4000
+  stereo_width: 0.07
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: koto, group: koto, program: koto, volume: 76, pan: 72, expression: 84}
+  - {name: shamisen, group: pluck, program: shamisen, volume: 72, pan: 40, expression: 82}
+  - {name: shakuhachi, group: winds, program: shakuhachi, volume: 72, pan: 80, expression: 84, modulation: 10}
+  - {name: noh_flute_shadow, group: winds, program: piccolo, volume: 42, pan: 58, expression: 64, modulation: 6}
+  - {name: low_bowed_shadow, group: strings, program: tremolo_strings, volume: 48, pan: 46, expression: 66, modulation: 12}
+  - {name: contrabass, group: bass, program: contrabass, volume: 56, pan: 36, expression: 70}
+  - {name: taiko_tuned, group: percussion, program: taiko_drum, volume: 64, pan: 62, expression: 82}
+  - {name: shadow_kit, group: percussion, is_drum: true, volume: 54, pan: 64, expression: 80}
+motifs:
+  - id: in_sen_kata
+    root: D5
+    intervals: [0, 1, 5, 7, 10, 7, 5, 1, 0]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 1.0, 0.5, 0.5, 0.25, 1.75]
+    velocities: [0.42, 0.34, 0.56, 0.64, 0.82, 0.54, 0.46, 0.32, 0.24]
+  - id: kage_answer
+    root: A4
+    intervals: [0, -2, -5, -7, -11, -7, -5, -2, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 1.0, 0.5, 0.5, 0.5, 1.5]
+    velocities: [0.36, 0.34, 0.48, 0.34, 0.62, 0.46, 0.38, 0.30, 0.22]
+layer_templates:
+  noh_shadow_pad:
+    kind: pad_chords
+    instruments: [low_bowed_shadow]
+    octave: 2
+    every_bars: 2
+    duration_beats: 8.0
+    velocity: 18
+    articulation: pad
+    voicing: wide
+    humanize_ms: 18
+    humanize_velocity_pct: 3
+  hidden_pedal:
+    kind: pedal
+    instruments: [contrabass]
+    note: D2
+    duration_beats: 8.0
+    velocity: 24
+    articulation: pad
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  koto_ma:
+    kind: ostinato
+    instruments: [koto]
+    octave: 4
+    intervals: [0, 1, 7, 5, 10]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 1.5]
+    velocity: 30
+    articulation: pluck
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+  shamisen_kiri:
+    kind: ostinato
+    instruments: [shamisen]
+    octave: 3
+    intervals: [0, 7, 1, 0]
+    rhythm: [0.5, 0.25, 0.25, 3.0]
+    velocity: 36
+    articulation: pluck
+    humanize_ms: 5
+    humanize_velocity_pct: 7
+  shakuhachi_kata:
+    kind: motif
+    instrument: shakuhachi
+    motif: in_sen_kata
+    root: D5
+    every_bars: 8
+    repeats: 4
+    starts: [[0, 0.0]]
+    velocity: 48
+    articulation: legato
+    pitch_scoop_cents: -42
+    pitch_bend_curve: [[0.0, -32], [0.18, 0], [0.72, 0], [1.0, -16]]
+    humanize_ms: 18
+    humanize_velocity_pct: 5
+  flute_ghost:
+    kind: motif
+    instrument: noh_flute_shadow
+    motif: kage_answer
+    root: A5
+    every_bars: 16
+    repeats: 2
+    starts: [[6, 0.0]]
+    velocity: 26
+    articulation: legato
+    pitch_scoop_cents: 20
+    humanize_ms: 20
+    humanize_velocity_pct: 7
+  taiko_ma:
+    kind: root_hits
+    instruments: [taiko_tuned]
+    octave: 2
+    velocity: 42
+    articulation: marcato
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+    hits:
+      - [0, 0.0, 0, 0.35]
+      - [3, 3.0, 0, 0.30]
+      - [8, 0.0, 0, 0.35]
+      - [11, 3.0, 0, 0.30]
+      - [16, 0.0, 0, 0.35]
+      - [19, 3.0, 0, 0.30]
+      - [24, 0.0, 0, 0.35]
+      - [27, 3.0, 0, 0.30]
+  hyoshigi_ticks:
+    kind: drums
+    instrument: shadow_kit
+    velocity: 24
+    humanize_ms: 7
+    humanize_velocity_pct: 8
+    events:
+      - {drum: woodblock_hi, beats: [1.0], velocity: 18, probability: 0.65}
+      - {drum: woodblock_low, beats: [2.5], velocity: 16, probability: 0.50}
+      - {drum: low_tom, beats: [0.0], velocity: 22, every: 4, offset: 0}
+      - {drum: triangle_mute, beats: [3.75], velocity: 8, probability: 0.20}
+playback:
+  mode: section_stem_matrix
+  loop_components: [kata_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 5
+    bridge_stems: [koto, pluck, winds]
+    fade_stems: [strings, bass, percussion]
+state_map:
+  default:
+    section: kata_loop
+    stems: {koto: 0.66, pluck: 0.58, winds: 0.72, strings: 0.34, bass: 0.42, percussion: 0.38}
+sections:
+  - id: kata_loop
+    kind: loop_component
+    label: ninja guild hidden noh stage
+    bars: 32
+    intensity: 0.55
+    density: 0.48
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Dsus4
+      - Dsus4
+      - Eb
+      - Csus4
+      - Dm
+      - Dsus4
+      - Csus4
+      - Dsus4
+      - Dsus4
+      - Eb
+      - Fsus4
+      - Dsus4
+      - Dm
+      - Csus4
+      - Eb
+      - Dsus4
+      - Dsus4
+      - Dsus4
+      - Eb
+      - Csus4
+      - Dm
+      - Dsus4
+      - Csus4
+      - Dsus4
+      - Dsus4
+      - Eb
+      - Fsus4
+      - Dsus4
+      - Dm
+      - Csus4
+      - Eb
+      - Dsus4
+    layers: [noh_shadow_pad, hidden_pedal, koto_ma, shamisen_kiri, shakuhachi_kata, flute_ghost, taiko_ma, hyoshigi_ticks]

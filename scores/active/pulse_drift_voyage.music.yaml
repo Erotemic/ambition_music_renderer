@@ -1,0 +1,310 @@
+schema: ambition.musicir.v1
+id: pulse_drift_voyage
+title: Pulse Drift Voyage
+seed: 20260507_3
+notes: >-
+  Brighter, pulsier companion to the lofi drift tracks. Used in
+  water_world rooms (see sandbox.ron music_track binding). Replaces the
+  procedural render_lofi_theme synth path on the pulse_drift_voyage
+  track, removing ~800ms of startup synth time.
+
+  Style targets: 92 BPM, A major / Lydian-tinged with major-7 and
+  dominant 9 colors -- airier than the minor-key lofi tracks. Layered
+  electric piano + soft synth pad + plucked bass + light driving kit
+  beat (still brushes, but with a steadier pulse than the study loop).
+  Vibraphone arpeggios dance through, bright flute traces top lines.
+  Lighter postprocess: less lowpass, more sparkle.
+
+tempo:
+  bpm: 92
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 28
+  lowpass_hz: 11000
+  high_shelf_hz: 5200
+  high_shelf_db: -1.6
+  presence_low_hz: 2000
+  presence_high_hz: 4400
+  presence_db: 0.6
+  reverb_wet: 0.16
+  reverb_decay_seconds: 1.5
+  reverb_damping_hz: 5400
+  post_reverb_high_shelf_hz: 5800
+  post_reverb_high_shelf_db: -0.8
+  stereo_width: 0.16
+  compressor_threshold_db: -16.0
+  compressor_ratio: 3.2
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 1.4
+  compressor_knee_db: 6.0
+  limiter_drive: 1.0
+  normalize: true
+  # Master peak low so music sits under the SFX bus. Voyage is
+  # brighter / louder-feeling than the lofi cues, so it gets a
+  # touch more headroom (-7 vs -8) without blowing past SFX.
+  target_peak_db: -7.0
+
+stem_postprocess:
+  highpass_hz: 26
+  reverb_wet: 0.06
+  reverb_decay_seconds: 0.95
+  reverb_damping_hz: 5400
+  stereo_width: 0.08
+  limiter_drive: 1.0
+  normalize: false
+  target_peak_db: -2.5
+
+instruments:
+  - {name: bright_rhodes,  group: piano,      program: electric_piano_2,       volume: 70, pan: 60, expression: 78}
+  - {name: felt_piano,     group: piano,      program: acoustic_grand_piano,   volume: 56, pan: 46, expression: 72}
+  - {name: synth_pad,      group: pad,        program: pad_poly,               volume: 46, pan: 64, expression: 64, modulation: 18}
+  - {name: warm_pad,       group: pad,        program: pad_warm,               volume: 30, pan: 64, expression: 56, modulation: 12}
+  - {name: picked_bass,    group: bass,       program: picked_bass,            volume: 76, pan: 50, expression: 84}
+  - {name: vibraphone,     group: glimmer,    program: vibraphone,             volume: 52, pan: 38, expression: 72}
+  - {name: celesta,        group: glimmer,    program: celesta,                volume: 44, pan: 76, expression: 66}
+  - {name: bright_flute,   group: winds,      program: flute,                  volume: 56, pan: 80, expression: 78, modulation: 8}
+  - {name: voyage_drums,   group: percussion, is_drum: true,                   volume: 64, pan: 64, expression: 86}
+
+motifs:
+  - id: voyage_call
+    root: A4
+    intervals: [0, 4, 7, 11, 7, 4, 2, 0]
+    rhythm:    [0.5, 0.5, 0.75, 0.5, 0.75, 0.5, 0.5, 1.0]
+    velocities: [0.66, 0.62, 0.72, 0.66, 0.68, 0.62, 0.58, 0.54]
+  - id: voyage_answer
+    root: D5
+    intervals: [0, -2, -5, -7, -5, -2, 0, 2]
+    rhythm:    [0.5, 0.5, 1.0, 0.5, 0.5, 0.75, 0.5, 0.75]
+    velocities: [0.62, 0.58, 0.70, 0.62, 0.58, 0.62, 0.66, 0.58]
+  - id: pulse_glint
+    root: E5
+    intervals: [0, 4, 7, 11, 14, 11, 7, 4]
+    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.54, 0.50, 0.54, 0.58, 0.66, 0.58, 0.54, 0.50]
+  - id: high_beacon
+    root: A5
+    intervals: [0, 7, 12, 9, 7, 4, 0]
+    rhythm:    [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.50, 0.46, 0.62, 0.54, 0.50, 0.46, 0.42]
+
+layer_templates:
+  pad_chords_full:
+    kind: pad_chords
+    instruments: [synth_pad, warm_pad]
+    octave: 3
+    duration_beats: 4
+    velocity: 38
+    articulation: pad
+    voicing: wide
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  rhodes_chords:
+    kind: pad_chords
+    instruments: [bright_rhodes]
+    octave: 4
+    duration_beats: 2
+    velocity: 54
+    articulation: normal
+    voicing: shell
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  pulsing_bass:
+    kind: bassline
+    instrument: picked_bass
+    octave: 2
+    # Pulsing eighth-note bassline: root on 1, octave + fifth pulses
+    # through the bar. More motion than the lofi tracks -- this is
+    # the "voyage" energy.
+    pattern:
+      - [0,  0.0, 0.45]
+      - [0,  0.5, 0.40]
+      - [12, 1.0, 0.40]
+      - [7,  1.5, 0.40]
+      - [0,  2.0, 0.45]
+      - [0,  2.5, 0.40]
+      - [12, 3.0, 0.40]
+      - [7,  3.5, 0.40]
+    velocity: 70
+    articulation: staccato
+    humanize_ms: 6
+    humanize_velocity_pct: 5
+  voyage_kit:
+    kind: drums
+    instrument: voyage_drums
+    velocity: 58
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+    # Lighter driving kit beat -- still brushes on snare, but with
+    # steadier kick + ride pulse than the lofi tracks.
+    events:
+      - {drum: kick,        beats: [0.0, 2.0],                     velocity: 64}
+      - {drum: snare,       beats: [1.0, 3.0],                     velocity: 48}
+      - {drum: closed_hat,  beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 24}
+      - {drum: ride,        beats: [0.0, 2.0],                     velocity: 22, probability: 0.55}
+      - {drum: side_stick,  beats: [3.5],                          velocity: 26, probability: 0.30}
+  vibe_arpeggio:
+    kind: arpeggio
+    instrument: vibraphone
+    octave: 5
+    pattern: [0, 2, 1, 3, 2, 4]
+    step: 0.5
+    duration_beats: 0.45
+    velocity: 36
+    density: 0.65
+    articulation: normal
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+    events_per_bar: null
+
+playback:
+  mode: section_stem_matrix
+  loop_components:
+    - voyage_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [piano, pad, bass]
+    fade_stems: [glimmer, winds, percussion]
+
+state_map:
+  default:
+    section: voyage_loop
+    stems:
+      piano: 0.85
+      pad: 0.65
+      bass: 0.85
+      glimmer: 0.55
+      winds: 0.45
+      percussion: 0.65
+
+sections:
+  - id: voyage_loop
+    kind: loop_component
+    label: pulse drift
+    bars: 48
+    intensity: 0.55
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [16, 32, 48]
+    # A major / A Lydian colors. Three 16-bar phrases:
+    # Phrase A: home with clean major-7 voicings
+    # Phrase B: lift to E (V) and brighten through F#m9
+    # Phrase C: descend through Bm9 / Dm9 back to Amaj9
+    harmony:
+      # Phrase A
+      - Amaj9
+      - Dmaj7(#11)
+      - Bm9
+      - E13
+      - Amaj9
+      - F#m11
+      - Dmaj9
+      - E9sus4
+      - Amaj9
+      - Dmaj9
+      - Bm9
+      - E13
+      - C#m9
+      - F#m11
+      - Bm9
+      - E7sus4
+      # Phrase B (lift)
+      - Emaj9
+      - F#m11
+      - Bm9
+      - E13
+      - C#m9
+      - Amaj9
+      - Dmaj7(#11)
+      - F#m11
+      - Bm9
+      - E9
+      - C#m9
+      - F#m9
+      - Bm9
+      - E13
+      - Amaj9
+      - F#m11
+      # Phrase C (descend home)
+      - Bm9
+      - Em11
+      - Amaj9
+      - Dmaj9
+      - F#m11
+      - Bm9
+      - C#m7
+      - F#m9
+      - Bm11
+      - Em9
+      - Amaj9
+      - Dmaj7(#11)
+      - C#m9
+      - Bm9
+      - E13
+      - Amaj9
+    layers:
+      - pad_chords_full
+      - rhodes_chords
+      - pulsing_bass
+      - voyage_kit
+      - vibe_arpeggio
+      - kind: motif
+        instrument: bright_rhodes
+        motif: voyage_call
+        roots: [A4, E4, A4]
+        starts:
+          - [4, 0.0]
+          - [20, 0.0]
+          - [36, 0.0]
+        velocity: 60
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 6
+      - kind: motif
+        instrument: bright_rhodes
+        motif: voyage_answer
+        roots: [D5, F#5]
+        starts:
+          - [12, 0.5]
+          - [28, 0.0]
+        velocity: 56
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 6
+      - kind: motif
+        instrument: bright_flute
+        motif: pulse_glint
+        roots: [E5, F#5]
+        starts:
+          - [16, 0.0]
+          - [40, 0.5]
+        velocity: 50
+        articulation: legato
+        humanize_ms: 16
+        humanize_velocity_pct: 6
+      - kind: motif
+        instrument: celesta
+        motif: high_beacon
+        roots: [A5, E5]
+        starts:
+          - [24, 1.0]
+          - [44, 0.5]
+        velocity: 42
+        articulation: bell
+        humanize_ms: 18
+        humanize_velocity_pct: 7

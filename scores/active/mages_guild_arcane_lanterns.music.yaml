@@ -1,0 +1,218 @@
+schema: ambition.musicir.v1
+id: mages_guild_arcane_lanterns
+title: Arcane Lanterns - Mages Guild Theme
+seed: 2026050912
+notes: >-
+  Mages Guild faction loop. Slow occult waltz in D harmonic minor with a clear
+  rising spell motif, celesta sparks, choir fog, and bassoon shadows. It should
+  feel learned, ancient, and a little unsafe rather than generic wizard music.
+tempo:
+  bpm: 72
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 32
+  lowpass_hz: 9800
+  presence_low_hz: 1600
+  presence_high_hz: 3600
+  presence_db: -0.4
+  reverb_wet: 0.24
+  reverb_decay_seconds: 2.7
+  reverb_damping_hz: 4300
+  stereo_width: 0.22
+  compressor_threshold_db: -19.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 18.0
+  compressor_release_ms: 140.0
+  compressor_makeup_db: 1.2
+  compressor_knee_db: 7.0
+  limiter_drive: 0.96
+  normalize: true
+  target_peak_db: -7.5
+stem_postprocess:
+  highpass_hz: 30
+  reverb_wet: 0.11
+  reverb_decay_seconds: 1.5
+  reverb_damping_hz: 4400
+  stereo_width: 0.12
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: choir_vault, group: choir, program: choir_aahs, volume: 58, pan: 64, expression: 74, modulation: 4}
+  - {name: bowed_glass, group: pad, program: pad_bowed, volume: 48, pan: 70, expression: 68, modulation: 12}
+  - {name: celesta, group: bells, program: celesta, volume: 60, pan: 80, expression: 78}
+  - {name: music_box, group: bells, program: music_box, volume: 44, pan: 38, expression: 60}
+  - {name: bassoon, group: winds, program: bassoon, volume: 64, pan: 42, expression: 78, modulation: 4}
+  - {name: clarinet, group: winds, program: clarinet, volume: 60, pan: 72, expression: 78, modulation: 6}
+  - {name: contrabass, group: bass, program: contrabass, volume: 58, pan: 34, expression: 70}
+  - {name: ritual_drum, group: percussion, is_drum: true, volume: 46, pan: 64, expression: 80}
+motifs:
+  - id: lantern_spell
+    root: D5
+    intervals: [0, 2, 3, 7, 11, 10, 7, 3, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.50, 0.54, 0.58, 0.74, 0.86, 0.62, 0.58, 0.54, 0.48, 0.42]
+  - id: ward_answer
+    root: A4
+    intervals: [0, -1, -5, -8, -5, -1, 2]
+    rhythm: [0.75, 0.25, 0.75, 0.75, 0.5, 0.5, 1.0]
+    velocities: [0.52, 0.44, 0.58, 0.70, 0.56, 0.48, 0.40]
+layer_templates:
+  vault_pad:
+    kind: pad_chords
+    instruments: [choir_vault, bowed_glass]
+    instrument_octave_offsets: {choir_vault: 0, bowed_glass: 1}
+    instrument_velocity_offsets: {choir_vault: 0, bowed_glass: -8}
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.0
+    velocity: 36
+    articulation: pad
+    voicing: wide
+    humanize_ms: 20
+    humanize_velocity_pct: 4
+  shadow_bass:
+    kind: bassline
+    instrument: contrabass
+    octave: 2
+    pattern: [[0, 0.0, 1.35], [7, 1.5, 0.75], [11, 2.5, 0.45]]
+    velocity: 46
+    articulation: tenuto
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  bassoon_ward:
+    kind: motif
+    instrument: bassoon
+    motif: ward_answer
+    root: A3
+    every_bars: 6
+    repeats: 8
+    starts: [[3, 0.0]]
+    velocity: 48
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+  celesta_spell:
+    kind: motif
+    instruments: [celesta, clarinet]
+    motif: lantern_spell
+    root: D5
+    every_bars: 6
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 54
+    articulation: bell
+    instrument_velocity_offsets: {celesta: 4, clarinet: -10}
+    instrument_octave_offsets: {celesta: 0, clarinet: -1}
+    humanize_ms: 10
+    humanize_velocity_pct: 5
+  star_arpeggio:
+    kind: arpeggio
+    instruments: [celesta, music_box]
+    instrument_octave_offsets: {celesta: 0, music_box: 1}
+    instrument_velocity_offsets: {celesta: 0, music_box: -12}
+    octave: 5
+    pattern: [0, 2, 3, 1, 4, 2]
+    step: 0.5
+    duration_beats: 0.45
+    velocity: 34
+    density: 0.55
+    articulation: bell
+    humanize_ms: 12
+    humanize_velocity_pct: 6
+  ritual_threes:
+    kind: drums
+    instrument: ritual_drum
+    velocity: 36
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+    events:
+      - {drum: concert_bass_drum, beats: [0.0], velocity: 34}
+      - {drum: triangle, beats: [2.5], velocity: 18, probability: 0.62}
+      - {drum: low_tom, beats: [1.5], velocity: 20, probability: 0.40}
+  shimmer_lfo:
+    kind: automation
+    group: pad
+    automation:
+      - {group: pad, cc: modulation, from: 4, to: 28, curve: lfo, cycles: 6, points: 96}
+      - {group: choir, cc: expression, from: 58, to: 82, curve: smooth, points: 12}
+playback:
+  mode: section_stem_matrix
+  loop_components: [lantern_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [choir, pad, bass]
+    fade_stems: [bells, winds, percussion]
+state_map:
+  default:
+    section: lantern_loop
+    stems: {choir: 0.72, pad: 0.62, bells: 0.74, winds: 0.56, bass: 0.62, percussion: 0.38}
+sections:
+  - id: lantern_loop
+    kind: loop_component
+    label: mages guild lantern hall
+    bars: 48
+    intensity: 0.56
+    density: 0.58
+    loopable: true
+    valid_exit_local_bars: [12, 24, 36, 48]
+    harmony:
+      - Dm(maj7)
+      - Gm9
+      - A7(b9)
+      - Dm9
+      - Bbmaj7(#11)
+      - Gm9
+      - E7(b9)
+      - A7(b9)
+      - Dm(maj7)
+      - Fmaj9
+      - C#dim7
+      - Dm9
+      - Gm9
+      - Dm/A
+      - Bbmaj9
+      - A7(b9)
+      - Dm(maj7)
+      - Gm9
+      - A7(b9)
+      - Dm9
+      - Fmaj9
+      - C13
+      - Bbmaj7(#11)
+      - A7(b9)
+      - Dm(maj7)
+      - E7(b9)
+      - A7(b9)
+      - Dm9
+      - Gm9
+      - Bbmaj7
+      - C#dim7
+      - Dm9
+      - Bbmaj9
+      - Gm9
+      - E7(b9)
+      - A7(b9)
+      - Dm(maj7)
+      - Fmaj9
+      - Gm9
+      - A7(b9)
+      - Dm9
+      - C13
+      - Bbmaj7(#11)
+      - Gm9
+      - E7(b9)
+      - A7(b9)
+      - Dm(maj7)
+      - Dm(maj7)
+    layers: [vault_pad, shadow_bass, celesta_spell, bassoon_ward, star_arpeggio, ritual_threes, shimmer_lfo]

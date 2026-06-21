@@ -1,0 +1,374 @@
+schema: ambition.musicir.v1
+id: for_emmy_forever_ago
+title: For Emmy, Forever Ago
+seed: 2026062009
+notes: >-
+  Emmy Noether's Noether Chamber theme. This pass restores a warmer chamber-folk
+  body after the horn/balance experiments: ambient piano chords carry the room,
+  low piano gives a gentle waltz floor, and French horn pads sit as prominent
+  backing rather than a lead. The Bon Iver-adjacent intimacy remains, but the
+  arrangement should breathe more organically and avoid exposed dissonance. The
+  main melody remains a strict two-bar palindrome, so the cue's conserved
+  quantity is still the tune itself.
+
+tempo:
+  bpm: 108
+
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 12.0
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 34
+  lowpass_hz: 9400
+  high_shelf_hz: 5400
+  high_shelf_db: -1.45
+  presence_low_hz: 1400
+  presence_high_hz: 3400
+  presence_db: -0.05
+  transient_tame: 0.075
+  transient_lowpass_hz: 6800
+  reverb_wet: 0.145
+  reverb_decay_seconds: 1.55
+  reverb_damping_hz: 4300
+  post_reverb_high_shelf_hz: 5200
+  post_reverb_high_shelf_db: -1.35
+  stereo_width: 0.12
+  compressor_threshold_db: -15.0
+  compressor_ratio: 1.32
+  compressor_attack_ms: 24.0
+  compressor_release_ms: 160.0
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 8.0
+  limiter_drive: 0.86
+  normalize: true
+  target_peak_db: -9.0
+
+stem_postprocess:
+  highpass_hz: 32
+  lowpass_hz: 9400
+  transient_tame: 0.055
+  transient_lowpass_hz: 7200
+  reverb_wet: 0.018
+  reverb_decay_seconds: 0.80
+  reverb_damping_hz: 4600
+  stereo_width: 0.04
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  pluck:
+    gain_db: 0.1
+    lowpass_hz: 8200
+    high_shelf_hz: 5200
+    high_shelf_db: -1.8
+    transient_tame: 0.16
+  keys:
+    gain_db: 1.2
+    lowpass_hz: 9200
+    high_shelf_hz: 5600
+    high_shelf_db: -1.0
+    transient_tame: 0.055
+    reverb_wet: 0.028
+  low_keys:
+    gain_db: 0.0
+    lowpass_hz: 5200
+    transient_tame: 0.05
+  horns:
+    gain_db: -4.8
+    lowpass_hz: 6100
+    high_shelf_hz: 4300
+    high_shelf_db: -1.6
+    transient_tame: 0.035
+    reverb_wet: 0.030
+  glimmer:
+    gain_db: 9.5
+    lowpass_hz: 7400
+    high_shelf_hz: 5600
+    high_shelf_db: -1.8
+    transient_tame: 0.18
+    reverb_wet: 0.016
+
+instruments:
+  - {name: nylon, group: pluck, program: nylon_guitar, volume: 97, pan: 55, expression: 102}
+  - {name: piano, group: keys, program: acoustic_grand_piano, volume: 108, pan: 48, expression: 112}
+  - {name: low_piano, group: low_keys, program: acoustic_grand_piano, volume: 100, pan: 42, expression: 108}
+  - {name: horn, group: horns, program: french_horn, volume: 106, pan: 58, expression: 108}
+  - {name: celesta, group: glimmer, program: celesta, volume: 98, pan: 73, expression: 100}
+
+motifs:
+  - id: emmy_palindrome_waltz
+    root: D5
+    intervals: [0, 2, 5, 7, 9, 7, 5, 2, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.75, 1.0, 0.75, 0.75, 0.5, 0.5]
+    velocities: [0.44, 0.50, 0.58, 0.66, 0.72, 0.66, 0.58, 0.50, 0.44]
+  - id: emmy_palindrome_d_resolved
+    root: D5
+    # D-root version for the exposed D-major phrase starts.  The original
+    # +5/+9 colors put G/B above sustained D/F# haze around 0:28; this keeps
+    # the same two-bar palindrome rhythm while landing on chord-stable tones.
+    intervals: [0, 2, 4, 7, 12, 7, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.75, 1.0, 0.75, 0.75, 0.5, 0.5]
+    velocities: [0.42, 0.48, 0.56, 0.64, 0.68, 0.62, 0.54, 0.48, 0.42]
+  - id: emmy_palindrome_em_turn
+    root: G4
+    intervals: [0, 2, 4, 7, 9, 7, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.75, 1.0, 0.75, 0.75, 0.5, 0.5]
+    velocities: [0.44, 0.50, 0.58, 0.64, 0.68, 0.64, 0.58, 0.50, 0.44]
+  - id: waltz_answer
+    root: A4
+    intervals: [0, 3, 5, 7, 5, 3, 0]
+    rhythm: [0.5, 0.5, 1.0, 0.75, 0.75, 0.5, 2.0]
+    velocities: [0.42, 0.48, 0.56, 0.62, 0.54, 0.46, 0.36]
+  - id: horn_breath
+    root: D3
+    intervals: [0, 4, 7, 4, 2, 0]
+    rhythm: [1.25, 1.0, 1.25, 0.75, 0.75, 1.0]
+    velocities: [0.36, 0.44, 0.52, 0.46, 0.40, 0.34]
+  - id: glimmer_palindrome_echo
+    root: B5
+    # Two-bar celesta echo aligned to the main palindrome's phrase length.
+    # It uses chord tones plus gentle 6/9 color instead of the old 1.75-bar
+    # salon turn, which could feel pasted across the piano/horn cadence.
+    intervals: [0, 3, 5, 8, 10, 8, 5, 3, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.75, 1.0, 0.75, 0.75, 0.5, 0.5]
+    velocities: [0.26, 0.34, 0.42, 0.48, 0.50, 0.44, 0.36, 0.30, 0.24]
+
+layer_templates:
+  low_waltz_floor:
+    kind: bassline
+    instrument: low_piano
+    octave: 1
+    pattern: [[0, 0.0, 0.62], [7, 2.0, 0.32]]
+    velocity: 60
+    articulation: tenuto
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  fingerpick_waltz:
+    kind: arpeggio
+    instrument: nylon
+    octave: 3
+    pattern: [0, 2, 3, 2, 4, 2]
+    step: 0.5
+    duration_beats: 0.30
+    velocity: 52
+    density: 0.74
+    articulation: pluck
+    voicing: open
+    humanize_ms: 6
+    humanize_velocity_pct: 6
+
+  piano_haze:
+    kind: pad_chords
+    instrument: piano
+    octave: 3
+    every_bars: 1
+    duration_beats: 2.62
+    velocity: 42
+    articulation: pad
+    voicing: open
+    humanize_ms: 14
+    humanize_velocity_pct: 4
+
+  piano_breath:
+    kind: arpeggio
+    instrument: piano
+    octave: 4
+    pattern: [0, 2, 1]
+    step: 1.5
+    duration_beats: 0.92
+    velocity: 32
+    density: 0.42
+    every: 2
+    offset: 1
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+
+  emmy_piano_palindrome:
+    kind: motif
+    instrument: piano
+    motif: emmy_palindrome_d_resolved
+    # D-centered starts at local bars 1 and 17 use a resolved variant so the
+    # exposed 0:28-ish passage does not lean on G/B against sustained D haze.
+    roots: [D5, D5]
+    every_bars: 16
+    repeats: 2
+    starts: [[0, 0.0]]
+    velocity: 62
+    articulation: legato
+    gate: 0.90
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+
+  emmy_piano_palindrome_a_turn:
+    kind: motif
+    instrument: piano
+    motif: emmy_palindrome_waltz
+    # The A-rooted repeat works as a D/A color; keep its old contour instead
+    # of applying the D-root cleanup globally, which created C# rubs over D.
+    roots: [A4]
+    every_bars: 8
+    repeats: 1
+    starts: [[8, 0.0]]
+    velocity: 62
+    articulation: legato
+    gate: 0.90
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+
+  emmy_piano_palindrome_em_turn:
+    kind: motif
+    instrument: piano
+    motif: emmy_palindrome_em_turn
+    # Dedicated 0:40 Em turn.  It keeps the palindrome contour but avoids
+    # the previous G-rooted C-natural and the other roots' exposed half-step
+    # pressure against the sustained Em piano body.
+    roots: [G4]
+    every_bars: 8
+    repeats: 1
+    starts: [[24, 0.0]]
+    velocity: 60
+    articulation: legato
+    gate: 0.90
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+
+  answer_phrase:
+    kind: motif
+    instrument: piano
+    motif: waltz_answer
+    # Answer roots are chosen for the start chords at local bars 5, 13,
+    # 21, and 29: Bm, A, Bm, and G.
+    roots: [B4, F#4, B4, E5]
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 56
+    articulation: legato
+    gate: 0.90
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+
+  horn_pad:
+    kind: chord_hits
+    instrument: horn
+    octave: 3
+    hits: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0], [18, 0.0], [22, 0.0], [26, 0.0], [30, 0.0]]
+    duration_beats: 2.65
+    velocity: 49
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  horn_breath_answer:
+    kind: motif
+    instrument: horn
+    motif: horn_breath
+    # These roots follow the harmony under the repeat starts: A, Em, A, A.
+    # Avoid the old B/G roots here; they produced exposed D#/G horn tones
+    # against A around 0:32 and 0:43.
+    roots: [A2, G2, A2, A2]
+    every_bars: 8
+    repeats: 4
+    starts: [[2, 0.0]]
+    velocity: 36
+    articulation: legato
+    gate: 0.90
+    humanize_ms: 9
+    humanize_velocity_pct: 4
+
+  celesta_turn:
+    kind: motif
+    instrument: celesta
+    motif: glimmer_palindrome_echo
+    # Diatonic two-bar echoes for start chords G, D, G, D.
+    # Keep this as a shimmer answer to the ensemble phrase, not an independent
+    # salon lick floating across the cadence.
+    roots: [B5, F#5, B5, F#5]
+    every_bars: 8
+    repeats: 4
+    starts: [[6, 0.0]]
+    velocity: 42
+    articulation: bell
+    gate: 0.62
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+
+playback:
+  mode: section_stem_matrix
+  loop_components: [emmy_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [pluck, keys, low_keys, horns]
+    fade_stems: [glimmer]
+
+state_map:
+  default:
+    section: emmy_loop
+    stems: {pluck: 0.68, keys: 0.78, low_keys: 0.75, horns: 0.56, glimmer: 0.24}
+  quiet:
+    section: emmy_loop
+    stems: {pluck: 0.38, keys: 0.58, low_keys: 0.42, horns: 0.24, glimmer: 0.04}
+  dance:
+    section: emmy_loop
+    stems: {pluck: 0.78, keys: 0.92, low_keys: 0.82, horns: 0.64, glimmer: 0.30}
+
+sections:
+  - id: emmy_loop
+    kind: loop_component
+    label: noether chamber waltz
+    bars: 32
+    intensity: 0.68
+    density: 0.60
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - D
+      - D
+      - A
+      - A
+      - Bm
+      - Bm
+      - G
+      - G
+      - D
+      - D
+      - Em
+      - Em
+      - A
+      - A
+      - D
+      - D
+      - D
+      - D
+      - A
+      - A
+      - Bm
+      - Bm
+      - G
+      - G
+      - Em
+      - Em
+      - A
+      - A
+      - G
+      - G
+      - D
+      - D
+    layers: [low_waltz_floor, fingerpick_waltz, piano_haze, emmy_piano_palindrome, emmy_piano_palindrome_a_turn, emmy_piano_palindrome_em_turn, answer_phrase, horn_pad, horn_breath_answer, celesta_turn]
