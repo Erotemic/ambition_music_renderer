@@ -36,7 +36,7 @@ import yaml
 from .profiler import profile
 from scipy import signal
 
-RENDERER_VERSION = "ambition-musicir-renderer-v0.8.2-adaptive-global-section-master-v1"
+RENDERER_VERSION = "ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1"
 DEFAULT_SOUNDFONTS = [
     "/usr/share/sounds/sf3/MuseScore_General_Full.sf3",
     "/usr/share/sounds/sf3/MuseScore_General.sf3",
@@ -261,6 +261,8 @@ class RenderContext:
     groups: dict[str, str]
     section_starts: dict[str, int]
     motifs: dict[str, dict[str, Any]]
+    instrument_specs: dict[str, dict[str, Any]] = dc.field(default_factory=dict)
+    last_guitar_voicing: dict[str, list[Any]] = dc.field(default_factory=dict)
     # Tracks the most recent chord voicing per instrument for the
     # `voice_leading: minimize_motion` constraint.
     last_voicing: dict[str, list[int]] = dc.field(default_factory=dict)
@@ -444,6 +446,7 @@ def add_instrument(ctx: RenderContext, spec: dict[str, Any]) -> None:
         inst = pretty_midi.Instrument(program=program, is_drum=False, name=name)
     ctx.pm.instruments.append(inst)
     ctx.instruments[name] = inst
+    ctx.instrument_specs[name] = copy.deepcopy(spec)
     ctx.groups[name] = spec.get("group", name)
     add_cc(inst, 7, int(spec.get("volume", 100)), 0.0)
     add_cc(inst, 10, int(spec.get("pan", 64)), 0.0)
@@ -1244,6 +1247,231 @@ def render_layer_root_hits(
             )
 
 
+
+@profile
+def render_layer_guitar_strum(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render playable guitar strums instead of piano-block chords.
+
+    YAML sketch:
+
+    kind: guitar_strum
+    instrument: acoustic_guitar
+    hits: [[0, 0.0, down], [0, 2.0, up]]
+    duration_beats: 1.75
+    spread_ms: 42
+    tuning: standard
+    max_span: 5
+    """
+    from . import guitar_performance as gp
+
+    insts = resolve_instruments(ctx, layer)
+    tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    octave = int(layer.get("octave", 3))
+    velocity = float(layer.get("velocity", 82))
+    duration = float(layer.get("duration_beats", layer.get("dur_beats", 1.5)))
+    articulation = layer.get("articulation", "pluck")
+    gate = layer.get("gate")
+    gate_f = None if gate is None else float(gate)
+    spread_ms = float(layer.get("spread_ms", 38.0))
+    max_span = int(layer.get("max_span", 5))
+    max_fret = int(layer.get("max_fret", 17))
+    max_notes = int(layer.get("max_notes", 6))
+    prefer_open = bool(layer.get("prefer_open", True))
+    velocity_slope = float(layer.get("velocity_slope", -2.0))
+    hk = _layer_human(layer, 1.5)
+    hits = layer.get("hits")
+    if not hits:
+        every = float(layer.get("every_bars", 1.0))
+        beats = layer.get("beats", [0.0])
+        hits = []
+        local = 0.0
+        while local < float(section["bars"]) - 1e-9:
+            for beat in beats:
+                hits.append([local, float(beat)])
+            local += every
+    elif "every_bars" in layer or bool(layer.get("repeat_hits", False)):
+        # Treat explicit hits as a per-period pattern when every_bars is present.
+        # This lets authors define one-bar down/up strums and repeat them across
+        # the section without spelling out every local bar.
+        base_hits = [list(item) for item in hits]
+        every = float(layer.get("every_bars", 1.0))
+        expanded = []
+        period = 0.0
+        while period < float(section["bars"]) - 1e-9:
+            for item in base_hits:
+                clone = list(item)
+                clone[0] = float(clone[0]) + period
+                if float(clone[0]) < float(section["bars"]):
+                    expanded.append(clone)
+            period += every
+        hits = expanded
+    dirs = list(layer.get("directions", []))
+    default_direction = str(layer.get("direction", "down"))
+    for hit_idx, item in enumerate(hits):
+        local = float(item[0])
+        if local >= float(section["bars"]):
+            continue
+        beat = float(item[1])
+        direction = str(item[2]) if len(item) > 2 else (str(dirs[hit_idx % len(dirs)]) if dirs else default_direction)
+        chord = str(item[3]) if len(item) > 3 else chord_for_bar(section, int(local))
+        notes = chord_pitches(chord, octave=octave, voicing=layer.get("voicing", "closed"))
+        for inst in insts:
+            previous = ctx.last_guitar_voicing.get(inst)
+            events, assignment = gp.strum_plan(
+                notes,
+                bpm=ctx.bpm,
+                direction=direction,
+                spread_ms=spread_ms,
+                velocity=velocity * float(section.get("intensity", 1.0)),
+                velocity_slope=velocity_slope,
+                tuning=tuning,
+                max_fret=max_fret,
+                max_span=max_span,
+                max_notes=max_notes,
+                prefer_open=prefer_open,
+                previous=previous,
+            )
+            ctx.last_guitar_voicing[inst] = assignment
+            for ev in events:
+                add_note(
+                    ctx,
+                    inst,
+                    int(ev["pitch"]),
+                    section["start_bar"] + local,
+                    beat + float(ev["beat_offset"]),
+                    duration,
+                    float(ev["velocity"]),
+                    articulation=articulation,
+                    gate=gate_f,
+                    **hk,
+                )
+
+
+@profile
+def render_layer_guitar_chug(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render tight power-chord / palm-muted guitar rhythms.
+
+    This is meant to replace generic ostinato for distorted rhythm guitar.  It
+    emits separate take performances when ``takes`` are supplied instead of
+    relying on stereo widening.
+    """
+    from . import guitar_performance as gp
+
+    if any(k in layer for k in ("instrument", "instruments", "group")):
+        default_insts = resolve_instruments(ctx, layer)
+    else:
+        default_insts = []
+    takes = gp.take_specs(layer, default_insts)
+    pattern = layer.get("pattern", [[0, 0.0, 0.5], [0, 0.5, 0.5], [7, 1.0, 0.5], [0, 1.5, 0.5]])
+    root_octave = int(layer.get("octave", 2))
+    velocity = float(layer.get("velocity", 92))
+    shape = str(layer.get("shape", "fifth_octave"))
+    articulation = str(layer.get("articulation", "staccato"))
+    gate = float(layer.get("gate", 0.48))
+    strum_spread_ms = float(layer.get("spread_ms", 8.0))
+    beat_per_second = ctx.bpm / 60.0
+    hk = _layer_human(layer, 1.0)
+    for local in range(int(section["bars"])):
+        root_base = root_for_chord(chord_for_bar(section, local), root_octave)
+        for event_idx, item in enumerate(pattern):
+            interval = int(item[0])
+            beat = float(item[1])
+            dur = float(item[2])
+            accent = float(item[3]) if len(item) > 3 else 1.0
+            root = root_base + interval
+            pitches = gp.power_chord_pitches(root, shape=shape)
+            for take_idx, take in enumerate(takes):
+                inst = str(take.get("instrument"))
+                if inst not in ctx.instruments:
+                    raise KeyError(f"guitar_chug take references unknown instrument {inst!r}")
+                timing_ms = float(take.get("timing_offset_ms", take.get("offset_ms", 0.0)))
+                take_beat = beat + timing_ms / 1000.0 * beat_per_second
+                vel_offset = float(take.get("velocity_offset", -2.0 * take_idx))
+                for p_idx, p in enumerate(pitches):
+                    note_offset = p_idx * (strum_spread_ms / 1000.0 * beat_per_second / max(1, len(pitches) - 1))
+                    add_note(
+                        ctx,
+                        inst,
+                        p,
+                        section["start_bar"] + local,
+                        take_beat + note_offset,
+                        dur,
+                        (velocity + vel_offset - p_idx * 2.0) * accent * float(section.get("intensity", 1.0)),
+                        articulation=articulation,
+                        gate=gate,
+                        **hk,
+                    )
+
+
+@profile
+def render_layer_guitar_lead(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render a motif as a mostly monophonic guitar lead performance."""
+    from . import guitar_performance as gp
+
+    insts = resolve_instruments(ctx, layer)
+    roots = layer.get("roots", [None])
+    starts = layer.get("starts", [[0, 0.0]])
+    repeats = int(layer.get("repeats", max(1, int(section["bars"]))))
+    every_bars = float(layer.get("every_bars", 1.0))
+    velocity = float(layer.get("velocity", 76))
+    articulation = layer.get("articulation", "pluck")
+    gate = float(layer.get("gate", 0.78))
+    transform = layer.get("transform")
+    transpose = int(layer.get("transpose", 0))
+    hk = _layer_human(layer, 3.0)
+    scoop = float(layer.get("pitch_scoop_cents", 12.0))
+    note_velocity_pattern = layer.get("note_velocity_pattern")
+    # Use the fretboard allocator to choose a plausible string/fret for each
+    # note.  The current version only uses that to vary scoops on jumps; future
+    # noise events can reuse the same assignment.
+    tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    prev_assign: dict[str, gp.StringFret | None] = {inst: None for inst in insts}
+    for rep in range(repeats):
+        root = roots[rep % len(roots)]
+        for start in starts:
+            local_bar, start_beat = float(start[0]) + rep * every_bars, float(start[1])
+            if local_bar >= section["bars"]:
+                continue
+            notes, rhythm, velocities = motif_notes(
+                ctx, layer["motif"], root=root, transform=transform, transpose=transpose
+            )
+            beat = start_beat
+            for i, p0 in enumerate(notes):
+                dur = rhythm[i % len(rhythm)] * float(layer.get("rhythm_scale", 1.0))
+                vel_scale = velocities[i % len(velocities)]
+                if note_velocity_pattern:
+                    vel_scale *= float(note_velocity_pattern[i % len(note_velocity_pattern)])
+                for inst in insts:
+                    choices = gp.positions_for_pitch(int(p0), tuning=tuning, max_fret=int(layer.get("max_fret", 19)))
+                    chosen = choices[0] if choices else None
+                    local_scoop = scoop
+                    prev = prev_assign.get(inst)
+                    if prev is not None and chosen is not None:
+                        # Larger position jumps get a slightly stronger attack scoop.
+                        local_scoop = scoop + min(28.0, abs(chosen.fret - prev.fret) * 2.0 + abs(chosen.string_index - prev.string_index) * 3.0)
+                    if chosen is not None:
+                        prev_assign[inst] = chosen
+                    add_note(
+                        ctx,
+                        inst,
+                        int(chosen.pitch if chosen is not None else p0),
+                        section["start_bar"] + local_bar,
+                        beat,
+                        dur,
+                        velocity * vel_scale * float(section.get("intensity", 1.0)),
+                        articulation=articulation,
+                        gate=gate,
+                        pitch_scoop_cents=local_scoop,
+                        **hk,
+                    )
+                beat += dur
+
 def render_layer_automation(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
 ) -> None:
@@ -1276,6 +1504,12 @@ def render_layer(
         render_layer_pedal(ctx, section, layer)
     elif kind == "root_hits":
         render_layer_root_hits(ctx, section, layer)
+    elif kind == "guitar_strum":
+        render_layer_guitar_strum(ctx, section, layer)
+    elif kind == "guitar_chug":
+        render_layer_guitar_chug(ctx, section, layer)
+    elif kind == "guitar_lead":
+        render_layer_guitar_lead(ctx, section, layer)
     elif kind == "automation":
         render_layer_automation(ctx, section, layer)
         return
@@ -1322,6 +1556,7 @@ def build_score(
         groups={},
         section_starts={},
         motifs={m["id"]: m for m in spec.get("motifs", [])},
+        instrument_specs={},
     )
     for inst_spec in spec.get("instruments", []):
         add_instrument(ctx, inst_spec)
@@ -1335,6 +1570,7 @@ def build_score(
             ctx.active_layer_kind = str(layer.get("kind", ""))
             render_layer(ctx, section, layer)
     pm._ambition_note_events = list(ctx.note_events)  # type: ignore[attr-defined]
+    pm._ambition_instrument_specs = copy.deepcopy(ctx.instrument_specs)  # type: ignore[attr-defined]
     return pm, ctx.groups, section_meta
 
 
@@ -1451,20 +1687,21 @@ def render_pretty_midi(
         # Add a tail (~0.6 s) so any release / built-in envelope tails finish
         # before the per-stem post-process slicing cuts in.
         total_samples = int(math.ceil((last_event_time + 0.6) * fs_float))
-        out = np.zeros(total_samples, dtype=np.float32)
+        out = np.zeros((total_samples, 2), dtype=np.float32)
         cursor = 0
         for ev in events:
             target = min(int(ev[0] * fs_float), total_samples)
             n = target - cursor
             if n > 0:
                 buf = fl.get_samples(n)
-                # pyFluidSynth returns interleaved L,R,L,R,...; mix to mono.
-                mono = (
-                    buf[0::2].astype(np.float32) + buf[1::2].astype(np.float32)
-                ) * 0.5
+                # pyFluidSynth returns interleaved L,R,L,R,...; preserve stereo
+                # so MIDI CC10 pan remains audible in stem renders.
+                stereo = np.column_stack(
+                    [buf[0::2].astype(np.float32), buf[1::2].astype(np.float32)]
+                )
                 # Normalize the int16 range pyFluidSynth uses by default.
-                mono /= 32768.0
-                out[cursor : cursor + len(mono)] = mono[:n]
+                stereo /= 32768.0
+                out[cursor : cursor + len(stereo), :] = stereo[:n]
                 cursor += n
             kind = ev[2]
             if kind == "on":
@@ -1477,9 +1714,11 @@ def render_pretty_midi(
                 fl.pitch_bend(channel, ev[3])
         if cursor < total_samples:
             buf = fl.get_samples(total_samples - cursor)
-            mono = (buf[0::2].astype(np.float32) + buf[1::2].astype(np.float32)) * 0.5
-            mono /= 32768.0
-            out[cursor : cursor + len(mono)] = mono[: total_samples - cursor]
+            stereo = np.column_stack(
+                [buf[0::2].astype(np.float32), buf[1::2].astype(np.float32)]
+            )
+            stereo /= 32768.0
+            out[cursor : cursor + len(stereo), :] = stereo[: total_samples - cursor]
         fl.delete()
         waveforms.append(out)
 
@@ -1487,9 +1726,9 @@ def render_pretty_midi(
         return np.zeros((1, 2), dtype=np.float32)
 
     max_len = max(len(w) for w in waveforms)
-    mixed = np.zeros(max_len, dtype=np.float32)
+    mixed = np.zeros((max_len, 2), dtype=np.float32)
     for w in waveforms:
-        mixed[: len(w)] += w
+        mixed[: len(w), :] += _coerce_stereo(w)
     return _coerce_stereo(mixed)
 
 
@@ -1570,6 +1809,10 @@ def render_synth_audio(
                 "pretty-midi backend requires --soundfont or installed default SoundFont"
             )
         return render_pretty_midi(pm, soundfont, sample_rate)
+    if backend in {"sfizz", "sfizz-render"}:
+        raise ValueError(
+            "sfizz rendering is instrument-aware; call render_group_audio so YAML can provide instrument_backend.sfz"
+        )
     if backend == "auto":
         if soundfont and shutil.which("fluidsynth"):
             try:
@@ -1849,7 +2092,11 @@ def soft_limit(
 
 @profile
 def post_process(
-    audio: np.ndarray, sample_rate: int, settings: dict[str, Any]
+    audio: np.ndarray,
+    sample_rate: int,
+    settings: dict[str, Any],
+    *,
+    base_dir: Path | None = None,
 ) -> np.ndarray:
     audio = _coerce_stereo(audio)
     if settings.get("gain_db", 0):
@@ -1912,9 +2159,42 @@ def post_process(
             db=float(settings["post_reverb_high_shelf_db"]),
         )
     audio = stereo_widen(audio, float(settings.get("stereo_width", 0.10)))
+
+    # Optional pro/post-DAW style extensions. These remain opt-in so normal
+    # lightweight renders do not need Pedalboard, LV2, Guitarix, NAM, or any
+    # local plugin inventory.
+    pedalboard_effects = (
+        settings.get("pedalboard_effects")
+        or settings.get("vst3_effects")
+        or settings.get("plugins")
+        or []
+    )
+    if pedalboard_effects:
+        from .backends.pedalboard_backend import apply_pedalboard_effects
+
+        audio = apply_pedalboard_effects(
+            audio, sample_rate, list(pedalboard_effects), base_dir=base_dir
+        )
+
+    external_effects = settings.get("external_effects") or settings.get("external_chain") or []
+    if external_effects:
+        from .backends.external_fx import apply_external_effects
+
+        audio = apply_external_effects(audio, sample_rate, list(external_effects))
+
+    if (
+        settings.get("target_lufs") is not None
+        or settings.get("loudness_target_lufs") is not None
+        or settings.get("loudness") is not None
+    ):
+        from .loudness import apply_loudness_settings
+
+        audio = apply_loudness_settings(audio, sample_rate, settings)
+
+    target_peak = settings.get("true_peak_db", settings.get("target_peak_db", -1.0))
     return soft_limit(
         audio,
-        float(settings.get("target_peak_db", -1.0)),
+        float(target_peak),
         drive=float(settings.get("limiter_drive", 1.08)),
         normalize=bool(settings.get("normalize", True)),
     )
@@ -2219,8 +2499,88 @@ def render_group_audio(
     tempdir: Path,
     minimum_duration: float,
     bpm: float,
+    *,
+    base_dir: Path | None = None,
+    render_cfg: dict[str, Any] | None = None,
 ) -> np.ndarray:
     insts = [inst for inst in pm.instruments if groups.get(inst.name) == group]
+    render_cfg = render_cfg or {}
+    instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
+    sfizz_cfg = dict(render_cfg.get("sfizz") or {})
+
+    def _instrument_backend_spec(inst_name: str) -> dict[str, Any]:
+        spec = dict(instrument_specs.get(inst_name, {}) or {})
+        raw = spec.get("instrument_backend", spec.get("backend", {}))
+        if isinstance(raw, str):
+            raw = {"kind": raw}
+        if not isinstance(raw, dict):
+            raw = {}
+        if "sfz" in spec and "sfz" not in raw:
+            raw = {**raw, "sfz": spec["sfz"]}
+        return raw
+
+    wants_sfizz = backend in {"sfizz", "sfizz-render"}
+    has_instrument_sfizz = any(
+        str(_instrument_backend_spec(inst.name).get("kind", "")).lower() in {"sfz", "sfizz"}
+        or bool(_instrument_backend_spec(inst.name).get("sfz"))
+        for inst in insts
+    )
+    if wants_sfizz or has_instrument_sfizz:
+        from .backends.sfizz_backend import render_sfizz
+
+        fallback_backend_name = str(sfizz_cfg.get("fallback_backend", render_cfg.get("sfizz_fallback_backend", "auto")))
+        rendered: list[np.ndarray] = []
+        for idx, inst in enumerate(insts):
+            inst_backend = _instrument_backend_spec(inst.name)
+            sfz_path = inst_backend.get("sfz") or sfizz_cfg.get("default_sfz")
+            inst_pm = copy_with_instruments(pm, [inst], bpm)
+            if sfz_path:
+                settings = dict(sfizz_cfg)
+                settings.update(dict(inst_backend.get("settings") or {}))
+                if "command" in inst_backend:
+                    settings["command"] = inst_backend["command"]
+                if "binary" in inst_backend:
+                    settings["binary"] = inst_backend["binary"]
+                rendered.append(
+                    render_sfizz(
+                        inst_pm,
+                        sfz_path=sfz_path,
+                        sample_rate=sample_rate,
+                        tempdir=tempdir,
+                        output_name=f"group_{group}.{idx}.{inst.name}",
+                        minimum_duration=minimum_duration,
+                        base_dir=base_dir,
+                        settings=settings,
+                    )
+                )
+            elif wants_sfizz:
+                raise FileNotFoundError(
+                    f"backend={backend!r} requires render.sfizz.default_sfz or instrument {inst.name!r} instrument_backend.sfz"
+                )
+            else:
+                midi_path = tempdir / f"group_{group}.{idx}.{inst.name}.mid"
+                dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.dry.wav"
+                if fallback_backend_name != "fallback":
+                    inst_pm.write(str(midi_path))
+                rendered.append(
+                    render_synth_audio(
+                        inst_pm,
+                        fallback_backend_name,
+                        soundfont,
+                        sample_rate,
+                        midi_path,
+                        dry_wav,
+                        minimum_duration,
+                    )
+                )
+        if not rendered:
+            return np.zeros((max(1, int(sample_rate * minimum_duration)), 2), dtype=np.float32)
+        max_len = max(len(x) for x in rendered)
+        out = np.zeros((max_len, 2), dtype=np.float32)
+        for x in rendered:
+            out[: len(x), :] += _coerce_stereo(x)
+        return out.astype(np.float32)
+
     sub_pm = copy_with_instruments(pm, insts, bpm)
     midi_path = tempdir / f"group_{group}.mid"
     dry_wav = tempdir / f"group_{group}.dry.wav"
@@ -2331,6 +2691,8 @@ def render_all(args: argparse.Namespace) -> dict[str, Any]:
                 tempdir,
                 total_seconds,
                 bpm,
+                base_dir=spec_path.parent,
+                render_cfg=render_cfg,
             )
             group_raw = ensure_audio_length(group_raw, target_samples)
             group_settings = copy.deepcopy(stem_base_settings)
@@ -2344,7 +2706,7 @@ def render_all(args: argparse.Namespace) -> dict[str, Any]:
             import time as _time
 
             _t0 = _time.time()
-            group_audio = post_process(group_raw, sample_rate, group_settings)
+            group_audio = post_process(group_raw, sample_rate, group_settings, base_dir=spec_path.parent)
             if getattr(args, "verbose", False):
                 print(
                     f"[post-done] stem {group} elapsed={_time.time() - _t0:.2f}s shape={group_audio.shape}",
@@ -2387,7 +2749,7 @@ def render_all(args: argparse.Namespace) -> dict[str, Any]:
         if getattr(args, "verbose", False):
             print("[post] master from processed stems", flush=True)
         full_audio = post_process(
-            full_stem_sum, sample_rate, spec.get("postprocess", {})
+            full_stem_sum, sample_rate, spec.get("postprocess", {}), base_dir=spec_path.parent
         )
         preview_path = (
             output_root
@@ -2466,7 +2828,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--outdir", default="output", help="Output directory")
     parser.add_argument(
         "--backend",
-        choices=["auto", "fallback", "fluidsynth-cli", "pretty-midi"],
+        choices=["auto", "fallback", "fluidsynth-cli", "pretty-midi", "sfizz", "sfizz-render"],
         default=None,
     )
     parser.add_argument("--soundfont", default=None)
