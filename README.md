@@ -364,3 +364,20 @@ When composing new YAML cues, prefer explicit, inspectable musical choices:
 - Preserve conservative gain ranges in tune specs; the runtime renderer can clip if stems are too hot.
 - Treat `first_goblin_tune_v2` as the current active adaptive-music lab, not as the final abstraction for all encounters.
 - Update `docs/recipes/generated-music-workflow.md` and `docs/tools/generated-audio-tools.md` when the workflow changes.
+
+## Troubleshooting score discovery
+
+If `cue_bundle` reports `cue not found`, it now prints the renderer project root
+and each score candidate it checked.  The expected renderer project root is the
+directory that contains both `pyproject.toml` and `scores/`; for the Ambition
+checkout this should be:
+
+```bash
+~/code/ambition/tools/ambition_music_renderer
+```
+
+A common post-reorg failure mode is accidentally resolving paths relative to the
+Python package directory (`ambition_music_renderer/`) instead of the renderer
+project root.  The shared `ambition_music_renderer._paths` helpers centralize
+this discovery and should be used by render, audit, and legacy modules instead
+of hard-coded `Path(__file__).parents[...]` calculations.

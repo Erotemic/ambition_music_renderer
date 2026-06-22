@@ -29,6 +29,7 @@ import yaml
 from . import musicir_renderer as r
 from ..profiler import PhaseTimer, profile
 from ..kwconf_runner import KwconfCommand
+from .._paths import project_root
 
 
 RUNTIME_STEM_GAIN_MODES = ("native", "shared")
@@ -408,7 +409,7 @@ def _render_main(ns) -> int:
     worker_command = KwconfCommand(
         RenderGroupWorkerConfig,
         module="ambition_music_renderer.render.group_worker",
-        cwd=Path(__file__).resolve().parent.parent,
+        cwd=project_root(),
     )
     worker_plan = RenderWorkerPlan(
         spec_path=spec_path,
@@ -739,7 +740,7 @@ def _render_main(ns) -> int:
     # from the same inputs without remembering the CLI invocation. The script
     # activates a sibling .venv if one exists in the renderer dir, so users
     # can `bash regen.sh` from anywhere.
-    renderer_dir = Path(__file__).resolve().parent.parent
+    renderer_dir = project_root()
     abs_spec = spec_path.resolve()
     abs_outdir = outdir.resolve()
     regen = outdir / "regen.sh"

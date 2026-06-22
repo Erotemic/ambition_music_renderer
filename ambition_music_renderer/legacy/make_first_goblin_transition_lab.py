@@ -14,6 +14,8 @@ from ..profiler import profile
 import kwconf
 import copy
 from pathlib import Path
+
+from .._paths import project_root
 from typing import Any
 
 import yaml
@@ -24,7 +26,7 @@ except Exception:  # pragma: no cover - fallback for fresh environments
     rich_print = print
 
 
-RENDERER_ROOT = Path(__file__).resolve().parent.parent
+RENDERER_ROOT = project_root()
 REPO_ROOT = RENDERER_ROOT.parents[1]
 DEFAULT_SOURCE = RENDERER_ROOT / "scores" / "active" / "first_goblin_tune_v2.music.yaml"
 DEFAULT_OUTPUT = (

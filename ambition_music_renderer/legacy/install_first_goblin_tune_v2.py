@@ -20,6 +20,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from .._paths import repo_root as _repo_root
+
 CUE_ID = "first_goblin_tune_v2"
 SECTIONS = ("intro", "wave1", "wave2", "wave3", "recap_loop", "outro")
 STEMS = ("strings", "brass", "winds", "choir_pad", "mallets", "percussion")
@@ -33,7 +35,7 @@ FULL_SECTIONS = SECTIONS
 
 @profile
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
+    return _repo_root()
 
 
 @profile

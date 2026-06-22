@@ -49,7 +49,7 @@ class SpectralCompareConfig(kwconf.Config):
     """Compare spectral energy in rendered scratch stems."""
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
-    window: tuple[float, float] = kwconf.Value((38.0, 43.0), nargs=2)
+    window: list[float] = kwconf.Value(default_factory=lambda: [38.0, 43.0], nargs=2)
     sr: int = kwconf.Value(48000)
     label: str = kwconf.Value("")
 

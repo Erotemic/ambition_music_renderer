@@ -112,7 +112,7 @@ class SpectralLocalizeConfig(kwconf.Config):
     """Localize spectral content in rendered scratch stems."""
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
-    window: tuple[float, float] = kwconf.Value((0.0, -1.0), nargs=2, help="Time window in seconds")
+    window: list[float] = kwconf.Value(default_factory=lambda: [0.0, -1.0], nargs=2, help="Time window in seconds")
     bucket: float = kwconf.Value(0.25, help="Bucket size in seconds")
     sr: int = kwconf.Value(48000, help="Sample rate of stems")
     bands: str = kwconf.Value("default", choices=["default", "vhigh-only"])

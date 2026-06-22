@@ -43,19 +43,30 @@ def _coerce_command_data(
 
 
 def _cli_scalar(value: Any) -> str:
-    """Stringify one CLI value without changing its semantic type."""
+    """Stringify one scalar CLI value without changing its semantic type."""
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, (str, int, float)):
         return str(value)
-    if isinstance(value, tuple):
-        # Kwconf can parse nargs tuples from separate tokens more reliably than
-        # from a serialized string, but for a key=value-only command seam we use
-        # JSON so nested values remain unambiguous.
-        return json.dumps(list(value))
-    if isinstance(value, (list, dict)):
+    if isinstance(value, (list, tuple, dict)):
         return json.dumps(value)
     return str(value)
+
+
+def _is_flat_cli_sequence(value: Any) -> bool:
+    """Return true when a sequence should be emitted as nargs tokens.
+
+    kwconf fields such as ``window = kwconf.Value(..., nargs=2)`` expect
+    ``--window 0 53.333``.  Emitting ``--window=[0, 53.333]`` only works when
+    the receiving field opts into a structured parser such as ``parser='yaml'``.
+    Keep nested lists/dicts as one JSON/YAML-ish scalar, but treat flat
+    scalar sequences as normal argparse/kwconf nargs values.
+    """
+    if isinstance(value, (str, bytes, bytearray, Mapping)):
+        return False
+    if not isinstance(value, (list, tuple)):
+        return False
+    return all(not isinstance(item, (list, tuple, dict, set)) for item in value)
 
 
 def config_to_argv(
@@ -77,8 +88,9 @@ def config_to_argv(
         cli_key = key.replace("-", "_")
         if isinstance(value, bool):
             argv.append(f"--{cli_key}" if value else f"--no-{cli_key}")
-        elif isinstance(value, (list, tuple)) and not isinstance(value, str):
-            argv.append(f"--{cli_key}={_cli_scalar(value)}")
+        elif _is_flat_cli_sequence(value):
+            argv.append(f"--{cli_key}")
+            argv.extend(_cli_scalar(item) for item in value)
         else:
             argv.append(f"--{cli_key}={_cli_scalar(value)}")
     return argv

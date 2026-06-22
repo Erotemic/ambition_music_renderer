@@ -34,6 +34,12 @@ from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
 from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
+from .._paths import bundles_root as _bundles_root
+from .._paths import find_score as _find_score
+from .._paths import generated_root as _generated_root
+from .._paths import project_root as _project_root
+from .._paths import repo_root as _repo_root
+from .._paths import score_candidates as _score_candidates
 
 DEFAULT_BACKEND = "pretty-midi"
 BACKEND_CHOICES = ("pretty-midi", "fluidsynth-cli", "fallback", "auto")
@@ -169,19 +175,19 @@ class CommandResult:
 
 
 def package_dir() -> Path:
-    return Path(__file__).resolve().parent.parent
+    return _project_root()
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
+    return _repo_root()
 
 
 def default_generated_root() -> Path:
-    return package_dir() / "generated"
+    return _generated_root()
 
 
 def default_bundle_root() -> Path:
-    return package_dir() / "bundles"
+    return _bundles_root()
 
 
 def default_publish_dest_root() -> Path:
@@ -201,15 +207,18 @@ def find_score(cue: str) -> Path | None:
 
     Kept local to avoid importing the top-level CLI from this lower-level helper.
     """
-    p = Path(cue)
-    if p.suffix in (".yaml", ".yml") and p.exists():
-        return p.resolve()
-    for sub in ("active", "examples", "archive", "experiments"):
-        for suffix in (".music.yaml", ".yaml", ".yml"):
-            candidate = package_dir() / "scores" / sub / f"{cue}{suffix}"
-            if candidate.exists():
-                return candidate.resolve()
-    return None
+    return _find_score(cue)
+
+
+def missing_score_debug(cue: str) -> str:
+    candidates = _score_candidates(cue)
+    lines = [
+        f"cue not found: {cue}",
+        f"renderer project root: {package_dir()}",
+        "score candidates checked:",
+    ]
+    lines.extend(f"  - {candidate}" for candidate in candidates)
+    return "\n".join(lines)
 
 
 def load_yaml(path: Path) -> dict:
@@ -2664,7 +2673,9 @@ def create_bundle(
     progress_line(f"locating score for {cue!r}")
     score_path = find_score(cue)
     if score_path is None:
-        raise FileNotFoundError(f"cue not found: {cue}")
+        message = missing_score_debug(cue)
+        progress_line(message)
+        raise FileNotFoundError(message)
     spec = load_yaml(score_path)
     cue_id = str(spec.get("id", cue))
     progress_line(f"loaded {cue_id} from {terminal_link(score_path)}")

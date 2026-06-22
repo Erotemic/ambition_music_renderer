@@ -29,6 +29,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ._paths import find_score as _find_score
+from ._paths import generated_root as _generated_root
+from ._paths import output_root as _output_root
+from ._paths import project_root as _project_root
+from ._paths import repo_root as _repo_root
+
 import kwconf
 
 from .profiler import profile
@@ -90,21 +96,20 @@ PINNED_FILENAME = "published.ogg"
 
 
 def package_dir() -> Path:
-    return Path(__file__).resolve().parent.parent
+    return _project_root()
 
 
 def repo_root() -> Path:
-    # tools/ambition_music_renderer/ambition_music_renderer/cli.py -> repo
-    return Path(__file__).resolve().parents[3]
+    return _repo_root()
 
 
 def generated_root() -> Path:
-    return package_dir() / "generated"
+    return _generated_root()
 
 
 def output_root() -> Path:
     """Legacy hashed output root used by the underlying renderer."""
-    return package_dir() / "output"
+    return _output_root()
 
 
 def find_score(cue: str) -> Path | None:
@@ -113,17 +118,7 @@ def find_score(cue: str) -> Path | None:
     Accepts a bare cue id (e.g. ``lofi_study_loop``) or a relative/absolute
     path to a YAML.
     """
-    p = Path(cue)
-    if p.suffix in (".yaml", ".yml") and p.exists():
-        return p.resolve()
-    candidates = [
-        package_dir() / "scores" / sub / f"{cue}.music.yaml" for sub in SCORE_DIRS
-    ]
-    candidates += [package_dir() / "scores" / sub / f"{cue}.yaml" for sub in SCORE_DIRS]
-    for c in candidates:
-        if c.exists():
-            return c
-    return None
+    return _find_score(cue, subdirs=SCORE_DIRS)
 
 
 def find_full_mix(preview_dir: Path, cue: str) -> Path | None:
@@ -1077,7 +1072,7 @@ class SpectralCompareTool(_LazyToolCommand):
     _config_name = "SpectralCompareConfig"
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
-    window: tuple[float, float] = kwconf.Value((38.0, 43.0), nargs=2)
+    window: list[float] = kwconf.Value(default_factory=lambda: [38.0, 43.0], nargs=2)
     sr: int = kwconf.Value(48000)
     label: str = kwconf.Value("")
 
@@ -1089,7 +1084,7 @@ class SpectralLocalizeTool(_LazyToolCommand):
     _config_name = "SpectralLocalizeConfig"
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
-    window: tuple[float, float] = kwconf.Value((0.0, -1.0), nargs=2, help="Time window in seconds")
+    window: list[float] = kwconf.Value(default_factory=lambda: [0.0, -1.0], nargs=2, help="Time window in seconds")
     bucket: float = kwconf.Value(0.25, help="Bucket size in seconds")
     sr: int = kwconf.Value(48000, help="Sample rate of stems")
     bands: str = kwconf.Value("default", choices=["default", "vhigh-only"])
