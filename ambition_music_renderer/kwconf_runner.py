@@ -23,6 +23,26 @@ def _field_names(config_cls: type[kwconf.Config]) -> set[str]:
     return set(getattr(config_cls, "__default__", {}) or {})
 
 
+def _field_defaults(config_cls: type[kwconf.Config]) -> dict[str, Any]:
+    return dict(getattr(config_cls, "__default__", {}) or {})
+
+
+def _positioned_field_names(config_cls: type[kwconf.Config]) -> list[str]:
+    """Return kwconf fields declared with ``position=...`` in CLI order."""
+
+    positioned: list[tuple[int, str]] = []
+    for key, value in _field_defaults(config_cls).items():
+        position = getattr(value, "position", None)
+        if position is None:
+            continue
+        try:
+            pos_int = int(position)
+        except Exception:
+            pos_int = 10_000
+        positioned.append((pos_int, key))
+    return [key for _pos, key in sorted(positioned)]
+
+
 def _coerce_command_data(
     config_cls: type[kwconf.Config],
     data: Mapping[str, Any] | kwconf.Config | None = None,
@@ -74,14 +94,26 @@ def config_to_argv(
     data: Mapping[str, Any] | kwconf.Config | None = None,
     **kwargs: Any,
 ) -> list[str]:
-    """Render kwconf config data as explicit CLI key/value arguments.
+    """Render kwconf config data as CLI argv for subprocess handoffs.
 
-    Non-boolean values become ``--key=value``.  Boolean True values become a
-    bare ``--key`` and Boolean False values become ``--no-key`` because kwconf's
-    flag action is intentionally flag-oriented and supports the negated form.
+    Values declared with ``position=...`` must remain positional.  Emitting them
+    as ``--key=value`` is not equivalent for all kwconf fields: optional
+    positionals with ``nargs='?'`` can ignore the option spelling and silently
+    fall back to their default.  Non-positional booleans become ``--key`` /
+    ``--no-key``; flat scalar sequences are emitted as nargs tokens.
     """
     raw = _coerce_command_data(config_cls, data, **kwargs)
     argv: list[str] = []
+
+    for key in _positioned_field_names(config_cls):
+        value = raw.pop(key, None)
+        if value is None:
+            continue
+        if _is_flat_cli_sequence(value):
+            argv.extend(_cli_scalar(item) for item in value)
+        else:
+            argv.append(_cli_scalar(value))
+
     for key, value in raw.items():
         if value is None:
             continue

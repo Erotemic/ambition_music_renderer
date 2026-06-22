@@ -115,13 +115,16 @@ def create_bundle(
             "simple_mix": render_audio_mode == "simple-mix",
             "full_mix_only": render_audio_mode == "full-mix-only",
         }
+        line_profile_requested = bool(os.environ.get("LINE_PROFILE"))
         command_mode = "direct" if render_in_process else "subprocess"
-        if profile_render:
-            os.environ.setdefault("LINE_PROFILE", "1")
+        if profile_render or line_profile_requested:
+            if profile_render:
+                os.environ.setdefault("LINE_PROFILE", "1")
             render_in_process = True
             command_mode = "direct"
             render_data["profile_workers"] = True
-            progress_line("profiling enabled via line_profiler; running render_isolated in-process")
+            reason = "--profile_render" if profile_render else "LINE_PROFILE"
+            progress_line(f"profiling/debug requested by {reason}; running render_isolated and group workers in-process")
         render_command = KwconfCommand(RenderIsolatedConfig, module="ambition_music_renderer.render.isolated", cwd=package_dir())
         commands.append(
             run_kwconf_logged(

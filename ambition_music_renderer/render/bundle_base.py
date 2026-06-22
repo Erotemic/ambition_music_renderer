@@ -247,6 +247,46 @@ def safe_rel(path: Path, root: Path | None = None) -> str:
         return str(path)
 
 
+
+
+def file_uri(path: Path) -> str:
+    return path.resolve().as_uri()
+
+
+def terminal_link(path: Path, label: str | None = None) -> str:
+    """Return an OSC-8 terminal hyperlink with a plain absolute-path label."""
+    path = path.resolve()
+    shown = label or str(path)
+    return f"\033]8;;{path.as_uri()}\033\\{shown}\033]8;;\033\\"
+
+
+def progress_line(message: str, *, stream=None) -> None:
+    """Emit a visible progress update for long bundle workflows."""
+    if stream is None:
+        stream = sys.stderr
+    print(f"[music bundle] {message}", file=stream, flush=True)
+
+
+
+@profile
+def renderer_audit_command(command_name: str, *args: object) -> list[str]:
+    """Build a subprocess command for a packaged audit helper.
+
+    Root-level helper scripts were moved under ``ambition_music_renderer.audit``
+    and exposed through the package modal CLI. Bundle/report generation should
+    call that public CLI surface instead of stale ``tools_dir / "script.py"``
+    paths, which disappear after the cleanup.
+    """
+    return [
+        sys.executable,
+        "-m",
+        "ambition_music_renderer",
+        "audit",
+        str(command_name),
+        *(str(arg) for arg in args),
+    ]
+
+
 def _tail_text(path: Path, *, max_lines: int = 80, max_chars: int = 12000) -> str:
     try:
         text = path.read_text(encoding="utf8", errors="replace")

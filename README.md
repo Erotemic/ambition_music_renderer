@@ -171,7 +171,7 @@ useful but usually too large for chat upload.
 
 ### Profiling renders
 
-Normal `cue_bundle` may launch `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, use `--profile_render`; it enables `LINE_PROFILE=1`, runs `render_isolated` in-process, and renders serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` uses line profiler only; it does not start cProfile.
+Normal `cue_bundle` launches `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, either set `LINE_PROFILE=1` or pass `--profile_render`; both run `render_isolated` in-process and render serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` is a convenience flag that also enables `LINE_PROFILE=1`; it uses line profiler only and does not start cProfile.
 
 Recommended short profiling command:
 
@@ -253,29 +253,34 @@ Outputs include `reference_audio_summary.txt`, `reference_audio_audit.json`,
 
 Rendering is a staging step. Publishing/installing is a separate decision.
 
-Typical generated output for a cue includes:
+Typical generated output for a cue is versioned by the renderer/spec hash so old experiments do not sit beside current files:
 
 ```text
 generated/<cue>/
-  adaptive/<section>/
-    <section>.full.ogg
-    <section>.<stem>.ogg
-  preview/
-    full_soundtrack_preview.ogg
-    runtime_minimal.ogg
-    runtime_maximal.ogg
-    runtime_state_<name>.ogg
-    audition_minimal.ogg
-    audition_maximal.ogg
-    audition_state_<name>.ogg
-  reports/
-    stem_export_report.tsv
-    manifest_audio_levels.tsv
-    mix_diagnostics.txt
-    spectral_fingerprint.json
-    spectral_fingerprint.tsv
-  <cue>.adaptive_manifest.json
+  building -> .versioned/<hash-being-built>/
+  latest -> .versioned/<latest-successful-hash>/
+  .versioned/<hash>/
+    adaptive/<section>/
+      <section>.full.ogg
+      <section>.<stem>.ogg
+    preview/
+      full_soundtrack_preview.ogg
+      runtime_minimal.ogg
+      runtime_maximal.ogg
+      runtime_state_<name>.ogg
+      audition_minimal.ogg
+      audition_maximal.ogg
+      audition_state_<name>.ogg
+    reports/
+      stem_export_report.tsv
+      manifest_audio_levels.tsv
+      mix_diagnostics.txt
+      spectral_fingerprint.json
+      spectral_fingerprint.tsv
+    <cue>.adaptive_manifest.json
 ```
+
+Use `generated/<cue>/building/` while a render is in progress if you want to peek at intermediate stems. Use `generated/<cue>/latest/` for the most recent successful run. Explicit `--outdir` paths keep the caller-provided layout and do not get moved under `.versioned/`.
 
 `runtime_*` previews are true weighted stem sums with no upward audition
 normalization. `audition_*` previews are the same mixes normalized for easier
