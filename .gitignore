@@ -97,3 +97,4 @@ build/
 *.midi
 generated/
 tmp/
+legacy_outputs
