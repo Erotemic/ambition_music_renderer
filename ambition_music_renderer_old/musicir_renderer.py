@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses as dc
+import functools
 import hashlib
 import json
 import math
@@ -1970,14 +1971,22 @@ def band_gain(
     return (audio + band * (gain - 1.0)).astype(np.float32)
 
 
-@profile
-def _comb_filter(
+@functools.cache
+def _audio_kernels():
+    """Return lazily imported compiled DSP kernels, or ``None`` for fallback."""
+    disabled = os.environ.get("AMBITION_MUSIC_RENDERER_DISABLE_NUMBA", "").lower()
+    if disabled in {"1", "true", "yes", "on"}:
+        return None
+    try:
+        from . import _audio_kernels as kernels
+    except Exception:
+        return None
+    return kernels
+
+
+def _comb_filter_python(
     signal_in: np.ndarray, delay: int, feedback: float, damping: float
 ) -> np.ndarray:
-    """Lowpass-feedback comb (Freeverb-style). Delay in samples; feedback is
-    the per-loop multiplier (RT60-controlling); damping applies a one-pole
-    lowpass inside the feedback path so the reverb tail darkens over time.
-    """
     n = len(signal_in)
     out = np.zeros(n, dtype=np.float32)
     if delay <= 0 or delay >= n:
@@ -2001,12 +2010,9 @@ def _comb_filter(
     return out
 
 
-@profile
-def _allpass_filter(
+def _allpass_filter_python(
     signal_in: np.ndarray, delay: int, feedback: float = 0.5
 ) -> np.ndarray:
-    """Schroeder-style allpass for diffusion. No spectral coloration, just
-    smears the impulse response."""
     n = len(signal_in)
     out = np.zeros(n, dtype=np.float32)
     if delay <= 0 or delay >= n:
@@ -2023,6 +2029,39 @@ def _allpass_filter(
         if write >= delay:
             write = 0
     return out
+
+
+@profile
+def _comb_filter(
+    signal_in: np.ndarray, delay: int, feedback: float, damping: float
+) -> np.ndarray:
+    """Lowpass-feedback comb (Freeverb-style).
+
+    The pure-Python implementation is retained as a fallback/reference, but the
+    normal render path uses lazily imported Numba kernels so these long
+    sample-by-sample feedback loops run as native code instead of dominating
+    line profiles.
+    """
+    sig = np.ascontiguousarray(signal_in, dtype=np.float32)
+    damping = float(clamp(damping, 0.0, 0.99))
+    kernels = _audio_kernels()
+    if kernels is not None:
+        return kernels.comb_filter_lowpass_feedback(
+            sig, int(delay), float(feedback), damping
+        )
+    return _comb_filter_python(sig, int(delay), float(feedback), damping)
+
+
+@profile
+def _allpass_filter(
+    signal_in: np.ndarray, delay: int, feedback: float = 0.5
+) -> np.ndarray:
+    """Schroeder-style allpass/diffuser for the internal reverb."""
+    sig = np.ascontiguousarray(signal_in, dtype=np.float32)
+    kernels = _audio_kernels()
+    if kernels is not None:
+        return kernels.allpass_filter(sig, int(delay), float(feedback))
+    return _allpass_filter_python(sig, int(delay), float(feedback))
 
 
 @profile

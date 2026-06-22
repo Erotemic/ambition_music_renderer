@@ -30,13 +30,12 @@ import sys
 from pathlib import Path
 
 import kwconf
+import ubelt as ub
 
 from .profiler import profile
 
 
 def _progress(iterable, *, total, desc):
-    import ubelt as ub
-
     return ub.ProgIter(
         iterable,
         total=total,
@@ -230,7 +229,7 @@ def render_cue(
     cmd = [
         python_exe(),
         "-m",
-        "ambition_music_renderer.render.isolated",
+        "ambition_music_renderer.render_isolated",
         str(yaml_path),
         "--outdir",
         str(outdir),
@@ -545,7 +544,7 @@ def cmd_radio(args) -> int:
 
 @profile
 def cmd_bundle(args) -> int:
-    from .render.bundle import CueBundleConfig, create_bundle_from_config, print_bundle_summary
+    from .cue_bundle import CueBundleConfig, create_bundle_from_config, print_bundle_summary
 
     config = args if isinstance(args, CueBundleConfig) else CueBundleConfig.cli(argv=False, data=dict(args))
     report = create_bundle_from_config(config)
@@ -794,7 +793,7 @@ class BundleManyCommand(kwconf.Config):
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
         config = cls.cli(argv=argv, data=kwargs)
-        from .render.batch_bundle import run_batch_bundle
+        from .batch_bundle import run_batch_bundle
 
         return run_batch_bundle(config)
 
@@ -957,7 +956,7 @@ class _LazyToolCommand(kwconf.Config):
 class ArrangementAuditTool(_LazyToolCommand):
     """Audit MusicIR arrangement density and event overlap."""
 
-    _module_name = "audit.arrangement_audit"
+    _module_name = "arrangement_audit"
     _config_name = "ArrangementAuditConfig"
 
     score: Path = kwconf.Value(None, position=1, parser=Path)
@@ -970,7 +969,7 @@ class ArrangementAuditTool(_LazyToolCommand):
 class DissonanceAuditTool(_LazyToolCommand):
     """Audit MusicIR harmonic dissonance hotspots."""
 
-    _module_name = "audit.dissonance_audit"
+    _module_name = "dissonance_audit"
     _config_name = "DissonanceAuditConfig"
 
     score: Path = kwconf.Value(None, position=1, parser=Path, help="MusicIR YAML score to analyze")
@@ -985,7 +984,7 @@ class DissonanceAuditTool(_LazyToolCommand):
 class ReferenceAudioAuditTool(_LazyToolCommand):
     """Analyze reference audio and write comparison reports."""
 
-    _module_name = "audit.reference_audio_audit"
+    _module_name = "reference_audio_audit"
     _config_name = "ReferenceAudioAuditConfig"
 
     audio: Path = kwconf.Value(None, position=1, parser=Path, help="reference audio file")
@@ -997,7 +996,7 @@ class ReferenceAudioAuditTool(_LazyToolCommand):
 class ShrillNoteAuditTool(_LazyToolCommand):
     """Audit notes that may be shrill or whistle-like."""
 
-    _module_name = "audit.shrill_note_audit"
+    _module_name = "shrill_note_audit"
     _config_name = "ShrillNoteAuditConfig"
 
     score: Path = kwconf.Value(None, position=1, parser=Path)
@@ -1012,7 +1011,7 @@ class ShrillNoteAuditTool(_LazyToolCommand):
 class SourNoteAuditTool(_LazyToolCommand):
     """Audit likely sour-note candidates."""
 
-    _module_name = "audit.sour_note_audit"
+    _module_name = "sour_note_audit"
     _config_name = "SourNoteAuditConfig"
 
     score: Path = kwconf.Value(None, position=1, parser=Path)
@@ -1028,7 +1027,7 @@ class SourNoteAuditTool(_LazyToolCommand):
 class AuditCueBalanceTool(_LazyToolCommand):
     """Print peak/RMS balance for generated cue OGG files."""
 
-    _module_name = "audit.audit_cue_balance"
+    _module_name = "audit_cue_balance"
     _config_name = "AuditCueBalanceConfig"
 
     root: Path | None = kwconf.Value(None, position=1, parser=Path, nargs="?")
@@ -1037,7 +1036,7 @@ class AuditCueBalanceTool(_LazyToolCommand):
 class InstallFirstGoblinTuneTool(_LazyToolCommand):
     """Install first_goblin_tune_v2 renderer outputs into stable asset paths."""
 
-    _module_name = "legacy.install_first_goblin_tune_v2"
+    _module_name = "install_first_goblin_tune_v2"
     _config_name = "InstallFirstGoblinTuneConfig"
 
     src: Path | None = kwconf.Value(None, parser=Path, help="Renderer output directory")
@@ -1048,7 +1047,7 @@ class InstallFirstGoblinTuneTool(_LazyToolCommand):
 class LevelReportTool(_LazyToolCommand):
     """Report rendered cue loudness / peak levels."""
 
-    _module_name = "audit.level_report"
+    _module_name = "level_report"
     _config_name = "LevelReportConfig"
 
     root: Path | None = kwconf.Value(None, parser=Path, help="music root to scan")
@@ -1062,7 +1061,7 @@ class LevelReportTool(_LazyToolCommand):
 class FirstGoblinTransitionLabTool(_LazyToolCommand):
     """Create the first-goblin transition lab experiment score."""
 
-    _module_name = "legacy.make_first_goblin_transition_lab"
+    _module_name = "make_first_goblin_transition_lab"
     _config_name = "FirstGoblinTransitionLabConfig"
 
     source: Path | None = kwconf.Value(None, parser=Path)
@@ -1073,7 +1072,7 @@ class FirstGoblinTransitionLabTool(_LazyToolCommand):
 class SpectralCompareTool(_LazyToolCommand):
     """Compare spectral energy in rendered scratch stems."""
 
-    _module_name = "audit.spectral_compare"
+    _module_name = "spectral_compare"
     _config_name = "SpectralCompareConfig"
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
@@ -1085,7 +1084,7 @@ class SpectralCompareTool(_LazyToolCommand):
 class SpectralLocalizeTool(_LazyToolCommand):
     """Localize spectral content in rendered scratch stems."""
 
-    _module_name = "audit.spectral_localize"
+    _module_name = "spectral_localize"
     _config_name = "SpectralLocalizeConfig"
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
@@ -1098,7 +1097,7 @@ class SpectralLocalizeTool(_LazyToolCommand):
 class TransitionAuditTool(_LazyToolCommand):
     """Audit adaptive section transition metrics and previews."""
 
-    _module_name = "audit.transition_audit"
+    _module_name = "transition_audit"
     _config_name = "TransitionAuditConfig"
 
     root: Path = kwconf.Value(None, position=1, parser=Path, help="generated cue root containing adaptive/<section>/")
@@ -1116,42 +1115,8 @@ class TransitionAuditTool(_LazyToolCommand):
     envelope_hop_ms: float = kwconf.Value(20.0)
 
 
-class AuditModal(kwconf.ModalCLI):
-    """Analysis and audit helpers for rendered scores and generated audio."""
-
-    arrangement = ArrangementAuditTool
-    arrangement_audit = ArrangementAuditTool
-    dissonance = DissonanceAuditTool
-    dissonance_audit = DissonanceAuditTool
-    reference_audio = ReferenceAudioAuditTool
-    reference_audio_audit = ReferenceAudioAuditTool
-    shrill_notes = ShrillNoteAuditTool
-    shrill_note_audit = ShrillNoteAuditTool
-    sour_notes = SourNoteAuditTool
-    sour_note_audit = SourNoteAuditTool
-    cue_balance = AuditCueBalanceTool
-    audit_cue_balance = AuditCueBalanceTool
-    levels = LevelReportTool
-    level_report = LevelReportTool
-    spectral_compare = SpectralCompareTool
-    spectral_localize = SpectralLocalizeTool
-    transition = TransitionAuditTool
-    transition_audit = TransitionAuditTool
-
-
-class LegacyModal(kwconf.ModalCLI):
-    """Quarantined legacy helpers kept importable until we verify deletion safety."""
-
-    install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
-    make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
-
-
 class ToolsModal(kwconf.ModalCLI):
-    """Compatibility alias for older `tools ...` invocations.
-
-    Prefer `audit ...` for active diagnostics and `legacy ...` for quarantined
-    one-off helpers.
-    """
+    """Analysis and maintenance helpers formerly kept as top-level scripts."""
 
     arrangement_audit = ArrangementAuditTool
     dissonance_audit = DissonanceAuditTool
@@ -1159,12 +1124,12 @@ class ToolsModal(kwconf.ModalCLI):
     shrill_note_audit = ShrillNoteAuditTool
     sour_note_audit = SourNoteAuditTool
     audit_cue_balance = AuditCueBalanceTool
+    install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
     level_report = LevelReportTool
+    make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
     spectral_compare = SpectralCompareTool
     spectral_localize = SpectralLocalizeTool
     transition_audit = TransitionAuditTool
-    install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
-    make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
 
 
 class AmbitionMusicRendererCLI(kwconf.ModalCLI):
@@ -1180,8 +1145,6 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     sandbox = SandboxModal
     radio = RadioModal
     plugins = PluginsModal
-    audit = AuditModal
-    legacy = LegacyModal
     tools = ToolsModal
 
 

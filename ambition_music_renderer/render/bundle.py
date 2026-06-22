@@ -24,16 +24,16 @@ import yaml
 import kwconf
 
 from . import musicir_renderer as r
-from .arrangement_audit import audit_file as audit_arrangement_file
-from .arrangement_audit import write_reports as write_arrangement_reports
-from .dissonance_audit import audit_file as audit_dissonance_file
-from .dissonance_audit import write_reports as write_dissonance_reports
-from .sour_note_audit import audit_file as audit_sour_note_file
-from .sour_note_audit import write_reports as write_sour_note_reports
-from .shrill_note_audit import audit_file as audit_shrill_note_file
-from .shrill_note_audit import write_reports as write_shrill_note_reports
-from .profiler import profile
-from .kwconf_runner import KwconfCommand
+from ..audit.arrangement_audit import audit_file as audit_arrangement_file
+from ..audit.arrangement_audit import write_reports as write_arrangement_reports
+from ..audit.dissonance_audit import audit_file as audit_dissonance_file
+from ..audit.dissonance_audit import write_reports as write_dissonance_reports
+from ..audit.sour_note_audit import audit_file as audit_sour_note_file
+from ..audit.sour_note_audit import write_reports as write_sour_note_reports
+from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
+from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
+from ..profiler import profile
+from ..kwconf_runner import KwconfCommand
 
 DEFAULT_BACKEND = "pretty-midi"
 BACKEND_CHOICES = ("pretty-midi", "fluidsynth-cli", "fallback", "auto")
@@ -2225,6 +2225,143 @@ def write_spectral_shrillness_report(
     return json_path
 
 
+
+@profile
+def spectrogram_db(audio: np.ndarray, sample_rate: int, signal_module) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute a compact dB spectrogram for bundle plots."""
+    mono = audio.mean(axis=1) if audio.ndim == 2 else audio.astype("float32")
+    if mono.size == 0:
+        return np.asarray([]), np.asarray([]), np.asarray([[]])
+    nperseg = min(4096, max(256, int(2 ** math.floor(math.log2(max(256, min(len(mono), 4096)))))))
+    noverlap = max(0, int(nperseg * 0.75))
+    freqs, times, spec = signal_module.spectrogram(
+        mono,
+        fs=sample_rate,
+        nperseg=nperseg,
+        noverlap=noverlap,
+        scaling="spectrum",
+        mode="magnitude",
+    )
+    return freqs, times, 20 * np.log10(spec + 1e-10)
+
+
+@profile
+def spectrogram_save_kwargs(dest: Path, jpeg_quality: int) -> dict:
+    save_kwargs = {"dpi": 120}
+    if dest.suffix.lower() in {".jpg", ".jpeg"}:
+        save_kwargs["format"] = "jpeg"
+        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
+    return save_kwargs
+
+
+@profile
+def save_audio_spectrogram_plot(
+    audio: np.ndarray,
+    title: str,
+    dest: Path,
+    *,
+    sample_rate: int,
+    signal_module,
+    pyplot,
+    jpeg_quality: int,
+) -> None:
+    freqs, times, spec_db = spectrogram_db(audio, sample_rate, signal_module)
+    if spec_db.size == 0:
+        return
+    pyplot.figure(figsize=(14, 5))
+    pyplot.pcolormesh(times, freqs, spec_db, shading="auto", vmin=-110, vmax=-35, cmap="inferno")
+    pyplot.yscale("log")
+    pyplot.ylim(80, 12000)
+    pyplot.axhspan(3000, 6000, alpha=0.15)
+    pyplot.axhspan(6000, 12000, alpha=0.10)
+    pyplot.title(title)
+    pyplot.xlabel("time (s)")
+    pyplot.ylabel("frequency (Hz)")
+    pyplot.colorbar(label="dB, fixed -110..-35")
+    pyplot.tight_layout()
+    pyplot.savefig(dest, **spectrogram_save_kwargs(dest, jpeg_quality))
+    pyplot.close()
+
+
+@profile
+def save_high_detail_spectrogram_plot(
+    audio: np.ndarray,
+    title: str,
+    dest: Path,
+    *,
+    sample_rate: int,
+    signal_module,
+    pyplot,
+    jpeg_quality: int,
+) -> None:
+    freqs, times, spec_db = spectrogram_db(audio, sample_rate, signal_module)
+    if spec_db.size == 0:
+        return
+    mask = (freqs >= 2500) & (freqs <= 16000)
+    if not np.any(mask):
+        return
+    focus = spec_db[mask]
+    finite = focus[np.isfinite(focus)]
+    if finite.size:
+        vmax = float(np.percentile(finite, 99.7))
+        vmin = max(vmax - 60.0, float(np.percentile(finite, 20.0)))
+    else:
+        vmin, vmax = -100.0, -40.0
+    pyplot.figure(figsize=(14, 5))
+    pyplot.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
+    pyplot.yscale("log")
+    pyplot.ylim(2500, 16000)
+    pyplot.axhline(4000, linestyle="--", linewidth=0.8)
+    pyplot.axhline(8000, linestyle=":", linewidth=0.9)
+    pyplot.title(f"{title} — high-frequency detail")
+    pyplot.xlabel("time (s)")
+    pyplot.ylabel("frequency (Hz)")
+    pyplot.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
+    pyplot.tight_layout()
+    pyplot.savefig(dest, **spectrogram_save_kwargs(dest, jpeg_quality))
+    pyplot.close()
+
+
+@profile
+def save_shrill_detail_spectrogram_plot(
+    audio: np.ndarray,
+    title: str,
+    dest: Path,
+    *,
+    sample_rate: int,
+    signal_module,
+    pyplot,
+    jpeg_quality: int,
+) -> None:
+    freqs, times, spec_db = spectrogram_db(audio, sample_rate, signal_module)
+    if spec_db.size == 0:
+        return
+    mask = (freqs >= 3500) & (freqs <= 12500)
+    if not np.any(mask):
+        return
+    focus = spec_db[mask]
+    finite = focus[np.isfinite(focus)]
+    if finite.size:
+        vmax = float(np.percentile(finite, 99.85))
+        vmin = max(vmax - 48.0, float(np.percentile(finite, 35.0)))
+    else:
+        vmin, vmax = -95.0, -45.0
+    pyplot.figure(figsize=(14, 5))
+    pyplot.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
+    pyplot.ylim(3500, 12500)
+    for hz, label in ((4000, "4k review"), (6000, "6k piercing"), (8000, "8k whistle"), (10000, "10k extreme")):
+        pyplot.axhline(hz, linestyle="--", linewidth=0.7)
+        if times.size:
+            pyplot.text(float(times[0]), hz * 1.01, label, fontsize=7, va="bottom")
+    pyplot.title(f"{title} — shrill-band detail")
+    pyplot.xlabel("time (s)")
+    pyplot.ylabel("frequency (Hz, linear)")
+    pyplot.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
+    pyplot.tight_layout()
+    pyplot.savefig(dest, **spectrogram_save_kwargs(dest, jpeg_quality))
+    pyplot.close()
+
+@profile
 def write_spectrograms(
     outdir: Path,
     manifest: dict,
@@ -2254,107 +2391,6 @@ def write_spectrograms(
     sample_rate = int(manifest.get("sample_rate", 48000))
     written: list[Path] = []
 
-    def _spectrogram_db(audio: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        mono = audio.mean(axis=1) if audio.ndim == 2 else audio.astype("float32")
-        if mono.size == 0:
-            return np.asarray([]), np.asarray([]), np.asarray([[]])
-        nperseg = min(4096, max(256, int(2 ** math.floor(math.log2(max(256, min(len(mono), 4096)))))))
-        noverlap = max(0, int(nperseg * 0.75))
-        freqs, times, spec = signal.spectrogram(
-            mono,
-            fs=sample_rate,
-            nperseg=nperseg,
-            noverlap=noverlap,
-            scaling="spectrum",
-            mode="magnitude",
-        )
-        return freqs, times, 20 * np.log10(spec + 1e-10)
-
-    def _save_kwargs(dest: Path) -> dict:
-        save_kwargs = {"dpi": 120}
-        if dest.suffix.lower() in {".jpg", ".jpeg"}:
-            save_kwargs["format"] = "jpeg"
-            save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
-        return save_kwargs
-
-    def save_audio_plot(audio: np.ndarray, title: str, dest: Path) -> None:
-        freqs, times, spec_db = _spectrogram_db(audio)
-        if spec_db.size == 0:
-            return
-        plt.figure(figsize=(14, 5))
-        plt.pcolormesh(times, freqs, spec_db, shading="auto", vmin=-110, vmax=-35, cmap="inferno")
-        plt.yscale("log")
-        plt.ylim(80, 12000)
-        plt.axhspan(3000, 6000, alpha=0.15)
-        plt.axhspan(6000, 12000, alpha=0.10)
-        plt.title(title)
-        plt.xlabel("time (s)")
-        plt.ylabel("frequency (Hz)")
-        plt.colorbar(label="dB, fixed -110..-35")
-        plt.tight_layout()
-        plt.savefig(dest, **_save_kwargs(dest))
-        plt.close()
-
-    def save_high_detail_plot(audio: np.ndarray, title: str, dest: Path) -> None:
-        freqs, times, spec_db = _spectrogram_db(audio)
-        if spec_db.size == 0:
-            return
-        mask = (freqs >= 2500) & (freqs <= 16000)
-        if not np.any(mask):
-            return
-        focus = spec_db[mask]
-        finite = focus[np.isfinite(focus)]
-        if finite.size:
-            vmax = float(np.percentile(finite, 99.7))
-            vmin = max(vmax - 60.0, float(np.percentile(finite, 20.0)))
-        else:
-            vmin, vmax = -100.0, -40.0
-        plt.figure(figsize=(14, 5))
-        plt.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
-        plt.yscale("log")
-        plt.ylim(2500, 16000)
-        plt.axhline(4000, linestyle="--", linewidth=0.8)
-        plt.axhline(8000, linestyle=":", linewidth=0.9)
-        plt.title(f"{title} — high-frequency detail")
-        plt.xlabel("time (s)")
-        plt.ylabel("frequency (Hz)")
-        plt.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
-        plt.tight_layout()
-        plt.savefig(dest, **_save_kwargs(dest))
-        plt.close()
-
-    def save_shrill_detail_plot(audio: np.ndarray, title: str, dest: Path) -> None:
-        freqs, times, spec_db = _spectrogram_db(audio)
-        if spec_db.size == 0:
-            return
-        mask = (freqs >= 3500) & (freqs <= 12500)
-        if not np.any(mask):
-            return
-        focus = spec_db[mask]
-        finite = focus[np.isfinite(focus)]
-        if finite.size:
-            vmax = float(np.percentile(finite, 99.85))
-            vmin = max(vmax - 48.0, float(np.percentile(finite, 35.0)))
-        else:
-            vmin, vmax = -95.0, -45.0
-        plt.figure(figsize=(14, 5))
-        plt.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
-        # Linear high-frequency axis makes isolated C8-C9 whistle lines easier
-        # to see than the full log spectrogram. The percentile colorbar avoids
-        # cymbal/drum maxima hiding quieter but audible standalone tones.
-        plt.ylim(3500, 12500)
-        for hz, label in ((4000, "4k review"), (6000, "6k piercing"), (8000, "8k whistle"), (10000, "10k extreme")):
-            plt.axhline(hz, linestyle="--", linewidth=0.7)
-            if times.size:
-                plt.text(float(times[0]), hz * 1.01, label, fontsize=7, va="bottom")
-        plt.title(f"{title} — shrill-band detail")
-        plt.xlabel("time (s)")
-        plt.ylabel("frequency (Hz, linear)")
-        plt.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
-        plt.tight_layout()
-        plt.savefig(dest, **_save_kwargs(dest))
-        plt.close()
-
     candidates: list[tuple[str, Path, str]] = []
     for npy in current_scratch_stem_paths(outdir, manifest):
         candidates.append(("npy", npy, npy.stem.split(".")[-1]))
@@ -2375,15 +2411,15 @@ def write_spectrograms(
                 audio, _sample_rate = sf.read(path, always_2d=True, dtype="float32")
             suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
             dest = plots_dir / f"{label}.spectrogram.{suffix}"
-            save_audio_plot(audio, label, dest)
+            save_audio_spectrogram_plot(audio, label, dest, sample_rate=sample_rate, signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
             if dest.exists():
                 written.append(dest)
             high_dest = plots_dir / f"{label}.spectrogram_high_detail.{suffix}"
-            save_high_detail_plot(audio, label, high_dest)
+            save_high_detail_spectrogram_plot(audio, label, high_dest, sample_rate=sample_rate, signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
             if high_dest.exists():
                 written.append(high_dest)
             shrill_dest = plots_dir / f"{label}.spectrogram_shrill_detail.{suffix}"
-            save_shrill_detail_plot(audio, label, shrill_dest)
+            save_shrill_detail_spectrogram_plot(audio, label, shrill_dest, sample_rate=sample_rate, signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
             if shrill_dest.exists():
                 written.append(shrill_dest)
         except Exception as ex:  # noqa: BLE001
@@ -2415,9 +2451,6 @@ def run_transition_audits(
     if not pairs:
         return results
     section_meta = {str(sec.get("id")): sec for sec in manifest.get("sections") or [] if isinstance(sec, dict)}
-    audit_script = (tools_dir / "transition_audit.py").resolve()
-    if not audit_script.exists():
-        return results
     audit_root = reports_dir / "transition_audit"
     audit_root.mkdir(parents=True, exist_ok=True)
     for first, second in pairs:
@@ -2429,22 +2462,21 @@ def run_transition_audits(
             if str(first_meta.get("kind")) == "intro" and bool(second_meta.get("loopable", False))
             else "smooth"
         )
-        cmd = [
-            sys.executable,
-            str(audit_script),
-            str(analysis_root),
+        cmd = renderer_audit_command(
+            "transition",
+            analysis_root,
             "--sections",
             first,
             second,
             "--crossfade",
-            str(crossfade_seconds),
-            "--crossfade-shape",
+            crossfade_seconds,
+            "--crossfade_shape",
             crossfade_shape,
-            "--incoming-start",
+            "--incoming_start",
             incoming_start,
             "--outdir",
-            str(outdir),
-        ]
+            outdir,
+        )
         safe_name = f"transition_audit_{first}_to_{second}".replace("/", "_")
         results.append(run_logged(safe_name, cmd, reports_dir, cwd=tools_dir))
     return results
@@ -2508,6 +2540,25 @@ def progress_line(message: str, *, stream=None) -> None:
     if stream is None:
         stream = sys.stderr
     print(f"[music bundle] {message}", file=stream, flush=True)
+
+
+@profile
+def renderer_audit_command(command_name: str, *args: object) -> list[str]:
+    """Build a subprocess command for a packaged audit helper.
+
+    Root-level helper scripts were moved under ``ambition_music_renderer.audit``
+    and exposed through the package modal CLI. Bundle/report generation should
+    call that public CLI surface instead of stale ``tools_dir / "script.py"``
+    paths, which disappear after the cleanup.
+    """
+    return [
+        sys.executable,
+        "-m",
+        "ambition_music_renderer",
+        "audit",
+        str(command_name),
+        *(str(arg) for arg in args),
+    ]
 
 
 def print_bundle_summary(report: dict[str, object], *, stream=None) -> None:
@@ -2659,7 +2710,7 @@ def create_bundle(
 
     if not skip_render:
         progress_line(f"rendering {cue_id} with backend={backend}, runtime_stems={runtime_stem_gain_mode}")
-        from .render_isolated import RenderIsolatedConfig
+        from .isolated import RenderIsolatedConfig
 
         render_data: dict[str, object] = {
             "spec": score_path,
@@ -2681,7 +2732,7 @@ def create_bundle(
             command_mode = "direct"
             render_data["profile_workers"] = True
             progress_line("profiling enabled via line_profiler; running render_isolated in-process")
-        render_command = KwconfCommand(RenderIsolatedConfig, module="ambition_music_renderer.render_isolated", cwd=package_dir())
+        render_command = KwconfCommand(RenderIsolatedConfig, module="ambition_music_renderer.render.isolated", cwd=package_dir())
         commands.append(
             run_kwconf_logged(
                 "render_isolated",
@@ -2724,7 +2775,7 @@ def create_bundle(
         commands.append(
             run_logged(
                 "audit_cue_balance",
-                [sys.executable, str(tools_dir / "audit_cue_balance.py"), str(analysis_root)],
+                renderer_audit_command("cue_balance", analysis_root),
                 reports_dir,
                 cwd=tools_dir,
             )
@@ -2734,16 +2785,15 @@ def create_bundle(
             commands.append(
                 run_logged(
                     "spectral_compare",
-                    [
-                        sys.executable,
-                        str(tools_dir / "spectral_compare.py"),
-                        str(analysis_root),
+                    renderer_audit_command(
+                        "spectral_compare",
+                        analysis_root,
                         "--window",
                         "0",
                         hi,
                         "--label",
                         cue_id,
-                    ],
+                    ),
                     reports_dir,
                     cwd=tools_dir,
                 )
@@ -2751,16 +2801,15 @@ def create_bundle(
             commands.append(
                 run_logged(
                     "spectral_localize",
-                    [
-                        sys.executable,
-                        str(tools_dir / "spectral_localize.py"),
-                        str(analysis_root),
+                    renderer_audit_command(
+                        "spectral_localize",
+                        analysis_root,
                         "--window",
                         "0",
                         "-1",
                         "--bucket",
                         "0.25",
-                    ],
+                    ),
                     reports_dir,
                     cwd=tools_dir,
                 )
@@ -2854,7 +2903,7 @@ def create_bundle(
     if publish:
         progress_line("publishing full.ogg to game assets")
         # Import lazily so this module can be used by tests without importing the CLI.
-        from .cli import publish_cue
+        from ..cli import publish_cue
 
         ok = publish_cue(cue_id, outdir, dest_root)
         if ok:
@@ -3031,7 +3080,7 @@ def main(argv: list[str] | None = None) -> int:
         return rc
     finally:
         elapsed = _time.perf_counter() - total_start
-        print(f"[ambition_music_renderer.cue_bundle] cue={cue_name} total_elapsed_s={elapsed:.3f}", flush=True)
+        print(f"[ambition_music_renderer.render.bundle] cue={cue_name} total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":

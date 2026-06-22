@@ -37,25 +37,35 @@ Auxiliary analysis and maintenance helpers are exposed through the package modal
 
 ```bash
 cd ~/code/ambition
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools transition_audit --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools audit_cue_balance --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools level_report --check
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit transition --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit cue_balance --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit levels --check
 ```
 
 Use the package CLI for current music-renderer work. Older docs may mention retired paths under `tools/audio/` or direct `python *.py` tool scripts; those paths are stale and should not be copied into new instructions.
 
+Bundle report generation also calls these helpers through the packaged modal CLI. If a bundle run reports `can't open file .../audit_cue_balance.py`, `spectral_compare.py`, `spectral_localize.py`, or `transition_audit.py`, that checkout still has stale orchestration code; update to a build where `cue_bundle` invokes `python -m ambition_music_renderer audit ...` instead of root-level script paths.
+
+## Package layout
+
+- `ambition_music_renderer/cli.py` - light top-level modal CLI and repo path helpers.
+- `ambition_music_renderer/render/` - render orchestration, bundle generation, worker entrypoints, MusicIR renderer internals, and compiled kernels.
+- `ambition_music_renderer/audit/` - active diagnostics and reports exposed under `python -m ambition_music_renderer audit ...`.
+- `ambition_music_renderer/legacy/` - quarantined older one-off helpers that are still callable but need a later rename/delete decision.
+- `ambition_music_renderer/backends/` - optional plugin/SFZ/LV2/VST adapter code, imported only when requested.
+
 ## Useful files
 
-- `ambition_music_renderer/cli.py` - package CLI.
-- `ambition_music_renderer/musicir_renderer.py` - main MusicIR renderer and renderer version.
-- `ambition_music_renderer/cue_bundle.py` - one-command cue regeneration, diagnostics, reports, plots, and uploadable bundles.
+- `ambition_music_renderer/render/musicir_renderer.py` - main MusicIR renderer and renderer version.
+- `ambition_music_renderer/render/bundle.py` - one-command cue regeneration, diagnostics, reports, plots, and uploadable bundles.
+- `ambition_music_renderer/render/isolated.py` and `render/group_worker.py` - adaptive stem render entrypoints.
+- `ambition_music_renderer/audit/*.py` - active analysis helpers (`levels`, `cue_balance`, `arrangement`, `dissonance`, `spectral_localize`, `spectral_compare`, `transition`, etc.).
+- `ambition_music_renderer/legacy/install_first_goblin_tune_v2.py` - quarantined legacy installer for the first-goblin tune asset path, exposed as `python -m ambition_music_renderer legacy install_first_goblin_tune_v2`.
 - `scores/active/` - cues actively used or being prepared for runtime.
 - `scores/examples/` - reference/example cues.
 - `scores/archive/` - historical cues kept for reference.
 - `render_first_goblin_transition_lab.sh` - local transition-lab helper.
-- `ambition_music_renderer/install_first_goblin_tune_v2.py` - installer for the first-goblin tune asset path, exposed as `python -m ambition_music_renderer tools install_first_goblin_tune_v2`.
-- `ambition_music_renderer/*_audit.py`, `ambition_music_renderer/level_report.py`, `ambition_music_renderer/spectral_*.py` - analysis helpers exposed under `python -m ambition_music_renderer tools ...` (`level_report` is the diff-friendly cross-catalog loudness/clipping report; `arrangement_audit` preflights group prominence, low-register density, and harmonic outliers; `dissonance_audit` finds score-level note clashes before audio is rendered and can emit human-readable markdown + plots).
 - `goals.md` - design/planning notes for renderer direction.
 - `MUSIC_RENDERER_REFACTOR_ROADMAP.md` - durable roadmap/checklist for the renderer cleanup.
 
@@ -71,7 +81,7 @@ The renderer can use multiple backends depending on local setup:
 | `auto` | backend selection/fallback policy | Use only when fallback behavior is acceptable and explicitly reported. |
 | `sfizz` / `sfizz-render` | optional `sfizz_render` CLI + SFZ instrument files | Use for better open sample instruments from YAML; requires `render.sfizz.default_sfz` or per-instrument `instrument_backend.sfz`. |
 
-Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making GPL/Pedalboard part of the light renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML explicitly requests those optional backends.
+Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. `numba` is also part of the normal dependency set because the built-in Schroeder/Freeverb-style reverb uses compiled DSP kernels for its long comb/allpass feedback loops; set `AMBITION_MUSIC_RENDERER_DISABLE_NUMBA=1` only when debugging the pure-Python fallback. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making Pedalboard part of the default renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML explicitly requests those optional backends.
 
 Use the plugin diagnostics before authoring a score that depends on local plugins:
 
@@ -188,7 +198,7 @@ python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
   --zip_report
 ```
 
-Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. The profile surface includes the old process-boundary functions plus audio hotspots such as `simple_reverb`, `_comb_filter`, `_allpass_filter`, `_new_fluidsynth`, `_fluidsynth_stereo_samples`, filters, compressor, limiter, and OGG writing helpers. To inspect a saved line-profiler file, use:
+Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. The profile surface includes the old process-boundary functions plus audio hotspots such as `simple_reverb`, `_comb_filter`, `_allpass_filter`, `_new_fluidsynth`, `_fluidsynth_stereo_samples`, filters, compressor, limiter, and OGG writing helpers. The comb/allpass bodies normally run through lazily imported Numba kernels, so line profiler should show those wrapper calls becoming small instead of spending minutes inside Python loops. To inspect a saved line-profiler file, use:
 
 ```bash
 python -m line_profiler -rtmz profile_output.lprof
@@ -226,7 +236,7 @@ decode depends on the local `soundfile` / `ffmpeg` setup.
 
 ```bash
 uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer tools reference_audio_audit path/to/reference.mp3 \
+python -m ambition_music_renderer audit reference_audio path/to/reference.mp3 \
   --outdir=/tmp/reference_audio_audit
 ```
 
@@ -324,7 +334,7 @@ Per-layer overrides can use the same shape. Constraints currently apply to chord
 For adaptive cues, distinguish runtime problems from generated-audio problems before changing code:
 
 1. Render/regenerate the cue.
-2. Audit generated and installed OGGs with `python -m ambition_music_renderer tools audit_cue_balance`.
+2. Audit generated and installed OGGs with `python -m ambition_music_renderer audit cue_balance`.
 3. Run the game in the relevant room and capture music logs.
 4. Confirm whether the runtime starts the next state at target gain or fades from silence.
 5. Listen to adjacent generated files outside the game to decide if the seam exists before runtime touches them.

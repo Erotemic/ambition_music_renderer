@@ -22,7 +22,7 @@ import math
 import numpy as np
 import pretty_midi
 
-from .render.musicir_renderer import _lowpass_mono, clamp
+from .musicir_renderer import _lowpass_mono, clamp
 
 
 # ---------------------------------------------------------------------------

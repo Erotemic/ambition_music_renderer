@@ -8,7 +8,7 @@ import numpy as np
 import soundfile as sf
 
 from ambition_music_renderer.cli import BundleManyCommand, RenderCommand, RenderPublishCommand
-from ambition_music_renderer.cue_bundle import (
+from ambition_music_renderer.render.bundle import (
     CueBundleConfig,
     copy_manifest_referenced_files,
     make_zip,
@@ -24,17 +24,17 @@ from ambition_music_renderer.cue_bundle import (
     write_state_mix_report,
     write_stem_export_report,
 )
-from ambition_music_renderer.arrangement_audit import audit_spec as audit_arrangement_spec
-from ambition_music_renderer.arrangement_audit import write_reports as write_arrangement_reports
-from ambition_music_renderer.dissonance_audit import audit_spec, write_reports as write_dissonance_reports
-from ambition_music_renderer.render_group_worker import RenderGroupWorkerConfig
-from ambition_music_renderer.render_isolated import RenderIsolatedConfig
-from ambition_music_renderer.reference_audio_audit import analyze_audio as analyze_reference_audio, write_reports as write_reference_audio_reports
-from ambition_music_renderer.sour_note_audit import audit_spec as audit_sour_note_spec
-from ambition_music_renderer.sour_note_audit import write_reports as write_sour_note_reports
-from ambition_music_renderer.shrill_note_audit import audit_spec as audit_shrill_note_spec
-from ambition_music_renderer.shrill_note_audit import write_reports as write_shrill_note_reports
-from ambition_music_renderer.musicir_renderer import chord_intervals, timeline_markers_from_spec
+from ambition_music_renderer.audit.arrangement_audit import audit_spec as audit_arrangement_spec
+from ambition_music_renderer.audit.arrangement_audit import write_reports as write_arrangement_reports
+from ambition_music_renderer.audit.dissonance_audit import audit_spec, write_reports as write_dissonance_reports
+from ambition_music_renderer.render.group_worker import RenderGroupWorkerConfig
+from ambition_music_renderer.render.isolated import RenderIsolatedConfig
+from ambition_music_renderer.audit.reference_audio_audit import analyze_audio as analyze_reference_audio, write_reports as write_reference_audio_reports
+from ambition_music_renderer.audit.sour_note_audit import audit_spec as audit_sour_note_spec
+from ambition_music_renderer.audit.sour_note_audit import write_reports as write_sour_note_reports
+from ambition_music_renderer.audit.shrill_note_audit import audit_spec as audit_shrill_note_spec
+from ambition_music_renderer.audit.shrill_note_audit import write_reports as write_shrill_note_reports
+from ambition_music_renderer.render.musicir_renderer import chord_intervals, timeline_markers_from_spec
 
 
 def test_backend_defaults_prefer_pretty_midi():

@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
   "numpy",
   "scipy",
+  "numba>=0.61.0",
   "pretty_midi",
   "pyfluidsynth",
   "soundfile",
@@ -45,7 +46,7 @@ dev = ["pytest", "ruff", "line_profiler"]
 
 [project.scripts]
 ambition-music-renderer = "ambition_music_renderer.cli:main"
-render-ambition-music = "ambition_music_renderer.musicir_renderer:main"
+render-ambition-music = "ambition_music_renderer.render.musicir_renderer:main"
 
 [tool.setuptools.packages.find]
 include = ["ambition_music_renderer*"]

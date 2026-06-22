@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import contextlib
 import json
-import os
 import time
 from pathlib import Path
 from typing import Any, Callable, Iterator, TypeVar
@@ -23,12 +22,9 @@ def _identity_profile(func: F) -> F:
     return func
 
 
-if os.environ.get("LINE_PROFILE", "").lower() in {"1", "true", "yes", "on"}:
-    try:  # pragma: no cover - optional developer dependency.
-        from line_profiler import profile as profile  # type: ignore
-    except Exception:  # noqa: BLE001
-        profile = _identity_profile  # type: ignore[assignment]
-else:
+try:  # pragma: no cover - optional developer dependency.
+    from line_profiler import profile as profile  # type: ignore
+except Exception:  # noqa: BLE001
     profile = _identity_profile  # type: ignore[assignment]
 
 

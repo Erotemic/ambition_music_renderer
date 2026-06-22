@@ -75,7 +75,7 @@ make_args=(
 if [[ "$keep_existing_score" -eq 0 ]]; then
     make_args+=(--force)
 fi
-python "$renderer_dir/make_first_goblin_transition_lab.py" "${make_args[@]}"
+python -m ambition_music_renderer legacy make_first_goblin_transition_lab "${make_args[@]}"
 
 render_args=(
     "$experiment_score"
@@ -91,10 +91,10 @@ fi
 
 (
     cd "$renderer_dir"
-    python -m ambition_music_renderer.render_isolated "${render_args[@]}"
+    python -m ambition_music_renderer.render.isolated "${render_args[@]}"
 )
 
-python "$renderer_dir/audit_cue_balance.py" "$outdir" || true
+python -m ambition_music_renderer audit cue_balance "$outdir" || true
 
 # Keep alternate crossfade previews side-by-side. The default run keeps the
 # historical transition_audit/ path, but explicit --crossfade runs write into a
@@ -108,7 +108,7 @@ if [[ "$crossfade_explicit" -eq 1 ]]; then
 else
     audit_outdir="$outdir/transition_audit_equal_power"
 fi
-python "$renderer_dir/transition_audit.py" "$outdir" --sections intro wave1 --crossfade "$transition_crossfade" --crossfade-shape "$crossfade_shape" --outdir "$audit_outdir"
+python -m ambition_music_renderer audit transition "$outdir" --sections intro wave1 --crossfade "$transition_crossfade" --crossfade-shape "$crossfade_shape" --outdir "$audit_outdir"
 
 cat <<EOF
 
