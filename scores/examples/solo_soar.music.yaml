@@ -44,63 +44,75 @@ instruments:
 - name: clean_guitar
   group: strings
   program: clean_guitar
-  volume: 112
+  volume: 104
   pan: 34
-  expression: 116
+  expression: 108
   modulation: 3
 - name: steel_guitar
   group: strings
   program: steel_guitar
-  volume: 98
+  volume: 90
   pan: 80
-  expression: 110
+  expression: 100
   modulation: 5
 - name: overdrive_lead
   group: strings
   program: overdrive_guitar
-  volume: 58
-  pan: 72
-  expression: 72
+  volume: 94
+  pan: 76
+  expression: 112
   modulation: 6
 - name: distortion_lead
   group: strings
   program: distortion_guitar
-  volume: 50
-  pan: 48
-  expression: 66
+  volume: 88
+  pan: 50
+  expression: 106
   modulation: 4
 - name: rhythm_guitar
   group: strings
   program: muted_guitar
-  volume: 62
+  volume: 50
   pan: 28
-  expression: 78
+  expression: 66
+- name: rhythm_guitar_L
+  group: strings
+  program: muted_guitar
+  volume: 46
+  pan: 24
+  expression: 66
+- name: rhythm_guitar_R
+  group: strings
+  program: muted_guitar
+  volume: 44
+  pan: 104
+  expression: 64
 - name: bass
   group: strings
   program: picked_bass
-  volume: 108
+  volume: 104
   pan: 50
-  expression: 114
+  expression: 110
 - name: fiddle
   group: winds
   program: fiddle
-  volume: 62
+  volume: 54
   pan: 72
-  expression: 78
+  expression: 68
   modulation: 8
 - name: drawbar_organ
   group: choir_pad
   program: drawbar_organ
-  volume: 94
+  volume: 78
   pan: 62
-  expression: 108
+  expression: 90
   modulation: 14
 - name: warm_pad
   group: choir_pad
   program: pad_warm
-  volume: 54
+  volume: 42
   pan: 64
-  expression: 72
+  expression: 58
   modulation: 16
 - name: piano
   group: mallets
@@ -471,21 +483,46 @@ layer_templates:
     - 1
     - 2
     step: 0.5
-    duration_beats: 0.48
-    velocity: 74
-    density: 1.0
+    duration_beats: 0.36
+    velocity: 46
+    density: 0.52
     articulation: normal
-    humanize_ms: 9
+    humanize_ms: 6
     voicing: open
+  clean_sunrise_strum:
+    kind: guitar_strum
+    instrument: clean_guitar
+    hits:
+    - - 0
+      - 0.0
+      - down
+    - - 0
+      - 2.0
+      - up
+    every_bars: 1
+    duration_beats: 1.15
+    spread_ms: 34
+    max_span: 4
+    max_notes: 4
+    velocity: 34
+    velocity_slope: -1.5
+    gate: 0.58
+    articulation: pluck
+    humanize_ms: 3.0
+    humanize_velocity_pct: 3.0
   steel_answer:
-    kind: motif
+    kind: guitar_lead
     instrument: steel_guitar
     motif: open_road_answer
     root: D4
-    velocity: 64
+    velocity: 52
     articulation: legato
-    humanize_ms: 14
-    pitch_scoop_cents: 4.0
+    humanize_ms: 8.0
+    pitch_scoop_cents: 5.0
+    gate: 0.78
+    tuning: standard
+    max_fret: 15
+    humanize_velocity_pct: 2.5
   organ_haze:
     kind: root_hits
     instruments:
@@ -496,12 +533,12 @@ layer_templates:
       warm_pad: 1
     instrument_velocity_offsets:
       drawbar_organ: 0
-      warm_pad: -16
+      warm_pad: -20
     octave: 2
-    velocity: 58
-    duration_beats: 3.6
+    velocity: 36
+    duration_beats: 2.55
     articulation: pad
-    humanize_ms: 10
+    humanize_ms: 8
     hits:
     - - 0
       - 0.0
@@ -534,38 +571,6 @@ layer_templates:
     - - 7
       - 0.0
       - 0
-      - 3.8
-    - - 0
-      - 0.0
-      - 12
-      - 3.8
-    - - 1
-      - 0.0
-      - 12
-      - 3.8
-    - - 2
-      - 0.0
-      - 12
-      - 3.8
-    - - 3
-      - 0.0
-      - 12
-      - 3.8
-    - - 4
-      - 0.0
-      - 12
-      - 3.8
-    - - 5
-      - 0.0
-      - 12
-      - 3.8
-    - - 6
-      - 0.0
-      - 12
-      - 3.8
-    - - 7
-      - 0.0
-      - 12
       - 3.8
   piano_lift:
     kind: chord_hits
@@ -637,14 +642,18 @@ layer_templates:
       - 3.5
       - 0.34
   lead_question_clean:
-    kind: motif
+    kind: guitar_lead
     instrument: clean_guitar
     motif: open_road_question
     root: D4
-    velocity: 68
+    velocity: 56
     articulation: legato
-    humanize_ms: 10
-    pitch_scoop_cents: 3.0
+    humanize_ms: 8.0
+    pitch_scoop_cents: 4.0
+    gate: 0.78
+    tuning: standard
+    max_fret: 16
+    humanize_velocity_pct: 2.5
   fiddle_memory:
     kind: motif
     instruments:
@@ -652,7 +661,7 @@ layer_templates:
     - steel_guitar
     motif: open_road_answer
     root: D4
-    velocity: 34
+    velocity: 26
     articulation: legato
     instrument_octave_offsets:
       fiddle: 1
@@ -665,98 +674,137 @@ layer_templates:
       steel_guitar: 5.0
     humanize_ms: 12
   rhythm_chug:
-    kind: arpeggio
-    instrument: rhythm_guitar
-    octave: 3
+    kind: guitar_chug
+    takes:
+    - instrument: rhythm_guitar_L
+      timing_offset_ms: -7
+      velocity_offset: 0
+    - instrument: rhythm_guitar_R
+      timing_offset_ms: 11
+      velocity_offset: -3
+    octave: 2
+    shape: fifth
     pattern:
-    - 0
-    - 0
-    - 2
-    - 0
-    - 1
-    - 0
-    - 2
-    - 0
-    step: 0.25
-    duration_beats: 0.18
-    velocity: 38
-    density: 0.66
-    articulation: staccato
-    humanize_ms: 4
-    voicing: closed
-  power_chords:
-    kind: chord_hits
-    instruments:
-    - rhythm_guitar
-    - distortion_lead
-    instrument_velocity_offsets:
-      rhythm_guitar: 0
-      distortion_lead: -18
-    octave: 3
-    velocity: 38
-    duration_beats: 0.3
-    articulation: marcato
-    voicing: closed
-    humanize_ms: 4
-    hits:
     - - 0
       - 0.0
-    - - 1
+      - 0.34
+      - 1.0
+    - - 0
+      - 0.5
+      - 0.22
+      - 0.48
+    - - 0
+      - 1.0
+      - 0.3
+      - 0.72
+    - - 0
+      - 1.5
+      - 0.22
+      - 0.44
+    - - 0
       - 2.0
-    - - 2
-      - 0.0
-    - - 3
-      - 2.0
-    - - 4
-      - 0.0
-    - - 5
-      - 2.0
-    - - 6
-      - 0.0
+      - 0.34
+      - 0.86
+    - - 0
+      - 2.5
+      - 0.22
+      - 0.44
     - - 7
+      - 3.0
+      - 0.28
+      - 0.62
+    velocity: 34
+    spread_ms: 5
+    gate: 0.36
+    articulation: staccato
+    humanize_ms: 0.8
+    humanize_velocity_pct: 2.5
+    root_policy: chord_root
+  power_chords:
+    kind: guitar_chug
+    takes:
+    - instrument: rhythm_guitar_L
+      timing_offset_ms: -4
+      velocity_offset: 2
+    - instrument: rhythm_guitar_R
+      timing_offset_ms: 8
+      velocity_offset: -2
+    - instrument: distortion_lead
+      timing_offset_ms: 3
+      velocity_offset: -14
+    octave: 2
+    shape: fifth_octave
+    pattern:
+    - - 0
+      - 0.0
+      - 0.34
+      - 1.0
+    - - 0
       - 2.0
+      - 0.3
+      - 0.82
+    velocity: 36
+    spread_ms: 7
+    gate: 0.42
+    articulation: marcato
+    humanize_ms: 1.0
+    humanize_velocity_pct: 2.0
+    root_policy: chord_root
   lead_run_a:
-    kind: motif
+    kind: guitar_lead
     instrument: overdrive_lead
     motif: runway_run_a
     root: D4
-    velocity: 60
+    velocity: 86
     articulation: normal
-    humanize_ms: 4
-    pitch_scoop_cents: 2.0
+    humanize_ms: 2.5
+    pitch_scoop_cents: 6.0
+    gate: 0.82
+    tuning: standard
+    max_fret: 17
+    humanize_velocity_pct: 1.8
   lead_run_b:
-    kind: motif
+    kind: guitar_lead
     instrument: distortion_lead
     motif: runway_run_b
     root: D4
-    velocity: 56
+    velocity: 82
     articulation: normal
-    humanize_ms: 4
-    pitch_scoop_cents: 1.5
+    humanize_ms: 2.5
+    pitch_scoop_cents: 6.0
+    gate: 0.8
+    tuning: standard
+    max_fret: 17
+    humanize_velocity_pct: 1.8
   twin_sky_climb:
-    kind: motif
+    kind: guitar_lead
     instruments:
     - overdrive_lead
     - distortion_lead
     motif: high_sky_climb
     root: D4
-    velocity: 62
+    velocity: 86
     articulation: normal
     instrument_octave_offsets:
       overdrive_lead: 0
       distortion_lead: 0
     instrument_velocity_offsets:
-      overdrive_lead: 0
-      distortion_lead: -10
+      overdrive_lead: 2
+      distortion_lead: -3
     instrument_pitch_scoop_cents:
       overdrive_lead: 2.0
       distortion_lead: 1.0
-    humanize_ms: 3
+    humanize_ms: 2.0
+    gate: 0.82
+    tuning: standard
+    max_fret: 17
+    pitch_scoop_cents: 5.0
+    humanize_velocity_pct: 1.6
   brass_sheen_hits:
     kind: chord_hits
     instrument: brass_sheen
     octave: 3
-    velocity: 24
+    velocity: 20
     duration_beats: 0.7
     articulation: tenuto
     voicing: closed
@@ -1001,10 +1049,12 @@ sections:
   layers:
   - ballad_expression
   - template: clean_sunrise_arps
-    velocity: 76
-    density: 1.0
+    velocity: 42
+    density: 0.46
+  - template: clean_sunrise_strum
+    velocity: 32
   - template: organ_haze
-    velocity: 64
+    velocity: 34
   - template: bass_ballad_roots
     velocity: 76
   - template: piano_lift
@@ -1037,10 +1087,12 @@ sections:
   layers:
   - ballad_expression
   - template: clean_sunrise_arps
-    velocity: 76
-    density: 1.0
+    velocity: 42
+    density: 0.46
+  - template: clean_sunrise_strum
+    velocity: 32
   - template: organ_haze
-    velocity: 64
+    velocity: 34
   - template: bass_ballad_roots
     velocity: 76
   - template: lead_question_clean
@@ -1081,10 +1133,12 @@ sections:
   layers:
   - ballad_expression
   - template: clean_sunrise_arps
-    velocity: 66
-    density: 0.96
+    velocity: 36
+    density: 0.34
+  - template: clean_sunrise_strum
+    velocity: 28
   - template: organ_haze
-    velocity: 54
+    velocity: 26
   - template: bass_ballad_roots
     velocity: 74
   - template: piano_lift
@@ -1097,7 +1151,7 @@ sections:
       - 0.0
     velocity: 34
   - template: brass_sheen_hits
-    velocity: 28
+    velocity: 18
   - drums_lift
 - id: solo_launch
   kind: loop_component
@@ -1121,14 +1175,14 @@ sections:
   layers:
   - solo_expression
   - template: rhythm_chug
-    velocity: 34
-    density: 0.58
+    velocity: 32
+    density: 1.0
   - template: power_chords
-    velocity: 34
+    velocity: 30
   - template: bass_drive_roots
-    velocity: 58
+    velocity: 54
   - template: organ_haze
-    velocity: 26
+    velocity: 14
   - template: lead_run_a
     starts:
     - - 0
@@ -1136,7 +1190,7 @@ sections:
     - - 4
       - 0.0
     root: D4
-    velocity: 64
+    velocity: 92
   - template: lead_run_b
     starts:
     - - 1
@@ -1144,7 +1198,7 @@ sections:
     - - 5
       - 0.0
     root: C4
-    velocity: 60
+    velocity: 88
   - template: lead_run_a
     starts:
     - - 2
@@ -1152,9 +1206,9 @@ sections:
     - - 6
       - 0.0
     root: G3
-    velocity: 64
+    velocity: 92
   - template: brass_sheen_hits
-    velocity: 24
+    velocity: 18
   - drums_solo
 - id: solo_runaway
   kind: loop_component
@@ -1179,13 +1233,13 @@ sections:
   - solo_expression
   - template: rhythm_chug
     velocity: 34
-    density: 0.66
+    density: 1.0
   - template: power_chords
-    velocity: 38
+    velocity: 32
   - template: bass_drive_roots
-    velocity: 62
+    velocity: 56
   - template: organ_haze
-    velocity: 26
+    velocity: 14
   - template: lead_run_a
     starts:
     - - 0
@@ -1193,7 +1247,7 @@ sections:
     - - 4
       - 0.0
     root: D4
-    velocity: 64
+    velocity: 92
   - template: lead_run_b
     starts:
     - - 1
@@ -1201,27 +1255,27 @@ sections:
     - - 5
       - 0.0
     root: C4
-    velocity: 60
+    velocity: 88
   - template: lead_run_a
     starts:
     - - 2
       - 0.0
     root: G3
-    velocity: 64
+    velocity: 92
   - template: lead_run_b
     starts:
     - - 3
       - 0.0
     root: D4
-    velocity: 60
+    velocity: 88
   - template: twin_sky_climb
     starts:
     - - 6
       - 0.0
     root: G3
-    velocity: 60
+    velocity: 94
   - template: brass_sheen_hits
-    velocity: 28
+    velocity: 18
   - drums_runaway
 - id: victory_recap
   kind: loop_component
@@ -1245,10 +1299,12 @@ sections:
   layers:
   - ballad_expression
   - template: clean_sunrise_arps
-    velocity: 48
-    density: 0.8
+    velocity: 36
+    density: 0.34
+  - template: clean_sunrise_strum
+    velocity: 28
   - template: organ_haze
-    velocity: 30
+    velocity: 20
   - template: bass_ballad_roots
     velocity: 56
   - template: steel_answer
@@ -1263,8 +1319,8 @@ sections:
     starts:
     - - 6
       - 0.0
-    velocity: 62
-    root: D4
+    velocity: 68
+    root: G3
   - drums_lift
 - id: outro
   kind: outro
@@ -1301,16 +1357,18 @@ sections:
       curve: smooth
       points: 8
   - template: organ_haze
-    velocity: 28
+    velocity: 20
   - template: clean_sunrise_arps
-    velocity: 34
-    density: 0.35
-  - kind: motif
+    velocity: 26.0
+    density: 0.25
+  - template: clean_sunrise_strum
+    velocity: 26.0
+  - kind: guitar_lead
     instruments:
     - overdrive_lead
     - steel_guitar
     motif: final_wingbeat
-    root: D4
+    root: G3
     starts:
     - - 0
       - 0.0
@@ -1326,6 +1384,11 @@ sections:
       overdrive_lead: 2.0
       steel_guitar: 5.0
     humanize_ms: 8
+    gate: 0.82
+    tuning: standard
+    max_fret: 16
+    humanize_velocity_pct: 2.0
+    pitch_scoop_cents: 7.0
   - kind: drums
     instrument: rock_drums
     humanize_ms: 2.0
@@ -1348,17 +1411,22 @@ sections:
       velocity: 42
 group_postprocess:
   strings:
-    gain_db: -1.8
-    lowpass_hz: 4800
-    high_shelf_hz: 3000
-    high_shelf_db: -7.5
-    presence_low_hz: 1800
-    presence_high_hz: 5600
-    presence_db: -3.2
+    gain_db: -1.0
+    lowpass_hz: 7600
+    high_shelf_hz: 4200
+    high_shelf_db: -3.2
+    presence_low_hz: 2000
+    presence_high_hz: 5200
+    presence_db: -0.8
     transient_tame: 0.12
     reverb_wet: 0.006
+    compressor_threshold_db: -20
+    compressor_ratio: 2.0
+    compressor_attack_ms: 8
+    compressor_release_ms: 110
+    compressor_makeup_db: 0.8
   winds:
-    gain_db: -2.5
+    gain_db: -4.0
     lowpass_hz: 11000
     high_shelf_hz: 5000
     high_shelf_db: -0.2
@@ -1382,16 +1450,16 @@ group_postprocess:
     transient_tame: 0.1
     reverb_wet: 0.004
   brass:
-    gain_db: -7.0
+    gain_db: -9.0
     lowpass_hz: 9800
     high_shelf_hz: 5200
     high_shelf_db: -0.4
     transient_tame: 0.04
     reverb_wet: 0.005
   choir_pad:
-    gain_db: 0.8
-    lowpass_hz: 5600
+    gain_db: -2.4
+    lowpass_hz: 4800
     high_shelf_hz: 3600
-    high_shelf_db: -2.6
+    high_shelf_db: -4.0
     transient_tame: 0.06
-    reverb_wet: 0.01
+    reverb_wet: 0.008

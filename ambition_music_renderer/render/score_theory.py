@@ -66,13 +66,21 @@ def chord_intervals(chord_symbol: str) -> tuple[str, list[int], str | None]:
         intervals = [0, 3, 7]
     else:
         intervals = [0, 4, 7]
-    if "maj7" in suffix or "Δ" in suffix:
+    add9 = "add9" in suffix
+    six_nine = "6/9" in suffix or "6add9" in suffix
+    major_seventh_quality = "maj7" in suffix or "maj9" in suffix or "Δ" in suffix
+    dominant_extension = (
+        "7" in suffix
+        or "13" in suffix
+        or ("9" in suffix and not add9 and not six_nine and "maj9" not in suffix)
+    )
+    if major_seventh_quality:
         intervals.append(11)
-    elif "7" in suffix or "9" in suffix or "13" in suffix:
+    elif dominant_extension:
         intervals.append(10)
     if "6" in suffix and 9 not in intervals:
         intervals.append(9)
-    if "9" in suffix or "add9" in suffix:
+    if "9" in suffix or add9:
         intervals.append(14)
     if "#11" in suffix:
         intervals.append(18)

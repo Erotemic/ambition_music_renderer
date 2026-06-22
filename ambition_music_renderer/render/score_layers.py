@@ -505,9 +505,15 @@ def render_layer_guitar_chug(
     gate = float(layer.get("gate", 0.48))
     strum_spread_ms = float(layer.get("spread_ms", 8.0))
     beat_per_second = ctx.bpm / 60.0
+    root_policy = str(layer.get("root_policy", layer.get("bass_policy", "bass"))).lower().replace("-", "_")
     hk = _layer_human(layer, 1.0)
     for local in range(int(section["bars"])):
-        root_base = root_for_chord(chord_for_bar(section, local), root_octave)
+        chord = chord_for_bar(section, local)
+        if root_policy in {"chord_root", "root"}:
+            chord_root, _intervals, _slash = chord_intervals(chord)
+            root_base = note_to_midi(f"{chord_root}{root_octave}")
+        else:
+            root_base = root_for_chord(chord, root_octave)
         for event_idx, item in enumerate(pattern):
             interval = int(item[0])
             beat = float(item[1])
@@ -542,26 +548,39 @@ def render_layer_guitar_chug(
 def render_layer_guitar_lead(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
 ) -> None:
-    """Render a motif as a mostly monophonic guitar lead performance."""
+    """Render a motif as a mostly monophonic guitar lead performance.
+
+    This intentionally mirrors the plain ``motif`` layer's authoring
+    conveniences (``root``, ``starts``, and per-instrument octave/velocity
+    offsets), then adds fretboard-aware pitch choices and position-dependent
+    scoops.  That keeps existing lead templates easy to convert to
+    ``guitar_lead`` without forcing score authors to rewrite every section
+    override as a ``roots`` list.
+    """
     from .. import guitar_performance as gp
 
     insts = resolve_instruments(ctx, layer)
-    roots = layer.get("roots", [None])
-    starts = layer.get("starts", [[0, 0.0]])
-    repeats = int(layer.get("repeats", max(1, int(section["bars"]))))
-    every_bars = float(layer.get("every_bars", 1.0))
+    roots = layer.get("roots") or [layer.get("root", None)]
+    starts = layer.get("starts") or [[0, 0.0]]
+    repeats = int(layer.get("repeats", 1))
+    every_bars = float(layer.get("every_bars", 2.0))
     velocity = float(layer.get("velocity", 76))
     articulation = layer.get("articulation", "pluck")
     gate = float(layer.get("gate", 0.78))
     transform = layer.get("transform")
     transpose = int(layer.get("transpose", 0))
+    inst_velocity_offsets = layer.get("instrument_velocity_offsets", {}) or {}
+    inst_octave_offsets = layer.get("instrument_octave_offsets", {}) or {}
+    inst_pitch_scoop = layer.get("instrument_pitch_scoop_cents", {}) or {}
+    inst_pitch_bend_curves = layer.get("instrument_pitch_bend_curves", {}) or {}
     hk = _layer_human(layer, 3.0)
-    scoop = float(layer.get("pitch_scoop_cents", 12.0))
+    default_scoop = float(layer.get("pitch_scoop_cents", 12.0))
     note_velocity_pattern = layer.get("note_velocity_pattern")
     # Use the fretboard allocator to choose a plausible string/fret for each
     # note.  The current version only uses that to vary scoops on jumps; future
     # noise events can reuse the same assignment.
     tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    max_fret = int(layer.get("max_fret", 19))
     prev_assign: dict[str, gp.StringFret | None] = {inst: None for inst in insts}
     for rep in range(repeats):
         root = roots[rep % len(roots)]
@@ -578,27 +597,44 @@ def render_layer_guitar_lead(
                 vel_scale = velocities[i % len(velocities)]
                 if note_velocity_pattern:
                     vel_scale *= float(note_velocity_pattern[i % len(note_velocity_pattern)])
-                for inst in insts:
-                    choices = gp.positions_for_pitch(int(p0), tuning=tuning, max_fret=int(layer.get("max_fret", 19)))
+                for j, inst in enumerate(insts):
+                    p = int(p0) + 12 * int(inst_octave_offsets.get(inst, 0))
+                    choices = gp.positions_for_pitch(p, tuning=tuning, max_fret=max_fret)
                     chosen = choices[0] if choices else None
+                    scoop = float(inst_pitch_scoop.get(inst, default_scoop))
                     local_scoop = scoop
                     prev = prev_assign.get(inst)
                     if prev is not None and chosen is not None:
                         # Larger position jumps get a slightly stronger attack scoop.
-                        local_scoop = scoop + min(28.0, abs(chosen.fret - prev.fret) * 2.0 + abs(chosen.string_index - prev.string_index) * 3.0)
+                        local_scoop = scoop + min(
+                            28.0,
+                            abs(chosen.fret - prev.fret) * 2.0
+                            + abs(chosen.string_index - prev.string_index) * 3.0,
+                        )
                     if chosen is not None:
                         prev_assign[inst] = chosen
+                    bend_curve = inst_pitch_bend_curves.get(
+                        inst, layer.get("pitch_bend_curve")
+                    )
+                    bend_curve_pairs = (
+                        [(float(x[0]), float(x[1])) for x in bend_curve]
+                        if bend_curve
+                        else None
+                    )
                     add_note(
                         ctx,
                         inst,
-                        int(chosen.pitch if chosen is not None else p0),
+                        int(chosen.pitch if chosen is not None else p),
                         section["start_bar"] + local_bar,
                         beat,
                         dur,
-                        velocity * vel_scale * float(section.get("intensity", 1.0)),
+                        (velocity + float(inst_velocity_offsets.get(inst, -8 * j)))
+                        * vel_scale
+                        * float(section.get("intensity", 1.0)),
                         articulation=articulation,
                         gate=gate,
                         pitch_scoop_cents=local_scoop,
+                        pitch_bend_curve=bend_curve_pairs,
                         **hk,
                     )
                 beat += dur

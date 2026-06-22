@@ -808,3 +808,35 @@ def test_timeline_markers_include_explicit_form_markers():
     markers = timeline_markers_from_spec(spec, sections)
     assert [m["id"] for m in markers] == ["loop", "bloom"]
     assert markers[1]["start_seconds"] == 16.0
+
+
+def test_add9_and_six_nine_do_not_imply_dominant_seventh():
+    assert chord_intervals("Gadd9")[1] == [0, 4, 7, 14]
+    assert chord_intervals("D(add9)")[1] == [0, 4, 7, 14]
+    assert chord_intervals("D6/9")[1] == [0, 4, 7, 9, 14]
+    assert chord_intervals("A9")[1] == [0, 4, 7, 10, 14]
+    assert chord_intervals("Cmaj9")[1] == [0, 4, 7, 11, 14]
+
+
+def test_versioned_generated_layout_latest_manifest_lookup():
+    from ambition_music_renderer.render.generated_layout import GeneratedRunLayout
+    from ambition_music_renderer.render.generated_layout import begin_generated_run
+    from ambition_music_renderer.render.generated_layout import generated_manifest_search_roots
+    from ambition_music_renderer.render.generated_layout import latest_manifest_in_roots
+    from ambition_music_renderer.render.generated_layout import mark_generated_run_latest
+    from ambition_music_renderer.render.generated_layout import resolve_latest_generated_dir
+
+    with tempfile.TemporaryDirectory() as td:
+        cue_dir = Path(td) / "generated" / "cue"
+        old_layout = GeneratedRunLayout(cue_dir=cue_dir, hash_id="oldhash")
+        begin_generated_run(old_layout)
+        (old_layout.run_dir / "cue_oldhash.adaptive_manifest.json").write_text('{"hash":"oldhash"}', encoding="utf8")
+        new_layout = GeneratedRunLayout(cue_dir=cue_dir, hash_id="newhash")
+        begin_generated_run(new_layout)
+        (new_layout.run_dir / "cue_newhash.adaptive_manifest.json").write_text('{"hash":"newhash"}', encoding="utf8")
+        mark_generated_run_latest(new_layout)
+
+        assert resolve_latest_generated_dir(cue_dir).resolve() == new_layout.run_dir.resolve()
+        manifest = latest_manifest_in_roots(generated_manifest_search_roots(cue_dir), "cue")
+        assert manifest is not None
+        assert manifest.name == "cue_newhash.adaptive_manifest.json"

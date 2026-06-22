@@ -38,6 +38,12 @@ from ._paths import repo_root as _repo_root
 import kwconf
 
 from .profiler import profile
+from .render.generated_layout import begin_generated_run
+from .render.generated_layout import generated_manifest_search_roots
+from .render.generated_layout import generated_run_layout
+from .render.generated_layout import latest_manifest_in_roots
+from .render.generated_layout import mark_generated_run_latest
+from .render.generated_layout import resolve_latest_generated_dir
 
 
 def _progress(iterable, *, total, desc):
@@ -192,8 +198,10 @@ def manifest_has_adaptive_full_sections(manifest_path: Path) -> bool:
     )
 
 
+@profile
 def needs_render(cue: str, yaml_path: Path, outdir: Path) -> bool:
-    preview_dir = outdir / "preview"
+    latest_outdir = resolve_latest_generated_dir(outdir)
+    preview_dir = latest_outdir / "preview"
     latest = find_full_mix(preview_dir, cue)
     if latest is None:
         return True
@@ -284,13 +292,9 @@ def _display_path(path: Path) -> Path:
         return path
 
 
+@profile
 def find_latest_manifest(outdir: Path, cue: str) -> Path | None:
-    candidates = sorted(
-        outdir.glob(f"{cue}_*.adaptive_manifest.json"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return candidates[0] if candidates else None
+    return latest_manifest_in_roots(generated_manifest_search_roots(outdir), cue)
 
 
 def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> list[Path]:
@@ -311,6 +315,7 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
     except Exception as ex:
         print(f"skip adaptive publish {cue}: failed to read {manifest_path}: {ex}", file=sys.stderr)
         return []
+    manifest_root = manifest_path.parent
 
     copied: list[Path] = []
     adaptive = ((manifest.get("files") or {}).get("adaptive") or {})
@@ -325,7 +330,7 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
         rel = section_files.get("full")
         if not rel:
             continue
-        src = outdir / str(rel)
+        src = manifest_root / str(rel)
         dest = dest_dir / "adaptive" / str(section_id) / f"{section_id}.full.ogg"
         if src.exists():
             to_copy.append((src, dest))
@@ -351,6 +356,7 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
 
 
 def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
+    outdir = resolve_latest_generated_dir(outdir)
     preview_dir = outdir / "preview"
     src = find_full_mix(preview_dir, cue)
     if src is None:
@@ -383,20 +389,42 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
 
 
 @profile
+def render_cue_to_versioned_generated(
+    cue: str,
+    yaml_path: Path,
+    *,
+    backend: str = "pretty-midi",
+    simple_mix: bool = True,
+    full_mix_only: bool = False,
+    extra_args: list[str] | None = None,
+) -> bool:
+    cue_dir = generated_root() / cue
+    layout = generated_run_layout(cue_dir, yaml_path, backend)
+    outdir = begin_generated_run(layout)
+    ok = render_cue(
+        cue,
+        yaml_path,
+        outdir,
+        backend=backend,
+        simple_mix=simple_mix,
+        full_mix_only=full_mix_only,
+        extra_args=extra_args,
+    )
+    if ok:
+        mark_generated_run_latest(layout)
+    return ok
+
+
+@profile
 def cmd_render(args) -> int:
     yaml_path = find_score(args.cue)
     if yaml_path is None:
         print(f"error: cue not found: {args.cue}", file=sys.stderr)
         return 2
-    outdir = generated_root() / args.cue
-    if not args.simple_mix and outdir == generated_root() / args.cue:
-        # nothing special; just leaving the simple-mix off
-        pass
     simple_mix, full_mix_only = render_mode_for_cue(args.cue, args)
-    ok = render_cue(
+    ok = render_cue_to_versioned_generated(
         args.cue,
         yaml_path,
-        outdir,
         backend=args.backend,
         simple_mix=simple_mix,
         full_mix_only=full_mix_only,
@@ -407,11 +435,14 @@ def cmd_render(args) -> int:
 @profile
 def cmd_publish(args) -> int:
     outdir = generated_root() / args.cue
+    resolved_outdir = resolve_latest_generated_dir(outdir)
     # Fallback to legacy output/ tree if generated/ is empty.
-    if not (outdir / "preview").exists():
+    if not (resolved_outdir / "preview").exists():
         legacy = output_root() / args.cue
         if (legacy / "preview").exists():
             outdir = legacy
+        else:
+            outdir = resolved_outdir
     ok = publish_cue(args.cue, outdir, args.dest_root)
     return 0 if ok else 1
 
@@ -425,10 +456,9 @@ def cmd_render_publish(args) -> int:
     outdir = generated_root() / args.cue
     if args.force_render or needs_render(args.cue, yaml_path, outdir):
         simple_mix, full_mix_only = render_mode_for_cue(args.cue, args)
-        if not render_cue(
+        if not render_cue_to_versioned_generated(
             args.cue,
             yaml_path,
-            outdir,
             backend=args.backend,
             simple_mix=simple_mix,
             full_mix_only=full_mix_only,
@@ -468,10 +498,9 @@ def _process_simple_mix_cue(
     outdir = generated_root() / cue
     if action in ("render", "render-publish"):
         if force_render or needs_render(cue, yaml_path, outdir):
-            if not render_cue(
+            if not render_cue_to_versioned_generated(
                 cue,
                 yaml_path,
-                outdir,
                 backend=backend,
                 simple_mix=True,
             ):

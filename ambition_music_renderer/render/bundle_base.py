@@ -24,6 +24,8 @@ import yaml
 import kwconf
 
 from . import musicir_renderer as r
+from .generated_layout import generated_manifest_search_roots
+from .generated_layout import latest_manifest_in_roots
 from ..audit.arrangement_audit import audit_file as audit_arrangement_file
 from ..audit.arrangement_audit import write_reports as write_arrangement_reports
 from ..audit.dissonance_audit import audit_file as audit_dissonance_file
@@ -228,13 +230,11 @@ def load_yaml(path: Path) -> dict:
     return data
 
 
+@profile
 def latest_manifest(outdir: Path, cue_id: str) -> Path | None:
-    candidates = sorted(
-        outdir.glob(f"{cue_id}_*.adaptive_manifest.json"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return candidates[0] if candidates else None
+    """Find the newest manifest in either a flat or versioned output dir."""
+
+    return latest_manifest_in_roots(generated_manifest_search_roots(outdir), cue_id)
 
 
 def safe_rel(path: Path, root: Path | None = None) -> str:

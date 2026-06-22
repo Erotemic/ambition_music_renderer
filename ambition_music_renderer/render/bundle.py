@@ -10,6 +10,10 @@ from __future__ import annotations
 from . import bundle_base as _bundle_base
 from . import bundle_reports as _bundle_reports
 from . import bundle_archive as _bundle_archive
+from .generated_layout import begin_generated_run
+from .generated_layout import generated_run_layout
+from .generated_layout import mark_generated_run_latest
+from .generated_layout import resolve_latest_generated_dir
 
 globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
 globals().update({k: v for k, v in vars(_bundle_reports).items() if not k.startswith("__")})
@@ -56,8 +60,14 @@ def create_bundle(
     if render_audio_mode not in RENDER_AUDIO_MODES:
         raise ValueError(f"render_audio_mode must be one of {RENDER_AUDIO_MODES}, got {render_audio_mode!r}")
 
+    generated_layout = None
     if outdir is None:
-        outdir = default_generated_root() / cue_id
+        cue_generated_dir = default_generated_root() / cue_id
+        if skip_render:
+            outdir = resolve_latest_generated_dir(cue_generated_dir)
+        else:
+            generated_layout = generated_run_layout(cue_generated_dir, score_path, backend, spec=spec)
+            outdir = begin_generated_run(generated_layout)
     else:
         outdir = Path(outdir)
     if bundle_root is None:
@@ -325,6 +335,9 @@ def create_bundle(
         render_in_process,
     )
 
+    if generated_layout is not None:
+        mark_generated_run_latest(generated_layout)
+
     command_rows = [
         {
             "name": c.name,
@@ -349,6 +362,9 @@ def create_bundle(
         "render_in_process": render_in_process,
         "render_hash": render_hash,
         "outdir": str(outdir),
+        "generated_dir": str(generated_layout.cue_dir) if generated_layout is not None else str(outdir),
+        "generated_latest": str(generated_layout.latest_link) if generated_layout is not None else None,
+        "generated_building": str(generated_layout.building_link) if generated_layout is not None else None,
         "bundle_dir": str(bundle_dir),
         "manifest": str(manifest_path),
         "duration_s": duration,
