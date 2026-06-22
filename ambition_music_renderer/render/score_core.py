@@ -12,29 +12,13 @@ and exports OGG Vorbis section/stem assets plus a full soundtrack preview.
 
 from __future__ import annotations
 
-import copy
 import dataclasses as dc
-import functools
-import hashlib
-import json
-import math
-import re
-import shutil
-import subprocess
-import tempfile
 from pathlib import Path
 from typing import Any
-import gc
-import os
-import sys
 
 import numpy as np
 import pretty_midi
-import soundfile as sf
 import yaml
-import kwconf
-from ..profiler import profile
-from scipy import signal
 
 RENDERER_VERSION = "ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1"
 DEFAULT_SOUNDFONTS = [

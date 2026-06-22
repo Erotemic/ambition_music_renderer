@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
-from . import bundle_audio_reports as _bundle_audio_reports
-from . import bundle_spectral_reports as _bundle_spectral_reports
-from . import bundle_adaptive_reports as _bundle_adaptive_reports
+import math
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_audio_reports).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_spectral_reports).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_adaptive_reports).items() if not k.startswith("__")})
+import numpy as np
+
+from ..profiler import profile
+from .bundle_base import current_scratch_stem_paths, report_plot_save_kwargs
 
 @profile
 def spectrogram_db(audio: np.ndarray, sample_rate: int, signal_module) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -32,12 +30,8 @@ def spectrogram_db(audio: np.ndarray, sample_rate: int, signal_module) -> tuple[
 
 
 @profile
-def spectrogram_save_kwargs(dest: Path, jpeg_quality: int) -> dict:
-    save_kwargs = {"dpi": 120}
-    if dest.suffix.lower() in {".jpg", ".jpeg"}:
-        save_kwargs["format"] = "jpeg"
-        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
-    return save_kwargs
+def spectrogram_save_kwargs(dest: Path, jpeg_quality: int) -> dict[str, object]:
+    return report_plot_save_kwargs(dest, jpeg_quality=jpeg_quality)
 
 
 @profile
@@ -87,12 +81,7 @@ def save_high_detail_spectrogram_plot(
     if not np.any(mask):
         return
     focus = spec_db[mask]
-    finite = focus[np.isfinite(focus)]
-    if finite.size:
-        vmax = float(np.percentile(finite, 99.7))
-        vmin = max(vmax - 60.0, float(np.percentile(finite, 20.0)))
-    else:
-        vmin, vmax = -100.0, -40.0
+    vmin, vmax = -110.0, -35.0
     pyplot.figure(figsize=(14, 5))
     pyplot.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
     pyplot.yscale("log")
@@ -102,7 +91,7 @@ def save_high_detail_spectrogram_plot(
     pyplot.title(f"{title} — high-frequency detail")
     pyplot.xlabel("time (s)")
     pyplot.ylabel("frequency (Hz)")
-    pyplot.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
+    pyplot.colorbar(label=f"dB, fixed {vmin:.0f}..{vmax:.0f}")
     pyplot.tight_layout()
     pyplot.savefig(dest, **spectrogram_save_kwargs(dest, jpeg_quality))
     pyplot.close()
@@ -126,12 +115,7 @@ def save_shrill_detail_spectrogram_plot(
     if not np.any(mask):
         return
     focus = spec_db[mask]
-    finite = focus[np.isfinite(focus)]
-    if finite.size:
-        vmax = float(np.percentile(finite, 99.85))
-        vmin = max(vmax - 48.0, float(np.percentile(finite, 35.0)))
-    else:
-        vmin, vmax = -95.0, -45.0
+    vmin, vmax = -110.0, -35.0
     pyplot.figure(figsize=(14, 5))
     pyplot.pcolormesh(times, freqs[mask], focus, shading="auto", vmin=vmin, vmax=vmax, cmap="inferno")
     pyplot.ylim(3500, 12500)
@@ -142,7 +126,7 @@ def save_shrill_detail_spectrogram_plot(
     pyplot.title(f"{title} — shrill-band detail")
     pyplot.xlabel("time (s)")
     pyplot.ylabel("frequency (Hz, linear)")
-    pyplot.colorbar(label=f"relative dB, local percentile {vmin:.0f}..{vmax:.0f}")
+    pyplot.colorbar(label=f"dB, fixed {vmin:.0f}..{vmax:.0f}")
     pyplot.tight_layout()
     pyplot.savefig(dest, **spectrogram_save_kwargs(dest, jpeg_quality))
     pyplot.close()

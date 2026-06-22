@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-from . import score_core as _core
+import re
+from typing import Any
 
-globals().update({k: v for k, v in vars(_core).items() if not k.startswith("__")})
+import pretty_midi
+
+from .score_core import NOTE_CLASS, RenderContext
 
 def note_to_midi(note: str) -> int:
     note = note.strip()

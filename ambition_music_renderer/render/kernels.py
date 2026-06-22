@@ -1,10 +1,9 @@
 """Optional compiled DSP kernels for the music renderer.
 
-This module is imported lazily by :mod:`ambition_music_renderer.render.musicir_renderer`
-so normal CLI startup and YAML-only tooling do not pay the Numba import/compile
-cost.  The small wrappers in ``musicir_renderer`` retain the public/testable
-Python API and line-profiler visibility, while these functions provide the
-sample-by-sample loops as native code for long renders.
+This module is imported lazily by the effect wrappers so normal CLI startup
+and YAML-only tooling do not pay the Numba import/compile cost. The wrappers
+retain the public/testable Python API and line-profiler visibility, while these
+functions provide sample-by-sample loops as native code for long renders.
 """
 
 from __future__ import annotations
@@ -61,3 +60,23 @@ def allpass_filter(
         if write >= delay:
             write = 0
     return out
+
+
+@njit(cache=True)
+def compressor_envelope(
+    gain_reduction_db: np.ndarray,
+    attack_coeff: float,
+    release_coeff: float,
+) -> np.ndarray:
+    """Attack/release smoothing loop for the peak compressor."""
+    n = gain_reduction_db.shape[0]
+    env = np.zeros(n, dtype=np.float32)
+    state = 0.0
+    for i in range(n):
+        target = gain_reduction_db[i]
+        if target < state:
+            state = attack_coeff * state + (1.0 - attack_coeff) * target
+        else:
+            state = release_coeff * state + (1.0 - release_coeff) * target
+        env[i] = state
+    return env

@@ -2,11 +2,27 @@
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
-from . import bundle_audio_reports as _bundle_audio_reports
+import json
+import math
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_audio_reports).items() if not k.startswith("__")})
+import numpy as np
+
+from .audio_utils import coerce_stereo
+from .bundle_base import (
+    DBFS_PLOT_FLOOR,
+    DBFS_SILENCE_FLOOR,
+    _audio_stats,
+    _db,
+    _format_dbfs,
+    _plot_db,
+    current_scratch_stem_paths,
+    manifest_audio_entries,
+    manifest_duration,
+    report_plot_save_kwargs,
+    ordered_section_ids,
+    section_time_offsets,
+)
 
 def write_spectral_fingerprint(
     outdir: Path,
@@ -40,7 +56,7 @@ def write_spectral_fingerprint(
         group = path.stem.split(".")[-1]
         try:
             arr = np.load(path).astype("float32", copy=False)
-            arr = r._coerce_stereo(arr)
+            arr = coerce_stereo(arr)
         except Exception:
             continue
         groups.append(group)
@@ -373,10 +389,10 @@ def write_stem_amplitude_report(
         try:
             import matplotlib.pyplot as plt
             suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
-            save_kwargs: dict[str, object] = {"dpi": 130, "bbox_inches": "tight"}
-            if suffix == "jpg":
-                save_kwargs["format"] = "jpeg"
-                save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
+            save_kwargs = report_plot_save_kwargs(
+                plot_format=suffix,
+                jpeg_quality=jpeg_quality,
+            )
             labels = [f"{row['section']}/{row['group']}" for row in ordered_groups if not row.get("error")]
             values = [_plot_db(float(row.get("weighted_default_rms_dbfs", DBFS_SILENCE_FLOOR))) for row in ordered_groups if not row.get("error")]
             if labels:
@@ -388,6 +404,7 @@ def write_stem_amplitude_report(
                 ax.set_xlabel("weighted RMS (dBFS)")
                 ax.set_title("Section/stem amplitude balance")
                 ax.grid(True, axis="x", alpha=0.3)
+                ax.set_xlim(DBFS_PLOT_FLOOR, 0.0)
                 fig.savefig(plots_dir / f"stem_amplitude_balance.{suffix}", **save_kwargs)
                 plt.close(fig)
             by_group: dict[str, list[dict[str, object]]] = {}
@@ -405,9 +422,11 @@ def write_stem_amplitude_report(
                         ax.axvline(start, alpha=0.18, linewidth=0.8)
                 ax.set_xlabel("absolute soundtrack time (s)")
                 ax.set_ylabel("weighted RMS (dBFS)")
-                ax.set_title("Stem amplitude over absolute section time")
+                ax.set_title("Stem loudness over soundtrack time")
                 ax.grid(True, alpha=0.3)
+                ax.set_ylim(DBFS_PLOT_FLOOR, 0.0)
                 ax.legend(loc="best", fontsize=8)
+                fig.savefig(plots_dir / f"stem_loudness_timeline.{suffix}", **save_kwargs)
                 fig.savefig(plots_dir / f"stem_amplitude_timeline.{suffix}", **save_kwargs)
                 plt.close(fig)
 

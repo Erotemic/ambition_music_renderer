@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from . import score_core as _core
-from . import score_theory as _theory
+import copy
+import math
+from typing import Any
 
-globals().update({k: v for k, v in vars(_core).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_theory).items() if not k.startswith("__")})
+import pretty_midi
+
+from .score_core import ARTICULATION_GATE, CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext
+from .score_theory import chord_pitches, clamp, fit_midi_pitch, midi_to_note, note_to_midi
 
 def add_cc(inst: pretty_midi.Instrument, number: int, value: int, time: float) -> None:
     inst.control_changes.append(

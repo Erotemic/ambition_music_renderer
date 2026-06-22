@@ -24,7 +24,9 @@ from typing import Any
 
 import pretty_midi
 
-from ..render import musicir_renderer as r
+from ..render.score_core import load_yaml
+from ..render.score_layers import build_score
+from ..render.score_theory import chord_for_bar, chord_intervals, chord_pitches, note_to_midi
 
 try:  # Optional plotting dependency.
     import matplotlib
@@ -101,13 +103,13 @@ def _chord_for_abs_bar(spec: dict[str, Any], bar0: int) -> str:
     section, local = _section_for_bar(spec, bar0)
     if not section:
         return ""
-    return r.chord_for_bar(section, local)
+    return chord_for_bar(section, local)
 
 
 @profile
 def _chord_pcs(chord: str) -> set[int]:
     try:
-        return {int(p) % 12 for p in r.chord_pitches(chord, octave=4, voicing="closed")}
+        return {int(p) % 12 for p in chord_pitches(chord, octave=4, voicing="closed")}
     except Exception:
         return set()
 
@@ -115,8 +117,8 @@ def _chord_pcs(chord: str) -> set[int]:
 @profile
 def _chord_root_pc(chord: str) -> int | None:
     try:
-        root, _intervals, _slash = r.chord_intervals(chord)
-        return r.note_to_midi(f"{root}4") % 12
+        root, _intervals, _slash = chord_intervals(chord)
+        return note_to_midi(f"{root}4") % 12
     except Exception:
         return None
 
@@ -171,7 +173,7 @@ def _state_weights(spec: dict[str, Any], state: str = "default") -> dict[str, fl
 
 @profile
 def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
-    pm, groups, _section_meta = r.build_score(spec)
+    pm, groups, _section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     events = list(getattr(pm, "_ambition_note_events", []) or [])
@@ -312,7 +314,7 @@ def _source_hint(
         return _motif_source_hint(spec, ev, layer, section_starts, beats_per_bar)
     bar0 = int(float(ev.get("start_beat", 0.0)) // beats_per_bar)
     section, local_bar = _section_for_bar(spec, bar0)
-    chord = r.chord_for_bar(section, local_bar) if section else ""
+    chord = chord_for_bar(section, local_bar) if section else ""
     section_id = str((section or {}).get("id") or ev.get("section") or "?")
     return (
         f"sections.{section_id}.harmony[{local_bar}]={chord}; layer_templates.{layer_name}",
@@ -341,7 +343,7 @@ def _sample_contexts(
         bar0 = int(beat // beats_per_bar)
         section, local_bar = _section_for_bar(spec, bar0)
         sid = str((section or {}).get("id") or ev.get("section") or "")
-        chord = r.chord_for_bar(section, local_bar) if section else ""
+        chord = chord_for_bar(section, local_bar) if section else ""
         key = section_keys.get(sid, {"name": "unknown", "pcs": set()})
         contexts.append(
             {
@@ -727,7 +729,7 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_candidates: int = 80, min_score: float = 0.28) -> dict[str, Any]:
-    return audit_spec(r.load_yaml(path), bucket_beats=bucket_beats, max_candidates=max_candidates, min_score=min_score)
+    return audit_spec(load_yaml(path), bucket_beats=bucket_beats, max_candidates=max_candidates, min_score=min_score)
 
 
 class SourNoteAuditConfig(kwconf.Config):

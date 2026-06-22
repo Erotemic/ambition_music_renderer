@@ -2,9 +2,23 @@
 
 from __future__ import annotations
 
-from . import score as _score
+import hashlib
+import json
+import math
+import os
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Any
 
-globals().update({k: v for k, v in vars(_score).items() if not k.startswith("__")})
+import numpy as np
+import pretty_midi
+import soundfile as sf
+from scipy import signal
+
+from ..profiler import profile
+from .audio_utils import coerce_stereo
+from .score_core import RENDERER_VERSION
 
 def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
     payload = {
@@ -16,16 +30,6 @@ def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True).encode("utf8")
     ).hexdigest()[:16]
-
-
-@profile
-def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
-    audio = np.asarray(audio, dtype=np.float32)
-    if audio.ndim == 1:
-        audio = np.column_stack([audio, audio])
-    if audio.shape[1] > 2:
-        audio = audio[:, :2]
-    return audio.astype(np.float32, copy=False)
 
 
 def sanitize_same_pitch_overlaps(
@@ -147,8 +151,8 @@ def _render_pretty_midi_per_instrument(
     max_len = max(len(w) for w in waveforms)
     mixed = np.zeros((max_len, 2), dtype=np.float32)
     for w in waveforms:
-        mixed[: len(w), :] += _coerce_stereo(w)
-    return _coerce_stereo(mixed)
+        mixed[: len(w), :] += coerce_stereo(w)
+    return coerce_stereo(mixed)
 
 
 @profile
@@ -241,7 +245,7 @@ def render_pretty_midi(
         stereo = _fluidsynth_stereo_samples(fl, total_samples - cursor)
         out[cursor : cursor + len(stereo), :] = stereo[: total_samples - cursor]
     fl.delete()
-    return _coerce_stereo(out)
+    return coerce_stereo(out)
 
 
 
@@ -273,7 +277,7 @@ def render_with_fluidsynth_cli(
     audio, sr = sf.read(dry_wav_path, dtype="float32", always_2d=True)
     if sr != sample_rate:
         audio = signal.resample_poly(audio, sample_rate, sr, axis=0).astype(np.float32)
-    return _coerce_stereo(audio)
+    return coerce_stereo(audio)
 
 
 @profile

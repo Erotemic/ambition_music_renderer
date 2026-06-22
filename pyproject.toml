@@ -46,7 +46,7 @@ dev = ["pytest", "ruff", "line_profiler"]
 
 [project.scripts]
 ambition-music-renderer = "ambition_music_renderer.cli:main"
-render-ambition-music = "ambition_music_renderer.render.musicir_renderer:main"
+render-ambition-music = "ambition_music_renderer.render.musicir_config:main"
 
 [tool.setuptools.packages.find]
 include = ["ambition_music_renderer*"]

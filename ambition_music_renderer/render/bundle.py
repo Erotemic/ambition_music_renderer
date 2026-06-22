@@ -1,23 +1,63 @@
-"""Cue regeneration, diagnostics, and shareable debug bundles.
-
-The implementation is split across ``bundle_base``, ``bundle_reports``, and
-``bundle_archive``.  This module keeps the historical public API and owns the
-main ``create_bundle`` orchestration path.
-"""
+"""Cue regeneration, diagnostics, and shareable debug bundles."""
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
-from . import bundle_reports as _bundle_reports
-from . import bundle_archive as _bundle_archive
-from .generated_layout import begin_generated_run
-from .generated_layout import generated_run_layout
-from .generated_layout import mark_generated_run_latest
-from .generated_layout import resolve_latest_generated_dir
+import json
+import os
+import shutil
+import tempfile
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_reports).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_archive).items() if not k.startswith("__")})
+from ..audit.arrangement_audit import audit_file as audit_arrangement_file
+from ..audit.arrangement_audit import write_reports as write_arrangement_reports
+from ..audit.dissonance_audit import audit_file as audit_dissonance_file
+from ..audit.dissonance_audit import write_reports as write_dissonance_reports
+from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
+from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
+from ..audit.sour_note_audit import audit_file as audit_sour_note_file
+from ..audit.sour_note_audit import write_reports as write_sour_note_reports
+from ..kwconf_runner import KwconfCommand
+from ..profiler import profile
+from .bundle_adaptive_reports import (
+    write_adaptive_composition_mastering_report,
+    write_adaptive_section_report,
+    write_spectral_shrillness_report,
+)
+from .bundle_archive import build_rerun_script, copy_tree_if_exists, make_zip, print_bundle_summary, run_transition_audits
+from .bundle_audio_reports import (
+    summarize_mix_diagnostics,
+    write_audio_metadata_report,
+    write_manifest_audio_level_report,
+    write_state_mix_report,
+    write_stem_export_report,
+)
+from .bundle_base import (
+    DEFAULT_BACKEND,
+    RENDER_AUDIO_MODES,
+    CommandResult,
+    CueBundleConfig,
+    copy_current_scratch_stems,
+    copy_manifest_referenced_files,
+    default_bundle_root,
+    default_generated_root,
+    default_publish_dest_root,
+    find_score,
+    latest_manifest,
+    load_yaml,
+    manifest_duration,
+    missing_score_debug,
+    package_dir,
+    prepare_manifest_analysis_root,
+    progress_line,
+    renderer_audit_command,
+    run_kwconf_logged,
+    run_logged,
+    safe_rel,
+    terminal_link,
+)
+from .bundle_spectral_reports import write_spectral_fingerprint, write_stem_amplitude_report
+from .bundle_spectrograms import write_spectrograms
+from .generated_layout import begin_generated_run, generated_run_layout, mark_generated_run_latest, resolve_latest_generated_dir
 
 @profile
 def create_bundle(

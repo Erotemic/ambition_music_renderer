@@ -14,7 +14,12 @@ from pathlib import Path
 import kwconf
 import numpy as np
 import yaml
-from . import musicir_renderer as r
+from .effects import post_process
+from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
+from .group import ensure_audio_length, render_group_audio, slice_audio
+from .score_core import choose_soundfont
+from .score_layers import build_score
+from .synth import spec_hash
 from ..profiler import PhaseTimer, profile
 
 
@@ -66,30 +71,30 @@ def _worker_main(ns) -> int:
         render_cfg = spec.get("render", {})
         sr = int(render_cfg.get("sample_rate", 48000))
         bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-        soundfont = r.choose_soundfont(render_cfg.get("soundfont"))
-        cue_hash = r.spec_hash(spec_path, soundfont, ns.backend)
+        soundfont = choose_soundfont(render_cfg.get("soundfont"))
+        cue_hash = spec_hash(spec_path, soundfont, ns.backend)
         quality = float(render_cfg.get("ogg_quality", 5.0))
-        pm, groups, meta = r.build_score(spec)
-        cue_metadata = r.section_chapter_metadata(
+        pm, groups, meta = build_score(spec)
+        cue_metadata = section_chapter_metadata(
             cue_id=str(spec.get("id", spec_path.stem)),
             title=str(spec.get("title", spec.get("id", spec_path.stem))),
-            sections=r.timeline_markers_from_spec(spec, meta),
+            sections=timeline_markers_from_spec(spec, meta),
         )
     total = meta[-1]["end_seconds"]
     target = int(math.ceil(total * sr))
     outdir = Path(ns.outdir)
     with tempfile.TemporaryDirectory() as td:
         with timings.phase("render_group_audio", group=ns.group, backend=ns.backend):
-            raw = r.render_group_audio(
+            raw = render_group_audio(
                 pm, groups, ns.group, ns.backend, soundfont, sr, Path(td), total, bpm
             )
         with timings.phase("postprocess_group", group=ns.group):
-            raw = r.ensure_audio_length(raw, target)
+            raw = ensure_audio_length(raw, target)
             settings = dict(spec.get("stem_postprocess", {}) or {})
             settings.update((spec.get("group_postprocess", {}) or {}).get(ns.group, {}))
             settings.setdefault("normalize", False)
             settings.setdefault("target_peak_db", -2.5)
-            audio = r.post_process(raw, sr, settings)
+            audio = post_process(raw, sr, settings)
     with timings.phase("write_scratch_npy", group=ns.group):
         npy = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{ns.group}.npy"
         npy.parent.mkdir(parents=True, exist_ok=True)
@@ -98,7 +103,7 @@ def _worker_main(ns) -> int:
     if not ns.skip_section_ogg:
         with timings.phase("write_section_oggs", group=ns.group, sections=len(meta)):
             for sec in meta:
-                piece = r.slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
+                piece = slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
                 path = (
                     outdir
                     / "adaptive"
@@ -107,7 +112,7 @@ def _worker_main(ns) -> int:
                 )
                 section_metadata = dict(cue_metadata)
                 section_metadata.update(
-                    r.section_chapter_metadata(
+                    section_chapter_metadata(
                         cue_id=str(spec.get("id", spec_path.stem)),
                         title=f"{spec.get('title', spec.get('id', spec_path.stem))} — {sec['id']} — {ns.group}",
                         section_id=str(sec["id"]),
@@ -116,7 +121,7 @@ def _worker_main(ns) -> int:
                     )
                 )
                 section_metadata["STEM_GROUP"] = ns.group
-                r.write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False, metadata=section_metadata)
+                write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False, metadata=section_metadata)
                 files[sec["id"]] = str(path.relative_to(outdir))
     if ns.timings_out is not None:
         timings.write_json(ns.timings_out)

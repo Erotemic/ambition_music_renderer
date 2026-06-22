@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
+import json
+import math
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
+import numpy as np
+
+from .bundle_base import _audio_stats, _read_audio_stats, current_scratch_stem_paths, manifest_audio_entries
 
 def write_audio_metadata_report(outdir: Path, manifest: dict, reports_dir: Path) -> Path:
     """Record which audio metadata/chapter tags were written for manifest files."""

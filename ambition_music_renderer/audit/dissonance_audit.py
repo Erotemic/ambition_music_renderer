@@ -23,7 +23,9 @@ from typing import Any
 
 import pretty_midi
 
-from ..render import musicir_renderer as r
+from ..render.score_core import load_yaml
+from ..render.score_layers import build_score
+from ..render.score_theory import chord_for_bar, chord_intervals, note_to_midi
 
 try:  # Optional plotting dependency.
     import matplotlib
@@ -80,7 +82,7 @@ def _chord_for_abs_bar(spec: dict[str, Any], bar: int) -> str:
     section, local = _section_for_bar(spec, bar)
     if not section:
         return ""
-    return r.chord_for_bar(section, local)
+    return chord_for_bar(section, local)
 
 
 @profile
@@ -114,15 +116,15 @@ def _fallback_events(pm: pretty_midi.PrettyMIDI, groups: dict[str, str], bpm: fl
 @profile
 def _chord_pitch_classes(chord: str) -> set[int]:
     try:
-        root, intervals, slash_bass = r.chord_intervals(chord)
-        root_pc = r.note_to_midi(f"{root}4") % 12
+        root, intervals, slash_bass = chord_intervals(chord)
+        root_pc = note_to_midi(f"{root}4") % 12
         pcs = {(root_pc + int(i)) % 12 for i in intervals}
         if slash_bass:
             bass_root = slash_bass.strip().split()[0]
             import re
             match = re.match(r"^([A-G](?:#|b)?)", bass_root)
             if match:
-                pcs.add(r.note_to_midi(f"{match.group(1)}4") % 12)
+                pcs.add(note_to_midi(f"{match.group(1)}4") % 12)
         return pcs
     except Exception:
         return set()
@@ -205,7 +207,7 @@ def _active_events(events: list[dict[str, Any]], center_beat: float) -> list[dic
 @profile
 def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
     """Return JSON-serializable dissonance hotspot diagnostics."""
-    pm, groups, section_meta = r.build_score(spec)
+    pm, groups, section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     events = list(getattr(pm, "_ambition_note_events", []) or _fallback_events(pm, groups, bpm))
@@ -576,7 +578,7 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
-    spec = r.load_yaml(path)
+    spec = load_yaml(path)
     return audit_spec(spec, bucket_beats=bucket_beats, max_hotspots=max_hotspots)
 
 

@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from . import score_core as _core
-from . import score_theory as _theory
-from . import score_events as _events
+import copy
+import math
+from typing import Any
 
-globals().update({k: v for k, v in vars(_core).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_theory).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_events).items() if not k.startswith("__")})
+import numpy as np
+import pretty_midi
+
+from ..profiler import profile
+from .score_core import RenderContext
+from .score_events import add_chord, add_drum, add_instrument, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
+from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
 
 @profile
 def render_layer_pad_chords(

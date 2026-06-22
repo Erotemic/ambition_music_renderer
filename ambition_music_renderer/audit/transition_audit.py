@@ -14,6 +14,7 @@ from ..profiler import profile
 import kwconf
 import csv
 import math
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
@@ -30,6 +31,7 @@ except Exception:  # pragma: no cover
 # The runtime does not use an equal-power audio editor crossfade; it starts a
 # new bank and smooths layer gains exponentially toward their target.
 AMBITION_STEM_GAIN_BLEND_SECONDS = 0.18
+AUDIT_PLOT_DPI = 110
 
 
 @profile
@@ -88,6 +90,10 @@ def high_band_ratio(
     mono = np.mean(audio, axis=1)
     if mono.size < 64:
         return 0.0
+    max_frames = 131072
+    if mono.size > max_frames:
+        step = max(1, int(math.ceil(mono.size / max_frames)))
+        mono = mono[::step]
     window = np.hanning(mono.size)
     spectrum = np.fft.rfft(mono * window)
     power = np.square(np.abs(spectrum))
@@ -289,13 +295,12 @@ def windowed_rms_db(
     hop = max(1, int(round(sample_rate * hop_ms / 1000.0)))
     if signal.size < win:
         signal = np.pad(signal, (0, win - signal.size))
-    times: list[float] = []
-    values: list[float] = []
-    for start in range(0, max(1, signal.size - win + 1), hop):
-        chunk = signal[start : start + win]
-        times.append((start + 0.5 * win) / float(sample_rate))
-        values.append(db(rms(chunk[:, None])))
-    return np.asarray(times, dtype="float32"), np.asarray(values, dtype="float32")
+    starts = np.arange(0, max(1, signal.size - win + 1), hop, dtype=np.int64)
+    windows = np.lib.stride_tricks.sliding_window_view(signal, win)[starts]
+    rms_values = np.sqrt(np.mean(np.square(windows, dtype=np.float64), axis=1))
+    values = 20.0 * np.log10(np.maximum(rms_values, 1e-12))
+    times = (starts.astype(np.float64) + 0.5 * win) / float(sample_rate)
+    return times.astype("float32"), values.astype("float32")
 
 
 @profile
@@ -307,13 +312,12 @@ def windowed_peak_db(
     hop = max(1, int(round(sample_rate * hop_ms / 1000.0)))
     if signal.size < win:
         signal = np.pad(signal, (0, win - signal.size))
-    times: list[float] = []
-    values: list[float] = []
-    for start in range(0, max(1, signal.size - win + 1), hop):
-        chunk = signal[start : start + win]
-        times.append((start + 0.5 * win) / float(sample_rate))
-        values.append(db(peak(chunk[:, None])))
-    return np.asarray(times, dtype="float32"), np.asarray(values, dtype="float32")
+    starts = np.arange(0, max(1, signal.size - win + 1), hop, dtype=np.int64)
+    windows = np.lib.stride_tricks.sliding_window_view(signal, win)[starts]
+    peak_values = np.max(np.abs(windows), axis=1)
+    values = 20.0 * np.log10(np.maximum(peak_values, 1e-12))
+    times = (starts.astype(np.float64) + 0.5 * win) / float(sample_rate)
+    return times.astype("float32"), values.astype("float32")
 
 
 @profile
@@ -344,6 +348,7 @@ def spectrogram_db(
     )
 
 
+@lru_cache(maxsize=1)
 @profile
 def load_matplotlib():
     try:
@@ -356,6 +361,12 @@ def load_matplotlib():
     except Exception as ex:  # pragma: no cover - optional authoring dependency
         rich_print(f"[yellow]plotting skipped[/yellow] matplotlib is unavailable: {ex}")
         return None
+
+
+def save_plot(fig, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(output, dpi=AUDIT_PLOT_DPI)
 
 
 @profile
@@ -410,9 +421,7 @@ def plot_transition_components(
     ax.set_ylim(bottom=max(-80.0, float(np.nanmin(y_sum)) - 8.0), top=3.0)
     ax.grid(True, alpha=0.25)
     ax.legend(loc="best")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(output, dpi=150)
+    save_plot(fig, output)
     plt.close(fig)
     return output
 
@@ -454,9 +463,7 @@ def plot_transition_envelope(
     ax.set_ylim(bottom=max(-80.0, float(np.nanmin(y_rms)) - 6.0), top=3.0)
     ax.grid(True, alpha=0.25)
     ax.legend(loc="best")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(output, dpi=150)
+    save_plot(fig, output)
     plt.close(fig)
     return output
 
@@ -505,9 +512,7 @@ def plot_tail_head_comparison(
     )
     ax.grid(True, alpha=0.25)
     ax.legend(loc="best")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(output, dpi=150)
+    save_plot(fig, output)
     plt.close(fig)
     return output
 
@@ -549,9 +554,7 @@ def plot_preview_spectrogram(
     ax.set_xlabel("seconds in preview")
     ax.set_ylabel("Hz")
     fig.colorbar(image, ax=ax, label="dB power")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
-    fig.savefig(output, dpi=150)
+    save_plot(fig, output)
     plt.close(fig)
     return output
 

@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
-from . import score as _score
-from . import synth as _synth
+import functools
+import math
+import os
+from pathlib import Path
+from typing import Any
 
-globals().update({k: v for k, v in vars(_score).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_synth).items() if not k.startswith("__")})
+import numpy as np
+from scipy import signal
+
+from ..profiler import profile
+from .audio_utils import coerce_stereo
+from .score_theory import clamp
 
 @profile
 def _lowpass_mono(signal_in: np.ndarray, amount: float) -> np.ndarray:
@@ -33,7 +40,7 @@ def lowpass(
 ) -> np.ndarray:
     if hz <= 0 or hz >= sample_rate * 0.49:
         return audio.astype(np.float32, copy=False)
-    audio = _coerce_stereo(audio)
+    audio = coerce_stereo(audio)
     alpha = _one_pole_alpha(hz, sample_rate)
     out = audio.astype(np.float32, copy=True)
     # Cascade cheap one-pole sections for steeper response when requested.
@@ -47,7 +54,7 @@ def lowpass(
 def highpass(audio: np.ndarray, sample_rate: int, hz: float = 35.0) -> np.ndarray:
     if hz <= 0:
         return audio.astype(np.float32, copy=False)
-    audio = _coerce_stereo(audio)
+    audio = coerce_stereo(audio)
     return (audio - lowpass(audio, sample_rate, hz, order=1)).astype(np.float32)
 
 
@@ -69,7 +76,7 @@ def band_gain(
 ) -> np.ndarray:
     if abs(db) < 1e-6:
         return audio.astype(np.float32, copy=False)
-    audio = _coerce_stereo(audio)
+    audio = coerce_stereo(audio)
     low_hz = max(20.0, float(low_hz))
     high_hz = min(float(high_hz), sample_rate * 0.49)
     if high_hz <= low_hz:
@@ -174,6 +181,41 @@ def _allpass_filter(
     return _allpass_filter_python(sig, int(delay), float(feedback))
 
 
+def _compressor_envelope_python(
+    gain_reduction_db: np.ndarray,
+    attack_coeff: float,
+    release_coeff: float,
+) -> np.ndarray:
+    env = np.zeros_like(gain_reduction_db, dtype=np.float32)
+    state = 0.0
+    for i in range(len(gain_reduction_db)):
+        target = float(gain_reduction_db[i])
+        if target < state:
+            state = attack_coeff * state + (1.0 - attack_coeff) * target
+        else:
+            state = release_coeff * state + (1.0 - release_coeff) * target
+        env[i] = state
+    return env
+
+
+@profile
+def _compressor_envelope(
+    gain_reduction_db: np.ndarray,
+    attack_coeff: float,
+    release_coeff: float,
+) -> np.ndarray:
+    """Smooth compressor gain reduction with lazy Numba acceleration."""
+    gr = np.ascontiguousarray(gain_reduction_db, dtype=np.float32)
+    kernels = _audio_kernels()
+    if kernels is not None:
+        return kernels.compressor_envelope(
+            gr,
+            float(attack_coeff),
+            float(release_coeff),
+        )
+    return _compressor_envelope_python(gr, float(attack_coeff), float(release_coeff))
+
+
 @profile
 def simple_reverb(
     audio: np.ndarray,
@@ -194,7 +236,7 @@ def simple_reverb(
     if wet <= 0.0 or audio.size == 0:
         return audio.astype("float32", copy=False)
 
-    y = _coerce_stereo(audio)
+    y = coerce_stereo(audio)
     n = len(y)
 
     # Comb-filter delay times in samples (Freeverb's prime-number choices,
@@ -257,7 +299,7 @@ def compressor(
     """
     if ratio <= 1.0:
         return audio.astype(np.float32, copy=False)
-    audio = _coerce_stereo(audio)
+    audio = coerce_stereo(audio)
     # Detector signal: per-sample stereo peak, in dB.
     det = np.maximum(np.abs(audio[:, 0]), np.abs(audio[:, 1]))
     det = np.maximum(det, 1e-9)
@@ -284,15 +326,7 @@ def compressor(
     # Attack/release smoothing of the gain reduction envelope (in dB).
     a = math.exp(-1.0 / max(float(attack_ms) * 1e-3 * sr, 1.0))
     r = math.exp(-1.0 / max(float(release_ms) * 1e-3 * sr, 1.0))
-    env = np.zeros_like(gr_db)
-    state = 0.0
-    for i in range(len(gr_db)):
-        target = gr_db[i]
-        if target < state:  # attack: gain reduction is increasing (more negative)
-            state = a * state + (1.0 - a) * target
-        else:  # release: gain reduction is decreasing
-            state = r * state + (1.0 - r) * target
-        env[i] = state
+    env = _compressor_envelope(gr_db, a, r)
 
     # Apply gain reduction + makeup to both channels.
     gain = np.power(10.0, (env + float(makeup_db)) / 20.0).astype(np.float32)
@@ -337,7 +371,7 @@ def post_process(
     *,
     base_dir: Path | None = None,
 ) -> np.ndarray:
-    audio = _coerce_stereo(audio)
+    audio = coerce_stereo(audio)
     if settings.get("gain_db", 0):
         audio = audio * (10 ** (float(settings["gain_db"]) / 20.0))
     if settings.get("highpass_hz", 0):

@@ -26,7 +26,13 @@ from pathlib import Path
 import kwconf
 import numpy as np
 import yaml
-from . import musicir_renderer as r
+from .audio_utils import coerce_stereo
+from .effects import post_process, soft_limit
+from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
+from .group import build_manifest, ensure_audio_length, slice_audio
+from .score_core import choose_soundfont
+from .score_layers import build_score
+from .synth import spec_hash
 from ..profiler import PhaseTimer, profile
 from ..kwconf_runner import KwconfCommand
 from .._paths import project_root
@@ -192,7 +198,7 @@ def _db(value: float) -> float:
 
 @profile
 def _audio_stats(audio: np.ndarray, sample_rate: int) -> dict[str, float]:
-    audio = r._coerce_stereo(audio)  # internal renderer helper; keeps stats consistent.
+    audio = coerce_stereo(audio)  # internal renderer helper; keeps stats consistent.
     if audio.size == 0:
         return {
             "duration_s": 0.0,
@@ -346,8 +352,8 @@ def _render_main(ns) -> int:
         spec = yaml.safe_load(spec_path.read_text())
         render_cfg = spec.get("render", {})
         sr = int(render_cfg.get("sample_rate", 48000))
-        soundfont = r.choose_soundfont(render_cfg.get("soundfont"))
-        cue_hash = r.spec_hash(spec_path, soundfont, ns.backend)
+        soundfont = choose_soundfont(render_cfg.get("soundfont"))
+        cue_hash = spec_hash(spec_path, soundfont, ns.backend)
         quality = float(render_cfg.get("ogg_quality", 5.0))
         outdir = Path(ns.outdir)
         outdir.mkdir(parents=True, exist_ok=True)
@@ -389,9 +395,9 @@ def _render_main(ns) -> int:
             )
 
     with timings.phase("build_score"):
-        pm, groups, meta = r.build_score(spec)
-    cue_markers = r.timeline_markers_from_spec(spec, meta)
-    cue_metadata = r.section_chapter_metadata(
+        pm, groups, meta = build_score(spec)
+    cue_markers = timeline_markers_from_spec(spec, meta)
+    cue_metadata = section_chapter_metadata(
         cue_id=str(spec.get("id", spec_path.stem)),
         title=str(spec.get("title", spec.get("id", spec_path.stem))),
         sections=cue_markers,
@@ -476,7 +482,7 @@ def _render_main(ns) -> int:
     with timings.phase("load_scratch_stems", groups=len(group_names)):
         for group in group_names:
             npy = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{group}.npy"
-            stem_audio[group] = r.ensure_audio_length(np.load(npy), target)
+            stem_audio[group] = ensure_audio_length(np.load(npy), target)
             for sec in meta:
                 if not (ns.simple_mix or ns.full_mix_only):
                     path = (
@@ -497,11 +503,11 @@ def _render_main(ns) -> int:
         master_settings = dict(spec.get("postprocess", {}) or {})
         master_settings.setdefault("normalize", True)
         master_settings.setdefault("target_peak_db", -1.2)
-        master = r.post_process(raw_full, sr, master_settings)
+        master = post_process(raw_full, sr, master_settings)
         preview = (
             outdir / "preview" / f"{spec['id']}_{cue_hash}.full_soundtrack_preview.ogg"
         )
-        r.write_ogg_from_audio(
+        write_ogg_from_audio(
             master,
             sr,
             preview,
@@ -565,14 +571,14 @@ def _render_main(ns) -> int:
     if ns.runtime_stem_gain_mode == "shared" and not (ns.simple_mix or ns.full_mix_only):
         for group, audio in runtime_stem_audio.items():
             for sec in meta:
-                piece = r.slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
+                piece = slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
                 path = (
                     outdir
                     / "adaptive"
                     / sec["id"]
                     / f"{spec['id']}_{cue_hash}.{sec['id']}.{group}.ogg"
                 )
-                r.write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False)
+                write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False)
 
     # Per-section full slices for horizontal adaptive playback.
     #
@@ -597,20 +603,20 @@ def _render_main(ns) -> int:
             if section_full_mode == "global_master_slices":
                 if section_pp:
                     ignored_section_postprocess.append(str(sec["id"]))
-                piece = r.slice_audio(
+                piece = slice_audio(
                     master, sr, sec["start_seconds"], sec["end_seconds"]
                 )
             elif section_pp:
                 # Legacy behavior: slice the raw stem sum (pre-master), apply
                 # the section's postprocess chain to that slice.
-                raw_piece = r.slice_audio(
+                raw_piece = slice_audio(
                     raw_full, sr, sec["start_seconds"], sec["end_seconds"]
                 )
                 section_settings = dict(master_settings)
                 section_settings.update(section_pp)
-                piece = r.post_process(raw_piece, sr, section_settings)
+                piece = post_process(raw_piece, sr, section_settings)
             else:
-                piece = r.slice_audio(
+                piece = slice_audio(
                     master, sr, sec["start_seconds"], sec["end_seconds"]
                 )
             path = (
@@ -621,7 +627,7 @@ def _render_main(ns) -> int:
             )
             section_metadata = dict(cue_metadata)
             section_metadata.update(
-                r.section_chapter_metadata(
+                section_chapter_metadata(
                     cue_id=str(spec.get("id", spec_path.stem)),
                     title=f"{spec.get('title', spec.get('id', spec_path.stem))} — {sec['id']}",
                     section_id=str(sec["id"]),
@@ -629,7 +635,7 @@ def _render_main(ns) -> int:
                     section_end_s=float(sec.get("end_seconds", 0.0)),
                 )
             )
-            r.write_ogg_from_audio(
+            write_ogg_from_audio(
                 piece,
                 sr,
                 path,
@@ -659,15 +665,15 @@ def _render_main(ns) -> int:
             runtime_meta = dict(cue_metadata)
             runtime_meta["PREVIEW_TYPE"] = "runtime"
             runtime_meta["STATE_ID"] = label
-            r.write_ogg_from_audio(mix, sr, runtime_path, quality=quality, keep_wav=False, metadata=runtime_meta)
+            write_ogg_from_audio(mix, sr, runtime_path, quality=quality, keep_wav=False, metadata=runtime_meta)
             output_files["preview"][f"runtime_{label}"] = str(runtime_path.relative_to(outdir))
 
-            audition = r.soft_limit(mix, target_peak_db=-2.5, drive=1.0, normalize=True)
+            audition = soft_limit(mix, target_peak_db=-2.5, drive=1.0, normalize=True)
             audition_path = outdir / "preview" / f"{spec['id']}_{cue_hash}.audition_{label}.ogg"
             audition_meta = dict(cue_metadata)
             audition_meta["PREVIEW_TYPE"] = "audition"
             audition_meta["STATE_ID"] = label
-            r.write_ogg_from_audio(audition, sr, audition_path, quality=quality, keep_wav=False, metadata=audition_meta)
+            write_ogg_from_audio(audition, sr, audition_path, quality=quality, keep_wav=False, metadata=audition_meta)
             output_files["preview"][f"audition_{label}"] = str(audition_path.relative_to(outdir))
             runtime_preview_stats[label] = {
                 "runtime": _audio_stats(mix, sr),
@@ -707,7 +713,7 @@ def _render_main(ns) -> int:
             "runtime stems remain quieter by design to avoid exporting amplified noise floors"
         )
 
-    manifest = r.build_manifest(spec, cue_hash, meta, group_names, output_files, sr)
+    manifest = build_manifest(spec, cue_hash, meta, group_names, output_files, sr)
     manifest["render_mode"] = "isolated_process_stem_warmmix"
     manifest["simple_mix"] = bool(ns.simple_mix)
     manifest["full_mix_only"] = bool(ns.full_mix_only)

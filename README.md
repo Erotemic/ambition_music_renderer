@@ -226,12 +226,20 @@ about than raw audio:
   states are normalized for review and may collapse loudness differences.
 - `spectral_fingerprint_summary.txt/json/tsv` summarizes low/mid/high/vhigh/air
   energy by stem without requiring an audio player.
+- `stem_loudness_summary.txt/json/tsv` reports per-stem native and runtime
+  RMS/peak/headroom in dBFS and warns when one channel is wildly louder or
+  quieter than the rest. Start here when a mix sounds obviously wrong.
+- `plots/stem_loudness.<fmt>` is a single ranked stem/channel loudness plot
+  that makes buried or overpowering stems visible at a glance.
 - `stem_amplitude_summary.txt/json/tsv` and `stem_amplitude_envelope.tsv`
   show raw and state-weighted runtime stem levels, so mix balance can be read
   directly rather than inferred from spectrogram color.
 - `plots/stem_amplitude_balance.<fmt>`, `plots/stem_amplitude_timeline.<fmt>`,
   and `plots/stem_amplitude_stack.<fmt>` visualize relative stem amplitude and
   how the stems layer through the cue.
+- Spectrogram plots use a fixed dB color range by default so two plots from the
+  same bundle can be compared visually without local autoscaling hiding level
+  mistakes.
 
 ## Reference-audio surface analysis
 
@@ -275,8 +283,15 @@ generated/<cue>/
       stem_export_report.tsv
       manifest_audio_levels.tsv
       mix_diagnostics.txt
+      stem_loudness_summary.txt
+      stem_loudness.json
+      stem_loudness.tsv
       spectral_fingerprint.json
       spectral_fingerprint.tsv
+    plots/
+      stem_loudness.jpg
+      stem_amplitude_balance.jpg
+      full_spectrogram.jpg
     <cue>.adaptive_manifest.json
 ```
 

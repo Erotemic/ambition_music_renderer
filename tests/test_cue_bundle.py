@@ -8,21 +8,26 @@ import numpy as np
 import soundfile as sf
 
 from ambition_music_renderer.cli import BundleManyCommand, RenderCommand, RenderPublishCommand
-from ambition_music_renderer.render.bundle import (
-    CueBundleConfig,
-    copy_manifest_referenced_files,
-    make_zip,
-    manifest_audio_entries,
-    should_include_in_report_zip,
-    summarize_mix_diagnostics,
-    prepare_manifest_analysis_root,
-    write_manifest_audio_level_report,
-    write_spectral_fingerprint,
-    write_stem_amplitude_report,
-    write_adaptive_section_report,
+from ambition_music_renderer.render.bundle_adaptive_reports import (
     write_adaptive_composition_mastering_report,
+    write_adaptive_section_report,
+)
+from ambition_music_renderer.render.bundle_archive import make_zip, should_include_in_report_zip
+from ambition_music_renderer.render.bundle_audio_reports import (
+    summarize_mix_diagnostics,
+    write_manifest_audio_level_report,
     write_state_mix_report,
     write_stem_export_report,
+)
+from ambition_music_renderer.render.bundle_base import (
+    CueBundleConfig,
+    copy_manifest_referenced_files,
+    manifest_audio_entries,
+    prepare_manifest_analysis_root,
+)
+from ambition_music_renderer.render.bundle_spectral_reports import (
+    write_spectral_fingerprint,
+    write_stem_amplitude_report,
 )
 from ambition_music_renderer.audit.arrangement_audit import audit_spec as audit_arrangement_spec
 from ambition_music_renderer.audit.arrangement_audit import write_reports as write_arrangement_reports
@@ -34,7 +39,8 @@ from ambition_music_renderer.audit.sour_note_audit import audit_spec as audit_so
 from ambition_music_renderer.audit.sour_note_audit import write_reports as write_sour_note_reports
 from ambition_music_renderer.audit.shrill_note_audit import audit_spec as audit_shrill_note_spec
 from ambition_music_renderer.audit.shrill_note_audit import write_reports as write_shrill_note_reports
-from ambition_music_renderer.render.musicir_renderer import chord_intervals, timeline_markers_from_spec
+from ambition_music_renderer.render.score_theory import chord_intervals
+from ambition_music_renderer.render.export import timeline_markers_from_spec
 
 
 def test_backend_defaults_prefer_pretty_midi():
@@ -531,6 +537,7 @@ def test_stem_amplitude_report_shows_default_weighted_balance():
         assert (root / "reports" / "stem_amplitude_envelope.tsv").exists()
         if (root / "plots" / "stem_amplitude_balance.jpg").exists():
             assert (root / "plots" / "stem_amplitude_timeline.jpg").exists()
+            assert (root / "plots" / "stem_loudness_timeline.jpg").exists()
 
 
 

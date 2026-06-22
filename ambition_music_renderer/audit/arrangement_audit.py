@@ -26,7 +26,9 @@ from typing import Any
 
 import pretty_midi
 
-from ..render import musicir_renderer as r
+from ..render.score_core import load_yaml
+from ..render.score_layers import build_score
+from ..render.score_theory import chord_for_bar, chord_pitches
 
 
 @profile
@@ -36,7 +38,7 @@ def _round3(value: float) -> float:
 
 @profile
 def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
-    pm, groups, _section_meta = r.build_score(spec)
+    pm, groups, _section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     events = list(getattr(pm, "_ambition_note_events", []) or [])
@@ -77,8 +79,8 @@ def _chord_pcs(spec: dict[str, Any], bar0: int) -> set[int]:
     section, local_bar = _section_for_bar(spec, bar0)
     if not section:
         return set()
-    chord = r.chord_for_bar(section, local_bar)
-    return {int(p) % 12 for p in r.chord_pitches(chord, octave=4, voicing="closed")}
+    chord = chord_for_bar(section, local_bar)
+    return {int(p) % 12 for p in chord_pitches(chord, octave=4, voicing="closed")}
 
 
 @profile
@@ -408,7 +410,7 @@ def write_reports(payload: dict[str, Any], reports_dir: Path) -> dict[str, str]:
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_rows: int = 40) -> dict[str, Any]:
-    return audit_spec(r.load_yaml(path), bucket_beats=bucket_beats, max_rows=max_rows)
+    return audit_spec(load_yaml(path), bucket_beats=bucket_beats, max_rows=max_rows)
 
 
 class ArrangementAuditConfig(kwconf.Config):

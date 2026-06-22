@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
-from . import bundle_reports as _bundle_reports
+import shutil
+import sys
+import zipfile
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_reports).items() if not k.startswith("__")})
+from .bundle_base import (
+    REPORT_ZIP_EXCLUDED_SUFFIXES,
+    CommandResult,
+    adjacent_section_pairs,
+    renderer_audit_command,
+    run_logged,
+    terminal_link,
+)
 
 def run_transition_audits(
     analysis_root: Path,

@@ -10,12 +10,9 @@ from __future__ import annotations
 
 import json
 import math
-import os
 import shutil
 import subprocess
 import sys
-import tempfile
-import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,17 +20,8 @@ import numpy as np
 import yaml
 import kwconf
 
-from . import musicir_renderer as r
 from .generated_layout import generated_manifest_search_roots
 from .generated_layout import latest_manifest_in_roots
-from ..audit.arrangement_audit import audit_file as audit_arrangement_file
-from ..audit.arrangement_audit import write_reports as write_arrangement_reports
-from ..audit.dissonance_audit import audit_file as audit_dissonance_file
-from ..audit.dissonance_audit import write_reports as write_dissonance_reports
-from ..audit.sour_note_audit import audit_file as audit_sour_note_file
-from ..audit.sour_note_audit import write_reports as write_sour_note_reports
-from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
-from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
 from .._paths import bundles_root as _bundles_root
@@ -51,6 +39,7 @@ RENDER_AUDIO_MODES = ("full", "full-mix-only", "simple-mix")
 REPORT_ZIP_EXCLUDED_SUFFIXES = {".ogg", ".oga", ".wav", ".flac", ".mp3", ".npy", ".mid", ".midi"}
 DBFS_SILENCE_FLOOR = -120.0
 DBFS_PLOT_FLOOR = -100.0
+REPORT_PLOT_DPI = 96
 
 
 class CueBundleConfig(kwconf.Config):
@@ -132,6 +121,9 @@ class CueBundleConfig(kwconf.Config):
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
         config = cls.cli(argv=argv, data=kwargs)
+        from .bundle import create_bundle_from_config
+        from .bundle_archive import print_bundle_summary
+
         report = create_bundle_from_config(config)
         print_bundle_summary(report)
         print(json.dumps(report, indent=2, default=str))
@@ -156,6 +148,23 @@ def _format_dbfs(value: object) -> str:
     if v <= DBFS_PLOT_FLOOR:
         return f"< {DBFS_PLOT_FLOOR:.0f}"
     return f"{v:.1f}"
+
+
+
+def report_plot_save_kwargs(
+    path: Path | None = None,
+    *,
+    plot_format: str | None = None,
+    jpeg_quality: int = 84,
+    dpi: int = REPORT_PLOT_DPI,
+) -> dict[str, object]:
+    """Shared plot-save defaults for fast bundle diagnostics."""
+    suffix = path.suffix.lower() if path is not None else (f".{plot_format.lower()}" if plot_format else "")
+    save_kwargs: dict[str, object] = {"dpi": int(dpi), "bbox_inches": "tight"}
+    if suffix in {".jpg", ".jpeg"}:
+        save_kwargs["format"] = "jpeg"
+        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
+    return save_kwargs
 
 
 @dataclass(frozen=True)

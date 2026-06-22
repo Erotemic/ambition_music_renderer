@@ -6,7 +6,7 @@ stacks plus filtered noise bands to give the YAML something audible without
 needing FluidSynth or a SoundFont.
 
 Everything in here is fallback-backend-specific. The rest of the package
-(`musicir_renderer.py`) is a YAML interpreter and post-process pipeline that
+the MusicIR render package is a YAML interpreter and post-process pipeline that
 can dispatch to any synth backend; this module is one such backend. Keeping
 its hacks isolated from the main module makes it clear what is YAML-faithful
 versus what is a synthesis approximation.
@@ -22,7 +22,8 @@ import math
 import numpy as np
 import pretty_midi
 
-from .render.musicir_renderer import _lowpass_mono, clamp
+from .render.effects import _lowpass_mono
+from .render.score_theory import clamp
 
 
 # ---------------------------------------------------------------------------

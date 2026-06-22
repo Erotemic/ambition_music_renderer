@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from . import score as _score
-from . import synth as _synth
+import json
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Any
 
-globals().update({k: v for k, v in vars(_score).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_synth).items() if not k.startswith("__")})
+import numpy as np
+import soundfile as sf
+
+from ..profiler import profile
+from .audio_utils import coerce_stereo
 
 def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -196,7 +202,7 @@ def write_ogg_from_audio(
     """Write OGG Vorbis, preferring ffmpeg pipe encoding for reliability/speed."""
     ogg_path.parent.mkdir(parents=True, exist_ok=True)
     pcm = np.nan_to_num(
-        np.clip(_coerce_stereo(audio), -1.0, 1.0), nan=0.0, posinf=0.0, neginf=0.0
+        np.clip(coerce_stereo(audio), -1.0, 1.0), nan=0.0, posinf=0.0, neginf=0.0
     ).astype(np.float32, copy=False)
     if not shutil.which("ffmpeg"):
         # Fallback for minimal environments. Some libsndfile builds are slow on

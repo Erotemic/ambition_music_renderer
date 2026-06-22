@@ -2,15 +2,24 @@
 
 from __future__ import annotations
 
-from . import score as _score
-from . import synth as _synth
-from . import effects as _effects
-from . import export as _export
+import copy
+import gc
+import json
+import math
+import tempfile
+from pathlib import Path
+from typing import Any
 
-globals().update({k: v for k, v in vars(_score).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_synth).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_effects).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_export).items() if not k.startswith("__")})
+import numpy as np
+import pretty_midi
+
+from ..profiler import profile
+from .audio_utils import coerce_stereo
+from .effects import post_process
+from .export import write_ogg_from_audio
+from .score_core import RENDERER_VERSION, choose_soundfont, load_yaml
+from .score_layers import build_score
+from .synth import render_synth_audio, sanitize_same_pitch_overlaps, spec_hash
 
 @profile
 def copy_with_instruments(
@@ -166,7 +175,7 @@ def render_group_audio(
         max_len = max(len(x) for x in rendered)
         out = np.zeros((max_len, 2), dtype=np.float32)
         for x in rendered:
-            out[: len(x), :] += _coerce_stereo(x)
+            out[: len(x), :] += coerce_stereo(x)
         return out.astype(np.float32)
 
     sub_pm = copy_with_instruments(pm, insts, bpm)

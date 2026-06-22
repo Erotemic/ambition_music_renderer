@@ -21,7 +21,7 @@ from typing import Any
 
 import pretty_midi
 
-from ..render import musicir_renderer as r
+from ..render.score_core import load_yaml
 from .sour_note_audit import _events_for_spec, _section_for_bar, _section_starts, _source_hint
 
 try:  # Optional plotting dependency.
@@ -443,7 +443,7 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, min_frequency_hz: float = PRESENCE_HZ, max_candidates: int = 120) -> dict[str, Any]:
-    return audit_spec(r.load_yaml(path), min_frequency_hz=min_frequency_hz, max_candidates=max_candidates)
+    return audit_spec(load_yaml(path), min_frequency_hz=min_frequency_hz, max_candidates=max_candidates)
 
 
 class ShrillNoteAuditConfig(kwconf.Config):

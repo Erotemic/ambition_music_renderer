@@ -100,13 +100,14 @@ def replace_directory_symlink(link: Path, target: Path) -> bool:
 def compute_score_render_hash(score_path: Path, backend: str, spec: dict | None = None) -> str:
     """Return the same render hash that ``render.isolated`` will use."""
 
-    from . import musicir_renderer as r
+    from .score_core import choose_soundfont
+    from .synth import spec_hash
 
     if spec is None:
         spec = yaml.safe_load(Path(score_path).read_text(encoding="utf8")) or {}
     render_cfg = spec.get("render", {}) or {}
-    soundfont = r.choose_soundfont(render_cfg.get("soundfont"))
-    return str(r.spec_hash(Path(score_path), soundfont, backend))
+    soundfont = choose_soundfont(render_cfg.get("soundfont"))
+    return str(spec_hash(Path(score_path), soundfont, backend))
 
 
 @profile

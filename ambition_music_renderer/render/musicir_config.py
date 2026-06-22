@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from . import score as _score
-from . import group as _group
+import json
+import os
+import sys
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_score).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_group).items() if not k.startswith("__")})
+import kwconf
+
+from .group import render_all
 
 class MusicIRRenderConfig(kwconf.Config):
     """Render Ambition MusicIR YAML to adaptive OGG assets."""

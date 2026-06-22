@@ -2,13 +2,28 @@
 
 from __future__ import annotations
 
-from . import bundle_base as _bundle_base
-from . import bundle_audio_reports as _bundle_audio_reports
-from . import bundle_spectral_reports as _bundle_spectral_reports
+import json
+import math
+from pathlib import Path
 
-globals().update({k: v for k, v in vars(_bundle_base).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_audio_reports).items() if not k.startswith("__")})
-globals().update({k: v for k, v in vars(_bundle_spectral_reports).items() if not k.startswith("__")})
+import numpy as np
+
+from .audio_utils import coerce_stereo
+from .bundle_base import (
+    DBFS_SILENCE_FLOOR,
+    _format_dbfs,
+    _plot_db,
+    adjacent_section_pairs,
+    current_scratch_stem_paths,
+    ordered_section_ids,
+    report_plot_save_kwargs,
+)
+from .bundle_spectral_reports import (
+    _head_tail_stats,
+    _rms_envelope,
+    _safe_plot_name,
+    _spectral_band_features,
+)
 
 def adaptive_section_mastering_config_from_spec(spec: dict) -> dict[str, object]:
     render_cfg = spec.get("render", {}) or {}
@@ -291,10 +306,10 @@ def write_adaptive_section_report(
             import matplotlib.pyplot as plt
 
             suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
-            save_kwargs: dict[str, object] = {"dpi": 130, "bbox_inches": "tight"}
-            if suffix == "jpg":
-                save_kwargs["format"] = "jpeg"
-                save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
+            save_kwargs = report_plot_save_kwargs(
+                plot_format=suffix,
+                jpeg_quality=jpeg_quality,
+            )
 
             if full_rows:
                 labels = [str(r0.get("section")) for r0 in full_rows]
@@ -572,10 +587,10 @@ def write_adaptive_composition_mastering_report(
             import matplotlib.pyplot as plt
 
             suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
-            save_kwargs: dict[str, object] = {"dpi": 130, "bbox_inches": "tight"}
-            if suffix == "jpg":
-                save_kwargs["format"] = "jpeg"
-                save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
+            save_kwargs = report_plot_save_kwargs(
+                plot_format=suffix,
+                jpeg_quality=jpeg_quality,
+            )
             labels = [str(r0.get("section")) for r0 in good]
             x = np.arange(len(labels))
             fig, ax1 = plt.subplots(figsize=(max(9.0, len(labels) * 1.25), 4.8))
@@ -663,7 +678,7 @@ def write_spectral_shrillness_report(
         return path
 
     def _audio_candidates(label: str, kind: str, audio: np.ndarray) -> None:
-        arr = r._coerce_stereo(audio).astype("float32", copy=False)
+        arr = coerce_stereo(audio).astype("float32", copy=False)
         mono = arr.mean(axis=1)
         if mono.size < 1024:
             return
