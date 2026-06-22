@@ -9,9 +9,8 @@ from other agents can continue independently.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import copy
-import re
 from pathlib import Path
 from typing import Any
 
@@ -460,19 +459,18 @@ def apply_transition_lab_changes(score: dict[str, Any]) -> dict[str, Any]:
     return score
 
 
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument(
-        "--force", action="store_true", help="overwrite an existing experiment score"
-    )
-    args = parser.parse_args(argv)
+class FirstGoblinTransitionLabConfig(kwconf.Config):
+    """Create the first-goblin transition lab experiment score."""
 
+    source: Path = kwconf.Value(DEFAULT_SOURCE, parser=Path)
+    output: Path = kwconf.Value(DEFAULT_OUTPUT, parser=Path)
+    force: bool = kwconf.Flag(False, help="overwrite an existing experiment score")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = FirstGoblinTransitionLabConfig.cli(argv=argv)
     if args.output.exists() and not args.force:
-        rich_print(
-            f"[yellow]kept existing experiment score[/yellow] {path_link(args.output)}"
-        )
+        rich_print(f"[yellow]kept existing experiment score[/yellow] {path_link(args.output)}")
         return 0
     if not args.source.exists():
         raise SystemExit(f"source score not found: {args.source}")
@@ -481,9 +479,7 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(f"source score did not parse as a mapping: {args.source}")
     experiment = apply_transition_lab_changes(score)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        yaml.safe_dump(experiment, sort_keys=False, width=100), encoding="utf8"
-    )
+    args.output.write_text(yaml.safe_dump(experiment, sort_keys=False, width=100), encoding="utf8")
     rich_print(f"[green]wrote[/green] {path_link(args.output)}")
     return 0
 

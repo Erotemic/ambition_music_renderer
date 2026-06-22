@@ -12,7 +12,7 @@ those stable filenames, so re-rendering the cue does not require Rust changes.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import shutil
 import sys
@@ -116,42 +116,20 @@ def _autodetect_src() -> Path:
     return candidates[0]
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    default_src = _autodetect_src()
-    parser.add_argument(
-        "--src",
-        default=str(default_src),
-        help=(
-            "Renderer output directory. Default auto-detects the "
-            "newest of target/generated-audio/<cue>, "
-            "tools/ambition_music_renderer/generated/<cue>, and "
-            "tools/ambition_music_renderer/output/<cue> by manifest mtime "
-            "(default for THIS run: %(default)s)."
-        ),
-    )
-    parser.add_argument(
-        "--clean",
-        action="store_true",
-        help="Wipe destination directory (and any legacy first_goblin_encounter assets) first",
-    )
-    parser.add_argument(
-        "--with-stems",
-        action="store_true",
-        help=(
-            "Also require/install per-stem OGGs. The game currently plays "
-            "per-section full mixes for this cue, so the default is faster "
-            "and installs full mixes only."
-        ),
-    )
-    args = parser.parse_args()
+class InstallFirstGoblinTuneConfig(kwconf.Config):
+    """Install first_goblin_tune_v2 renderer outputs into stable asset paths."""
 
+    src: Path = kwconf.Value(default_factory=_autodetect_src, parser=Path, help="Renderer output directory")
+    clean: bool = kwconf.Flag(False, help="Wipe destination directory first")
+    with_stems: bool = kwconf.Flag(False, help="Also require/install per-stem OGGs")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = InstallFirstGoblinTuneConfig.cli(argv=argv)
     src = Path(args.src).resolve()
     if not (src / "adaptive").exists():
         print(f"error: no adaptive directory at {src}", file=sys.stderr)
-        print(
-            "       run ./scripts/regen_first_goblin_tune_v2.sh first.", file=sys.stderr
-        )
+        print("       run ./scripts/regen_first_goblin_tune_v2.sh first.", file=sys.stderr)
         return 2
 
     manifest_path = find_manifest(src)

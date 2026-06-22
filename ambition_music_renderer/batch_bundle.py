@@ -11,24 +11,25 @@ processes.
 
 from __future__ import annotations
 
-import argparse
 import csv
 import os
 import queue
 import shlex
 import subprocess
 import sys
-import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+import kwconf
+
 import ubelt as ub
 
-from .cli import find_score, package_dir, python_exe
+from .cli import find_score, package_dir
 from .cue_bundle import default_bundle_root, terminal_link
 from .profiler import profile
+from .kwconf_runner import KwconfCommand
 
 
 @dataclass(frozen=True)
@@ -127,45 +128,32 @@ def _find_job_artifacts(cue: str, bundle_root: Path, start_time: float) -> tuple
 def _fmt_link(path: Path | None) -> str:
     return terminal_link(path) if path else ""
 
-def _build_command(args: argparse.Namespace, cue: str) -> list[str]:
-    cmd = [
-        python_exe(),
-        "-m",
-        "ambition_music_renderer",
-        "cue",
-        "bundle",
-        cue,
-        "--backend",
-        args.backend,
-        "--runtime-stem-gain-mode",
-        args.runtime_stem_gain_mode,
-        "--jobs",
-        str(args.render_jobs),
-        "--plot-format",
-        args.plot_format,
-        "--jpeg-quality",
-        str(args.jpeg_quality),
-    ]
-    if args.runtime_stem_max_gain_db is not None:
-        cmd.extend(["--runtime-stem-max-gain-db", str(args.runtime_stem_max_gain_db)])
-    if args.force:
-        cmd.append("--force")
-    if args.publish:
-        cmd.append("--publish")
-    if args.zip:
-        cmd.append("--zip")
-    if args.zip_report:
-        cmd.append("--zip-report")
-    if args.skip_spectrograms:
-        cmd.append("--skip-spectrograms")
-    cmd.extend(["--render-audio-mode", args.render_audio_mode])
-    if args.profile_render:
-        cmd.append("--profile-render")
-    if args.include_scratch_stems:
-        cmd.append("--include-scratch-stems")
-    if args.bundle_root is not None:
-        cmd.extend(["--bundle-root", str(args.bundle_root)])
-    return cmd
+def _build_command(args, cue: str) -> list[str]:
+    from .cue_bundle import CueBundleConfig
+
+    data = {
+        "cue": cue,
+        "backend": args.backend,
+        "runtime_stem_gain_mode": args.runtime_stem_gain_mode,
+        "jobs": args.render_jobs,
+        "plot_format": args.plot_format,
+        "jpeg_quality": args.jpeg_quality,
+        "runtime_stem_max_gain_db": args.runtime_stem_max_gain_db,
+        "force": args.force,
+        "publish": args.publish,
+        "zip_bundle": args.zip,
+        "zip_report_bundle": args.zip_report,
+        "skip_spectrograms": args.skip_spectrograms,
+        "render_audio_mode": args.render_audio_mode,
+        "profile_render": args.profile_render,
+        "include_scratch_stems": args.include_scratch_stems,
+        "bundle_root": args.bundle_root,
+    }
+    return KwconfCommand(
+        CueBundleConfig,
+        module="ambition_music_renderer.cue_bundle",
+        cwd=package_dir(),
+    ).python_command(data)
 
 
 @profile
@@ -196,8 +184,11 @@ def _worker(job: BundleJob, events: "queue.Queue[tuple[str, str, object]]") -> B
     elapsed = time.monotonic() - start
     bundle_root = default_bundle_root()
     for idx, item in enumerate(job.command):
-        if item == "--bundle-root" and idx + 1 < len(job.command):
+        if item == "--bundle_root" and idx + 1 < len(job.command):
             bundle_root = Path(job.command[idx + 1])
+            break
+        if item.startswith("--bundle_root="):
+            bundle_root = Path(item.split("=", 1)[1])
             break
     start_wall = start_wall_time
     bundle_dir, report_zip, full_zip = _find_job_artifacts(job.cue, bundle_root, start_wall)
@@ -345,41 +336,53 @@ def write_status(results: list[BundleResult], status_path: Path) -> None:
             )
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        prog="ambition_music_renderer.batch_bundle",
-        description="Render/debug many cue bundles in parallel with per-cue logs.",
-    )
-    ap.add_argument("cues", nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    ap.add_argument("-j", "--workers", type=int, default=max(1, min(4, (os.cpu_count() or 4) // 2)), help="parallel cue jobs; 0 or 1 runs serially")
-    ap.add_argument("--render-jobs", type=int, default=1, help="per-cue render worker count passed to cue bundle")
-    ap.add_argument("--scope", choices=["active", "examples", "all"], default="active")
-    ap.add_argument("--include-examples", action="store_true", help="include scores/examples in discovery")
-    ap.add_argument("--backend", default="pretty-midi")
-    ap.add_argument("--runtime-stem-gain-mode", choices=["native", "shared"], default="shared")
-    ap.add_argument("--runtime-stem-max-gain-db", type=float, default=None)
-    ap.add_argument("--force", action="store_true")
-    ap.add_argument("--publish", action="store_true")
-    ap.add_argument("--zip", action="store_true", help="write full bundle zips including audio")
-    ap.add_argument("--zip-report", action="store_true", default=True, help="write compact report zips; enabled by default")
-    ap.add_argument("--no-zip-report", dest="zip_report", action="store_false")
-    ap.add_argument("--skip-spectrograms", action="store_true")
-    ap.add_argument("--include-scratch-stems", action="store_true")
-    ap.add_argument("--render-audio-mode", choices=["full", "full-mix-only", "simple-mix"], default="full")
-    ap.add_argument("--profile-render", action="store_true", help="enable line_profiler in render subprocesses via LINE_PROFILE=1")
-    ap.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
-    ap.add_argument("--jpeg-quality", type=int, default=84)
-    ap.add_argument("--bundle-root", type=Path, default=None)
-    ap.add_argument("--log-root", type=Path, default=package_dir() / "batch_logs")
-    return ap
+class BatchBundleConfig(kwconf.Config):
+    """Render/debug many cue bundles in parallel with per-cue logs."""
+
+
+    cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
+    workers: int | None = kwconf.Value(max(1, min(4, (os.cpu_count() or 4) // 2)), short_alias=["j"], help="parallel cue jobs; 0 or 1 runs serially")
+    render_jobs: int = kwconf.Value(1, help="per-cue render worker count passed to cue bundle")
+    scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
+    include_examples: bool = kwconf.Flag(False, help="include scores/examples in discovery")
+    backend: str = kwconf.Value("pretty-midi")
+    runtime_stem_gain_mode: str = kwconf.Value("shared", choices=["native", "shared"])
+    runtime_stem_max_gain_db: float | None = kwconf.Value(None)
+    force: bool = kwconf.Flag(False)
+    publish: bool = kwconf.Flag(False)
+    zip: bool = kwconf.Flag(False, help="write full bundle zips including audio")
+    zip_report: bool = kwconf.Flag(True, help="write compact report zips; enabled by default")
+    skip_spectrograms: bool = kwconf.Flag(False)
+    include_scratch_stems: bool = kwconf.Flag(False)
+    render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
+    profile_render: bool = kwconf.Flag(False, help="enable line_profiler in render subprocesses via LINE_PROFILE=1")
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    jpeg_quality: int = kwconf.Value(84)
+    bundle_root: Path | None = kwconf.Value(None, parser=Path)
+    log_root: Path = kwconf.Value(default_factory=lambda: package_dir() / "batch_logs", parser=Path)
+
+    def __post_init__(self) -> None:
+        self.workers = int(self.workers if self.workers is not None else 1)
+        self.render_jobs = int(self.render_jobs)
+        self.jpeg_quality = int(self.jpeg_quality)
+        for key in ("bundle_root", "log_root"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        return run_batch_bundle(config)
+
+
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
+def run_batch_bundle(args) -> int:
     total_start = time.perf_counter()
     rc = 1
     try:
-        args = build_parser().parse_args(argv)
         cues = resolve_cues(args.cues, scope=args.scope, include_examples=args.include_examples)
         if not cues:
             print("no cues selected", file=sys.stderr)
@@ -416,6 +419,11 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         elapsed = time.perf_counter() - total_start
         print(f"[ambition_music_renderer.bundle_many] total_elapsed_s={elapsed:.3f}", flush=True)
+
+
+def main(argv: list[str] | None = None) -> int:
+    config = BatchBundleConfig.cli(argv=argv)
+    return run_batch_bundle(config)
 
 
 if __name__ == "__main__":

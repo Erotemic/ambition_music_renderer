@@ -22,7 +22,7 @@ Examples:
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import sys
 from pathlib import Path
 
@@ -145,41 +145,19 @@ def _summary(rows: list[dict], target_rms_db: float, rms_tol: float) -> str:
     )
 
 
-def main(argv: list[str] | None = None) -> int:
-    if argv is None:
-        argv = sys.argv[1:]
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument(
-        "--root",
-        type=Path,
-        default=DEFAULT_ROOT,
-        help="music root to scan (default: sandbox generated cues)",
-    )
-    ap.add_argument(
-        "--glob", default="*/full.ogg", help="glob under --root for files to analyze"
-    )
-    ap.add_argument(
-        "--target-rms-db",
-        type=float,
-        default=-20.0,
-        help="reference RMS dBFS for the dRMS delta + LOUD/QUIET flags",
-    )
-    ap.add_argument(
-        "--rms-tol",
-        type=float,
-        default=3.0,
-        help="dB tolerance before a cue is flagged LOUD/QUIET",
-    )
-    ap.add_argument("--format", choices=["table", "tsv"], default="table")
-    ap.add_argument(
-        "--check",
-        action="store_true",
-        help="exit non-zero if any cue clips (true peak > -1 dBTP) — "
-        "a CI guard for the one unambiguous defect (loudness spread "
-        "is a mastering call and stays report-only)",
-    )
-    args = ap.parse_args(argv)
+class LevelReportConfig(kwconf.Config):
+    """Report rendered cue loudness / peak levels."""
 
+    root: Path = kwconf.Value(DEFAULT_ROOT, parser=Path, help="music root to scan")
+    glob: str = kwconf.Value("*/full.ogg", help="glob under --root for files to analyze")
+    target_rms_db: float = kwconf.Value(-20.0)
+    rms_tol: float = kwconf.Value(3.0)
+    format: str = kwconf.Value("table", choices=["table", "tsv"])
+    check: bool = kwconf.Flag(False)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = LevelReportConfig.cli(argv=argv)
     paths = sorted(args.root.glob(args.glob))
     if not paths:
         print(f"no audio matched {args.root}/{args.glob}", file=sys.stderr)

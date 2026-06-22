@@ -23,34 +23,27 @@ cue's mastered preview lives under a manual filename.
 
 from __future__ import annotations
 
-import argparse
 import json
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+import kwconf
+import ubelt as ub
+
 from .profiler import profile
 
-# Soft import: ubelt.ProgIter gives the bulk loop a count + ETA. If it's not
-# installed in the active venv (older setup), fall back to a plain iterator
-# so the renderer still works.
-try:
-    import ubelt as _ub  # type: ignore[import-not-found]
 
-    def _progress(iterable, *, total, desc):
-        return _ub.ProgIter(
-            iterable,
-            total=total,
-            desc=desc,
-            verbose=3,
-            freq=1,
-            adjust=False,
-        )
-except ImportError:  # pragma: no cover — graceful fallback
-
-    def _progress(iterable, *, total, desc):  # noqa: ARG001
-        return iterable
+def _progress(iterable, *, total, desc):
+    return ub.ProgIter(
+        iterable,
+        total=total,
+        desc=desc,
+        verbose=3,
+        freq=1,
+        adjust=False,
+    )
 
 
 # Single-track cues authored under scores/active that ship via the radio.
@@ -254,7 +247,7 @@ def render_cue(
     return result.returncode == 0
 
 
-def render_mode_for_cue(cue: str, args: argparse.Namespace) -> tuple[bool, bool]:
+def render_mode_for_cue(cue: str, args) -> tuple[bool, bool]:
     """Return (simple_mix, full_mix_only) for top-level render commands.
 
     Goblin-style adaptive encounter cues ship as per-section full mixes. The
@@ -394,7 +387,7 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
 
 
 @profile
-def cmd_render(args: argparse.Namespace) -> int:
+def cmd_render(args) -> int:
     yaml_path = find_score(args.cue)
     if yaml_path is None:
         print(f"error: cue not found: {args.cue}", file=sys.stderr)
@@ -416,7 +409,7 @@ def cmd_render(args: argparse.Namespace) -> int:
 
 
 @profile
-def cmd_publish(args: argparse.Namespace) -> int:
+def cmd_publish(args) -> int:
     outdir = generated_root() / args.cue
     # Fallback to legacy output/ tree if generated/ is empty.
     if not (outdir / "preview").exists():
@@ -428,7 +421,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
 
 
 @profile
-def cmd_render_publish(args: argparse.Namespace) -> int:
+def cmd_render_publish(args) -> int:
     yaml_path = find_score(args.cue)
     if yaml_path is None:
         print(f"error: cue not found: {args.cue}", file=sys.stderr)
@@ -502,7 +495,7 @@ def _process_simple_mix_cue(
     return None
 
 
-def _run_bulk(args: argparse.Namespace, cues: tuple[str, ...]) -> int:
+def _run_bulk(args, cues: tuple[str, ...]) -> int:
     failed: list[str] = []
     desc = f"music {args.action}"
     for cue in _progress(cues, total=len(cues), desc=desc):
@@ -523,7 +516,7 @@ def _run_bulk(args: argparse.Namespace, cues: tuple[str, ...]) -> int:
 
 
 @profile
-def cmd_sandbox(args: argparse.Namespace) -> int:
+def cmd_sandbox(args) -> int:
     """Render+publish the sandbox single-track cues.
 
     Mirrors the legacy ``tools/audio/render_sandbox_music.py`` behavior:
@@ -536,7 +529,7 @@ def cmd_sandbox(args: argparse.Namespace) -> int:
 
 
 @profile
-def cmd_radio(args: argparse.Namespace) -> int:
+def cmd_radio(args) -> int:
     """Render+publish every cue we expose on the in-game radio.
 
     Covers ``SANDBOX_CUES`` plus auto-discovered ``scores/active/*`` cues
@@ -550,41 +543,19 @@ def cmd_radio(args: argparse.Namespace) -> int:
 
 
 @profile
-def cmd_bundle(args: argparse.Namespace) -> int:
-    from .cue_bundle import create_bundle, print_bundle_summary
+def cmd_bundle(args) -> int:
+    from .cue_bundle import CueBundleConfig, create_bundle_from_config, print_bundle_summary
 
-    report = create_bundle(
-        args.cue,
-        backend=args.backend,
-        runtime_stem_gain_mode=args.runtime_stem_gain_mode,
-        runtime_stem_max_gain_db=args.runtime_stem_max_gain_db,
-        outdir=args.outdir,
-        bundle_root=args.bundle_root,
-        force=args.force,
-        publish=args.publish,
-        dest_root=args.dest_root,
-        zip_bundle=args.zip_bundle,
-        zip_report_bundle=args.zip_report_bundle,
-        jobs=args.jobs,
-        include_scratch_stems=args.include_scratch_stems,
-        skip_render=args.skip_render,
-        skip_spectrograms=args.skip_spectrograms,
-        plot_format=args.plot_format,
-        jpeg_quality=args.jpeg_quality,
-        render_audio_mode=args.render_audio_mode,
-        profile_render=args.profile_render,
-        render_in_process=getattr(args, "render_in_process", False),
-    )
-    import json as _json
-
+    config = args if isinstance(args, CueBundleConfig) else CueBundleConfig.cli(argv=False, data=dict(args))
+    report = create_bundle_from_config(config)
     print_bundle_summary(report)
-    print(_json.dumps(report, indent=2, default=str))
+    print(json.dumps(report, indent=2, default=str))
     return 0 if report.get("ok", True) else 1
 
 
 
 
-def cmd_plugins_doctor(args: argparse.Namespace) -> int:
+def cmd_plugins_doctor(args) -> int:
     from .audio_plugins import collect_plugin_diagnostics
 
     report = collect_plugin_diagnostics(probe_counts=not args.fast)
@@ -592,7 +563,7 @@ def cmd_plugins_doctor(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_plugins_list_vst3(args: argparse.Namespace) -> int:
+def cmd_plugins_list_vst3(args) -> int:
     from .audio_plugins import discover_vst3_plugins
 
     roots = [Path(p) for p in args.path] if args.path else None
@@ -605,7 +576,7 @@ def cmd_plugins_list_vst3(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_plugins_list_lv2(args: argparse.Namespace) -> int:
+def cmd_plugins_list_lv2(args) -> int:
     from .audio_plugins import discover_lv2_plugins
 
     uris = discover_lv2_plugins(limit=args.limit)
@@ -617,7 +588,7 @@ def cmd_plugins_list_lv2(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_plugins_lv2_info(args: argparse.Namespace) -> int:
+def cmd_plugins_lv2_info(args) -> int:
     from .audio_plugins import lv2_info
 
     report = lv2_info(args.uri)
@@ -630,7 +601,7 @@ def cmd_plugins_lv2_info(args: argparse.Namespace) -> int:
     return 0 if report.get("ok") else 1
 
 
-def cmd_plugins_validate_score(args: argparse.Namespace) -> int:
+def cmd_plugins_validate_score(args) -> int:
     from .audio_plugins import load_score, validate_score_plugins
 
     score = find_score(args.score)
@@ -646,281 +617,279 @@ def cmd_plugins_validate_score(args: argparse.Namespace) -> int:
     return 0 if report.get("ok") or args.warn_only else 1
 
 
-def add_bundle_args(p: argparse.ArgumentParser) -> None:
-    p.add_argument("cue", help="cue id or .music.yaml path")
-    p.add_argument(
-        "--backend",
-        default="pretty-midi",
-        choices=["pretty-midi", "fluidsynth-cli", "fallback", "auto"],
-        help="renderer backend (default: pretty-midi; fallback is explicit opt-in)",
-    )
-    p.add_argument(
-        "--runtime-stem-gain-mode",
-        choices=["native", "shared"],
-        default="native",
-        help=(
-            "runtime adaptive stem export mode: native preserves current raw levels; "
-            "shared applies one shared reference gain across all stems"
-        ),
-    )
-    p.add_argument(
-        "--runtime-stem-max-gain-db",
-        type=float,
-        default=None,
-        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
-    )
-    p.add_argument("--outdir", type=Path, default=None)
-    p.add_argument("--bundle-root", type=Path, default=None)
-    p.add_argument("--force", action="store_true", help="force render regeneration")
-    p.add_argument("--publish", action="store_true", help="publish full.ogg to game assets")
-    p.add_argument("--dest-root", type=Path, default=None, help="game music generated asset root")
-    p.add_argument("--zip", dest="zip_bundle", action="store_true", help="write a complete uploadable bundle zip including manifest-referenced audio")
-    p.add_argument("--zip-report", dest="zip_report_bundle", action="store_true", help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries")
-    p.add_argument(
-        "--plot-format",
-        choices=["jpg", "png"],
-        default="jpg",
-        help="spectrogram image format for bundles; jpg is smaller and numeric reports preserve detail",
-    )
-    p.add_argument("--jpeg-quality", type=int, default=84, help="JPEG quality for spectrogram plots")
-    p.add_argument("--jobs", "-j", type=int, default=1, help="render worker count")
-    p.add_argument(
-        "--include-scratch-stems",
-        action="store_true",
-        help="include raw scratch_stems/*.npy in the bundle zip; useful but large",
-    )
-    p.add_argument("--skip-render", action="store_true", help="bundle/analyze existing outdir")
-    p.add_argument("--skip-spectrograms", action="store_true", help="skip PNG spectrogram generation")
-    p.add_argument(
-        "--render-audio-mode",
-        choices=["full", "full-mix-only", "simple-mix"],
-        default="full",
-        help=(
-            "audio export scope for render_isolated. full preserves all adaptive stem/state preview OGGs; "
-            "full-mix-only keeps scratch stems plus mastered preview and section full mixes; "
-            "simple-mix writes only the mastered preview."
-        ),
-    )
-    p.add_argument("--profile-render", action="store_true", help="enable LINE_PROFILE=1 and run render_isolated in-process for line_profiler")
-    p.add_argument("--render-in-process", action="store_true", help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess")
+class RenderCommand(kwconf.Config):
+    """Render a single cue YAML."""
 
 
-def add_render_args(p: argparse.ArgumentParser) -> None:
-    p.add_argument(
-        "--backend",
-        default="pretty-midi",
-        help="renderer backend (pretty-midi / fluidsynth-cli / fallback / auto)",
-    )
-    p.add_argument(
-        "--simple-mix",
-        dest="simple_mix",
-        action="store_true",
-        default=True,
-        help="emit only the mastered preview (default for sandbox cues)",
-    )
-    p.add_argument(
-        "--no-simple-mix",
-        dest="simple_mix",
-        action="store_false",
-        help="emit the full adaptive stem set (per-section per-group OGGs)",
-    )
-    p.add_argument(
-        "--full-mix-only",
-        action="store_true",
-        help="emit mastered preview plus per-section full mixes, but skip per-section per-stem OGGs",
-    )
+    cue: str = kwconf.Value(None, position=1, help="cue id or YAML path")
+    backend: str = kwconf.Value("pretty-midi", help="renderer backend")
+    simple_mix: bool = kwconf.Flag(True, help="emit only the mastered preview")
+    full_mix_only: bool = kwconf.Flag(False, help="emit mastered preview plus per-section full mixes")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        return cmd_render(config)
 
 
-def add_publish_args(p: argparse.ArgumentParser) -> None:
-    p.add_argument(
-        "--dest-root",
-        type=Path,
-        default=default_publish_dest_root(),
-        help="install destination root (default: bevy asset tree)",
-    )
+class PublishCommand(kwconf.Config):
+    """Publish newest preview to sandbox assets."""
+
+    cue: str = kwconf.Value(None, position=1)
+    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path, help="install destination root")
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.dest_root, Path):
+            self.dest_root = Path(self.dest_root)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        return cmd_publish(config)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        prog="ambition_music_renderer",
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    sub = ap.add_subparsers(dest="command", required=True)
+class RenderPublishCommand(kwconf.Config):
+    """Render then publish a single cue."""
 
-    p_render = sub.add_parser("render", help="Render a single cue YAML")
-    p_render.add_argument("cue", help="cue id (e.g. lofi_study_loop) or YAML path")
-    add_render_args(p_render)
-    p_render.set_defaults(func=cmd_render)
+    cue: str = kwconf.Value(None, position=1)
+    backend: str = kwconf.Value("pretty-midi")
+    simple_mix: bool = kwconf.Flag(True)
+    full_mix_only: bool = kwconf.Flag(False)
+    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path)
+    force_render: bool = kwconf.Flag(False)
 
-    p_publish = sub.add_parser(
-        "publish", help="Publish newest preview to sandbox assets"
-    )
-    p_publish.add_argument("cue")
-    add_publish_args(p_publish)
-    p_publish.set_defaults(func=cmd_publish)
+    def __post_init__(self) -> None:
+        if not isinstance(self.dest_root, Path):
+            self.dest_root = Path(self.dest_root)
 
-    p_rp = sub.add_parser("render-publish", help="Render then publish a single cue")
-    p_rp.add_argument("cue")
-    add_render_args(p_rp)
-    add_publish_args(p_rp)
-    p_rp.add_argument("--force-render", action="store_true")
-    p_rp.set_defaults(func=cmd_render_publish)
-
-    p_bundle = sub.add_parser("bundle", help="Render, debug, and package a cue bundle")
-    add_bundle_args(p_bundle)
-    p_bundle.set_defaults(func=cmd_bundle)
-
-    def _cmd_bundle_many(batch_args: argparse.Namespace) -> int:
-        from .batch_bundle import main as batch_main
-
-        argv: list[str] = []
-        if batch_args.workers is not None:
-            argv.extend(["--workers", str(batch_args.workers)])
-        if batch_args.render_jobs is not None:
-            argv.extend(["--render-jobs", str(batch_args.render_jobs)])
-        argv.extend(["--scope", batch_args.scope])
-        if batch_args.include_examples:
-            argv.append("--include-examples")
-        argv.extend(["--backend", batch_args.backend])
-        argv.extend(["--runtime-stem-gain-mode", batch_args.runtime_stem_gain_mode])
-        if batch_args.runtime_stem_max_gain_db is not None:
-            argv.extend(["--runtime-stem-max-gain-db", str(batch_args.runtime_stem_max_gain_db)])
-        if batch_args.force:
-            argv.append("--force")
-        if batch_args.publish:
-            argv.append("--publish")
-        if batch_args.zip:
-            argv.append("--zip")
-        if batch_args.zip_report:
-            argv.append("--zip-report")
-        else:
-            argv.append("--no-zip-report")
-        if batch_args.skip_spectrograms:
-            argv.append("--skip-spectrograms")
-        if batch_args.include_scratch_stems:
-            argv.append("--include-scratch-stems")
-        argv.extend(["--render-audio-mode", batch_args.render_audio_mode])
-        if batch_args.profile_render:
-            argv.append("--profile-render")
-        argv.extend(["--plot-format", batch_args.plot_format])
-        argv.extend(["--jpeg-quality", str(batch_args.jpeg_quality)])
-        if batch_args.bundle_root is not None:
-            argv.extend(["--bundle-root", str(batch_args.bundle_root)])
-        if batch_args.log_root is not None:
-            argv.extend(["--log-root", str(batch_args.log_root)])
-        argv.extend(batch_args.cues)
-        return batch_main(argv)
-
-    p_bundle_many = sub.add_parser("bundle-many", help="Render/debug many cue bundles in parallel")
-    p_bundle_many.add_argument("cues", nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    p_bundle_many.add_argument("-j", "--workers", type=int, default=None, help="parallel cue bundle jobs")
-    p_bundle_many.add_argument("--render-jobs", type=int, default=1, help="per-cue render worker count")
-    p_bundle_many.add_argument("--scope", choices=["active", "examples", "all"], default="active")
-    p_bundle_many.add_argument("--include-examples", action="store_true")
-    p_bundle_many.add_argument("--backend", default="pretty-midi")
-    p_bundle_many.add_argument("--runtime-stem-gain-mode", choices=["native", "shared"], default="shared")
-    p_bundle_many.add_argument("--runtime-stem-max-gain-db", type=float, default=None)
-    p_bundle_many.add_argument("--force", action="store_true")
-    p_bundle_many.add_argument("--publish", action="store_true")
-    p_bundle_many.add_argument("--zip", action="store_true")
-    p_bundle_many.add_argument("--zip-report", action="store_true", default=True)
-    p_bundle_many.add_argument("--no-zip-report", dest="zip_report", action="store_false")
-    p_bundle_many.add_argument("--skip-spectrograms", action="store_true")
-    p_bundle_many.add_argument("--include-scratch-stems", action="store_true")
-    p_bundle_many.add_argument("--render-audio-mode", choices=["full", "full-mix-only", "simple-mix"], default="full")
-    p_bundle_many.add_argument("--profile-render", action="store_true")
-    p_bundle_many.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
-    p_bundle_many.add_argument("--jpeg-quality", type=int, default=84)
-    p_bundle_many.add_argument("--bundle-root", type=Path, default=None)
-    p_bundle_many.add_argument("--log-root", type=Path, default=None)
-    p_bundle_many.set_defaults(func=_cmd_bundle_many)
-
-    p_cue = sub.add_parser("cue", help="Cue-oriented workflows")
-    cue_sub = p_cue.add_subparsers(dest="cue_action", required=True)
-    p_cue_bundle = cue_sub.add_parser("bundle", help="Render, debug, and package one cue")
-    add_bundle_args(p_cue_bundle)
-    p_cue_bundle.set_defaults(func=cmd_bundle)
-
-    p_sb = sub.add_parser(
-        "sandbox",
-        help="Sandbox-cue presets (lofi_study_loop, long_lofi_drift, pulse_drift_voyage)",
-    )
-    sb_sub = p_sb.add_subparsers(dest="action", required=True)
-    for action in ("render", "publish", "render-publish"):
-        sp = sb_sub.add_parser(action)
-        sp.add_argument(
-            "--cue",
-            action="append",
-            choices=SANDBOX_CUES,
-            help="restrict to the named sandbox cue(s); repeat to select multiple",
-        )
-        sp.add_argument("--backend", default="pretty-midi")
-        sp.add_argument("--force-render", action="store_true")
-        # publish-only convenience: the user typing `publish` already implies skip-render.
-        sp.add_argument(
-            "--skip-render",
-            action="store_true",
-            help="alias: ignored when action is publish; treats render-publish as publish",
-        )
-        add_publish_args(sp)
-        sp.set_defaults(func=cmd_sandbox)
-    p_sb.set_defaults(func=cmd_sandbox)
-
-    p_radio = sub.add_parser(
-        "radio",
-        help="All radio cues: SANDBOX_CUES + scores/active/* + EXTRA_RADIO_CUES",
-    )
-    radio_choices = radio_cues()
-    radio_sub = p_radio.add_subparsers(dest="action", required=True)
-    for action in ("render", "publish", "render-publish"):
-        sp = radio_sub.add_parser(action)
-        sp.add_argument(
-            "--cue",
-            action="append",
-            choices=radio_choices,
-            help="restrict to the named radio cue(s); repeat to select multiple",
-        )
-        sp.add_argument("--backend", default="pretty-midi")
-        sp.add_argument("--force-render", action="store_true")
-        sp.add_argument(
-            "--skip-render",
-            action="store_true",
-            help="alias: ignored when action is publish; treats render-publish as publish",
-        )
-        add_publish_args(sp)
-        sp.set_defaults(func=cmd_radio)
-    p_radio.set_defaults(func=cmd_radio)
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        return cmd_render_publish(config)
 
 
-    p_plugins = sub.add_parser("plugins", help="Inspect optional LV2/VST3/SFZ rendering infrastructure")
-    plugin_sub = p_plugins.add_subparsers(dest="plugin_action", required=True)
+class BundleCommandMixin:
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        return cmd_bundle(config)
 
-    p_pd = plugin_sub.add_parser("doctor", help="print optional backend diagnostics as JSON")
-    p_pd.add_argument("--fast", action="store_true", help="skip plugin-count probes")
-    p_pd.set_defaults(func=cmd_plugins_doctor)
 
-    p_pv = plugin_sub.add_parser("list-vst3", help="list discovered VST3 bundle paths")
-    p_pv.add_argument("--path", action="append", default=[], help="additional/override search root; repeatable")
-    p_pv.add_argument("--json", action="store_true", help="emit JSON instead of one path per line")
-    p_pv.set_defaults(func=cmd_plugins_list_vst3)
+def _bundle_command_cls():
+    from .cue_bundle import CueBundleConfig
 
-    p_pl = plugin_sub.add_parser("list-lv2", help="list installed LV2 plugin URIs via lv2ls")
-    p_pl.add_argument("--limit", type=int, default=None)
-    p_pl.add_argument("--json", action="store_true", help="emit JSON instead of one URI per line")
-    p_pl.set_defaults(func=cmd_plugins_list_lv2)
+    class BundleCommand(BundleCommandMixin, CueBundleConfig):
+        """Render, debug, and package a cue bundle."""
 
-    p_pi = plugin_sub.add_parser("lv2-info", help="inspect one LV2 plugin URI via lv2info")
-    p_pi.add_argument("uri")
-    p_pi.add_argument("--raw", action="store_true", help="print raw lv2info text instead of JSON")
-    p_pi.set_defaults(func=cmd_plugins_lv2_info)
 
-    p_ps = plugin_sub.add_parser("validate-score", help="preflight optional plugin/effect references in a score")
-    p_ps.add_argument("score", help="cue id or score YAML path")
-    p_ps.add_argument("--warn-only", action="store_true", help="return success even if missing optional tools are reported")
-    p_ps.set_defaults(func=cmd_plugins_validate_score)
+    return BundleCommand
 
-    return ap
+
+BundleCommand = _bundle_command_cls()
+
+
+class CueModal(kwconf.ModalCLI):
+    """Cue-oriented workflows."""
+
+    bundle = BundleCommand
+
+
+class BundleManyCommand(kwconf.Config):
+    """Render/debug many cue bundles in parallel with per-cue logs."""
+
+
+    cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
+    workers: int | None = kwconf.Value(None, short_alias=["j"], help="parallel cue bundle jobs")
+    render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
+    scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
+    include_examples: bool = kwconf.Flag(False)
+    backend: str = kwconf.Value("pretty-midi")
+    runtime_stem_gain_mode: str = kwconf.Value("shared", choices=["native", "shared"])
+    runtime_stem_max_gain_db: float | None = kwconf.Value(None)
+    force: bool = kwconf.Flag(False)
+    publish: bool = kwconf.Flag(False)
+    zip: bool = kwconf.Flag(False)
+    zip_report: bool = kwconf.Flag(True)
+    skip_spectrograms: bool = kwconf.Flag(False)
+    include_scratch_stems: bool = kwconf.Flag(False)
+    render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
+    profile_render: bool = kwconf.Flag(False)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    jpeg_quality: int = kwconf.Value(84)
+    bundle_root: Path | None = kwconf.Value(None, parser=Path)
+    log_root: Path | None = kwconf.Value(None, parser=Path)
+
+    def __post_init__(self) -> None:
+        if self.log_root is None:
+            self.log_root = package_dir() / "batch_logs"
+        self.render_jobs = int(self.render_jobs)
+        self.jpeg_quality = int(self.jpeg_quality)
+        if self.workers is not None:
+            self.workers = int(self.workers)
+        for key in ("bundle_root", "log_root"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        from .batch_bundle import run_batch_bundle
+
+        return run_batch_bundle(config)
+
+
+class BulkActionConfig(kwconf.Config):
+    """Shared options for sandbox/radio bulk cue actions."""
+
+    cue: list[str] | None = kwconf.Value(None, help="restrict to named cue(s); may be comma/list parsed")
+    backend: str = kwconf.Value("pretty-midi")
+    force_render: bool = kwconf.Flag(False)
+    skip_render: bool = kwconf.Flag(False, help="treat render_publish as publish")
+    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path)
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.dest_root, Path):
+            self.dest_root = Path(self.dest_root)
+
+
+class SandboxRender(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "render"
+        return cmd_sandbox(config)
+
+
+class SandboxPublish(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "publish"
+        return cmd_sandbox(config)
+
+
+class SandboxRenderPublish(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "publish" if config.skip_render else "render-publish"
+        return cmd_sandbox(config)
+
+
+class SandboxModal(kwconf.ModalCLI):
+    """Sandbox-cue presets."""
+
+    render = SandboxRender
+    publish = SandboxPublish
+    render_publish = SandboxRenderPublish
+
+
+class RadioRender(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "render"
+        return cmd_radio(config)
+
+
+class RadioPublish(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "publish"
+        return cmd_radio(config)
+
+
+class RadioRenderPublish(BulkActionConfig):
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        config.action = "publish" if config.skip_render else "render-publish"
+        return cmd_radio(config)
+
+
+class RadioModal(kwconf.ModalCLI):
+    """All radio cues."""
+
+    render = RadioRender
+    publish = RadioPublish
+    render_publish = RadioRenderPublish
+
+
+class PluginDoctor(kwconf.Config):
+    fast: bool = kwconf.Flag(False, help="skip plugin-count probes")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_doctor(cls.cli(argv=argv, data=kwargs))
+
+
+class PluginListVST3(kwconf.Config):
+    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_list_vst3(cls.cli(argv=argv, data=kwargs))
+
+
+class PluginListLV2(kwconf.Config):
+    limit: int | None = kwconf.Value(None)
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_list_lv2(cls.cli(argv=argv, data=kwargs))
+
+
+class PluginLV2Info(kwconf.Config):
+    uri: str = kwconf.Value(None, position=1)
+    raw: bool = kwconf.Flag(False, help="print raw lv2info text")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_lv2_info(cls.cli(argv=argv, data=kwargs))
+
+
+class PluginValidateScore(kwconf.Config):
+    score: str = kwconf.Value(None, position=1, help="cue id or score YAML path")
+    warn_only: bool = kwconf.Flag(False, help="return success even if missing optional tools are reported")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_validate_score(cls.cli(argv=argv, data=kwargs))
+
+
+class PluginsModal(kwconf.ModalCLI):
+    """Inspect optional LV2/VST3/SFZ rendering infrastructure."""
+
+    doctor = PluginDoctor
+    list_vst3 = PluginListVST3
+    list_lv2 = PluginListLV2
+    lv2_info = PluginLV2Info
+    validate_score = PluginValidateScore
+
+
+class AmbitionMusicRendererCLI(kwconf.ModalCLI):
+    """Modal CLI for ambition_music_renderer."""
+
+    render = RenderCommand
+    publish = PublishCommand
+    render_publish = RenderPublishCommand
+    bundle = BundleCommand
+    bundle_many = BundleManyCommand
+    cue = CueModal
+    sandbox = SandboxModal
+    radio = RadioModal
+    plugins = PluginsModal
+
 
 
 @profile
@@ -928,19 +897,10 @@ def main(argv: list[str] | None = None) -> int:
     import time as _time
 
     total_start = _time.perf_counter()
-    rc = 1
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     command_name = next((item for item in raw_argv if not str(item).startswith("-")), "<parse-error>")
     try:
-        ap = build_parser()
-        args = ap.parse_args(argv)
-        command_name = str(getattr(args, "command", command_name))
-        if args.command in ("sandbox", "radio"):
-            # Map --skip-render onto action.
-            if getattr(args, "skip_render", False) and args.action == "render-publish":
-                args.action = "publish"
-        rc = int(args.func(args))
-        return rc
+        return int(AmbitionMusicRendererCLI.main(argv=argv))
     finally:
         elapsed = _time.perf_counter() - total_start
         print(f"[ambition_music_renderer] command={command_name} total_elapsed_s={elapsed:.3f}", flush=True)

@@ -15,17 +15,94 @@ while still rendering the adaptive section full mixes that the game loads.
 """
 
 from __future__ import annotations
-import argparse, json, math, os, shlex, subprocess, sys
+import json
+import math
+import os
+import shlex
+import subprocess
+import sys
 from pathlib import Path
+import kwconf
+import ubelt as ub
 import numpy as np
 import yaml
 from . import musicir_renderer as r
 from .profiler import PhaseTimer, profile
+from .kwconf_runner import KwconfCommand
 
 
 RUNTIME_STEM_GAIN_MODES = ("native", "shared")
 
 SECTION_FULL_MASTERING_MODES = ("section_postprocess", "global_master_slices")
+
+
+
+class RenderIsolatedConfig(kwconf.Config):
+    """kwconf-backed config for the render-isolated entrypoint."""
+
+
+    spec: Path = kwconf.Value(None, position=1, parser=Path, help="MusicIR YAML spec")
+    outdir: Path = kwconf.Value(Path("output"), parser=Path, help="render output directory")
+    backend: str = kwconf.Value(
+        "pretty-midi",
+        choices=["fallback", "auto", "fluidsynth-cli", "pretty-midi"],
+        help="renderer backend",
+    )
+    simple_mix: bool = kwconf.Flag(
+        False,
+        help="Only emit the mastered preview/full_soundtrack_preview.ogg.",
+    )
+    full_mix_only: bool = kwconf.Flag(
+        False,
+        help="Emit mastered preview plus per-section full mixes, but skip per-stem OGGs.",
+    )
+    runtime_stem_gain_mode: str = kwconf.Value(
+        "native",
+        choices=RUNTIME_STEM_GAIN_MODES,
+        help="How to export adaptive per-stem OGGs and runtime previews.",
+    )
+    runtime_stem_max_gain_db: float | None = kwconf.Value(None)
+    keep_debug_stems: bool = kwconf.Flag(
+        False,
+        help="Keep intermediate .npy stem buffers under scratch_stems/.",
+    )
+    force: bool = kwconf.Flag(False, help="force regeneration")
+    jobs: int = kwconf.Value(
+        max(1, (os.cpu_count() or 2) // 2),
+        short_alias=["j"],
+        help="Parallel worker count. Pass 0 or 1 for serial rendering.",
+    )
+    timings_out: Path | None = kwconf.Value(None, parser=Path, help="write coarse render phase timings to JSON")
+    profile_out: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead",
+    )
+    profile_workers: bool = kwconf.Flag(
+        False,
+        help="write per-worker timings and make worker execution line-profiler friendly",
+    )
+    groups_in_process: bool = kwconf.Flag(
+        False,
+        help="debug/profiling mode: render groups by direct Python calls instead of worker subprocesses",
+    )
+
+    def __post_init__(self) -> None:
+        if self.simple_mix and self.full_mix_only:
+            raise ValueError("--simple-mix and --full-mix-only are mutually exclusive")
+        self.jobs = int(self.jobs)
+        for key in ("spec", "outdir", "timings_out", "profile_out"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        if config.profile_out is not None:
+            print("render_isolated: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+        return _render_main(config)
+
 
 
 def adaptive_section_mastering_config(spec: dict) -> dict[str, object]:
@@ -207,117 +284,10 @@ def is_render_current(
     return True, manifest_path, "current"
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        description="Render Ambition MusicIR via isolated stem workers"
-    )
-    ap.add_argument("spec")
-    ap.add_argument("--outdir", default="output")
-    ap.add_argument(
-        "--backend",
-        default="pretty-midi",
-        choices=["fallback", "auto", "fluidsynth-cli", "pretty-midi"],
-        help=(
-            "renderer backend (default: pretty-midi). The fallback backend is "
-            "diagnostic/sketch-only and must be requested explicitly."
-        ),
-    )
-    ap.add_argument(
-        "--simple-mix",
-        action="store_true",
-        help=(
-            "Only emit the mastered preview/full_soundtrack_preview.ogg. "
-            "Skips per-section per-group adaptive stem OGGs, per-section "
-            "full slices, and the in-game preview mixes. Cuts ~10 OGG "
-            "encodes per cue down to 1; appropriate for non-adaptive "
-            "single-track music (e.g. sandbox lofi cues) where the runtime "
-            "loads only the master mix anyway."
-        ),
-    )
-    ap.add_argument(
-        "--full-mix-only",
-        action="store_true",
-        help=(
-            "Emit the mastered preview plus per-section full mixes, but skip "
-            "per-section per-stem OGGs and in-game preview mixes. This is the "
-            "fast path for adaptive cues whose Rust spec plays full mixes "
-            "directly, such as first_goblin_tune_v2."
-        ),
-    )
-    ap.add_argument(
-        "--runtime-stem-gain-mode",
-        choices=RUNTIME_STEM_GAIN_MODES,
-        default="native",
-        help=(
-            "How to export adaptive per-stem OGGs and runtime previews. "
-            "'native' preserves the current raw stem levels. 'shared' applies "
-            "one shared gain, derived from the raw all-stem reference mix, to "
-            "all runtime stems so layered playback is audible without "
-            "independently normalizing stems and destroying the mix."
-        ),
-    )
-    ap.add_argument(
-        "--runtime-stem-max-gain-db",
-        type=float,
-        default=None,
-        help=(
-            "Safety cap for --runtime-stem-gain-mode shared. Defaults to "
-            "render.runtime_stems.max_gain_db or 24 dB. If a cue needs more "
-            "gain than this, the stems are probably too quiet at the source; "
-            "raise instrument/layer levels instead of exporting noise-lifted stems."
-        ),
-    )
-    ap.add_argument(
-        "--keep-debug-stems",
-        action="store_true",
-        help=(
-            "Keep intermediate .npy stem buffers under scratch_stems/. By "
-            "default they are deleted at the end of a successful render; they "
-            "exist only so isolated worker processes can pass audio back to "
-            "the parent process for full-mix assembly."
-        ),
-    )
-    ap.add_argument(
-        "--force",
-        action="store_true",
-        help=(
-            "force regeneration even when the adaptive manifest hash, renderer "
-            "version, output files, and timestamps are current"
-        ),
-    )
-    ap.add_argument(
-        "--jobs",
-        "-j",
-        type=int,
-        default=max(1, (os.cpu_count() or 2) // 2),
-        help=(
-            "Parallel worker subprocess count for per-group synth. Default "
-            "is half the CPU count. Pass 0 or 1 for serial rendering; this "
-            "is preferred for focused profiling."
-        ),
-    )
-    ap.add_argument(
-        "--timings-out",
-        type=Path,
-        default=None,
-        help="write coarse render phase timings to this JSON path; sibling .tsv/.txt files are also written",
-    )
-    ap.add_argument(
-        "--profile-out",
-        type=Path,
-        default=None,
-        help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead",
-    )
-    ap.add_argument(
-        "--profile-workers",
-        action="store_true",
-        help="write per-worker timings and propagate LINE_PROFILE=1 to worker subprocesses",
-    )
-    return ap
 
 
 @profile
-def _render_main(ns: argparse.Namespace) -> int:
+def _render_main(ns) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
     with timings.phase("load_spec_and_hash"):
@@ -378,67 +348,89 @@ def _render_main(ns: argparse.Namespace) -> int:
     target = int(math.ceil(total * sr))
     group_names = sorted(set(groups.values()))
 
-    # Run per-group workers in parallel up to --jobs at a time. Each
-    # worker is a separate Python subprocess with its own FluidSynth
-    # state, so concurrency here is safe (the original sequential loop
-    # picked subprocess isolation for stability, not for serialization).
-    def worker_cmd(group: str) -> list[str]:
-        cmd = [
-            sys.executable,
-            "-m",
-            "ambition_music_renderer.render_group_worker",
-            str(spec_path),
-            "--outdir",
-            str(outdir),
-            "--group",
-            group,
-            "--backend",
-            ns.backend,
-        ]
-        if ns.simple_mix or ns.full_mix_only:
-            cmd.append("--skip-section-ogg")
+    # Run per-group workers. Production can keep subprocess isolation, but the
+    # profiling/debug path uses direct Python calls so line_profiler sees below
+    # the old worker process boundary. Serial/direct execution is also simpler
+    # and avoids executor overhead for jobs=0/1.
+    def worker_timings_path(group: str) -> Path | None:
         if ns.profile_workers:
             profile_dir = Path(ns.outdir) / "profiles"
-            cmd.extend(["--timings-out", str(profile_dir / f"render_group_worker.{group}.timings.json")])
-        return cmd
+            return profile_dir / f"render_group_worker.{group}.timings.json"
+        return None
 
+    from .render_group_worker import RenderGroupWorkerConfig
+
+    worker_command = KwconfCommand(
+        RenderGroupWorkerConfig,
+        module="ambition_music_renderer.render_group_worker",
+        cwd=Path(__file__).resolve().parent.parent,
+    )
+
+    def worker_data(group: str) -> dict[str, object]:
+        return {
+            "spec": spec_path,
+            "outdir": outdir,
+            "group": group,
+            "backend": ns.backend,
+            "skip_section_ogg": bool(ns.simple_mix or ns.full_mix_only),
+            "timings_out": worker_timings_path(group),
+        }
+
+    @profile
+    def run_worker_direct(group: str) -> None:
+        rc = worker_command.run_direct(argv=False, data=worker_data(group))
+        if rc != 0:
+            raise RuntimeError(f"render group {group!r} failed with rc={rc}")
+
+    def run_worker_subprocess(group: str) -> None:
+        proc = worker_command.run_subprocess(data=worker_data(group))
+        if proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, proc.args)
+
+    groups_in_process = bool(getattr(ns, "groups_in_process", False) or ns.profile_workers)
     jobs = 1 if ns.jobs <= 1 else min(ns.jobs, len(group_names))
-    with timings.phase("render_group_workers", groups=len(group_names), jobs=jobs):
+    if groups_in_process and jobs != 1:
+        print(
+            "render_isolated: forcing serial in-process group rendering for profiling/debug visibility",
+            file=sys.stderr,
+        )
+        jobs = 1
+    worker_mode = "direct" if groups_in_process else "subprocess"
+    with timings.phase(
+        "render_group_workers",
+        groups=len(group_names),
+        jobs=jobs,
+        mode="in-process" if groups_in_process else "subprocess",
+    ):
         if jobs == 1:
             for group in group_names:
                 start_group = __import__("time").perf_counter()
-                subprocess.run(worker_cmd(group), check=True)
-                timings.add("render_group_worker", __import__("time").perf_counter() - start_group, group=group)
+                if groups_in_process:
+                    run_worker_direct(group)
+                else:
+                    run_worker_subprocess(group)
+                timings.add(
+                    "render_group_worker",
+                    __import__("time").perf_counter() - start_group,
+                    group=group,
+                    mode=worker_mode,
+                )
         else:
-            # Schedule with a sliding window: launch up to `jobs` at once,
-            # await any completion, then launch the next. Polls in a small
-            # sleep loop because `Popen.wait(timeout=...)` raises on timeout
-            # which makes the "wait for any" idiom awkward.
             import time as _time
-    
-            pending: list[tuple[str, subprocess.Popen]] = []
-            remaining = list(group_names)
-            while remaining or pending:
-                while remaining and len(pending) < jobs:
-                    grp = remaining.pop(0)
-                    pending.append((grp, subprocess.Popen(worker_cmd(grp))))
-                done_idx = None
-                while done_idx is None:
-                    for i, (_, proc) in enumerate(pending):
-                        if proc.poll() is not None:
-                            done_idx = i
-                            break
-                    if done_idx is None:
-                        _time.sleep(0.1)
-                grp, proc = pending.pop(done_idx)
-                if proc.returncode != 0:
-                    # Tear down the rest before propagating so we don't leak
-                    # fluidsynth subprocesses if one worker crashes.
-                    for _, other in pending:
-                        other.terminate()
-                    for _, other in pending:
-                        other.wait()
-                    raise subprocess.CalledProcessError(proc.returncode, worker_cmd(grp))
+
+            with ub.Executor(mode="thread", max_workers=jobs) as pool:
+                futures = {
+                    pool.submit(run_worker_subprocess, group): (group, _time.perf_counter())
+                    for group in group_names
+                }
+                for future, (group, start_group) in futures.items():
+                    future.result()
+                    timings.add(
+                        "render_group_worker",
+                        _time.perf_counter() - start_group,
+                        group=group,
+                        mode=worker_mode,
+                    )
 
     output_files: dict = {"preview": {}, "adaptive": {}}
 
@@ -784,6 +776,23 @@ def _render_main(ns: argparse.Namespace) -> int:
     return 0
 
 
+def render_isolated_main(
+    argv: list[str] | str | bool | None = None,
+    *,
+    cmdline: bool | None = None,
+    **kwargs: object,
+) -> int:
+    """kwconf-backed Python/CLI entrypoint for render_isolated."""
+    if cmdline is False:
+        argv = False
+    elif cmdline is True and argv is None:
+        argv = True
+    config = RenderIsolatedConfig.cli(argv=argv, data=kwargs)
+    if config.profile_out is not None:
+        print("render_isolated: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+    return _render_main(config)
+
+
 @profile
 def main(argv=None) -> int:
     import time as _time
@@ -791,13 +800,7 @@ def main(argv=None) -> int:
     total_start = _time.perf_counter()
     rc = 1
     try:
-        ap = build_parser()
-        ns = ap.parse_args(argv)
-        if ns.simple_mix and ns.full_mix_only:
-            ap.error("--simple-mix and --full-mix-only are mutually exclusive")
-        if ns.profile_out is not None:
-            print("render_isolated: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
-        rc = _render_main(ns)
+        rc = render_isolated_main(argv=argv)
         return rc
     finally:
         elapsed = _time.perf_counter() - total_start

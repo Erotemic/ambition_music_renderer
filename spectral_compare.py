@@ -12,7 +12,7 @@ Lower numbers = less squeak.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 from pathlib import Path
 
 import numpy as np
@@ -41,18 +41,19 @@ def band_energy(
     return float(spec[mask].sum())
 
 
-def main(argv=None) -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("cue_outdir", type=Path)
-    ap.add_argument(
-        "--window", nargs=2, type=float, metavar=("LO", "HI"), default=(38.0, 43.0)
-    )
-    ap.add_argument("--sr", type=int, default=48000)
-    ap.add_argument("--label", type=str, default="")
-    ns = ap.parse_args(argv)
+class SpectralCompareConfig(kwconf.Config):
+    """Compare spectral energy in rendered scratch stems."""
 
+    cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
+    window: tuple[float, float] = kwconf.Value((38.0, 43.0), nargs=2)
+    sr: int = kwconf.Value(48000)
+    label: str = kwconf.Value("")
+
+
+def main(argv=None) -> int:
+    ns = SpectralCompareConfig.cli(argv=argv)
     stems = sorted((ns.cue_outdir / "scratch_stems").glob("*.npy"))
-    t_lo, t_hi = ns.window
+    t_lo, t_hi = [float(v) for v in ns.window]
 
     by_group = {}
     for p in stems:
@@ -73,7 +74,7 @@ def main(argv=None) -> int:
     print(f"  squeak (vhigh+air absolute):  {squeak:11.3e}")
     print(f"  mid (300-1k absolute):        {total['mid']:11.3e}")
     print(f"  squeak/mid ratio:             {ratio:7.4f}")
-    print(f"  per-group vhigh contributions:")
+    print("  per-group vhigh contributions:")
     vhigh_total = max(total["vhigh"], 1e-12)
     for g in sorted(by_group, key=lambda x: -by_group[x]["vhigh"]):
         frac = by_group[g]["vhigh"] / vhigh_total

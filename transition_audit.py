@@ -9,7 +9,7 @@ audited visually when the ear is not enough.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import csv
 import math
 from pathlib import Path
@@ -710,73 +710,27 @@ def write_csv(path: Path, rows: Iterable[dict[str, float | str]]) -> None:
         writer.writerows(rows)
 
 
+class TransitionAuditConfig(kwconf.Config):
+    """Audit adaptive section transition metrics and previews."""
+
+    root: Path = kwconf.Value(None, position=1, parser=Path, help="generated cue root containing adaptive/<section>/")
+    sections: list[str] = kwconf.Value(default_factory=lambda: ["intro", "wave1"], nargs=2)
+    window: float = kwconf.Value(1.0, help="head/tail analysis window in seconds")
+    tail_window: float = kwconf.Value(1.5, help="tail hiss/noise window in seconds")
+    crossfade: float = kwconf.Value(0.35, help="runtime-style crossfade seconds")
+    crossfade_shape: str = kwconf.Value("ambition_runtime", choices=["linear", "equal_power", "ambition_runtime"])
+    incoming_start: str = kwconf.Value("smooth", choices=["smooth", "target"])
+    context: float = kwconf.Value(4.0, help="seconds of each side to include in previews")
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    no_preview: bool = kwconf.Flag(False, help="only print metrics; do not write WAV previews")
+    no_plots: bool = kwconf.Flag(False, help="skip plots and Markdown visual report")
+    envelope_window_ms: float = kwconf.Value(80.0)
+    envelope_hop_ms: float = kwconf.Value(20.0)
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "root", type=Path, help="generated cue root containing adaptive/<section>/"
-    )
-    parser.add_argument(
-        "--sections", nargs=2, default=["intro", "wave1"], metavar=("A", "B")
-    )
-    parser.add_argument(
-        "--window", type=float, default=1.0, help="head/tail analysis window in seconds"
-    )
-    parser.add_argument(
-        "--tail-window",
-        type=float,
-        default=1.5,
-        help="tail hiss/noise window in seconds",
-    )
-    parser.add_argument(
-        "--crossfade", type=float, default=0.35, help="runtime-style crossfade seconds"
-    )
-    parser.add_argument(
-        "--crossfade-shape",
-        choices=["linear", "equal_power", "ambition_runtime"],
-        default="ambition_runtime",
-        help="preview crossfade curve shape",
-    )
-    parser.add_argument(
-        "--incoming-start",
-        choices=["smooth", "target"],
-        default="smooth",
-        help="whether the incoming bank ramps from silence or starts at target gain (intro->loop in Rust starts at target)",
-    )
-    parser.add_argument(
-        "--context",
-        type=float,
-        default=4.0,
-        help="seconds of each side to include in previews",
-    )
-    parser.add_argument(
-        "--outdir",
-        type=Path,
-        default=None,
-        help="directory for reports/previews; default root/transition_audit",
-    )
-    parser.add_argument(
-        "--no-preview",
-        action="store_true",
-        help="only print metrics; do not write WAV previews",
-    )
-    parser.add_argument(
-        "--no-plots",
-        action="store_true",
-        help="skip PNG plots and Markdown visual report",
-    )
-    parser.add_argument(
-        "--envelope-window-ms",
-        type=float,
-        default=80.0,
-        help="RMS/peak envelope window for plots",
-    )
-    parser.add_argument(
-        "--envelope-hop-ms",
-        type=float,
-        default=20.0,
-        help="RMS/peak envelope hop for plots",
-    )
-    args = parser.parse_args(argv)
+    args = TransitionAuditConfig.cli(argv=argv)
+
 
     root = args.root.resolve()
     outdir = (args.outdir or (root / "transition_audit")).resolve()

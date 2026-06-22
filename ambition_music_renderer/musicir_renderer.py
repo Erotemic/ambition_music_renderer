@@ -12,7 +12,6 @@ and exports OGG Vorbis section/stem assets plus a full soundtrack preview.
 
 from __future__ import annotations
 
-import argparse
 import copy
 import dataclasses as dc
 import hashlib
@@ -23,8 +22,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Iterable
-import wave
+from typing import Any
 import gc
 import os
 import sys
@@ -33,6 +31,7 @@ import numpy as np
 import pretty_midi
 import soundfile as sf
 import yaml
+import kwconf
 from .profiler import profile
 from scipy import signal
 
@@ -2744,7 +2743,7 @@ def adaptive_section_mastering_config(spec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def render_all(args: argparse.Namespace) -> dict[str, Any]:
+def render_all(args) -> dict[str, Any]:
     spec_path = Path(args.spec).resolve()
     spec = load_yaml(spec_path)
     render_cfg = spec.get("render", {})
@@ -2917,25 +2916,28 @@ def render_all(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+class MusicIRRenderConfig(kwconf.Config):
+    """Render Ambition MusicIR YAML to adaptive OGG assets."""
+
+
+    spec: Path = kwconf.Value(None, position=1, parser=Path, help="Path to .music.yaml source")
+    outdir: Path = kwconf.Value(Path("output"), parser=Path, help="Output directory")
+    backend: str | None = kwconf.Value(None, choices=["auto", "fallback", "fluidsynth-cli", "pretty-midi", "sfizz", "sfizz-render"])
+    soundfont: str | None = kwconf.Value(None)
+    keep_wav: bool = kwconf.Flag(False)
+    keep_midi: bool = kwconf.Flag(False)
+    verbose: bool = kwconf.Flag(False)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        result = render_all(config)
+        print(json.dumps(result, indent=2))
+        return 0
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Render Ambition MusicIR YAML to adaptive OGG assets"
-    )
-    parser.add_argument("spec", help="Path to .music.yaml source")
-    parser.add_argument("--outdir", default="output", help="Output directory")
-    parser.add_argument(
-        "--backend",
-        choices=["auto", "fallback", "fluidsynth-cli", "pretty-midi", "sfizz", "sfizz-render"],
-        default=None,
-    )
-    parser.add_argument("--soundfont", default=None)
-    parser.add_argument("--keep-wav", action="store_true")
-    parser.add_argument("--keep-midi", action="store_true")
-    parser.add_argument("--verbose", action="store_true")
-    args = parser.parse_args(argv)
-    result = render_all(args)
-    print(json.dumps(result, indent=2))
-    return 0
+    return MusicIRRenderConfig.main(argv=argv)
 
 
 if __name__ == "__main__":

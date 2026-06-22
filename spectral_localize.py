@@ -32,7 +32,7 @@ The script intentionally does not mutate the YAML — it only diagnoses.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 from pathlib import Path
 
 import numpy as np
@@ -102,37 +102,26 @@ def render_heatmap_row(name: str, vals: np.ndarray) -> str:
     return f"{name:14s} " + "".join(cells)
 
 
+class SpectralLocalizeConfig(kwconf.Config):
+    """Localize spectral content in rendered scratch stems."""
+
+    cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
+    window: tuple[float, float] = kwconf.Value((0.0, -1.0), nargs=2, help="Time window in seconds")
+    bucket: float = kwconf.Value(0.25, help="Bucket size in seconds")
+    sr: int = kwconf.Value(48000, help="Sample rate of stems")
+    bands: str = kwconf.Value("default", choices=["default", "vhigh-only"])
+
+
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("cue_outdir", type=Path)
-    ap.add_argument(
-        "--window",
-        nargs=2,
-        type=float,
-        metavar=("LO", "HI"),
-        default=(0.0, -1.0),
-        help="Time window in seconds (default: full track)",
-    )
-    ap.add_argument(
-        "--bucket",
-        type=float,
-        default=0.25,
-        help="Bucket size in seconds (default: 0.25)",
-    )
-    ap.add_argument(
-        "--sr", type=int, default=48000, help="Sample rate of stems (default: 48000)"
-    )
-    ap.add_argument("--bands", choices=["default", "vhigh-only"], default="default")
-    ns = ap.parse_args(argv)
+    ns = SpectralLocalizeConfig.cli(argv=argv)
+
 
     stems_dir = ns.cue_outdir / "scratch_stems"
     if not stems_dir.is_dir():
-        ap.error(
-            f"no scratch_stems/ under {ns.cue_outdir} — re-render with --keep-debug-stems"
-        )
+        raise SystemExit(f"no scratch_stems/ under {ns.cue_outdir} — re-render with --keep-debug-stems")
     stems = sorted(stems_dir.glob("*.npy"))
     if not stems:
-        ap.error(f"no .npy files under {stems_dir}")
+        raise SystemExit(f"no .npy files under {stems_dir}")
 
     bands = (
         DEFAULT_BANDS if ns.bands == "default" else {"vhigh (3-6k)": (3000.0, 6000.0)}

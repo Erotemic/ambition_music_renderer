@@ -10,7 +10,7 @@ intentional.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import math
 from collections import Counter
@@ -431,20 +431,23 @@ def audit_file(path: Path, *, min_frequency_hz: float = PRESENCE_HZ, max_candida
     return audit_spec(r.load_yaml(path), min_frequency_hz=min_frequency_hz, max_candidates=max_candidates)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("score", type=Path)
-    parser.add_argument("--outdir", type=Path, default=None)
-    parser.add_argument("--plots", type=Path, default=None)
-    parser.add_argument("--min-frequency-hz", type=float, default=PRESENCE_HZ)
-    parser.add_argument("--max-candidates", type=int, default=120)
-    parser.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
-    parser.add_argument("--json", action="store_true")
-    return parser
+class ShrillNoteAuditConfig(kwconf.Config):
+    """Audit notes that may be shrill or whistle-like."""
+
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    plots: Path | None = kwconf.Value(None, parser=Path)
+    min_frequency_hz: float = kwconf.Value(PRESENCE_HZ)
+    max_candidates: int = kwconf.Value(120)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    json: bool = kwconf.Flag(False)
+
+
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    args = ShrillNoteAuditConfig.cli(argv=argv)
     payload = audit_file(
         args.score,
         min_frequency_hz=args.min_frequency_hz,

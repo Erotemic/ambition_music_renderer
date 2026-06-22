@@ -15,8 +15,6 @@ from __future__ import annotations
 import dataclasses as dc
 from typing import Any, Iterable
 
-import numpy as np
-
 STANDARD_TUNING = (40, 45, 50, 55, 59, 64)  # E2 A2 D3 G3 B3 E4, low to high.
 DROP_D_TUNING = (38, 45, 50, 55, 59, 64)
 

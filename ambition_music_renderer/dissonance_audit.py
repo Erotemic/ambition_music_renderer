@@ -12,7 +12,7 @@ listening pass.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import math
 from collections import Counter
@@ -564,20 +564,23 @@ def audit_file(path: Path, *, bucket_beats: float = 0.25, max_hotspots: int = 40
     return audit_spec(spec, bucket_beats=bucket_beats, max_hotspots=max_hotspots)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("score", type=Path, help="MusicIR YAML score to analyze")
-    parser.add_argument("--outdir", type=Path, default=None, help="directory for reports; defaults next to score")
-    parser.add_argument("--bucket-beats", type=float, default=0.25, help="analysis bucket size in beats")
-    parser.add_argument("--max-hotspots", type=int, default=40)
-    parser.add_argument("--json", action="store_true", help="also print JSON payload to stdout")
-    parser.add_argument("--plots", type=Path, default=None, help="optional directory for plot images")
-    parser.add_argument("--plot-format", default="jpg", choices=["jpg", "png"], help="format for generated plots")
-    return parser
+class DissonanceAuditConfig(kwconf.Config):
+    """Audit MusicIR harmonic dissonance hotspots."""
+
+
+    score: Path = kwconf.Value(None, position=1, parser=Path, help="MusicIR YAML score to analyze")
+    outdir: Path | None = kwconf.Value(None, parser=Path, help="directory for reports; defaults next to score")
+    bucket_beats: float = kwconf.Value(0.25, help="analysis bucket size in beats")
+    max_hotspots: int = kwconf.Value(40)
+    json: bool = kwconf.Flag(False, help="also print JSON payload to stdout")
+    plots: Path | None = kwconf.Value(None, parser=Path, help="optional directory for plot images")
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"], help="format for generated plots")
+
+
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    args = DissonanceAuditConfig.cli(argv=argv)
     payload = audit_file(args.score, bucket_beats=args.bucket_beats, max_hotspots=args.max_hotspots)
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir, plots_dir=args.plots, plot_format=args.plot_format)

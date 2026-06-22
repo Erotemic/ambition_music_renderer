@@ -9,11 +9,10 @@ we can recover its stems.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import math
 import subprocess
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -259,17 +258,20 @@ def write_reports(payload: dict[str, Any], outdir: Path, *, plot_format: str = "
     return paths
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("audio", type=Path, help="reference audio file, e.g. WAV/OGG/MP3 if decoder support exists")
-    parser.add_argument("--outdir", type=Path, required=True)
-    parser.add_argument("--frame-seconds", type=float, default=0.5)
-    parser.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
-    return parser
+class ReferenceAudioAuditConfig(kwconf.Config):
+    """Analyze reference audio and write comparison reports."""
+
+
+    audio: Path = kwconf.Value(None, position=1, parser=Path, help="reference audio file")
+    outdir: Path = kwconf.Value(None, parser=Path, required=True)
+    frame_seconds: float = kwconf.Value(0.5)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+
+
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    args = ReferenceAudioAuditConfig.cli(argv=argv)
     payload = analyze_audio(args.audio, frame_seconds=args.frame_seconds)
     paths = write_reports(payload, args.outdir, plot_format=args.plot_format)
     print(paths["summary"])

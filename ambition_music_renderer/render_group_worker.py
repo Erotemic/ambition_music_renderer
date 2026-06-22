@@ -6,38 +6,59 @@ between stems. It is intentionally a small command invoked by render_isolated.py
 """
 
 from __future__ import annotations
-import argparse, json, math, os, sys, tempfile
+import json
+import math
+import sys
+import tempfile
 from pathlib import Path
+import kwconf
 import numpy as np
 import yaml
 from . import musicir_renderer as r
 from .profiler import PhaseTimer, profile
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("spec")
-    ap.add_argument("--outdir", required=True)
-    ap.add_argument("--group", required=True)
-    ap.add_argument("--backend", default="pretty-midi")
-    ap.add_argument(
-        "--skip-section-ogg",
-        action="store_true",
+class RenderGroupWorkerConfig(kwconf.Config):
+    """kwconf-backed config for one isolated/in-process render group."""
+
+
+    spec: Path = kwconf.Value(None, position=1, parser=Path, help="MusicIR YAML spec")
+    outdir: Path = kwconf.Value(None, parser=Path, required=True, help="render output directory")
+    group: str = kwconf.Value(None, required=True, help="stem/group name to render")
+    backend: str = kwconf.Value("pretty-midi", help="renderer backend")
+    skip_section_ogg: bool = kwconf.Flag(
+        False,
         help=(
-            "Skip writing per-section per-group OGGs. The temporary .npy "
-            "stem buffer is still written (the parent process needs it to "
-            "mix the mastered preview and/or per-section full mixes). Used "
-            "by render_isolated --simple-mix / --full-mix-only to remove "
-            "unused encoded outputs from the render budget."
+            "Skip writing per-section per-group OGGs. The temporary .npy stem "
+            "buffer is still written for parent full-mix assembly."
         ),
     )
-    ap.add_argument("--profile-out", type=Path, default=None, help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead")
-    ap.add_argument("--timings-out", type=Path, default=None, help="write worker phase timings to JSON")
-    return ap
+    profile_out: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead",
+    )
+    timings_out: Path | None = kwconf.Value(None, parser=Path, help="write worker phase timings to JSON")
+
+    def __post_init__(self) -> None:
+        for key in ("spec", "outdir", "profile_out", "timings_out"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        if config.profile_out is not None:
+            print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+        return _worker_main(config)
+
+
+
 
 
 @profile
-def _worker_main(ns: argparse.Namespace) -> int:
+def _worker_main(ns) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
     with timings.phase("load_spec_and_build_score"):
@@ -109,6 +130,23 @@ def _worker_main(ns: argparse.Namespace) -> int:
     return 0
 
 
+def render_group_worker_main(
+    argv: list[str] | str | bool | None = None,
+    *,
+    cmdline: bool | None = None,
+    **kwargs: object,
+) -> int:
+    """kwconf-backed Python/CLI entrypoint for one render group."""
+    if cmdline is False:
+        argv = False
+    elif cmdline is True and argv is None:
+        argv = True
+    config = RenderGroupWorkerConfig.cli(argv=argv, data=kwargs)
+    if config.profile_out is not None:
+        print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+    return _worker_main(config)
+
+
 @profile
 def main(argv=None) -> int:
     import time as _time
@@ -116,11 +154,7 @@ def main(argv=None) -> int:
     total_start = _time.perf_counter()
     rc = 1
     try:
-        ap = build_parser()
-        ns = ap.parse_args(argv)
-        if ns.profile_out is not None:
-            print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
-        rc = _worker_main(ns)
+        rc = render_group_worker_main(argv=argv)
         return rc
     finally:
         elapsed = _time.perf_counter() - total_start

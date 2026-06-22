@@ -8,7 +8,6 @@ refactored behind a stable workflow.
 
 from __future__ import annotations
 
-import argparse
 import json
 import math
 import os
@@ -16,14 +15,13 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import yaml
+import kwconf
 
 from . import musicir_renderer as r
 from .arrangement_audit import audit_file as audit_arrangement_file
@@ -35,6 +33,7 @@ from .sour_note_audit import write_reports as write_sour_note_reports
 from .shrill_note_audit import audit_file as audit_shrill_note_file
 from .shrill_note_audit import write_reports as write_shrill_note_reports
 from .profiler import profile
+from .kwconf_runner import KwconfCommand
 
 DEFAULT_BACKEND = "pretty-midi"
 BACKEND_CHOICES = ("pretty-midi", "fluidsynth-cli", "fallback", "auto")
@@ -44,6 +43,92 @@ RENDER_AUDIO_MODES = ("full", "full-mix-only", "simple-mix")
 REPORT_ZIP_EXCLUDED_SUFFIXES = {".ogg", ".oga", ".wav", ".flac", ".mp3", ".npy", ".mid", ".midi"}
 DBFS_SILENCE_FLOOR = -120.0
 DBFS_PLOT_FLOOR = -100.0
+
+
+class CueBundleConfig(kwconf.Config):
+    """kwconf-backed configuration for ``cue bundle``.
+
+    This is the single source of truth for Python-callable and CLI bundle options.
+    """
+
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    backend: str = kwconf.Value(DEFAULT_BACKEND, choices=BACKEND_CHOICES)
+    runtime_stem_gain_mode: str = kwconf.Value(
+        "native",
+        choices=RUNTIME_STEM_GAIN_MODES,
+        help=(
+            "runtime adaptive stem export mode: native preserves current raw "
+            "levels; shared applies one shared reference gain across all stems"
+        ),
+    )
+    runtime_stem_max_gain_db: float | None = kwconf.Value(
+        None,
+        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
+    )
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    bundle_root: Path | None = kwconf.Value(None, parser=Path)
+    force: bool = kwconf.Flag(False, help="force render regeneration")
+    publish: bool = kwconf.Flag(False, help="publish full.ogg to game assets after rendering")
+    dest_root: Path | None = kwconf.Value(None, parser=Path, help="game music generated asset root")
+    zip_bundle: bool = kwconf.Flag(
+        False,
+        alias=["zip"],
+        help="write a complete uploadable bundle zip including manifest-referenced audio",
+    )
+    zip_report_bundle: bool = kwconf.Flag(
+        False,
+        alias=["zip_report"],
+        help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries",
+    )
+    plot_format: str = kwconf.Value(
+        "jpg",
+        choices=PLOT_FORMATS,
+        help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
+    )
+    jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
+    jobs: int = kwconf.Value(1, short_alias=["j"], help="render worker count")
+    include_scratch_stems: bool = kwconf.Flag(
+        False,
+        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
+    )
+    skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
+    skip_spectrograms: bool = kwconf.Flag(False, help="skip spectrogram generation")
+    render_audio_mode: str = kwconf.Value(
+        "full",
+        choices=RENDER_AUDIO_MODES,
+        help=(
+            "audio export scope for render_isolated. full preserves all adaptive "
+            "stem/state preview OGGs; full-mix-only keeps scratch stems plus "
+            "mastered preview and section full mixes; simple-mix writes only the "
+            "mastered preview."
+        ),
+    )
+    profile_render: bool = kwconf.Flag(
+        False,
+        help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",
+    )
+    render_in_process: bool = kwconf.Flag(
+        False,
+        help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
+    )
+
+    def __post_init__(self) -> None:
+        self.jobs = int(self.jobs)
+        self.jpeg_quality = int(self.jpeg_quality)
+        for key in ("outdir", "bundle_root", "dest_root"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        report = create_bundle_from_config(config)
+        print_bundle_summary(report)
+        print(json.dumps(report, indent=2, default=str))
+        return 0 if report.get("ok", True) else 1
+
 
 
 def _plot_db(value: float) -> float:
@@ -189,25 +274,48 @@ def run_logged(name: str, command: list[str], reports_dir: Path, *, cwd: Path) -
 
 
 @profile
-def run_render_in_process(name: str, argv: list[str], reports_dir: Path) -> CommandResult:
-    """Run render_isolated in this interpreter for useful line-profiler output."""
+def run_kwconf_logged(
+    name: str,
+    command: KwconfCommand,
+    reports_dir: Path,
+    *,
+    mode: str,
+    data: dict[str, object],
+) -> CommandResult:
+    """Run a kwconf command through the selected direct/subprocess boundary."""
     import time as _time
-    from . import render_isolated
 
     reports_dir.mkdir(parents=True, exist_ok=True)
     stdout = reports_dir / f"{name}.stdout.txt"
     stderr = reports_dir / f"{name}.stderr.txt"
-    stdout.write_text("in-process render; output streamed to terminal\n", encoding="utf8")
-    stderr.write_text("in-process render; stderr streamed to terminal\n", encoding="utf8")
     start = _time.perf_counter()
-    rc = 1
-    try:
-        rc = int(render_isolated.main(argv))
-    except SystemExit as ex:
-        code = ex.code
-        rc = int(code) if isinstance(code, int) else 1
+    if mode == "direct":
+        stdout.write_text("direct kwconf command; output streamed to terminal\n", encoding="utf8")
+        stderr.write_text("direct kwconf command; stderr streamed to terminal\n", encoding="utf8")
+        try:
+            rc = int(command.run_direct(argv=False, data=data))
+        except SystemExit as ex:
+            code = ex.code
+            rc = int(code) if isinstance(code, int) else 1
+        shown_command = ["<direct>", command.config_cls.__module__, command.config_cls.__name__, *command.cli_argv(data)]
+    elif mode == "subprocess":
+        shown_command = command.python_command(data)
+        with stdout.open("w", encoding="utf8") as out_f, stderr.open("w", encoding="utf8") as err_f:
+            proc = command.run_subprocess(data=data, stdout=out_f, stderr=err_f, cwd=package_dir())
+        rc = int(proc.returncode)
+    else:
+        raise KeyError(f"unknown kwconf command mode: {mode!r}")
     elapsed = _time.perf_counter() - start
-    return CommandResult(name, ["<in-process>", "ambition_music_renderer.render_isolated", *argv], rc, stdout, stderr, elapsed)
+    result = CommandResult(name, shown_command, rc, stdout, stderr, elapsed)
+    if rc != 0:
+        progress_line(f"command failed: {name} rc={rc} elapsed_s={elapsed:.3f}")
+        progress_line(f"stdout: {terminal_link(stdout)}")
+        progress_line(f"stderr: {terminal_link(stderr)}")
+        tail = result.stderr_tail
+        if tail:
+            print(f"[music bundle] --- {name} stderr tail ---")
+            print(tail)
+    return result
 
 
 def _db(value: float) -> float:
@@ -1342,7 +1450,6 @@ def write_adaptive_section_report(
 
     mastering_cfg = adaptive_section_mastering_config_from_spec(spec)
     section_specs = [s0 for s0 in spec.get("sections", []) if isinstance(s0, dict)]
-    section_spec_by_id = {str(s0.get("id")): s0 for s0 in section_specs if s0.get("id") is not None}
     section_postprocess_ids = [
         str(s0.get("id")) for s0 in section_specs if isinstance(s0.get("postprocess"), dict)
     ]
@@ -2445,29 +2552,28 @@ def build_rerun_script(
     render_in_process: bool = False,
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
-    publish_flag = " --publish" if publish else ""
     cmd = [
         "uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle",
         str(cue),
         "--backend",
         str(backend),
-        "--runtime-stem-gain-mode",
+        "--runtime_stem_gain_mode",
         str(runtime_stem_gain_mode),
     ]
     if runtime_stem_max_gain_db is not None:
-        cmd.extend(["--runtime-stem-max-gain-db", str(runtime_stem_max_gain_db)])
-    cmd.extend(["--plot-format", str(plot_format)])
-    cmd.extend(["--outdir", str(outdir), "--force", "--render-audio-mode", str(render_audio_mode)])
+        cmd.extend(["--runtime_stem_max_gain_db", str(runtime_stem_max_gain_db)])
+    cmd.extend(["--plot_format", str(plot_format)])
+    cmd.extend(["--outdir", str(outdir), "--force", "--render_audio_mode", str(render_audio_mode)])
     if profile_render:
-        cmd.append("--profile-render")
+        cmd.append("--profile_render")
     if render_in_process:
-        cmd.append("--render-in-process")
+        cmd.append("--render_in_process")
     if publish:
         cmd.append("--publish")
     if zip_bundle:
         cmd.append("--zip")
     if zip_report_bundle:
-        cmd.append("--zip-report")
+        cmd.append("--zip_report")
     wrapped = " \\\n  ".join(cmd)
     body = (
         "#!/usr/bin/env bash\n"
@@ -2553,38 +2659,38 @@ def create_bundle(
 
     if not skip_render:
         progress_line(f"rendering {cue_id} with backend={backend}, runtime_stems={runtime_stem_gain_mode}")
-        render_args = [
-            str(score_path),
-            "--outdir",
-            str(outdir),
-            "--backend",
-            backend,
-            "--runtime-stem-gain-mode",
-            runtime_stem_gain_mode,
-            "--keep-debug-stems",
-            "--jobs",
-            str(jobs),
-            "--timings-out",
-            str(reports_dir / "render_isolated_timings.json"),
-        ]
-        if render_audio_mode == "full-mix-only":
-            render_args.append("--full-mix-only")
-        elif render_audio_mode == "simple-mix":
-            render_args.append("--simple-mix")
+        from .render_isolated import RenderIsolatedConfig
+
+        render_data: dict[str, object] = {
+            "spec": score_path,
+            "outdir": outdir,
+            "backend": backend,
+            "runtime_stem_gain_mode": runtime_stem_gain_mode,
+            "keep_debug_stems": True,
+            "jobs": jobs,
+            "timings_out": reports_dir / "render_isolated_timings.json",
+            "runtime_stem_max_gain_db": runtime_stem_max_gain_db,
+            "force": force,
+            "simple_mix": render_audio_mode == "simple-mix",
+            "full_mix_only": render_audio_mode == "full-mix-only",
+        }
+        command_mode = "direct" if render_in_process else "subprocess"
         if profile_render:
             os.environ.setdefault("LINE_PROFILE", "1")
             render_in_process = True
-            render_args.append("--profile-workers")
+            command_mode = "direct"
+            render_data["profile_workers"] = True
             progress_line("profiling enabled via line_profiler; running render_isolated in-process")
-        if runtime_stem_max_gain_db is not None:
-            render_args.extend(["--runtime-stem-max-gain-db", str(runtime_stem_max_gain_db)])
-        if force:
-            render_args.append("--force")
-        if render_in_process:
-            commands.append(run_render_in_process("render_isolated", render_args, reports_dir))
-        else:
-            render_cmd = [sys.executable, "-m", "ambition_music_renderer.render_isolated", *render_args]
-            commands.append(run_logged("render_isolated", render_cmd, reports_dir, cwd=package_dir()))
+        render_command = KwconfCommand(RenderIsolatedConfig, module="ambition_music_renderer.render_isolated", cwd=package_dir())
+        commands.append(
+            run_kwconf_logged(
+                "render_isolated",
+                render_command,
+                reports_dir,
+                mode=command_mode,
+                data=render_data,
+            )
+        )
         if commands[-1].returncode != 0:
             return {
                 "cue": cue_id,
@@ -2855,61 +2961,57 @@ def create_bundle(
     return report
 
 
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("cue", help="cue id or .music.yaml path")
-    ap.add_argument("--backend", default=DEFAULT_BACKEND, choices=BACKEND_CHOICES)
-    ap.add_argument(
-        "--runtime-stem-gain-mode",
-        choices=RUNTIME_STEM_GAIN_MODES,
-        default="native",
-        help=(
-            "runtime adaptive stem export mode: native preserves current raw levels; "
-            "shared applies one shared reference gain across all stems"
-        ),
+def create_bundle_from_config(config: CueBundleConfig) -> dict[str, object]:
+    """Run bundle creation from a kwconf ``CueBundleConfig`` instance."""
+    return create_bundle(
+        config.cue,
+        backend=config.backend,
+        runtime_stem_gain_mode=config.runtime_stem_gain_mode,
+        outdir=config.outdir,
+        bundle_root=config.bundle_root,
+        force=config.force,
+        publish=config.publish,
+        dest_root=config.dest_root,
+        zip_bundle=config.zip_bundle,
+        zip_report_bundle=config.zip_report_bundle,
+        jobs=config.jobs,
+        include_scratch_stems=config.include_scratch_stems,
+        skip_render=config.skip_render,
+        skip_spectrograms=config.skip_spectrograms,
+        plot_format=config.plot_format,
+        jpeg_quality=config.jpeg_quality,
+        runtime_stem_max_gain_db=config.runtime_stem_max_gain_db,
+        render_audio_mode=config.render_audio_mode,
+        profile_render=config.profile_render,
+        render_in_process=config.render_in_process,
     )
-    ap.add_argument(
-        "--runtime-stem-max-gain-db",
-        type=float,
-        default=None,
-        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
-    )
-    ap.add_argument("--outdir", type=Path, default=None)
-    ap.add_argument("--bundle-root", type=Path, default=None)
-    ap.add_argument("--force", action="store_true", help="force render regeneration")
-    ap.add_argument("--publish", action="store_true", help="publish full.ogg to game assets after rendering")
-    ap.add_argument("--dest-root", type=Path, default=None, help="game music generated asset root")
-    ap.add_argument("--zip", dest="zip_bundle", action="store_true", help="write a complete uploadable bundle zip including manifest-referenced audio")
-    ap.add_argument("--zip-report", dest="zip_report_bundle", action="store_true", help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries")
-    ap.add_argument(
-        "--plot-format",
-        choices=PLOT_FORMATS,
-        default="jpg",
-        help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
-    )
-    ap.add_argument("--jpeg-quality", type=int, default=84, help="JPEG quality for spectrogram plots")
-    ap.add_argument("--jobs", "-j", type=int, default=1, help="render worker count")
-    ap.add_argument(
-        "--include-scratch-stems",
-        action="store_true",
-        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
-    )
-    ap.add_argument("--skip-render", action="store_true", help="bundle/analyze existing outdir")
-    ap.add_argument("--skip-spectrograms", action="store_true", help="skip PNG spectrogram generation")
-    ap.add_argument(
-        "--render-audio-mode",
-        choices=RENDER_AUDIO_MODES,
-        default="full",
-        help=(
-            "audio export scope for render_isolated. full preserves all adaptive stem/state preview OGGs; "
-            "full-mix-only keeps scratch stems plus mastered preview and section full mixes; "
-            "simple-mix writes only the mastered preview. Use full-mix-only for fast report bundles "
-            "when you do not need per-stem runtime OGG exports."
-        ),
-    )
-    ap.add_argument("--profile-render", action="store_true", help="enable LINE_PROFILE=1 and run render_isolated in-process for line_profiler")
-    ap.add_argument("--render-in-process", action="store_true", help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess")
-    return ap
+
+
+def cue_bundle_main(
+    argv: list[str] | str | bool | None = None,
+    *,
+    cmdline: bool | None = None,
+    print_json: bool = True,
+    **kwargs: object,
+) -> int:
+    """kwconf-backed Python/CLI entrypoint for ``cue bundle``.
+
+    Examples:
+        >>> cue_bundle_main(cmdline=False, cue='for_emmy_forever_ago', skip_render=True)  # doctest: +SKIP
+    """
+    if cmdline is False:
+        argv = False
+    elif cmdline is True and argv is None:
+        argv = True
+    config = CueBundleConfig.cli(argv=argv, data=kwargs)
+    report = create_bundle_from_config(config)
+    print_bundle_summary(report)
+    if print_json:
+        print(json.dumps(report, indent=2, default=str))
+    return 0 if report.get("ok", True) else 1
+
+
+
 
 
 @profile
@@ -2920,30 +3022,9 @@ def main(argv: list[str] | None = None) -> int:
     cue_name = "<parse-error>"
     rc = 1
     try:
-        args = build_parser().parse_args(argv)
-        cue_name = str(args.cue)
-        report = create_bundle(
-            args.cue,
-            backend=args.backend,
-            runtime_stem_gain_mode=args.runtime_stem_gain_mode,
-            outdir=args.outdir,
-            bundle_root=args.bundle_root,
-            force=args.force,
-            publish=args.publish,
-            dest_root=args.dest_root,
-            zip_bundle=args.zip_bundle,
-            zip_report_bundle=args.zip_report_bundle,
-            jobs=args.jobs,
-            include_scratch_stems=args.include_scratch_stems,
-            skip_render=args.skip_render,
-            skip_spectrograms=args.skip_spectrograms,
-            plot_format=args.plot_format,
-            jpeg_quality=args.jpeg_quality,
-            runtime_stem_max_gain_db=args.runtime_stem_max_gain_db,
-            render_audio_mode=args.render_audio_mode,
-            profile_render=args.profile_render,
-            render_in_process=getattr(args, "render_in_process", False),
-        )
+        config = CueBundleConfig.cli(argv=argv)
+        cue_name = str(config.cue)
+        report = create_bundle_from_config(config)
         print_bundle_summary(report)
         print(json.dumps(report, indent=2, default=str))
         rc = 0 if report.get("ok", True) else 1

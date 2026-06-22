@@ -15,10 +15,10 @@ places that deserve listening, not replace listening.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import math
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -398,18 +398,21 @@ def audit_file(path: Path, *, bucket_beats: float = 0.25, max_rows: int = 40) ->
     return audit_spec(r.load_yaml(path), bucket_beats=bucket_beats, max_rows=max_rows)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("score", type=Path)
-    parser.add_argument("--outdir", type=Path, default=None)
-    parser.add_argument("--bucket-beats", type=float, default=0.25)
-    parser.add_argument("--max-rows", type=int, default=40)
-    parser.add_argument("--json", action="store_true")
-    return parser
+class ArrangementAuditConfig(kwconf.Config):
+    """Audit MusicIR arrangement density and event overlap."""
+
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    bucket_beats: float = kwconf.Value(0.25)
+    max_rows: int = kwconf.Value(40)
+    json: bool = kwconf.Flag(False)
+
+
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    args = ArrangementAuditConfig.cli(argv=argv)
     payload = audit_file(args.score, bucket_beats=args.bucket_beats, max_rows=args.max_rows)
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir)

@@ -19,6 +19,7 @@ dependencies = [
   "mido",
   "pydub",
   "ubelt",
+  "kwconf>=0.10.0",
   "rich",
   "pyloudnorm",
 ]
@@ -34,6 +35,9 @@ all = [
     "ambition-music-renderer[optional]",
     "ambition-music-renderer[dev]",
 ]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "line_profiler"]
 
 # sfizz_render, lv2proc, Guitarix, and NAM are external command/plugin installs,
 # not Python package dependencies. The renderer probes for them only when YAML

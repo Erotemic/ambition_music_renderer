@@ -13,7 +13,7 @@ hints such as ``layer_templates.answer_phrase.roots[2]``.
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import json
 import math
 from collections import Counter
@@ -705,21 +705,24 @@ def audit_file(path: Path, *, bucket_beats: float = 0.25, max_candidates: int = 
     return audit_spec(r.load_yaml(path), bucket_beats=bucket_beats, max_candidates=max_candidates, min_score=min_score)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("score", type=Path)
-    parser.add_argument("--outdir", type=Path, default=None)
-    parser.add_argument("--plots", type=Path, default=None)
-    parser.add_argument("--bucket-beats", type=float, default=0.25)
-    parser.add_argument("--max-candidates", type=int, default=80)
-    parser.add_argument("--min-score", type=float, default=0.28)
-    parser.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
-    parser.add_argument("--json", action="store_true")
-    return parser
+class SourNoteAuditConfig(kwconf.Config):
+    """Audit likely sour-note candidates."""
+
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    plots: Path | None = kwconf.Value(None, parser=Path)
+    bucket_beats: float = kwconf.Value(0.25)
+    max_candidates: int = kwconf.Value(80)
+    min_score: float = kwconf.Value(0.28)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    json: bool = kwconf.Flag(False)
+
+
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    args = SourNoteAuditConfig.cli(argv=argv)
     payload = audit_file(
         args.score,
         bucket_beats=args.bucket_beats,

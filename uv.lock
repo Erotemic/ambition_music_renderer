@@ -49,6 +49,13 @@ optional = [
     { name = "pedalboard" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "line-profiler" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "ambition-music-renderer", extras = ["dev"], marker = "extra == 'all'" },
@@ -73,6 +80,13 @@ requires-dist = [
     { name = "ubelt" },
 ]
 provides-extras = ["optional", "dev", "all"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "line-profiler" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "certifi"

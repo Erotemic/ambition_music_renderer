@@ -6,21 +6,31 @@ This package is the canonical code-only music generator for the project. Do not 
 
 ## Common commands
 
-Run from the repo root unless noted:
+Run from the repo root unless noted. `uv run --project tools/ambition_music_renderer` installs/runs the package with the renderer project metadata, so `PYTHONPATH=tools/ambition_music_renderer` should not be needed.
+
+Recommended test command:
 
 ```bash
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer --help
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --force --zip
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime-stem-gain-mode shared --force --zip
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime-stem-gain-mode shared --zip-report --force
-./generate_audio_assets.sh --force
+cd ~/code/ambition
+uv run --project tools/ambition_music_renderer pytest -q tools/ambition_music_renderer/tests
 ```
 
 If you already activated the renderer environment, use `uv run --active`:
 
 ```bash
+cd ~/code/ambition
 source tools/ambition_music_renderer/.venv/bin/activate
-uv run --active python -m ambition_music_renderer --help
+uv run --active pytest -q tools/ambition_music_renderer/tests
+```
+
+Common CLI commands:
+
+```bash
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer --help
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --force --zip
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime_stem_gain_mode shared --force --zip
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime_stem_gain_mode shared --zip_report --force
+./generate_audio_assets.sh --force
 ```
 
 From the tool directory:
@@ -68,9 +78,9 @@ Use the plugin diagnostics before authoring a score that depends on local plugin
 
 ```bash
 uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins doctor
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list-vst3
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list-lv2 --limit 40
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins validate-score guitar_backend_demo
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list_vst3
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list_lv2 --limit 40
+uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins validate_score guitar_backend_demo
 ```
 
 For new work, prefer the explicit `effect_chain` surface. Each step states the host family. This keeps the default render path lightweight while making DAW-like processing reproducible from YAML/Python.
@@ -96,8 +106,8 @@ group_postprocess:
         path: local/plugins/MyAmp.vst3
         parameters: {}
 
-      # Simple LV2 file effects use lv2proc. Use `plugins list-lv2` and
-      # `plugins lv2-info <URI>` to discover plugin URIs/ports locally.
+      # Simple LV2 file effects use lv2proc. Use `plugins list_lv2` and
+      # `plugins lv2_info <URI>` to discover plugin URIs/ports locally.
       - kind: lv2proc
         plugin_uri: http://example.invalid/my-lv2-plugin
         params: {gain: 0.5}
@@ -128,52 +138,62 @@ python -m ambition_music_renderer cue bundle <cue_id> \
   --zip
 ```
 
-For layered runtime-stem audits, add `--runtime-stem-gain-mode shared`. The
+For layered runtime-stem audits, add `--runtime_stem_gain_mode shared`. The
 default `native` mode preserves historical raw stem levels; `shared` computes one
 reference gain from the all-stem mix and applies it to every runtime stem so the
 layered export is audible without destroying the stem balance via independent
 normalization. Shared gain is capped by default (`render.runtime_stems.max_gain_db`
-or `--runtime-stem-max-gain-db`) because a cue that needs 40+ dB of rescue gain
+or `--runtime_stem_max_gain_db`) because a cue that needs 40+ dB of rescue gain
 usually needs louder source instruments/layers, not louder exported noise.
 
-Use `--zip-report` for compact chat/agent handoff zips; the on-disk bundle directory remains fully featured and keeps the generated audio for local audition. Report zips exclude
+Use `--zip_report` for compact chat/agent handoff zips; the on-disk bundle directory remains fully featured and keeps the generated audio for local audition. Report zips exclude
 large OGG/WAV/NPY binaries but keep source YAML, manifests, logs, TSV/JSON level
 reports, `spectral_fingerprint.json`, and JPEG spectrograms. Use `--zip` only when the recipient must audition audio directly from the zip. Add `--publish` only when
 the generated `full.ogg` should be copied into the game asset tree. Add
-`--include-scratch-stems` only for local handoff bundles; raw `.npy` stems are
+`--include_scratch_stems` only for local handoff bundles; raw `.npy` stems are
 useful but usually too large for chat upload.
 
 
 ### Profiling renders
 
-Normal `cue bundle` launches `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, use `--profile-render`; it enables `LINE_PROFILE=1` and runs `render_isolated` in-process so line-profiler can see the expensive orchestration call. The per-stem synth workers remain separate child processes, but their coarse timings are written under `reports/profiles/`.
+Normal `cue bundle` may launch `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, use `--profile_render`; it enables `LINE_PROFILE=1`, runs `render_isolated` in-process, and renders serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` uses line profiler only; it does not start cProfile.
+
+Recommended short profiling command:
 
 ```bash
+cd ~/code/ambition
+
 LINE_PROFILE=1 uv run --project tools/ambition_music_renderer \
 python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
   --backend pretty-midi \
-  --runtime-stem-gain-mode shared \
-  --render-audio-mode full-mix-only \
-  --profile-render \
+  --runtime_stem_gain_mode shared \
+  --render_audio_mode full-mix-only \
+  --profile_render \
   --force \
-  --zip-report
+  --zip_report
 ```
 
 For an already-active renderer venv:
 
 ```bash
+cd ~/code/ambition
 source tools/ambition_music_renderer/.venv/bin/activate
+
 LINE_PROFILE=1 uv run --active \
 python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
   --backend pretty-midi \
-  --runtime-stem-gain-mode shared \
-  --render-audio-mode full-mix-only \
-  --profile-render \
+  --runtime_stem_gain_mode shared \
+  --render_audio_mode full-mix-only \
+  --profile_render \
   --force \
-  --zip-report
+  --zip_report
 ```
 
-Use `--render-in-process` without `--profile-render` only for debugging; the default subprocess path is still the safer production path.
+Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. To inspect a saved line-profiler file, use:
+
+```bash
+python -m line_profiler -rtmz profile_output.lprof
+```
 
 The bundle also emits theory/debug reports that are easier for agents to reason
 about than raw audio:

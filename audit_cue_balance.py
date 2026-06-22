@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import argparse
+import kwconf
 import math
 from pathlib import Path
 
@@ -49,11 +49,14 @@ def discover_files(root: Path) -> list[tuple[str, str, Path]]:
 DEFAULT_ROOT = Path(__file__).resolve().parent / "output" / "first_goblin_tune_v2"
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("root", nargs="?", default=str(DEFAULT_ROOT))
-    args = parser.parse_args()
+class AuditCueBalanceConfig(kwconf.Config):
+    """Audit rendered cue balance."""
 
+    root: Path = kwconf.Value(DEFAULT_ROOT, position=1, parser=Path, nargs="?")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = AuditCueBalanceConfig.cli(argv=argv)
     root = Path(args.root).resolve()
     if not root.exists():
         raise SystemExit(f"missing root: {root}")

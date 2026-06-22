@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
+import kwconf
 
 
 PYTHON_MODULES = ("pedalboard", "pyloudnorm", "pretty_midi", "music21", "soundfile")
@@ -336,39 +337,72 @@ def load_score(path: Path) -> dict[str, Any]:
     return data
 
 
-def main(argv: list[str] | None = None) -> int:
-    import argparse
 
-    parser = argparse.ArgumentParser(description="Inspect optional VST3/LV2/SFZ music-renderer infrastructure")
-    sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("doctor", help="print optional backend diagnostics as JSON")
-    sub.add_parser("list-vst3", help="list discovered VST3 bundle paths")
-    p_lv2 = sub.add_parser("list-lv2", help="list installed LV2 plugin URIs")
-    p_lv2.add_argument("--limit", type=int, default=None)
-    p_info = sub.add_parser("lv2-info", help="print raw lv2info output for one URI")
-    p_info.add_argument("uri")
-    p_val = sub.add_parser("validate-score", help="validate optional effect/plugin references in a score YAML")
-    p_val.add_argument("score", type=Path)
-    args = parser.parse_args(argv)
+class AudioPluginDoctor(kwconf.Config):
+    fast: bool = kwconf.Flag(False, help="skip plugin-count probes")
 
-    if args.command == "doctor":
-        print(json.dumps(collect_plugin_diagnostics(), indent=2))
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
+        print(json.dumps(collect_plugin_diagnostics(probe_counts=not args.fast), indent=2))
         return 0
-    if args.command == "list-vst3":
-        print(json.dumps(discover_vst3_plugins(), indent=2))
+
+
+class AudioPluginListVST3(kwconf.Config):
+    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
+        roots = [Path(p) for p in args.path] or None
+        print(json.dumps(discover_vst3_plugins(roots), indent=2))
         return 0
-    if args.command == "list-lv2":
+
+
+class AudioPluginListLV2(kwconf.Config):
+    limit: int | None = kwconf.Value(None)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
         print(json.dumps(discover_lv2_plugins(limit=args.limit), indent=2))
         return 0
-    if args.command == "lv2-info":
+
+
+class AudioPluginLV2Info(kwconf.Config):
+    uri: str = kwconf.Value(None, position=1)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
         print(json.dumps(lv2_info(args.uri), indent=2))
         return 0
-    if args.command == "validate-score":
+
+
+class AudioPluginValidateScore(kwconf.Config):
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
         score_path = args.score.resolve()
         report = validate_score_plugins(load_score(score_path), base_dir=score_path.parent)
         print(json.dumps(report, indent=2))
         return 0 if report.get("ok") else 1
-    raise AssertionError(args.command)
+
+
+class AudioPluginsModal(kwconf.ModalCLI):
+    """Inspect optional VST3/LV2/SFZ music-renderer infrastructure."""
+
+    doctor = AudioPluginDoctor
+    list_vst3 = AudioPluginListVST3
+    list_lv2 = AudioPluginListLV2
+    lv2_info = AudioPluginLV2Info
+    validate_score = AudioPluginValidateScore
+
+
+def main(argv: list[str] | None = None) -> int:
+    return int(AudioPluginsModal.main(argv=argv))
 
 
 if __name__ == "__main__":

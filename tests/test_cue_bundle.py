@@ -7,8 +7,9 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from ambition_music_renderer.cli import build_parser
+from ambition_music_renderer.cli import BundleManyCommand, RenderCommand, RenderPublishCommand
 from ambition_music_renderer.cue_bundle import (
+    CueBundleConfig,
     copy_manifest_referenced_files,
     make_zip,
     manifest_audio_entries,
@@ -26,8 +27,8 @@ from ambition_music_renderer.cue_bundle import (
 from ambition_music_renderer.arrangement_audit import audit_spec as audit_arrangement_spec
 from ambition_music_renderer.arrangement_audit import write_reports as write_arrangement_reports
 from ambition_music_renderer.dissonance_audit import audit_spec, write_reports as write_dissonance_reports
-from ambition_music_renderer.render_group_worker import build_parser as build_worker_parser
-from ambition_music_renderer.render_isolated import build_parser as build_isolated_parser
+from ambition_music_renderer.render_group_worker import RenderGroupWorkerConfig
+from ambition_music_renderer.render_isolated import RenderIsolatedConfig
 from ambition_music_renderer.reference_audio_audit import analyze_audio as analyze_reference_audio, write_reports as write_reference_audio_reports
 from ambition_music_renderer.sour_note_audit import audit_spec as audit_sour_note_spec
 from ambition_music_renderer.sour_note_audit import write_reports as write_sour_note_reports
@@ -37,46 +38,37 @@ from ambition_music_renderer.musicir_renderer import chord_intervals, timeline_m
 
 
 def test_backend_defaults_prefer_pretty_midi():
-    assert build_isolated_parser().parse_args(["cue.music.yaml"]).backend == "pretty-midi"
-    assert build_worker_parser().parse_args(
-        ["cue.music.yaml", "--outdir", "out", "--group", "keys"]
+    assert RenderIsolatedConfig.cli(argv=["cue.music.yaml"]).backend == "pretty-midi"
+    assert RenderGroupWorkerConfig.cli(
+        argv=["cue.music.yaml", "--outdir=out", "--group=keys"]
     ).backend == "pretty-midi"
-    assert build_parser().parse_args(["render", "lofi_study_loop"]).backend == "pretty-midi"
-    assert build_parser().parse_args(["cue", "bundle", "lofi_study_loop"]).backend == "pretty-midi"
-    adaptive_args = build_parser().parse_args(["render-publish", "first_goblin_tune_v2", "--full-mix-only"])
+    assert RenderCommand.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
+    assert CueBundleConfig.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
+    adaptive_args = RenderPublishCommand.cli(argv=["first_goblin_tune_v2", "--full_mix_only"])
     assert adaptive_args.full_mix_only is True
-    shared_args = build_isolated_parser().parse_args([
+    shared_args = RenderIsolatedConfig.cli(argv=[
         "cue.music.yaml",
-        "--runtime-stem-gain-mode",
-        "shared",
-        "--runtime-stem-max-gain-db",
-        "18",
+        "--runtime_stem_gain_mode=shared",
+        "--runtime_stem_max_gain_db=18",
     ])
     assert shared_args.runtime_stem_gain_mode == "shared"
     assert shared_args.runtime_stem_max_gain_db == 18.0
 
 
 def test_bundle_parser_exposes_publish_and_zip_flags():
-    args = build_parser().parse_args(
-        [
-            "cue",
-            "bundle",
+    args = CueBundleConfig.cli(
+        argv=[
             "for_emmy_forever_ago",
             "--publish",
             "--zip",
             "--jobs",
             "2",
-            "--runtime-stem-gain-mode",
-            "shared",
-            "--runtime-stem-max-gain-db",
-            "18",
-            "--zip-report",
-            "--plot-format",
-            "jpg",
+            "--runtime_stem_gain_mode=shared",
+            "--runtime_stem_max_gain_db=18",
+            "--zip_report_bundle",
+            "--plot_format=jpg",
         ]
     )
-    assert args.command == "cue"
-    assert args.cue_action == "bundle"
     assert args.cue == "for_emmy_forever_ago"
     assert args.publish is True
     assert args.zip_bundle is True
@@ -661,13 +653,13 @@ def test_publish_adaptive_cue_fails_without_section_fulls():
 def test_top_level_adaptive_render_defaults_to_full_mix_sections():
     from ambition_music_renderer.cli import render_mode_for_cue
 
-    args = build_parser().parse_args(["render", "first_goblin_tune_v2"])
+    args = RenderCommand.cli(argv=["first_goblin_tune_v2"])
     assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, True)
 
-    args = build_parser().parse_args(["render", "first_goblin_tune_v2", "--no-simple-mix"])
+    args = RenderCommand.cli(argv=["first_goblin_tune_v2", "--no-simple_mix"])
     assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, False)
 
-    args = build_parser().parse_args(["render", "lofi_study_loop"])
+    args = RenderCommand.cli(argv=["lofi_study_loop"])
     assert render_mode_for_cue("lofi_study_loop", args) == (True, False)
 
 
@@ -782,18 +774,17 @@ def test_shrill_note_audit_flags_whistle_register_sources():
 
 
 def test_bundle_many_parser_accepts_parallel_flags():
-    args = build_parser().parse_args([
-        "bundle-many",
+    args = BundleManyCommand.cli(argv=[
+
         "lofi_study_loop",
         "tech_bros_disruption",
         "--workers",
         "3",
-        "--render-jobs",
+        "--render_jobs",
         "1",
         "--force",
-        "--zip-report",
+        "--zip_report",
     ])
-    assert args.command == "bundle-many"
     assert args.workers == 3
     assert args.render_jobs == 1
     assert args.cues == ["lofi_study_loop", "tech_bros_disruption"]
