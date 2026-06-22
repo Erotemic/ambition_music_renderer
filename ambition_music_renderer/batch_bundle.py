@@ -3,10 +3,10 @@
 This wrapper deliberately launches one normal ``cue bundle`` subprocess per cue.
 That is safer than importing the renderer into many in-process workers because
 pretty-midi, fluidsynth/ffmpeg, matplotlib, and SoundFont handles all have their
-own process-level state.  The Python coordinator is mostly waiting on child
-process I/O, so a ThreadPoolExecutor is the right fit: it lets several fully
-separate render processes consume CPU while the parent keeps a live progress UI
-and per-cue logs.
+own process-level state.  The Python coordinator is mostly waiting on child process I/O.  We use
+``ubelt.Executor`` so ``--workers 0`` / ``--workers 1`` have an explicit serial
+fallback, while larger values use a thread coordinator around separate render
+processes.
 """
 
 from __future__ import annotations
@@ -20,13 +20,15 @@ import subprocess
 import sys
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+import ubelt as ub
+
 from .cli import find_score, package_dir, python_exe
 from .cue_bundle import default_bundle_root, terminal_link
+from .profiler import profile
 
 
 @dataclass(frozen=True)
@@ -166,6 +168,7 @@ def _build_command(args: argparse.Namespace, cue: str) -> list[str]:
     return cmd
 
 
+@profile
 def _worker(job: BundleJob, events: "queue.Queue[tuple[str, str, object]]") -> BundleResult:
     start_wall_time = time.time()
     start = time.monotonic()
@@ -203,10 +206,25 @@ def _worker(job: BundleJob, events: "queue.Queue[tuple[str, str, object]]") -> B
     return result
 
 
+def _executor_mode(workers: int) -> tuple[str, int]:
+    """Return an ubelt executor mode for cue-level bundle jobs.
+
+    ``workers <= 1`` deliberately means serial execution.  That avoids thread
+    coordinator overhead and makes single-cue profiling easier to interpret.
+    ``workers > 1`` uses threads only to supervise independent child processes;
+    the CPU-heavy work still happens in those subprocesses.
+    """
+    if workers <= 1:
+        return "serial", 0
+    return "thread", int(workers)
+
+
+@profile
 def _run_plain(jobs: list[BundleJob], *, workers: int) -> list[BundleResult]:
     events: "queue.Queue[tuple[str, str, object]]" = queue.Queue()
     results: list[BundleResult] = []
-    with ThreadPoolExecutor(max_workers=workers) as pool:
+    mode, max_workers = _executor_mode(workers)
+    with ub.Executor(mode=mode, max_workers=max_workers) as pool:
         futures = [pool.submit(_worker, job, events) for job in jobs]
         remaining = len(futures)
         stages: dict[str, str] = {job.cue: "queued" for job in jobs}
@@ -232,6 +250,7 @@ def _run_plain(jobs: list[BundleJob], *, workers: int) -> list[BundleResult]:
     return results
 
 
+@profile
 def _run_rich(jobs: list[BundleJob], *, workers: int) -> list[BundleResult]:
     try:
         from rich.console import Console
@@ -244,7 +263,8 @@ def _run_rich(jobs: list[BundleJob], *, workers: int) -> list[BundleResult]:
     events: "queue.Queue[tuple[str, str, object]]" = queue.Queue()
     results: list[BundleResult] = []
     task_for_cue: dict[str, int] = {}
-    with ThreadPoolExecutor(max_workers=workers) as pool:
+    mode, max_workers = _executor_mode(workers)
+    with ub.Executor(mode=mode, max_workers=max_workers) as pool:
         futures = [pool.submit(_worker, job, events) for job in jobs]
         columns = [
             SpinnerColumn(),
@@ -331,7 +351,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Render/debug many cue bundles in parallel with per-cue logs.",
     )
     ap.add_argument("cues", nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    ap.add_argument("-j", "--workers", type=int, default=max(1, min(4, (os.cpu_count() or 4) // 2)), help="parallel cue jobs")
+    ap.add_argument("-j", "--workers", type=int, default=max(1, min(4, (os.cpu_count() or 4) // 2)), help="parallel cue jobs; 0 or 1 runs serially")
     ap.add_argument("--render-jobs", type=int, default=1, help="per-cue render worker count passed to cue bundle")
     ap.add_argument("--scope", choices=["active", "examples", "all"], default="active")
     ap.add_argument("--include-examples", action="store_true", help="include scores/examples in discovery")
@@ -346,7 +366,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--skip-spectrograms", action="store_true")
     ap.add_argument("--include-scratch-stems", action="store_true")
     ap.add_argument("--render-audio-mode", choices=["full", "full-mix-only", "simple-mix"], default="full")
-    ap.add_argument("--profile-render", action="store_true")
+    ap.add_argument("--profile-render", action="store_true", help="enable line_profiler in render subprocesses via LINE_PROFILE=1")
     ap.add_argument("--plot-format", choices=["jpg", "png"], default="jpg")
     ap.add_argument("--jpeg-quality", type=int, default=84)
     ap.add_argument("--bundle-root", type=Path, default=None)
@@ -354,42 +374,48 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+@profile
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    cues = resolve_cues(args.cues, scope=args.scope, include_examples=args.include_examples)
-    if not cues:
-        print("no cues selected", file=sys.stderr)
-        return 2
-    stamp = time.strftime("%Y%m%dT%H%M%S")
-    log_root = args.log_root / f"bundle_many_{stamp}"
-    jobs = [BundleJob(cue, log_root / f"{cue}.log", _build_command(args, cue)) for cue in cues]
-    bundle_root = args.bundle_root or default_bundle_root()
-    print(f"bundle-many: {len(jobs)} cue(s), {args.workers} parallel job(s)", file=sys.stderr)
-    print(f"logs: {terminal_link(log_root)}", file=sys.stderr)
-    print(f"bundle root: {terminal_link(bundle_root)}", file=sys.stderr)
-    print("queued bundle logs:", file=sys.stderr)
-    for job in jobs:
-        print(f"  {job.cue}: {terminal_link(job.log_path)}", file=sys.stderr)
-    results = _run_rich(jobs, workers=max(1, args.workers))
-    status_path = log_root / "status.tsv"
-    write_status(results, status_path)
-    print(f"status: {terminal_link(status_path)}", file=sys.stderr)
-    print("bundle-many output links:", file=sys.stderr)
-    for result in sorted(results, key=lambda r: r.cue):
-        status = "OK" if result.returncode == 0 else f"FAIL {result.returncode}"
-        print(f"  {result.cue} [{status}]", file=sys.stderr)
-        print(f"    log: {terminal_link(result.log_path)}", file=sys.stderr)
-        if result.bundle_dir:
-            print(f"    bundle dir: {terminal_link(result.bundle_dir)}", file=sys.stderr)
-        if result.report_zip:
-            print(f"    report zip: {terminal_link(result.report_zip)}", file=sys.stderr)
-        if result.full_zip:
-            print(f"    full zip: {terminal_link(result.full_zip)}", file=sys.stderr)
-    failed = [r for r in results if r.returncode != 0]
-    if failed:
-        print("FAILED: " + ", ".join(f"{r.cue}({r.returncode})" for r in failed), file=sys.stderr)
-        return 1
-    return 0
+    total_start = time.perf_counter()
+    rc = 1
+    try:
+        args = build_parser().parse_args(argv)
+        cues = resolve_cues(args.cues, scope=args.scope, include_examples=args.include_examples)
+        if not cues:
+            print("no cues selected", file=sys.stderr)
+            rc = 2
+            return rc
+        stamp = time.strftime("%Y%m%dT%H%M%S")
+        log_root = args.log_root / f"bundle_many_{stamp}"
+        jobs = [BundleJob(cue, log_root / f"{cue}.log", _build_command(args, cue)) for cue in cues]
+        bundle_root = args.bundle_root or default_bundle_root()
+        print(f"bundle-many: {len(jobs)} cue(s), {args.workers} parallel job(s)", file=sys.stderr)
+        print(f"logs: {terminal_link(log_root)}", file=sys.stderr)
+        print(f"bundle root: {terminal_link(bundle_root)}", file=sys.stderr)
+        print("queued bundle logs:", file=sys.stderr)
+        for job in jobs:
+            print(f"  {job.cue}: {terminal_link(job.log_path)}", file=sys.stderr)
+        results = _run_rich(jobs, workers=args.workers)
+        status_path = log_root / "status.tsv"
+        write_status(results, status_path)
+        print(f"status: {terminal_link(status_path)}", file=sys.stderr)
+        print("bundle-many output links:", file=sys.stderr)
+        for result in sorted(results, key=lambda r: r.cue):
+            status = "OK" if result.returncode == 0 else f"FAIL {result.returncode}"
+            print(f"  {result.cue} [{status}]", file=sys.stderr)
+            print(f"    log:    {terminal_link(result.log_path)}", file=sys.stderr)
+            if result.bundle_dir:
+                print(f"    bundle: {terminal_link(result.bundle_dir)}", file=sys.stderr)
+            if result.report_zip:
+                print(f"    report: {terminal_link(result.report_zip)}", file=sys.stderr)
+            if result.full_zip:
+                print(f"    zip:    {terminal_link(result.full_zip)}", file=sys.stderr)
+        failures = [r for r in results if r.returncode != 0]
+        rc = 1 if failures else 0
+        return rc
+    finally:
+        elapsed = time.perf_counter() - total_start
+        print(f"[ambition_music_renderer.bundle_many] total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":

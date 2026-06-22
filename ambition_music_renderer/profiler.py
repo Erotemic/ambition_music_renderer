@@ -1,19 +1,15 @@
 """Small optional profiling helpers for the MusicIR renderer.
 
-These utilities are intentionally dependency-light.  If ``line_profiler`` is
-installed, ``profile`` is the real decorator.  Otherwise it is an identity
-decorator, so functions can be annotated without making normal renders slower
-or adding a hard dependency.
+Use ``from ambition_music_renderer.profiler import profile`` throughout the
+codebase. When ``line_profiler`` is installed this is its modern decorator; when
+it is not installed it is a no-op identity decorator. The environment variable
+``LINE_PROFILE=1`` is handled by line_profiler itself.
 """
 
 from __future__ import annotations
 
 import contextlib
-import cProfile
-import functools
-import io
 import json
-import pstats
 import time
 from pathlib import Path
 from typing import Any, Callable, Iterator, TypeVar
@@ -26,9 +22,6 @@ def _identity_profile(func: F) -> F:
     return func
 
 
-# Modern line_profiler controls collection through LINE_PROFILE=1 internally.
-# Import its decorator whenever the optional dependency is installed; otherwise
-# keep annotations as a simple identity function.
 try:  # pragma: no cover - optional developer dependency.
     from line_profiler import profile as profile  # type: ignore
 except Exception:  # noqa: BLE001
@@ -103,20 +96,3 @@ def _format_tsv(value: Any) -> str:
     if isinstance(value, float):
         return f"{value:.6f}"
     return str(value).replace("\t", " ").replace("\n", " ")
-
-
-def run_with_cprofile(func: Callable[[], int], profile_path: Path, *, text_path: Path | None = None) -> int:
-    """Run ``func`` under cProfile and write binary + text stats."""
-    profile_path.parent.mkdir(parents=True, exist_ok=True)
-    profiler = cProfile.Profile()
-    try:
-        return int(profiler.runcall(func))
-    finally:
-        profiler.dump_stats(str(profile_path))
-        if text_path is None:
-            text_path = profile_path.with_suffix(profile_path.suffix + ".txt")
-        stream = io.StringIO()
-        stats = pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats("cumulative")
-        stats.print_stats(80)
-        text_path.parent.mkdir(parents=True, exist_ok=True)
-        text_path.write_text(stream.getvalue(), encoding="utf8")

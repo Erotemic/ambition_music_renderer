@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 from . import musicir_renderer as r
-from .profiler import PhaseTimer, run_with_cprofile
+from .profiler import PhaseTimer, profile
 
 
 RUNTIME_STEM_GAIN_MODES = ("native", "shared")
@@ -292,9 +292,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=max(1, (os.cpu_count() or 2) // 2),
         help=(
             "Parallel worker subprocess count for per-group synth. Default "
-            "is half the CPU count (each worker is single-threaded "
-            "fluidsynth + reverb DSP, so going past physical cores hurts). "
-            "Pass 1 for sequential rendering."
+            "is half the CPU count. Pass 0 or 1 for serial rendering; this "
+            "is preferred for focused profiling."
         ),
     )
     ap.add_argument(
@@ -307,16 +306,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--profile-out",
         type=Path,
         default=None,
-        help="run the parent render process under cProfile and write stats to this file",
+        help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead",
     )
     ap.add_argument(
         "--profile-workers",
         action="store_true",
-        help="also cProfile each per-group worker subprocess under outdir/profiles/",
+        help="write per-worker timings and propagate LINE_PROFILE=1 to worker subprocesses",
     )
     return ap
 
 
+@profile
 def _render_main(ns: argparse.Namespace) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
@@ -399,11 +399,10 @@ def _render_main(ns: argparse.Namespace) -> int:
             cmd.append("--skip-section-ogg")
         if ns.profile_workers:
             profile_dir = Path(ns.outdir) / "profiles"
-            cmd.extend(["--profile-out", str(profile_dir / f"render_group_worker.{group}.cprofile")])
             cmd.extend(["--timings-out", str(profile_dir / f"render_group_worker.{group}.timings.json")])
         return cmd
 
-    jobs = max(1, min(ns.jobs, len(group_names)))
+    jobs = 1 if ns.jobs <= 1 else min(ns.jobs, len(group_names))
     with timings.phase("render_group_workers", groups=len(group_names), jobs=jobs):
         if jobs == 1:
             for group in group_names:
@@ -785,14 +784,24 @@ def _render_main(ns: argparse.Namespace) -> int:
     return 0
 
 
+@profile
 def main(argv=None) -> int:
-    ap = build_parser()
-    ns = ap.parse_args(argv)
-    if ns.simple_mix and ns.full_mix_only:
-        ap.error("--simple-mix and --full-mix-only are mutually exclusive")
-    if ns.profile_out is not None:
-        return run_with_cprofile(lambda: _render_main(ns), ns.profile_out)
-    return _render_main(ns)
+    import time as _time
+
+    total_start = _time.perf_counter()
+    rc = 1
+    try:
+        ap = build_parser()
+        ns = ap.parse_args(argv)
+        if ns.simple_mix and ns.full_mix_only:
+            ap.error("--simple-mix and --full-mix-only are mutually exclusive")
+        if ns.profile_out is not None:
+            print("render_isolated: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+        rc = _render_main(ns)
+        return rc
+    finally:
+        elapsed = _time.perf_counter() - total_start
+        print(f"[ambition_music_renderer.render_isolated] total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":

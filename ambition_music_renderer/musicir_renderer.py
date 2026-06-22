@@ -1619,19 +1619,19 @@ def sanitize_same_pitch_overlaps(
                 prev = note
 
 
-@profile
-def render_pretty_midi(
-    pm: pretty_midi.PrettyMIDI, soundfont: str, sample_rate: int
-) -> np.ndarray:
-    """Render via pyFluidSynth, with the synth's built-in reverb and chorus
-    disabled so they don't stack on top of the YAML postprocess chain.
+def _fluidsynth_stereo_samples(fl: Any, n: int) -> np.ndarray:
+    """Return ``n`` stereo frames from pyFluidSynth as float32 [-1, 1]."""
+    if n <= 0:
+        return np.zeros((0, 2), dtype=np.float32)
+    buf = fl.get_samples(int(n))
+    stereo = np.column_stack(
+        [buf[0::2].astype(np.float32), buf[1::2].astype(np.float32)]
+    )
+    stereo /= 32768.0
+    return stereo
 
-    pretty_midi.PrettyMIDI.fluidsynth() leaves both effects on, which adds a
-    hissy diffuse wash to every stem. We re-implement the same per-instrument
-    rendering loop so we can flip those settings off, and so we can render a
-    clean tail past the last note (the stock implementation cuts off at the
-    last event, which clips reverb-bus tails when stems are sliced later).
-    """
+
+def _new_fluidsynth(soundfont: str, sample_rate: int) -> tuple[Any, int]:
     try:
         import fluidsynth  # type: ignore
     except ImportError as e:
@@ -1640,6 +1640,21 @@ def render_pretty_midi(
             "`uv pip install pyfluidsynth`."
         ) from e
 
+    fl = fluidsynth.Synth(samplerate=float(sample_rate), gain=1.6)
+    try:
+        fl.setting("synth.reverb.active", 0)
+        fl.setting("synth.chorus.active", 0)
+    except Exception:
+        pass
+    sfid = fl.sfload(soundfont)
+    return fl, sfid
+
+
+@profile
+def _render_pretty_midi_per_instrument(
+    pm: pretty_midi.PrettyMIDI, soundfont: str, sample_rate: int
+) -> np.ndarray:
+    """Legacy pyFluidSynth path: one synth instance per MIDI instrument."""
     if not pm.instruments:
         return np.zeros((1, 2), dtype=np.float32)
 
@@ -1648,19 +1663,7 @@ def render_pretty_midi(
     for inst in pm.instruments:
         if not inst.notes:
             continue
-        # gain=1.6: at MIDI vel 100, vol/expr 100, the SoundFont samples come
-        # out around -13 dB peak — comparable to per-stem fallback-backend levels
-        # and well within headroom for stem summing. fluidsynth's stock default
-        # is 0.2, which makes everything 18 dB quieter than authored.
-        fl = fluidsynth.Synth(samplerate=fs_float, gain=1.6)
-        # Kill fluidsynth's internal effects buses; the YAML controls reverb
-        # and we don't want a chorus pseudo-noise floor on every stem.
-        try:
-            fl.setting("synth.reverb.active", 0)
-            fl.setting("synth.chorus.active", 0)
-        except Exception:
-            pass
-        sfid = fl.sfload(soundfont)
+        fl, sfid = _new_fluidsynth(soundfont, sample_rate)
         if inst.is_drum:
             channel = 9
             fl.program_select(channel, sfid, 128, 0)
@@ -1670,22 +1673,15 @@ def render_pretty_midi(
 
         events: list[tuple] = []
         for note in inst.notes:
-            events.append(
-                (float(note.start), 1, "on", int(note.pitch), int(note.velocity))
-            )
-            events.append((float(note.end), 0, "off", int(note.pitch), 0))
+            events.append((float(note.start), 1, channel, "on", int(note.pitch), int(note.velocity)))
+            events.append((float(note.end), 0, channel, "off", int(note.pitch), 0))
         for cc in inst.control_changes:
-            events.append((float(cc.time), 0, "cc", int(cc.number), int(cc.value)))
+            events.append((float(cc.time), 0, channel, "cc", int(cc.number), int(cc.value)))
         for pb in inst.pitch_bends:
-            events.append((float(pb.time), 0, "pb", int(pb.pitch), 0))
-        # Sort by time, with note-on AFTER note-off and CCs at the same time
-        # so coincident-time events don't accidentally trigger a note before
-        # the previous one ends.
+            events.append((float(pb.time), 0, channel, "pb", int(pb.pitch), 0))
         events.sort(key=lambda e: (e[0], e[1]))
 
         last_event_time = events[-1][0] if events else 0.0
-        # Add a tail (~0.6 s) so any release / built-in envelope tails finish
-        # before the per-stem post-process slicing cuts in.
         total_samples = int(math.ceil((last_event_time + 0.6) * fs_float))
         out = np.zeros((total_samples, 2), dtype=np.float32)
         cursor = 0
@@ -1693,43 +1689,124 @@ def render_pretty_midi(
             target = min(int(ev[0] * fs_float), total_samples)
             n = target - cursor
             if n > 0:
-                buf = fl.get_samples(n)
-                # pyFluidSynth returns interleaved L,R,L,R,...; preserve stereo
-                # so MIDI CC10 pan remains audible in stem renders.
-                stereo = np.column_stack(
-                    [buf[0::2].astype(np.float32), buf[1::2].astype(np.float32)]
-                )
-                # Normalize the int16 range pyFluidSynth uses by default.
-                stereo /= 32768.0
+                stereo = _fluidsynth_stereo_samples(fl, n)
                 out[cursor : cursor + len(stereo), :] = stereo[:n]
                 cursor += n
-            kind = ev[2]
+            kind = ev[3]
             if kind == "on":
-                fl.noteon(channel, ev[3], ev[4])
+                fl.noteon(channel, ev[4], ev[5])
             elif kind == "off":
-                fl.noteoff(channel, ev[3])
+                fl.noteoff(channel, ev[4])
             elif kind == "cc":
-                fl.cc(channel, ev[3], ev[4])
+                fl.cc(channel, ev[4], ev[5])
             elif kind == "pb":
-                fl.pitch_bend(channel, ev[3])
+                fl.pitch_bend(channel, ev[4])
         if cursor < total_samples:
-            buf = fl.get_samples(total_samples - cursor)
-            stereo = np.column_stack(
-                [buf[0::2].astype(np.float32), buf[1::2].astype(np.float32)]
-            )
-            stereo /= 32768.0
+            stereo = _fluidsynth_stereo_samples(fl, total_samples - cursor)
             out[cursor : cursor + len(stereo), :] = stereo[: total_samples - cursor]
         fl.delete()
         waveforms.append(out)
 
     if not waveforms:
         return np.zeros((1, 2), dtype=np.float32)
-
     max_len = max(len(w) for w in waveforms)
     mixed = np.zeros((max_len, 2), dtype=np.float32)
     for w in waveforms:
         mixed[: len(w), :] += _coerce_stereo(w)
     return _coerce_stereo(mixed)
+
+
+@profile
+def render_pretty_midi(
+    pm: pretty_midi.PrettyMIDI, soundfont: str, sample_rate: int
+) -> np.ndarray:
+    """Render via pyFluidSynth with one synth pass per stem group.
+
+    The original implementation created one FluidSynth instance per instrument
+    and rendered each instrument to a separate waveform before summing.  That is
+    easy to reason about, but it is painfully slow for multi-instrument groups:
+    a group with six instruments pays six full-duration synthesis passes.
+
+    This path assigns each melodic instrument to its own MIDI channel in one
+    FluidSynth instance, reserves channel 9 for drums, and renders the whole
+    group in a single event sweep.  That preserves per-instrument programs, CCs,
+    pitch bends, and pan while turning the dominant cost from
+    O(instruments * duration) into O(duration).  Set
+    ``AMBITION_PRETTY_MIDI_LEGACY=1`` to use the old path for A/B debugging.
+    """
+    if os.environ.get("AMBITION_PRETTY_MIDI_LEGACY") == "1":
+        return _render_pretty_midi_per_instrument(pm, soundfont, sample_rate)
+    if not pm.instruments:
+        return np.zeros((1, 2), dtype=np.float32)
+
+    active_insts = [inst for inst in pm.instruments if inst.notes]
+    if not active_insts:
+        return np.zeros((1, 2), dtype=np.float32)
+
+    melodic = [inst for inst in active_insts if not inst.is_drum]
+    if len(melodic) > 15:
+        # MIDI has only 16 channels and channel 9 is reserved for drums here.
+        # Large groups are rare; keep behavior safe rather than clever.
+        return _render_pretty_midi_per_instrument(pm, soundfont, sample_rate)
+
+    channels = [ch for ch in range(16) if ch != 9]
+    channel_for_inst: dict[int, int] = {}
+    for inst, channel in zip(melodic, channels):
+        channel_for_inst[id(inst)] = channel
+    for inst in active_insts:
+        if inst.is_drum:
+            channel_for_inst[id(inst)] = 9
+
+    fl, sfid = _new_fluidsynth(soundfont, sample_rate)
+    selected_channels: set[int] = set()
+    for inst in active_insts:
+        channel = channel_for_inst[id(inst)]
+        if inst.is_drum:
+            if channel not in selected_channels:
+                fl.program_select(channel, sfid, 128, 0)
+                selected_channels.add(channel)
+        else:
+            fl.program_select(channel, sfid, 0, int(inst.program))
+            selected_channels.add(channel)
+
+    fs_float = float(sample_rate)
+    events: list[tuple] = []
+    for inst in active_insts:
+        channel = channel_for_inst[id(inst)]
+        for note in inst.notes:
+            events.append((float(note.start), 1, channel, "on", int(note.pitch), int(note.velocity)))
+            events.append((float(note.end), 0, channel, "off", int(note.pitch), 0))
+        for cc in inst.control_changes:
+            events.append((float(cc.time), 0, channel, "cc", int(cc.number), int(cc.value)))
+        for pb in inst.pitch_bends:
+            events.append((float(pb.time), 0, channel, "pb", int(pb.pitch), 0))
+    events.sort(key=lambda e: (e[0], e[1], e[2]))
+
+    last_event_time = events[-1][0] if events else 0.0
+    total_samples = int(math.ceil((last_event_time + 0.6) * fs_float))
+    out = np.zeros((total_samples, 2), dtype=np.float32)
+    cursor = 0
+    for ev in events:
+        target = min(int(ev[0] * fs_float), total_samples)
+        n = target - cursor
+        if n > 0:
+            stereo = _fluidsynth_stereo_samples(fl, n)
+            out[cursor : cursor + len(stereo), :] = stereo[:n]
+            cursor += n
+        _, _, channel, kind, a, b = ev
+        if kind == "on":
+            fl.noteon(channel, a, b)
+        elif kind == "off":
+            fl.noteoff(channel, a)
+        elif kind == "cc":
+            fl.cc(channel, a, b)
+        elif kind == "pb":
+            fl.pitch_bend(channel, a)
+    if cursor < total_samples:
+        stereo = _fluidsynth_stereo_samples(fl, total_samples - cursor)
+        out[cursor : cursor + len(stereo), :] = stereo[: total_samples - cursor]
+    fl.delete()
+    return _coerce_stereo(out)
 
 
 def _lowpass_mono(signal_in: np.ndarray, amount: float) -> np.ndarray:

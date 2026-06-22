@@ -30,6 +30,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from .profiler import profile
+
 # Soft import: ubelt.ProgIter gives the bulk loop a count + ETA. If it's not
 # installed in the active venv (older setup), fall back to a plain iterator
 # so the renderer still works.
@@ -391,6 +393,7 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
     return True
 
 
+@profile
 def cmd_render(args: argparse.Namespace) -> int:
     yaml_path = find_score(args.cue)
     if yaml_path is None:
@@ -412,6 +415,7 @@ def cmd_render(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+@profile
 def cmd_publish(args: argparse.Namespace) -> int:
     outdir = generated_root() / args.cue
     # Fallback to legacy output/ tree if generated/ is empty.
@@ -423,6 +427,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+@profile
 def cmd_render_publish(args: argparse.Namespace) -> int:
     yaml_path = find_score(args.cue)
     if yaml_path is None:
@@ -517,6 +522,7 @@ def _run_bulk(args: argparse.Namespace, cues: tuple[str, ...]) -> int:
     return 0
 
 
+@profile
 def cmd_sandbox(args: argparse.Namespace) -> int:
     """Render+publish the sandbox single-track cues.
 
@@ -529,6 +535,7 @@ def cmd_sandbox(args: argparse.Namespace) -> int:
     return _run_bulk(args, cues)
 
 
+@profile
 def cmd_radio(args: argparse.Namespace) -> int:
     """Render+publish every cue we expose on the in-game radio.
 
@@ -542,6 +549,7 @@ def cmd_radio(args: argparse.Namespace) -> int:
     return _run_bulk(args, cues)
 
 
+@profile
 def cmd_bundle(args: argparse.Namespace) -> int:
     from .cue_bundle import create_bundle, print_bundle_summary
 
@@ -565,6 +573,7 @@ def cmd_bundle(args: argparse.Namespace) -> int:
         jpeg_quality=args.jpeg_quality,
         render_audio_mode=args.render_audio_mode,
         profile_render=args.profile_render,
+        render_in_process=getattr(args, "render_in_process", False),
     )
     import json as _json
 
@@ -692,7 +701,8 @@ def add_bundle_args(p: argparse.ArgumentParser) -> None:
             "simple-mix writes only the mastered preview."
         ),
     )
-    p.add_argument("--profile-render", action="store_true", help="cProfile render_isolated and per-group workers into reports/")
+    p.add_argument("--profile-render", action="store_true", help="enable LINE_PROFILE=1 and run render_isolated in-process for line_profiler")
+    p.add_argument("--render-in-process", action="store_true", help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess")
 
 
 def add_render_args(p: argparse.ArgumentParser) -> None:
@@ -913,14 +923,27 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+@profile
 def main(argv: list[str] | None = None) -> int:
-    ap = build_parser()
-    args = ap.parse_args(argv)
-    if args.command in ("sandbox", "radio"):
-        # Map --skip-render onto action.
-        if getattr(args, "skip_render", False) and args.action == "render-publish":
-            args.action = "publish"
-    return args.func(args)
+    import time as _time
+
+    total_start = _time.perf_counter()
+    rc = 1
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    command_name = next((item for item in raw_argv if not str(item).startswith("-")), "<parse-error>")
+    try:
+        ap = build_parser()
+        args = ap.parse_args(argv)
+        command_name = str(getattr(args, "command", command_name))
+        if args.command in ("sandbox", "radio"):
+            # Map --skip-render onto action.
+            if getattr(args, "skip_render", False) and args.action == "render-publish":
+                args.action = "publish"
+        rc = int(args.func(args))
+        return rc
+    finally:
+        elapsed = _time.perf_counter() - total_start
+        print(f"[ambition_music_renderer] command={command_name} total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":

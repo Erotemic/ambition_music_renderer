@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 from . import musicir_renderer as r
-from .profiler import PhaseTimer, run_with_cprofile
+from .profiler import PhaseTimer, profile
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -31,11 +31,12 @@ def build_parser() -> argparse.ArgumentParser:
             "unused encoded outputs from the render budget."
         ),
     )
-    ap.add_argument("--profile-out", type=Path, default=None, help="write cProfile stats for this worker")
+    ap.add_argument("--profile-out", type=Path, default=None, help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead")
     ap.add_argument("--timings-out", type=Path, default=None, help="write worker phase timings to JSON")
     return ap
 
 
+@profile
 def _worker_main(ns: argparse.Namespace) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
@@ -108,12 +109,22 @@ def _worker_main(ns: argparse.Namespace) -> int:
     return 0
 
 
+@profile
 def main(argv=None) -> int:
-    ap = build_parser()
-    ns = ap.parse_args(argv)
-    if ns.profile_out is not None:
-        return run_with_cprofile(lambda: _worker_main(ns), ns.profile_out)
-    return _worker_main(ns)
+    import time as _time
+
+    total_start = _time.perf_counter()
+    rc = 1
+    try:
+        ap = build_parser()
+        ns = ap.parse_args(argv)
+        if ns.profile_out is not None:
+            print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
+        rc = _worker_main(ns)
+        return rc
+    finally:
+        elapsed = _time.perf_counter() - total_start
+        print(f"[ambition_music_renderer.render_group_worker] total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":

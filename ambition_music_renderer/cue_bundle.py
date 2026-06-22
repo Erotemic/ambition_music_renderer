@@ -34,6 +34,7 @@ from .sour_note_audit import audit_file as audit_sour_note_file
 from .sour_note_audit import write_reports as write_sour_note_reports
 from .shrill_note_audit import audit_file as audit_shrill_note_file
 from .shrill_note_audit import write_reports as write_shrill_note_reports
+from .profiler import profile
 
 DEFAULT_BACKEND = "pretty-midi"
 BACKEND_CHOICES = ("pretty-midi", "fluidsynth-cli", "fallback", "auto")
@@ -71,6 +72,15 @@ class CommandResult:
     returncode: int
     stdout: Path
     stderr: Path
+    elapsed_s: float | None = None
+
+    @property
+    def stdout_tail(self) -> str:
+        return _tail_text(self.stdout)
+
+    @property
+    def stderr_tail(self) -> str:
+        return _tail_text(self.stderr)
 
 
 def package_dir() -> Path:
@@ -143,13 +153,61 @@ def safe_rel(path: Path, root: Path | None = None) -> str:
         return str(path)
 
 
+def _tail_text(path: Path, *, max_lines: int = 80, max_chars: int = 12000) -> str:
+    try:
+        text = path.read_text(encoding="utf8", errors="replace")
+    except Exception:
+        return ""
+    lines = text.splitlines()[-max_lines:]
+    tail = "\n".join(lines)
+    if len(tail) > max_chars:
+        tail = tail[-max_chars:]
+    return tail
+
+
+@profile
 def run_logged(name: str, command: list[str], reports_dir: Path, *, cwd: Path) -> CommandResult:
+    import time as _time
+
     reports_dir.mkdir(parents=True, exist_ok=True)
     stdout = reports_dir / f"{name}.stdout.txt"
     stderr = reports_dir / f"{name}.stderr.txt"
+    start = _time.perf_counter()
     with stdout.open("w", encoding="utf8") as out_f, stderr.open("w", encoding="utf8") as err_f:
         proc = subprocess.run(command, cwd=cwd, stdout=out_f, stderr=err_f)
-    return CommandResult(name, command, proc.returncode, stdout, stderr)
+    elapsed = _time.perf_counter() - start
+    result = CommandResult(name, command, proc.returncode, stdout, stderr, elapsed)
+    if proc.returncode != 0:
+        progress_line(f"command failed: {name} rc={proc.returncode} elapsed_s={elapsed:.3f}")
+        progress_line(f"stdout: {terminal_link(stdout)}")
+        progress_line(f"stderr: {terminal_link(stderr)}")
+        tail = result.stderr_tail
+        if tail:
+            print(f"[music bundle] --- {name} stderr tail ---")
+            print(tail)
+    return result
+
+
+@profile
+def run_render_in_process(name: str, argv: list[str], reports_dir: Path) -> CommandResult:
+    """Run render_isolated in this interpreter for useful line-profiler output."""
+    import time as _time
+    from . import render_isolated
+
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    stdout = reports_dir / f"{name}.stdout.txt"
+    stderr = reports_dir / f"{name}.stderr.txt"
+    stdout.write_text("in-process render; output streamed to terminal\n", encoding="utf8")
+    stderr.write_text("in-process render; stderr streamed to terminal\n", encoding="utf8")
+    start = _time.perf_counter()
+    rc = 1
+    try:
+        rc = int(render_isolated.main(argv))
+    except SystemExit as ex:
+        code = ex.code
+        rc = int(code) if isinstance(code, int) else 1
+    elapsed = _time.perf_counter() - start
+    return CommandResult(name, ["<in-process>", "ambition_music_renderer.render_isolated", *argv], rc, stdout, stderr, elapsed)
 
 
 def _db(value: float) -> float:
@@ -2384,11 +2442,12 @@ def build_rerun_script(
     zip_report_bundle: bool,
     render_audio_mode: str = "full",
     profile_render: bool = False,
+    render_in_process: bool = False,
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
     publish_flag = " --publish" if publish else ""
     cmd = [
-        "PYTHONPATH=tools/ambition_music_renderer python -m ambition_music_renderer cue bundle",
+        "uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle",
         str(cue),
         "--backend",
         str(backend),
@@ -2401,6 +2460,8 @@ def build_rerun_script(
     cmd.extend(["--outdir", str(outdir), "--force", "--render-audio-mode", str(render_audio_mode)])
     if profile_render:
         cmd.append("--profile-render")
+    if render_in_process:
+        cmd.append("--render-in-process")
     if publish:
         cmd.append("--publish")
     if zip_bundle:
@@ -2419,6 +2480,7 @@ def build_rerun_script(
     return script
 
 
+@profile
 def create_bundle(
     cue: str,
     *,
@@ -2440,6 +2502,7 @@ def create_bundle(
     runtime_stem_max_gain_db: float | None = None,
     render_audio_mode: str = "full",
     profile_render: bool = False,
+    render_in_process: bool = False,
 ) -> dict[str, object]:
     progress_line(f"locating score for {cue!r}")
     score_path = find_score(cue)
@@ -2490,10 +2553,7 @@ def create_bundle(
 
     if not skip_render:
         progress_line(f"rendering {cue_id} with backend={backend}, runtime_stems={runtime_stem_gain_mode}")
-        render_cmd = [
-            sys.executable,
-            "-m",
-            "ambition_music_renderer.render_isolated",
+        render_args = [
             str(score_path),
             "--outdir",
             str(outdir),
@@ -2508,22 +2568,31 @@ def create_bundle(
             str(reports_dir / "render_isolated_timings.json"),
         ]
         if render_audio_mode == "full-mix-only":
-            render_cmd.append("--full-mix-only")
+            render_args.append("--full-mix-only")
         elif render_audio_mode == "simple-mix":
-            render_cmd.append("--simple-mix")
+            render_args.append("--simple-mix")
         if profile_render:
-            render_cmd.extend(["--profile-out", str(reports_dir / "render_isolated.cprofile"), "--profile-workers"])
+            os.environ.setdefault("LINE_PROFILE", "1")
+            render_in_process = True
+            render_args.append("--profile-workers")
+            progress_line("profiling enabled via line_profiler; running render_isolated in-process")
         if runtime_stem_max_gain_db is not None:
-            render_cmd.extend(["--runtime-stem-max-gain-db", str(runtime_stem_max_gain_db)])
+            render_args.extend(["--runtime-stem-max-gain-db", str(runtime_stem_max_gain_db)])
         if force:
-            render_cmd.append("--force")
-        commands.append(run_logged("render_isolated", render_cmd, reports_dir, cwd=package_dir()))
+            render_args.append("--force")
+        if render_in_process:
+            commands.append(run_render_in_process("render_isolated", render_args, reports_dir))
+        else:
+            render_cmd = [sys.executable, "-m", "ambition_music_renderer.render_isolated", *render_args]
+            commands.append(run_logged("render_isolated", render_cmd, reports_dir, cwd=package_dir()))
         if commands[-1].returncode != 0:
             return {
                 "cue": cue_id,
                 "ok": False,
                 "error": "render_isolated failed",
                 "commands": [c.__dict__ for c in commands],
+                "stderr_tail": commands[-1].stderr_tail if commands else "",
+                "stdout_tail": commands[-1].stdout_tail if commands else "",
                 "outdir": str(outdir),
             }
 
@@ -2718,6 +2787,7 @@ def create_bundle(
         zip_report_bundle,
         render_audio_mode,
         profile_render,
+        render_in_process,
     )
 
     command_rows = [
@@ -2727,6 +2797,7 @@ def create_bundle(
             "command": c.command,
             "stdout": str(c.stdout),
             "stderr": str(c.stderr),
+            "elapsed_s": c.elapsed_s,
         }
         for c in commands
     ]
@@ -2740,6 +2811,7 @@ def create_bundle(
         "plot_format": plot_format,
         "render_audio_mode": render_audio_mode,
         "profile_render": profile_render,
+        "render_in_process": render_in_process,
         "render_hash": render_hash,
         "outdir": str(outdir),
         "bundle_dir": str(bundle_dir),
@@ -2835,36 +2907,50 @@ def build_parser() -> argparse.ArgumentParser:
             "when you do not need per-stem runtime OGG exports."
         ),
     )
-    ap.add_argument("--profile-render", action="store_true", help="cProfile render_isolated and per-group workers into reports/")
+    ap.add_argument("--profile-render", action="store_true", help="enable LINE_PROFILE=1 and run render_isolated in-process for line_profiler")
+    ap.add_argument("--render-in-process", action="store_true", help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess")
     return ap
 
 
+@profile
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    report = create_bundle(
-        args.cue,
-        backend=args.backend,
-        runtime_stem_gain_mode=args.runtime_stem_gain_mode,
-        outdir=args.outdir,
-        bundle_root=args.bundle_root,
-        force=args.force,
-        publish=args.publish,
-        dest_root=args.dest_root,
-        zip_bundle=args.zip_bundle,
-        zip_report_bundle=args.zip_report_bundle,
-        jobs=args.jobs,
-        include_scratch_stems=args.include_scratch_stems,
-        skip_render=args.skip_render,
-        skip_spectrograms=args.skip_spectrograms,
-        plot_format=args.plot_format,
-        jpeg_quality=args.jpeg_quality,
-        runtime_stem_max_gain_db=args.runtime_stem_max_gain_db,
-        render_audio_mode=args.render_audio_mode,
-        profile_render=args.profile_render,
-    )
-    print_bundle_summary(report)
-    print(json.dumps(report, indent=2, default=str))
-    return 0 if report.get("ok", True) else 1
+    import time as _time
+
+    total_start = _time.perf_counter()
+    cue_name = "<parse-error>"
+    rc = 1
+    try:
+        args = build_parser().parse_args(argv)
+        cue_name = str(args.cue)
+        report = create_bundle(
+            args.cue,
+            backend=args.backend,
+            runtime_stem_gain_mode=args.runtime_stem_gain_mode,
+            outdir=args.outdir,
+            bundle_root=args.bundle_root,
+            force=args.force,
+            publish=args.publish,
+            dest_root=args.dest_root,
+            zip_bundle=args.zip_bundle,
+            zip_report_bundle=args.zip_report_bundle,
+            jobs=args.jobs,
+            include_scratch_stems=args.include_scratch_stems,
+            skip_render=args.skip_render,
+            skip_spectrograms=args.skip_spectrograms,
+            plot_format=args.plot_format,
+            jpeg_quality=args.jpeg_quality,
+            runtime_stem_max_gain_db=args.runtime_stem_max_gain_db,
+            render_audio_mode=args.render_audio_mode,
+            profile_render=args.profile_render,
+            render_in_process=getattr(args, "render_in_process", False),
+        )
+        print_bundle_summary(report)
+        print(json.dumps(report, indent=2, default=str))
+        rc = 0 if report.get("ok", True) else 1
+        return rc
+    finally:
+        elapsed = _time.perf_counter() - total_start
+        print(f"[ambition_music_renderer.cue_bundle] cue={cue_name} total_elapsed_s={elapsed:.3f}", flush=True)
 
 
 if __name__ == "__main__":
