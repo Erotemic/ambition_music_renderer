@@ -46,7 +46,7 @@ DBFS_PLOT_FLOOR = -100.0
 
 
 class CueBundleConfig(kwconf.Config):
-    """kwconf-backed configuration for ``cue bundle``.
+    """kwconf-backed configuration for ``cue_bundle``.
 
     This is the single source of truth for Python-callable and CLI bundle options.
     """
@@ -2553,7 +2553,7 @@ def build_rerun_script(
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
     cmd = [
-        "uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle",
+        "uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle",
         str(cue),
         "--backend",
         str(backend),
@@ -2994,7 +2994,7 @@ def cue_bundle_main(
     print_json: bool = True,
     **kwargs: object,
 ) -> int:
-    """kwconf-backed Python/CLI entrypoint for ``cue bundle``.
+    """kwconf-backed Python/CLI entrypoint for ``cue_bundle``.
 
     Examples:
         >>> cue_bundle_main(cmdline=False, cue='for_emmy_forever_ago', skip_render=True)  # doctest: +SKIP

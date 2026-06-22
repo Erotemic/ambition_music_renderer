@@ -6,13 +6,13 @@ This package is the canonical code-only music generator for the project. Do not 
 
 ## Common commands
 
-Run from the repo root unless noted. `uv run --project tools/ambition_music_renderer` installs/runs the package with the renderer project metadata, so `PYTHONPATH=tools/ambition_music_renderer` should not be needed.
+Run from the repo root unless noted. `uv run --project ~/code/ambition/tools/ambition_music_renderer` installs/runs the package with the renderer project metadata, so `PYTHONPATH=tools/ambition_music_renderer` should not be needed.
 
 Recommended test command:
 
 ```bash
 cd ~/code/ambition
-uv run --project tools/ambition_music_renderer pytest -q tools/ambition_music_renderer/tests
+uv run --project ~/code/ambition/tools/ambition_music_renderer pytest -q tools/ambition_music_renderer/tests
 ```
 
 If you already activated the renderer environment, use `uv run --active`:
@@ -26,10 +26,10 @@ uv run --active pytest -q tools/ambition_music_renderer/tests
 Common CLI commands:
 
 ```bash
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer --help
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --force --zip
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime_stem_gain_mode shared --force --zip
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend pretty-midi --runtime_stem_gain_mode shared --zip_report --force
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --force --zip
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --force --zip
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --zip_report --force
 ./generate_audio_assets.sh --force
 ```
 
@@ -77,10 +77,10 @@ Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal
 Use the plugin diagnostics before authoring a score that depends on local plugins:
 
 ```bash
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins doctor
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list_vst3
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins list_lv2 --limit 40
-uv run --project tools/ambition_music_renderer python -m ambition_music_renderer plugins validate_score guitar_backend_demo
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins doctor
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins list_vst3
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins list_lv2 --limit=40
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins validate_score guitar_backend_demo
 ```
 
 For new work, prefer the explicit `effect_chain` surface. Each step states the host family. This keeps the default render path lightweight while making DAW-like processing reproducible from YAML/Python.
@@ -125,20 +125,20 @@ SoundFont preference is defined in the renderer code. Prefer high-quality MuseSc
 
 ## One-command cue debug bundles
 
-Use `cue bundle` when regenerating a song for review or for handoff to another
+Use `cue_bundle` when regenerating a song for review or for handoff to another
 agent. It renders with retained debug stems, runs the useful reports, writes
 spectrogram images when matplotlib is available, and packages an uploadable
 bundle on request. Generated bundles remain ignored by git.
 
 ```bash
-uv run --project tools/ambition_music_renderer \
-python -m ambition_music_renderer cue bundle <cue_id> \
-  --backend pretty-midi \
+uv run --project ~/code/ambition/tools/ambition_music_renderer \
+python -m ambition_music_renderer cue_bundle <cue_id> \
+  --backend=pretty-midi \
   --force \
   --zip
 ```
 
-For layered runtime-stem audits, add `--runtime_stem_gain_mode shared`. The
+For layered runtime-stem audits, add `--runtime_stem_gain_mode=shared`. The
 default `native` mode preserves historical raw stem levels; `shared` computes one
 reference gain from the all-stem mix and applies it to every runtime stem so the
 layered export is audible without destroying the stem balance via independent
@@ -156,18 +156,18 @@ useful but usually too large for chat upload.
 
 ### Profiling renders
 
-Normal `cue bundle` may launch `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, use `--profile_render`; it enables `LINE_PROFILE=1`, runs `render_isolated` in-process, and renders serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` uses line profiler only; it does not start cProfile.
+Normal `cue_bundle` may launch `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, use `--profile_render`; it enables `LINE_PROFILE=1`, runs `render_isolated` in-process, and renders serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` uses line profiler only; it does not start cProfile.
 
 Recommended short profiling command:
 
 ```bash
 cd ~/code/ambition
 
-LINE_PROFILE=1 uv run --project tools/ambition_music_renderer \
-python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
-  --backend pretty-midi \
-  --runtime_stem_gain_mode shared \
-  --render_audio_mode full-mix-only \
+LINE_PROFILE=1 uv run --project ~/code/ambition/tools/ambition_music_renderer \
+python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
+  --backend=pretty-midi \
+  --runtime_stem_gain_mode=shared \
+  --render_audio_mode=full-mix-only \
   --profile_render \
   --force \
   --zip_report
@@ -180,10 +180,10 @@ cd ~/code/ambition
 source tools/ambition_music_renderer/.venv/bin/activate
 
 LINE_PROFILE=1 uv run --active \
-python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
-  --backend pretty-midi \
-  --runtime_stem_gain_mode shared \
-  --render_audio_mode full-mix-only \
+python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
+  --backend=pretty-midi \
+  --runtime_stem_gain_mode=shared \
+  --render_audio_mode=full-mix-only \
   --profile_render \
   --force \
   --zip_report
@@ -226,7 +226,7 @@ density. It does **not** do source separation or infer instrumentation. MP3
 decode depends on the local `soundfile` / `ffmpeg` setup.
 
 ```bash
-uv run --project tools/ambition_music_renderer \
+uv run --project ~/code/ambition/tools/ambition_music_renderer \
 python -m ambition_music_renderer.reference_audio_audit path/to/reference.mp3 \
   --outdir /tmp/reference_audio_audit
 ```

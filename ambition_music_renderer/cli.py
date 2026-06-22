@@ -371,7 +371,7 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
         print(
             f"error: publish {cue}: no adaptive full-section assets were copied from {outdir}. "
             "The encounter runtime loads adaptive/<section>/<section>.full.ogg, not full.ogg. "
-            "Render with `cue bundle --publish` or render_isolated --full-mix-only before publishing.",
+            "Render with `cue_bundle --publish` or render_isolated --full-mix-only before publishing.",
             file=sys.stderr,
         )
         return False
@@ -699,7 +699,7 @@ class BundleManyCommand(kwconf.Config):
 
 
     cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    workers: int | None = kwconf.Value(None, short_alias=["j"], help="parallel cue bundle jobs")
+    workers: int | None = kwconf.Value(None, short_alias=["j"], help="parallel cue_bundle jobs")
     render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
     scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
     include_examples: bool = kwconf.Flag(False)
@@ -883,6 +883,7 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     render = RenderCommand
     publish = PublishCommand
     render_publish = RenderPublishCommand
+    cue_bundle = BundleCommand
     bundle = BundleCommand
     bundle_many = BundleManyCommand
     cue = CueModal

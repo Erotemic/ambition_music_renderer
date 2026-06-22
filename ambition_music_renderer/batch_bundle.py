@@ -1,6 +1,6 @@
 """Parallel cue bundle runner for overnight MusicIR diagnostics.
 
-This wrapper deliberately launches one normal ``cue bundle`` subprocess per cue.
+This wrapper deliberately launches one normal ``cue_bundle`` subprocess per cue.
 That is safer than importing the renderer into many in-process workers because
 pretty-midi, fluidsynth/ffmpeg, matplotlib, and SoundFont handles all have their
 own process-level state.  The Python coordinator is mostly waiting on child process I/O.  We use
@@ -117,7 +117,7 @@ def _newer_than(paths: Iterable[Path], start_mtime: float) -> Path | None:
 
 
 def _find_job_artifacts(cue: str, bundle_root: Path, start_time: float) -> tuple[Path | None, Path | None, Path | None]:
-    """Find bundle outputs created by a just-finished cue bundle subprocess."""
+    """Find bundle outputs created by a just-finished cue_bundle subprocess."""
     root = bundle_root.resolve()
     bundle_dir = _newer_than(root.glob(f"{cue}_*_bundle"), start_time)
     report_zip = _newer_than(root.glob(f"{cue}_*_bundle_report.zip"), start_time)
@@ -342,7 +342,7 @@ class BatchBundleConfig(kwconf.Config):
 
     cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
     workers: int | None = kwconf.Value(max(1, min(4, (os.cpu_count() or 4) // 2)), short_alias=["j"], help="parallel cue jobs; 0 or 1 runs serially")
-    render_jobs: int = kwconf.Value(1, help="per-cue render worker count passed to cue bundle")
+    render_jobs: int = kwconf.Value(1, help="per-cue render worker count passed to cue_bundle")
     scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
     include_examples: bool = kwconf.Flag(False, help="include scores/examples in discovery")
     backend: str = kwconf.Value("pretty-midi")
