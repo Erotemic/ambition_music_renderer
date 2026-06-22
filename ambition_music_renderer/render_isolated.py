@@ -140,6 +140,7 @@ def _db(value: float) -> float:
     return 20.0 * math.log10(value)
 
 
+@profile
 def _audio_stats(audio: np.ndarray, sample_rate: int) -> dict[str, float]:
     audio = r._coerce_stereo(audio)  # internal renderer helper; keeps stats consistent.
     if audio.size == 0:
@@ -161,6 +162,7 @@ def _audio_stats(audio: np.ndarray, sample_rate: int) -> dict[str, float]:
     }
 
 
+@profile
 def _scale_audio(audio: np.ndarray, gain_db: float) -> np.ndarray:
     if abs(gain_db) < 1e-9:
         return audio.astype("float32", copy=False)

@@ -22,7 +22,7 @@ except Exception:  # pragma: no cover - fallback for fresh environments
     rich_print = print
 
 
-RENDERER_ROOT = Path(__file__).resolve().parent
+RENDERER_ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = RENDERER_ROOT.parents[1]
 DEFAULT_SOURCE = RENDERER_ROOT / "scores" / "active" / "first_goblin_tune_v2.music.yaml"
 DEFAULT_OUTPUT = (

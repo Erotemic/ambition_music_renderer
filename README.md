@@ -33,18 +33,17 @@ uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambitio
 ./generate_audio_assets.sh --force
 ```
 
-From the tool directory:
+Auxiliary analysis and maintenance helpers are exposed through the package modal CLI rather than top-level scripts:
 
 ```bash
-cd tools/ambition_music_renderer
-python -m ambition_music_renderer --help
-./render_first_goblin_transition_lab.sh
-python transition_audit.py --help     # two-file transition seam
-python audit_cue_balance.py --help    # sections within one cue
-python level_report.py --help         # inter-cue catalog levels; --check fails on clipping
+cd ~/code/ambition
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools transition_audit --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools audit_cue_balance --help
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer tools level_report --check
 ```
 
-Use the package CLI and scripts in this directory for current music-renderer work. Older docs may mention retired paths under `tools/audio/`; those paths are stale and should not be copied into new instructions.
+Use the package CLI for current music-renderer work. Older docs may mention retired paths under `tools/audio/` or direct `python *.py` tool scripts; those paths are stale and should not be copied into new instructions.
 
 ## Useful files
 
@@ -55,8 +54,8 @@ Use the package CLI and scripts in this directory for current music-renderer wor
 - `scores/examples/` - reference/example cues.
 - `scores/archive/` - historical cues kept for reference.
 - `render_first_goblin_transition_lab.sh` - local transition-lab helper.
-- `install_first_goblin_tune_v2.py` - installer for the first-goblin tune asset path.
-- `audit_cue_balance.py`, `transition_audit.py`, `level_report.py`, `spectral_compare.py`, `spectral_localize.py`, `arrangement_audit.py`, `dissonance_audit.py` - analysis helpers (`level_report.py` is the diff-friendly cross-catalog loudness/clipping report; `arrangement_audit.py` preflights group prominence, low-register density, and harmonic outliers; `dissonance_audit.py` finds score-level note clashes before audio is rendered and can emit human-readable markdown + plots).
+- `ambition_music_renderer/install_first_goblin_tune_v2.py` - installer for the first-goblin tune asset path, exposed as `python -m ambition_music_renderer tools install_first_goblin_tune_v2`.
+- `ambition_music_renderer/*_audit.py`, `ambition_music_renderer/level_report.py`, `ambition_music_renderer/spectral_*.py` - analysis helpers exposed under `python -m ambition_music_renderer tools ...` (`level_report` is the diff-friendly cross-catalog loudness/clipping report; `arrangement_audit` preflights group prominence, low-register density, and harmonic outliers; `dissonance_audit` finds score-level note clashes before audio is rendered and can emit human-readable markdown + plots).
 - `goals.md` - design/planning notes for renderer direction.
 - `MUSIC_RENDERER_REFACTOR_ROADMAP.md` - durable roadmap/checklist for the renderer cleanup.
 
@@ -189,7 +188,7 @@ python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
   --zip_report
 ```
 
-Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. To inspect a saved line-profiler file, use:
+Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. The profile surface includes the old process-boundary functions plus audio hotspots such as `simple_reverb`, `_comb_filter`, `_allpass_filter`, `_new_fluidsynth`, `_fluidsynth_stereo_samples`, filters, compressor, limiter, and OGG writing helpers. To inspect a saved line-profiler file, use:
 
 ```bash
 python -m line_profiler -rtmz profile_output.lprof
@@ -227,8 +226,8 @@ decode depends on the local `soundfile` / `ffmpeg` setup.
 
 ```bash
 uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer.reference_audio_audit path/to/reference.mp3 \
-  --outdir /tmp/reference_audio_audit
+python -m ambition_music_renderer tools reference_audio_audit path/to/reference.mp3 \
+  --outdir=/tmp/reference_audio_audit
 ```
 
 Outputs include `reference_audio_summary.txt`, `reference_audio_audit.json`,
@@ -325,7 +324,7 @@ Per-layer overrides can use the same shape. Constraints currently apply to chord
 For adaptive cues, distinguish runtime problems from generated-audio problems before changing code:
 
 1. Render/regenerate the cue.
-2. Audit generated and installed OGGs with `audit_cue_balance.py`.
+2. Audit generated and installed OGGs with `python -m ambition_music_renderer tools audit_cue_balance`.
 3. Run the game in the relevant room and capture music logs.
 4. Confirm whether the runtime starts the next state at target gain or fades from silence.
 5. Listen to adjacent generated files outside the game to decide if the seam exists before runtime touches them.

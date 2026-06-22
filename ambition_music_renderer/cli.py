@@ -668,24 +668,83 @@ class RenderPublishCommand(kwconf.Config):
         return cmd_render_publish(config)
 
 
-class BundleCommandMixin:
+class BundleCommand(kwconf.Config):
+    """Render, debug, and package a cue bundle."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    backend: str = kwconf.Value("pretty-midi", choices=["pretty-midi", "fluidsynth-cli", "fallback", "auto"])
+    runtime_stem_gain_mode: str = kwconf.Value(
+        "native",
+        choices=["native", "shared"],
+        help=(
+            "runtime adaptive stem export mode: native preserves current raw "
+            "levels; shared applies one shared reference gain across all stems"
+        ),
+    )
+    runtime_stem_max_gain_db: float | None = kwconf.Value(
+        None,
+        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
+    )
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    bundle_root: Path | None = kwconf.Value(None, parser=Path)
+    force: bool = kwconf.Flag(False, help="force render regeneration")
+    publish: bool = kwconf.Flag(False, help="publish full.ogg to game assets after rendering")
+    dest_root: Path | None = kwconf.Value(None, parser=Path, help="game music generated asset root")
+    zip_bundle: bool = kwconf.Flag(
+        False,
+        alias=["zip"],
+        help="write a complete uploadable bundle zip including manifest-referenced audio",
+    )
+    zip_report_bundle: bool = kwconf.Flag(
+        False,
+        alias=["zip_report"],
+        help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries",
+    )
+    plot_format: str = kwconf.Value(
+        "jpg",
+        choices=["jpg", "png"],
+        help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
+    )
+    jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
+    jobs: int = kwconf.Value(1, short_alias=["j"], help="render worker count")
+    include_scratch_stems: bool = kwconf.Flag(
+        False,
+        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
+    )
+    skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
+    skip_spectrograms: bool = kwconf.Flag(False, help="skip spectrogram generation")
+    render_audio_mode: str = kwconf.Value(
+        "full",
+        choices=["full", "full-mix-only", "simple-mix"],
+        help=(
+            "audio export scope for render_isolated. full preserves all adaptive "
+            "stem/state preview OGGs; full-mix-only keeps scratch stems plus "
+            "mastered preview and section full mixes; simple-mix writes only the "
+            "mastered preview."
+        ),
+    )
+    profile_render: bool = kwconf.Flag(
+        False,
+        help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",
+    )
+    render_in_process: bool = kwconf.Flag(
+        False,
+        help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
+    )
+
+    def __post_init__(self) -> None:
+        self.jobs = int(self.jobs)
+        self.jpeg_quality = int(self.jpeg_quality)
+        for key in ("outdir", "bundle_root", "dest_root"):
+            value = getattr(self, key)
+            if value is not None and not isinstance(value, Path):
+                setattr(self, key, Path(value))
+
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
         config = cls.cli(argv=argv, data=kwargs)
         return cmd_bundle(config)
 
-
-def _bundle_command_cls():
-    from .cue_bundle import CueBundleConfig
-
-    class BundleCommand(BundleCommandMixin, CueBundleConfig):
-        """Render, debug, and package a cue bundle."""
-
-
-    return BundleCommand
-
-
-BundleCommand = _bundle_command_cls()
 
 
 class CueModal(kwconf.ModalCLI):
@@ -876,6 +935,202 @@ class PluginsModal(kwconf.ModalCLI):
     lv2_info = PluginLV2Info
     validate_score = PluginValidateScore
 
+class _LazyToolCommand(kwconf.Config):
+    """Local proxy for package tool modules with optional/heavy imports."""
+
+    _module_name = ""
+    _config_name = ""
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        import importlib
+
+        from .kwconf_runner import config_to_argv
+
+        module = importlib.import_module(f".{cls._module_name}", __package__)
+        target_config_cls = getattr(module, cls._config_name)
+        return int(module.main(argv=config_to_argv(target_config_cls, config.asdict())))
+
+
+class ArrangementAuditTool(_LazyToolCommand):
+    """Audit MusicIR arrangement density and event overlap."""
+
+    _module_name = "arrangement_audit"
+    _config_name = "ArrangementAuditConfig"
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    bucket_beats: float = kwconf.Value(0.25)
+    max_rows: int = kwconf.Value(40)
+    json: bool = kwconf.Flag(False)
+
+
+class DissonanceAuditTool(_LazyToolCommand):
+    """Audit MusicIR harmonic dissonance hotspots."""
+
+    _module_name = "dissonance_audit"
+    _config_name = "DissonanceAuditConfig"
+
+    score: Path = kwconf.Value(None, position=1, parser=Path, help="MusicIR YAML score to analyze")
+    outdir: Path | None = kwconf.Value(None, parser=Path, help="directory for reports; defaults next to score")
+    bucket_beats: float = kwconf.Value(0.25, help="analysis bucket size in beats")
+    max_hotspots: int = kwconf.Value(40)
+    json: bool = kwconf.Flag(False, help="also print JSON payload to stdout")
+    plots: Path | None = kwconf.Value(None, parser=Path, help="optional directory for plot images")
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"], help="format for generated plots")
+
+
+class ReferenceAudioAuditTool(_LazyToolCommand):
+    """Analyze reference audio and write comparison reports."""
+
+    _module_name = "reference_audio_audit"
+    _config_name = "ReferenceAudioAuditConfig"
+
+    audio: Path = kwconf.Value(None, position=1, parser=Path, help="reference audio file")
+    outdir: Path = kwconf.Value(None, parser=Path, required=True)
+    frame_seconds: float = kwconf.Value(0.5)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+
+
+class ShrillNoteAuditTool(_LazyToolCommand):
+    """Audit notes that may be shrill or whistle-like."""
+
+    _module_name = "shrill_note_audit"
+    _config_name = "ShrillNoteAuditConfig"
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    plots: Path | None = kwconf.Value(None, parser=Path)
+    min_frequency_hz: float = kwconf.Value(4186.01)
+    max_candidates: int = kwconf.Value(120)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    json: bool = kwconf.Flag(False)
+
+
+class SourNoteAuditTool(_LazyToolCommand):
+    """Audit likely sour-note candidates."""
+
+    _module_name = "sour_note_audit"
+    _config_name = "SourNoteAuditConfig"
+
+    score: Path = kwconf.Value(None, position=1, parser=Path)
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    plots: Path | None = kwconf.Value(None, parser=Path)
+    bucket_beats: float = kwconf.Value(0.25)
+    max_candidates: int = kwconf.Value(80)
+    min_score: float = kwconf.Value(0.28)
+    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
+    json: bool = kwconf.Flag(False)
+
+
+class AuditCueBalanceTool(_LazyToolCommand):
+    """Print peak/RMS balance for generated cue OGG files."""
+
+    _module_name = "audit_cue_balance"
+    _config_name = "AuditCueBalanceConfig"
+
+    root: Path | None = kwconf.Value(None, position=1, parser=Path, nargs="?")
+
+
+class InstallFirstGoblinTuneTool(_LazyToolCommand):
+    """Install first_goblin_tune_v2 renderer outputs into stable asset paths."""
+
+    _module_name = "install_first_goblin_tune_v2"
+    _config_name = "InstallFirstGoblinTuneConfig"
+
+    src: Path | None = kwconf.Value(None, parser=Path, help="Renderer output directory")
+    clean: bool = kwconf.Flag(False, help="Wipe destination directory first")
+    with_stems: bool = kwconf.Flag(False, help="Also require/install per-stem OGGs")
+
+
+class LevelReportTool(_LazyToolCommand):
+    """Report rendered cue loudness / peak levels."""
+
+    _module_name = "level_report"
+    _config_name = "LevelReportConfig"
+
+    root: Path | None = kwconf.Value(None, parser=Path, help="music root to scan")
+    glob: str = kwconf.Value("*/full.ogg", help="glob under --root for files to analyze")
+    target_rms_db: float = kwconf.Value(-20.0)
+    rms_tol: float = kwconf.Value(3.0)
+    format: str = kwconf.Value("table", choices=["table", "tsv"])
+    check: bool = kwconf.Flag(False)
+
+
+class FirstGoblinTransitionLabTool(_LazyToolCommand):
+    """Create the first-goblin transition lab experiment score."""
+
+    _module_name = "make_first_goblin_transition_lab"
+    _config_name = "FirstGoblinTransitionLabConfig"
+
+    source: Path | None = kwconf.Value(None, parser=Path)
+    output: Path | None = kwconf.Value(None, parser=Path)
+    force: bool = kwconf.Flag(False, help="overwrite an existing experiment score")
+
+
+class SpectralCompareTool(_LazyToolCommand):
+    """Compare spectral energy in rendered scratch stems."""
+
+    _module_name = "spectral_compare"
+    _config_name = "SpectralCompareConfig"
+
+    cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
+    window: tuple[float, float] = kwconf.Value((38.0, 43.0), nargs=2)
+    sr: int = kwconf.Value(48000)
+    label: str = kwconf.Value("")
+
+
+class SpectralLocalizeTool(_LazyToolCommand):
+    """Localize spectral content in rendered scratch stems."""
+
+    _module_name = "spectral_localize"
+    _config_name = "SpectralLocalizeConfig"
+
+    cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
+    window: tuple[float, float] = kwconf.Value((0.0, -1.0), nargs=2, help="Time window in seconds")
+    bucket: float = kwconf.Value(0.25, help="Bucket size in seconds")
+    sr: int = kwconf.Value(48000, help="Sample rate of stems")
+    bands: str = kwconf.Value("default", choices=["default", "vhigh-only"])
+
+
+class TransitionAuditTool(_LazyToolCommand):
+    """Audit adaptive section transition metrics and previews."""
+
+    _module_name = "transition_audit"
+    _config_name = "TransitionAuditConfig"
+
+    root: Path = kwconf.Value(None, position=1, parser=Path, help="generated cue root containing adaptive/<section>/")
+    sections: list[str] = kwconf.Value(default_factory=lambda: ["intro", "wave1"], nargs=2)
+    window: float = kwconf.Value(1.0, help="head/tail analysis window in seconds")
+    tail_window: float = kwconf.Value(1.5, help="tail hiss/noise window in seconds")
+    crossfade: float = kwconf.Value(0.35, help="runtime-style crossfade seconds")
+    crossfade_shape: str = kwconf.Value("ambition_runtime", choices=["linear", "equal_power", "ambition_runtime"])
+    incoming_start: str = kwconf.Value("smooth", choices=["smooth", "target"])
+    context: float = kwconf.Value(4.0, help="seconds of each side to include in previews")
+    outdir: Path | None = kwconf.Value(None, parser=Path)
+    no_preview: bool = kwconf.Flag(False, help="only print metrics; do not write WAV previews")
+    no_plots: bool = kwconf.Flag(False, help="skip plots and Markdown visual report")
+    envelope_window_ms: float = kwconf.Value(80.0)
+    envelope_hop_ms: float = kwconf.Value(20.0)
+
+
+class ToolsModal(kwconf.ModalCLI):
+    """Analysis and maintenance helpers formerly kept as top-level scripts."""
+
+    arrangement_audit = ArrangementAuditTool
+    dissonance_audit = DissonanceAuditTool
+    reference_audio_audit = ReferenceAudioAuditTool
+    shrill_note_audit = ShrillNoteAuditTool
+    sour_note_audit = SourNoteAuditTool
+    audit_cue_balance = AuditCueBalanceTool
+    install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
+    level_report = LevelReportTool
+    make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
+    spectral_compare = SpectralCompareTool
+    spectral_localize = SpectralLocalizeTool
+    transition_audit = TransitionAuditTool
+
 
 class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     """Modal CLI for ambition_music_renderer."""
@@ -890,6 +1145,7 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     sandbox = SandboxModal
     radio = RadioModal
     plugins = PluginsModal
+    tools = ToolsModal
 
 
 

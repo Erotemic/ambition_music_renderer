@@ -46,7 +46,7 @@ def discover_files(root: Path) -> list[tuple[str, str, Path]]:
 # The renderer was moved from tools/audio/music_renderer to
 # tools/ambition_music_renderer; resolve the default relative to this script
 # so it works regardless of the caller's cwd.
-DEFAULT_ROOT = Path(__file__).resolve().parent / "output" / "first_goblin_tune_v2"
+DEFAULT_ROOT = Path(__file__).resolve().parent.parent / "output" / "first_goblin_tune_v2"
 
 
 class AuditCueBalanceConfig(kwconf.Config):

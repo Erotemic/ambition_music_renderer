@@ -15,9 +15,9 @@ importable; the exact metrics above need only numpy / soundfile / scipy
 true peak exceeds -1 dBTP, or whose RMS is far from target, are flagged.
 
 Examples:
-  python level_report.py                          # default root, table
-  python level_report.py --format tsv             # machine / commit form
-  python level_report.py --root some/dir --target-rms-db -20
+  python -m ambition_music_renderer tools level_report                          # default root, table
+  python -m ambition_music_renderer tools level_report --format tsv             # machine / commit form
+  python -m ambition_music_renderer tools level_report --root some/dir --target-rms-db -20
 """
 
 from __future__ import annotations
@@ -30,9 +30,9 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import resample_poly
 
-from transition_audit import db, peak, rms
+from .transition_audit import db, peak, rms
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ROOT = REPO_ROOT / "crates/ambition_gameplay_core/assets/audio/music/generated"
 CLIP_DBTP = -1.0  # ITU true-peak ceiling convention; above this we flag.
 

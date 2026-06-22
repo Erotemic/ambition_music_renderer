@@ -1,4 +1,4 @@
-"""Tests for the music cue level report (level_report.py).
+"""Tests for the packaged music cue level report.
 
 The exact metrics (RMS / sample-peak / true-peak / crest / duration) are
 verified against a synthesized 1 kHz sine whose values are known in
@@ -6,7 +6,7 @@ closed form, so a regression in the math fails loudly. Run under pytest,
 or directly with the renderer venv python (which carries numpy /
 soundfile / scipy):
 
-    .venv/bin/python tests/test_level_report.py
+    .venv/bin/python -m pytest tests/test_level_report.py
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ import soundfile as sf
 REPO_TOOL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_TOOL))
 
-import level_report as lr  # noqa: E402
+from ambition_music_renderer import level_report as lr  # noqa: E402
 
 SR = 48_000
 

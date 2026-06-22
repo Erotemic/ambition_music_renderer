@@ -1585,6 +1585,7 @@ def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
     ).hexdigest()[:16]
 
 
+@profile
 def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
     audio = np.asarray(audio, dtype=np.float32)
     if audio.ndim == 1:
@@ -1618,6 +1619,7 @@ def sanitize_same_pitch_overlaps(
                 prev = note
 
 
+@profile
 def _fluidsynth_stereo_samples(fl: Any, n: int) -> np.ndarray:
     """Return ``n`` stereo frames from pyFluidSynth as float32 [-1, 1]."""
     if n <= 0:
@@ -1630,6 +1632,7 @@ def _fluidsynth_stereo_samples(fl: Any, n: int) -> np.ndarray:
     return stereo
 
 
+@profile
 def _new_fluidsynth(soundfont: str, sample_rate: int) -> tuple[Any, int]:
     try:
         import fluidsynth  # type: ignore
@@ -1808,6 +1811,7 @@ def render_pretty_midi(
     return _coerce_stereo(out)
 
 
+@profile
 def _lowpass_mono(signal_in: np.ndarray, amount: float) -> np.ndarray:
     # One-pole lowpass: y[n] = y[n-1] + amount * (x[n] - y[n-1]).
     # Implemented with scipy.signal.lfilter because this runs for every rendered
@@ -1912,6 +1916,7 @@ def _one_pole_alpha(hz: float, sample_rate: int) -> float:
     return float(1.0 - math.exp(-2.0 * math.pi * hz / sample_rate))
 
 
+@profile
 def lowpass(
     audio: np.ndarray, sample_rate: int, hz: float = 12_000.0, order: int = 1
 ) -> np.ndarray:
@@ -1927,6 +1932,7 @@ def lowpass(
     return out.astype(np.float32, copy=False)
 
 
+@profile
 def highpass(audio: np.ndarray, sample_rate: int, hz: float = 35.0) -> np.ndarray:
     if hz <= 0:
         return audio.astype(np.float32, copy=False)
@@ -1934,6 +1940,7 @@ def highpass(audio: np.ndarray, sample_rate: int, hz: float = 35.0) -> np.ndarra
     return (audio - lowpass(audio, sample_rate, hz, order=1)).astype(np.float32)
 
 
+@profile
 def high_shelf(
     audio: np.ndarray, sample_rate: int, *, hz: float = 4_500.0, db: float = -2.0
 ) -> np.ndarray:
@@ -1945,6 +1952,7 @@ def high_shelf(
     return (audio + hi * (gain - 1.0)).astype(np.float32)
 
 
+@profile
 def band_gain(
     audio: np.ndarray, sample_rate: int, *, low_hz: float, high_hz: float, db: float
 ) -> np.ndarray:
@@ -1962,6 +1970,7 @@ def band_gain(
     return (audio + band * (gain - 1.0)).astype(np.float32)
 
 
+@profile
 def _comb_filter(
     signal_in: np.ndarray, delay: int, feedback: float, damping: float
 ) -> np.ndarray:
@@ -1992,6 +2001,7 @@ def _comb_filter(
     return out
 
 
+@profile
 def _allpass_filter(
     signal_in: np.ndarray, delay: int, feedback: float = 0.5
 ) -> np.ndarray:
@@ -2015,6 +2025,7 @@ def _allpass_filter(
     return out
 
 
+@profile
 def simple_reverb(
     audio: np.ndarray,
     sr: int,
@@ -2077,6 +2088,7 @@ def simple_reverb(
     return (y * (1.0 - wet) + wet_arr * wet).astype(np.float32, copy=False)
 
 
+@profile
 def compressor(
     audio: np.ndarray,
     sr: int,
@@ -2139,6 +2151,7 @@ def compressor(
     return out.astype(np.float32, copy=False)
 
 
+@profile
 def stereo_widen(audio: np.ndarray, amount: float = 0.12) -> np.ndarray:
     if amount <= 0:
         return audio.astype(np.float32, copy=False)
@@ -2147,6 +2160,7 @@ def stereo_widen(audio: np.ndarray, amount: float = 0.12) -> np.ndarray:
     return np.column_stack([mid + side, mid - side]).astype(np.float32)
 
 
+@profile
 def soft_limit(
     audio: np.ndarray,
     target_peak_db: float = -1.0,
@@ -2530,6 +2544,7 @@ def write_ogg_from_audio(
     return ogg_path
 
 
+@profile
 def copy_with_instruments(
     pm: pretty_midi.PrettyMIDI, instruments: list[pretty_midi.Instrument], bpm: float
 ) -> pretty_midi.PrettyMIDI:
@@ -2538,6 +2553,7 @@ def copy_with_instruments(
     return new_pm
 
 
+@profile
 def ensure_audio_length(audio: np.ndarray, target_samples: int) -> np.ndarray:
     if len(audio) < target_samples:
         audio = np.pad(audio, ((0, target_samples - len(audio)), (0, 0)))
@@ -2546,6 +2562,7 @@ def ensure_audio_length(audio: np.ndarray, target_samples: int) -> np.ndarray:
     return audio.astype(np.float32, copy=False)
 
 
+@profile
 def slice_audio(
     audio: np.ndarray, sample_rate: int, start_seconds: float, end_seconds: float
 ) -> np.ndarray:
