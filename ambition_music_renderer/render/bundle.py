@@ -493,9 +493,9 @@ def cue_bundle_main(
         argv = True
     config = CueBundleConfig.cli(argv=argv, data=kwargs)
     report = create_bundle_from_config(config)
-    print_bundle_summary(report)
-    if print_json:
+    if print_json or getattr(config, "json", False):
         print(json.dumps(report, indent=2, default=str))
+    print_bundle_summary(report)
     return 0 if report.get("ok", True) else 1
 
 
@@ -513,13 +513,15 @@ def main(argv: list[str] | None = None) -> int:
         config = CueBundleConfig.cli(argv=argv)
         cue_name = str(config.cue)
         report = create_bundle_from_config(config)
-        print_bundle_summary(report)
-        print(json.dumps(report, indent=2, default=str))
+        if config.json:
+            print(json.dumps(report, indent=2, default=str))
         rc = 0 if report.get("ok", True) else 1
         return rc
     finally:
         elapsed = _time.perf_counter() - total_start
         print(f"[ambition_music_renderer.render.bundle] cue={cue_name} total_elapsed_s={elapsed:.3f}", flush=True)
+        if 'report' in locals():
+            print_bundle_summary(report)
 
 
 if __name__ == "__main__":

@@ -34,40 +34,143 @@ def _one_pole_alpha(hz: float, sample_rate: int) -> float:
     return float(1.0 - math.exp(-2.0 * math.pi * hz / sample_rate))
 
 
+def _sos_filter(audio: np.ndarray, sos: np.ndarray) -> np.ndarray:
+    """Apply a numerically stable stereo SOS filter.
+
+    The old post bus used one-pole subtraction for tone shaping. That was fast,
+    but it was too shallow for mix decisions like "remove the 4 kHz guitar
+    whistle" or "keep bass out of the cymbal band". SciPy is a normal
+    dependency now, so use real Butterworth/RBJ-style filters for the authoring
+    path while keeping the one-pole helper available for fallback synthesis.
+    """
+    audio = coerce_stereo(audio)
+    if audio.size == 0:
+        return audio.astype(np.float32, copy=False)
+    return signal.sosfilt(sos, audio, axis=0).astype(np.float32, copy=False)
+
+
+def _safe_cutoff(hz: float, sample_rate: int) -> float:
+    return float(clamp(float(hz), 1.0, sample_rate * 0.49))
+
+
 @profile
 def lowpass(
-    audio: np.ndarray, sample_rate: int, hz: float = 12_000.0, order: int = 1
+    audio: np.ndarray, sample_rate: int, hz: float = 12_000.0, order: int = 2
 ) -> np.ndarray:
     if hz <= 0 or hz >= sample_rate * 0.49:
         return audio.astype(np.float32, copy=False)
-    audio = coerce_stereo(audio)
-    alpha = _one_pole_alpha(hz, sample_rate)
-    out = audio.astype(np.float32, copy=True)
-    # Cascade cheap one-pole sections for steeper response when requested.
-    for _ in range(max(1, int(order))):
-        out[:, 0] = _lowpass_mono(out[:, 0], alpha)
-        out[:, 1] = _lowpass_mono(out[:, 1], alpha)
-    return out.astype(np.float32, copy=False)
+    sos = signal.butter(
+        max(1, int(order)), _safe_cutoff(hz, sample_rate), btype="lowpass", fs=sample_rate, output="sos"
+    )
+    return _sos_filter(audio, sos)
 
 
 @profile
-def highpass(audio: np.ndarray, sample_rate: int, hz: float = 35.0) -> np.ndarray:
+def highpass(audio: np.ndarray, sample_rate: int, hz: float = 35.0, order: int = 2) -> np.ndarray:
     if hz <= 0:
         return audio.astype(np.float32, copy=False)
+    sos = signal.butter(
+        max(1, int(order)), _safe_cutoff(hz, sample_rate), btype="highpass", fs=sample_rate, output="sos"
+    )
+    return _sos_filter(audio, sos)
+
+
+def _biquad_filter(
+    audio: np.ndarray,
+    sample_rate: int,
+    *,
+    kind: str,
+    hz: float,
+    q: float = 0.707,
+    db: float = 0.0,
+) -> np.ndarray:
+    """RBJ cookbook biquad for mix EQ bands.
+
+    Supported kinds: ``peak`` / ``bell``, ``notch``, ``high_shelf``,
+    ``low_shelf``.  ``notch`` may be used with either an explicit negative
+    ``db`` cut or no gain, in which case it becomes a true notch.
+    """
+    if abs(float(db)) < 1e-6 and kind not in {"notch", "bandstop"}:
+        return audio.astype(np.float32, copy=False)
     audio = coerce_stereo(audio)
-    return (audio - lowpass(audio, sample_rate, hz, order=1)).astype(np.float32)
+    hz = _safe_cutoff(hz, sample_rate)
+    q = max(float(q), 1e-3)
+    w0 = 2.0 * math.pi * hz / float(sample_rate)
+    cos_w0 = math.cos(w0)
+    sin_w0 = math.sin(w0)
+    alpha = sin_w0 / (2.0 * q)
+    kind = kind.lower().replace("-", "_")
+
+    if kind in {"notch", "bandstop"} and abs(float(db)) < 1e-6:
+        b = np.array([1.0, -2.0 * cos_w0, 1.0], dtype=np.float64)
+        a = np.array([1.0 + alpha, -2.0 * cos_w0, 1.0 - alpha], dtype=np.float64)
+    else:
+        a_gain = 10.0 ** (float(db) / 40.0)
+        if kind in {"peak", "bell", "peaking", "notch", "bandstop"}:
+            b = np.array([1.0 + alpha * a_gain, -2.0 * cos_w0, 1.0 - alpha * a_gain], dtype=np.float64)
+            a = np.array([1.0 + alpha / a_gain, -2.0 * cos_w0, 1.0 - alpha / a_gain], dtype=np.float64)
+        elif kind in {"high_shelf", "highshelf", "shelf_high"}:
+            sqrt_a = math.sqrt(a_gain)
+            two_sqrt_a_alpha = 2.0 * sqrt_a * alpha
+            b = np.array([
+                a_gain * ((a_gain + 1.0) + (a_gain - 1.0) * cos_w0 + two_sqrt_a_alpha),
+                -2.0 * a_gain * ((a_gain - 1.0) + (a_gain + 1.0) * cos_w0),
+                a_gain * ((a_gain + 1.0) + (a_gain - 1.0) * cos_w0 - two_sqrt_a_alpha),
+            ], dtype=np.float64)
+            a = np.array([
+                (a_gain + 1.0) - (a_gain - 1.0) * cos_w0 + two_sqrt_a_alpha,
+                2.0 * ((a_gain - 1.0) - (a_gain + 1.0) * cos_w0),
+                (a_gain + 1.0) - (a_gain - 1.0) * cos_w0 - two_sqrt_a_alpha,
+            ], dtype=np.float64)
+        elif kind in {"low_shelf", "lowshelf", "shelf_low"}:
+            sqrt_a = math.sqrt(a_gain)
+            two_sqrt_a_alpha = 2.0 * sqrt_a * alpha
+            b = np.array([
+                a_gain * ((a_gain + 1.0) - (a_gain - 1.0) * cos_w0 + two_sqrt_a_alpha),
+                2.0 * a_gain * ((a_gain - 1.0) - (a_gain + 1.0) * cos_w0),
+                a_gain * ((a_gain + 1.0) - (a_gain - 1.0) * cos_w0 - two_sqrt_a_alpha),
+            ], dtype=np.float64)
+            a = np.array([
+                (a_gain + 1.0) + (a_gain - 1.0) * cos_w0 + two_sqrt_a_alpha,
+                -2.0 * ((a_gain - 1.0) + (a_gain + 1.0) * cos_w0),
+                (a_gain + 1.0) + (a_gain - 1.0) * cos_w0 - two_sqrt_a_alpha,
+            ], dtype=np.float64)
+        else:
+            raise ValueError(f"unknown eq band type {kind!r}")
+
+    if abs(a[0]) < 1e-12:
+        return audio.astype(np.float32, copy=False)
+    b = b / a[0]
+    a = a / a[0]
+    out = signal.lfilter(b, a, audio, axis=0)
+    return out.astype(np.float32, copy=False)
 
 
 @profile
 def high_shelf(
     audio: np.ndarray, sample_rate: int, *, hz: float = 4_500.0, db: float = -2.0
 ) -> np.ndarray:
-    """Simple high-shelf using a high-passed side band."""
-    if abs(db) < 1e-6:
-        return audio.astype(np.float32, copy=False)
-    hi = highpass(audio, sample_rate, hz)
-    gain = 10 ** (db / 20.0)
-    return (audio + hi * (gain - 1.0)).astype(np.float32)
+    """High shelf using a proper biquad instead of highpass side-band mixing."""
+    return _biquad_filter(audio, sample_rate, kind="high_shelf", hz=hz, q=0.707, db=db)
+
+
+@profile
+def parametric_eq(
+    audio: np.ndarray, sample_rate: int, bands: list[dict[str, Any]] | tuple[dict[str, Any], ...]
+) -> np.ndarray:
+    out = coerce_stereo(audio)
+    for raw in bands or []:
+        band = dict(raw or {})
+        kind = str(band.get("type") or band.get("kind") or band.get("shape") or "peak")
+        out = _biquad_filter(
+            out,
+            sample_rate,
+            kind=kind,
+            hz=float(band.get("hz") or band.get("freq") or band.get("frequency_hz") or 1000.0),
+            q=float(band.get("q") or band.get("Q") or 0.707),
+            db=float(band.get("db") or band.get("gain_db") or 0.0),
+        )
+    return out.astype(np.float32, copy=False)
 
 
 @profile
@@ -81,11 +184,12 @@ def band_gain(
     high_hz = min(float(high_hz), sample_rate * 0.49)
     if high_hz <= low_hz:
         return audio.astype(np.float32, copy=False)
-    band = lowpass(audio, sample_rate, high_hz, order=1) - lowpass(
-        audio, sample_rate, low_hz, order=1
-    )
-    gain = 10 ** (db / 20.0)
-    return (audio + band * (gain - 1.0)).astype(np.float32)
+    # A broad bell at the geometric midpoint sounds more mix-console-like than
+    # subtracting two one-pole lowpasses, and avoids mushy phase cancellation.
+    center = math.sqrt(low_hz * high_hz)
+    bandwidth_oct = math.log2(high_hz / low_hz)
+    q = max(0.25, 1.0 / max(bandwidth_oct, 0.25))
+    return _biquad_filter(audio, sample_rate, kind="peak", hz=center, q=q, db=db)
 
 
 @functools.cache
@@ -399,6 +503,9 @@ def post_process(
             hz=float(settings.get("high_shelf_hz", 4_500)),
             db=float(settings["high_shelf_db"]),
         )
+    eq_bands = settings.get("eq_bands") or settings.get("parametric_eq") or []
+    if eq_bands:
+        audio = parametric_eq(audio, sample_rate, list(eq_bands))
     if settings.get("lowpass_hz", 0):
         audio = lowpass(audio, sample_rate, float(settings["lowpass_hz"]))
     # Real bus compressor — opt-in via `compressor_threshold_db`. Glues the mix

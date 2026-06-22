@@ -234,9 +234,14 @@ about than raw audio:
 - `stem_amplitude_summary.txt/json/tsv` and `stem_amplitude_envelope.tsv`
   show raw and state-weighted runtime stem levels, so mix balance can be read
   directly rather than inferred from spectrogram color.
+- `plots/stem_loudness_timeline.<fmt>` is the main over-time balance plot:
+  one fixed-dBFS line per stem across the full soundtrack timeline. It is
+  generated from scratch stems when running fast `full-mix-only` bundles, so it
+  remains available even when per-section per-stem OGGs are skipped.
 - `plots/stem_amplitude_balance.<fmt>`, `plots/stem_amplitude_timeline.<fmt>`,
   and `plots/stem_amplitude_stack.<fmt>` visualize relative stem amplitude and
-  how the stems layer through the cue.
+  how the stems layer through the cue. `stem_amplitude_timeline` is retained as
+  the legacy filename for the same over-time diagnostic.
 - Spectrogram plots use a fixed dB color range by default so two plots from the
   same bundle can be compared visually without local autoscaling hiding level
   mistakes.
@@ -290,6 +295,7 @@ generated/<cue>/
       spectral_fingerprint.tsv
     plots/
       stem_loudness.jpg
+      stem_loudness_timeline.jpg
       stem_amplitude_balance.jpg
       full_spectrogram.jpg
     <cue>.adaptive_manifest.json

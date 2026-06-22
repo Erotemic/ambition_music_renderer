@@ -46,6 +46,15 @@ from .render.generated_layout import mark_generated_run_latest
 from .render.generated_layout import resolve_latest_generated_dir
 
 
+_FINAL_BUNDLE_REPORT: dict[str, object] | None = None
+
+
+def _schedule_final_bundle_summary(report: dict[str, object]) -> None:
+    """Defer bundle path printing until after top-level timing output."""
+    global _FINAL_BUNDLE_REPORT
+    _FINAL_BUNDLE_REPORT = report
+
+
 def _progress(iterable, *, total, desc):
     import ubelt as ub
 
@@ -569,12 +578,13 @@ def cmd_radio(args) -> int:
 
 @profile
 def cmd_bundle(args) -> int:
-    from .render.bundle import CueBundleConfig, create_bundle_from_config, print_bundle_summary
+    from .render.bundle import CueBundleConfig, create_bundle_from_config
 
     config = args if isinstance(args, CueBundleConfig) else CueBundleConfig.cli(argv=False, data=dict(args))
     report = create_bundle_from_config(config)
-    print_bundle_summary(report)
-    print(json.dumps(report, indent=2, default=str))
+    if getattr(config, "json", False):
+        print(json.dumps(report, indent=2, default=str))
+    _schedule_final_bundle_summary(report)
     return 0 if report.get("ok", True) else 1
 
 
@@ -610,6 +620,29 @@ def cmd_plugins_list_lv2(args) -> int:
     else:
         for uri in uris:
             print(uri)
+    return 0
+
+
+def cmd_plugins_list_sfz_libraries(args) -> int:
+    from .instrument_libraries import collect_sfz_library_diagnostics
+
+    report = collect_sfz_library_diagnostics(limit=args.limit)
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print("SFZ roots:")
+        for root in report["sfz_roots"]:
+            print(f"  {root}")
+        print(f"SFZ files: {report['sfz_count']}")
+        print("Resolved aliases:")
+        for name, resolved in sorted(report["alias_hits"].items()):
+            if resolved:
+                print(f"  {name}: {resolved}")
+        missing = [name for name, resolved in sorted(report["alias_hits"].items()) if not resolved]
+        if missing:
+            print("Missing aliases:")
+            for name in missing:
+                print(f"  {name}")
     return 0
 
 
@@ -756,6 +789,7 @@ class BundleCommand(kwconf.Config):
         False,
         help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
     )
+    json: bool = kwconf.Flag(False, help="print the full bundle JSON payload to stdout")
 
     def __post_init__(self) -> None:
         self.jobs = int(self.jobs)
@@ -933,6 +967,15 @@ class PluginListLV2(kwconf.Config):
         return cmd_plugins_list_lv2(cls.cli(argv=argv, data=kwargs))
 
 
+class PluginListSFZLibraries(kwconf.Config):
+    limit: int = kwconf.Value(200)
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_list_sfz_libraries(cls.cli(argv=argv, data=kwargs))
+
+
 class PluginLV2Info(kwconf.Config):
     uri: str = kwconf.Value(None, position=1)
     raw: bool = kwconf.Flag(False, help="print raw lv2info text")
@@ -957,6 +1000,7 @@ class PluginsModal(kwconf.ModalCLI):
     doctor = PluginDoctor
     list_vst3 = PluginListVST3
     list_lv2 = PluginListLV2
+    list_sfz_libraries = PluginListSFZLibraries
     lv2_info = PluginLV2Info
     validate_score = PluginValidateScore
 
@@ -1222,6 +1266,10 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         elapsed = _time.perf_counter() - total_start
         print(f"[ambition_music_renderer] command={command_name} total_elapsed_s={elapsed:.3f}", flush=True)
+        if _FINAL_BUNDLE_REPORT is not None:
+            from .render.bundle_archive import print_bundle_summary
+
+            print_bundle_summary(_FINAL_BUNDLE_REPORT)
 
 
 if __name__ == "__main__":

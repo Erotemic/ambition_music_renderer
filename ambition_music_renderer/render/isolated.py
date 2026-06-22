@@ -93,6 +93,7 @@ class RenderIsolatedConfig(kwconf.Config):
         False,
         help="debug/profiling mode: render groups by direct Python calls instead of worker subprocesses",
     )
+    json: bool = kwconf.Flag(False, help="print render JSON payload to stdout")
 
     def __post_init__(self) -> None:
         if self.simple_mix and self.full_mix_only:
@@ -374,20 +375,21 @@ def _render_main(ns) -> int:
             preview_rel = (manifest.get("files", {}).get("preview", {}) or {}).get(
                 "full_soundtrack"
             )
-            print(
-                json.dumps(
-                    {
-                        "skipped": True,
-                        "reason": reason,
-                        "manifest": str(manifest_path),
-                        "preview": str(outdir / preview_rel)
-                        if isinstance(preview_rel, str)
-                        else None,
-                        "hash": cue_hash,
-                    },
-                    indent=2,
+            if getattr(ns, "json", False):
+                print(
+                    json.dumps(
+                        {
+                            "skipped": True,
+                            "reason": reason,
+                            "manifest": str(manifest_path),
+                            "preview": str(outdir / preview_rel)
+                            if isinstance(preview_rel, str)
+                            else None,
+                            "hash": cue_hash,
+                        },
+                        indent=2,
+                    )
                 )
-            )
             return 0
         if manifest_path is not None:
             print(
@@ -788,31 +790,32 @@ def _render_main(ns) -> int:
         timings.write_tsv(ns.timings_out.with_suffix(".tsv"))
         timings.write_summary(ns.timings_out.with_suffix(".txt"))
 
-    print(
-        json.dumps(
-            {
-                "skipped": False,
-                "manifest": str(manifest_path),
-                "preview": str(preview),
-                "runtime_previews": [
-                    v
-                    for k, v in output_files["preview"].items()
-                    if k.startswith("runtime_")
-                ],
-                "audition_previews": [
-                    v
-                    for k, v in output_files["preview"].items()
-                    if k.startswith("audition_")
-                ],
-                "runtime_stem_gain_mode": ns.runtime_stem_gain_mode,
-                "runtime_stem_max_gain_db": runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None,
-                "full_mix_only": bool(ns.full_mix_only),
-                "kept_debug_stems": bool(ns.keep_debug_stems),
-                "hash": cue_hash,
-            },
-            indent=2,
+    if getattr(ns, "json", False):
+        print(
+            json.dumps(
+                {
+                    "skipped": False,
+                    "manifest": str(manifest_path),
+                    "preview": str(preview),
+                    "runtime_previews": [
+                        v
+                        for k, v in output_files["preview"].items()
+                        if k.startswith("runtime_")
+                    ],
+                    "audition_previews": [
+                        v
+                        for k, v in output_files["preview"].items()
+                        if k.startswith("audition_")
+                    ],
+                    "runtime_stem_gain_mode": ns.runtime_stem_gain_mode,
+                    "runtime_stem_max_gain_db": runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None,
+                    "full_mix_only": bool(ns.full_mix_only),
+                    "kept_debug_stems": bool(ns.keep_debug_stems),
+                    "hash": cue_hash,
+                },
+                indent=2,
+            )
         )
-    )
     return 0
 
 

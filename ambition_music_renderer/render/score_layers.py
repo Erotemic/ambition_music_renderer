@@ -510,6 +510,8 @@ def render_layer_guitar_chug(
     strum_spread_ms = float(layer.get("spread_ms", 8.0))
     beat_per_second = ctx.bpm / 60.0
     root_policy = str(layer.get("root_policy", layer.get("bass_policy", "bass"))).lower().replace("-", "_")
+    min_pitch = layer.get("min_pitch")
+    min_pitch_i = int(min_pitch) if min_pitch is not None else None
     hk = _layer_human(layer, 1.0)
     for local in range(int(section["bars"])):
         chord = chord_for_bar(section, local)
@@ -524,6 +526,9 @@ def render_layer_guitar_chug(
             dur = float(item[2])
             accent = float(item[3]) if len(item) > 3 else 1.0
             root = root_base + interval
+            if min_pitch_i is not None:
+                while root < min_pitch_i:
+                    root += 12
             pitches = gp.power_chord_pitches(root, shape=shape)
             for take_idx, take in enumerate(takes):
                 inst = str(take.get("instrument"))
@@ -579,6 +584,9 @@ def render_layer_guitar_lead(
     inst_pitch_bend_curves = layer.get("instrument_pitch_bend_curves", {}) or {}
     hk = _layer_human(layer, 3.0)
     default_scoop = float(layer.get("pitch_scoop_cents", 12.0))
+    vibrato_cents = float(layer.get("pitch_vibrato_cents", layer.get("vibrato_cents", 0.0)))
+    vibrato_rate_hz = float(layer.get("pitch_vibrato_rate_hz", layer.get("vibrato_rate_hz", 5.4)))
+    vibrato_delay_beats = float(layer.get("pitch_vibrato_delay_beats", layer.get("vibrato_delay_beats", 0.45)))
     note_velocity_pattern = layer.get("note_velocity_pattern")
     # Use the fretboard allocator to choose a plausible string/fret for each
     # note.  The current version only uses that to vary scoops on jumps; future
@@ -639,6 +647,9 @@ def render_layer_guitar_lead(
                         gate=gate,
                         pitch_scoop_cents=local_scoop,
                         pitch_bend_curve=bend_curve_pairs,
+                        pitch_vibrato_cents=vibrato_cents,
+                        pitch_vibrato_rate_hz=vibrato_rate_hz,
+                        pitch_vibrato_delay_beats=vibrato_delay_beats,
                         **hk,
                     )
                 beat += dur

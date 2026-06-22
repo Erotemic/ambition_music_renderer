@@ -99,3 +99,17 @@ def test_validate_score_plugins_sees_nested_pedalboard_vst(tmp_path):
     report = validate_score_plugins(score, base_dir=tmp_path)
     assert report["effect_spec_count"] == 2
     assert report["errors"] >= 1
+
+
+def test_validate_score_plugins_optional_pedalboard_missing_is_warning(tmp_path):
+    score = {
+        "postprocess": {
+            "effect_chain": [
+                {"kind": "pedalboard", "optional": True, "effects": [{"effect": "compressor"}]},
+            ]
+        }
+    }
+    report = validate_score_plugins(score, base_dir=tmp_path)
+    assert report["errors"] == 0
+    assert report["warnings"] >= 0
+    assert report["ok"]

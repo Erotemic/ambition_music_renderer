@@ -112,6 +112,9 @@ def print_bundle_summary(report: dict[str, object], *, stream=None) -> None:
         stream = sys.stderr
     keys = [
         ("render output", "outdir"),
+        ("generated", "generated_dir"),
+        ("latest", "generated_latest"),
+        ("building", "generated_building"),
         ("bundle dir", "bundle_dir"),
         ("manifest", "manifest"),
         ("full zip", "zip"),

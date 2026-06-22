@@ -44,6 +44,7 @@ class RenderGroupWorkerConfig(kwconf.Config):
         help="deprecated compatibility flag; use LINE_PROFILE=1 with line_profiler instead",
     )
     timings_out: Path | None = kwconf.Value(None, parser=Path, help="write worker phase timings to JSON")
+    json: bool = kwconf.Flag(False, help="print worker JSON payload to stdout")
 
     def __post_init__(self) -> None:
         for key in ("spec", "outdir", "profile_out", "timings_out"):
@@ -127,11 +128,12 @@ def _worker_main(ns) -> int:
         timings.write_json(ns.timings_out)
         timings.write_tsv(ns.timings_out.with_suffix(".tsv"))
         timings.write_summary(ns.timings_out.with_suffix(".txt"))
-    print(
-        json.dumps(
-            {"group": ns.group, "npy": str(npy), "files": files, "hash": cue_hash}
+    if getattr(ns, "json", False):
+        print(
+            json.dumps(
+                {"group": ns.group, "npy": str(npy), "files": files, "hash": cue_hash}
+            )
         )
-    )
     return 0
 
 

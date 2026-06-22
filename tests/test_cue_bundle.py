@@ -28,6 +28,7 @@ from ambition_music_renderer.render.bundle_base import (
 from ambition_music_renderer.render.bundle_spectral_reports import (
     write_spectral_fingerprint,
     write_stem_amplitude_report,
+    write_stem_loudness_report,
 )
 from ambition_music_renderer.audit.arrangement_audit import audit_spec as audit_arrangement_spec
 from ambition_music_renderer.audit.arrangement_audit import write_reports as write_arrangement_reports
@@ -538,6 +539,64 @@ def test_stem_amplitude_report_shows_default_weighted_balance():
         if (root / "plots" / "stem_amplitude_balance.jpg").exists():
             assert (root / "plots" / "stem_amplitude_timeline.jpg").exists()
             assert (root / "plots" / "stem_loudness_timeline.jpg").exists()
+
+
+def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 2, dtype="float32") / sr
+        rhythm = 0.08 * np.sin(2 * np.pi * 110.0 * t)
+        lead = 0.03 * np.sin(2 * np.pi * 440.0 * t)
+        scratch = root / "scratch_stems"
+        scratch.mkdir(parents=True)
+        np.save(scratch / "cue_hash.rhythm_guitars.npy", np.stack([rhythm, rhythm], axis=1).astype("float32"))
+        np.save(scratch / "cue_hash.lead_guitars.npy", np.stack([lead, lead], axis=1).astype("float32"))
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [
+                {"id": "solo", "start_seconds": 0.0, "end_seconds": 0.5, "duration_seconds": 0.5},
+            ],
+            "files": {
+                "adaptive": {"solo": {"full": "adaptive/solo/cue_hash.solo.full.wav"}},
+                "preview": {},
+            },
+        }
+        spec = {"id": "cue", "state_map": {}}
+        report = write_stem_amplitude_report(root, spec, manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        groups = {row["group"] for row in payload["groups"]}
+        assert {"rhythm_guitars", "lead_guitars"}.issubset(groups)
+        assert payload["envelope_rows"]
+        assert (root / "plots" / "stem_loudness_timeline.jpg").exists()
+
+
+def test_stem_loudness_report_writes_tables_and_plot():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "runtime_stem_gain_mode": "shared",
+            "diagnostics": {
+                "native_stems": {
+                    "rhythm_guitars": {"rms_dbfs": -55.0, "peak_dbfs": -20.0},
+                    "lead_guitars": {"rms_dbfs": -40.0, "peak_dbfs": -12.0},
+                },
+                "runtime_stems": {
+                    "rhythm_guitars": {"rms_dbfs": -49.0, "peak_dbfs": -14.0},
+                    "lead_guitars": {"rms_dbfs": -34.0, "peak_dbfs": -6.0},
+                },
+            },
+        }
+        report = write_stem_loudness_report(manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.music_stem_loudness.v1"
+        assert (root / "reports" / "stem_loudness.tsv").exists()
+        assert (root / "reports" / "stem_loudness_summary.txt").exists()
+        assert (root / "plots" / "stem_loudness.jpg").exists()
 
 
 

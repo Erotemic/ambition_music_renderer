@@ -184,6 +184,192 @@ def _rms_envelope(audio: np.ndarray, sample_rate: int, bucket_seconds: float) ->
     return rows
 
 
+def _timeline_section_at_time(manifest: dict, time_s: float) -> str:
+    """Return the authored section id active at an absolute soundtrack time."""
+    sections = manifest.get("sections") or []
+    if not isinstance(sections, list):
+        return "full"
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        start = float(section.get("start_seconds", 0.0) or 0.0)
+        end = float(section.get("end_seconds", section.get("duration_seconds", start)) or start)
+        if start <= time_s < end:
+            return str(section.get("id", "full"))
+    return "full"
+
+
+def _read_scratch_stem_envelopes(
+    outdir: Path,
+    manifest: dict,
+    *,
+    bucket_seconds: float,
+) -> tuple[list[dict[str, object]], list[dict[str, object]], int]:
+    """Return whole-track stem rows/envelopes from scratch ``.npy`` stems.
+
+    Full-mix-only renders intentionally skip per-section per-stem OGG files, but
+    they still keep ``scratch_stems/*.npy`` while bundle diagnostics run. Use
+    those scratch stems for the loudness-over-time plot so the report remains
+    useful in the fast iteration mode.
+    """
+    sample_rate = int(manifest.get("sample_rate", 48000))
+    rows: list[dict[str, object]] = []
+    envelope_rows: list[dict[str, object]] = []
+    for path in current_scratch_stem_paths(outdir, manifest):
+        group = path.stem.split(".")[-1]
+        try:
+            audio = coerce_stereo(np.load(path).astype("float32", copy=False))
+        except Exception as ex:  # noqa: BLE001
+            rows.append(
+                {
+                    "group": group,
+                    "section": "full",
+                    "section_start_s": 0.0,
+                    "path": str(path.relative_to(outdir)) if path.is_relative_to(outdir) else str(path),
+                    "error": f"{type(ex).__name__}: {ex}",
+                }
+            )
+            continue
+        stats = _audio_stats(audio, sample_rate)
+        rows.append(
+            {
+                "group": group,
+                "section": "full",
+                "section_start_s": 0.0,
+                "path": str(path.relative_to(outdir)) if path.is_relative_to(outdir) else str(path),
+                "state_default_weight": 1.0,
+                "state_default_is_raw_reference": True,
+                "rms_dbfs": stats["rms_dbfs"],
+                "peak_dbfs": stats["peak_dbfs"],
+                "duration_s": stats["duration_s"],
+                "weighted_default_rms_dbfs": stats["rms_dbfs"],
+                "weighted_default_peak_dbfs": stats["peak_dbfs"],
+                "error": "",
+                "source": "scratch_stem",
+            }
+        )
+        for env in _rms_envelope(audio, sample_rate, bucket_seconds):
+            start_abs = float(env["time_start_s"])
+            end_abs = float(env["time_end_s"])
+            envelope_rows.append(
+                {
+                    "group": group,
+                    "section": _timeline_section_at_time(manifest, (start_abs + end_abs) * 0.5),
+                    "section_start_s": 0.0,
+                    "time_start_s": start_abs,
+                    "time_end_s": end_abs,
+                    "time_start_s_absolute": start_abs,
+                    "time_end_s_absolute": end_abs,
+                    "rms_dbfs": env["rms_dbfs"],
+                    "peak_dbfs": env["peak_dbfs"],
+                    "rms_linear": env["rms_linear"],
+                    "peak_linear": env["peak_linear"],
+                    "state_default_rms_linear": env["rms_linear"],
+                    "state_default_rms_dbfs": env["rms_dbfs"],
+                    "source": "scratch_stem",
+                }
+            )
+    return rows, envelope_rows, sample_rate
+
+
+def write_stem_loudness_report(
+    manifest: dict,
+    reports_dir: Path,
+    plots_dir: Path | None = None,
+    *,
+    plot_format: str = "jpg",
+    jpeg_quality: int = 84,
+) -> Path:
+    """Write native/runtime stem loudness tables and a fixed-scale bar plot."""
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    if plots_dir is not None:
+        plots_dir.mkdir(parents=True, exist_ok=True)
+    diagnostics = manifest.get("diagnostics") or {}
+    native = diagnostics.get("native_stems") or {}
+    runtime = diagnostics.get("runtime_stems") or {}
+    groups = sorted(set(native) | set(runtime)) if isinstance(native, dict) and isinstance(runtime, dict) else []
+    rows: list[dict[str, object]] = []
+    for group in groups:
+        native_stats = native.get(group, {}) if isinstance(native, dict) else {}
+        runtime_stats = runtime.get(group, {}) if isinstance(runtime, dict) else {}
+        if not isinstance(native_stats, dict):
+            native_stats = {}
+        if not isinstance(runtime_stats, dict):
+            runtime_stats = {}
+        rows.append(
+            {
+                "group": group,
+                "native_rms_dbfs": float(native_stats.get("rms_dbfs", DBFS_SILENCE_FLOOR)),
+                "native_peak_dbfs": float(native_stats.get("peak_dbfs", DBFS_SILENCE_FLOOR)),
+                "runtime_rms_dbfs": float(runtime_stats.get("rms_dbfs", DBFS_SILENCE_FLOOR)),
+                "runtime_peak_dbfs": float(runtime_stats.get("peak_dbfs", DBFS_SILENCE_FLOOR)),
+            }
+        )
+    rows.sort(key=lambda row: float(row["runtime_rms_dbfs"]), reverse=True)
+    payload = {
+        "schema": "ambition.music_stem_loudness.v1",
+        "cue": manifest.get("id"),
+        "hash": manifest.get("hash"),
+        "runtime_stem_gain_mode": manifest.get("runtime_stem_gain_mode"),
+        "rows": rows,
+    }
+    json_path = reports_dir / "stem_loudness.json"
+    json_path.write_text(json.dumps(payload, indent=2), encoding="utf8")
+    columns = ["group", "native_rms_dbfs", "native_peak_dbfs", "runtime_rms_dbfs", "runtime_peak_dbfs"]
+    tsv_path = reports_dir / "stem_loudness.tsv"
+    lines = ["\t".join(columns)]
+    for row in rows:
+        lines.append("\t".join(f"{row[c]:.3f}" if isinstance(row[c], float) else str(row[c]) for c in columns))
+    tsv_path.write_text("\n".join(lines) + "\n", encoding="utf8")
+    summary_path = reports_dir / "stem_loudness_summary.txt"
+    text = [
+        f"cue: {manifest.get('id')}",
+        f"hash: {manifest.get('hash')}",
+        f"runtime_stem_gain_mode: {manifest.get('runtime_stem_gain_mode')}",
+        "",
+        "stem loudness, ranked by runtime RMS:",
+    ]
+    for row in rows:
+        text.append(
+            f"  {row['group']}: runtime {_format_dbfs(row['runtime_rms_dbfs'])} dBFS RMS / "
+            f"{_format_dbfs(row['runtime_peak_dbfs'])} dBFS peak; native "
+            f"{_format_dbfs(row['native_rms_dbfs'])} dBFS RMS / {_format_dbfs(row['native_peak_dbfs'])} dBFS peak"
+        )
+    summary_path.write_text("\n".join(text) + "\n", encoding="utf8")
+
+    if plots_dir is not None and rows:
+        try:
+            import matplotlib.pyplot as plt
+
+            suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
+            save_kwargs = report_plot_save_kwargs(plot_format=suffix, jpeg_quality=jpeg_quality)
+            labels = [str(row["group"]) for row in rows]
+            y = np.arange(len(labels))
+            height = 0.34
+            native_values = [_plot_db(float(row["native_rms_dbfs"])) for row in rows]
+            runtime_values = [_plot_db(float(row["runtime_rms_dbfs"])) for row in rows]
+            peak_values = [_plot_db(float(row["native_peak_dbfs"])) for row in rows]
+            fig, ax = plt.subplots(figsize=(10.0, max(4.0, 0.46 * len(labels) + 1.4)))
+            ax.barh(y - height * 0.5, native_values, height, label="native RMS")
+            ax.barh(y + height * 0.5, runtime_values, height, label="runtime RMS")
+            ax.plot(peak_values, y, "|", markersize=13, label="native peak")
+            ax.set_yticks(y, labels=labels)
+            ax.invert_yaxis()
+            ax.set_xlim(DBFS_PLOT_FLOOR, 0.0)
+            ax.set_xlabel(f"dBFS, fixed {DBFS_PLOT_FLOOR:.0f}..0; louder is farther right")
+            ax.set_title("Stem/channel loudness — fixed dBFS scale")
+            ax.grid(True, axis="x", alpha=0.3)
+            ax.legend(loc="best")
+            fig.savefig(plots_dir / f"stem_loudness.{suffix}", **save_kwargs)
+            plt.close(fig)
+        except Exception as ex:  # noqa: BLE001
+            (plots_dir / "stem_loudness_plot_skipped.txt").write_text(
+                f"stem loudness plot generation skipped: {type(ex).__name__}: {ex}\n",
+                encoding="utf8",
+            )
+    return json_path
+
+
 def write_stem_amplitude_report(
     outdir: Path,
     spec: dict,
@@ -286,6 +472,19 @@ def write_stem_amplitude_report(
                 "state_default_rms_dbfs": _db(default_linear),
             }
             envelope_rows.append(env_row)
+
+    if not rows_by_section_group and not envelope_rows:
+        # Fast iteration usually renders with ``--render_audio_mode=full-mix-only``.
+        # That mode does not write per-section per-stem OGGs, so fall back to
+        # scratch stems to ensure the loudness-over-time plot is still produced.
+        scratch_rows, scratch_envelopes, sample_rate = _read_scratch_stem_envelopes(
+            outdir,
+            manifest,
+            bucket_seconds=bucket_seconds,
+        )
+        for row in scratch_rows:
+            rows_by_section_group[(str(row.get("section", "full")), str(row.get("group", "")))] = row
+        envelope_rows.extend(scratch_envelopes)
 
     ordered_groups = sorted(
         rows_by_section_group.values(),

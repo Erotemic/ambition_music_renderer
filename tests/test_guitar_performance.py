@@ -95,3 +95,111 @@ def test_guitar_chug_can_ignore_slash_bass_for_power_chords():
     pm, _groups, _meta = build_score(spec)
     pitches = sorted({note.pitch for inst in pm.instruments for note in inst.notes})
     assert pitches == [43, 50]
+
+
+def test_guitar_chug_min_pitch_octave_folds_unplayable_low_roots():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "chug_min_pitch",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [
+            {"name": "gtr", "group": "strings", "program": "muted_guitar"},
+        ],
+        "layer_templates": {
+            "chug": {
+                "kind": "guitar_chug",
+                "instrument": "gtr",
+                "shape": "fifth",
+                "pattern": [[0, 0.0, 0.25]],
+                "octave": 2,
+                "min_pitch": 40,
+            },
+        },
+        "sections": [
+            {"id": "loop", "bars": 1, "harmony": ["C"], "layers": ["chug"]},
+        ],
+    }
+    pm, _groups, _meta = build_score(spec)
+    pitches = sorted({note.pitch for inst in pm.instruments for note in inst.notes})
+    assert pitches == [48, 55]
+
+
+def test_guitar_lead_vibrato_adds_pitch_bend_events():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "lead_vibrato",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [
+            {"name": "lead", "group": "lead", "program": "overdrive_guitar"},
+        ],
+        "motifs": [
+            {
+                "id": "held",
+                "root": "D4",
+                "intervals": [0],
+                "rhythm": [2.0],
+                "velocities": [1.0],
+            },
+        ],
+        "sections": [
+            {
+                "id": "loop",
+                "bars": 1,
+                "harmony": ["D"],
+                "layers": [
+                    {
+                        "kind": "guitar_lead",
+                        "instrument": "lead",
+                        "motif": "held",
+                        "root": "D4",
+                        "pitch_vibrato_cents": 8.0,
+                        "pitch_vibrato_rate_hz": 5.0,
+                        "pitch_vibrato_delay_beats": 0.2,
+                    }
+                ],
+            }
+        ],
+    }
+    pm, _groups, _meta = build_score(spec)
+    lead = pm.instruments[0]
+    assert len(lead.notes) == 1
+    assert len(lead.pitch_bends) > 4
+
+
+def test_pad_chords_respect_max_notes_constraint():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "pad_max_notes",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "constraints": {"max_notes": 2},
+        "instruments": [
+            {"name": "pad", "group": "pad", "program": "clean_guitar"},
+        ],
+        "sections": [
+            {
+                "id": "loop",
+                "bars": 1,
+                "harmony": ["Gadd9"],
+                "layers": [
+                    {
+                        "kind": "pad_chords",
+                        "instrument": "pad",
+                        "duration_beats": 3.8,
+                        "voicing": "wide",
+                        "constraints": {"max_notes": 2},
+                    }
+                ],
+            }
+        ],
+    }
+    pm, _groups, _meta = build_score(spec)
+    assert len(pm.instruments[0].notes) == 2

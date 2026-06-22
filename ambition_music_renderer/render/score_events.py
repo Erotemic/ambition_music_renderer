@@ -73,6 +73,9 @@ def add_note(
     gate: float | None = None,
     pitch_scoop_cents: float = 0.0,
     pitch_bend_curve: list[tuple[float, float]] | None = None,
+    pitch_vibrato_cents: float = 0.0,
+    pitch_vibrato_rate_hz: float = 5.4,
+    pitch_vibrato_delay_beats: float = 0.45,
 ) -> None:
     """Schedule a single note.
 
@@ -139,12 +142,31 @@ def add_note(
             )
         # Reset to 0 just past the note end so we don't drag bend into the next note.
         inst.pitch_bends.append(pretty_midi.PitchBend(pitch=0, time=end + 0.001))
-    elif pitch_scoop_cents:
-        bend_value = int(clamp(pitch_scoop_cents / 200.0 * 8192.0, -8192, 8191))
-        inst.pitch_bends.append(pretty_midi.PitchBend(pitch=bend_value, time=start))
-        inst.pitch_bends.append(
-            pretty_midi.PitchBend(pitch=0, time=min(end, start + 0.10))
-        )
+    else:
+        if pitch_scoop_cents:
+            bend_value = int(clamp(pitch_scoop_cents / 200.0 * 8192.0, -8192, 8191))
+            inst.pitch_bends.append(pretty_midi.PitchBend(pitch=bend_value, time=start))
+            inst.pitch_bends.append(
+                pretty_midi.PitchBend(pitch=0, time=min(end, start + 0.10))
+            )
+        if pitch_vibrato_cents:
+            # A small delayed pitch vibrato gives MIDI guitar leads more held-note
+            # life without requiring the score to spell out pitch-bend curves for
+            # every note.  Keep it modest: pitch-bend affects the full MIDI
+            # channel, so authors should reserve it for mostly monophonic leads.
+            delay_s = ctx.beat_to_time(float(pitch_vibrato_delay_beats))
+            vibrato_start = start + max(0.0, delay_s)
+            if end - vibrato_start > 0.12:
+                rate = max(0.1, float(pitch_vibrato_rate_hz))
+                step = 1.0 / (rate * 8.0)
+                t = vibrato_start
+                while t < end - 0.01:
+                    phase = (t - vibrato_start) * rate * math.tau
+                    cents = math.sin(phase) * float(pitch_vibrato_cents)
+                    bend_value = int(clamp(cents / 200.0 * 8192.0, -8192, 8191))
+                    inst.pitch_bends.append(pretty_midi.PitchBend(pitch=bend_value, time=t))
+                    t += step
+                inst.pitch_bends.append(pretty_midi.PitchBend(pitch=0, time=end + 0.001))
 
 
 def add_chord(
@@ -213,6 +235,7 @@ def _apply_voicing_constraints(
         out = _spread_clusters(out)
     max_pitch = constraints.get("max_pitch")
     min_pitch = constraints.get("min_pitch")
+    max_notes = constraints.get("max_notes")
     bounded: list[int] = []
     for p0 in out:
         p = int(round(float(p0)))
@@ -236,6 +259,9 @@ def _apply_voicing_constraints(
             seen.add(p)
             deduped.append(p)
     out = deduped
+    if max_notes is not None:
+        limit = max(1, int(max_notes))
+        out = out[:limit]
     ctx.last_voicing[inst_name] = list(out)
     return out
 

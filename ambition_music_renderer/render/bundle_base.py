@@ -109,6 +109,7 @@ class CueBundleConfig(kwconf.Config):
         False,
         help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
     )
+    json: bool = kwconf.Flag(False, help="print the full bundle JSON payload to stdout")
 
     def __post_init__(self) -> None:
         self.jobs = int(self.jobs)
@@ -125,8 +126,9 @@ class CueBundleConfig(kwconf.Config):
         from .bundle_archive import print_bundle_summary
 
         report = create_bundle_from_config(config)
+        if config.json:
+            print(json.dumps(report, indent=2, default=str))
         print_bundle_summary(report)
-        print(json.dumps(report, indent=2, default=str))
         return 0 if report.get("ok", True) else 1
 
 
@@ -226,6 +228,8 @@ def missing_score_debug(cue: str) -> str:
     lines = [
         f"cue not found: {cue}",
         f"renderer project root: {package_dir()}",
+        f"current working directory: {Path.cwd()}",
+        f"parent repository root: {repo_root()}",
         "score candidates checked:",
     ]
     lines.extend(f"  - {candidate}" for candidate in candidates)

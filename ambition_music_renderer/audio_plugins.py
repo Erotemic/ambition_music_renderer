@@ -21,6 +21,11 @@ from typing import Any, Iterable
 import yaml
 import kwconf
 
+from .instrument_libraries import (
+    collect_sfz_library_diagnostics,
+    resolve_sfz_reference,
+)
+
 
 PYTHON_MODULES = ("pedalboard", "pyloudnorm", "pretty_midi", "music21", "soundfile")
 EXTERNAL_BINARIES = (
@@ -201,6 +206,7 @@ def collect_plugin_diagnostics(*, probe_counts: bool = True) -> dict[str, Any]:
         report["vst3"] = {"count": len(vst3), "plugins": vst3[:100]}
         lv2 = discover_lv2_plugins(limit=250)
         report["lv2"] = {"count": len(lv2), "uris": lv2}
+        report["sfz_libraries"] = collect_sfz_library_diagnostics(limit=100)
     return report
 
 
@@ -257,6 +263,90 @@ def _collect_effect_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, An
     return specs
 
 
+def _collect_instrument_backend_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    specs: list[tuple[str, dict[str, Any]]] = []
+    instruments = score.get("instruments", [])
+    if not isinstance(instruments, list):
+        return specs
+    for idx, inst in enumerate(instruments):
+        if not isinstance(inst, dict):
+            continue
+        raw = inst.get("instrument_backend", inst.get("backend", None))
+        if raw is None and "sfz" in inst:
+            raw = {"sfz": inst.get("sfz")}
+        if raw is None:
+            continue
+        if isinstance(raw, str):
+            raw = {"kind": raw}
+        if not isinstance(raw, dict):
+            raw = {}
+        if "sfz" in inst and "sfz" not in raw:
+            raw = {**raw, "sfz": inst["sfz"]}
+        name = inst.get("name", idx)
+        specs.append((f"$.instruments[{idx}]({name}).instrument_backend", raw))
+    return specs
+
+
+def _spec_missing_severity(spec: dict[str, Any]) -> str:
+    if "required" in spec:
+        return "error" if bool(spec.get("required")) else "warning"
+    return "warning" if bool(spec.get("optional", True)) else "error"
+
+
+def validate_instrument_backend_spec(
+    spec: dict[str, Any],
+    *,
+    base_dir: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Return warnings/errors for one instrument backend spec."""
+
+    messages: list[dict[str, Any]] = []
+    severity = _spec_missing_severity(spec)
+    kind = str(spec.get("kind") or spec.get("type") or "").lower().strip()
+    wants_sfz = kind in {"sfz", "sfizz", "sample", "sampled"} or any(
+        key in spec for key in ("sfz", "sfz_path", "sfz_glob", "library_ref", "library")
+    )
+    if not wants_sfz:
+        return messages
+    settings = dict(spec.get("settings") or {})
+    binary = str(spec.get("binary", settings.get("binary", "sfizz_render")))
+    renderer = str(settings.get("renderer", spec.get("renderer", "auto"))).lower().strip()
+    if not shutil.which(binary):
+        vst3_plugin = settings.get("vst3_plugin") or spec.get("vst3_plugin") or "sfizz"
+        vst3_path = resolve_vst3_reference(str(vst3_plugin), base_dir=base_dir)
+        pedalboard_available = importlib.util.find_spec("pedalboard") is not None
+        if renderer in {"auto", "vst3", "pedalboard", "sfizz_vst3"} and vst3_path is not None and pedalboard_available:
+            messages.append({
+                "severity": severity,
+                "message": f"{binary!r} not found; SFZ rendering will try sfizz VST3: {vst3_path}",
+            })
+        else:
+            messages.append({
+                "severity": severity,
+                "message": f"{binary!r} not found for SFZ instrument rendering",
+            })
+    prefer = spec.get("prefer") or spec.get("prefer_keywords") or []
+    resolved = resolve_sfz_reference(
+        spec.get("sfz") or spec.get("path") or spec.get("sfz_path") or spec.get("sfz_glob"),
+        library_ref=spec.get("library_ref") or spec.get("library"),
+        prefer=[str(item) for item in prefer],
+        base_dir=base_dir,
+        roots=spec.get("library_roots") or [],
+    )
+    if resolved is None:
+        requested = spec.get("library_ref") or spec.get("library") or spec.get("sfz") or spec.get("sfz_path") or spec.get("sfz_glob")
+        messages.append({
+            "severity": severity,
+            "message": f"SFZ library reference did not resolve: {requested!r}",
+        })
+    else:
+        messages.append({
+            "severity": "info",
+            "message": f"SFZ instrument resolved: {resolved}",
+        })
+    return messages
+
+
 def validate_effect_spec(
     spec: dict[str, Any],
     *,
@@ -266,6 +356,7 @@ def validate_effect_spec(
     """Return warnings/errors for one effect spec."""
 
     messages: list[dict[str, Any]] = []
+    missing_optional_severity = "warning" if bool(spec.get("optional", False)) else "error"
     kind = str(
         spec.get("kind")
         or spec.get("type")
@@ -275,22 +366,22 @@ def validate_effect_spec(
     ).lower().strip()
     if kind in {"pedalboard", "vst3", "vst", "plugin"} or "path" in spec:
         if importlib.util.find_spec("pedalboard") is None:
-            messages.append({"severity": "error", "message": "pedalboard Python package is not installed"})
+            messages.append({"severity": missing_optional_severity, "message": "pedalboard Python package is not installed"})
     if kind in {"vst3", "vst", "plugin"} or ("path" in spec and str(spec.get("path", "")).endswith(".vst3")):
         raw_path = spec.get("path") or spec.get("plugin")
         if raw_path:
             resolved = resolve_vst3_reference(str(raw_path), base_dir=base_dir)
             if resolved is None:
-                messages.append({"severity": "error", "message": f"VST3 plugin not found: {raw_path}"})
+                messages.append({"severity": missing_optional_severity, "message": f"VST3 plugin not found: {raw_path}"})
         else:
             messages.append({"severity": "warning", "message": "VST3 spec has no path/plugin reference"})
     if kind in {"lv2", "lv2proc", "nam_lv2", "neural_amp_modeler"}:
         binary = str(spec.get("binary", "lv2proc"))
         if not shutil.which(binary):
-            messages.append({"severity": "error", "message": f"{binary!r} not found for LV2 processing"})
+            messages.append({"severity": missing_optional_severity, "message": f"{binary!r} not found for LV2 processing"})
         uri = spec.get("plugin_uri") or spec.get("uri")
         if not uri:
-            messages.append({"severity": "error", "message": "LV2 effect is missing plugin_uri/uri"})
+            messages.append({"severity": missing_optional_severity, "message": "LV2 effect is missing plugin_uri/uri"})
         elif lv2_uris is not None and uri not in lv2_uris:
             messages.append({"severity": "warning", "message": f"LV2 URI not listed by lv2ls: {uri}"})
     if kind in {"command", "external", "guitarix", "nam"} or "command" in spec:
@@ -300,30 +391,43 @@ def validate_effect_spec(
             if first and not shutil.which(str(first)) and not Path(str(first)).expanduser().exists():
                 messages.append({"severity": "warning", "message": f"external command may not be on PATH: {first}"})
         elif kind in {"command", "external", "guitarix", "nam"}:
-            messages.append({"severity": "error", "message": f"{kind} effect requires command"})
+            messages.append({"severity": missing_optional_severity, "message": f"{kind} effect requires command"})
     return messages
 
 
 def validate_score_plugins(score: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
     specs = _collect_effect_specs(score)
+    instrument_specs = _collect_instrument_backend_specs(score)
     lv2_uris: set[str] | None = None
     if shutil.which("lv2ls"):
         lv2_uris = set(discover_lv2_plugins())
     entries: list[dict[str, Any]] = []
+    instrument_entries: list[dict[str, Any]] = []
     error_count = 0
     warning_count = 0
-    for path, spec in specs:
-        messages = validate_effect_spec(spec, base_dir=base_dir, lv2_uris=lv2_uris)
+
+    def count_messages(messages: list[dict[str, Any]]) -> None:
+        nonlocal error_count, warning_count
         for msg in messages:
             if msg.get("severity") == "error":
                 error_count += 1
             elif msg.get("severity") == "warning":
                 warning_count += 1
+
+    for path, spec in specs:
+        messages = validate_effect_spec(spec, base_dir=base_dir, lv2_uris=lv2_uris)
+        count_messages(messages)
         entries.append({"path": path, "spec": spec, "messages": messages})
+    for path, spec in instrument_specs:
+        messages = validate_instrument_backend_spec(spec, base_dir=base_dir)
+        count_messages(messages)
+        instrument_entries.append({"path": path, "spec": spec, "messages": messages})
     return {
         "ok": error_count == 0,
         "effect_specs": entries,
         "effect_spec_count": len(entries),
+        "instrument_backend_specs": instrument_entries,
+        "instrument_backend_spec_count": len(instrument_entries),
         "errors": error_count,
         "warnings": warning_count,
     }
@@ -379,6 +483,16 @@ class AudioPluginLV2Info(kwconf.Config):
         return 0
 
 
+class AudioPluginListSFZLibraries(kwconf.Config):
+    limit: int = kwconf.Value(200)
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
+        print(json.dumps(collect_sfz_library_diagnostics(limit=args.limit), indent=2))
+        return 0
+
+
 class AudioPluginValidateScore(kwconf.Config):
     score: Path = kwconf.Value(None, position=1, parser=Path)
 
@@ -397,6 +511,7 @@ class AudioPluginsModal(kwconf.ModalCLI):
     doctor = AudioPluginDoctor
     list_vst3 = AudioPluginListVST3
     list_lv2 = AudioPluginListLV2
+    list_sfz_libraries = AudioPluginListSFZLibraries
     lv2_info = AudioPluginLV2Info
     validate_score = AudioPluginValidateScore
 
