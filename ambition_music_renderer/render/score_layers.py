@@ -1,0 +1,737 @@
+"""Layer renderers and full-score construction for MusicIR scores."""
+
+from __future__ import annotations
+
+from . import score_core as _core
+from . import score_theory as _theory
+from . import score_events as _events
+
+globals().update({k: v for k, v in vars(_core).items() if not k.startswith("__")})
+globals().update({k: v for k, v in vars(_theory).items() if not k.startswith("__")})
+globals().update({k: v for k, v in vars(_events).items() if not k.startswith("__")})
+
+@profile
+def render_layer_pad_chords(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    every = float(layer.get("every_bars", 1.0))
+    dur = float(layer.get("duration_beats", ctx.beats_per_bar * every))
+    octave = int(layer.get("octave", 4))
+    velocity = float(layer.get("velocity", 60)) * float(section.get("intensity", 1.0))
+    articulation = layer.get("articulation", "pad")
+    voicing = layer.get("voicing", "open")
+    hk = _layer_human(layer, 8.0)
+    constraints = _layer_constraints(ctx.spec, layer)
+    for local in range(0, int(section["bars"]), max(1, int(every))):
+        chord = chord_for_bar(section, local)
+        for inst in insts:
+            add_chord(
+                ctx,
+                inst,
+                chord,
+                section["start_bar"] + local,
+                0.0,
+                dur,
+                velocity,
+                octave=octave,
+                articulation=articulation,
+                voicing=voicing,
+                constraints=constraints,
+                **hk,
+            )
+
+
+@profile
+def render_layer_arpeggio(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    pattern = [int(x) for x in layer.get("pattern", [0, 2, 1, 2])]
+    step = float(layer.get("step", 0.5))
+    dur = float(layer.get("duration_beats", step))
+    octave = int(layer.get("octave", 4))
+    velocity = float(layer.get("velocity", 64))
+    density = float(layer.get("density", section.get("density", 1.0)))
+    articulation = layer.get("articulation", "staccato")
+    inst_velocity_offsets = layer.get("instrument_velocity_offsets", {}) or {}
+    inst_octave_offsets = layer.get("instrument_octave_offsets", {}) or {}
+    hk = _layer_human(layer, 4.0)
+    for local in range(int(section["bars"])):
+        if "every" in layer and local % int(layer["every"]) != int(
+            layer.get("offset", 0)
+        ):
+            continue
+        tones = chord_pitches(
+            chord_for_bar(section, local),
+            octave=octave,
+            voicing=layer.get("voicing", "closed"),
+        )
+        count = int(ctx.beats_per_bar / step)
+        for i in range(count):
+            if ctx.rng.random() > density:
+                continue
+            base_pitch = tones[pattern[i % len(pattern)] % len(tones)]
+            for inst in insts:
+                p = base_pitch + 12 * int(inst_octave_offsets.get(inst, 0))
+                v = velocity + float(inst_velocity_offsets.get(inst, 0.0))
+                add_note(
+                    ctx,
+                    inst,
+                    p,
+                    section["start_bar"] + local,
+                    i * step,
+                    dur,
+                    v * float(section.get("intensity", 1.0)),
+                    articulation=articulation,
+                    **hk,
+                )
+
+
+@profile
+def render_layer_ostinato(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    intervals = [int(x) for x in layer.get("intervals", [0, 7, 12, 7])]
+    rhythm = [float(x) for x in layer.get("rhythm", [0.5] * len(intervals))]
+    root_octave = int(layer.get("octave", 3))
+    velocity = float(layer.get("velocity", 60))
+    articulation = layer.get("articulation", "spiccato")
+    bars = int(section["bars"])
+    hk = _layer_human(layer, 4.0)
+    for local in range(bars):
+        root = root_for_chord(chord_for_bar(section, local), root_octave)
+        beat = 0.0
+        idx = 0
+        while beat < ctx.beats_per_bar - 1e-6:
+            dur = rhythm[idx % len(rhythm)]
+            p = root + intervals[idx % len(intervals)]
+            for inst in insts:
+                add_note(
+                    ctx,
+                    inst,
+                    p,
+                    section["start_bar"] + local,
+                    beat,
+                    dur,
+                    velocity * float(section.get("intensity", 1.0)),
+                    articulation=articulation,
+                    **hk,
+                )
+            beat += dur
+            idx += 1
+
+
+@profile
+def render_layer_bassline(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    inst = resolve_instruments(ctx, layer)[0]
+    pattern = layer.get(
+        "pattern", [[0, 0.0, 0.75], [7, 1.5, 0.5], [12, 2.5, 0.5], [7, 3.25, 0.4]]
+    )
+    octave = int(layer.get("octave", 2))
+    velocity = float(layer.get("velocity", 74))
+    articulation = layer.get("articulation", "marcato")
+    hk = _layer_human(layer, 5.0)
+    for local in range(int(section["bars"])):
+        root = root_for_chord(chord_for_bar(section, local), octave)
+        for item in pattern:
+            interval, beat, dur = int(item[0]), float(item[1]), float(item[2])
+            add_note(
+                ctx,
+                inst,
+                root + interval,
+                section["start_bar"] + local,
+                beat,
+                dur,
+                velocity * float(section.get("intensity", 1.0)),
+                articulation=articulation,
+                **hk,
+            )
+
+
+@profile
+def render_layer_motif(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    roots = layer.get("roots") or [layer.get("root", None)]
+    starts = layer.get("starts") or [[0, 0.0]]
+    repeats = int(layer.get("repeats", 1))
+    every_bars = float(layer.get("every_bars", 2.0))
+    velocity = float(layer.get("velocity", 78))
+    articulation = layer.get("articulation", "normal")
+    gate_value = layer.get("gate")
+    gate = float(gate_value) if gate_value is not None else None
+    transpose = int(layer.get("transpose", 0))
+    transform = layer.get("transform")
+    inst_velocity_offsets = layer.get("instrument_velocity_offsets", {}) or {}
+    inst_octave_offsets = layer.get("instrument_octave_offsets", {}) or {}
+    inst_pitch_scoop = layer.get("instrument_pitch_scoop_cents", {}) or {}
+    inst_pitch_bend_curves = layer.get("instrument_pitch_bend_curves", {}) or {}
+    note_velocity_pattern = layer.get("note_velocity_pattern", None)
+    hk = _layer_human(layer, 6.0)
+    for rep in range(repeats):
+        root = roots[rep % len(roots)]
+        for start in starts:
+            local_bar, start_beat = float(start[0]) + rep * every_bars, float(start[1])
+            if local_bar >= section["bars"]:
+                continue
+            notes, rhythm, velocities = motif_notes(
+                ctx, layer["motif"], root=root, transform=transform, transpose=transpose
+            )
+            beat = start_beat
+            for i, p0 in enumerate(notes):
+                dur = rhythm[i % len(rhythm)] * float(layer.get("rhythm_scale", 1.0))
+                vel_scale = velocities[i % len(velocities)]
+                if note_velocity_pattern:
+                    vel_scale *= float(
+                        note_velocity_pattern[i % len(note_velocity_pattern)]
+                    )
+                for j, inst in enumerate(insts):
+                    p = p0 + 12 * int(inst_octave_offsets.get(inst, 0))
+                    v = velocity + float(inst_velocity_offsets.get(inst, -8 * j))
+                    scoop = float(
+                        inst_pitch_scoop.get(inst, layer.get("pitch_scoop_cents", 0.0))
+                    )
+                    bend_curve = inst_pitch_bend_curves.get(
+                        inst, layer.get("pitch_bend_curve")
+                    )
+                    bend_curve_pairs = (
+                        [(float(x[0]), float(x[1])) for x in bend_curve]
+                        if bend_curve
+                        else None
+                    )
+                    add_note(
+                        ctx,
+                        inst,
+                        p,
+                        section["start_bar"] + local_bar,
+                        beat,
+                        dur,
+                        v * vel_scale * float(section.get("intensity", 1.0)),
+                        articulation=articulation,
+                        gate=gate,
+                        pitch_scoop_cents=scoop,
+                        pitch_bend_curve=bend_curve_pairs,
+                        **hk,
+                    )
+                beat += dur
+
+
+@profile
+def render_layer_chord_hits(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    hits = layer.get("hits", [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]])
+    velocity = float(layer.get("velocity", 90))
+    octave = int(layer.get("octave", 3))
+    inst_octave_offsets = {
+        str(k): int(v) for k, v in (layer.get("instrument_octave_offsets") or {}).items()
+    }
+    inst_velocity_offsets = {
+        str(k): float(v) for k, v in (layer.get("instrument_velocity_offsets") or {}).items()
+    }
+    hk = _layer_human(layer, 6.0)
+    constraints = _layer_constraints(ctx.spec, layer)
+    for local, beat in hits:
+        if float(local) >= section["bars"]:
+            continue
+        chord = chord_for_bar(section, int(local))
+        for inst in insts:
+            add_chord(
+                ctx,
+                inst,
+                chord,
+                section["start_bar"] + float(local),
+                float(beat),
+                float(layer.get("duration_beats", 0.75)),
+                (velocity + float(inst_velocity_offsets.get(inst, 0.0))) * float(section.get("intensity", 1.0)),
+                octave=octave + int(inst_octave_offsets.get(inst, 0)),
+                articulation=layer.get("articulation", "marcato"),
+                voicing=layer.get("voicing", "closed"),
+                constraints=constraints,
+                **hk,
+            )
+
+
+def render_layer_drums(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    kit = resolve_instruments(ctx, layer)[0]
+    events = layer.get("events", [])
+    if not events:
+        return
+    for local in range(int(section["bars"])):
+        for ev in events:
+            if "bars" in ev and local not in set(int(b) for b in ev["bars"]):
+                continue
+            if "every" in ev and local % int(ev["every"]) != int(ev.get("offset", 0)):
+                continue
+            beats = ev.get("beats", [ev.get("beat", 0.0)])
+            for beat in beats:
+                if ctx.rng.random() > float(ev.get("probability", 1.0)):
+                    continue
+                add_drum(
+                    ctx,
+                    kit,
+                    ev["drum"],
+                    section["start_bar"] + local,
+                    float(beat),
+                    float(ev.get("velocity", layer.get("velocity", 70)))
+                    * float(section.get("intensity", 1.0)),
+                    dur_beats=float(ev.get("duration_beats", 0.1)),
+                    humanize_ms=float(
+                        ev.get("humanize_ms", layer.get("humanize_ms", 2.0))
+                    ),
+                )
+
+
+def render_layer_texture(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    scale = [int(x) for x in layer.get("scale", [0, 2, 3, 5, 7, 10, 12])]
+    root = note_to_midi(layer.get("root", "D5"))
+    count_per_bar = float(layer.get("events_per_bar", 1.0))
+    velocity = float(layer.get("velocity", 38))
+    hk = _layer_human(layer, 2.0)
+    for local in range(int(section["bars"])):
+        count = int(math.floor(count_per_bar)) + (
+            1 if ctx.rng.random() < count_per_bar % 1 else 0
+        )
+        for _ in range(count):
+            beat = float(ctx.rng.uniform(0.0, ctx.beats_per_bar))
+            p = root + int(ctx.rng.choice(scale)) + 12 * int(ctx.rng.integers(-1, 2))
+            inst = str(ctx.rng.choice(insts))
+            add_note(
+                ctx,
+                inst,
+                p,
+                section["start_bar"] + local,
+                beat,
+                float(layer.get("duration_beats", 0.25)),
+                velocity * float(section.get("intensity", 1.0)),
+                articulation=layer.get("articulation", "bell"),
+                **hk,
+            )
+
+
+def render_layer_pedal(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    pitch = layer.get("note")
+    if pitch is None:
+        pitch = root_for_chord(chord_for_bar(section, 0), int(layer.get("octave", 2)))
+    velocity = float(layer.get("velocity", 45)) * float(section.get("intensity", 1.0))
+    hk = _layer_human(layer, 8.0)
+    for inst in insts:
+        add_note(
+            ctx,
+            inst,
+            pitch,
+            section["start_bar"],
+            0.0,
+            section["bars"] * ctx.beats_per_bar,
+            velocity,
+            articulation=layer.get("articulation", "pad"),
+            **hk,
+        )
+
+
+def render_layer_root_hits(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    insts = resolve_instruments(ctx, layer)
+    hits = layer.get("hits", [[0, 0.0, 0, 0.75]])
+    velocity = float(layer.get("velocity", 76))
+    octave = int(layer.get("octave", 2))
+    articulation = layer.get("articulation", "marcato")
+    hk = _layer_human(layer, 2.0)
+    for item in hits:
+        local = float(item[0])
+        beat = float(item[1])
+        interval = int(item[2]) if len(item) > 2 else 0
+        dur = (
+            float(item[3])
+            if len(item) > 3
+            else float(layer.get("duration_beats", 0.75))
+        )
+        if local >= section["bars"]:
+            continue
+        root = root_for_chord(chord_for_bar(section, int(local)), octave)
+        for inst in insts:
+            add_note(
+                ctx,
+                inst,
+                root + interval,
+                section["start_bar"] + local,
+                beat,
+                dur,
+                velocity * float(section.get("intensity", 1.0)),
+                articulation=articulation,
+                **hk,
+            )
+
+
+
+@profile
+def render_layer_guitar_strum(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render playable guitar strums instead of piano-block chords.
+
+    YAML sketch:
+
+    kind: guitar_strum
+    instrument: acoustic_guitar
+    hits: [[0, 0.0, down], [0, 2.0, up]]
+    duration_beats: 1.75
+    spread_ms: 42
+    tuning: standard
+    max_span: 5
+    """
+    from .. import guitar_performance as gp
+
+    insts = resolve_instruments(ctx, layer)
+    tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    octave = int(layer.get("octave", 3))
+    velocity = float(layer.get("velocity", 82))
+    duration = float(layer.get("duration_beats", layer.get("dur_beats", 1.5)))
+    articulation = layer.get("articulation", "pluck")
+    gate = layer.get("gate")
+    gate_f = None if gate is None else float(gate)
+    spread_ms = float(layer.get("spread_ms", 38.0))
+    max_span = int(layer.get("max_span", 5))
+    max_fret = int(layer.get("max_fret", 17))
+    max_notes = int(layer.get("max_notes", 6))
+    prefer_open = bool(layer.get("prefer_open", True))
+    velocity_slope = float(layer.get("velocity_slope", -2.0))
+    hk = _layer_human(layer, 1.5)
+    hits = layer.get("hits")
+    if not hits:
+        every = float(layer.get("every_bars", 1.0))
+        beats = layer.get("beats", [0.0])
+        hits = []
+        local = 0.0
+        while local < float(section["bars"]) - 1e-9:
+            for beat in beats:
+                hits.append([local, float(beat)])
+            local += every
+    elif "every_bars" in layer or bool(layer.get("repeat_hits", False)):
+        # Treat explicit hits as a per-period pattern when every_bars is present.
+        # This lets authors define one-bar down/up strums and repeat them across
+        # the section without spelling out every local bar.
+        base_hits = [list(item) for item in hits]
+        every = float(layer.get("every_bars", 1.0))
+        expanded = []
+        period = 0.0
+        while period < float(section["bars"]) - 1e-9:
+            for item in base_hits:
+                clone = list(item)
+                clone[0] = float(clone[0]) + period
+                if float(clone[0]) < float(section["bars"]):
+                    expanded.append(clone)
+            period += every
+        hits = expanded
+    dirs = list(layer.get("directions", []))
+    default_direction = str(layer.get("direction", "down"))
+    for hit_idx, item in enumerate(hits):
+        local = float(item[0])
+        if local >= float(section["bars"]):
+            continue
+        beat = float(item[1])
+        direction = str(item[2]) if len(item) > 2 else (str(dirs[hit_idx % len(dirs)]) if dirs else default_direction)
+        chord = str(item[3]) if len(item) > 3 else chord_for_bar(section, int(local))
+        notes = chord_pitches(chord, octave=octave, voicing=layer.get("voicing", "closed"))
+        for inst in insts:
+            previous = ctx.last_guitar_voicing.get(inst)
+            events, assignment = gp.strum_plan(
+                notes,
+                bpm=ctx.bpm,
+                direction=direction,
+                spread_ms=spread_ms,
+                velocity=velocity * float(section.get("intensity", 1.0)),
+                velocity_slope=velocity_slope,
+                tuning=tuning,
+                max_fret=max_fret,
+                max_span=max_span,
+                max_notes=max_notes,
+                prefer_open=prefer_open,
+                previous=previous,
+            )
+            ctx.last_guitar_voicing[inst] = assignment
+            for ev in events:
+                add_note(
+                    ctx,
+                    inst,
+                    int(ev["pitch"]),
+                    section["start_bar"] + local,
+                    beat + float(ev["beat_offset"]),
+                    duration,
+                    float(ev["velocity"]),
+                    articulation=articulation,
+                    gate=gate_f,
+                    **hk,
+                )
+
+
+@profile
+def render_layer_guitar_chug(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render tight power-chord / palm-muted guitar rhythms.
+
+    This is meant to replace generic ostinato for distorted rhythm guitar.  It
+    emits separate take performances when ``takes`` are supplied instead of
+    relying on stereo widening.
+    """
+    from .. import guitar_performance as gp
+
+    if any(k in layer for k in ("instrument", "instruments", "group")):
+        default_insts = resolve_instruments(ctx, layer)
+    else:
+        default_insts = []
+    takes = gp.take_specs(layer, default_insts)
+    pattern = layer.get("pattern", [[0, 0.0, 0.5], [0, 0.5, 0.5], [7, 1.0, 0.5], [0, 1.5, 0.5]])
+    root_octave = int(layer.get("octave", 2))
+    velocity = float(layer.get("velocity", 92))
+    shape = str(layer.get("shape", "fifth_octave"))
+    articulation = str(layer.get("articulation", "staccato"))
+    gate = float(layer.get("gate", 0.48))
+    strum_spread_ms = float(layer.get("spread_ms", 8.0))
+    beat_per_second = ctx.bpm / 60.0
+    hk = _layer_human(layer, 1.0)
+    for local in range(int(section["bars"])):
+        root_base = root_for_chord(chord_for_bar(section, local), root_octave)
+        for event_idx, item in enumerate(pattern):
+            interval = int(item[0])
+            beat = float(item[1])
+            dur = float(item[2])
+            accent = float(item[3]) if len(item) > 3 else 1.0
+            root = root_base + interval
+            pitches = gp.power_chord_pitches(root, shape=shape)
+            for take_idx, take in enumerate(takes):
+                inst = str(take.get("instrument"))
+                if inst not in ctx.instruments:
+                    raise KeyError(f"guitar_chug take references unknown instrument {inst!r}")
+                timing_ms = float(take.get("timing_offset_ms", take.get("offset_ms", 0.0)))
+                take_beat = beat + timing_ms / 1000.0 * beat_per_second
+                vel_offset = float(take.get("velocity_offset", -2.0 * take_idx))
+                for p_idx, p in enumerate(pitches):
+                    note_offset = p_idx * (strum_spread_ms / 1000.0 * beat_per_second / max(1, len(pitches) - 1))
+                    add_note(
+                        ctx,
+                        inst,
+                        p,
+                        section["start_bar"] + local,
+                        take_beat + note_offset,
+                        dur,
+                        (velocity + vel_offset - p_idx * 2.0) * accent * float(section.get("intensity", 1.0)),
+                        articulation=articulation,
+                        gate=gate,
+                        **hk,
+                    )
+
+
+@profile
+def render_layer_guitar_lead(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Render a motif as a mostly monophonic guitar lead performance."""
+    from .. import guitar_performance as gp
+
+    insts = resolve_instruments(ctx, layer)
+    roots = layer.get("roots", [None])
+    starts = layer.get("starts", [[0, 0.0]])
+    repeats = int(layer.get("repeats", max(1, int(section["bars"]))))
+    every_bars = float(layer.get("every_bars", 1.0))
+    velocity = float(layer.get("velocity", 76))
+    articulation = layer.get("articulation", "pluck")
+    gate = float(layer.get("gate", 0.78))
+    transform = layer.get("transform")
+    transpose = int(layer.get("transpose", 0))
+    hk = _layer_human(layer, 3.0)
+    scoop = float(layer.get("pitch_scoop_cents", 12.0))
+    note_velocity_pattern = layer.get("note_velocity_pattern")
+    # Use the fretboard allocator to choose a plausible string/fret for each
+    # note.  The current version only uses that to vary scoops on jumps; future
+    # noise events can reuse the same assignment.
+    tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    prev_assign: dict[str, gp.StringFret | None] = {inst: None for inst in insts}
+    for rep in range(repeats):
+        root = roots[rep % len(roots)]
+        for start in starts:
+            local_bar, start_beat = float(start[0]) + rep * every_bars, float(start[1])
+            if local_bar >= section["bars"]:
+                continue
+            notes, rhythm, velocities = motif_notes(
+                ctx, layer["motif"], root=root, transform=transform, transpose=transpose
+            )
+            beat = start_beat
+            for i, p0 in enumerate(notes):
+                dur = rhythm[i % len(rhythm)] * float(layer.get("rhythm_scale", 1.0))
+                vel_scale = velocities[i % len(velocities)]
+                if note_velocity_pattern:
+                    vel_scale *= float(note_velocity_pattern[i % len(note_velocity_pattern)])
+                for inst in insts:
+                    choices = gp.positions_for_pitch(int(p0), tuning=tuning, max_fret=int(layer.get("max_fret", 19)))
+                    chosen = choices[0] if choices else None
+                    local_scoop = scoop
+                    prev = prev_assign.get(inst)
+                    if prev is not None and chosen is not None:
+                        # Larger position jumps get a slightly stronger attack scoop.
+                        local_scoop = scoop + min(28.0, abs(chosen.fret - prev.fret) * 2.0 + abs(chosen.string_index - prev.string_index) * 3.0)
+                    if chosen is not None:
+                        prev_assign[inst] = chosen
+                    add_note(
+                        ctx,
+                        inst,
+                        int(chosen.pitch if chosen is not None else p0),
+                        section["start_bar"] + local_bar,
+                        beat,
+                        dur,
+                        velocity * vel_scale * float(section.get("intensity", 1.0)),
+                        articulation=articulation,
+                        gate=gate,
+                        pitch_scoop_cents=local_scoop,
+                        **hk,
+                    )
+                beat += dur
+
+def render_layer_automation(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    # Note-free layer used to express section-wide CC ramps in YAML.
+    apply_automation(ctx, section, layer)
+
+
+@profile
+def render_layer(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    kind = layer["kind"]
+    if kind == "pad_chords":
+        render_layer_pad_chords(ctx, section, layer)
+    elif kind == "arpeggio":
+        render_layer_arpeggio(ctx, section, layer)
+    elif kind == "ostinato":
+        render_layer_ostinato(ctx, section, layer)
+    elif kind == "bassline":
+        render_layer_bassline(ctx, section, layer)
+    elif kind == "motif":
+        render_layer_motif(ctx, section, layer)
+    elif kind == "chord_hits":
+        render_layer_chord_hits(ctx, section, layer)
+    elif kind == "drums":
+        render_layer_drums(ctx, section, layer)
+    elif kind == "texture":
+        render_layer_texture(ctx, section, layer)
+    elif kind == "pedal":
+        render_layer_pedal(ctx, section, layer)
+    elif kind == "root_hits":
+        render_layer_root_hits(ctx, section, layer)
+    elif kind == "guitar_strum":
+        render_layer_guitar_strum(ctx, section, layer)
+    elif kind == "guitar_chug":
+        render_layer_guitar_chug(ctx, section, layer)
+    elif kind == "guitar_lead":
+        render_layer_guitar_lead(ctx, section, layer)
+    elif kind == "automation":
+        render_layer_automation(ctx, section, layer)
+        return
+    else:
+        raise KeyError(f"unknown layer kind {kind!r}")
+    apply_automation(ctx, section, layer)
+
+
+def merged_layers(
+    spec: dict[str, Any], section: dict[str, Any]
+) -> list[dict[str, Any]]:
+    templates = spec.get("layer_templates", {})
+    out: list[dict[str, Any]] = []
+    for item in section.get("layers", []):
+        if isinstance(item, str):
+            layer = copy.deepcopy(templates[item])
+            layer.setdefault("_source_layer", item)
+        elif "template" in item:
+            layer = copy.deepcopy(templates[item["template"]])
+            layer.update({k: v for k, v in item.items() if k != "template"})
+            layer.setdefault("_source_layer", str(item["template"]))
+        else:
+            layer = copy.deepcopy(item)
+            layer.setdefault("_source_layer", str(layer.get("id", layer.get("kind", "inline"))))
+        out.append(layer)
+    return out
+
+
+@profile
+def build_score(
+    spec: dict[str, Any],
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
+    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    pm = pretty_midi.PrettyMIDI(initial_tempo=bpm)
+    ctx = RenderContext(
+        spec=spec,
+        sample_rate=int(spec.get("render", {}).get("sample_rate", 48000)),
+        bpm=bpm,
+        beats_per_bar=beats_per_bar,
+        rng=np.random.default_rng(int(spec.get("seed", 1))),
+        pm=pm,
+        instruments={},
+        groups={},
+        section_starts={},
+        motifs={m["id"]: m for m in spec.get("motifs", [])},
+        instrument_specs={},
+    )
+    for inst_spec in spec.get("instruments", []):
+        add_instrument(ctx, inst_spec)
+    starts = section_starts(spec["sections"])
+    ctx.section_starts = starts
+    section_meta = section_metadata_from_spec(spec)
+    for section in spec["sections"]:
+        for layer in merged_layers(spec, section):
+            ctx.active_section_id = str(section.get("id", ""))
+            ctx.active_layer_id = str(layer.get("_source_layer", layer.get("kind", "layer")))
+            ctx.active_layer_kind = str(layer.get("kind", ""))
+            render_layer(ctx, section, layer)
+    pm._ambition_note_events = list(ctx.note_events)  # type: ignore[attr-defined]
+    pm._ambition_instrument_specs = copy.deepcopy(ctx.instrument_specs)  # type: ignore[attr-defined]
+    return pm, ctx.groups, section_meta
+
+
+
+
+def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
+    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    seconds_per_beat = 60.0 / bpm
+    cursor = 0
+    out = []
+    for section in spec["sections"]:
+        bars = int(section["bars"])
+        start_beat = cursor * beats_per_bar
+        end_beat = (cursor + bars) * beats_per_bar
+        out.append(
+            {
+                "id": section["id"],
+                "label": section.get("label", section["id"]),
+                "kind": section.get("kind", "section"),
+                "start_bar": cursor,
+                "bars": bars,
+                "start_beat": start_beat,
+                "end_beat": end_beat,
+                "start_seconds": start_beat * seconds_per_beat,
+                "end_seconds": end_beat * seconds_per_beat,
+                "duration_seconds": (end_beat - start_beat) * seconds_per_beat,
+                "loopable": bool(section.get("loopable", False)),
+                "valid_exit_local_bars": section.get("valid_exit_local_bars", []),
+            }
+        )
+        cursor += bars
+    return out

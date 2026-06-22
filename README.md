@@ -51,13 +51,19 @@ Bundle report generation also calls these helpers through the packaged modal CLI
 
 - `ambition_music_renderer/cli.py` - light top-level modal CLI and repo path helpers.
 - `ambition_music_renderer/render/` - render orchestration, bundle generation, worker entrypoints, MusicIR renderer internals, and compiled kernels.
+  - `render/score_*.py` - score expansion split into core constants/context, theory helpers, event construction, and layer renderers.
+  - `render/synth.py`, `render/effects.py`, `render/export.py`, and `render/group.py` - audio synthesis, post-process effects, export/metadata, and stem-group rendering.
+  - `render/bundle_*.py` - cue bundle orchestration split into base config/path helpers, audio reports, spectral reports, adaptive reports, spectrograms, archive/zip helpers, and the main `bundle.py` workflow.
+  - `render/musicir_renderer.py` and `render/bundle_reports.py` are compatibility facades; put new implementation code in the focused modules above.
 - `ambition_music_renderer/audit/` - active diagnostics and reports exposed under `python -m ambition_music_renderer audit ...`.
 - `ambition_music_renderer/legacy/` - quarantined older one-off helpers that are still callable but need a later rename/delete decision.
 - `ambition_music_renderer/backends/` - optional plugin/SFZ/LV2/VST adapter code, imported only when requested.
 
 ## Useful files
 
-- `ambition_music_renderer/render/musicir_renderer.py` - main MusicIR renderer and renderer version.
+- `ambition_music_renderer/render/score_layers.py` - MusicIR layer renderers and `build_score`.
+- `ambition_music_renderer/render/effects.py` - filters, compressor, reverb wrappers, stereo widening, and limiting.
+- `ambition_music_renderer/render/synth.py` - FluidSynth / pretty-midi audio rendering.
 - `ambition_music_renderer/render/bundle.py` - one-command cue regeneration, diagnostics, reports, plots, and uploadable bundles.
 - `ambition_music_renderer/render/isolated.py` and `render/group_worker.py` - adaptive stem render entrypoints.
 - `ambition_music_renderer/audit/*.py` - active analysis helpers (`levels`, `cue_balance`, `arrangement`, `dissonance`, `spectral_localize`, `spectral_compare`, `transition`, etc.).
@@ -364,20 +370,3 @@ When composing new YAML cues, prefer explicit, inspectable musical choices:
 - Preserve conservative gain ranges in tune specs; the runtime renderer can clip if stems are too hot.
 - Treat `first_goblin_tune_v2` as the current active adaptive-music lab, not as the final abstraction for all encounters.
 - Update `docs/recipes/generated-music-workflow.md` and `docs/tools/generated-audio-tools.md` when the workflow changes.
-
-## Troubleshooting score discovery
-
-If `cue_bundle` reports `cue not found`, it now prints the renderer project root
-and each score candidate it checked.  The expected renderer project root is the
-directory that contains both `pyproject.toml` and `scores/`; for the Ambition
-checkout this should be:
-
-```bash
-~/code/ambition/tools/ambition_music_renderer
-```
-
-A common post-reorg failure mode is accidentally resolving paths relative to the
-Python package directory (`ambition_music_renderer/`) instead of the renderer
-project root.  The shared `ambition_music_renderer._paths` helpers centralize
-this discovery and should be used by render, audit, and legacy modules instead
-of hard-coded `Path(__file__).parents[...]` calculations.
