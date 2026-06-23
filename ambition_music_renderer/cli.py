@@ -623,6 +623,19 @@ def cmd_plugins_list_lv2(args) -> int:
     return 0
 
 
+def cmd_plugins_list_clap(args) -> int:
+    from .audio_plugins import discover_clap_plugins
+
+    roots = [Path(p) for p in args.path] if args.path else None
+    plugins = discover_clap_plugins(roots)
+    if args.json:
+        print(json.dumps(plugins, indent=2))
+    else:
+        for plugin in plugins:
+            print(plugin["path"])
+    return 0
+
+
 def cmd_plugins_list_sfz_libraries(args) -> int:
     from .instrument_libraries import collect_sfz_library_diagnostics
 
@@ -770,7 +783,8 @@ class BundleCommand(kwconf.Config):
         help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
     )
     skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
-    skip_spectrograms: bool = kwconf.Flag(False, help="skip spectrogram generation")
+    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; off by default")
+    all_audits: bool = kwconf.Flag(False, help="run full cue-bundle diagnostic audits")
     render_audio_mode: str = kwconf.Value(
         "full",
         choices=["full", "full-mix-only", "simple-mix"],
@@ -828,7 +842,8 @@ class BundleManyCommand(kwconf.Config):
     publish: bool = kwconf.Flag(False)
     zip: bool = kwconf.Flag(False)
     zip_report: bool = kwconf.Flag(True)
-    skip_spectrograms: bool = kwconf.Flag(False)
+    spectrograms: bool = kwconf.Flag(False)
+    all_audits: bool = kwconf.Flag(False)
     include_scratch_stems: bool = kwconf.Flag(False)
     render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
     profile_render: bool = kwconf.Flag(False)
@@ -967,6 +982,15 @@ class PluginListLV2(kwconf.Config):
         return cmd_plugins_list_lv2(cls.cli(argv=argv, data=kwargs))
 
 
+class PluginListCLAP(kwconf.Config):
+    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_list_clap(cls.cli(argv=argv, data=kwargs))
+
+
 class PluginListSFZLibraries(kwconf.Config):
     limit: int = kwconf.Value(200)
     json: bool = kwconf.Flag(False, help="emit JSON")
@@ -1000,6 +1024,7 @@ class PluginsModal(kwconf.ModalCLI):
     doctor = PluginDoctor
     list_vst3 = PluginListVST3
     list_lv2 = PluginListLV2
+    list_clap = PluginListCLAP
     list_sfz_libraries = PluginListSFZLibraries
     lv2_info = PluginLV2Info
     validate_score = PluginValidateScore

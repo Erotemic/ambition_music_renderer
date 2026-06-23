@@ -63,3 +63,39 @@ def test_rock_drums_do_not_select_orchestral_percussion(tmp_path: Path):
     perc.write_text("<group>\n", encoding="utf8")
     assert resolve_sfz_reference(library_ref="drums.rock", roots=[tmp_path / "sfz"]) is None
     assert resolve_sfz_reference(library_ref="vpo.percussion", roots=[tmp_path / "sfz"]) == perc.resolve()
+
+
+def test_downloaded_role_aliases_resolve_from_stable_names(tmp_path: Path):
+    cases = {
+        "guitar.clean": "Karoryfer/Shinyguitar/Shinyguitar Sustain.sfz",
+        "guitar.electric_lead": "Karoryfer/Shinyguitar/Shinyguitar Lead Sustain.sfz",
+        "guitar.hollowbody": "Karoryfer/BlackAndGreenGuitars/Green Guitar Sustain.sfz",
+        "bass.electric": "Karoryfer/Growlybass/Growlybass Finger Sustain.sfz",
+        "drums.rock": "Karoryfer/GogodzePhuVolII/Gogodze Drum Kit.sfz",
+        "folk.banjo": "SFZInstruments/Ganjo/ganjo.sfz",
+        "folk.harp": "Versilian/EtherealwindsHarpII_CE/Etherealwinds Harp Normal Sustain.sfz",
+        "brass.tuba": "Karoryfer/WarTuba/War Tuba Sustain.sfz",
+        "strings.cello": "Karoryfer/BigcatCello/Bigcat Cello Sustain.sfz",
+        "strings.cyborg": "Karoryfer/StringCyborgs/String Cyborgs Sustain.sfz",
+        "folk.bass_tagelharpa": "Karoryfer/HorsePulse/Horse Pulse Bass Tagelharpa.sfz",
+    }
+    for ref, rel in cases.items():
+        root = tmp_path / ref.replace(".", "_") / "sfz"
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+        resolved = resolve_sfz_reference(library_ref=ref, roots=[root])
+        assert resolved == path.resolve(), ref
+
+
+def test_generic_aliases_avoid_wrong_vpo_roles(tmp_path: Path):
+    root = tmp_path / "sfz"
+    wrong_bass = root / "Virtual-Playing-Orchestra3" / "Brass" / "bass-trombone-SOLO-sustain.sfz"
+    right_bass = root / "Karoryfer" / "Growlybass" / "Growlybass Finger Sustain.sfz"
+    wrong_drum = root / "Virtual-Playing-Orchestra3" / "Percussion" / "bassdrum-snare-cymbals.sfz"
+    right_drum = root / "Karoryfer" / "GogodzePhuVolII" / "Gogodze Drum Kit.sfz"
+    for path in [wrong_bass, right_bass, wrong_drum, right_drum]:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="bass.electric", roots=[root]) == right_bass.resolve()
+    assert resolve_sfz_reference(library_ref="drums.rock", roots=[root]) == right_drum.resolve()

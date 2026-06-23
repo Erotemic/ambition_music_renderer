@@ -906,3 +906,15 @@ def test_versioned_generated_layout_latest_manifest_lookup():
         manifest = latest_manifest_in_roots(generated_manifest_search_roots(cue_dir), "cue")
         assert manifest is not None
         assert manifest.name == "cue_newhash.adaptive_manifest.json"
+
+
+def test_cue_bundle_positive_audit_flags_parse():
+    args = CueBundleConfig.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
+    assert args.spectrograms is True
+    assert args.all_audits is True
+
+
+def test_bundle_many_positive_audit_flags_parse():
+    args = BundleManyCommand.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
+    assert args.spectrograms is True
+    assert args.all_audits is True

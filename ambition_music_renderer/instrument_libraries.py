@@ -83,25 +83,25 @@ ALIASES: dict[str, SfzLibraryAlias] = {
     "guitar.clean": SfzLibraryAlias(
         ref="guitar.clean",
         required_any=(("guitar",), ("shinyguitar",), ("emilyguitar",), ("black", "green")),
-        prefer=("clean", "sustain", "sus", "long", "shiny", "emily", "guitar"),
-        avoid=("mute", "choke", "noise", "scrape"),
+        prefer=("shinyguitar", "black", "green", "clean", "sustain", "sus", "long", "mic", "hollowbody", "emily", "guitar"),
+        avoid=("mute", "choke", "noise", "scrape", "feedback", "staccato"),
     ),
     "guitar.electric_lead": SfzLibraryAlias(
         ref="guitar.electric_lead",
         required_any=(("guitar",), ("shinyguitar",), ("emilyguitar",), ("black", "green")),
-        prefer=("lead", "sustain", "sus", "long", "electric", "guitar", "shiny"),
-        avoid=("mute", "choke", "noise", "scrape"),
+        prefer=("shinyguitar", "lead", "sustain", "sus", "long", "electric", "pickup", "guitar", "black", "green"),
+        avoid=("mute", "choke", "noise", "scrape", "staccato"),
     ),
     "bass.electric": SfzLibraryAlias(
         ref="bass.electric",
         required_any=(("electric", "bass"), ("bass", "guitar"), ("growlybass",), ("swagbass",), ("fashionbass",), ("pastabass",)),
-        prefer=("finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
+        prefer=("growlybass", "swagbass", "finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
         avoid=("slap", "mute", "noise", "trombone", "tuba", "brass", "cello", "orchestra", "strings"),
     ),
     "drums.rock": SfzLibraryAlias(
         ref="drums.rock",
         required_any=(("drum", "kit"), ("rock", "drum"), ("gogodze",), ("muldjord",), ("salamander", "drum")),
-        prefer=("kit", "drum", "gm", "salamander", "muldjord", "gogodze", "rock"),
+        prefer=("gogodze", "kit", "drum", "gm", "salamander", "muldjord", "rock"),
         avoid=("brush", "loop", "timpani", "orchestra", "cymbals only"),
     ),
     "vpo.percussion": SfzLibraryAlias(
@@ -109,6 +109,75 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("virtual", "playing", "orchestra", "percussion"), ("vpo", "percussion"), ("percussion",)),
         prefer=("bassdrum snare cymbals", "snare", "bassdrum", "cymbals"),
         avoid=("timpani", "bells", "xylophone", "vibraphone"),
+    ),
+    # Direct libraries from the pro audio-tools downloader.  These aliases let a
+    # score request a musical role while the local library catalog chooses the
+    # best available SFZ patch.
+    "guitar.hollowbody": SfzLibraryAlias(
+        ref="guitar.hollowbody",
+        required_any=(("black", "green", "guitar"), ("blackandgreenguitars",), ("hollowbody", "guitar")),
+        prefer=("sustain", "sus", "long", "clean", "pickup", "guitar", "green", "black"),
+        avoid=("feedback", "noise", "scrape", "staccato", "mute"),
+    ),
+    "guitar.acoustic": SfzLibraryAlias(
+        ref="guitar.acoustic",
+        required_any=(("acoustic", "guitar"), ("blue", "jeans", "moonbeams"), ("shinyguitar",)),
+        prefer=("acoustic", "mic", "sustain", "long", "chord", "guitar"),
+        avoid=("pickup", "mute", "staccato", "noise", "scrape"),
+    ),
+    "bass.growly": SfzLibraryAlias(
+        ref="bass.growly",
+        required_any=(("growlybass",), ("growly", "bass")),
+        prefer=("finger", "sustain", "sus", "growly", "bass"),
+        avoid=("slap", "mute", "noise"),
+    ),
+    "bass.swag": SfzLibraryAlias(
+        ref="bass.swag",
+        required_any=(("swagbass",), ("swag", "bass")),
+        prefer=("finger", "sustain", "swag", "bass"),
+        avoid=("slap", "noise"),
+    ),
+    "drums.gogodze": SfzLibraryAlias(
+        ref="drums.gogodze",
+        required_any=(("gogodze",), ("phu", "vol", "ii")),
+        prefer=("kit", "drum", "gm", "hi", "47", "13", "gogodze"),
+        avoid=("loop", "timpani", "orchestra"),
+    ),
+    "folk.banjo": SfzLibraryAlias(
+        ref="folk.banjo",
+        required_any=(("ganjo",), ("banjo",)),
+        prefer=("ganjo", "banjo", "instrument", "sfz"),
+        avoid=("samples", "mapping", "readme"),
+    ),
+    "folk.harp": SfzLibraryAlias(
+        ref="folk.harp",
+        required_any=(("etherealwinds", "harp"), ("ewharp",), ("harp",)),
+        prefer=("harp", "normal", "sustain", "etherealwinds", "instrument"),
+        avoid=("gliss", "fx", "voice", "phrase", "raw"),
+    ),
+    "brass.tuba": SfzLibraryAlias(
+        ref="brass.tuba",
+        required_any=(("war", "tuba"), ("tuba",)),
+        prefer=("sustain", "sus", "tuba", "war"),
+        avoid=("stacc", "noise", "yell", "breath"),
+    ),
+    "strings.cello": SfzLibraryAlias(
+        ref="strings.cello",
+        required_any=(("bigcat", "cello"), ("cello",)),
+        prefer=("sustain", "sus", "bowed", "cello", "bigcat"),
+        avoid=("stacc", "pizz", "noise", "slide", "harmonic"),
+    ),
+    "strings.cyborg": SfzLibraryAlias(
+        ref="strings.cyborg",
+        required_any=(("string", "cyborg"), ("cyborg", "strings")),
+        prefer=("sustain", "strings", "ensemble", "cyborg"),
+        avoid=("stacc", "pizz", "noise"),
+    ),
+    "folk.bass_tagelharpa": SfzLibraryAlias(
+        ref="folk.bass_tagelharpa",
+        required_any=(("horse", "pulse"), ("tagelharpa",)),
+        prefer=("horse", "pulse", "pizz", "sustain", "bass"),
+        avoid=("noise", "fx"),
     ),
 }
 
@@ -209,10 +278,12 @@ def _score_candidate(
     score = 0
     if alias is not None:
         for token in alias.prefer:
-            if token.lower() in text:
+            norm = _normalize_text(token)
+            if norm and norm in text:
                 score += 12
         for token in alias.avoid:
-            if token.lower() in text:
+            norm = _normalize_text(token)
+            if norm and norm in text:
                 score -= 16
     for token in prefer:
         norm = _normalize_text(token)

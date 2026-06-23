@@ -103,6 +103,58 @@ def discover_vst3_plugins(search_dirs: Iterable[Path] | None = None) -> list[dic
     return plugins
 
 
+def common_clap_dirs() -> list[Path]:
+    """Return CLAP search directories in priority order."""
+
+    dirs: list[Path] = []
+    dirs.extend(_split_path_env(os.environ.get("AMBITION_MUSIC_CLAP_PATHS")))
+    dirs.extend(_split_path_env(os.environ.get("CLAP_PATH")))
+    audio_tools = os.environ.get("AMBITION_AUDIO_TOOLS_ROOT")
+    if audio_tools:
+        dirs.append(Path(audio_tools).expanduser() / "plugins" / "clap")
+    dirs.append(Path("/data/audio-tools/plugins/clap"))
+    home = Path.home()
+    dirs.extend(
+        [
+            home / ".clap",
+            home / ".local" / "lib" / "clap",
+            Path("/usr/local/lib/clap"),
+            Path("/usr/lib/clap"),
+        ]
+    )
+    seen: set[Path] = set()
+    unique: list[Path] = []
+    for d in dirs:
+        resolved = d.expanduser()
+        if resolved not in seen:
+            seen.add(resolved)
+            unique.append(resolved)
+    return unique
+
+
+def discover_clap_plugins(search_dirs: Iterable[Path] | None = None) -> list[dict[str, Any]]:
+    """Find local CLAP plugin bundle paths without loading them."""
+
+    plugins: list[dict[str, Any]] = []
+    for directory in search_dirs or common_clap_dirs():
+        d = Path(directory).expanduser()
+        if not d.exists():
+            continue
+        try:
+            matches = sorted(d.rglob("*.clap"))
+        except OSError:
+            continue
+        for path in matches:
+            plugins.append(
+                {
+                    "name": path.stem,
+                    "path": str(path),
+                    "is_dir": path.is_dir(),
+                }
+            )
+    return plugins
+
+
 def resolve_vst3_reference(ref: str | Path, *, base_dir: Path | None = None) -> Path | None:
     """Resolve a VST3 path or discovered plugin name.
 
@@ -200,10 +252,13 @@ def collect_plugin_diagnostics(*, probe_counts: bool = True) -> dict[str, Any]:
         "modules": {name: _module_status(name) for name in PYTHON_MODULES},
         "binaries": {name: _binary_status(name) for name in EXTERNAL_BINARIES},
         "vst3_search_dirs": [str(p) for p in common_vst3_dirs()],
+        "clap_search_dirs": [str(p) for p in common_clap_dirs()],
     }
     if probe_counts:
         vst3 = discover_vst3_plugins()
         report["vst3"] = {"count": len(vst3), "plugins": vst3[:100]}
+        clap = discover_clap_plugins()
+        report["clap"] = {"count": len(clap), "plugins": clap[:100]}
         lv2 = discover_lv2_plugins(limit=250)
         report["lv2"] = {"count": len(lv2), "uris": lv2}
         report["sfz_libraries"] = collect_sfz_library_diagnostics(limit=100)
@@ -375,6 +430,14 @@ def validate_effect_spec(
                 messages.append({"severity": missing_optional_severity, "message": f"VST3 plugin not found: {raw_path}"})
         else:
             messages.append({"severity": "warning", "message": "VST3 spec has no path/plugin reference"})
+    if kind in {"clap", "clap_plugin"} or ("path" in spec and str(spec.get("path", "")).endswith(".clap")):
+        raw_path = spec.get("path") or spec.get("plugin")
+        if raw_path:
+            wanted = str(raw_path)
+            found = [p for p in discover_clap_plugins() if wanted in {p["name"], Path(p["path"]).name, p["path"]}]
+            if not found:
+                messages.append({"severity": missing_optional_severity, "message": f"CLAP plugin not found: {raw_path}"})
+        messages.append({"severity": "warning", "message": "CLAP discovery is available, but CLAP hosting is not implemented yet; use LV2/VST3/command for renders"})
     if kind in {"lv2", "lv2proc", "nam_lv2", "neural_amp_modeler"}:
         binary = str(spec.get("binary", "lv2proc"))
         if not shutil.which(binary):
@@ -473,6 +536,17 @@ class AudioPluginListLV2(kwconf.Config):
         return 0
 
 
+class AudioPluginListCLAP(kwconf.Config):
+    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        args = cls.cli(argv=argv, data=kwargs)
+        roots = [Path(p) for p in args.path] or None
+        print(json.dumps(discover_clap_plugins(roots), indent=2))
+        return 0
+
+
 class AudioPluginLV2Info(kwconf.Config):
     uri: str = kwconf.Value(None, position=1)
 
@@ -511,6 +585,7 @@ class AudioPluginsModal(kwconf.ModalCLI):
     doctor = AudioPluginDoctor
     list_vst3 = AudioPluginListVST3
     list_lv2 = AudioPluginListLV2
+    list_clap = AudioPluginListCLAP
     list_sfz_libraries = AudioPluginListSFZLibraries
     lv2_info = AudioPluginLV2Info
     validate_score = AudioPluginValidateScore

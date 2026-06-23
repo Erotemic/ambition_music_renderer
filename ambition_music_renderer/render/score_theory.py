@@ -107,18 +107,34 @@ def chord_pitches(
 ) -> list[int]:
     root, intervals, slash_bass = chord_intervals(chord_symbol)
     root_midi = note_to_midi(f"{root}{octave}")
+    voicing_key = str(voicing).lower().replace("-", "_")
+    if voicing_key in {"triad", "plain_triad"}:
+        intervals = intervals[:3]
+    elif voicing_key in {"root_fifth", "fifth"}:
+        intervals = [0, 7]
+    elif voicing_key in {"root_fifth_octave", "power", "power_chord"}:
+        intervals = [0, 7, 12]
+    elif voicing_key in {"guitar_shell", "rhythm_shell"}:
+        # Guitar rhythm beds usually sound more realistic when long ringing
+        # chords use a stable root/fifth shell plus one chord-quality note, not
+        # every extension from the lead-sheet symbol.  This avoids add9/sus/6
+        # tones smearing into the next bar while the reverb supplies sustain.
+        third = intervals[1] if len(intervals) > 1 and intervals[1] in {3, 4, 5} else None
+        intervals = [0, 7] + ([third + 12] if third is not None else [12])
     notes = [root_midi + i for i in intervals]
-    if voicing in {"open", "spread"} and len(notes) >= 4:
+    if voicing_key in {"open", "spread"} and len(notes) >= 4:
         notes = [notes[0] - 12, notes[2], notes[1] + 12, notes[3]] + [
             n + 12 for n in notes[4:]
         ]
-    elif voicing == "wide" and len(notes) >= 3:
+    elif voicing_key == "wide" and len(notes) >= 3:
         notes = [notes[0] - 12, notes[2], notes[1] + 12] + [n + 12 for n in notes[3:]]
-    elif voicing == "drop2" and len(notes) >= 4:
+    elif voicing_key == "drop2" and len(notes) >= 4:
         notes = notes[:]
         notes[-2] -= 12
         notes.sort()
-    if slash_bass:
+    elif voicing_key == "guitar_shell" and len(notes) >= 3:
+        notes = [notes[0] - 12, notes[1], notes[2]]
+    if slash_bass and voicing_key not in {"root_fifth", "fifth", "root_fifth_octave", "power", "power_chord", "guitar_shell", "rhythm_shell"}:
         bass_root = re.match(r"^([A-G](?:#|b)?)", slash_bass.strip())
         if bass_root:
             notes.insert(0, note_to_midi(f"{bass_root.group(1)}{octave - 1}"))

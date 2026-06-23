@@ -90,7 +90,8 @@ class CueBundleConfig(kwconf.Config):
         help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
     )
     skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
-    skip_spectrograms: bool = kwconf.Flag(False, help="skip spectrogram generation")
+    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; disabled by default for fast listening renders")
+    all_audits: bool = kwconf.Flag(False, help="run full diagnostic audits, transition analysis, and plots")
     render_audio_mode: str = kwconf.Value(
         "full",
         choices=RENDER_AUDIO_MODES,

@@ -142,7 +142,8 @@ def _build_command(args, cue: str) -> list[str]:
         "publish": args.publish,
         "zip_bundle": args.zip,
         "zip_report_bundle": args.zip_report,
-        "skip_spectrograms": args.skip_spectrograms,
+        "spectrograms": args.spectrograms,
+        "all_audits": args.all_audits,
         "render_audio_mode": args.render_audio_mode,
         "profile_render": args.profile_render,
         "include_scratch_stems": args.include_scratch_stems,
@@ -355,7 +356,8 @@ class BatchBundleConfig(kwconf.Config):
     publish: bool = kwconf.Flag(False)
     zip: bool = kwconf.Flag(False, help="write full bundle zips including audio")
     zip_report: bool = kwconf.Flag(True, help="write compact report zips; enabled by default")
-    skip_spectrograms: bool = kwconf.Flag(False)
+    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; off by default")
+    all_audits: bool = kwconf.Flag(False, help="run full cue-bundle diagnostic audits")
     include_scratch_stems: bool = kwconf.Flag(False)
     render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
     profile_render: bool = kwconf.Flag(False, help="enable line_profiler in render subprocesses via LINE_PROFILE=1")

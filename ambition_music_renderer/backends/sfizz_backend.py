@@ -44,6 +44,30 @@ def _format_command(template: str | list[str], mapping: dict[str, str]) -> list[
     return [part.format(**mapping) for part in parts]
 
 
+def _short_process_text(value: bytes | str | None, *, limit: int = 1200) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        text = value.decode("utf8", errors="replace")
+    else:
+        text = str(value)
+    text = text.strip()
+    if len(text) > limit:
+        text = text[-limit:]
+    return text
+
+
+def _format_process_failure(cmd: list[str], proc: subprocess.CompletedProcess[str]) -> str:
+    stderr = _short_process_text(proc.stderr)
+    stdout = _short_process_text(proc.stdout)
+    parts = [f"command exited {proc.returncode}: {shlex.join(cmd)}"]
+    if stderr:
+        parts.append(f"stderr: {stderr}")
+    if stdout:
+        parts.append(f"stdout: {stdout}")
+    return "; ".join(parts)
+
+
 def _render_sfizz_cli(
     pm: pretty_midi.PrettyMIDI,
     *,
@@ -69,24 +93,49 @@ def _render_sfizz_cli(
         "wav": str(wav_path),
         "sample_rate": str(int(sample_rate)),
     }
+    templates = []
     template = settings.get("command")
     if template:
-        cmd = _format_command(template, mapping)
+        templates.append(template)
     else:
-        # sfizz_render's CLI has changed across builds.  This is the documented
-        # long-option form for recent versions; use command override if needed.
-        cmd = [
-            binary,
-            "--sfz",
-            str(sfz),
-            "--midi",
-            str(midi_path),
-            "--wav",
-            str(wav_path),
-            "--sample-rate",
-            str(int(sample_rate)),
-        ]
-    subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Try the modern long-option form first, then older positional forms.
+        # Distro builds of sfizz_render have differed enough that a fallback
+        # probe here is more reliable than asking score YAML to know the host.
+        templates.extend([
+            # Current distro builds accept named SFZ/MIDI/WAV options but do
+            # not necessarily accept a sample-rate option.  Try this form
+            # before older positional guesses so successful SFZ rendering does
+            # not fall through to pretty-midi.
+            [binary, "--sfz", "{sfz}", "--midi", "{midi}", "--wav", "{wav}"],
+            [
+                binary,
+                "--sfz",
+                "{sfz}",
+                "--midi",
+                "{midi}",
+                "--wav",
+                "{wav}",
+                "--sample-rate",
+                "{sample_rate}",
+            ],
+            [binary, "{sfz}", "{midi}", "{wav}"],
+            [binary, "{sfz}", "{midi}", "{wav}", "{sample_rate}"],
+        ])
+    failures: list[str] = []
+    for template_item in templates:
+        cmd = _format_command(template_item, mapping)
+        proc = subprocess.run(
+            cmd,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        if proc.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
+            break
+        failures.append(_format_process_failure(cmd, proc))
+    else:
+        raise RuntimeError("sfizz_render failed. " + " | ".join(failures[-3:]))
     audio, sr = sf.read(wav_path, dtype="float32", always_2d=True)
     if sr != int(sample_rate):
         audio = signal.resample_poly(audio, int(sample_rate), int(sr), axis=0).astype(np.float32)
@@ -206,7 +255,7 @@ def _render_sfizz_vst3(
     if plugin_path is None:
         raise FileNotFoundError(f"sfizz VST3 plugin not found: {plugin_ref}")
     parameter_values = dict(settings.get("parameters") or {})
-    plugin_name = settings.get("plugin_name")
+    plugin_name = settings.get("plugin_name", "sfizz")
     plugin = pb.load_plugin(
         str(plugin_path),
         parameter_values=parameter_values,
@@ -279,7 +328,31 @@ def render_sfizz(
             minimum_duration=minimum_duration,
             settings=settings,
         )
-    if renderer == "auto" and not shutil.which(binary):
+    if renderer == "auto":
+        if shutil.which(binary):
+            try:
+                return _render_sfizz_cli(
+                    pm,
+                    sfz=sfz,
+                    sample_rate=sample_rate,
+                    tempdir=tempdir,
+                    output_name=output_name,
+                    minimum_duration=minimum_duration,
+                    settings=settings,
+                )
+            except Exception as cli_ex:
+                try:
+                    return _render_sfizz_vst3(
+                        pm,
+                        sfz=sfz,
+                        sample_rate=sample_rate,
+                        minimum_duration=minimum_duration,
+                        settings=settings,
+                    )
+                except Exception as vst_ex:
+                    raise RuntimeError(
+                        f"sfizz_render CLI failed ({cli_ex}); sfizz VST3 fallback also failed ({vst_ex})"
+                    ) from cli_ex
         return _render_sfizz_vst3(
             pm,
             sfz=sfz,
@@ -287,12 +360,4 @@ def render_sfizz(
             minimum_duration=minimum_duration,
             settings=settings,
         )
-    return _render_sfizz_cli(
-        pm,
-        sfz=sfz,
-        sample_rate=sample_rate,
-        tempdir=tempdir,
-        output_name=output_name,
-        minimum_duration=minimum_duration,
-        settings=settings,
-    )
+    raise ValueError(f"unknown SFZ renderer mode: {renderer!r}")

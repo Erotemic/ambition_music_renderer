@@ -1,7 +1,9 @@
 from pathlib import Path
 
 from ambition_music_renderer.audio_plugins import (
+    common_clap_dirs,
     common_vst3_dirs,
+    discover_clap_plugins,
     discover_vst3_plugins,
     resolve_vst3_reference,
     validate_score_plugins,
@@ -113,3 +115,38 @@ def test_validate_score_plugins_optional_pedalboard_missing_is_warning(tmp_path)
     assert report["errors"] == 0
     assert report["warnings"] >= 0
     assert report["ok"]
+
+
+def test_discover_clap_plugins_from_explicit_dir(tmp_path):
+    bundle = tmp_path / "ToyMod.clap"
+    bundle.write_bytes(b"clap")
+    found = discover_clap_plugins([tmp_path])
+    assert found
+    assert found[0]["name"] == "ToyMod"
+    assert Path(found[0]["path"]).name == "ToyMod.clap"
+
+
+def test_common_clap_dirs_respects_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("AMBITION_MUSIC_CLAP_PATHS", str(tmp_path))
+    dirs = common_clap_dirs()
+    assert dirs[0] == tmp_path
+
+
+def test_validate_score_plugins_reports_clap_discovery_without_hosting(tmp_path):
+    clap = tmp_path / "ToyMod.clap"
+    clap.write_bytes(b"clap")
+    score = {
+        "postprocess": {
+            "effect_chain": [
+                {"kind": "clap", "path": str(clap), "optional": True},
+            ]
+        }
+    }
+    report = validate_score_plugins(score, base_dir=tmp_path)
+    assert report["errors"] == 0
+    assert report["warnings"] >= 1
+    assert any(
+        "CLAP hosting" in message["message"]
+        for entry in report["effect_specs"]
+        for message in entry["messages"]
+    )

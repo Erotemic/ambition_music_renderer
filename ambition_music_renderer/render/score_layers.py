@@ -450,7 +450,19 @@ def render_layer_guitar_strum(
             continue
         beat = float(item[1])
         direction = str(item[2]) if len(item) > 2 else (str(dirs[hit_idx % len(dirs)]) if dirs else default_direction)
-        chord = str(item[3]) if len(item) > 3 else chord_for_bar(section, int(local))
+        chord = chord_for_bar(section, int(local))
+        hit_duration = duration
+        if len(item) > 3:
+            # Backwards-compatible extension: a fourth hit field may be either
+            # an explicit chord symbol or a per-hit duration.  Per-hit
+            # durations let authors write full downbeat rings and short
+            # upbeat strums without letting the upbeat smear into the next bar.
+            try:
+                hit_duration = float(item[3])
+            except (TypeError, ValueError):
+                chord = str(item[3])
+        if len(item) > 4:
+            hit_duration = float(item[4])
         notes = chord_pitches(chord, octave=octave, voicing=layer.get("voicing", "closed"))
         for inst in insts:
             previous = ctx.last_guitar_voicing.get(inst)
@@ -476,7 +488,7 @@ def render_layer_guitar_strum(
                     int(ev["pitch"]),
                     section["start_bar"] + local,
                     beat + float(ev["beat_offset"]),
-                    duration,
+                    hit_duration,
                     float(ev["velocity"]),
                     articulation=articulation,
                     gate=gate_f,

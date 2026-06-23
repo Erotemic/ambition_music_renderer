@@ -149,6 +149,8 @@ def build_rerun_script(
     render_audio_mode: str = "full",
     profile_render: bool = False,
     render_in_process: bool = False,
+    spectrograms: bool = False,
+    all_audits: bool = False,
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
     cmd = [
@@ -167,6 +169,10 @@ def build_rerun_script(
         cmd.append("--profile_render")
     if render_in_process:
         cmd.append("--render_in_process")
+    if spectrograms:
+        cmd.append("--spectrograms")
+    if all_audits:
+        cmd.append("--all_audits")
     if publish:
         cmd.append("--publish")
     if zip_bundle:

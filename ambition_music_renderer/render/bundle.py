@@ -57,6 +57,7 @@ from .bundle_base import (
 )
 from .bundle_spectral_reports import write_spectral_fingerprint, write_stem_amplitude_report
 from .bundle_spectrograms import write_spectrograms
+from .bundle_quality_brief import write_quality_brief
 from .generated_layout import begin_generated_run, generated_run_layout, mark_generated_run_latest, resolve_latest_generated_dir
 
 @profile
@@ -75,7 +76,8 @@ def create_bundle(
     jobs: int = 1,
     include_scratch_stems: bool = False,
     skip_render: bool = False,
-    skip_spectrograms: bool = False,
+    spectrograms: bool = False,
+    all_audits: bool = False,
     plot_format: str = "jpg",
     jpeg_quality: int = 84,
     runtime_stem_max_gain_db: float | None = None,
@@ -134,9 +136,10 @@ def create_bundle(
     reports_dir.mkdir(parents=True, exist_ok=True)
     commands: list[CommandResult] = []
 
-    progress_line("running arrangement preflight")
-    arrangement_payload = audit_arrangement_file(score_path)
-    write_arrangement_reports(arrangement_payload, reports_dir)
+    if all_audits:
+        progress_line("running arrangement preflight")
+        arrangement_payload = audit_arrangement_file(score_path)
+        write_arrangement_reports(arrangement_payload, reports_dir)
 
     if not skip_render:
         progress_line(f"rendering {cue_id} with backend={backend}, runtime_stems={runtime_stem_gain_mode}")
@@ -197,133 +200,142 @@ def create_bundle(
     render_hash = str(manifest.get("hash", "unknown"))
     duration = manifest_duration(manifest)
 
-    # Diagnostics. These tools are report-only; a failure should not destroy the
-    # bundle. Run directory-scanning legacy helpers against a clean manifest-
-    # scoped analysis root so stale hashes in the real output dir cannot leak
-    # into the reports.
+    # Diagnostics. Normal listening renders keep this intentionally light; the
+    # full DAW-style audit suite is available through --all_audits.  Spectrograms
+    # are opt-in via --spectrograms (or included by --all_audits) because they
+    # are useful but visually noisy and slow for iteration.
     tools_dir = package_dir()
-    progress_line("running manifest-scoped reports and plots")
+    write_spectrogram_plots = bool(spectrograms or all_audits)
+    progress_line(
+        "running bundle reports"
+        + (" with full audits" if all_audits else " with fast default audits")
+    )
+    dissonance_warnings: list[str] = []
+    sour_note_warnings: list[str] = []
+    shrill_note_warnings: list[str] = []
+    adaptive_composition_warnings: list[str] = []
+    audio_shrillness_warnings: list[str] = []
     with tempfile.TemporaryDirectory(prefix=f"{cue_id}_{render_hash}_analysis_") as td:
         analysis_root = prepare_manifest_analysis_root(outdir, manifest, Path(td))
-        commands.append(
-            run_logged(
-                "audit_cue_balance",
-                renderer_audit_command("cue_balance", analysis_root),
-                reports_dir,
-                cwd=tools_dir,
-            )
-        )
-        if (analysis_root / "scratch_stems").is_dir():
-            hi = f"{duration:.3f}" if duration > 0 else "-1"
+        if all_audits:
             commands.append(
                 run_logged(
-                    "spectral_compare",
-                    renderer_audit_command(
+                    "audit_cue_balance",
+                    renderer_audit_command("cue_balance", analysis_root),
+                    reports_dir,
+                    cwd=tools_dir,
+                )
+            )
+            if (analysis_root / "scratch_stems").is_dir():
+                hi = f"{duration:.3f}" if duration > 0 else "-1"
+                commands.append(
+                    run_logged(
                         "spectral_compare",
-                        analysis_root,
-                        "--window",
-                        "0",
-                        hi,
-                        "--label",
-                        cue_id,
-                    ),
-                    reports_dir,
-                    cwd=tools_dir,
+                        renderer_audit_command(
+                            "spectral_compare",
+                            analysis_root,
+                            "--window",
+                            "0",
+                            hi,
+                            "--label",
+                            cue_id,
+                        ),
+                        reports_dir,
+                        cwd=tools_dir,
+                    )
                 )
-            )
-            commands.append(
-                run_logged(
-                    "spectral_localize",
-                    renderer_audit_command(
+                commands.append(
+                    run_logged(
                         "spectral_localize",
-                        analysis_root,
-                        "--window",
-                        "0",
-                        "-1",
-                        "--bucket",
-                        "0.25",
-                    ),
-                    reports_dir,
-                    cwd=tools_dir,
+                        renderer_audit_command(
+                            "spectral_localize",
+                            analysis_root,
+                            "--window",
+                            "0",
+                            "-1",
+                            "--bucket",
+                            "0.25",
+                        ),
+                        reports_dir,
+                        cwd=tools_dir,
+                    )
                 )
-            )
         write_stem_export_report(analysis_root, manifest, reports_dir)
         write_manifest_audio_level_report(analysis_root, manifest, reports_dir)
         write_audio_metadata_report(analysis_root, manifest, reports_dir)
-        write_stem_amplitude_report(
-            analysis_root,
-            spec,
-            manifest,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
-        write_adaptive_section_report(
-            analysis_root,
-            spec,
-            manifest,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
-        adaptive_composition_path = write_adaptive_composition_mastering_report(
-            analysis_root,
-            spec,
-            manifest,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
-        write_spectral_fingerprint(analysis_root, manifest, reports_dir)
-        audio_shrillness_path = write_spectral_shrillness_report(analysis_root, manifest, reports_dir)
         write_state_mix_report(spec, manifest, reports_dir)
-        progress_line("running adjacent-section transition audits")
-        commands.extend(run_transition_audits(analysis_root, manifest, reports_dir, tools_dir))
-        # Re-run arrangement preflight after render report cleanup so it is present in the final bundle.
-        arrangement_payload = audit_arrangement_file(score_path)
-        write_arrangement_reports(arrangement_payload, reports_dir)
-        dissonance_payload = audit_dissonance_file(score_path)
-        write_dissonance_reports(
-            dissonance_payload,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
-        sour_note_payload = audit_sour_note_file(score_path)
-        write_sour_note_reports(
-            sour_note_payload,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
-        shrill_note_payload = audit_shrill_note_file(score_path)
-        write_shrill_note_reports(
-            shrill_note_payload,
-            reports_dir,
-            plots_dir=plots_dir,
-            plot_format=plot_format,
-            jpeg_quality=jpeg_quality,
-        )
         mix_diag_path, mix_warnings = summarize_mix_diagnostics(manifest, reports_dir)
-        dissonance_warnings = list(dissonance_payload.get("warnings") or [])
-        sour_note_warnings = list(sour_note_payload.get("warnings") or [])
-        shrill_note_warnings = list(shrill_note_payload.get("warnings") or [])
-        adaptive_composition_warnings: list[str] = []
-        audio_shrillness_warnings: list[str] = []
-        try:
-            adaptive_composition_warnings = list(json.loads(Path(adaptive_composition_path).read_text(encoding="utf8")).get("warnings") or [])
-        except Exception:
-            adaptive_composition_warnings = []
-        try:
-            audio_shrillness_warnings = list(json.loads(Path(audio_shrillness_path).read_text(encoding="utf8")).get("warnings") or [])
-        except Exception:
-            audio_shrillness_warnings = []
-        if not skip_spectrograms:
+        if all_audits:
+            write_stem_amplitude_report(
+                analysis_root,
+                spec,
+                manifest,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            write_adaptive_section_report(
+                analysis_root,
+                spec,
+                manifest,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            adaptive_composition_path = write_adaptive_composition_mastering_report(
+                analysis_root,
+                spec,
+                manifest,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            write_spectral_fingerprint(analysis_root, manifest, reports_dir)
+            audio_shrillness_path = write_spectral_shrillness_report(analysis_root, manifest, reports_dir)
+            progress_line("running adjacent-section transition audits")
+            commands.extend(run_transition_audits(analysis_root, manifest, reports_dir, tools_dir))
+            # Re-run arrangement preflight after render report cleanup so it is present in the final bundle.
+            arrangement_payload = audit_arrangement_file(score_path)
+            write_arrangement_reports(arrangement_payload, reports_dir)
+            dissonance_payload = audit_dissonance_file(score_path)
+            write_dissonance_reports(
+                dissonance_payload,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            sour_note_payload = audit_sour_note_file(score_path)
+            write_sour_note_reports(
+                sour_note_payload,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            shrill_note_payload = audit_shrill_note_file(score_path)
+            write_shrill_note_reports(
+                shrill_note_payload,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            dissonance_warnings = list(dissonance_payload.get("warnings") or [])
+            sour_note_warnings = list(sour_note_payload.get("warnings") or [])
+            shrill_note_warnings = list(shrill_note_payload.get("warnings") or [])
+            try:
+                adaptive_composition_warnings = list(json.loads(Path(adaptive_composition_path).read_text(encoding="utf8")).get("warnings") or [])
+            except Exception:
+                adaptive_composition_warnings = []
+            try:
+                audio_shrillness_warnings = list(json.loads(Path(audio_shrillness_path).read_text(encoding="utf8")).get("warnings") or [])
+            except Exception:
+                audio_shrillness_warnings = []
+        if write_spectrogram_plots:
             write_spectrograms(
                 analysis_root,
                 manifest,
@@ -331,7 +343,13 @@ def create_bundle(
                 plot_format=plot_format,
                 jpeg_quality=jpeg_quality,
             )
-
+        quality_brief_path, quality_brief_warnings = write_quality_brief(
+            reports_dir,
+            cue_id=cue_id,
+            render_hash=render_hash,
+            all_audits=all_audits,
+            spectrograms=write_spectrogram_plots,
+        )
     published: str | None = None
     if publish:
         progress_line("publishing full.ogg to game assets")
@@ -376,6 +394,8 @@ def create_bundle(
         render_audio_mode,
         profile_render,
         render_in_process,
+        write_spectrogram_plots,
+        all_audits,
     )
 
     if generated_layout is not None:
@@ -404,6 +424,8 @@ def create_bundle(
         "profile_render": profile_render,
         "render_in_process": render_in_process,
         "render_hash": render_hash,
+        "all_audits": bool(all_audits),
+        "spectrograms": bool(write_spectrogram_plots),
         "outdir": str(outdir),
         "generated_dir": str(generated_layout.cue_dir) if generated_layout is not None else str(outdir),
         "generated_latest": str(generated_layout.latest_link) if generated_layout is not None else None,
@@ -415,11 +437,13 @@ def create_bundle(
         "include_scratch_stems": include_scratch_stems,
         "copied_audio_files": copied_audio,
         "mix_diagnostics": str(mix_diag_path),
+        "quality_brief": str(quality_brief_path),
         "warnings": [
             w
             for w in [
                 id_warning,
                 *mix_warnings,
+                *quality_brief_warnings,
                 *adaptive_composition_warnings,
                 *audio_shrillness_warnings,
                 *dissonance_warnings,
@@ -465,7 +489,8 @@ def create_bundle_from_config(config: CueBundleConfig) -> dict[str, object]:
         jobs=config.jobs,
         include_scratch_stems=config.include_scratch_stems,
         skip_render=config.skip_render,
-        skip_spectrograms=config.skip_spectrograms,
+        spectrograms=config.spectrograms,
+        all_audits=config.all_audits,
         plot_format=config.plot_format,
         jpeg_quality=config.jpeg_quality,
         runtime_stem_max_gain_db=config.runtime_stem_max_gain_db,

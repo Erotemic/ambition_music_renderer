@@ -203,3 +203,54 @@ def test_pad_chords_respect_max_notes_constraint():
     }
     pm, _groups, _meta = build_score(spec)
     assert len(pm.instruments[0].notes) == 2
+
+
+def test_guitar_strum_per_hit_duration_and_shell_voicing():
+    from ambition_music_renderer.render.score_core import RenderContext
+    from ambition_music_renderer.render.score_layers import render_layer_guitar_strum
+    from ambition_music_renderer.render.score_theory import chord_pitches
+
+    assert len(chord_pitches("D(add9)", octave=3, voicing="guitar_shell")) == 3
+    assert len(chord_pitches("A/C#", octave=3, voicing="root_fifth_octave")) == 3
+
+    import numpy as np
+    import pretty_midi
+
+    spec = {
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [{"name": "gtr", "program": "clean_guitar", "group": "gtr"}],
+        "constraints": {"min_pitch": 36, "max_pitch": 88},
+    }
+    inst = pretty_midi.Instrument(program=pretty_midi.instrument_name_to_program("Acoustic Guitar (nylon)"), name="gtr")
+    ctx = RenderContext(
+        spec=spec,
+        sample_rate=48000,
+        bpm=120,
+        beats_per_bar=4,
+        rng=np.random.default_rng(0),
+        pm=pretty_midi.PrettyMIDI(initial_tempo=120),
+        instruments={"gtr": inst},
+        groups={"gtr": "gtr"},
+        section_starts={"s": 0},
+        motifs={},
+        instrument_specs={"gtr": spec["instruments"][0]},
+    )
+    section = {"id": "s", "bars": 1, "start_bar": 0, "harmony": ["D(add9)"], "intensity": 1.0}
+    render_layer_guitar_strum(
+        ctx,
+        section,
+        {
+            "kind": "guitar_strum",
+            "instrument": "gtr",
+            "hits": [[0, 0.0, "down", 2.5], [0, 2.0, "up", 0.75]],
+            "voicing": "guitar_shell",
+            "max_notes": 3,
+            "spread_ms": 1,
+            "humanize_ms": 0,
+            "gate": 1.0,
+        },
+    )
+    beat_durs = sorted(round((n.end - n.start) * ctx.bpm / 60.0, 2) for n in ctx.instruments["gtr"].notes)
+    assert min(beat_durs) == 0.75
+    assert max(beat_durs) == 2.5
