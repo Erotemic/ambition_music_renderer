@@ -24,7 +24,7 @@ from .generated_layout import generated_manifest_search_roots
 from .generated_layout import latest_manifest_in_roots
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
-from .._paths import bundles_root as _bundles_root
+from .._paths import agent_root as _agent_root
 from .._paths import find_score as _find_score
 from .._paths import generated_root as _generated_root
 from .._paths import project_root as _project_root
@@ -201,7 +201,10 @@ def default_generated_root() -> Path:
 
 
 def default_bundle_root() -> Path:
-    return _bundles_root()
+    # Bundles land in the agent/ scratch drop-zone by default so a cue's audio,
+    # plots, and diagnostics are in one predictable place to audition after a
+    # (often blind) fix. Override with --bundle_root.
+    return _agent_root()
 
 
 def default_publish_dest_root() -> Path:

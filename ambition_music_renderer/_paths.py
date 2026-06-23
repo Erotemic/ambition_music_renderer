@@ -65,8 +65,14 @@ def output_root() -> Path:
     return project_root() / "output"
 
 
-def bundles_root() -> Path:
-    return project_root() / "bundles"
+def agent_root() -> Path:
+    """Scratch drop-zone for agent-generated bundles/plots/reports.
+
+    Bundles default here so that after a render (especially a blind fix) the
+    audio, plots, and diagnostics for a cue land in one predictable place to
+    audition and debug. Gitignored.
+    """
+    return project_root() / "agent"
 
 
 def score_candidates(cue: str, *, subdirs: Iterable[str] = SCORE_DIRS) -> list[Path]:

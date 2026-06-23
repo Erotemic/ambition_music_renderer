@@ -188,6 +188,11 @@ normalization. Shared gain is capped by default (`render.runtime_stems.max_gain_
 or `--runtime_stem_max_gain_db`) because a cue that needs 40+ dB of rescue gain
 usually needs louder source instruments/layers, not louder exported noise.
 
+Bundles default to the gitignored `agent/` drop-zone (`agent/<cue>_<hash>_bundle/`)
+so that after a render — especially a blind fix you can't verify by ear — the
+audio, piano-roll plots, and `harmony_diagnostics.md` for a cue are all in one
+predictable place to audition and debug. Override with `--bundle_root <dir>`.
+
 Use `--zip_report` for compact chat/agent handoff zips; the on-disk bundle directory remains fully featured and keeps the generated audio for local audition. Report zips exclude
 large OGG/WAV/NPY binaries but keep source YAML, manifests, logs, TSV/JSON level
 reports, `spectral_fingerprint.json`, and JPEG spectrograms. Use `--zip` only when the recipient must audition audio directly from the zip. Add `--publish` only when
