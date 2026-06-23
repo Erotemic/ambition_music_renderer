@@ -21,6 +21,7 @@ import os
 import shlex
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 import kwconf
@@ -445,14 +446,14 @@ def _render_main(ns) -> int:
     ):
         if jobs == 1:
             for group in group_names:
-                start_group = __import__("time").perf_counter()
+                start_group = time.perf_counter()
                 if groups_in_process:
                     run_worker_direct(worker_command, worker_plan, group)
                 else:
                     run_worker_subprocess(worker_command, worker_plan, group)
                 timings.add(
                     "render_group_worker",
-                    __import__("time").perf_counter() - start_group,
+                    time.perf_counter() - start_group,
                     group=group,
                     mode=worker_mode,
                 )
