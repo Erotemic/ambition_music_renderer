@@ -246,8 +246,11 @@ about than raw audio:
   register clusters, attributed back to layers/groups/instruments.
 - `dissonance_hotspots.md` is the same hotspot information in a scan-friendly
   table for humans.
-- `plots/dissonance_timeline.<fmt>` and `plots/dissonance_layer_pairs.<fmt>`
-  visualize when clashes occur and which layer pairs are responsible.
+- `plots/dissonance_pianoroll.<fmt>` is the main "where" view: every note on a
+  time x pitch grid colored by its clash score, with out-of-key notes marked and
+  sized by severity, over a time-ordered clash-per-beat strip. Read it to find
+  the exact bar/pitch of a clash or a sour note. `plots/dissonance_layer_pairs.<fmt>`
+  shows which layer pairs clash most in aggregate.
 - `state_mix_report_summary.txt/json/tsv` explains why adaptive previews may
   sound similar: `runtime_*` states are true weighted sums, while `audition_*`
   states are normalized for review and may collapse loudness differences.

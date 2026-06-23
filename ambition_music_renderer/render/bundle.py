@@ -11,6 +11,7 @@ from pathlib import Path
 from ..audit.arrangement_audit import audit_file as audit_arrangement_file
 from ..audit.arrangement_audit import write_reports as write_arrangement_reports
 from ..audit.dissonance_audit import audit_file as audit_dissonance_file
+from ..audit.dissonance_audit import render_pianoroll as render_dissonance_pianoroll
 from ..audit.dissonance_audit import write_reports as write_dissonance_reports
 from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
 from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
@@ -305,6 +306,12 @@ def create_bundle(
                 dissonance_payload,
                 reports_dir,
                 plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            render_dissonance_pianoroll(
+                spec,
+                plots_dir / f"dissonance_pianoroll.{plot_format}",
                 plot_format=plot_format,
                 jpeg_quality=jpeg_quality,
             )

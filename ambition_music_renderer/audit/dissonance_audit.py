@@ -185,12 +185,11 @@ def _pair_score(a: dict[str, Any], b: dict[str, Any], chord: str | None = None) 
             a_in = (pa % 12) in pcs
             b_in = (pb % 12) in pcs
             if a_in and b_in:
-                if diff >= 12:
-                    score *= 0.28
-                elif diff >= 7:
-                    score *= 0.45
-                else:
-                    score *= 0.75
+                # Both notes are chord tones: their interval is the chord's own
+                # intended color (a dominant 7th's tritone, a sus/add 2nd, a
+                # maj/min 7th), not an accidental clash. Discount hard; keep only
+                # a genuinely exposed in-chord minor second (a real cluster).
+                score *= 0.5 if diff == 1 else 0.18
             elif a_in or b_in:
                 if diff >= 12:
                     score *= 0.70
@@ -215,6 +214,24 @@ def _pair_score(a: dict[str, Any], b: dict[str, Any], chord: str | None = None) 
 @profile
 def _active_events(events: list[dict[str, Any]], center_beat: float) -> list[dict[str, Any]]:
     return [ev for ev in events if float(ev["start_beat"]) <= center_beat < float(ev["end_beat"])]
+
+
+def _dedup_active_by_pitch(active: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Collapse simultaneous notes on the same pitch to one representative.
+
+    Double-tracked / L+R-panned parts play identical pitches; counting the
+    chord's internal intervals once per copy inflates clash totals (a doubled
+    triad otherwise reports its own thirds and fifths several times over, which
+    is how a pure L/R doubling can top the clash ranking). Dissonance is about
+    distinct simultaneous pitches, so keep the loudest copy of each pitch.
+    """
+    best: dict[int, dict[str, Any]] = {}
+    for ev in active:
+        pitch = int(ev["pitch"])
+        current = best.get(pitch)
+        if current is None or int(ev.get("velocity", 64)) > int(current.get("velocity", 64)):
+            best[pitch] = ev
+    return list(best.values())
 
 
 @profile
@@ -245,7 +262,7 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
         start_beat = idx * bucket_beats
         end = min(end_beat, start_beat + bucket_beats)
         center = (start_beat + end) * 0.5
-        active = _active_events(events, center)
+        active = _dedup_active_by_pitch(_active_events(events, center))
         if len(active) < 2:
             continue
         abs_bar0 = int(center // beats_per_bar)
@@ -404,27 +421,144 @@ def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 
     plt.close(fig)
 
 
+def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, Any] | None:
+    """Per-note clash + out-of-key severity over time, for the piano-roll plot.
+
+    Reuses the same pair scoring as the hotspot report (so the picture and the
+    numbers agree) and the sour-note audit's key inference for the out-of-key
+    overlay, keeping a single source of truth for both judgments.
+    """
+    from ..render.score_layers import build_score
+    from . import sour_note_audit as _sour
+
+    pm, groups, section_meta = build_score(spec)
+    events = list(getattr(pm, "_ambition_note_events", []) or _fallback_events(pm, groups, 120.0))
+    if not events:
+        return None
+    bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    end_beat = max(float(e["end_beat"]) for e in events)
+    nb = max(1, int(math.ceil(end_beat / bucket_beats)))
+    beat_total = [0.0] * nb
+    clash_at: dict[tuple[int, int], float] = {}  # (bucket, pitch) -> worst clash
+    for bi in range(nb):
+        center = (bi + 0.5) * bucket_beats
+        active = _dedup_active_by_pitch(_active_events(events, center))
+        if len(active) < 2:
+            continue
+        chord = _chord_for_abs_bar(spec, int(center // bpb))
+        for i in range(len(active)):
+            for j in range(i + 1, len(active)):
+                score, _ = _pair_score(active[i], active[j], chord)
+                if score <= 0:
+                    continue
+                beat_total[bi] += score
+                for ev in (active[i], active[j]):
+                    key = (bi, int(ev["pitch"]))
+                    if score > clash_at.get(key, 0.0):
+                        clash_at[key] = score
+
+    notes: list[dict[str, Any]] = []
+    for ev in events:
+        pitch = int(ev["pitch"])
+        b0 = int(float(ev["start_beat"]) // bucket_beats)
+        b1 = int(math.ceil(float(ev["end_beat"]) / bucket_beats))
+        clash = max((clash_at.get((bi, pitch), 0.0) for bi in range(b0, b1 + 1)), default=0.0)
+        notes.append({"pitch": pitch, "x0": float(ev["start_beat"]), "x1": float(ev["end_beat"]), "clash": clash})
+
+    # Out-of-key overlay reuses the sour-note audit verbatim, so the markers are
+    # exactly its candidates (already key-aware and chord-tone-filtered) rather
+    # than a looser re-derivation that would re-flag passing tones.
+    sour_payload = _sour.audit_spec(spec, bucket_beats=bucket_beats)
+    sour = [
+        {
+            "pitch": int(c["pitch"]),
+            "x": (int(c["bar"]) - 1) * bpb + (float(c["beat"]) - 1.0),
+            "severity": float(c["score"]),
+        }
+        for c in sour_payload.get("candidates", [])
+    ]
+
+    return {
+        "id": spec.get("id"),
+        "bucket_beats": bucket_beats,
+        "beats_per_bar": bpb,
+        "end_beat": end_beat,
+        "sections": [{"id": s["id"], "start_beat": s["start_beat"]} for s in section_meta],
+        "notes": notes,
+        "sour": sour,
+        "beat_total": beat_total,
+    }
+
+
 @profile
-def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
+def render_pianoroll(
+    spec: dict[str, Any], path: Path, *, bucket_beats: float = 0.25, plot_format: str = "jpg", jpeg_quality: int = 90
+) -> bool:
+    """Piano-roll of where dissonance and out-of-key notes occur over time.
+
+    Top: every note (x=time, y=pitch) colored by its worst clash score, with
+    out-of-key notes marked and sized by severity. Bottom: a time-ordered
+    clash-per-beat strip. Replaces the old score-sorted timeline line, which
+    could not show *where* a clash was or *which* notes formed it.
+    """
     if not _ensure_matplotlib():
         return False
-    hotspots = payload.get("hotspots", [])
-    if not hotspots:
+    data = _pianoroll_data(spec, bucket_beats=bucket_beats)
+    if data is None or not data["notes"]:
         return False
-    beats_per_bar = float(payload.get("beats_per_bar", 4.0))
-    xs = [(float(h["center_beat"]) / beats_per_bar) + 1.0 for h in hotspots]
-    ys = [float(h["score"]) for h in hotspots]
-    fig, ax = plt.subplots(figsize=(10.5, 3.2))
-    ax.plot(xs, ys)
-    ax.set_title(f"Dissonance timeline — {payload.get('id')}")
-    ax.set_xlabel("bar position")
-    ax.set_ylabel("hotspot score")
-    ax.grid(True, alpha=0.35)
-    top = sorted(hotspots[:8], key=lambda row: float(row["score"]), reverse=True)
-    for item in top[:6]:
-        x = (float(item["center_beat"]) / beats_per_bar) + 1.0
-        y = float(item["score"])
-        ax.annotate(f"b{item['bar']}", (x, y), xytext=(0, 6), textcoords="offset points", fontsize=7)
+    from matplotlib.collections import LineCollection
+    from matplotlib.gridspec import GridSpec
+
+    notes = data["notes"]
+    pitches = [n["pitch"] for n in notes]
+    cmax = max((n["clash"] for n in notes), default=0.0) or 1.0
+    fig = plt.figure(figsize=(15, 7.5))
+    gs = GridSpec(2, 1, height_ratios=[4, 1], hspace=0.06, figure=fig)
+    ax = fig.add_subplot(gs[0])
+    axd = fig.add_subplot(gs[1], sharex=ax)
+    ax.set_facecolor("0.11")
+    cmap = plt.get_cmap("turbo")
+    segs, cols = [], []
+    for n in sorted(notes, key=lambda r: r["clash"]):  # hot notes drawn on top
+        segs.append([(n["x0"], n["pitch"]), (n["x1"], n["pitch"])])
+        cols.append(cmap(min(1.0, n["clash"] / cmax)))
+    ax.add_collection(LineCollection(segs, colors=cols, linewidths=2.2))
+    if data["sour"]:
+        smax = max(s["severity"] for s in data["sour"]) or 1.0
+        ax.scatter(
+            [s["x"] for s in data["sour"]],
+            [s["pitch"] for s in data["sour"]],
+            marker="v",
+            s=[18 + 70 * (s["severity"] / smax) for s in data["sour"]],
+            facecolors="none",
+            edgecolors="magenta",
+            linewidths=1.1,
+            alpha=0.9,
+            label="out-of-key note (size = severity)",
+            zorder=5,
+        )
+    top_pitch = max(pitches)
+    for sec in data["sections"]:
+        ax.axvline(sec["start_beat"], color="white", lw=0.7, alpha=0.22)
+        ax.text(sec["start_beat"] + 0.4, top_pitch + 2.0, sec["id"], fontsize=8, color="0.45")
+    ax.set_xlim(0, data["end_beat"])
+    ax.set_ylim(min(pitches) - 2, top_pitch + 5)
+    ax.set_ylabel("MIDI pitch")
+    ax.set_title(f"Dissonance & out-of-key map — {data['id']}")
+    ax.tick_params(labelbottom=False)
+    if data["sour"]:
+        ax.legend(loc="upper right", fontsize=8)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(0, cmax))
+    sm.set_array([])
+    fig.colorbar(sm, ax=ax, label="note clash score", pad=0.01, fraction=0.025)
+    xs = [i * bucket_beats for i in range(len(data["beat_total"]))]
+    axd.fill_between(xs, data["beat_total"], step="mid", color="orangered", alpha=0.65)
+    bpb = data["beats_per_bar"]
+    for b in range(0, int(data["end_beat"]) + 1, max(1, int(bpb))):
+        axd.axvline(b, color="0.85", lw=0.3)
+    axd.set_ylabel("clash / beat")
+    axd.set_xlabel("beat")
+    axd.set_xlim(0, data["end_beat"])
     _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
     return True
 
@@ -570,15 +704,13 @@ def write_reports(
     if plots_dir is not None:
         plots_dir.mkdir(parents=True, exist_ok=True)
         ext = plot_format.lower()
-        timeline_path = plots_dir / f"dissonance_timeline.{ext}"
+        # The piano-roll (the "where" view) is rendered in run() where the spec
+        # is available; write_reports only has the aggregated payload, so it
+        # handles the layer-pair heatmap here.
         heatmap_path = plots_dir / f"dissonance_layer_pairs.{ext}"
-        timeline_ok = _write_timeline_plot(payload, timeline_path, plot_format=plot_format, jpeg_quality=jpeg_quality)
-        heatmap_ok = _write_layer_pair_heatmap(payload, heatmap_path, plot_format=plot_format, jpeg_quality=jpeg_quality)
-        if timeline_ok:
-            paths["timeline_plot"] = str(timeline_path)
-        if heatmap_ok:
+        if _write_layer_pair_heatmap(payload, heatmap_path, plot_format=plot_format, jpeg_quality=jpeg_quality):
             paths["layer_pair_plot"] = str(heatmap_path)
-        if plots_dir is not None and not _ensure_matplotlib():
+        if not _ensure_matplotlib():
             warnings = list(payload.get("warnings") or [])
             note = "matplotlib unavailable; skipped dissonance plot generation"
             if note not in warnings:
@@ -618,9 +750,16 @@ class DissonanceAuditConfig(kwconf.Config):
 
 @profile
 def run(args: DissonanceAuditConfig) -> int:
-    payload = audit_file(args.score, bucket_beats=args.bucket_beats, max_hotspots=args.max_hotspots)
+    from ..render.score_core import load_yaml
+
+    spec = load_yaml(args.score)
+    payload = audit_spec(spec, bucket_beats=args.bucket_beats, max_hotspots=args.max_hotspots)
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir, plots_dir=args.plots, plot_format=args.plot_format)
+    if args.plots is not None:
+        pianoroll_path = Path(args.plots) / f"dissonance_pianoroll.{args.plot_format.lower()}"
+        if render_pianoroll(spec, pianoroll_path, bucket_beats=args.bucket_beats, plot_format=args.plot_format):
+            paths["pianoroll_plot"] = str(pianoroll_path)
     if args.json:
         print(json.dumps(payload, indent=2))
     else:

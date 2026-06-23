@@ -467,7 +467,14 @@ def audit_spec(
                 # a sustained chord contains a neighboring chord tone.
                 if ((pc - int(root_pc)) % 12) in {2, 5, 9, 10}:
                     safe_extension += 1
-            _ic, pressure, iname = _interval_class_to_chord(pc, chord_pcs)
+            if in_chord:
+                # A chord tone is consonant with its own chord; the tritone/
+                # seventh it forms with other chord tones (e.g. the 3rd and b7 of
+                # a dominant 7th, or the 2nd in a sus chord) is the chord's
+                # intended color, not sourness.
+                pressure, iname = 0.0, ""
+            else:
+                _ic, pressure, iname = _interval_class_to_chord(pc, chord_pcs)
             pressures.append(pressure)
             if iname:
                 intervals.append(iname)
