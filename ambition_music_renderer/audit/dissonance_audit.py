@@ -72,9 +72,7 @@ INTERVAL_CLASS_SEVERITY = {
 }
 
 
-@profile
-def _round3(value: float) -> float:
-    return round(float(value), 3)
+from ._common import round3 as _round3
 
 
 @profile

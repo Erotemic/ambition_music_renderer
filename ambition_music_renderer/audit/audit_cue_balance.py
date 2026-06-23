@@ -8,7 +8,6 @@ from ..profiler import profile
 import lazy_loader as lazy
 
 import kwconf
-import math
 from pathlib import Path
 
 from .._paths import output_root
@@ -16,11 +15,7 @@ from .._paths import output_root
 np = lazy.load("numpy")
 sf = lazy.load("soundfile")
 
-
-@profile
-def db(value: float) -> float:
-    value = max(float(value), 1e-12)
-    return 20.0 * math.log10(value)
+from ._common import db
 
 
 @profile

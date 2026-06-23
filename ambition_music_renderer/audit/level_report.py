@@ -35,7 +35,7 @@ from .._paths import repo_root
 np = lazy.load("numpy")
 sf = lazy.load("soundfile")
 
-from .transition_audit import db, peak, rms
+from ._common import db, peak, rms
 
 REPO_ROOT = repo_root()
 DEFAULT_ROOT = REPO_ROOT / "crates/ambition_gameplay_core/assets/audio/music/generated"

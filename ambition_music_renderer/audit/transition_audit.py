@@ -23,6 +23,8 @@ from typing import Iterable
 np = lazy.load("numpy")
 sf = lazy.load("soundfile")
 
+from ._common import db, peak, rms
+
 try:
     from rich import print as rich_print
 except Exception:  # pragma: no cover
@@ -43,12 +45,6 @@ def path_link(path: Path) -> str:
 
 
 @profile
-def db(value: float) -> float:
-    value = max(float(value), 1e-12)
-    return 20.0 * math.log10(value)
-
-
-@profile
 def read_audio(path: Path) -> tuple[np.ndarray, int]:
     audio, sample_rate = sf.read(path, always_2d=True, dtype="float32")
     if audio.shape[1] == 1:
@@ -62,20 +58,6 @@ def ensure_length(audio: np.ndarray, frames: int) -> np.ndarray:
         return audio[:frames]
     pad = np.zeros((frames - audio.shape[0], audio.shape[1]), dtype=audio.dtype)
     return np.concatenate([audio, pad], axis=0)
-
-
-@profile
-def rms(audio: np.ndarray) -> float:
-    if audio.size == 0:
-        return 0.0
-    return float(np.sqrt(np.mean(np.square(audio), dtype=np.float64)))
-
-
-@profile
-def peak(audio: np.ndarray) -> float:
-    if audio.size == 0:
-        return 0.0
-    return float(np.max(np.abs(audio)))
 
 
 @profile

@@ -55,9 +55,7 @@ WHISTLE_HZ = 8000.0
 EXTREME_HZ = 10000.0
 
 
-@profile
-def _round3(value: float) -> float:
-    return round(float(value), 3)
+from ._common import round3 as _round3
 
 
 @profile

@@ -15,12 +15,13 @@ import lazy_loader as lazy
 
 import kwconf
 import json
-import math
 import subprocess
 from pathlib import Path
 from typing import Any
 
 np = lazy.load("numpy")
+
+from ._common import db as _db
 
 BANDS = [
     ("sub", 20.0, 80.0),
@@ -30,11 +31,6 @@ BANDS = [
     ("presence", 2000.0, 6000.0),
     ("air", 6000.0, 12000.0),
 ]
-
-
-@profile
-def _db(value: float) -> float:
-    return 20.0 * math.log10(max(float(value), 1e-12))
 
 
 @profile
