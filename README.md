@@ -27,11 +27,15 @@ Common CLI commands:
 
 ```bash
 uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --force --zip
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --force --zip
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --zip_report --force
-./generate_audio_assets.sh --force
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue list
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --force --zip
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --force --zip
+uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --zip_report --force
 ```
+
+`cue list` enumerates every cue id found under `scores/` (grouped by
+`active`/`examples`/`archive`/`experiments`); pass `--json` for a machine
+readable map. `cue bundle` is the one-cue render+debug+package workflow.
 
 Auxiliary analysis and maintenance helpers are exposed through the package modal CLI rather than top-level scripts:
 
@@ -45,7 +49,7 @@ uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambitio
 
 Use the package CLI for current music-renderer work. Older docs may mention retired paths under `tools/audio/` or direct `python *.py` tool scripts; those paths are stale and should not be copied into new instructions.
 
-Bundle report generation also calls these helpers through the packaged modal CLI. If a bundle run reports `can't open file .../audit_cue_balance.py`, `spectral_compare.py`, `spectral_localize.py`, or `transition_audit.py`, that checkout still has stale orchestration code; update to a build where `cue_bundle` invokes `python -m ambition_music_renderer audit ...` instead of root-level script paths.
+Bundle report generation also calls these helpers through the packaged modal CLI. If a bundle run reports `can't open file .../audit_cue_balance.py`, `spectral_compare.py`, `spectral_localize.py`, or `transition_audit.py`, that checkout still has stale orchestration code; update to a build where `cue bundle` invokes `python -m ambition_music_renderer audit ...` instead of root-level script paths.
 
 ## Package layout
 
@@ -54,8 +58,7 @@ Bundle report generation also calls these helpers through the packaged modal CLI
   - `render/score_*.py` - score expansion split into core constants/context, theory helpers, event construction, and layer renderers.
   - `render/synth.py`, `render/effects.py`, `render/export.py`, and `render/group.py` - audio synthesis, post-process effects, export/metadata, and stem-group rendering.
   - `render/bundle_*.py` - cue bundle orchestration split into base config/path helpers, audio reports, spectral reports, adaptive reports, spectrograms, archive/zip helpers, and the main `bundle.py` workflow.
-  - `render/musicir_renderer.py` and `render/bundle_reports.py` are compatibility facades; put new implementation code in the focused modules above.
-- `ambition_music_renderer/audit/` - active diagnostics and reports exposed under `python -m ambition_music_renderer audit ...`.
+- `ambition_music_renderer/audit/` - active diagnostics and reports exposed under `python -m ambition_music_renderer audit ...`. Each audit module owns its own kwconf `*Config` (the single source of truth for its CLI arguments) and defers heavy imports via `lazy_loader`; `cli.py` registers those Configs directly. Shared dB/RMS/peak/round helpers live in `audit/_common.py`.
 - `ambition_music_renderer/legacy/` - quarantined older one-off helpers that are still callable but need a later rename/delete decision.
 - `ambition_music_renderer/backends/` - optional plugin/SFZ/LV2/VST adapter code, imported only when requested.
 
@@ -71,9 +74,7 @@ Bundle report generation also calls these helpers through the packaged modal CLI
 - `scores/active/` - cues actively used or being prepared for runtime.
 - `scores/examples/` - reference/example cues.
 - `scores/archive/` - historical cues kept for reference.
-- `render_first_goblin_transition_lab.sh` - local transition-lab helper.
 - `goals.md` - design/planning notes for renderer direction.
-- `MUSIC_RENDERER_REFACTOR_ROADMAP.md` - durable roadmap/checklist for the renderer cleanup.
 
 ## Dependencies and backends
 
@@ -140,14 +141,14 @@ SoundFont preference is defined in the renderer code. Prefer high-quality MuseSc
 
 ## One-command cue debug bundles
 
-Use `cue_bundle` when regenerating a song for review or for handoff to another
+Use `cue bundle` when regenerating a song for review or for handoff to another
 agent. It renders with retained debug stems, runs the useful reports, writes
 spectrogram images when matplotlib is available, and packages an uploadable
 bundle on request. Generated bundles remain ignored by git.
 
 ```bash
 uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer cue_bundle <cue_id> \
+python -m ambition_music_renderer cue bundle <cue_id> \
   --backend=pretty-midi \
   --force \
   --zip
@@ -171,7 +172,7 @@ useful but usually too large for chat upload.
 
 ### Profiling renders
 
-Normal `cue_bundle` launches `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, either set `LINE_PROFILE=1` or pass `--profile_render`; both run `render_isolated` in-process and render serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` is a convenience flag that also enables `LINE_PROFILE=1`; it uses line profiler only and does not start cProfile.
+Normal `cue bundle` launches `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, either set `LINE_PROFILE=1` or pass `--profile_render`; both run `render_isolated` in-process and render serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` is a convenience flag that also enables `LINE_PROFILE=1`; it uses line profiler only and does not start cProfile.
 
 Recommended short profiling command:
 
@@ -179,7 +180,7 @@ Recommended short profiling command:
 cd ~/code/ambition
 
 LINE_PROFILE=1 uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
+python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
   --backend=pretty-midi \
   --runtime_stem_gain_mode=shared \
   --render_audio_mode=full-mix-only \
@@ -195,7 +196,7 @@ cd ~/code/ambition
 source tools/ambition_music_renderer/.venv/bin/activate
 
 LINE_PROFILE=1 uv run --active \
-python -m ambition_music_renderer cue_bundle for_emmy_forever_ago \
+python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
   --backend=pretty-midi \
   --runtime_stem_gain_mode=shared \
   --render_audio_mode=full-mix-only \
@@ -371,7 +372,7 @@ For adaptive cues, distinguish runtime problems from generated-audio problems be
 4. Confirm whether the runtime starts the next state at target gain or fades from silence.
 5. Listen to adjacent generated files outside the game to decide if the seam exists before runtime touches them.
 
-Useful future improvements tracked in `TODO.md`:
+Useful future improvements:
 
 - level reports with LUFS / peak / RMS / duration,
 - live in-engine gain HUD,
