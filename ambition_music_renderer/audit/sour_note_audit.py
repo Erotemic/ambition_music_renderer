@@ -620,30 +620,79 @@ def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 
 
 
 @profile
-def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not _ensure_matplotlib():
+def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[str, Any] | None:
+    """Per-note sourness over time, for the sour piano-roll.
+
+    Each note is scored 0 when it is a chord tone (consonant with its own
+    chord) and otherwise by its harshest interval to the chord plus an
+    out-of-key bonus — the same judgment as the candidate audit, but kept for
+    every note so the plot can colour the whole roll.
+    """
+    from ..render.score_layers import build_score
+
+    pm, _groups, section_meta = build_score(spec)
+    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    if not events:
+        return None
+    bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    end_beat = max(float(e["end_beat"]) for e in events)
+    keys = _infer_section_keys(spec)
+    nb = max(1, int(math.ceil(end_beat / bucket_beats)))
+    strip = [0.0] * nb
+    notes: list[dict[str, Any]] = []
+    for ev in events:
+        pitch = int(ev["pitch"])
+        pc = pitch % 12
+        bar = int(float(ev["start_beat"]) // bpb)
+        section, _ = _section_for_bar(spec, bar)
+        chord = _chord_for_abs_bar(spec, bar)
+        chord_pcs = _chord_pcs(chord) if chord else set()
+        key_pcs = keys.get((section or {}).get("id"), {}).get("pcs", set())
+        if pc in chord_pcs:
+            sour = 0.0
+        else:
+            _ic, pressure, _ = _interval_class_to_chord(pc, chord_pcs)
+            sour = pressure + (0.6 if (key_pcs and pc not in key_pcs) else 0.0)
+        notes.append({"pitch": pitch, "x0": float(ev["start_beat"]), "x1": float(ev["end_beat"]), "value": sour})
+        if sour > 0:
+            b = int(float(ev["start_beat"]) // bucket_beats)
+            if 0 <= b < nb:
+                strip[b] += sour
+    return {
+        "id": spec.get("id"),
+        "beats_per_bar": bpb,
+        "end_beat": end_beat,
+        "sections": [{"id": s["id"], "start_beat": s["start_beat"]} for s in section_meta],
+        "notes": notes,
+        "strip": strip,
+    }
+
+
+@profile
+def render_pianoroll(
+    spec: dict[str, Any], path: Path, *, bucket_beats: float = 0.25, plot_format: str = "jpg", jpeg_quality: int = 90
+) -> bool:
+    """Piano-roll of where out-of-key (sour) notes occur, colored by sourness."""
+    data = pianoroll_data(spec, bucket_beats=bucket_beats)
+    if data is None or not data["notes"]:
         return False
-    candidates = payload.get("candidates", [])
-    if not candidates:
-        return False
-    fig, ax = plt.subplots(figsize=(11, 3.8))
-    xs = [float(row["time_s"]) for row in candidates]
-    ys = [float(row["score"]) for row in candidates]
-    ax.scatter(xs, ys, s=18)
-    ax.set_title(f"Sour-note candidates — {payload.get('id')}")
-    ax.set_xlabel("time (s)")
-    ax.set_ylabel("candidate score")
-    ax.grid(True, alpha=0.3)
-    for row in candidates[:8]:
-        ax.annotate(
-            f"b{row['bar']} {row['note']}",
-            (float(row["time_s"]), float(row["score"])),
-            xytext=(0, 6),
-            textcoords="offset points",
-            fontsize=7,
-        )
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
-    return True
+    from ._pianoroll import render_note_pianoroll
+
+    return render_note_pianoroll(
+        path,
+        notes=data["notes"],
+        end_beat=data["end_beat"],
+        beats_per_bar=data["beats_per_bar"],
+        sections=data["sections"],
+        title=f"Out-of-key (sour) map — {data['id']}",
+        value_label="sourness (interval pressure + out-of-key)",
+        cmap="magma",
+        strip=data["strip"],
+        strip_label="sourness / beat",
+        bucket_beats=bucket_beats,
+        plot_format=plot_format,
+        jpeg_quality=jpeg_quality,
+    )
 
 
 @profile
@@ -746,9 +795,9 @@ def write_reports(
     if plots_dir is not None:
         plots_dir.mkdir(parents=True, exist_ok=True)
         suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
-        timeline = plots_dir / f"sour_note_timeline.{suffix}"
-        if _write_timeline_plot(payload, timeline, plot_format=plot_format, jpeg_quality=jpeg_quality):
-            paths["timeline_plot"] = str(timeline)
+        # The piano-roll (the "where" view) is rendered in run() where the spec
+        # is available; write_reports only has the candidate payload, so it
+        # handles the per-layer bar chart here.
         layers = plots_dir / f"sour_note_layers.{suffix}"
         if _write_layer_plot(payload, layers, plot_format=plot_format, jpeg_quality=jpeg_quality):
             paths["layer_plot"] = str(layers)
@@ -782,14 +831,21 @@ class SourNoteAuditConfig(kwconf.Config):
 
 @profile
 def run(args: SourNoteAuditConfig) -> int:
-    payload = audit_file(
-        args.score,
+    from ..render.score_core import load_yaml
+
+    spec = load_yaml(args.score)
+    payload = audit_spec(
+        spec,
         bucket_beats=args.bucket_beats,
         max_candidates=args.max_candidates,
         min_score=args.min_score,
     )
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir, plots_dir=args.plots, plot_format=args.plot_format)
+    if args.plots is not None:
+        pianoroll_path = Path(args.plots) / f"sour_note_pianoroll.{args.plot_format.lower()}"
+        if render_pianoroll(spec, pianoroll_path, bucket_beats=args.bucket_beats, plot_format=args.plot_format):
+            paths["pianoroll_plot"] = str(pianoroll_path)
     if args.json:
         print(json.dumps(payload, indent=2))
     else:

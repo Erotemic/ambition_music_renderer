@@ -12,10 +12,12 @@ from ..audit.arrangement_audit import audit_file as audit_arrangement_file
 from ..audit.arrangement_audit import write_reports as write_arrangement_reports
 from ..audit.dissonance_audit import audit_file as audit_dissonance_file
 from ..audit.dissonance_audit import render_pianoroll as render_dissonance_pianoroll
+from ..audit.dissonance_audit import write_harmony_diagnostics
 from ..audit.dissonance_audit import write_reports as write_dissonance_reports
 from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
 from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
 from ..audit.sour_note_audit import audit_file as audit_sour_note_file
+from ..audit.sour_note_audit import render_pianoroll as render_sour_pianoroll
 from ..audit.sour_note_audit import write_reports as write_sour_note_reports
 from ..kwconf_runner import KwconfCommand
 from ..profiler import profile
@@ -322,6 +324,15 @@ def create_bundle(
                 plots_dir=plots_dir,
                 plot_format=plot_format,
                 jpeg_quality=jpeg_quality,
+            )
+            render_sour_pianoroll(
+                spec,
+                plots_dir / f"sour_note_pianoroll.{plot_format}",
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            write_harmony_diagnostics(
+                dissonance_payload, sour_note_payload, reports_dir / "harmony_diagnostics.md"
             )
             shrill_note_payload = audit_shrill_note_file(score_path)
             write_shrill_note_reports(

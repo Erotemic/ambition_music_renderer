@@ -463,7 +463,7 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
         b0 = int(float(ev["start_beat"]) // bucket_beats)
         b1 = int(math.ceil(float(ev["end_beat"]) / bucket_beats))
         clash = max((clash_at.get((bi, pitch), 0.0) for bi in range(b0, b1 + 1)), default=0.0)
-        notes.append({"pitch": pitch, "x0": float(ev["start_beat"]), "x1": float(ev["end_beat"]), "clash": clash})
+        notes.append({"pitch": pitch, "x0": float(ev["start_beat"]), "x1": float(ev["end_beat"]), "value": clash})
 
     # Out-of-key overlay reuses the sour-note audit verbatim, so the markers are
     # exactly its candidates (already key-aware and chord-tone-filtered) rather
@@ -496,71 +496,34 @@ def render_pianoroll(
 ) -> bool:
     """Piano-roll of where dissonance and out-of-key notes occur over time.
 
-    Top: every note (x=time, y=pitch) colored by its worst clash score, with
-    out-of-key notes marked and sized by severity. Bottom: a time-ordered
-    clash-per-beat strip. Replaces the old score-sorted timeline line, which
-    could not show *where* a clash was or *which* notes formed it.
+    Notes (x=time, y=pitch) colored by their worst clash score, out-of-key notes
+    marked and sized by severity, over a time-ordered clash-per-beat strip.
+    Replaces the old score-sorted timeline line, which could not show *where* a
+    clash was or *which* notes formed it.
     """
-    if not _ensure_matplotlib():
-        return False
     data = _pianoroll_data(spec, bucket_beats=bucket_beats)
     if data is None or not data["notes"]:
         return False
-    from matplotlib.collections import LineCollection
-    from matplotlib.gridspec import GridSpec
+    from ._pianoroll import render_note_pianoroll
 
-    notes = data["notes"]
-    pitches = [n["pitch"] for n in notes]
-    cmax = max((n["clash"] for n in notes), default=0.0) or 1.0
-    fig = plt.figure(figsize=(15, 7.5))
-    gs = GridSpec(2, 1, height_ratios=[4, 1], hspace=0.06, figure=fig)
-    ax = fig.add_subplot(gs[0])
-    axd = fig.add_subplot(gs[1], sharex=ax)
-    ax.set_facecolor("0.11")
-    cmap = plt.get_cmap("turbo")
-    segs, cols = [], []
-    for n in sorted(notes, key=lambda r: r["clash"]):  # hot notes drawn on top
-        segs.append([(n["x0"], n["pitch"]), (n["x1"], n["pitch"])])
-        cols.append(cmap(min(1.0, n["clash"] / cmax)))
-    ax.add_collection(LineCollection(segs, colors=cols, linewidths=2.2))
-    if data["sour"]:
-        smax = max(s["severity"] for s in data["sour"]) or 1.0
-        ax.scatter(
-            [s["x"] for s in data["sour"]],
-            [s["pitch"] for s in data["sour"]],
-            marker="v",
-            s=[18 + 70 * (s["severity"] / smax) for s in data["sour"]],
-            facecolors="none",
-            edgecolors="magenta",
-            linewidths=1.1,
-            alpha=0.9,
-            label="out-of-key note (size = severity)",
-            zorder=5,
-        )
-    top_pitch = max(pitches)
-    for sec in data["sections"]:
-        ax.axvline(sec["start_beat"], color="white", lw=0.7, alpha=0.22)
-        ax.text(sec["start_beat"] + 0.4, top_pitch + 2.0, sec["id"], fontsize=8, color="0.45")
-    ax.set_xlim(0, data["end_beat"])
-    ax.set_ylim(min(pitches) - 2, top_pitch + 5)
-    ax.set_ylabel("MIDI pitch")
-    ax.set_title(f"Dissonance & out-of-key map — {data['id']}")
-    ax.tick_params(labelbottom=False)
-    if data["sour"]:
-        ax.legend(loc="upper right", fontsize=8)
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(0, cmax))
-    sm.set_array([])
-    fig.colorbar(sm, ax=ax, label="note clash score", pad=0.01, fraction=0.025)
-    xs = [i * bucket_beats for i in range(len(data["beat_total"]))]
-    axd.fill_between(xs, data["beat_total"], step="mid", color="orangered", alpha=0.65)
-    bpb = data["beats_per_bar"]
-    for b in range(0, int(data["end_beat"]) + 1, max(1, int(bpb))):
-        axd.axvline(b, color="0.85", lw=0.3)
-    axd.set_ylabel("clash / beat")
-    axd.set_xlabel("beat")
-    axd.set_xlim(0, data["end_beat"])
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
-    return True
+    return render_note_pianoroll(
+        path,
+        notes=data["notes"],
+        end_beat=data["end_beat"],
+        beats_per_bar=data["beats_per_bar"],
+        sections=data["sections"],
+        title=f"Dissonance & out-of-key map — {data['id']}",
+        value_label="note clash score",
+        cmap="turbo",
+        strip=data["beat_total"],
+        strip_label="clash / beat",
+        bucket_beats=bucket_beats,
+        markers=data["sour"],
+        marker_label="out-of-key note (size = severity)",
+        marker_color="magenta",
+        plot_format=plot_format,
+        jpeg_quality=jpeg_quality,
+    )
 
 
 @profile
@@ -721,6 +684,62 @@ def write_reports(
                 summary_path.write_text("\n".join(text + ["", f"note: {note}"]) + "\n", encoding="utf8")
 
     return paths
+
+
+def write_harmony_diagnostics(
+    dissonance_payload: dict[str, Any], sour_payload: dict[str, Any], path: Path, *, limit: int = 20
+) -> Path:
+    """One compact, LLM-readable report merging clash hotspots + out-of-key notes.
+
+    The piano-roll plots are the human "where" view; this is the same findings as
+    text an agent can act on. Source hints point at the YAML to edit. Both signals
+    are score-level heuristics — intentional tension is expected, so triage rather
+    than blindly removing flagged notes.
+    """
+    lines = [
+        f"# Harmony diagnostics — {dissonance_payload.get('id')}",
+        "",
+        "Clashes (simultaneous dissonant intervals) and sour notes (out of the",
+        "section key / chord). Use `source hint` to find the YAML. Heuristic and",
+        "score-level: a dominant 7th's tritone or a held color tone is expected.",
+        "",
+    ]
+    keys = sour_payload.get("section_keys") or {}
+    if keys:
+        lines.append("## Inferred section keys")
+        lines.append("")
+        for sid, data in keys.items():
+            lines.append(f"- **{sid}**: {data.get('name')}")
+        lines.append("")
+    lines += [
+        "## Worst dissonance clashes",
+        "",
+        "| score | bar | beat | section | chord | interval | notes | layers |",
+        "| ---: | ---: | ---: | --- | --- | --- | --- | --- |",
+    ]
+    for h in dissonance_payload.get("hotspots", [])[:limit]:
+        worst = (h.get("worst_pairs") or [{}])[0]
+        notes = "+".join(str(x) for x in worst.get("notes", []) or [])
+        layers = "+".join(str(x) for x in worst.get("layers", []) or [])
+        lines.append(
+            f"| {h.get('score')} | {h.get('bar')} | {h.get('beat')} | {h.get('section')} | "
+            f"{h.get('chord')} | {worst.get('interval_name', '')} | {notes} | {layers} |"
+        )
+    lines += [
+        "",
+        "## Out-of-key (sour) notes",
+        "",
+        "| score | bar | beat | section | chord | note | layer | source hint |",
+        "| ---: | ---: | ---: | --- | --- | --- | --- | --- |",
+    ]
+    for c in sour_payload.get("candidates", [])[:limit]:
+        lines.append(
+            f"| {c.get('score')} | {c.get('bar')} | {c.get('beat')} | {c.get('section')} | "
+            f"{c.get('chord')} | {c.get('note')} | {c.get('layer')} | `{c.get('source_hint')}` |"
+        )
+    lines.append("")
+    path.write_text("\n".join(lines), encoding="utf8")
+    return path
 
 
 @profile
