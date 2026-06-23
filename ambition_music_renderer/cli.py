@@ -46,6 +46,8 @@ from ._paths import SCORE_SUFFIXES as _SCORE_SUFFIXES
 import kwconf
 
 from .profiler import profile
+from .render.bundle_options import BundleOptions
+from .render.bundle_options import PASSTHROUGH_FIELDS
 from .render.generated_layout import begin_generated_run
 from .render.generated_layout import generated_manifest_search_roots
 from .render.generated_layout import generated_run_layout
@@ -520,13 +522,13 @@ def _process_simple_mix_cue(
     return None
 
 
-def _run_bulk(args, cues: tuple[str, ...]) -> int:
+def _run_bulk(args, cues: tuple[str, ...], action: str) -> int:
     failed: list[str] = []
-    desc = f"music {args.action}"
+    desc = f"music {action}"
     for cue in _progress(cues, total=len(cues), desc=desc):
         stage = _process_simple_mix_cue(
             cue,
-            action=args.action,
+            action=action,
             backend=args.backend,
             force_render=args.force_render,
             dest_root=args.dest_root,
@@ -541,69 +543,32 @@ def _run_bulk(args, cues: tuple[str, ...]) -> int:
 
 
 @profile
-def cmd_sandbox(args) -> int:
-    """Render+publish the sandbox single-track cues.
+def run_bulk_cues(config, *, cues_factory, action: str) -> int:
+    """Run a render/publish/render-publish pass over a preset cue set.
 
-    Mirrors the legacy ``tools/audio/render_sandbox_music.py`` behavior:
-    skip the renderer when the YAML mtime is older than the latest preview,
-    use --simple-mix for these single-track cues, publish the newest
-    full_soundtrack_preview.ogg into the bevy asset tree.
+    ``cues_factory`` resolves the default cue set when ``--cue`` is not given
+    (``SANDBOX_CUES`` for sandbox, ``radio_cues()`` for radio). For the
+    ``render-publish`` action, ``--skip_render`` degrades it to publish-only.
     """
-    cues = tuple(args.cue) if args.cue else SANDBOX_CUES
-    return _run_bulk(args, cues)
-
-
-@profile
-def cmd_radio(args) -> int:
-    """Render+publish every cue we expose on the in-game radio.
-
-    Covers ``SANDBOX_CUES`` plus auto-discovered ``scores/active/*`` cues
-    plus the curated ``EXTRA_RADIO_CUES`` list. Skips ``ADAPTIVE_CUES``
-    (those go through ``scripts/regen_first_goblin_tune_v2.sh``). Honors
-    ``preview/published.ogg`` pins for cues whose mastered file lives
-    under a manual filename.
-    """
-    cues = tuple(args.cue) if args.cue else radio_cues()
-    return _run_bulk(args, cues)
+    cues = tuple(config.cue) if config.cue else tuple(cues_factory())
+    if action == "render-publish" and config.skip_render:
+        action = "publish"
+    return _run_bulk(config, cues, action)
 
 
 def _single_bundle_config(args, cue: str):
     """Build a per-cue ``CueBundleConfig`` from the orchestrator ``args``.
 
-    The orchestrator (``cue bundle``) speaks in terms of multiple cues and a
-    cross-cue ``jobs`` parallelism; the single-cue renderer config speaks in
-    terms of one ``cue`` and a per-render ``jobs`` worker count. This is the
-    one seam that translates between the two.
+    The shared ``BundleOptions`` fields copy across by name; the only divergence
+    is the positional (``cues`` -> ``cue``) and the meaning of ``jobs`` (the
+    orchestrator's ``render_jobs`` becomes the renderer's ``jobs`` worker count).
     """
     from .render.bundle import CueBundleConfig
 
-    return CueBundleConfig.cli(
-        argv=False,
-        data={
-            "cue": cue,
-            "backend": args.backend,
-            "runtime_stem_gain_mode": args.runtime_stem_gain_mode,
-            "runtime_stem_max_gain_db": args.runtime_stem_max_gain_db,
-            "outdir": args.outdir,
-            "bundle_root": args.bundle_root,
-            "force": args.force,
-            "publish": args.publish,
-            "dest_root": args.dest_root,
-            "zip_bundle": args.zip_bundle,
-            "zip_report_bundle": args.zip_report_bundle,
-            "plot_format": args.plot_format,
-            "jpeg_quality": args.jpeg_quality,
-            "jobs": args.render_jobs,
-            "include_scratch_stems": args.include_scratch_stems,
-            "skip_render": args.skip_render,
-            "spectrograms": args.spectrograms,
-            "all_audits": args.all_audits,
-            "render_audio_mode": args.render_audio_mode,
-            "profile_render": args.profile_render,
-            "render_in_process": args.render_in_process,
-            "json": args.json,
-        },
-    )
+    data = {field: getattr(args, field) for field in PASSTHROUGH_FIELDS}
+    data["cue"] = cue
+    data["jobs"] = args.render_jobs
+    return CueBundleConfig.cli(argv=False, data=data)
 
 
 @profile
@@ -768,12 +733,14 @@ class PublishCommand(kwconf.Config):
         return cmd_publish(config)
 
 
-class BundleCommand(kwconf.Config):
+class BundleCommand(BundleOptions):
     """Render, debug, and package one or more cue bundles.
 
-    Pass a single cue id to render it in-process (profiling and ``--json``
-    available). Pass several cue ids and/or ``-j/--jobs N`` to fan out across
-    cues, one render subprocess each, with per-cue logs.
+    Shared per-cue knobs come from :class:`BundleOptions`. This orchestrator adds
+    the multi-cue positional and the cross-cue parallelism: pass a single cue id
+    to render it in-process (profiling and ``--json`` available), or several cue
+    ids and/or ``-j/--jobs N`` to fan out across cues, one render subprocess each,
+    with per-cue logs.
     """
 
     cues: list[str] = kwconf.Value(
@@ -785,77 +752,15 @@ class BundleCommand(kwconf.Config):
     jobs: int = kwconf.Value(1, short_alias=["j"], help="parallel cue count; >1 fans out across cues")
     render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
     log_root: Path | None = kwconf.Value(None, parser=Path, help="batch per-cue log root (multi-cue runs)")
-    backend: str = kwconf.Value("pretty-midi", choices=["pretty-midi", "fluidsynth-cli", "fallback", "auto"])
-    runtime_stem_gain_mode: str = kwconf.Value(
-        "native",
-        choices=["native", "shared"],
-        help=(
-            "runtime adaptive stem export mode: native preserves current raw "
-            "levels; shared applies one shared reference gain across all stems"
-        ),
-    )
-    runtime_stem_max_gain_db: float | None = kwconf.Value(
-        None,
-        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
-    )
-    outdir: Path | None = kwconf.Value(None, parser=Path)
-    bundle_root: Path | None = kwconf.Value(None, parser=Path)
-    force: bool = kwconf.Flag(False, help="force render regeneration")
-    publish: bool = kwconf.Flag(False, help="publish full.ogg to game assets after rendering")
-    dest_root: Path | None = kwconf.Value(None, parser=Path, help="game music generated asset root")
-    zip_bundle: bool = kwconf.Flag(
-        False,
-        alias=["zip"],
-        help="write a complete uploadable bundle zip including manifest-referenced audio",
-    )
-    zip_report_bundle: bool = kwconf.Flag(
-        False,
-        alias=["zip_report"],
-        help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries",
-    )
-    plot_format: str = kwconf.Value(
-        "jpg",
-        choices=["jpg", "png"],
-        help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
-    )
-    jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
-    include_scratch_stems: bool = kwconf.Flag(
-        False,
-        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
-    )
-    skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
-    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; off by default")
-    all_audits: bool = kwconf.Flag(False, help="run full cue-bundle diagnostic audits")
-    render_audio_mode: str = kwconf.Value(
-        "full",
-        choices=["full", "full-mix-only", "simple-mix"],
-        help=(
-            "audio export scope for render_isolated. full preserves all adaptive "
-            "stem/state preview OGGs; full-mix-only keeps scratch stems plus "
-            "mastered preview and section full mixes; simple-mix writes only the "
-            "mastered preview."
-        ),
-    )
-    profile_render: bool = kwconf.Flag(
-        False,
-        help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",
-    )
-    render_in_process: bool = kwconf.Flag(
-        False,
-        help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
-    )
-    json: bool = kwconf.Flag(False, help="print the full bundle JSON payload to stdout")
 
     def __post_init__(self) -> None:
+        super().__post_init__()
         self.jobs = int(self.jobs)
         self.render_jobs = int(self.render_jobs)
-        self.jpeg_quality = int(self.jpeg_quality)
         if self.log_root is None:
             self.log_root = package_dir() / "batch_logs"
-        for key in ("outdir", "bundle_root", "dest_root", "log_root"):
-            value = getattr(self, key)
-            if value is not None and not isinstance(value, Path):
-                setattr(self, key, Path(value))
+        elif not isinstance(self.log_root, Path):
+            self.log_root = Path(self.log_root)
 
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
@@ -942,74 +847,58 @@ class BulkActionConfig(kwconf.Config):
             self.dest_root = Path(self.dest_root)
 
 
-class SandboxRender(BulkActionConfig):
+def _bulk_command(name: str, doc: str, *, cues_factory, action: str):
+    """Build a ``BulkActionConfig`` leaf command bound to a cue set + action.
+
+    Replaces six near-identical subclasses (and their post-hoc ``config.action``
+    attribute injection) with one factory: the action and default cue set are
+    captured in the closure instead of mutated onto the parsed config.
+    """
 
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
         config = cls.cli(argv=argv, data=kwargs)
-        config.action = "render"
-        return cmd_sandbox(config)
+        return run_bulk_cues(config, cues_factory=cues_factory, action=action)
 
-
-class SandboxPublish(BulkActionConfig):
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        config.action = "publish"
-        return cmd_sandbox(config)
-
-
-class SandboxRenderPublish(BulkActionConfig):
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        config.action = "publish" if config.skip_render else "render-publish"
-        return cmd_sandbox(config)
+    return type(
+        name,
+        (BulkActionConfig,),
+        {"__doc__": doc, "__module__": __name__, "main": main},
+    )
 
 
 class SandboxModal(kwconf.ModalCLI):
-    """Sandbox-cue presets."""
+    """Sandbox-cue presets (single-track cues that ship via the radio)."""
 
-    render = SandboxRender
-    publish = SandboxPublish
-    render_publish = SandboxRenderPublish
-
-
-class RadioRender(BulkActionConfig):
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        config.action = "render"
-        return cmd_radio(config)
-
-
-class RadioPublish(BulkActionConfig):
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        config.action = "publish"
-        return cmd_radio(config)
-
-
-class RadioRenderPublish(BulkActionConfig):
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        config.action = "publish" if config.skip_render else "render-publish"
-        return cmd_radio(config)
+    render = _bulk_command(
+        "SandboxRender", "Render the sandbox cues.", cues_factory=lambda: SANDBOX_CUES, action="render"
+    )
+    publish = _bulk_command(
+        "SandboxPublish", "Publish the sandbox cues.", cues_factory=lambda: SANDBOX_CUES, action="publish"
+    )
+    render_publish = _bulk_command(
+        "SandboxRenderPublish",
+        "Render+publish the sandbox cues (--skip_render = publish-only).",
+        cues_factory=lambda: SANDBOX_CUES,
+        action="render-publish",
+    )
 
 
 class RadioModal(kwconf.ModalCLI):
-    """All radio cues."""
+    """All in-game radio cues (SANDBOX_CUES + scores/active/* + EXTRA_RADIO_CUES)."""
 
-    render = RadioRender
-    publish = RadioPublish
-    render_publish = RadioRenderPublish
+    render = _bulk_command(
+        "RadioRender", "Render every radio cue.", cues_factory=radio_cues, action="render"
+    )
+    publish = _bulk_command(
+        "RadioPublish", "Publish every radio cue.", cues_factory=radio_cues, action="publish"
+    )
+    render_publish = _bulk_command(
+        "RadioRenderPublish",
+        "Render+publish every radio cue (--skip_render = publish-only).",
+        cues_factory=radio_cues,
+        action="render-publish",
+    )
 
 
 class PluginDoctor(kwconf.Config):

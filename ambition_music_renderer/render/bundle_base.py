@@ -22,6 +22,12 @@ import kwconf
 
 from .generated_layout import generated_manifest_search_roots
 from .generated_layout import latest_manifest_in_roots
+from .bundle_options import BundleOptions
+from .bundle_options import BACKEND_CHOICES
+from .bundle_options import DEFAULT_BACKEND
+from .bundle_options import PLOT_FORMATS
+from .bundle_options import RENDER_AUDIO_MODES
+from .bundle_options import RUNTIME_STEM_GAIN_MODES
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
 from .._paths import agent_root as _agent_root
@@ -31,94 +37,25 @@ from .._paths import project_root as _project_root
 from .._paths import repo_root as _repo_root
 from .._paths import score_candidates as _score_candidates
 
-DEFAULT_BACKEND = "pretty-midi"
-BACKEND_CHOICES = ("pretty-midi", "fluidsynth-cli", "fallback", "auto")
-RUNTIME_STEM_GAIN_MODES = ("native", "shared")
-PLOT_FORMATS = ("jpg", "png")
-RENDER_AUDIO_MODES = ("full", "full-mix-only", "simple-mix")
 REPORT_ZIP_EXCLUDED_SUFFIXES = {".ogg", ".oga", ".wav", ".flac", ".mp3", ".npy", ".mid", ".midi"}
 DBFS_SILENCE_FLOOR = -120.0
 DBFS_PLOT_FLOOR = -100.0
 REPORT_PLOT_DPI = 96
 
 
-class CueBundleConfig(kwconf.Config):
-    """kwconf-backed configuration for ``cue_bundle``.
+class CueBundleConfig(BundleOptions):
+    """kwconf-backed single-cue configuration for ``cue bundle``.
 
-    This is the single source of truth for Python-callable and CLI bundle options.
+    Shared per-cue knobs live on :class:`BundleOptions`; this adds the single
+    positional ``cue`` and a render-worker ``jobs`` count.
     """
 
-
     cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
-    backend: str = kwconf.Value(DEFAULT_BACKEND, choices=BACKEND_CHOICES)
-    runtime_stem_gain_mode: str = kwconf.Value(
-        "native",
-        choices=RUNTIME_STEM_GAIN_MODES,
-        help=(
-            "runtime adaptive stem export mode: native preserves current raw "
-            "levels; shared applies one shared reference gain across all stems"
-        ),
-    )
-    runtime_stem_max_gain_db: float | None = kwconf.Value(
-        None,
-        help="cap shared runtime stem gain; default is renderer policy or YAML render.runtime_stems.max_gain_db",
-    )
-    outdir: Path | None = kwconf.Value(None, parser=Path)
-    bundle_root: Path | None = kwconf.Value(None, parser=Path)
-    force: bool = kwconf.Flag(False, help="force render regeneration")
-    publish: bool = kwconf.Flag(False, help="publish full.ogg to game assets after rendering")
-    dest_root: Path | None = kwconf.Value(None, parser=Path, help="game music generated asset root")
-    zip_bundle: bool = kwconf.Flag(
-        False,
-        alias=["zip"],
-        help="write a complete uploadable bundle zip including manifest-referenced audio",
-    )
-    zip_report_bundle: bool = kwconf.Flag(
-        False,
-        alias=["zip_report"],
-        help="write a compact report zip excluding OGG/WAV/NPY/MIDI binaries",
-    )
-    plot_format: str = kwconf.Value(
-        "jpg",
-        choices=PLOT_FORMATS,
-        help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
-    )
-    jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
     jobs: int = kwconf.Value(1, short_alias=["j"], help="render worker count")
-    include_scratch_stems: bool = kwconf.Flag(
-        False,
-        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
-    )
-    skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
-    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; disabled by default for fast listening renders")
-    all_audits: bool = kwconf.Flag(False, help="run full diagnostic audits, transition analysis, and plots")
-    render_audio_mode: str = kwconf.Value(
-        "full",
-        choices=RENDER_AUDIO_MODES,
-        help=(
-            "audio export scope for render_isolated. full preserves all adaptive "
-            "stem/state preview OGGs; full-mix-only keeps scratch stems plus "
-            "mastered preview and section full mixes; simple-mix writes only the "
-            "mastered preview."
-        ),
-    )
-    profile_render: bool = kwconf.Flag(
-        False,
-        help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",
-    )
-    render_in_process: bool = kwconf.Flag(
-        False,
-        help="debug/profiling mode: import and run render_isolated instead of launching it as a subprocess",
-    )
-    json: bool = kwconf.Flag(False, help="print the full bundle JSON payload to stdout")
 
     def __post_init__(self) -> None:
+        super().__post_init__()
         self.jobs = int(self.jobs)
-        self.jpeg_quality = int(self.jpeg_quality)
-        for key in ("outdir", "bundle_root", "dest_root"):
-            value = getattr(self, key)
-            if value is not None and not isinstance(value, Path):
-                setattr(self, key, Path(value))
 
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
