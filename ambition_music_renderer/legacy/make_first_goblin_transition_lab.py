@@ -479,10 +479,13 @@ class FirstGoblinTransitionLabConfig(kwconf.Config):
     output: Path = kwconf.Value(DEFAULT_OUTPUT, parser=Path)
     force: bool = kwconf.Flag(False, help="overwrite an existing experiment score")
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = FirstGoblinTransitionLabConfig.cli(argv=argv)
+def run(args: FirstGoblinTransitionLabConfig) -> int:
     if args.output.exists() and not args.force:
         rich_print(f"[yellow]kept existing experiment score[/yellow] {path_link(args.output)}")
         return 0
@@ -499,4 +502,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(FirstGoblinTransitionLabConfig.main())

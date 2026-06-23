@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import csv
 import math
@@ -18,8 +20,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
-import numpy as np
-import soundfile as sf
+np = lazy.load("numpy")
+sf = lazy.load("soundfile")
 
 try:
     from rich import print as rich_print
@@ -757,12 +759,13 @@ class TransitionAuditConfig(kwconf.Config):
     envelope_window_ms: float = kwconf.Value(80.0)
     envelope_hop_ms: float = kwconf.Value(20.0)
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = TransitionAuditConfig.cli(argv=argv)
-
-
+def run(args: TransitionAuditConfig) -> int:
     root = args.root.resolve()
     outdir = (args.outdir or (root / "transition_audit")).resolve()
     section_a, section_b = args.sections
@@ -894,4 +897,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(TransitionAuditConfig.main())

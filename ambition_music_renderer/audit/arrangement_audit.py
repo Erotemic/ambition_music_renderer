@@ -17,6 +17,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import json
 import math
@@ -24,11 +26,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import pretty_midi
-
-from ..render.score_core import load_yaml
-from ..render.score_layers import build_score
-from ..render.score_theory import chord_for_bar, chord_pitches
+pretty_midi = lazy.load("pretty_midi")
 
 
 @profile
@@ -38,6 +36,8 @@ def _round3(value: float) -> float:
 
 @profile
 def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
+    from ..render.score_layers import build_score
+
     pm, groups, _section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -76,6 +76,8 @@ def _section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | 
 
 @profile
 def _chord_pcs(spec: dict[str, Any], bar0: int) -> set[int]:
+    from ..render.score_theory import chord_for_bar, chord_pitches
+
     section, local_bar = _section_for_bar(spec, bar0)
     if not section:
         return set()
@@ -410,6 +412,8 @@ def write_reports(payload: dict[str, Any], reports_dir: Path) -> dict[str, str]:
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_rows: int = 40) -> dict[str, Any]:
+    from ..render.score_core import load_yaml
+
     return audit_spec(load_yaml(path), bucket_beats=bucket_beats, max_rows=max_rows)
 
 
@@ -423,12 +427,13 @@ class ArrangementAuditConfig(kwconf.Config):
     max_rows: int = kwconf.Value(40)
     json: bool = kwconf.Flag(False)
 
-
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = ArrangementAuditConfig.cli(argv=argv)
+def run(args: ArrangementAuditConfig) -> int:
     payload = audit_file(args.score, bucket_beats=args.bucket_beats, max_rows=args.max_rows)
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir)
@@ -440,4 +445,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(ArrangementAuditConfig.main())

@@ -131,10 +131,13 @@ class InstallFirstGoblinTuneConfig(kwconf.Config):
     clean: bool = kwconf.Flag(False, help="Wipe destination directory first")
     with_stems: bool = kwconf.Flag(False, help="Also require/install per-stem OGGs")
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = InstallFirstGoblinTuneConfig.cli(argv=argv)
+def run(args: InstallFirstGoblinTuneConfig) -> int:
     src = Path(args.src).resolve()
     if not (src / "adaptive").exists():
         print(f"error: no adaptive directory at {src}", file=sys.stderr)
@@ -167,4 +170,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(InstallFirstGoblinTuneConfig.main())

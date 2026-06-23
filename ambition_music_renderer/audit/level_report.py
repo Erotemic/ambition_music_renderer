@@ -24,15 +24,16 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import sys
 from pathlib import Path
 
 from .._paths import repo_root
 
-import numpy as np
-import soundfile as sf
-from scipy.signal import resample_poly
+np = lazy.load("numpy")
+sf = lazy.load("soundfile")
 
 from .transition_audit import db, peak, rms
 
@@ -40,10 +41,14 @@ REPO_ROOT = repo_root()
 DEFAULT_ROOT = REPO_ROOT / "crates/ambition_gameplay_core/assets/audio/music/generated"
 CLIP_DBTP = -1.0  # ITU true-peak ceiling convention; above this we flag.
 
-try:
-    import pyloudnorm as _pyln
-except Exception:  # pragma: no cover - optional dependency
-    _pyln = None
+
+def _load_pyloudnorm():
+    """Return the optional ``pyloudnorm`` module, or None when unavailable."""
+    try:
+        import pyloudnorm
+    except Exception:  # pragma: no cover - optional dependency
+        return None
+    return pyloudnorm
 
 
 @profile
@@ -59,15 +64,18 @@ def true_peak_dbtp(audio: np.ndarray, oversample: int = 4) -> float:
     """Inter-sample (true) peak in dBTP via integer oversampling."""
     if audio.size == 0:
         return db(0.0)
+    from scipy.signal import resample_poly
+
     up = resample_poly(audio, oversample, 1, axis=0)
     return db(peak(up))
 
 
 @profile
 def integrated_lufs(audio: np.ndarray, sample_rate: int) -> float | None:
-    if _pyln is None:
+    pyln = _load_pyloudnorm()
+    if pyln is None:
         return None
-    meter = _pyln.Meter(sample_rate)
+    meter = pyln.Meter(sample_rate)
     return float(meter.integrated_loudness(audio))
 
 
@@ -167,10 +175,13 @@ class LevelReportConfig(kwconf.Config):
     format: str = kwconf.Value("table", choices=["table", "tsv"])
     check: bool = kwconf.Flag(False)
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = LevelReportConfig.cli(argv=argv)
+def run(args: LevelReportConfig) -> int:
     paths = sorted(args.root.glob(args.glob))
     if not paths:
         print(f"no audio matched {args.root}/{args.glob}", file=sys.stderr)
@@ -178,7 +189,7 @@ def main(argv: list[str] | None = None) -> int:
 
     rows = [analyze(p) for p in paths]
     print(render(rows, args.target_rms_db, args.rms_tol, args.format == "tsv"))
-    if _pyln is None:
+    if _load_pyloudnorm() is None:
         print("\n(install pyloudnorm for an integrated-LUFS column)", file=sys.stderr)
     if args.check:
         clipping = [r for r in rows if r["true_peak_dbtp"] > CLIP_DBTP]
@@ -195,4 +206,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(LevelReportConfig.main())

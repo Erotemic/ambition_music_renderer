@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import json
 import math
@@ -19,21 +21,33 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import pretty_midi
+pretty_midi = lazy.load("pretty_midi")
 
-from ..render.score_core import load_yaml
 from .sour_note_audit import _events_for_spec, _section_for_bar, _section_starts, _source_hint
 
-try:  # Optional plotting dependency.
-    import matplotlib
+# Optional plotting dependency, loaded on first use so importing this module
+# stays cheap (matplotlib is the single heaviest import in the audit package).
+plt = None
+HAS_MATPLOTLIB: bool | None = None
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
 
-    HAS_MATPLOTLIB = True
-except Exception:  # pragma: no cover - plotting is best-effort.
-    plt = None
-    HAS_MATPLOTLIB = False
+def _ensure_matplotlib() -> bool:
+    """Import matplotlib lazily; return whether plotting is available."""
+    global plt, HAS_MATPLOTLIB
+    if HAS_MATPLOTLIB is not None:
+        return HAS_MATPLOTLIB
+    try:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as _plt
+
+        plt = _plt
+        HAS_MATPLOTLIB = True
+    except Exception:  # pragma: no cover - plotting is best-effort.
+        plt = None
+        HAS_MATPLOTLIB = False
+    return HAS_MATPLOTLIB
 
 PRESENCE_HZ = 4000.0
 PIERCING_HZ = 6000.0
@@ -300,7 +314,7 @@ def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 
 
 @profile
 def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     candidates = payload.get("candidates", [])
     if not candidates:
@@ -333,7 +347,7 @@ def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: st
 
 @profile
 def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     rows = payload.get("top_layers", [])[:12]
     if not rows:
@@ -443,6 +457,8 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, min_frequency_hz: float = PRESENCE_HZ, max_candidates: int = 120) -> dict[str, Any]:
+    from ..render.score_core import load_yaml
+
     return audit_spec(load_yaml(path), min_frequency_hz=min_frequency_hz, max_candidates=max_candidates)
 
 
@@ -458,12 +474,13 @@ class ShrillNoteAuditConfig(kwconf.Config):
     plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
     json: bool = kwconf.Flag(False)
 
-
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = ShrillNoteAuditConfig.cli(argv=argv)
+def run(args: ShrillNoteAuditConfig) -> int:
     payload = audit_file(
         args.score,
         min_frequency_hz=args.min_frequency_hz,
@@ -479,4 +496,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(ShrillNoteAuditConfig.main())

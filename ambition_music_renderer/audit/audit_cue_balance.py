@@ -5,14 +5,16 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import math
 from pathlib import Path
 
 from .._paths import output_root
 
-import numpy as np
-import soundfile as sf
+np = lazy.load("numpy")
+sf = lazy.load("soundfile")
 
 
 @profile
@@ -61,10 +63,13 @@ class AuditCueBalanceConfig(kwconf.Config):
 
     root: Path = kwconf.Value(DEFAULT_ROOT, position=1, parser=Path, nargs="?")
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = AuditCueBalanceConfig.cli(argv=argv)
+def run(args: AuditCueBalanceConfig) -> int:
     root = Path(args.root).resolve()
     if not root.exists():
         raise SystemExit(f"missing root: {root}")
@@ -85,4 +90,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(AuditCueBalanceConfig.main())

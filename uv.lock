@@ -6,16 +6,13 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
-[options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
-exclude-newer-span = "P1D"
-
 [[package]]
 name = "ambition-music-renderer"
 version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "kwconf" },
+    { name = "lazy-loader" },
     { name = "midiutil" },
     { name = "mido" },
     { name = "music21" },
@@ -65,6 +62,7 @@ requires-dist = [
     { name = "ambition-music-renderer", extras = ["optional"], marker = "extra == 'all'" },
     { name = "dawdreamer", marker = "extra == 'optional'" },
     { name = "kwconf", specifier = ">=0.10.0" },
+    { name = "lazy-loader" },
     { name = "line-profiler", marker = "extra == 'dev'" },
     { name = "midiutil" },
     { name = "mido" },
@@ -769,6 +767,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a8/60/8c9001edf2683355343806382c2606890c3ccb6373ee17b821e7f1b3141e/kwconf-0.10.0.tar.gz", hash = "sha256:eb4bd0586fc2fd015d5738d65231163a81840815235fc588d13dcc139a843239", size = 118990, upload-time = "2026-06-19T17:39:19.744Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/84/19e8037d5d99896a48bf94d85199edba4f331c92a82a2d3ccbb35c431ebd/kwconf-0.10.0-py3-none-any.whl", hash = "sha256:f4ef2dd871748acdf565de61bfbcca028b9736de37ff2d6483757a114bdbde49", size = 92221, upload-time = "2026-06-19T17:39:17.929Z" },
+]
+
+[[package]]
+name = "lazy-loader"
+version = "0.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/49/ac/21a1f8aa3777f5658576777ea76bfb124b702c520bbe90edf4ae9915eafa/lazy_loader-0.5.tar.gz", hash = "sha256:717f9179a0dbed357012ddad50a5ad3d5e4d9a0b8712680d4e687f5e6e6ed9b3", size = 15294, upload-time = "2026-03-06T15:45:09.054Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8a/a1/8d812e53a5da1687abb10445275d41a8b13adb781bbf7196ddbcf8d88505/lazy_loader-0.5-py3-none-any.whl", hash = "sha256:ab0ea149e9c554d4ffeeb21105ac60bed7f3b4fd69b1d2360a4add51b170b005", size = 8044, upload-time = "2026-03-06T15:45:07.668Z" },
 ]
 
 [[package]]

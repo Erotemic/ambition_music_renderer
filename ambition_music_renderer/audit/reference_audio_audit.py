@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import json
 import math
@@ -18,7 +20,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-import numpy as np
+np = lazy.load("numpy")
 
 BANDS = [
     ("sub", 20.0, 80.0),
@@ -275,12 +277,13 @@ class ReferenceAudioAuditConfig(kwconf.Config):
     frame_seconds: float = kwconf.Value(0.5)
     plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
 
-
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = ReferenceAudioAuditConfig.cli(argv=argv)
+def run(args: ReferenceAudioAuditConfig) -> int:
     payload = analyze_audio(args.audio, frame_seconds=args.frame_seconds)
     paths = write_reports(payload, args.outdir, plot_format=args.plot_format)
     print(paths["summary"])
@@ -288,4 +291,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(ReferenceAudioAuditConfig.main())

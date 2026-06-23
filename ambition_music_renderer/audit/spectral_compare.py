@@ -14,10 +14,12 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 from pathlib import Path
 
-import numpy as np
+np = lazy.load("numpy")
 
 
 @profile
@@ -53,28 +55,31 @@ class SpectralCompareConfig(kwconf.Config):
     sr: int = kwconf.Value(48000)
     label: str = kwconf.Value("")
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv=None) -> int:
-    ns = SpectralCompareConfig.cli(argv=argv)
-    stems = sorted((ns.cue_outdir / "scratch_stems").glob("*.npy"))
-    t_lo, t_hi = [float(v) for v in ns.window]
+def run(args: SpectralCompareConfig) -> int:
+    stems = sorted((args.cue_outdir / "scratch_stems").glob("*.npy"))
+    t_lo, t_hi = [float(v) for v in args.window]
 
     by_group = {}
     for p in stems:
         name = p.stem.split(".")[-1]
         mono = to_mono(np.load(p))
         by_group[name] = {
-            "mid": band_energy(mono, ns.sr, t_lo, t_hi, 300, 1000),
-            "vhigh": band_energy(mono, ns.sr, t_lo, t_hi, 3000, 6000),
-            "air": band_energy(mono, ns.sr, t_lo, t_hi, 6000, 12000),
+            "mid": band_energy(mono, args.sr, t_lo, t_hi, 300, 1000),
+            "vhigh": band_energy(mono, args.sr, t_lo, t_hi, 3000, 6000),
+            "air": band_energy(mono, args.sr, t_lo, t_hi, 6000, 12000),
         }
 
     total = {b: sum(by_group[g][b] for g in by_group) for b in ("mid", "vhigh", "air")}
     squeak = total["vhigh"] + total["air"]
     ratio = squeak / max(total["mid"], 1e-12)
 
-    label = f"[{ns.label}] " if ns.label else ""
+    label = f"[{args.label}] " if args.label else ""
     print(f"{label}window={t_lo:.1f}-{t_hi:.1f}s")
     print(f"  squeak (vhigh+air absolute):  {squeak:11.3e}")
     print(f"  mid (300-1k absolute):        {total['mid']:11.3e}")
@@ -89,4 +94,4 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(SpectralCompareConfig.main())

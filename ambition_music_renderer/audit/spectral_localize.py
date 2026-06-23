@@ -34,10 +34,12 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 from pathlib import Path
 
-import numpy as np
+np = lazy.load("numpy")
 
 
 DEFAULT_BANDS = {
@@ -117,37 +119,38 @@ class SpectralLocalizeConfig(kwconf.Config):
     sr: int = kwconf.Value(48000, help="Sample rate of stems")
     bands: str = kwconf.Value("default", choices=["default", "vhigh-only"])
 
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    ns = SpectralLocalizeConfig.cli(argv=argv)
-
-
-    stems_dir = ns.cue_outdir / "scratch_stems"
+def run(args: SpectralLocalizeConfig) -> int:
+    stems_dir = args.cue_outdir / "scratch_stems"
     if not stems_dir.is_dir():
-        raise SystemExit(f"no scratch_stems/ under {ns.cue_outdir} — re-render with --keep-debug-stems")
+        raise SystemExit(f"no scratch_stems/ under {args.cue_outdir} — re-render with --keep-debug-stems")
     stems = sorted(stems_dir.glob("*.npy"))
     if not stems:
         raise SystemExit(f"no .npy files under {stems_dir}")
 
     bands = (
-        DEFAULT_BANDS if ns.bands == "default" else {"vhigh (3-6k)": (3000.0, 6000.0)}
+        DEFAULT_BANDS if args.bands == "default" else {"vhigh (3-6k)": (3000.0, 6000.0)}
     )
 
     # Determine track duration from the first stem
     first = np.load(stems[0])
     dur = (
-        first.shape[0] / ns.sr
+        first.shape[0] / args.sr
         if first.ndim == 1
-        else first.shape[-2] / ns.sr
+        else first.shape[-2] / args.sr
         if first.ndim == 2 and first.shape[-1] == 2
-        else len(first) / ns.sr
+        else len(first) / args.sr
     )
-    t_lo, t_hi = ns.window
+    t_lo, t_hi = args.window
     if t_hi < 0:
         t_hi = dur
     print(
-        f"track duration ~{dur:.2f}s, analyzing {t_lo:.2f}-{t_hi:.2f}s @ {ns.bucket}s buckets"
+        f"track duration ~{dur:.2f}s, analyzing {t_lo:.2f}-{t_hi:.2f}s @ {args.bucket}s buckets"
     )
 
     # Stem name = part of filename before .npy and after the cue hash, e.g. ".bass.npy"
@@ -160,7 +163,7 @@ def main(argv: list[str] | None = None) -> int:
     for p in stems:
         mono = to_mono(np.load(p))
         times, energies = time_resolved_band_energy(
-            mono, ns.sr, t_lo, t_hi, ns.bucket, bands
+            mono, args.sr, t_lo, t_hi, args.bucket, bands
         )
         all_data[stem_name(p)] = energies
         times_ref = times
@@ -214,4 +217,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(SpectralLocalizeConfig.main())

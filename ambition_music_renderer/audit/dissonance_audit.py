@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import json
 import math
@@ -21,22 +23,31 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import pretty_midi
+pretty_midi = lazy.load("pretty_midi")
 
-from ..render.score_core import load_yaml
-from ..render.score_layers import build_score
-from ..render.score_theory import chord_for_bar, chord_intervals, note_to_midi
+# Optional plotting dependency, loaded on first use so importing this module
+# stays cheap (matplotlib is the single heaviest import in the audit package).
+plt = None
+HAS_MATPLOTLIB: bool | None = None
 
-try:  # Optional plotting dependency.
-    import matplotlib
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+def _ensure_matplotlib() -> bool:
+    """Import matplotlib lazily; return whether plotting is available."""
+    global plt, HAS_MATPLOTLIB
+    if HAS_MATPLOTLIB is not None:
+        return HAS_MATPLOTLIB
+    try:
+        import matplotlib
 
-    HAS_MATPLOTLIB = True
-except Exception:  # pragma: no cover - plotting is best-effort.
-    plt = None
-    HAS_MATPLOTLIB = False
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as _plt
+
+        plt = _plt
+        HAS_MATPLOTLIB = True
+    except Exception:  # pragma: no cover - plotting is best-effort.
+        plt = None
+        HAS_MATPLOTLIB = False
+    return HAS_MATPLOTLIB
 
 INTERVAL_CLASS_NAMES = {
     0: "unison/octave",
@@ -79,6 +90,8 @@ def _section_for_bar(spec: dict[str, Any], bar: int) -> tuple[dict[str, Any] | N
 
 @profile
 def _chord_for_abs_bar(spec: dict[str, Any], bar: int) -> str:
+    from ..render.score_theory import chord_for_bar
+
     section, local = _section_for_bar(spec, bar)
     if not section:
         return ""
@@ -115,6 +128,8 @@ def _fallback_events(pm: pretty_midi.PrettyMIDI, groups: dict[str, str], bpm: fl
 
 @profile
 def _chord_pitch_classes(chord: str) -> set[int]:
+    from ..render.score_theory import chord_intervals, note_to_midi
+
     try:
         root, intervals, slash_bass = chord_intervals(chord)
         root_pc = note_to_midi(f"{root}4") % 12
@@ -207,6 +222,8 @@ def _active_events(events: list[dict[str, Any]], center_beat: float) -> list[dic
 @profile
 def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
     """Return JSON-serializable dissonance hotspot diagnostics."""
+    from ..render.score_layers import build_score
+
     pm, groups, section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -391,7 +408,7 @@ def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 
 
 @profile
 def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     hotspots = payload.get("hotspots", [])
     if not hotspots:
@@ -416,7 +433,7 @@ def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: st
 
 @profile
 def _write_layer_pair_heatmap(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     rows = payload.get("top_layer_pairs", [])
     if not rows:
@@ -563,7 +580,7 @@ def write_reports(
             paths["timeline_plot"] = str(timeline_path)
         if heatmap_ok:
             paths["layer_pair_plot"] = str(heatmap_path)
-        if plots_dir is not None and not HAS_MATPLOTLIB:
+        if plots_dir is not None and not _ensure_matplotlib():
             warnings = list(payload.get("warnings") or [])
             note = "matplotlib unavailable; skipped dissonance plot generation"
             if note not in warnings:
@@ -578,6 +595,8 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
+    from ..render.score_core import load_yaml
+
     spec = load_yaml(path)
     return audit_spec(spec, bucket_beats=bucket_beats, max_hotspots=max_hotspots)
 
@@ -594,12 +613,13 @@ class DissonanceAuditConfig(kwconf.Config):
     plots: Path | None = kwconf.Value(None, parser=Path, help="optional directory for plot images")
     plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"], help="format for generated plots")
 
-
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = DissonanceAuditConfig.cli(argv=argv)
+def run(args: DissonanceAuditConfig) -> int:
     payload = audit_file(args.score, bucket_beats=args.bucket_beats, max_hotspots=args.max_hotspots)
     outdir = args.outdir or (args.score.parent / "reports")
     paths = write_reports(payload, outdir, plots_dir=args.plots, plot_format=args.plot_format)
@@ -611,4 +631,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(DissonanceAuditConfig.main())

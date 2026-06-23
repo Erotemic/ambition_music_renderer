@@ -23,6 +23,7 @@ dependencies = [
   "kwconf>=0.10.0",
   "rich",
   "pyloudnorm",
+  "lazy_loader",
 ]
 
 [project.optional-dependencies]

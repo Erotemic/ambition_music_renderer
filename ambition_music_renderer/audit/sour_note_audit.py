@@ -15,6 +15,8 @@ from __future__ import annotations
 
 from ..profiler import profile
 
+import lazy_loader as lazy
+
 import kwconf
 import json
 import math
@@ -22,22 +24,31 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import pretty_midi
+pretty_midi = lazy.load("pretty_midi")
 
-from ..render.score_core import load_yaml
-from ..render.score_layers import build_score
-from ..render.score_theory import chord_for_bar, chord_intervals, chord_pitches, note_to_midi
+# Optional plotting dependency, loaded on first use so importing this module
+# stays cheap (matplotlib is the single heaviest import in the audit package).
+plt = None
+HAS_MATPLOTLIB: bool | None = None
 
-try:  # Optional plotting dependency.
-    import matplotlib
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+def _ensure_matplotlib() -> bool:
+    """Import matplotlib lazily; return whether plotting is available."""
+    global plt, HAS_MATPLOTLIB
+    if HAS_MATPLOTLIB is not None:
+        return HAS_MATPLOTLIB
+    try:
+        import matplotlib
 
-    HAS_MATPLOTLIB = True
-except Exception:  # pragma: no cover - plotting is best-effort.
-    plt = None
-    HAS_MATPLOTLIB = False
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as _plt
+
+        plt = _plt
+        HAS_MATPLOTLIB = True
+    except Exception:  # pragma: no cover - plotting is best-effort.
+        plt = None
+        HAS_MATPLOTLIB = False
+    return HAS_MATPLOTLIB
 
 PC_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 MAJOR_SCALE = {0, 2, 4, 5, 7, 9, 11}
@@ -100,6 +111,8 @@ def _section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | 
 
 @profile
 def _chord_for_abs_bar(spec: dict[str, Any], bar0: int) -> str:
+    from ..render.score_theory import chord_for_bar
+
     section, local = _section_for_bar(spec, bar0)
     if not section:
         return ""
@@ -108,6 +121,8 @@ def _chord_for_abs_bar(spec: dict[str, Any], bar0: int) -> str:
 
 @profile
 def _chord_pcs(chord: str) -> set[int]:
+    from ..render.score_theory import chord_pitches
+
     try:
         return {int(p) % 12 for p in chord_pitches(chord, octave=4, voicing="closed")}
     except Exception:
@@ -116,6 +131,8 @@ def _chord_pcs(chord: str) -> set[int]:
 
 @profile
 def _chord_root_pc(chord: str) -> int | None:
+    from ..render.score_theory import chord_intervals, note_to_midi
+
     try:
         root, _intervals, _slash = chord_intervals(chord)
         return note_to_midi(f"{root}4") % 12
@@ -173,6 +190,8 @@ def _state_weights(spec: dict[str, Any], state: str = "default") -> dict[str, fl
 
 @profile
 def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
+    from ..render.score_layers import build_score
+
     pm, groups, _section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -306,6 +325,8 @@ def _source_hint(
     section_starts: dict[str, int],
     beats_per_bar: float,
 ) -> tuple[str, int | None, int | None, Any]:
+    from ..render.score_theory import chord_for_bar
+
     templates = _layer_templates(spec)
     layer_name = str(ev.get("layer") or "?")
     layer = templates.get(layer_name, {})
@@ -332,6 +353,8 @@ def _sample_contexts(
     section_keys: dict[str, dict[str, Any]],
     bucket_beats: float,
 ) -> list[dict[str, Any]]:
+    from ..render.score_theory import chord_for_bar
+
     start = float(ev.get("start_beat", 0.0))
     end = float(ev.get("end_beat", start))
     if end <= start:
@@ -593,7 +616,7 @@ def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 
 
 @profile
 def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     candidates = payload.get("candidates", [])
     if not candidates:
@@ -620,7 +643,7 @@ def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: st
 
 @profile
 def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not HAS_MATPLOTLIB:
+    if not _ensure_matplotlib():
         return False
     rows = payload.get("top_layers", [])[:12]
     if not rows:
@@ -729,6 +752,8 @@ def write_reports(
 
 @profile
 def audit_file(path: Path, *, bucket_beats: float = 0.25, max_candidates: int = 80, min_score: float = 0.28) -> dict[str, Any]:
+    from ..render.score_core import load_yaml
+
     return audit_spec(load_yaml(path), bucket_beats=bucket_beats, max_candidates=max_candidates, min_score=min_score)
 
 
@@ -745,12 +770,13 @@ class SourNoteAuditConfig(kwconf.Config):
     plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
     json: bool = kwconf.Flag(False)
 
-
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
 
 @profile
-def main(argv: list[str] | None = None) -> int:
-    args = SourNoteAuditConfig.cli(argv=argv)
+def run(args: SourNoteAuditConfig) -> int:
     payload = audit_file(
         args.score,
         bucket_beats=args.bucket_beats,
@@ -767,4 +793,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(SourNoteAuditConfig.main())
