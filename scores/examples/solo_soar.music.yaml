@@ -16,7 +16,7 @@ constraints:
 render:
   sample_rate: 48000
   ogg_quality: 6
-  backend: fast
+  backend: pretty-midi
   soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
   adaptive_section_mastering:
     mode: global_master_slices
@@ -588,7 +588,11 @@ layer_templates:
       - 2.0
       - up
     every_bars: 1
-    duration_beats: 3.15
+    # Chords change every bar (4 beats); a 3.15-beat ring let each strum sustain
+    # ~2 beats into the NEXT bar's chord, holding the old harmony into the new
+    # one — the relentless beat-3 minor-2nd clash that read as "out of tune".
+    # Ring to just shy of the next strum/bar-line instead.
+    duration_beats: 1.95
     spread_ms: 44
     max_span: 5
     max_notes: 5
