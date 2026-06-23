@@ -95,8 +95,9 @@ ALIASES: dict[str, SfzLibraryAlias] = {
     "bass.electric": SfzLibraryAlias(
         ref="bass.electric",
         required_any=(("electric", "bass"), ("bass", "guitar"), ("growlybass",), ("swagbass",), ("fashionbass",), ("pastabass",)),
-        prefer=("growlybass", "swagbass", "finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
-        avoid=("slap", "mute", "noise", "trombone", "tuba", "brass", "cello", "orchestra", "strings"),
+        prefer=("clean", "growlybass", "swagbass", "finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
+        avoid=("slap", "mute", "noise", "trombone", "tuba", "brass", "cello", "orchestra", "strings",
+               "angry", "dirty", "vicious", "excessive", "strange", "shifty", "distort"),
     ),
     "drums.rock": SfzLibraryAlias(
         ref="drums.rock",
@@ -128,8 +129,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
     "bass.growly": SfzLibraryAlias(
         ref="bass.growly",
         required_any=(("growlybass",), ("growly", "bass")),
-        prefer=("finger", "sustain", "sus", "growly", "bass"),
-        avoid=("slap", "mute", "noise"),
+        # Growlybass ships 7 programs (clean / dirty / angry / vicious / excessive
+        # / strange / shifty). 'clean' is the usable finger-bass; the rest are
+        # distortion/character variants that read as "broken" for a normal bass.
+        prefer=("clean", "finger", "sustain", "sus", "growly", "bass"),
+        avoid=("slap", "mute", "noise", "angry", "dirty", "vicious", "excessive",
+               "strange", "shifty", "distort"),
     ),
     "bass.swag": SfzLibraryAlias(
         ref="bass.swag",

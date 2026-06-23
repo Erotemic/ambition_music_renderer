@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import logging
+import re
 import shlex
 import shutil
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +17,88 @@ from ..audio_utils import coerce_stereo
 import pretty_midi
 import soundfile as sf
 from scipy import signal
+
+log = logging.getLogger("ambition_music_renderer.sfizz")
+
+_NOTE_RE = re.compile(r"^([a-gA-G])([#b]?)(-?\d+)$")
+_KEY_OPCODE_RE = re.compile(r"\b(lokey|hikey|key|pitch_keycenter)\s*=\s*([A-Ga-g#b\-0-9]+)")
+
+
+def _note_to_midi(tok: str) -> int | None:
+    """Parse an SFZ key value (a MIDI number or a note name like 'c3'/'f#2')."""
+    tok = tok.strip()
+    if not tok:
+        return None
+    if tok.lstrip("-").isdigit():
+        return int(tok)
+    m = _NOTE_RE.match(tok)
+    if not m:
+        return None
+    step = {"c": 0, "d": 2, "e": 4, "f": 5, "g": 7, "a": 9, "b": 11}[m.group(1).lower()]
+    step += {"#": 1, "b": -1, "": 0}[m.group(2)]
+    # SFZ/sfizz convention: c4 == MIDI 60 (so octave offset is +1).
+    return step + (int(m.group(3)) + 1) * 12
+
+
+@lru_cache(maxsize=64)
+def sfz_key_span(sfz_path: str) -> tuple[int, int] | None:
+    """The lowest..highest playable key across an SFZ's regions.
+
+    Parsed leniently from the raw text (lokey/hikey/key/pitch_keycenter on any
+    line, including ``#include`` bodies we can read).  Returns None if nothing
+    parseable is found, so callers can skip range handling.
+    """
+    try:
+        text = Path(sfz_path).read_text(errors="ignore")
+    except OSError:
+        return None
+    base = Path(sfz_path).parent
+    for inc in re.findall(r'#include\s+"([^"]+)"', text):
+        try:
+            text += "\n" + (base / inc.replace("\\", "/")).read_text(errors="ignore")
+        except OSError:
+            pass
+    los: list[int] = []
+    his: list[int] = []
+    for op, val in _KEY_OPCODE_RE.findall(text):
+        midi = _note_to_midi(val)
+        if midi is None:
+            continue
+        if op in ("lokey", "key", "pitch_keycenter"):
+            los.append(midi)
+        if op in ("hikey", "key", "pitch_keycenter"):
+            his.append(midi)
+    if not los or not his:
+        return None
+    return (min(los), max(his))
+
+
+def fold_pm_into_key_span(pm: pretty_midi.PrettyMIDI, span: tuple[int, int]) -> int:
+    """Octave-fold notes that fall outside ``span`` back into it, in place.
+
+    A sampled instrument only has samples across its real range; notes authored
+    below the lowest string (or above the top) would otherwise drop to silence.
+    Shifting them by whole octaves keeps the pitch class and the line intact —
+    what a player does when a note is out of the instrument's reach.  Returns the
+    number of notes shifted.
+    """
+    lo, hi = span
+    if hi - lo < 11:  # too narrow to fold sensibly (e.g. a one-key percussion map)
+        return 0
+    shifted = 0
+    for inst in pm.instruments:
+        if inst.is_drum:
+            continue
+        for note in inst.notes:
+            p = note.pitch
+            while p < lo:
+                p += 12
+            while p > hi:
+                p -= 12
+            if p != note.pitch:
+                note.pitch = p
+                shifted += 1
+    return shifted
 
 
 def resolve_path(path: str | Path, *, base_dir: Path | None = None) -> Path:
@@ -72,6 +157,22 @@ def _render_sfizz_cli(
         )
     midi_path = tempdir / f"{output_name}.sfizz.mid"
     wav_path = tempdir / f"{output_name}.sfizz.wav"
+    # Octave-fold notes that fall outside the SFZ's sampled key range, unless the
+    # caller opts out. Sampled instruments only cover their real range, so an
+    # authored sub-bass part (e.g. octave 1) would otherwise drop to silence on a
+    # library whose lowest string is ~C2.
+    if settings.get("fold_to_range", True):
+        span = sfz_key_span(str(sfz))
+        if span is not None:
+            shifted = fold_pm_into_key_span(pm, span)
+            if shifted:
+                log.warning(
+                    "%s: octave-folded %d note(s) into the SFZ range %s..%s (%s..%s); "
+                    "the part was authored partly outside this sampled instrument's reach.",
+                    output_name, shifted, span[0], span[1],
+                    pretty_midi.note_number_to_name(span[0]),
+                    pretty_midi.note_number_to_name(span[1]),
+                )
     pm.write(str(midi_path))
     mapping = {
         "binary": binary,
