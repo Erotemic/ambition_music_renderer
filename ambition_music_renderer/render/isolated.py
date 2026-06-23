@@ -27,7 +27,7 @@ from pathlib import Path
 import kwconf
 import numpy as np
 import yaml
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio

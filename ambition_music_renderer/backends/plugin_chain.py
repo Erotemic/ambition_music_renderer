@@ -12,17 +12,7 @@ from typing import Any
 import sys
 
 import numpy as np
-
-
-def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
-    x = np.asarray(audio, dtype=np.float32)
-    if x.ndim == 1:
-        x = np.column_stack([x, x])
-    if x.shape[1] == 1:
-        x = np.column_stack([x[:, 0], x[:, 0]])
-    if x.shape[1] > 2:
-        x = x[:, :2]
-    return x.astype(np.float32, copy=False)
+from ..audio_utils import coerce_stereo
 
 
 def _step_kind(spec: dict[str, Any]) -> str:
@@ -56,7 +46,7 @@ def apply_effect_chain(
 ) -> np.ndarray:
     """Apply an explicit cross-backend chain to a stereo audio buffer."""
 
-    out = _coerce_stereo(audio)
+    out = coerce_stereo(audio)
     for idx, raw_spec in enumerate(chain or []):
         spec = dict(raw_spec or {})
         kind = _step_kind(spec)
@@ -89,4 +79,4 @@ def apply_effect_chain(
                 _warn_optional_skip(idx, kind, ex)
                 continue
             raise
-    return _coerce_stereo(out)
+    return coerce_stereo(out)

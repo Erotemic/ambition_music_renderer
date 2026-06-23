@@ -12,7 +12,7 @@ import numpy as np
 import soundfile as sf
 
 from ..profiler import profile
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 
 def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

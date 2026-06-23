@@ -11,17 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-
-
-def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
-    x = np.asarray(audio, dtype=np.float32)
-    if x.ndim == 1:
-        x = np.column_stack([x, x])
-    if x.shape[1] == 1:
-        x = np.column_stack([x[:, 0], x[:, 0]])
-    if x.shape[1] > 2:
-        x = x[:, :2]
-    return x.astype(np.float32, copy=False)
+from .audio_utils import coerce_stereo
 
 
 def peak_dbfs(audio: np.ndarray) -> float:
@@ -32,7 +22,7 @@ def peak_dbfs(audio: np.ndarray) -> float:
 
 
 def peak_limit(audio: np.ndarray, target_peak_db: float) -> np.ndarray:
-    x = _coerce_stereo(audio).copy()
+    x = coerce_stereo(audio).copy()
     peak = float(np.max(np.abs(x))) if x.size else 0.0
     if peak <= 1e-12:
         return x.astype(np.float32)
@@ -48,7 +38,7 @@ def integrated_lufs(audio: np.ndarray, sample_rate: int, block_size: float = 0.4
         import pyloudnorm as pyln  # type: ignore
     except Exception:
         return None
-    x = _coerce_stereo(audio)
+    x = coerce_stereo(audio)
     if len(x) == 0 or float(np.max(np.abs(x))) <= 1e-12:
         return None
     meter = pyln.Meter(int(sample_rate), block_size=float(block_size))
@@ -76,7 +66,7 @@ def normalize_lufs(
             "pyloudnorm is required for target_lufs loudness normalization. "
             "Install the music renderer dependencies or remove target_lufs."
         ) from ex
-    x = _coerce_stereo(audio)
+    x = coerce_stereo(audio)
     if len(x) == 0 or float(np.max(np.abs(x))) <= 1e-12:
         return x.astype(np.float32)
     meter = pyln.Meter(int(sample_rate), block_size=float(block_size))
@@ -103,7 +93,7 @@ def apply_loudness_settings(audio: np.ndarray, sample_rate: int, settings: dict[
         cfg = {"target_lufs": cfg}
     target = cfg.get("target_lufs", settings.get("target_lufs", settings.get("loudness_target_lufs")))
     if target is None:
-        return _coerce_stereo(audio)
+        return coerce_stereo(audio)
     true_peak = cfg.get("true_peak_db", settings.get("true_peak_db", settings.get("loudness_true_peak_db")))
     return normalize_lufs(
         audio,

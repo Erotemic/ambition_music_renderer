@@ -10,23 +10,10 @@ from typing import Any
 
 import mido
 import numpy as np
+from ..audio_utils import coerce_stereo
 import pretty_midi
 import soundfile as sf
 from scipy import signal
-
-
-def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
-    x = np.asarray(audio, dtype=np.float32)
-    if x.ndim == 1:
-        x = np.column_stack([x, x])
-    # Pedalboard returns channel-first audio; SoundFile returns sample-first.
-    if x.ndim == 2 and x.shape[0] in (1, 2) and x.shape[1] > x.shape[0]:
-        x = x.T
-    if x.shape[1] == 1:
-        x = np.column_stack([x[:, 0], x[:, 0]])
-    if x.shape[1] > 2:
-        x = x[:, :2]
-    return x.astype(np.float32, copy=False)
 
 
 def resolve_path(path: str | Path, *, base_dir: Path | None = None) -> Path:
@@ -143,7 +130,7 @@ def _render_sfizz_cli(
         target = int(round(float(minimum_duration) * int(sample_rate)))
         if len(audio) < target:
             audio = np.pad(audio, ((0, target - len(audio)), (0, 0)))
-    return _coerce_stereo(audio)
+    return coerce_stereo(audio)
 
 
 def _midi_messages_for_pedalboard(pm: pretty_midi.PrettyMIDI) -> list[mido.Message]:
@@ -283,7 +270,7 @@ def _render_sfizz_vst3(
         buffer_size=int(settings.get("buffer_size", 8192)),
         reset=True,
     )
-    return _coerce_stereo(audio)
+    return coerce_stereo(audio)
 
 
 def render_sfizz(

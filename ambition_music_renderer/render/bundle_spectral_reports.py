@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 from .bundle_base import (
     DBFS_PLOT_FLOOR,
     DBFS_SILENCE_FLOOR,

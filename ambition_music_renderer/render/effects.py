@@ -12,7 +12,7 @@ import numpy as np
 from scipy import signal
 
 from ..profiler import profile
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 from .score_theory import clamp
 
 @profile

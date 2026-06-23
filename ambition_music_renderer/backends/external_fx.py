@@ -16,19 +16,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from ..audio_utils import coerce_stereo
 import soundfile as sf
 from scipy import signal
-
-
-def _coerce_stereo(audio: np.ndarray) -> np.ndarray:
-    x = np.asarray(audio, dtype=np.float32)
-    if x.ndim == 1:
-        x = np.column_stack([x, x])
-    if x.shape[1] == 1:
-        x = np.column_stack([x[:, 0], x[:, 0]])
-    if x.shape[1] > 2:
-        x = x[:, :2]
-    return x.astype(np.float32, copy=False)
 
 
 def _format_command(template: str | list[str], mapping: dict[str, str]) -> list[str]:
@@ -44,7 +34,7 @@ def _run_file_command(audio: np.ndarray, sample_rate: int, spec: dict[str, Any])
         tempdir = Path(d)
         input_path = tempdir / "input.wav"
         output_path = tempdir / "output.wav"
-        sf.write(input_path, _coerce_stereo(audio), int(sample_rate), subtype="PCM_24")
+        sf.write(input_path, coerce_stereo(audio), int(sample_rate), subtype="PCM_24")
         mapping = {
             "input": str(input_path),
             "output": str(output_path),
@@ -77,11 +67,11 @@ def _run_file_command(audio: np.ndarray, sample_rate: int, spec: dict[str, Any])
         out, sr = sf.read(output_path, dtype="float32", always_2d=True)
         if sr != int(sample_rate):
             out = signal.resample_poly(out, int(sample_rate), int(sr), axis=0).astype(np.float32)
-        return _coerce_stereo(out)
+        return coerce_stereo(out)
 
 
 def apply_external_effects(audio: np.ndarray, sample_rate: int, effects: list[dict[str, Any]]) -> np.ndarray:
-    out = _coerce_stereo(audio)
+    out = coerce_stereo(audio)
     for spec in effects or []:
         out = _run_file_command(out, sample_rate, spec)
-    return _coerce_stereo(out)
+    return coerce_stereo(out)

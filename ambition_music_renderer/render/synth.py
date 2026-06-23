@@ -17,7 +17,7 @@ import soundfile as sf
 from scipy import signal
 
 from ..profiler import profile
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 from .score_core import RENDERER_VERSION
 
 def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:

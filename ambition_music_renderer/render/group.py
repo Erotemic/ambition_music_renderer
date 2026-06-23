@@ -16,7 +16,7 @@ import pretty_midi
 
 from ..profiler import profile
 from ..instrument_libraries import resolve_sfz_reference
-from .audio_utils import coerce_stereo
+from ..audio_utils import coerce_stereo
 from .effects import post_process
 from .export import write_ogg_from_audio
 from .score_core import RENDERER_VERSION, choose_soundfont, load_yaml
@@ -114,6 +114,22 @@ def _warn_instrument_backend_once(key: str, message: str) -> None:
     print(f"[ambition_music_renderer] {message}", file=sys.stderr)
 
 
+# A noted instrument that renders below this peak is treated as a failed render
+# (missing SFZ samples, an unmet keyswitch/CC, or an out-of-range part), not as
+# legitimately quiet audio: even a ppp note peaks well above -70 dBFS. This is a
+# cheap guard on the in-memory buffer; deeper analysis belongs in a post-render
+# audit.
+_SILENT_RENDER_PEAK = 10 ** (-70.0 / 20.0)
+
+
+def _instrument_has_notes(pm: pretty_midi.PrettyMIDI) -> bool:
+    return any(inst.notes for inst in pm.instruments)
+
+
+def _is_effectively_silent(audio: np.ndarray) -> bool:
+    return audio.size == 0 or float(np.max(np.abs(audio))) < _SILENT_RENDER_PEAK
+
+
 def _instrument_prefers_sfizz(inst_backend: dict[str, Any]) -> bool:
     kind = str(inst_backend.get("kind", "")).lower().strip()
     return kind in {"sfz", "sfizz", "sample", "sampled"} or any(
@@ -178,9 +194,16 @@ def render_group_audio(
         from ..backends.sfizz_backend import render_sfizz
 
         default_fallback_backend = str(sfizz_cfg.get("fallback_backend", render_cfg.get("sfizz_fallback_backend", "auto")))
+        # Strict mode (render.strict_backends) turns every backend failure /
+        # silent render into a hard error instead of warn-and-fallback. The
+        # default is forgiving so one bad SFZ never silently drops a whole stem,
+        # but it always warns loudly so the author can fix the SFZ or make the
+        # fallback that instrument's real backend.
+        strict_backends = bool(render_cfg.get("strict_backends", render_cfg.get("strict_instruments", False)))
         rendered: list[np.ndarray] = []
         for idx, inst in enumerate(insts):
             inst_backend = instrument_backend_spec(instrument_specs, inst.name)
+            allow_fallback = _is_optional_instrument_backend(inst_backend) and not strict_backends
             fallback_backend_name = str(inst_backend.get("fallback_backend", default_fallback_backend))
             inst_pm = copy_with_instruments(pm, [inst], bpm)
             sfz_path = _resolve_instrument_sfz(inst_backend, base_dir=base_dir, sfizz_cfg=sfizz_cfg)
@@ -192,33 +215,52 @@ def render_group_audio(
                 if "binary" in inst_backend:
                     settings["binary"] = inst_backend["binary"]
                 try:
-                    rendered.append(
-                        render_sfizz(
-                            inst_pm,
-                            sfz_path=sfz_path,
-                            sample_rate=sample_rate,
-                            tempdir=tempdir,
-                            output_name=f"group_{group}.{idx}.{inst.name}",
-                            minimum_duration=minimum_duration,
-                            base_dir=base_dir,
-                            settings=settings,
-                        )
+                    sfizz_audio = render_sfizz(
+                        inst_pm,
+                        sfz_path=sfz_path,
+                        sample_rate=sample_rate,
+                        tempdir=tempdir,
+                        output_name=f"group_{group}.{idx}.{inst.name}",
+                        minimum_duration=minimum_duration,
+                        base_dir=base_dir,
+                        settings=settings,
                     )
-                    continue
                 except Exception as ex:
-                    if not _is_optional_instrument_backend(inst_backend):
+                    if not allow_fallback:
                         raise
                     _warn_instrument_backend_once(
                         f"sfizz-render-failed:{inst.name}:{sfz_path}",
                         f"instrument {inst.name!r} requested SFZ {sfz_path}, but rendering failed; "
                         f"using {fallback_backend_name!r} fallback. reason: {ex}",
                     )
+                else:
+                    # sfizz exits 0 even when it drops every region (missing
+                    # samples) or nothing matches (unmet keyswitch/CC/range),
+                    # yielding silence. Treat that like a failure so the stem is
+                    # not silently lost.
+                    if _instrument_has_notes(inst_pm) and _is_effectively_silent(sfizz_audio):
+                        msg = (
+                            f"instrument {inst.name!r} SFZ {sfz_path} rendered SILENCE despite active "
+                            f"notes (missing samples, or an unmet keyswitch/CC/range)"
+                        )
+                        if not allow_fallback:
+                            raise RuntimeError(msg)
+                        _warn_instrument_backend_once(
+                            f"sfizz-silent:{inst.name}:{sfz_path}",
+                            f"{msg}; using {fallback_backend_name!r} fallback. Fix the SFZ choice or make "
+                            f"{fallback_backend_name!r} this instrument's backend.",
+                        )
+                    else:
+                        rendered.append(sfizz_audio)
+                        continue
             elif wants_sfizz or _instrument_prefers_sfizz(inst_backend):
-                if wants_sfizz and not _is_optional_instrument_backend(inst_backend):
-                    raise FileNotFoundError(
-                        f"backend={backend!r} requires render.sfizz.default_sfz or instrument {inst.name!r} instrument_backend.sfz/library_ref"
-                    )
                 requested = inst_backend.get("library_ref") or inst_backend.get("library") or inst_backend.get("sfz") or sfizz_cfg.get("default_sfz")
+                if (wants_sfizz and not _is_optional_instrument_backend(inst_backend)) or strict_backends:
+                    raise FileNotFoundError(
+                        f"instrument {inst.name!r} requested SFZ library {requested!r}, but no matching .sfz was "
+                        f"found (backend={backend!r}); set render.sfizz.default_sfz or "
+                        f"instrument_backend.sfz/library_ref, or disable render.strict_backends"
+                    )
                 _warn_instrument_backend_once(
                     f"sfz-not-found:{inst.name}:{requested}",
                     f"instrument {inst.name!r} requested SFZ library {requested!r}, but no matching .sfz was found; "
@@ -229,17 +271,26 @@ def render_group_audio(
             dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.dry.wav"
             if fallback_backend_name != "fallback":
                 inst_pm.write(str(midi_path))
-            rendered.append(
-                render_synth_audio(
-                    inst_pm,
-                    fallback_backend_name,
-                    soundfont,
-                    sample_rate,
-                    midi_path,
-                    dry_wav,
-                    minimum_duration,
-                )
+            inst_audio = render_synth_audio(
+                inst_pm,
+                fallback_backend_name,
+                soundfont,
+                sample_rate,
+                midi_path,
+                dry_wav,
+                minimum_duration,
             )
+            # Last-resort guard: even the fallback can render silence if a GM
+            # program is absent from the soundfont. Never drop a noted stem quietly.
+            if _instrument_has_notes(inst_pm) and _is_effectively_silent(inst_audio):
+                msg = (
+                    f"instrument {inst.name!r} rendered SILENCE despite active notes via "
+                    f"{fallback_backend_name!r} backend (check program/soundfont coverage)"
+                )
+                if strict_backends:
+                    raise RuntimeError(msg)
+                _warn_instrument_backend_once(f"instrument-silent:{inst.name}", msg)
+            rendered.append(inst_audio)
         if not rendered:
             return np.zeros((max(1, int(sample_rate * minimum_duration)), 2), dtype=np.float32)
         max_len = max(len(x) for x in rendered)
