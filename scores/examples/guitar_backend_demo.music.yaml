@@ -36,13 +36,15 @@ group_postprocess:
     compressor_ratio: 2.5
     reverb_wet: 0.06
     stereo_width: 0.0
-    # Optional VST3/Pedalboard path:
-    # pedalboard_effects:
-    #   - {effect: distortion, drive_db: 6}
-    #   - {effect: vst3, path: local/plugins/Amp.vst3, parameters: {}}
-    # Optional LV2/NAM/Guitarix path via file command:
-    # external_effects:
-    #   - kind: command
+    # Optional cross-backend effects via the single `effect_chain` surface.
+    # To REPLACE the built-in room with a plugin reverb (instead of stacking),
+    # set `reverb_enabled: false` here and add a reverb step below.
+    # effect_chain:
+    #   - kind: pedalboard
+    #     effects:
+    #       - {effect: distortion, drive_db: 6}
+    #       - {effect: vst3, path: local/plugins/Amp.vst3, parameters: {}}
+    #   - kind: command   # offline NAM/Guitarix/LV2 host
     #     command: [my-offline-amp, --input, "{input}", --output, "{output}"]
   bass:
     highpass_hz: 38

@@ -522,13 +522,18 @@ def post_process(
             makeup_db=float(settings.get("compressor_makeup_db", 0.0)),
             knee_db=float(settings.get("compressor_knee_db", 6.0)),
         )
-    audio = simple_reverb(
-        audio,
-        sample_rate,
-        wet=float(settings.get("reverb_wet", 0.18)),
-        decay=float(settings.get("reverb_decay_seconds", 1.4)),
-        damping_hz=float(settings.get("reverb_damping_hz", 6_000)),
-    )
+    # Built-in room. Skippable so a score can replace it with a Pedalboard/VST
+    # reverb in `effect_chain` instead of stacking on top: set
+    # `reverb_enabled: false` (or `reverb_wet: 0`).
+    reverb_wet = float(settings.get("reverb_wet", 0.18))
+    if settings.get("reverb_enabled", True) and reverb_wet > 0:
+        audio = simple_reverb(
+            audio,
+            sample_rate,
+            wet=reverb_wet,
+            decay=float(settings.get("reverb_decay_seconds", 1.4)),
+            damping_hz=float(settings.get("reverb_damping_hz", 6_000)),
+        )
     # Apply one final brightness control after the room, because undamped
     # reverb can reintroduce fizz on synthetic sources.
     if settings.get("post_reverb_high_shelf_db", 0):
@@ -540,47 +545,16 @@ def post_process(
         )
     audio = stereo_widen(audio, float(settings.get("stereo_width", 0.10)))
 
-    # Optional pro/post-DAW style extensions. These remain opt-in so normal
-    # lightweight renders do not need Pedalboard, LV2, Guitarix, NAM, or any
-    # local plugin inventory. Prefer the explicit cross-backend `effect_chain`
-    # surface for new work; legacy `pedalboard_effects` and `external_effects`
-    # are still supported.
-    effect_chain = settings.get("effect_chain") or settings.get("effects_chain") or []
+    # Optional cross-backend effects. `effect_chain` is the single explicit
+    # surface for pro-audio processing: each step names its host family
+    # (`pedalboard`/`vst3`, `lv2`/`lv2proc`, or `command` for NAM/Guitarix) and
+    # ordering is explicit. The default render path stays dependency-free
+    # because this only runs when a score provides a chain.
+    effect_chain = settings.get("effect_chain") or []
     if effect_chain:
         from ..backends.plugin_chain import apply_effect_chain
 
         audio = apply_effect_chain(audio, sample_rate, list(effect_chain), base_dir=base_dir)
-
-    pedalboard_effects = (
-        settings.get("pedalboard_effects")
-        or settings.get("vst3_effects")
-        or settings.get("plugins")
-        or []
-    )
-    if pedalboard_effects:
-        from ..backends.pedalboard_backend import apply_pedalboard_effects
-
-        audio = apply_pedalboard_effects(
-            audio, sample_rate, list(pedalboard_effects), base_dir=base_dir
-        )
-
-    lv2_effects = settings.get("lv2_effects") or settings.get("nam_lv2_effects") or []
-    if lv2_effects:
-        from ..backends.lv2_backend import apply_lv2_effects
-
-        audio = apply_lv2_effects(audio, sample_rate, list(lv2_effects))
-
-    external_effects = (
-        settings.get("external_effects")
-        or settings.get("external_chain")
-        or settings.get("nam_effects")
-        or settings.get("guitarix_effects")
-        or []
-    )
-    if external_effects:
-        from ..backends.external_fx import apply_external_effects
-
-        audio = apply_external_effects(audio, sample_rate, list(external_effects))
 
     if (
         settings.get("target_lufs") is not None
@@ -591,6 +565,10 @@ def post_process(
 
         audio = apply_loudness_settings(audio, sample_rate, settings)
 
+    # Built-in master limiter. Skippable (`limiter_enabled: false`) so a score
+    # can end its `effect_chain` with an external limiter/maximizer instead.
+    if not settings.get("limiter_enabled", True):
+        return audio.astype(np.float32, copy=False)
     target_peak = settings.get("true_peak_db", settings.get("target_peak_db", -1.0))
     return soft_limit(
         audio,

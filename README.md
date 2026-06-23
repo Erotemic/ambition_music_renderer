@@ -134,7 +134,33 @@ group_postprocess:
         command: [my-offline-amp, --input, "{input}", --output, "{output}", --sample-rate, "{sample_rate}"]
 ```
 
-Legacy `pedalboard_effects`, `vst3_effects`, `external_effects`, and `external_chain` still work. Use `effect_chain` when combining multiple host families because ordering is explicit.
+`effect_chain` is the single cross-backend effects surface; each step names its
+host family (`pedalboard`/`vst3`, `lv2`/`lv2proc`, or `command`) so ordering is
+explicit. The older flat `pedalboard_effects` / `vst3_effects` / `lv2_effects` /
+`external_effects` keys have been removed — wrap those effects in an
+`effect_chain` step instead.
+
+### Replacing built-in master stages (don't just stack)
+
+The built-in post-process applies a room reverb and a final true-peak limiter by
+default. To use a Pedalboard/VST reverb or limiter as a *replacement* rather than
+stacking it on top of the built-ins, disable the built-in stage and add the
+plugin to `effect_chain`:
+
+```yaml
+postprocess:
+  reverb_enabled: false    # skip the built-in Schroeder room (also: reverb_wet: 0)
+  limiter_enabled: false   # skip the built-in soft limiter / normalizer
+  effect_chain:
+    - kind: pedalboard
+      effects:
+        - {effect: reverb, room_size: 0.30, wet_level: 0.12}
+        - {effect: limiter, threshold_db: -1.0}
+```
+
+`effect_chain` runs before the built-in loudness/limiter stages, so when you
+disable `limiter_enabled` (and aren't using `target_lufs`) your chain's limiter
+is the final stage. `stereo_width: 0` likewise disables the built-in widener.
 
 SoundFont preference is defined in the renderer code. Prefer high-quality MuseScore/FluidR3 style General MIDI SoundFonts when available. Override per-cue with `render.soundfont` in YAML or per invocation with a backend-specific CLI flag when supported. Normal authoring defaults should prefer `pretty-midi`; fallback should never appear because a prompt or lower-level script quietly picked it.
 

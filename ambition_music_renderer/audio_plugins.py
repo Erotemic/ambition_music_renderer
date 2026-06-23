@@ -286,18 +286,9 @@ def _walk_dicts(node: Any, path: str = "$") -> Iterable[tuple[str, dict[str, Any
 
 def _collect_effect_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
     specs: list[tuple[str, dict[str, Any]]] = []
-    keys = {
-        "effect_chain",
-        "effects_chain",
-        "pedalboard_effects",
-        "vst3_effects",
-        "plugins",
-        "external_effects",
-        "external_chain",
-        "lv2_effects",
-        "nam_effects",
-        "guitarix_effects",
-    }
+    # `effect_chain` is the single cross-backend effects surface; its steps carry
+    # nested `effects`/`chain`/`plugins` lists which add_spec() recurses into.
+    keys = {"effect_chain"}
 
     def add_spec(spec_path: str, value: Any) -> None:
         if isinstance(value, dict):
