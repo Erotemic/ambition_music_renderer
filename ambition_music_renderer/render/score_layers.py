@@ -596,6 +596,13 @@ def render_layer_guitar_lead(
     inst_pitch_bend_curves = layer.get("instrument_pitch_bend_curves", {}) or {}
     hk = _layer_human(layer, 3.0)
     default_scoop = float(layer.get("pitch_scoop_cents", 12.0))
+    # Scale (or disable) the position-dependent attack scoop. The fret/string-jump
+    # scoop models a plucked-guitar pick attack and assumes a fast-decaying
+    # envelope; on sustained voices (fiddle, organ) or soundfonts with longer
+    # guitar samples it reads as an audible out-of-tune bend. Set this to 0.0 to
+    # turn the position scoop off entirely (a fixed pitch_scoop_cents still
+    # applies), or below 1.0 to tame it.
+    position_scoop_scale = float(layer.get("position_scoop_scale", 1.0))
     vibrato_cents = float(layer.get("pitch_vibrato_cents", layer.get("vibrato_cents", 0.0)))
     vibrato_rate_hz = float(layer.get("pitch_vibrato_rate_hz", layer.get("vibrato_rate_hz", 5.4)))
     vibrato_delay_beats = float(layer.get("pitch_vibrato_delay_beats", layer.get("vibrato_delay_beats", 0.45)))
@@ -628,9 +635,9 @@ def render_layer_guitar_lead(
                     scoop = float(inst_pitch_scoop.get(inst, default_scoop))
                     local_scoop = scoop
                     prev = prev_assign.get(inst)
-                    if prev is not None and chosen is not None:
+                    if prev is not None and chosen is not None and position_scoop_scale:
                         # Larger position jumps get a slightly stronger attack scoop.
-                        local_scoop = scoop + min(
+                        local_scoop = scoop + position_scoop_scale * min(
                             28.0,
                             abs(chosen.fret - prev.fret) * 2.0
                             + abs(chosen.string_index - prev.string_index) * 3.0,

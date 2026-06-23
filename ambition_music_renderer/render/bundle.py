@@ -14,6 +14,8 @@ from ..audit.dissonance_audit import audit_file as audit_dissonance_file
 from ..audit.dissonance_audit import render_pianoroll as render_dissonance_pianoroll
 from ..audit.dissonance_audit import write_harmony_diagnostics
 from ..audit.dissonance_audit import write_reports as write_dissonance_reports
+from ..audit.mix_balance_audit import audit_spec as audit_mix_balance
+from ..audit.mix_balance_audit import write_reports as write_mix_balance_reports
 from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
 from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
 from ..audit.sour_note_audit import audit_file as audit_sour_note_file
@@ -268,6 +270,44 @@ def create_bundle(
         write_audio_metadata_report(analysis_root, manifest, reports_dir)
         write_state_mix_report(spec, manifest, reports_dir)
         mix_diag_path, mix_warnings = summarize_mix_diagnostics(manifest, reports_dir)
+        # Mix-balance / lead-audibility audit runs by DEFAULT (it is spec-static and
+        # cheap) so a buried lead instrument — a lead whose group is allocated far
+        # less mix budget than the bed — is caught on every listening render, not
+        # just under --all_audits.
+        mix_balance_warnings: list[str] = []
+        try:
+            mix_balance_payload = audit_mix_balance(spec)
+            write_mix_balance_reports(
+                mix_balance_payload,
+                reports_dir,
+                plots_dir=plots_dir,
+                plot_format=plot_format,
+                jpeg_quality=jpeg_quality,
+            )
+            mix_balance_warnings = list(mix_balance_payload.get("warnings") or [])
+        except Exception as exc:  # never let a diagnostic break a render
+            mix_balance_warnings = [f"mix_balance audit failed: {exc}"]
+        # Harmony piano-roll plots + the LLM-readable harmony_diagnostics.md are
+        # spec-static and cheap, so generate them on every render — they are the
+        # primary visual debugging artifacts for sour / dissonant notes.
+        dissonance_payload = audit_dissonance_file(score_path)
+        sour_note_payload = audit_sour_note_file(score_path)
+        try:
+            render_dissonance_pianoroll(
+                spec, plots_dir / f"dissonance_pianoroll.{plot_format}",
+                plot_format=plot_format, jpeg_quality=jpeg_quality,
+            )
+            render_sour_pianoroll(
+                spec, plots_dir / f"sour_note_pianoroll.{plot_format}",
+                plot_format=plot_format, jpeg_quality=jpeg_quality,
+            )
+            write_harmony_diagnostics(
+                dissonance_payload, sour_note_payload, reports_dir / "harmony_diagnostics.md"
+            )
+        except Exception as exc:  # plotting is best-effort
+            progress_line(f"harmony plots skipped: {exc}")
+        dissonance_warnings = list(dissonance_payload.get("warnings") or [])
+        sour_note_warnings = list(sour_note_payload.get("warnings") or [])
         if all_audits:
             write_stem_amplitude_report(
                 analysis_root,
@@ -303,7 +343,9 @@ def create_bundle(
             # Re-run arrangement preflight after render report cleanup so it is present in the final bundle.
             arrangement_payload = audit_arrangement_file(score_path)
             write_arrangement_reports(arrangement_payload, reports_dir)
-            dissonance_payload = audit_dissonance_file(score_path)
+            # dissonance_payload / sour_note_payload + their piano-rolls and
+            # harmony_diagnostics.md are already produced in the default block
+            # above; here we add the heavier full TSV/markdown report tables.
             write_dissonance_reports(
                 dissonance_payload,
                 reports_dir,
@@ -311,28 +353,12 @@ def create_bundle(
                 plot_format=plot_format,
                 jpeg_quality=jpeg_quality,
             )
-            render_dissonance_pianoroll(
-                spec,
-                plots_dir / f"dissonance_pianoroll.{plot_format}",
-                plot_format=plot_format,
-                jpeg_quality=jpeg_quality,
-            )
-            sour_note_payload = audit_sour_note_file(score_path)
             write_sour_note_reports(
                 sour_note_payload,
                 reports_dir,
                 plots_dir=plots_dir,
                 plot_format=plot_format,
                 jpeg_quality=jpeg_quality,
-            )
-            render_sour_pianoroll(
-                spec,
-                plots_dir / f"sour_note_pianoroll.{plot_format}",
-                plot_format=plot_format,
-                jpeg_quality=jpeg_quality,
-            )
-            write_harmony_diagnostics(
-                dissonance_payload, sour_note_payload, reports_dir / "harmony_diagnostics.md"
             )
             shrill_note_payload = audit_shrill_note_file(score_path)
             write_shrill_note_reports(
@@ -460,6 +486,7 @@ def create_bundle(
             w
             for w in [
                 id_warning,
+                *mix_balance_warnings,
                 *mix_warnings,
                 *quality_brief_warnings,
                 *adaptive_composition_warnings,
