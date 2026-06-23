@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from ambition_music_renderer.cli import BundleManyCommand, RenderCommand, RenderPublishCommand
+from ambition_music_renderer.cli import BundleCommand, RenderCommand
 from ambition_music_renderer.render.bundle_adaptive_reports import (
     write_adaptive_composition_mastering_report,
     write_adaptive_section_report,
@@ -51,8 +51,9 @@ def test_backend_defaults_prefer_pretty_midi():
     ).backend == "pretty-midi"
     assert RenderCommand.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
     assert CueBundleConfig.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
-    adaptive_args = RenderPublishCommand.cli(argv=["first_goblin_tune_v2", "--full_mix_only"])
+    adaptive_args = RenderCommand.cli(argv=["first_goblin_tune_v2", "--full_mix_only", "--publish"])
     assert adaptive_args.full_mix_only is True
+    assert adaptive_args.publish is True
     shared_args = RenderIsolatedConfig.cli(argv=[
         "cue.music.yaml",
         "--runtime_stem_gain_mode=shared",
@@ -840,18 +841,18 @@ def test_shrill_note_audit_flags_whistle_register_sources():
 
 
 def test_bundle_many_parser_accepts_parallel_flags():
-    args = BundleManyCommand.cli(argv=[
+    args = BundleCommand.cli(argv=[
 
         "lofi_study_loop",
         "tech_bros_disruption",
-        "--workers",
+        "--jobs",
         "3",
         "--render_jobs",
         "1",
         "--force",
         "--zip_report",
     ])
-    assert args.workers == 3
+    assert args.jobs == 3
     assert args.render_jobs == 1
     assert args.cues == ["lofi_study_loop", "tech_bros_disruption"]
 
@@ -915,6 +916,6 @@ def test_cue_bundle_positive_audit_flags_parse():
 
 
 def test_bundle_many_positive_audit_flags_parse():
-    args = BundleManyCommand.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
+    args = BundleCommand.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
     assert args.spectrograms is True
     assert args.all_audits is True

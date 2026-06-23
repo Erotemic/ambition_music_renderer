@@ -35,7 +35,11 @@ uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambitio
 
 `cue list` enumerates every cue id found under `scores/` (grouped by
 `active`/`examples`/`archive`/`experiments`); pass `--json` for a machine
-readable map. `cue bundle` is the one-cue render+debug+package workflow.
+readable map. `cue bundle` is the render+debug+package workflow: pass one cue
+to render it in-process, or several cue ids plus `-j/--jobs N` to fan out across
+cues (one render subprocess each) with per-cue logs. `cue render <cue>` renders
+without the debug/package step; add `--publish` to install `full.ogg` into the
+game asset tree.
 
 Auxiliary analysis and maintenance helpers are exposed through the package modal CLI rather than top-level scripts:
 

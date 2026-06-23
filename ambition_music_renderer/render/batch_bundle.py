@@ -12,7 +12,6 @@ processes.
 from __future__ import annotations
 
 import csv
-import os
 import queue
 import shlex
 import subprocess
@@ -21,9 +20,6 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
-
-import kwconf
-
 
 from ..cli import find_score, package_dir
 from .bundle import default_bundle_root, terminal_link
@@ -140,8 +136,8 @@ def _build_command(args, cue: str) -> list[str]:
         "runtime_stem_max_gain_db": args.runtime_stem_max_gain_db,
         "force": args.force,
         "publish": args.publish,
-        "zip_bundle": args.zip,
-        "zip_report_bundle": args.zip_report,
+        "zip_bundle": args.zip_bundle,
+        "zip_report_bundle": args.zip_report_bundle,
         "spectrograms": args.spectrograms,
         "all_audits": args.all_audits,
         "render_audio_mode": args.render_audio_mode,
@@ -340,55 +336,24 @@ def write_status(results: list[BundleResult], status_path: Path) -> None:
             )
 
 
-class BatchBundleConfig(kwconf.Config):
-    """Render/debug many cue bundles in parallel with per-cue logs."""
-
-
-    cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    workers: int | None = kwconf.Value(max(1, min(4, (os.cpu_count() or 4) // 2)), short_alias=["j"], help="parallel cue jobs; 0 or 1 runs serially")
-    render_jobs: int = kwconf.Value(1, help="per-cue render worker count passed to cue_bundle")
-    scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
-    include_examples: bool = kwconf.Flag(False, help="include scores/examples in discovery")
-    backend: str = kwconf.Value("pretty-midi")
-    runtime_stem_gain_mode: str = kwconf.Value("shared", choices=["native", "shared"])
-    runtime_stem_max_gain_db: float | None = kwconf.Value(None)
-    force: bool = kwconf.Flag(False)
-    publish: bool = kwconf.Flag(False)
-    zip: bool = kwconf.Flag(False, help="write full bundle zips including audio")
-    zip_report: bool = kwconf.Flag(True, help="write compact report zips; enabled by default")
-    spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; off by default")
-    all_audits: bool = kwconf.Flag(False, help="run full cue-bundle diagnostic audits")
-    include_scratch_stems: bool = kwconf.Flag(False)
-    render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
-    profile_render: bool = kwconf.Flag(False, help="enable line_profiler in render subprocesses via LINE_PROFILE=1")
-    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
-    jpeg_quality: int = kwconf.Value(84)
-    bundle_root: Path | None = kwconf.Value(None, parser=Path)
-    log_root: Path = kwconf.Value(default_factory=lambda: package_dir() / "batch_logs", parser=Path)
-
-    def __post_init__(self) -> None:
-        self.workers = int(self.workers if self.workers is not None else 1)
-        self.render_jobs = int(self.render_jobs)
-        self.jpeg_quality = int(self.jpeg_quality)
-        for key in ("bundle_root", "log_root"):
-            value = getattr(self, key)
-            if value is not None and not isinstance(value, Path):
-                setattr(self, key, Path(value))
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        return run_batch_bundle(config)
-
-
-
-
 @profile
 def run_batch_bundle(args) -> int:
+    """Fan out one render subprocess per cue.
+
+    ``args`` is the ``cli.BundleCommand`` orchestrator config (the sole caller).
+    It supplies ``cues``, a cross-cue ``jobs`` parallelism, per-cue passthrough
+    flags, and ``log_root``; ``run_batch_bundle`` only reads attributes, so any
+    duck-typed config with those fields works.
+    """
     total_start = time.perf_counter()
     rc = 1
+    workers = int(getattr(args, "jobs", 1))
     try:
-        cues = resolve_cues(args.cues, scope=args.scope, include_examples=args.include_examples)
+        cues = resolve_cues(
+            args.cues,
+            scope=getattr(args, "scope", "active"),
+            include_examples=getattr(args, "include_examples", False),
+        )
         if not cues:
             print("no cues selected", file=sys.stderr)
             rc = 2
@@ -397,13 +362,13 @@ def run_batch_bundle(args) -> int:
         log_root = args.log_root / f"bundle_many_{stamp}"
         jobs = [BundleJob(cue, log_root / f"{cue}.log", _build_command(args, cue)) for cue in cues]
         bundle_root = args.bundle_root or default_bundle_root()
-        print(f"bundle-many: {len(jobs)} cue(s), {args.workers} parallel job(s)", file=sys.stderr)
+        print(f"bundle-many: {len(jobs)} cue(s), {workers} parallel job(s)", file=sys.stderr)
         print(f"logs: {terminal_link(log_root)}", file=sys.stderr)
         print(f"bundle root: {terminal_link(bundle_root)}", file=sys.stderr)
         print("queued bundle logs:", file=sys.stderr)
         for job in jobs:
             print(f"  {job.cue}: {terminal_link(job.log_path)}", file=sys.stderr)
-        results = _run_rich(jobs, workers=args.workers)
+        results = _run_rich(jobs, workers=workers)
         status_path = log_root / "status.tsv"
         write_status(results, status_path)
         print(f"status: {terminal_link(status_path)}", file=sys.stderr)
@@ -424,12 +389,3 @@ def run_batch_bundle(args) -> int:
     finally:
         elapsed = time.perf_counter() - total_start
         print(f"[ambition_music_renderer.bundle_many] total_elapsed_s={elapsed:.3f}", flush=True)
-
-
-def main(argv: list[str] | None = None) -> int:
-    config = BatchBundleConfig.cli(argv=argv)
-    return run_batch_bundle(config)
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -2,9 +2,14 @@
 
 Subcommands:
 
-    render <cue>            Render a single cue YAML to local generated/<cue>/.
-    publish <cue>           Publish newest preview into the sandbox asset tree.
-    render-publish <cue>    Render then publish.
+    cue list                List every cue id discovered under scores/.
+    cue render <cue>        Render a single cue YAML to local generated/<cue>/.
+                            Add --publish to also install full.ogg into the
+                            game asset tree.
+    cue publish <cue>       Publish newest preview into the sandbox asset tree.
+    cue bundle <cue>...     Render+debug+package one or more cues. Pass several
+                            cue ids and -j/--jobs N to run them in parallel
+                            (one render subprocess per cue).
     sandbox render-publish  Render+publish the sandbox single-track cues
                             (lofi_study_loop, long_lofi_drift, pulse_drift_voyage).
     sandbox render          Render-only for sandbox cues.
@@ -385,7 +390,7 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
         print(
             f"error: publish {cue}: no adaptive full-section assets were copied from {outdir}. "
             "The encounter runtime loads adaptive/<section>/<section>.full.ogg, not full.ogg. "
-            "Render with `cue_bundle --publish` or render_isolated --full-mix-only before publishing.",
+            "Render with `cue bundle --publish` or render_isolated --full-mix-only before publishing.",
             file=sys.stderr,
         )
         return False
@@ -441,7 +446,12 @@ def cmd_render(args) -> int:
         simple_mix=simple_mix,
         full_mix_only=full_mix_only,
     )
-    return 0 if ok else 1
+    if not ok:
+        return 1
+    if getattr(args, "publish", False):
+        outdir = generated_root() / args.cue
+        return 0 if publish_cue(args.cue, outdir, args.dest_root) else 1
+    return 0
 
 
 @profile
@@ -457,28 +467,6 @@ def cmd_publish(args) -> int:
             outdir = resolved_outdir
     ok = publish_cue(args.cue, outdir, args.dest_root)
     return 0 if ok else 1
-
-
-@profile
-def cmd_render_publish(args) -> int:
-    yaml_path = find_score(args.cue)
-    if yaml_path is None:
-        print(f"error: cue not found: {args.cue}", file=sys.stderr)
-        return 2
-    outdir = generated_root() / args.cue
-    if args.force_render or needs_render(args.cue, yaml_path, outdir):
-        simple_mix, full_mix_only = render_mode_for_cue(args.cue, args)
-        if not render_cue_to_versioned_generated(
-            args.cue,
-            yaml_path,
-            backend=args.backend,
-            simple_mix=simple_mix,
-            full_mix_only=full_mix_only,
-        ):
-            return 1
-    else:
-        print(f"skip render {args.cue}: YAML unchanged since last render")
-    return 0 if publish_cue(args.cue, outdir, args.dest_root) else 1
 
 
 def _process_simple_mix_cue(
@@ -579,13 +567,61 @@ def cmd_radio(args) -> int:
     return _run_bulk(args, cues)
 
 
+def _single_bundle_config(args, cue: str):
+    """Build a per-cue ``CueBundleConfig`` from the orchestrator ``args``.
+
+    The orchestrator (``cue bundle``) speaks in terms of multiple cues and a
+    cross-cue ``jobs`` parallelism; the single-cue renderer config speaks in
+    terms of one ``cue`` and a per-render ``jobs`` worker count. This is the
+    one seam that translates between the two.
+    """
+    from .render.bundle import CueBundleConfig
+
+    return CueBundleConfig.cli(
+        argv=False,
+        data={
+            "cue": cue,
+            "backend": args.backend,
+            "runtime_stem_gain_mode": args.runtime_stem_gain_mode,
+            "runtime_stem_max_gain_db": args.runtime_stem_max_gain_db,
+            "outdir": args.outdir,
+            "bundle_root": args.bundle_root,
+            "force": args.force,
+            "publish": args.publish,
+            "dest_root": args.dest_root,
+            "zip_bundle": args.zip_bundle,
+            "zip_report_bundle": args.zip_report_bundle,
+            "plot_format": args.plot_format,
+            "jpeg_quality": args.jpeg_quality,
+            "jobs": args.render_jobs,
+            "include_scratch_stems": args.include_scratch_stems,
+            "skip_render": args.skip_render,
+            "spectrograms": args.spectrograms,
+            "all_audits": args.all_audits,
+            "render_audio_mode": args.render_audio_mode,
+            "profile_render": args.profile_render,
+            "render_in_process": args.render_in_process,
+            "json": args.json,
+        },
+    )
+
+
 @profile
 def cmd_bundle(args) -> int:
-    from .render.bundle import CueBundleConfig, create_bundle_from_config
+    cues = list(args.cues)
+    # Multiple cues, or an explicit cross-cue parallelism request, go through
+    # the batch runner (one render subprocess per cue). A lone serial cue stays
+    # in-process so profiling / --render_in_process / --json keep working.
+    if len(cues) > 1 or args.jobs > 1:
+        from .render.batch_bundle import run_batch_bundle
 
-    config = args if isinstance(args, CueBundleConfig) else CueBundleConfig.cli(argv=False, data=dict(args))
+        return run_batch_bundle(args)
+
+    from .render.bundle import create_bundle_from_config
+
+    config = _single_bundle_config(args, cues[0])
     report = create_bundle_from_config(config)
-    if getattr(config, "json", False):
+    if config.json:
         print(json.dumps(report, indent=2, default=str))
     _schedule_final_bundle_summary(report)
     return 0 if report.get("ok", True) else 1
@@ -692,13 +728,23 @@ def cmd_plugins_validate_score(args) -> int:
 
 
 class RenderCommand(kwconf.Config):
-    """Render a single cue YAML."""
+    """Render a single cue YAML; optionally publish it to the game assets."""
 
 
     cue: str = kwconf.Value(None, position=1, help="cue id or YAML path")
     backend: str = kwconf.Value("pretty-midi", help="renderer backend")
     simple_mix: bool = kwconf.Flag(True, help="emit only the mastered preview")
     full_mix_only: bool = kwconf.Flag(False, help="emit mastered preview plus per-section full mixes")
+    publish: bool = kwconf.Flag(False, help="after rendering, install full.ogg into the game asset tree")
+    dest_root: Path = kwconf.Value(
+        default_factory=default_publish_dest_root,
+        parser=Path,
+        help="publish destination root (with --publish)",
+    )
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.dest_root, Path):
+            self.dest_root = Path(self.dest_root)
 
     @classmethod
     def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
@@ -722,30 +768,23 @@ class PublishCommand(kwconf.Config):
         return cmd_publish(config)
 
 
-class RenderPublishCommand(kwconf.Config):
-    """Render then publish a single cue."""
-
-    cue: str = kwconf.Value(None, position=1)
-    backend: str = kwconf.Value("pretty-midi")
-    simple_mix: bool = kwconf.Flag(True)
-    full_mix_only: bool = kwconf.Flag(False)
-    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path)
-    force_render: bool = kwconf.Flag(False)
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.dest_root, Path):
-            self.dest_root = Path(self.dest_root)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        return cmd_render_publish(config)
-
-
 class BundleCommand(kwconf.Config):
-    """Render, debug, and package a cue bundle."""
+    """Render, debug, and package one or more cue bundles.
 
-    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    Pass a single cue id to render it in-process (profiling and ``--json``
+    available). Pass several cue ids and/or ``-j/--jobs N`` to fan out across
+    cues, one render subprocess each, with per-cue logs.
+    """
+
+    cues: list[str] = kwconf.Value(
+        default_factory=list,
+        position=1,
+        nargs="+",
+        help="one or more cue ids or .music.yaml paths",
+    )
+    jobs: int = kwconf.Value(1, short_alias=["j"], help="parallel cue count; >1 fans out across cues")
+    render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
+    log_root: Path | None = kwconf.Value(None, parser=Path, help="batch per-cue log root (multi-cue runs)")
     backend: str = kwconf.Value("pretty-midi", choices=["pretty-midi", "fluidsynth-cli", "fallback", "auto"])
     runtime_stem_gain_mode: str = kwconf.Value(
         "native",
@@ -780,7 +819,6 @@ class BundleCommand(kwconf.Config):
         help="spectrogram image format for bundles; jpg is much smaller and reports keep numeric values",
     )
     jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
-    jobs: int = kwconf.Value(1, short_alias=["j"], help="render worker count")
     include_scratch_stems: bool = kwconf.Flag(
         False,
         help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
@@ -810,8 +848,11 @@ class BundleCommand(kwconf.Config):
 
     def __post_init__(self) -> None:
         self.jobs = int(self.jobs)
+        self.render_jobs = int(self.render_jobs)
         self.jpeg_quality = int(self.jpeg_quality)
-        for key in ("outdir", "bundle_root", "dest_root"):
+        if self.log_root is None:
+            self.log_root = package_dir() / "batch_logs"
+        for key in ("outdir", "bundle_root", "dest_root", "log_root"):
             value = getattr(self, key)
             if value is not None and not isinstance(value, Path):
                 setattr(self, key, Path(value))
@@ -882,53 +923,9 @@ class CueModal(kwconf.ModalCLI):
     """Cue-oriented workflows."""
 
     list = ListCommand
+    render = RenderCommand
+    publish = PublishCommand
     bundle = BundleCommand
-
-
-class BundleManyCommand(kwconf.Config):
-    """Render/debug many cue bundles in parallel with per-cue logs."""
-
-
-    cues: list[str] = kwconf.Value(default_factory=list, position=1, nargs="*", help="cue ids or YAML paths; omit to discover by --scope")
-    workers: int | None = kwconf.Value(None, short_alias=["j"], help="parallel cue_bundle jobs")
-    render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
-    scope: str = kwconf.Value("active", choices=["active", "examples", "all"])
-    include_examples: bool = kwconf.Flag(False)
-    backend: str = kwconf.Value("pretty-midi")
-    runtime_stem_gain_mode: str = kwconf.Value("shared", choices=["native", "shared"])
-    runtime_stem_max_gain_db: float | None = kwconf.Value(None)
-    force: bool = kwconf.Flag(False)
-    publish: bool = kwconf.Flag(False)
-    zip: bool = kwconf.Flag(False)
-    zip_report: bool = kwconf.Flag(True)
-    spectrograms: bool = kwconf.Flag(False)
-    all_audits: bool = kwconf.Flag(False)
-    include_scratch_stems: bool = kwconf.Flag(False)
-    render_audio_mode: str = kwconf.Value("full", choices=["full", "full-mix-only", "simple-mix"])
-    profile_render: bool = kwconf.Flag(False)
-    plot_format: str = kwconf.Value("jpg", choices=["jpg", "png"])
-    jpeg_quality: int = kwconf.Value(84)
-    bundle_root: Path | None = kwconf.Value(None, parser=Path)
-    log_root: Path | None = kwconf.Value(None, parser=Path)
-
-    def __post_init__(self) -> None:
-        if self.log_root is None:
-            self.log_root = package_dir() / "batch_logs"
-        self.render_jobs = int(self.render_jobs)
-        self.jpeg_quality = int(self.jpeg_quality)
-        if self.workers is not None:
-            self.workers = int(self.workers)
-        for key in ("bundle_root", "log_root"):
-            value = getattr(self, key)
-            if value is not None and not isinstance(value, Path):
-                setattr(self, key, Path(value))
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        from .render.batch_bundle import run_batch_bundle
-
-        return run_batch_bundle(config)
 
 
 class BulkActionConfig(kwconf.Config):
@@ -1131,10 +1128,6 @@ class LegacyModal(kwconf.ModalCLI):
 class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     """Modal CLI for ambition_music_renderer."""
 
-    render = RenderCommand
-    publish = PublishCommand
-    render_publish = RenderPublishCommand
-    bundle_many = BundleManyCommand
     cue = CueModal
     sandbox = SandboxModal
     radio = RadioModal
