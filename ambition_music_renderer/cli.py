@@ -34,6 +34,9 @@ from ._paths import generated_root as _generated_root
 from ._paths import output_root as _output_root
 from ._paths import project_root as _project_root
 from ._paths import repo_root as _repo_root
+from ._paths import scores_root as _scores_root
+from ._paths import SCORE_DIRS as _SCORE_DIRS
+from ._paths import SCORE_SUFFIXES as _SCORE_SUFFIXES
 
 import kwconf
 
@@ -820,9 +823,65 @@ class BundleCommand(kwconf.Config):
 
 
 
+def cue_id_from_path(path: Path) -> str:
+    """Return the cue id for a score file (filename minus its score suffix)."""
+    name = path.name
+    for suffix in (".music.yaml", ".music.yml", *_SCORE_SUFFIXES):
+        if name.endswith(suffix):
+            return name[: -len(suffix)]
+    return path.stem
+
+
+def discover_cues() -> dict[str, list[str]]:
+    """Map each scores/ subdir to the sorted cue ids it defines."""
+    root = _scores_root()
+    found: dict[str, list[str]] = {}
+    for subdir in _SCORE_DIRS:
+        directory = root / subdir
+        if not directory.is_dir():
+            continue
+        ids = {
+            cue_id_from_path(path)
+            for path in directory.iterdir()
+            if path.is_file() and any(path.name.endswith(s) for s in _SCORE_SUFFIXES)
+        }
+        if ids:
+            found[subdir] = sorted(ids)
+    return found
+
+
+def cmd_cue_list(args) -> int:
+    cues = discover_cues()
+    if getattr(args, "json", False):
+        print(json.dumps(cues, indent=2))
+        return 0
+    total = 0
+    for subdir in _SCORE_DIRS:
+        ids = cues.get(subdir, [])
+        if not ids:
+            continue
+        print(f"{subdir} ({len(ids)}):")
+        for cue_id in ids:
+            print(f"  {cue_id}")
+        total += len(ids)
+    print(f"total cues: {total}")
+    return 0
+
+
+class ListCommand(kwconf.Config):
+    """List all cue ids discovered under scores/."""
+
+    json: bool = kwconf.Flag(False, help="emit JSON mapping of scores subdir -> cue ids")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_cue_list(cls.cli(argv=argv, data=kwargs))
+
+
 class CueModal(kwconf.ModalCLI):
     """Cue-oriented workflows."""
 
+    list = ListCommand
     bundle = BundleCommand
 
 
@@ -1213,49 +1272,20 @@ class AuditModal(kwconf.ModalCLI):
     """Analysis and audit helpers for rendered scores and generated audio."""
 
     arrangement = ArrangementAuditTool
-    arrangement_audit = ArrangementAuditTool
     dissonance = DissonanceAuditTool
-    dissonance_audit = DissonanceAuditTool
     reference_audio = ReferenceAudioAuditTool
-    reference_audio_audit = ReferenceAudioAuditTool
     shrill_notes = ShrillNoteAuditTool
-    shrill_note_audit = ShrillNoteAuditTool
     sour_notes = SourNoteAuditTool
-    sour_note_audit = SourNoteAuditTool
     cue_balance = AuditCueBalanceTool
-    audit_cue_balance = AuditCueBalanceTool
     levels = LevelReportTool
-    level_report = LevelReportTool
     spectral_compare = SpectralCompareTool
     spectral_localize = SpectralLocalizeTool
     transition = TransitionAuditTool
-    transition_audit = TransitionAuditTool
 
 
 class LegacyModal(kwconf.ModalCLI):
     """Quarantined legacy helpers kept importable until we verify deletion safety."""
 
-    install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
-    make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
-
-
-class ToolsModal(kwconf.ModalCLI):
-    """Compatibility alias for older `tools ...` invocations.
-
-    Prefer `audit ...` for active diagnostics and `legacy ...` for quarantined
-    one-off helpers.
-    """
-
-    arrangement_audit = ArrangementAuditTool
-    dissonance_audit = DissonanceAuditTool
-    reference_audio_audit = ReferenceAudioAuditTool
-    shrill_note_audit = ShrillNoteAuditTool
-    sour_note_audit = SourNoteAuditTool
-    audit_cue_balance = AuditCueBalanceTool
-    level_report = LevelReportTool
-    spectral_compare = SpectralCompareTool
-    spectral_localize = SpectralLocalizeTool
-    transition_audit = TransitionAuditTool
     install_first_goblin_tune_v2 = InstallFirstGoblinTuneTool
     make_first_goblin_transition_lab = FirstGoblinTransitionLabTool
 
@@ -1266,8 +1296,6 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     render = RenderCommand
     publish = PublishCommand
     render_publish = RenderPublishCommand
-    cue_bundle = BundleCommand
-    bundle = BundleCommand
     bundle_many = BundleManyCommand
     cue = CueModal
     sandbox = SandboxModal
@@ -1275,7 +1303,6 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     plugins = PluginsModal
     audit = AuditModal
     legacy = LegacyModal
-    tools = ToolsModal
 
 
 
