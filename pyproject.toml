@@ -23,6 +23,8 @@ dependencies = [
   "kwconf>=0.10.0",
   "rich",
   "pyloudnorm",
+  "matchering",
+  "librosa",
   "lazy_loader",
 ]
 
