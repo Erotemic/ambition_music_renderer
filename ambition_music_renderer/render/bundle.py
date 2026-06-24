@@ -16,6 +16,8 @@ from ..audit.dissonance_audit import write_harmony_diagnostics
 from ..audit.dissonance_audit import write_reports as write_dissonance_reports
 from ..audit.mix_balance_audit import audit_spec as audit_mix_balance
 from ..audit.mix_balance_audit import write_reports as write_mix_balance_reports
+from ..audit.instrument_resolution import audit_spec as audit_instrument_resolution
+from ..audit.instrument_resolution import write_reports as write_instrument_resolution_reports
 from ..audit.shrill_note_audit import audit_file as audit_shrill_note_file
 from ..audit.shrill_note_audit import write_reports as write_shrill_note_reports
 from ..audit.sour_note_audit import audit_file as audit_sour_note_file
@@ -287,6 +289,16 @@ def create_bundle(
             mix_balance_warnings = list(mix_balance_payload.get("warnings") or [])
         except Exception as exc:  # never let a diagnostic break a render
             mix_balance_warnings = [f"mix_balance audit failed: {exc}"]
+        # Instrument resolution provenance: records exactly what every library_ref /
+        # GM program resolved to on disk, plus octave-folds / unmapped drums /
+        # fallbacks — so "asked for X, got Y" is never invisible.
+        resolution_warnings: list[str] = []
+        try:
+            resolution_payload = audit_instrument_resolution(spec)
+            write_instrument_resolution_reports(resolution_payload, reports_dir)
+            resolution_warnings = list(resolution_payload.get("warnings") or [])
+        except Exception as exc:
+            resolution_warnings = [f"instrument_resolution audit failed: {exc}"]
         # Harmony piano-roll plots + the LLM-readable harmony_diagnostics.md are
         # spec-static and cheap, so generate them on every render — they are the
         # primary visual debugging artifacts for sour / dissonant notes.
@@ -486,6 +498,7 @@ def create_bundle(
             w
             for w in [
                 id_warning,
+                *resolution_warnings,
                 *mix_balance_warnings,
                 *mix_warnings,
                 *quality_brief_warnings,
