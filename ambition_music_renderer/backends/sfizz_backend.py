@@ -209,16 +209,27 @@ def _render_sfizz_cli(
             [binary, "{sfz}", "{midi}", "{wav}"],
             [binary, "{sfz}", "{midi}", "{wav}", "{sample_rate}"],
         ])
+    # A hung sfizz_render (e.g. a broken/pathological SFZ) must not run forever:
+    # an orphaned one once wrote a ~100 GB WAV and filled the disk. Cap it; the
+    # caller falls back to GM on failure. Override via settings/env if needed.
+    import os
+    timeout_s = float(settings.get("render_timeout_s",
+                                   os.environ.get("AMBITION_SFIZZ_TIMEOUT_S", 120)))
     failures: list[str] = []
     for template_item in templates:
         cmd = _format_command(template_item, mapping)
-        proc = subprocess.run(
-            cmd,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        try:
+            proc = subprocess.run(
+                cmd,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=timeout_s,
+            )
+        except subprocess.TimeoutExpired:
+            failures.append(f"timed out after {timeout_s:.0f}s: {shlex.join(cmd)}")
+            continue
         if proc.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
             break
         failures.append(_format_process_failure(cmd, proc))
