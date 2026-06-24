@@ -126,6 +126,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("acoustic", "mic", "sustain", "long", "chord", "guitar"),
         avoid=("pickup", "mute", "staccato", "noise", "scrape"),
     ),
+    "epiano.rhodes": SfzLibraryAlias(
+        ref="epiano.rhodes",
+        required_any=(("jrhodes",), ("rhodes",)),
+        prefer=("stereo", "looped", "both", "rhodes"),
+        avoid=("mono", "release", "noise"),
+    ),
     "bass.growly": SfzLibraryAlias(
         ref="bass.growly",
         required_any=(("growlybass",), ("growly", "bass")),
