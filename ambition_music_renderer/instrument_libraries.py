@@ -126,6 +126,51 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("acoustic", "mic", "sustain", "long", "chord", "guitar"),
         avoid=("pickup", "mute", "staccato", "noise", "scrape"),
     ),
+    # Sonatina Symphonic Orchestra string sections (real sampled orchestra).
+    # Prefer the simple "Notation/...Sustain" patches; avoid the keyswitch
+    # "Performance" builds, the include fragments, and the non-sustain articulations.
+    "strings.violin_solo": SfzLibraryAlias(
+        ref="strings.violin_solo",
+        required_any=(("sonatina", "violin", "solo"), ("violin", "solo", "sustain")),
+        prefer=("notation", "violin solo 1 sustain", "sustain"),
+        avoid=("performance", "includes", "looped", "non-vibrato", "pizz", "staccato",
+               "tremolo", "legno", "harmonic", "marcato", "ks", "2"),
+    ),
+    "strings.violins_1": SfzLibraryAlias(
+        ref="strings.violins_1",
+        required_any=(("sonatina", "1st", "violins"), ("1st", "violins", "sustain")),
+        prefer=("notation", "sustain"),
+        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
+               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
+    "strings.violins_2": SfzLibraryAlias(
+        ref="strings.violins_2",
+        required_any=(("sonatina", "2nd", "violins"), ("2nd", "violins", "sustain")),
+        prefer=("notation", "sustain"),
+        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
+               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
+    "strings.violas": SfzLibraryAlias(
+        ref="strings.violas",
+        required_any=(("sonatina", "violas"), ("violas", "sustain")),
+        prefer=("notation", "violas sustain", "sustain"),
+        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
+               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
+    "strings.celli": SfzLibraryAlias(
+        ref="strings.celli",
+        required_any=(("sonatina", "celli"), ("celli", "sustain")),
+        prefer=("notation", "celli sustain", "sustain"),
+        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
+               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
+    "strings.basses": SfzLibraryAlias(
+        ref="strings.basses",
+        required_any=(("sonatina", "basses"), ("basses", "sustain")),
+        prefer=("notation", "basses sustain", "sustain"),
+        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
+               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
     "epiano.rhodes": SfzLibraryAlias(
         ref="epiano.rhodes",
         required_any=(("jrhodes",), ("rhodes",)),
