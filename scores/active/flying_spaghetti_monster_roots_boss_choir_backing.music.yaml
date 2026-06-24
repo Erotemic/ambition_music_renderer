@@ -1,11 +1,16 @@
 schema: ambition.musicir.v1
 id: flying_spaghetti_monster_roots_boss_choir_backing
-title: One Noodle Rises - Rooted Low Gregorian Chorale r12
+title: One Noodle Rises - Rooted Low Gregorian Chorale r13 (FluidR3 remaster, fingered
+  bass)
 seed: 2026060412
-notes: 'Revision r12: redesigns the monk choir away from common-tone suspension drones. The choir now follows each local A/D/E
-  harmony with sustained root/fifth tones, compressing repeated tones into longer holds where possible and resolving phrase
-  endings back to A/E. It keeps the r10/r11 renderer same-pitch-overlap safety while avoiding the unresolved B/A holds that
-  felt detached.'
+notes: 'Revision r12: redesigns the monk choir away from common-tone suspension drones.
+  The choir now follows each local A/D/E harmony with sustained root/fifth tones,
+  compressing repeated tones into longer holds where possible and resolving phrase
+  endings back to A/E. It keeps the r10/r11 renderer same-pitch-overlap safety while
+  avoiding the unresolved B/A holds that felt detached. | r13: FluidR3 soundfont,
+  chord-safe walking bass + A-Mixolydian leads, jRhodes e-piano (SFZ, GM fallback),
+  boss group mix with measured per-group gains, master EQ polish; original GM fingered
+  bass restored (tuned to -27 dBFS).'
 tempo:
   bpm: 104
 meter:
@@ -15,6 +20,12 @@ render:
   sample_rate: 48000
   ogg_quality: 6
   backend: pretty-midi
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
 constraints:
   voice_leading: minimize_motion
   no_clusters: true
@@ -24,11 +35,11 @@ postprocess:
   lowpass_hz: 10600
   presence_low_hz: 1300
   presence_high_hz: 3900
-  presence_db: 1.05
+  presence_db: 0.4
   reverb_wet: 0.082
   reverb_decay_seconds: 1.05
   reverb_damping_hz: 5400
-  stereo_width: 0.14
+  stereo_width: 0.16
   compressor_threshold_db: -17.2
   compressor_ratio: 3.5
   compressor_attack_ms: 7.5
@@ -38,6 +49,23 @@ postprocess:
   limiter_drive: 1.04
   normalize: true
   target_peak_db: -4.5
+  eq_bands:
+  - type: low_shelf
+    hz: 110
+    q: 0.8
+    db: 1.0
+  - type: peak
+    hz: 340
+    q: 0.9
+    db: -1.6
+  - type: peak
+    hz: 2600
+    q: 1.2
+    db: -1.4
+  - type: high_shelf
+    hz: 7500
+    q: 0.7
+    db: -1.6
 stem_postprocess:
   gain_db: 0.75
   highpass_hz: 30
@@ -82,6 +110,15 @@ instruments:
   expression: 76
   chorus: 14
   reverb: 11
+  instrument_backend:
+    kind: sfz
+    library_ref: epiano.rhodes
+    prefer:
+    - stereo
+    - looped
+    - both
+    optional: true
+    fallback_backend: pretty-midi
 - name: dub_bass
   group: bass
   program: fingered_bass
@@ -1444,7 +1481,7 @@ layer_templates:
     - - 12
       - 1.25
       - 0.22
-    - - -2
+    - - 0
       - 1.75
       - 0.34
     - - 0
@@ -1453,7 +1490,7 @@ layer_templates:
     - - 7
       - 3.0
       - 0.32
-    - - 10
+    - - 0
       - 3.5
       - 0.28
     velocity: 78
@@ -1468,7 +1505,7 @@ layer_templates:
     - - 0
       - 0.0
       - 0.3
-    - - -2
+    - - 0
       - 1.75
       - 0.24
     - - 0
@@ -1488,9 +1525,9 @@ layer_templates:
     motif: rising_noodle_command
     roots:
     - A4
-    - D4
-    - E4
-    - D4
+    - A4
+    - A4
+    - A4
     every_bars: 4
     repeats: 10
     starts:
@@ -1670,8 +1707,8 @@ layer_templates:
     motif: overdrive_guitar_call_phrase
     roots:
     - A4
-    - D4
-    - E4
+    - A4
+    - A4
     - A4
     every_bars: 4
     repeats: 8
@@ -1694,8 +1731,8 @@ layer_templates:
     motif: steel_guitar_answer_phrase
     roots:
     - A4
-    - D4
-    - E4
+    - A4
+    - A4
     - A4
     every_bars: 4
     repeats: 8
@@ -1725,7 +1762,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato bass monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous legato bass monk voice for intro (gate 1.0: continuous without
+      same-pitch overlap)'
     gate: 1.0
   low_monk_intro_chorale_baritone:
     kind: motif
@@ -1741,7 +1779,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato baritone monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous legato baritone monk voice for intro (gate 1.0: continuous
+      without same-pitch overlap)'
     gate: 1.0
   low_monk_loop_chorale_bass:
     kind: motif
@@ -1757,8 +1796,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous root-resolving low monk bass voice following loop harmony (gate 1.0: continuous without same-pitch
-      overlap)'
+    label: 'continuous root-resolving low monk bass voice following loop harmony (gate
+      1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_loop_chorale_baritone:
     kind: motif
@@ -1774,8 +1813,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous fifth-resolving low baritone monk voice following loop harmony (gate 1.0: continuous without same-pitch
-      overlap)'
+    label: 'continuous fifth-resolving low baritone monk voice following loop harmony
+      (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_solo_chorale_bass:
     kind: motif
@@ -1791,8 +1830,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous root-resolving low monk bass voice following solo harmony (gate 1.0: continuous without same-pitch
-      overlap)'
+    label: 'continuous root-resolving low monk bass voice following solo harmony (gate
+      1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_solo_chorale_baritone:
     kind: motif
@@ -1808,8 +1847,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous fifth-resolving low baritone monk voice following solo harmony (gate 1.0: continuous without same-pitch
-      overlap)'
+    label: 'continuous fifth-resolving low baritone monk voice following solo harmony
+      (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_tag_chorale_bass:
     kind: motif
@@ -1825,7 +1864,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato low monk bass voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous legato low monk bass voice for outro tag (gate 1.0: continuous
+      without same-pitch overlap)'
     gate: 1.0
   low_monk_tag_chorale_baritone:
     kind: motif
@@ -1841,7 +1881,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato low baritone monk voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous legato low baritone monk voice for outro tag (gate 1.0: continuous
+      without same-pitch overlap)'
     gate: 1.0
 playback:
   mode: section_stem_matrix
@@ -2047,3 +2088,56 @@ sections:
   - guitar_boss_hook
   - amen_brass_hits
   - rockers_boss_drums
+group_postprocess:
+  bass:
+    gain_db: 1.5
+    highpass_hz: 34
+    lowpass_hz: 2200
+    presence_low_hz: 600
+    presence_high_hz: 1200
+    presence_db: 1.0
+    transient_tame: 0.05
+    reverb_wet: 0.005
+  holy_chant:
+    gain_db: 6.0
+    highpass_hz: 150
+    lowpass_hz: 5200
+    high_shelf_hz: 3600
+    high_shelf_db: -1.0
+    reverb_wet: 0.1
+    reverb_decay_seconds: 2.6
+  skank:
+    gain_db: 10.0
+    highpass_hz: 220
+    lowpass_hz: 7000
+    presence_low_hz: 1800
+    presence_high_hz: 3600
+    presence_db: 1.5
+    transient_tame: 0.0
+    reverb_wet: 0.02
+  jam_guitar:
+    gain_db: 6.0
+    highpass_hz: 160
+    lowpass_hz: 6400
+    presence_low_hz: 1400
+    presence_high_hz: 3200
+    presence_db: 1.0
+    reverb_wet: 0.04
+  keys:
+    gain_db: 8.0
+    highpass_hz: 120
+    lowpass_hz: 6200
+    high_shelf_hz: 4000
+    high_shelf_db: -1.0
+    reverb_wet: 0.03
+  drums:
+    gain_db: 1.0
+    highpass_hz: 40
+    lowpass_hz: 11000
+    transient_tame: 0.0
+    reverb_wet: 0.02
+  brass:
+    gain_db: 2.0
+    highpass_hz: 180
+    lowpass_hz: 6600
+    reverb_wet: 0.04
