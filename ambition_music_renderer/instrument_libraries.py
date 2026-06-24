@@ -150,6 +150,19 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
                "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
     ),
+    # Marcato (accented) variants — louder/punchier, for cutting over a rock band.
+    "strings.violin_solo_marcato": SfzLibraryAlias(
+        ref="strings.violin_solo_marcato",
+        required_any=(("sonatina", "violin", "solo", "marcato"),),
+        prefer=("notation", "violin solo 1 marcato", "marcato"),
+        avoid=("performance", "includes", "looped", "non-vibrato", " 2", "solo 2"),
+    ),
+    "strings.violins_1_marcato": SfzLibraryAlias(
+        ref="strings.violins_1_marcato",
+        required_any=(("sonatina", "1st", "violins", "marcato"),),
+        prefer=("notation", "1st violins marcato", "marcato"),
+        avoid=("performance", "includes", "looped"),
+    ),
     "strings.violas": SfzLibraryAlias(
         ref="strings.violas",
         required_any=(("sonatina", "violas"), ("violas", "sustain")),
