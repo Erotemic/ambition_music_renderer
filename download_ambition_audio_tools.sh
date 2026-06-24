@@ -790,8 +790,22 @@ if want_pro; then
     download_and_extract_optional "Karoryfer String Cyborgs" "https://github.com/sfzinstruments/karoryfer.string-cyborgs/releases/download/v1.001/Karoryfer.String_Cyborgs.v1.001.zip" "Karoryfer.String_Cyborgs.v1.001.zip" "$SFZ_ROOT/Karoryfer/StringCyborgs" || true
     download_and_extract_optional "Karoryfer Horse Pulse" "https://github.com/sfzinstruments/Karoryfer.HorsePulse/releases/download/v1.000/Karoryfer_Horse_Pulse_1000.zip" "Karoryfer_Horse_Pulse_1000.zip" "$SFZ_ROOT/Karoryfer/HorsePulse" || true
     if [[ "$ORCHESTRA_EXTRAS" != "0" ]]; then
-        download_github_release_asset "VCSL SFZ Build" "sgossner/VCSL" "VCSL.*\.zip$|.*SFZ.*\.zip$|.*\.zip$" "$SFZ_ROOT/Versilian/VCSL" || true
-        download_github_release_asset "Sonatina Symphonic Orchestra" "peastman/sso" "SSO.*\.zip$|Sonatina.*\.zip$|.*\.zip$" "$SFZ_ROOT/Sonatina/SymphonicOrchestra" || true
+        # VCSL / Sonatina ship their samples in the repo itself; their GitHub
+        # "releases" carry NO uploaded asset (only the auto-generated source
+        # zipball), so download_github_release_asset finds nothing. Pull the
+        # codeload zipball directly (with a branch-archive fallback). ~4GB / ~500MB.
+        download_and_extract_optional "VCSL (Versilian Community Sample Library)" \
+            "https://codeload.github.com/sgossner/VCSL/zip/refs/tags/v1.2.2-RC" \
+            "VCSL-v1.2.2-RC.zip" "$SFZ_ROOT/Versilian/VCSL" \
+          || download_and_extract_optional "VCSL (Versilian Community Sample Library)" \
+            "https://codeload.github.com/sgossner/VCSL/zip/refs/heads/master" \
+            "VCSL-master.zip" "$SFZ_ROOT/Versilian/VCSL" || true
+        download_and_extract_optional "Sonatina Symphonic Orchestra" \
+            "https://codeload.github.com/peastman/sso/zip/refs/tags/v4.0" \
+            "Sonatina-SSO-v4.0.zip" "$SFZ_ROOT/Sonatina/SymphonicOrchestra" \
+          || download_and_extract_optional "Sonatina Symphonic Orchestra" \
+            "https://codeload.github.com/peastman/sso/zip/refs/heads/master" \
+            "Sonatina-SSO-master.zip" "$SFZ_ROOT/Sonatina/SymphonicOrchestra" || true
     else
         log "orchestra extras disabled by ORCHESTRA_EXTRAS=0"
     fi
