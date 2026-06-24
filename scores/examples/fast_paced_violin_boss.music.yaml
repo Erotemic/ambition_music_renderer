@@ -1,49 +1,46 @@
 schema: ambition.musicir.v1
 id: fast_paced_violin_boss
-title: Fast-Paced Violin Boss Battle
+title: Fast-Paced Violin Boss r2 (Sonatina strings, remaster)
 seed: 20260507
-notes: >-
-  D-minor boss cue at 176 BPM, 4/4. The solo violin carries the boss
-  identity — but unlike the previous version (which was pure 16th-note
-  scalar runs end to end), this cue gives the violin a real melodic
-  theme with longer notes and rests, then puts the fast 16th-note bursts
-  in punctuation slots between phrases. Six phases:
-
-    intro              (4 bars  / 5.5 s)  drone + distant brass call
-    phase1             (12 bars / 16.4 s) boss theme, sparse drums
-    phase2             (12 bars / 16.4 s) theme + woodwind counter, brass joins
-    phase3             (12 bars / 16.4 s) theme variation, virtuoso bursts
-    desperation_loop   (12 bars / 16.4 s) "dying boss" — slow held note + flailing
-    outro              (4 bars  / 5.5 s)  cadence to held Dm
-
-  Total: 56 bars = 76.4 s. Uses the v0.8.0 renderer features: spec-level
-  voice-leading + cluster constraints, master bus compressor, per-section
-  ambience overrides (intimate intro, cathedral phase3, drier desperation
-  loop, long-tail outro), per-template velocity humanization, and a real
-  pitch-bend curve on the held tonic of desperation_phrase.
-
+notes: "D-minor boss cue at 176 BPM, 4/4. The solo violin carries the boss identity\
+  \ \u2014 but unlike the previous version (which was pure 16th-note scalar runs end\
+  \ to end), this cue gives the violin a real melodic theme with longer notes and\
+  \ rests, then puts the fast 16th-note bursts in punctuation slots between phrases.\
+  \ Six phases:\n\n  intro              (4 bars  / 5.5 s)  drone + distant brass call\n\
+  \  phase1             (12 bars / 16.4 s) boss theme, sparse drums\n  phase2    \
+  \         (12 bars / 16.4 s) theme + woodwind counter, brass joins\n  phase3   \
+  \          (12 bars / 16.4 s) theme variation, virtuoso bursts\n  desperation_loop\
+  \   (12 bars / 16.4 s) \"dying boss\" \u2014 slow held note + flailing\n  outro\
+  \              (4 bars  / 5.5 s)  cadence to held Dm\n\nTotal: 56 bars = 76.4 s.\
+  \ Uses the v0.8.0 renderer features: spec-level voice-leading + cluster constraints,\
+  \ master bus compressor, per-section ambience overrides (intimate intro, cathedral\
+  \ phase3, drier desperation loop, long-tail outro), per-template velocity humanization,\
+  \ and a real pitch-bend curve on the held tonic of desperation_phrase."
 tempo:
   bpm: 176
 meter:
   beats_per_bar: 4
   beat_unit: 4
-
 constraints:
   voice_leading: minimize_motion
   no_clusters: true
-
 render:
   sample_rate: 48000
   ogg_quality: 6
   backend: pretty-midi
-
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
 postprocess:
   gain_db: 0.0
   highpass_hz: 34
   reverb_wet: 0.045
-  reverb_decay_seconds: 1.10
+  reverb_decay_seconds: 1.1
   reverb_damping_hz: 6800
-  stereo_width: 0.05
+  stereo_width: 0.2
   compressor_threshold_db: -16.0
   compressor_ratio: 3.0
   compressor_attack_ms: 8.0
@@ -53,240 +50,744 @@ postprocess:
   limiter_drive: 0.92
   normalize: true
   target_peak_db: -2.0
-
+  eq_bands:
+  - type: low_shelf
+    hz: 90
+    q: 0.8
+    db: 1.0
+  - type: peak
+    hz: 320
+    q: 0.9
+    db: -1.8
+  - type: peak
+    hz: 2400
+    q: 1.1
+    db: -1.5
+  - type: high_shelf
+    hz: 8000
+    q: 0.7
+    db: -1.2
 stem_postprocess:
   gain_db: 0.0
   highpass_hz: 34
   reverb_wet: 0.006
   reverb_decay_seconds: 0.45
   reverb_damping_hz: 6500
-  stereo_width: 0.030
-  limiter_drive: 0.90
+  stereo_width: 0.03
+  limiter_drive: 0.9
   normalize: false
   target_peak_db: -3.0
-
 instruments:
-  - {name: solo_violin,  group: strings,    program: violin,            volume: 100, pan: 72, expression: 104, modulation: 14}
-  - {name: violins_i,    group: strings,    program: string_ensemble_1, volume: 78,  pan: 82, expression: 84,  modulation: 10}
-  - {name: violins_ii,   group: strings,    program: string_ensemble_2, volume: 72,  pan: 40, expression: 78,  modulation: 8}
-  - {name: violas,       group: strings,    program: viola,             volume: 76,  pan: 50, expression: 82,  modulation: 6}
-  - {name: celli,        group: strings,    program: cello,             volume: 82,  pan: 36, expression: 86,  modulation: 6}
-  - {name: contrabass,   group: strings,    program: contrabass,        volume: 80,  pan: 30, expression: 84}
-
-  - {name: horns,        group: brass,      program: french_horn,       volume: 76,  pan: 70, expression: 82,  modulation: 5}
-  - {name: trumpets,     group: brass,      program: trumpet,           volume: 72,  pan: 84, expression: 78,  modulation: 3}
-  - {name: trombones,    group: brass,      program: trombone,          volume: 76,  pan: 44, expression: 82,  modulation: 3}
-  - {name: tuba,         group: brass,      program: tuba,              volume: 70,  pan: 32, expression: 76}
-
-  - {name: oboe,         group: winds,      program: oboe,              volume: 86,  pan: 76, expression: 92,  modulation: 6}
-  - {name: clarinet,     group: winds,      program: clarinet,          volume: 82,  pan: 56, expression: 88,  modulation: 5}
-  - {name: bassoon,      group: winds,      program: bassoon,           volume: 80,  pan: 38, expression: 86,  modulation: 4}
-
-  - {name: choir,        group: choir_pad,  program: choir_aahs,        volume: 56,  pan: 64, expression: 70,  modulation: 4}
-  - {name: pad_warm,     group: choir_pad,  program: pad_warm,          volume: 48,  pan: 64, expression: 64,  modulation: 3}
-
-  - {name: bells,        group: mallets,    program: tubular_bells,     volume: 70,  pan: 78, expression: 84}
-  - {name: harp,         group: mallets,    program: orchestral_harp,   volume: 60,  pan: 60, expression: 76}
-
-  - {name: timpani,      group: percussion, program: timpani,           volume: 84,  pan: 52, expression: 92}
-  - {name: war_drums,    group: percussion, is_drum: true,              volume: 100, pan: 64, expression: 108}
-
+- name: solo_violin
+  group: strings
+  program: violin
+  volume: 100
+  pan: 72
+  expression: 104
+  modulation: 14
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violin_solo
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_i
+  group: strings
+  program: string_ensemble_1
+  volume: 78
+  pan: 82
+  expression: 84
+  modulation: 10
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_ii
+  group: strings
+  program: string_ensemble_2
+  volume: 72
+  pan: 40
+  expression: 78
+  modulation: 8
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_2
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violas
+  group: strings
+  program: viola
+  volume: 76
+  pan: 50
+  expression: 82
+  modulation: 6
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celli
+  group: strings
+  program: cello
+  volume: 82
+  pan: 36
+  expression: 86
+  modulation: 6
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: contrabass
+  group: strings
+  program: contrabass
+  volume: 80
+  pan: 30
+  expression: 84
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.basses
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: horns
+  group: brass
+  program: french_horn
+  volume: 76
+  pan: 70
+  expression: 82
+  modulation: 5
+- name: trumpets
+  group: brass
+  program: trumpet
+  volume: 72
+  pan: 84
+  expression: 78
+  modulation: 3
+- name: trombones
+  group: brass
+  program: trombone
+  volume: 76
+  pan: 44
+  expression: 82
+  modulation: 3
+- name: tuba
+  group: brass
+  program: tuba
+  volume: 70
+  pan: 32
+  expression: 76
+- name: oboe
+  group: winds
+  program: oboe
+  volume: 86
+  pan: 76
+  expression: 92
+  modulation: 6
+- name: clarinet
+  group: winds
+  program: clarinet
+  volume: 82
+  pan: 56
+  expression: 88
+  modulation: 5
+- name: bassoon
+  group: winds
+  program: bassoon
+  volume: 80
+  pan: 38
+  expression: 86
+  modulation: 4
+- name: choir
+  group: choir_pad
+  program: choir_aahs
+  volume: 56
+  pan: 64
+  expression: 70
+  modulation: 4
+- name: pad_warm
+  group: choir_pad
+  program: pad_warm
+  volume: 48
+  pan: 64
+  expression: 64
+  modulation: 3
+- name: bells
+  group: mallets
+  program: tubular_bells
+  volume: 70
+  pan: 78
+  expression: 84
+- name: harp
+  group: mallets
+  program: orchestral_harp
+  volume: 60
+  pan: 60
+  expression: 76
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.harp
+    prefer:
+    - harp
+    - normal
+    optional: true
+    fallback_backend: pretty-midi
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 84
+  pan: 52
+  expression: 92
+- name: war_drums
+  group: percussion
+  is_drum: true
+  volume: 100
+  pan: 64
+  expression: 108
 motifs:
-  # Boss theme — 4 bars. The violin's actual melodic identity.
-  # Bar 1: D5 (q) - F5 (q) - A5 (h)            — rising tonic-3rd-5th declaration
-  # Bar 2: G5 - F5 - E5 - D5                    — controlled descent (q,q,q,h)
-  # Bar 3: A5 - F5 - C#5                        — leap up + dip to leading tone (q,q,h)
-  # Bar 4: D5 (whole)                            — held tonic with vibrato
-  - id: boss_theme
-    root: D5
-    intervals: [0, 3, 7, 5, 3, 2, 0, 7, 3, -1, 0]
-    rhythm:    [1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 4.0]
-    velocities: [0.96, 0.92, 1.00, 0.92, 0.90, 0.88, 0.86, 1.00, 0.92, 0.86, 0.82]
-
-  # Boss theme variation B — uses b6 (Bb) for harmonic-minor flavor.
-  # Bar 1: Bb5 - A5 - G5 - F5                   — descending from b6 (q,q,q,q)
-  # Bar 2: E5 - F5 - G5 - A5                    — ascending answer (q,q,q,q)
-  # Bar 3: Bb5 - A5 - G5 - F5 - E5 - D5         — six 8ths cascading
-  # Bar 4: F5 (whole)                            — held minor 3rd, unresolved
-  - id: boss_theme_b
-    root: D5
-    intervals: [8, 7, 5, 3, 2, 3, 5, 7, 8, 7, 5, 3, 2, 0, 3]
-    rhythm:    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 4.0]
-    velocities: [0.94, 0.92, 0.90, 0.86, 0.84, 0.86, 0.90, 0.94, 0.96, 0.92, 0.88, 0.84, 0.82, 0.80, 0.84]
-
-  # Fast 16th burst — 1-bar interjection between melodic phrases. Real
-  # virtuoso flair, but bracketed by held notes on either side so it lands
-  # as a *moment*, not a continuous texture.
-  # D5 E5 F5 G5 A5 G5 F5 E5 D5 C#5 D5 E5 F5 G5 A5 F5  (16 16ths)
-  - id: violin_burst
-    root: D5
-    intervals: [0, 2, 3, 5, 7, 5, 3, 2, 0, -1, 0, 2, 3, 5, 7, 3]
-    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
-    velocities: [1.00, 0.84, 0.88, 0.86, 0.96, 0.86, 0.88, 0.84, 0.94, 0.84, 0.86, 0.84, 0.92, 0.84, 1.00, 0.92]
-
-  # Climax burst — 2 bars. Ascending run + held A5, then descending run +
-  # held D5. This is the peak shred moment.
-  - id: violin_climax_burst
-    root: D5
-    intervals: [0, 2, 3, 5, 7, 5, 7, 8, 7, 12, 10, 8, 7, 5, 3, 2, 0]
-    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 2.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 2.5]
-    velocities: [1.00, 0.86, 0.88, 0.86, 0.96, 0.88, 0.94, 1.00, 0.96, 1.00, 0.94, 0.90, 0.86, 0.84, 0.82, 0.80, 0.78]
-
-  # Woodwind counter melody — answers the violin theme. 4 bars, lyrical.
-  # A4 - C5 - D5 (h) - Bb4 - A4 - G4 (h) - F4 G4 A4 Bb4 A4 G4 F4 E4 - D4 (whole)
-  - id: counter_phrase
-    root: D5
-    intervals: [-5, -2, 0, -4, -5, -7, -9, -7, -5, -4, -5, -7, -9, -10, -12]
-    rhythm:    [1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 4.0]
-    velocities: [0.84, 0.86, 0.92, 0.84, 0.84, 0.86, 0.82, 0.84, 0.86, 0.88, 0.86, 0.84, 0.80, 0.78, 0.74]
-
-  # Brass war-call — 2 bars. Ascending arpeggio + descending resolution.
-  # D4 (q) - A4 (q) - D5 (h) - A4 - F4 - E4 - D4 (q-q-q-h)
-  - id: brass_call
-    root: D4
-    intervals: [0, 7, 12, 7, 3, 2, 0]
-    rhythm:    [1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0]
-    velocities: [0.94, 0.96, 1.00, 0.94, 0.92, 0.88, 0.90]
-
-  # Desperation phrase — 4 bars. Slow held note → desperate flourish →
-  # final descent → held dying tone.
-  - id: desperation_phrase
-    root: D5
-    intervals: [0, 0, 3, 7, 12, 7, 3, 0, -5, -4, -5, -7, -9, -10, -12, -12]
-    rhythm:    [4.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 4.0]
-    velocities: [0.96, 0.94, 0.96, 0.98, 1.00, 0.94, 0.88, 0.84, 0.86, 0.84, 0.82, 0.80, 0.78, 0.76, 0.78, 0.70]
-
-  # Cello "knife" stab pattern — 2 bars, rhythmic.
-  # D3 (e) rest A2 D3 (e-e-e) - F3 (q) rest D3 (q)
-  - id: cello_stab
-    root: D3
-    intervals: [0, -5, 0, 3, 0]
-    rhythm:    [0.5, 0.5, 0.5, 0.5, 2.0]
-    velocities: [0.96, 0.84, 0.94, 0.92, 0.78]
-
+- id: boss_theme
+  root: D5
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  - 7
+  - 3
+  - -1
+  - 0
+  rhythm:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  velocities:
+  - 0.96
+  - 0.92
+  - 1.0
+  - 0.92
+  - 0.9
+  - 0.88
+  - 0.86
+  - 1.0
+  - 0.92
+  - 0.86
+  - 0.82
+- id: boss_theme_b
+  root: D5
+  intervals:
+  - 8
+  - 7
+  - 5
+  - 3
+  - 2
+  - 3
+  - 5
+  - 7
+  - 8
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  - 3
+  rhythm:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 4.0
+  velocities:
+  - 0.94
+  - 0.92
+  - 0.9
+  - 0.86
+  - 0.84
+  - 0.86
+  - 0.9
+  - 0.94
+  - 0.96
+  - 0.92
+  - 0.88
+  - 0.84
+  - 0.82
+  - 0.8
+  - 0.84
+- id: violin_burst
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 3
+  - 5
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  - -1
+  - 0
+  - 2
+  - 3
+  - 5
+  - 7
+  - 3
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  velocities:
+  - 1.0
+  - 0.84
+  - 0.88
+  - 0.86
+  - 0.96
+  - 0.86
+  - 0.88
+  - 0.84
+  - 0.94
+  - 0.84
+  - 0.86
+  - 0.84
+  - 0.92
+  - 0.84
+  - 1.0
+  - 0.92
+- id: violin_climax_burst
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 3
+  - 5
+  - 7
+  - 5
+  - 7
+  - 8
+  - 7
+  - 12
+  - 10
+  - 8
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 2.0
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 2.5
+  velocities:
+  - 1.0
+  - 0.86
+  - 0.88
+  - 0.86
+  - 0.96
+  - 0.88
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.9
+  - 0.86
+  - 0.84
+  - 0.82
+  - 0.8
+  - 0.78
+- id: counter_phrase
+  root: D5
+  intervals:
+  - -5
+  - -2
+  - 0
+  - -4
+  - -5
+  - -7
+  - -9
+  - -7
+  - -5
+  - -4
+  - -5
+  - -7
+  - -9
+  - -10
+  - -12
+  rhythm:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.0
+  - 2.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 4.0
+  velocities:
+  - 0.84
+  - 0.86
+  - 0.92
+  - 0.84
+  - 0.84
+  - 0.86
+  - 0.82
+  - 0.84
+  - 0.86
+  - 0.88
+  - 0.86
+  - 0.84
+  - 0.8
+  - 0.78
+  - 0.74
+- id: brass_call
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 12
+  - 7
+  - 3
+  - 2
+  - 0
+  rhythm:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.94
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.92
+  - 0.88
+  - 0.9
+- id: desperation_phrase
+  root: D5
+  intervals:
+  - 0
+  - 0
+  - 3
+  - 7
+  - 12
+  - 7
+  - 3
+  - 0
+  - -5
+  - -4
+  - -5
+  - -7
+  - -9
+  - -10
+  - -12
+  - -12
+  rhythm:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 4.0
+  velocities:
+  - 0.96
+  - 0.94
+  - 0.96
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.88
+  - 0.84
+  - 0.86
+  - 0.84
+  - 0.82
+  - 0.8
+  - 0.78
+  - 0.76
+  - 0.78
+  - 0.7
+- id: cello_stab
+  root: D3
+  intervals:
+  - 0
+  - -5
+  - 0
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.96
+  - 0.84
+  - 0.94
+  - 0.92
+  - 0.78
 layer_templates:
   expression_swell:
     kind: automation
     automation:
-      - {group: strings,   cc: expression, from: 80, to: 110, curve: smooth, points: 12}
-      - {group: brass,     cc: expression, from: 60, to: 95,  curve: smooth, points: 12}
-      - {group: winds,     cc: expression, from: 70, to: 100, curve: smooth, points: 12}
-      - {group: choir_pad, cc: expression, from: 40, to: 78,  curve: smooth, points: 8}
-
-  # Vibrato LFO on the solo violin — gives the held notes life.
+    - group: strings
+      cc: expression
+      from: 80
+      to: 110
+      curve: smooth
+      points: 12
+    - group: brass
+      cc: expression
+      from: 60
+      to: 95
+      curve: smooth
+      points: 12
+    - group: winds
+      cc: expression
+      from: 70
+      to: 100
+      curve: smooth
+      points: 12
+    - group: choir_pad
+      cc: expression
+      from: 40
+      to: 78
+      curve: smooth
+      points: 8
   violin_vibrato:
     kind: automation
     automation:
-      - {instrument: solo_violin, cc: modulation, curve: lfo, from: 20, to: 90, cycles: 14}
-
-  # Solo violin theme.
+    - instrument: solo_violin
+      cc: modulation
+      curve: lfo
+      from: 20
+      to: 90
+      cycles: 14
   boss_theme_voice:
     kind: motif
     instrument: solo_violin
     motif: boss_theme
     velocity: 96
     articulation: tenuto
-    instrument_pitch_scoop_cents: {solo_violin: 8.0}
+    instrument_pitch_scoop_cents:
+      solo_violin: 8.0
     humanize_ms: 4
     humanize_velocity_pct: 3
-
   boss_theme_b_voice:
     kind: motif
     instrument: solo_violin
     motif: boss_theme_b
     velocity: 96
     articulation: tenuto
-    instrument_pitch_scoop_cents: {solo_violin: 8.0}
+    instrument_pitch_scoop_cents:
+      solo_violin: 8.0
     humanize_ms: 4
     humanize_velocity_pct: 3
-
   violin_burst_voice:
     kind: motif
     instrument: solo_violin
     motif: violin_burst
     velocity: 100
     articulation: spiccato
-    instrument_pitch_scoop_cents: {solo_violin: 4.0}
+    instrument_pitch_scoop_cents:
+      solo_violin: 4.0
     humanize_ms: 2
     humanize_velocity_pct: 4
-
   climax_burst_voice:
     kind: motif
     instrument: solo_violin
     motif: violin_climax_burst
     velocity: 104
     articulation: spiccato
-    instrument_pitch_scoop_cents: {solo_violin: 6.0}
-    # Bend up a quarter-tone on the held A5 (note 9 of the motif), then
-    # release. Real string bend gesture.
-    pitch_bend_curve: [[8.0, 0], [8.5, 60], [10.0, 60], [10.5, 0]]
+    instrument_pitch_scoop_cents:
+      solo_violin: 6.0
+    pitch_bend_curve:
+    - - 8.0
+      - 0
+    - - 8.5
+      - 60
+    - - 10.0
+      - 60
+    - - 10.5
+      - 0
     humanize_ms: 2
     humanize_velocity_pct: 4
-
   desperation_voice:
     kind: motif
     instrument: solo_violin
     motif: desperation_phrase
     velocity: 90
     articulation: tenuto
-    instrument_pitch_scoop_cents: {solo_violin: 6.0}
-    # The held opening D5 gets a slow vibrato bend — the boss is "dying".
-    pitch_bend_curve: [[0.0, 0], [1.0, -30], [2.0, 30], [3.0, -30], [3.8, 0]]
+    instrument_pitch_scoop_cents:
+      solo_violin: 6.0
+    pitch_bend_curve:
+    - - 0.0
+      - 0
+    - - 1.0
+      - -30
+    - - 2.0
+      - 30
+    - - 3.0
+      - -30
+    - - 3.8
+      - 0
     humanize_ms: 4
     humanize_velocity_pct: 3
-
-  # Counter melody on oboe + clarinet (light unison double).
   counter_voice:
     kind: motif
-    instruments: [oboe, clarinet]
+    instruments:
+    - oboe
+    - clarinet
     motif: counter_phrase
     velocity: 82
     articulation: legato
-    instrument_velocity_offsets: {oboe: 0, clarinet: -8}
+    instrument_velocity_offsets:
+      oboe: 0
+      clarinet: -8
     humanize_ms: 5
     humanize_velocity_pct: 3
-
-  # Brass war call (horns + trumpets in octaves).
   brass_call_voice:
     kind: motif
-    instruments: [horns, trumpets]
+    instruments:
+    - horns
+    - trumpets
     motif: brass_call
     velocity: 86
     articulation: marcato
-    instrument_octave_offsets: {horns: 0, trumpets: 1}
-    instrument_velocity_offsets: {horns: 0, trumpets: -8}
+    instrument_octave_offsets:
+      horns: 0
+      trumpets: 1
+    instrument_velocity_offsets:
+      horns: 0
+      trumpets: -8
     humanize_ms: 4
     humanize_velocity_pct: 3
-
-  # Cello-knife stab pattern (celli + bassoon).
   cello_knives:
     kind: motif
-    instruments: [celli, bassoon]
+    instruments:
+    - celli
+    - bassoon
     motif: cello_stab
     velocity: 78
     articulation: marcato
-    instrument_velocity_offsets: {celli: 0, bassoon: -8}
+    instrument_velocity_offsets:
+      celli: 0
+      bassoon: -8
     humanize_ms: 3
     humanize_velocity_pct: 3
-    starts: [[0, 0.0]]
+    starts:
+    - - 0
+      - 0.0
     repeats: 12
     every_bars: 2
-
-  # Sustained string-pad bed (violins_i + violas + celli).
   string_bed:
     kind: pad_chords
-    instruments: [violins_i, violins_ii, violas, celli]
-    instrument_octave_offsets: {violins_i: 1, violins_ii: 0, violas: 0, celli: -1}
-    instrument_velocity_offsets: {violins_i: -6, violins_ii: -10, violas: -10, celli: -6}
+    instruments:
+    - violins_i
+    - violins_ii
+    - violas
+    - celli
+    instrument_octave_offsets:
+      violins_i: 1
+      violins_ii: 0
+      violas: 0
+      celli: -1
+    instrument_velocity_offsets:
+      violins_i: -6
+      violins_ii: -10
+      violas: -10
+      celli: -6
     octave: 3
     duration_beats: 4.0
     velocity: 60
     articulation: legato
-    voicing: open
+    voicing: shell
     humanize_ms: 6
     humanize_velocity_pct: 3
-
-  # Driving 8th-note bass line — fast tempo so this is hot.
+    constraints:
+      max_notes: 3
   bass_drive:
     kind: bassline
     instrument: contrabass
@@ -296,16 +797,30 @@ layer_templates:
     humanize_ms: 3
     humanize_velocity_pct: 3
     pattern:
-      - [0, 0.0, 0.45]
-      - [0, 0.5, 0.45]
-      - [0, 1.0, 0.45]
-      - [0, 1.5, 0.45]
-      - [0, 2.0, 0.45]
-      - [0, 2.5, 0.45]
-      - [0, 3.0, 0.45]
-      - [0, 3.5, 0.45]
-
-  # Pulsing root for the desperation_loop — half-time feel.
+    - - 0
+      - 0.0
+      - 0.45
+    - - 0
+      - 0.5
+      - 0.45
+    - - 0
+      - 1.0
+      - 0.45
+    - - 0
+      - 1.5
+      - 0.45
+    - - 0
+      - 2.0
+      - 0.45
+    - - 0
+      - 2.5
+      - 0.45
+    - - 0
+      - 3.0
+      - 0.45
+    - - 0
+      - 3.5
+      - 0.45
   bass_pulse_slow:
     kind: bassline
     instrument: contrabass
@@ -315,13 +830,18 @@ layer_templates:
     humanize_ms: 3
     humanize_velocity_pct: 3
     pattern:
-      - [0, 0.0, 1.8]
-      - [0, 2.0, 1.8]
-
-  # Brass chord stab on phrase boundaries.
+    - - 0
+      - 0.0
+      - 1.8
+    - - 0
+      - 2.0
+      - 1.8
   brass_stab:
     kind: chord_hits
-    instruments: [horns, trombones, tuba]
+    instruments:
+    - horns
+    - trombones
+    - tuba
     octave: 3
     velocity: 80
     duration_beats: 1.0
@@ -329,15 +849,11 @@ layer_templates:
     voicing: closed
     humanize_ms: 3
     humanize_velocity_pct: 3
-
-  # Tuba pedal under the climax sections.
   tuba_pedal:
     kind: pedal
     instrument: tuba
     octave: 1
     velocity: 64
-
-  # Timpani root hits.
   timpani_hit:
     kind: root_hits
     instrument: timpani
@@ -345,33 +861,32 @@ layer_templates:
     velocity: 86
     articulation: marcato
     humanize_ms: 3
-
-  # Choir wash.
   choir_wash:
     kind: pad_chords
     instrument: choir
     octave: 4
     every_bars: 4
-    duration_beats: 16.0
+    duration_beats: 8.0
     velocity: 50
     articulation: pad
     voicing: open
     humanize_ms: 0
     humanize_velocity_pct: 2
-
+    constraints:
+      max_notes: 4
   warm_pad_layer:
     kind: pad_chords
     instrument: pad_warm
     octave: 3
     every_bars: 4
-    duration_beats: 16.0
+    duration_beats: 4.0
     velocity: 36
     articulation: pad
-    voicing: wide
+    voicing: shell
     humanize_ms: 0
     humanize_velocity_pct: 2
-
-  # Bell tolls on phrase tops.
+    constraints:
+      max_notes: 3
   bell_toll:
     kind: chord_hits
     instrument: bells
@@ -382,299 +897,715 @@ layer_templates:
     voicing: closed
     humanize_ms: 0
     humanize_velocity_pct: 2
-
-  # ---- Drum patterns ----
-
   drums_intro:
     kind: drums
     instrument: war_drums
     humanize_ms: 1.0
     events:
-      - {drum: concert_bass_drum, beat: 0.0, velocity: 50, bars: [2, 3]}
-      - {drum: snare,             beat: 2.0, velocity: 38, bars: [3]}
-
+    - drum: concert_bass_drum
+      beat: 0.0
+      velocity: 50
+      bars:
+      - 2
+      - 3
+    - drum: snare
+      beat: 2.0
+      velocity: 38
+      bars:
+      - 3
   drums_phase1:
     kind: drums
     instrument: war_drums
     humanize_ms: 1.0
     events:
-      - {drum: concert_bass_drum, beats: [0.0, 2.0],  velocity: 76}
-      - {drum: snare,             beats: [1.0, 3.0],  velocity: 70}
-      - {drum: closed_hat,        beats: [0.5, 1.5, 2.5, 3.5], velocity: 26}
-
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 76
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 70
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 26
   drums_phase2:
     kind: drums
     instrument: war_drums
     humanize_ms: 1.0
     events:
-      - {drum: concert_bass_drum, beats: [0.0, 0.75, 2.0],  velocity: 80}
-      - {drum: snare,             beats: [1.0, 3.0],        velocity: 78}
-      - {drum: closed_hat,        beats: [0.5, 1.5, 2.5, 3.5], velocity: 30}
-      - {drum: low_tom,           beat: 3.5, velocity: 50, probability: 0.6}
-
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 0.75
+      - 2.0
+      velocity: 80
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 78
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 30
+    - drum: low_tom
+      beat: 3.5
+      velocity: 50
+      probability: 0.6
   drums_phase3:
     kind: drums
     instrument: war_drums
     humanize_ms: 1.0
     events:
-      - {drum: concert_bass_drum, beats: [0.0, 1.0, 2.0, 3.0], velocity: 84}
-      - {drum: snare,             beats: [1.0, 3.0],            velocity: 84}
-      - {drum: closed_hat,        beats: [0.5, 1.5, 2.5, 3.5],  velocity: 32}
-      - {drum: ride,              beats: [0.0, 1.0, 2.0, 3.0],  velocity: 28}
-      - {drum: crash,             beat: 0.0, velocity: 86, bars: [0, 4, 8]}
-      - {drum: low_tom,           beat: 3.5, velocity: 56}
-
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 84
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 84
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 32
+    - drum: ride
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 28
+    - drum: crash
+      beat: 0.0
+      velocity: 86
+      bars:
+      - 0
+      - 4
+      - 8
+    - drum: low_tom
+      beat: 3.5
+      velocity: 56
   drums_desperation:
     kind: drums
     instrument: war_drums
     humanize_ms: 1.0
     events:
-      - {drum: concert_bass_drum, beat: 0.0,            velocity: 78}
-      - {drum: snare,             beats: [2.0, 3.5],    velocity: 60, probability: 0.7}
-      - {drum: low_tom,           beats: [1.0, 1.5, 2.5, 3.0], velocity: 50, probability: 0.6}
-      - {drum: ride,              beats: [0.0, 1.0, 2.0, 3.0], velocity: 24}
-
+    - drum: concert_bass_drum
+      beat: 0.0
+      velocity: 78
+    - drum: snare
+      beats:
+      - 2.0
+      - 3.5
+      velocity: 60
+      probability: 0.7
+    - drum: low_tom
+      beats:
+      - 1.0
+      - 1.5
+      - 2.5
+      - 3.0
+      velocity: 50
+      probability: 0.6
+    - drum: ride
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 24
 playback:
   mode: section_stem_matrix
   intro: intro
-  loop_components: [phase1, phase2, phase3, desperation_loop]
+  loop_components:
+  - phase1
+  - phase2
+  - phase3
+  - desperation_loop
   outro: outro
   exit_policy:
     request_outro: next_valid_exit_bar
     fade_aggressive_stems_beats: 2
-    bridge_stems: [strings, choir_pad]
-    fade_stems: [brass, percussion, mallets, winds]
-
+    bridge_stems:
+    - strings
+    - choir_pad
+    fade_stems:
+    - brass
+    - percussion
+    - mallets
+    - winds
 state_map:
-  starting:        {section: intro}
-  phase_1:         {preferred_section: phase1, stems: {strings: 1.0, brass: 0.20, winds: 0.30, percussion: 0.55, mallets: 0.15, choir_pad: 0.20}}
-  phase_2:         {preferred_section: phase2, stems: {strings: 1.0, brass: 0.55, winds: 0.65, percussion: 0.85, mallets: 0.25, choir_pad: 0.30}}
-  phase_3:         {preferred_section: phase3, stems: {strings: 1.0, brass: 0.85, winds: 0.65, percussion: 1.00, mallets: 0.45, choir_pad: 0.40}}
-  desperation:     {preferred_section: desperation_loop, stems: {strings: 1.0, brass: 0.45, winds: 0.45, percussion: 0.40, mallets: 0.55, choir_pad: 0.65}}
-  defeated:        {transition: outro_at_next_valid_exit_bar, outro: outro}
-
+  starting:
+    section: intro
+  phase_1:
+    preferred_section: phase1
+    stems:
+      strings: 1.0
+      brass: 0.2
+      winds: 0.3
+      percussion: 0.55
+      mallets: 0.15
+      choir_pad: 0.2
+  phase_2:
+    preferred_section: phase2
+    stems:
+      strings: 1.0
+      brass: 0.55
+      winds: 0.65
+      percussion: 0.85
+      mallets: 0.25
+      choir_pad: 0.3
+  phase_3:
+    preferred_section: phase3
+    stems:
+      strings: 1.0
+      brass: 0.85
+      winds: 0.65
+      percussion: 1.0
+      mallets: 0.45
+      choir_pad: 0.4
+  desperation:
+    preferred_section: desperation_loop
+    stems:
+      strings: 1.0
+      brass: 0.45
+      winds: 0.45
+      percussion: 0.4
+      mallets: 0.55
+      choir_pad: 0.65
+  defeated:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
 sections:
-  - id: intro
-    kind: intro
-    label: distant approach - drone + brass call
-    bars: 4
-    intensity: 0.55
-    density: 0.30
-    loopable: false
-    harmony: ["Dm", "Bb", "Gm", "A7"]
-    # Intimate ambience — the boss isn't ready yet.
-    postprocess:
-      reverb_wet: 0.075
-      reverb_decay_seconds: 1.40
-    layers:
-      - expression_swell
-      # Sustained tonic drone on violins_i tremolo.
-      - kind: pedal
-        instrument: violins_i
-        octave: 5
-        note: D5
-        velocity: 64
-      # Distant low contrabass + tuba drone.
-      - kind: pedal
-        instrument: contrabass
-        octave: 2
-        note: D2
-        velocity: 60
-      - kind: pedal
-        instrument: tuba
-        octave: 1
-        note: D1
-        velocity: 56
-      # Single brass call on bar 2.
-      - {template: brass_call_voice, starts: [[2, 0.0]], velocity: 70}
-      - drums_intro
-      # Bell on bar 0 + bar 3 (announcement + cadence).
-      - kind: chord_hits
-        instrument: bells
-        octave: 5
-        velocity: 70
-        duration_beats: 4.0
-        articulation: bell
-        humanize_ms: 0
-        hits: [[0, 0.0], [3, 0.0]]
-      - {template: choir_wash, velocity: 38}
-      - {template: warm_pad_layer, velocity: 28}
-
-  - id: phase1
-    kind: loop_component
-    label: phase 1 - boss theme appears, sparse drums
-    bars: 12
-    intensity: 0.72
-    density: 0.55
-    loopable: true
-    valid_exit_local_bars: [4, 8, 12]
-    harmony: ["Dm", "C", "Bb", "A7", "Dm", "Gm", "Bb", "A7",
-              "Dm", "C", "Bb", "A7"]
-    layers:
-      - violin_vibrato
-      - {template: boss_theme_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 92}
-      # Single fast burst at the end of bar 3, 7, 11 — ends each phrase.
-      - {template: violin_burst_voice, starts: [[3, 0.0], [7, 0.0], [11, 0.0]], velocity: 92}
-      - {template: cello_knives, repeats: 6, velocity: 70}
-      - {template: bass_drive, velocity: 76}
-      - {template: string_bed, velocity: 56}
-      - drums_phase1
-      - {template: warm_pad_layer, velocity: 32}
-
-  - id: phase2
-    kind: loop_component
-    label: phase 2 - theme + woodwind counter, brass joins
-    bars: 12
-    intensity: 0.82
-    density: 0.65
-    loopable: true
-    valid_exit_local_bars: [4, 8, 12]
-    harmony: ["Dm", "Gm", "Bb", "A7", "Dm", "F", "Gm", "A7",
-              "Dm", "C#dim7", "Bb", "A7"]
-    layers:
-      - violin_vibrato
-      - {template: boss_theme_voice, starts: [[0, 0.0], [8, 0.0]], velocity: 96}
-      - {template: counter_voice, starts: [[4, 0.0]], velocity: 84}
-      - {template: violin_burst_voice, starts: [[3, 0.0], [7, 0.0], [11, 0.0]], velocity: 94}
-      - {template: brass_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 82}
-      - {template: brass_call_voice, starts: [[6, 0.0]], velocity: 80}
-      - {template: cello_knives, repeats: 6, velocity: 76}
-      - {template: bass_drive, velocity: 80}
-      - {template: string_bed, velocity: 60}
-      - {template: timpani_hit, hits: [[0, 0.0, 0, 0.4], [4, 0.0, 0, 0.4], [8, 0.0, 0, 0.4]], velocity: 80}
-      - drums_phase2
-      - {template: choir_wash, velocity: 44}
-      - {template: warm_pad_layer, velocity: 34}
-
-  - id: phase3
-    kind: loop_component
-    label: phase 3 - theme variation, virtuoso climax burst
-    bars: 12
-    intensity: 0.92
-    density: 0.78
-    loopable: true
-    valid_exit_local_bars: [4, 8, 12]
-    harmony: ["Dm", "Bb", "Gm", "A7", "Dm", "F", "C#dim7", "A7",
-              "Dm", "Gm", "Bb", "A7"]
-    # Cathedral ambience for the climax phase.
-    postprocess:
-      reverb_wet: 0.075
-      reverb_decay_seconds: 1.40
-    layers:
-      - violin_vibrato
-      # Theme variation B opens the section.
-      - {template: boss_theme_b_voice, starts: [[0, 0.0]], velocity: 100}
-      # The 2-bar virtuoso climax burst at bars 4-5 is the peak shred moment.
-      - {template: climax_burst_voice, starts: [[4, 0.0]], velocity: 104}
-      # Boss theme returns at bar 8 to close the phase.
-      - {template: boss_theme_voice, starts: [[8, 0.0]], velocity: 100}
-      - {template: violin_burst_voice, starts: [[6, 0.0], [11, 0.0]], velocity: 100}
-      - {template: counter_voice, starts: [[8, 0.0]], velocity: 86}
-      - {template: brass_call_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 88}
-      - {template: brass_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 90}
-      - {template: tuba_pedal, velocity: 70}
-      - {template: cello_knives, repeats: 6, velocity: 80}
-      - {template: bass_drive, velocity: 86}
-      - {template: string_bed, velocity: 64}
-      - {template: timpani_hit, hits: [[0, 0.0, 0, 0.5], [4, 0.0, 0, 0.5], [8, 0.0, 0, 0.5]], velocity: 86}
-      - drums_phase3
-      - {template: bell_toll, hits: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 76}
-      - {template: choir_wash, velocity: 56}
-      - {template: warm_pad_layer, velocity: 40}
-
-  - id: desperation_loop
-    kind: loop_component
-    label: desperation - boss is dying, slow held + flailing flourish
-    bars: 12
-    intensity: 0.70
-    density: 0.55
-    loopable: true
-    valid_exit_local_bars: [4, 8, 12]
-    harmony: ["Dm", "A7", "Dm", "Bb", "Gm", "A7", "Dm", "Dm",
-              "Dm", "A7", "Dm", "Dm"]
-    # Drier, more intimate ambience — pulled-back contrast.
-    postprocess:
-      reverb_wet: 0.030
-      reverb_decay_seconds: 0.80
-    layers:
-      - violin_vibrato
-      # Desperation phrase repeats — held tonic with vibrato bend, then
-      # flailing 8th-note flourish, then dying held tone.
-      - {template: desperation_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0]], velocity: 86}
-      - {template: violin_burst_voice, starts: [[3, 0.0], [7, 0.0], [11, 0.0]], velocity: 92}
-      - {template: counter_voice, starts: [[4, 0.0]], velocity: 76}
-      # Bass pulses slowly — the boss's weakening heartbeat.
-      - {template: bass_pulse_slow, velocity: 76}
-      # Sparse string sustain.
-      - kind: pad_chords
-        instruments: [violins_i, violas, celli]
-        instrument_octave_offsets: {violins_i: 1, violas: 0, celli: -1}
-        octave: 3
-        duration_beats: 4.0
-        velocity: 60
-        articulation: legato
-        voicing: open
-        humanize_ms: 6
-        humanize_velocity_pct: 3
-      - {template: brass_stab, hits: [[3, 2.0], [7, 2.0], [11, 2.0]], velocity: 76}
-      - drums_desperation
-      - {template: bell_toll, hits: [[0, 0.0], [8, 0.0]], velocity: 70}
-      - {template: choir_wash, velocity: 56}
-      - {template: warm_pad_layer, velocity: 38}
-
-  - id: outro
-    kind: outro
-    label: cadence to held Dm
-    bars: 4
-    intensity: 0.60
-    density: 0.40
-    loopable: false
-    harmony: ["Gm", "A7sus4", "Dm", "Dm"]
-    # Long-tail reverb for the outro.
-    postprocess:
-      reverb_wet: 0.080
-      reverb_decay_seconds: 1.80
-    layers:
-      - violin_vibrato
-      # Final violin held tone, slowly fading.
-      - kind: motif
-        instrument: solo_violin
-        motif: boss_theme
-        velocity: 88
-        articulation: tenuto
-        humanize_ms: 4
-        humanize_velocity_pct: 3
-        starts: [[0, 0.0]]
-      - {template: string_bed, velocity: 64}
-      - {template: bass_pulse_slow, velocity: 64}
-      # Final stinger on bar 3.
-      - kind: drums
-        instrument: war_drums
-        humanize_ms: 0
-        events:
-          - {drum: concert_bass_drum, beat: 0.0, velocity: 88, bars: [3]}
-          - {drum: crash,             beat: 0.0, velocity: 86, bars: [3]}
-      - kind: root_hits
-        instrument: timpani
-        octave: 2
-        velocity: 84
-        articulation: marcato
-        hits: [[3, 0.0, 0, 1.0]]
-      - kind: chord_hits
-        instrument: bells
-        octave: 5
-        velocity: 70
-        duration_beats: 4.0
-        articulation: bell
-        humanize_ms: 0
-        hits: [[3, 0.0]]
-      - {template: choir_wash, velocity: 56}
-      - {template: warm_pad_layer, velocity: 38}
-
+- id: intro
+  kind: intro
+  label: distant approach - drone + brass call
+  bars: 4
+  intensity: 0.55
+  density: 0.3
+  loopable: false
+  harmony:
+  - Dm
+  - Bb
+  - Gm
+  - A7
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.4
+  layers:
+  - expression_swell
+  - kind: pedal
+    instrument: violins_i
+    octave: 5
+    note: D5
+    velocity: 64
+  - kind: pedal
+    instrument: contrabass
+    octave: 2
+    note: D2
+    velocity: 60
+  - kind: pedal
+    instrument: tuba
+    octave: 1
+    note: D1
+    velocity: 56
+  - template: brass_call_voice
+    starts:
+    - - 2
+      - 0.0
+    velocity: 70
+  - drums_intro
+  - kind: chord_hits
+    instrument: bells
+    octave: 5
+    velocity: 70
+    duration_beats: 4.0
+    articulation: bell
+    humanize_ms: 0
+    hits:
+    - - 0
+      - 0.0
+    - - 3
+      - 0.0
+  - template: choir_wash
+    velocity: 38
+  - template: warm_pad_layer
+    velocity: 28
+- id: phase1
+  kind: loop_component
+  label: phase 1 - boss theme appears, sparse drums
+  bars: 12
+  intensity: 0.72
+  density: 0.55
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  harmony:
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - Gm
+  - Bb
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  layers:
+  - violin_vibrato
+  - template: boss_theme_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 92
+  - template: violin_burst_voice
+    starts:
+    - - 3
+      - 0.0
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    velocity: 92
+  - template: cello_knives
+    repeats: 6
+    velocity: 70
+  - template: bass_drive
+    velocity: 76
+  - template: string_bed
+    velocity: 56
+  - drums_phase1
+  - template: warm_pad_layer
+    velocity: 32
+- id: phase2
+  kind: loop_component
+  label: phase 2 - theme + woodwind counter, brass joins
+  bars: 12
+  intensity: 0.82
+  density: 0.65
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  harmony:
+  - Dm
+  - Gm
+  - Bb
+  - A7
+  - Dm
+  - F
+  - Gm
+  - A7
+  - Dm
+  - C#dim7
+  - Bb
+  - A7
+  layers:
+  - violin_vibrato
+  - template: boss_theme_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 96
+  - template: counter_voice
+    starts:
+    - - 4
+      - 0.0
+    velocity: 84
+  - template: violin_burst_voice
+    starts:
+    - - 3
+      - 0.0
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    velocity: 94
+  - template: brass_stab
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 82
+  - template: brass_call_voice
+    starts:
+    - - 6
+      - 0.0
+    velocity: 80
+  - template: cello_knives
+    repeats: 6
+    velocity: 76
+  - template: bass_drive
+    velocity: 80
+  - template: string_bed
+    velocity: 60
+  - template: timpani_hit
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.4
+    - - 4
+      - 0.0
+      - 0
+      - 0.4
+    - - 8
+      - 0.0
+      - 0
+      - 0.4
+    velocity: 80
+  - drums_phase2
+  - template: choir_wash
+    velocity: 44
+  - template: warm_pad_layer
+    velocity: 34
+- id: phase3
+  kind: loop_component
+  label: phase 3 - theme variation, virtuoso climax burst
+  bars: 12
+  intensity: 0.92
+  density: 0.78
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  harmony:
+  - Dm
+  - Bb
+  - Gm
+  - A7
+  - Dm
+  - F
+  - C#dim7
+  - A7
+  - Dm
+  - Gm
+  - Bb
+  - A7
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.4
+  layers:
+  - violin_vibrato
+  - template: boss_theme_b_voice
+    starts:
+    - - 0
+      - 0.0
+    velocity: 100
+  - template: climax_burst_voice
+    starts:
+    - - 4
+      - 0.0
+    velocity: 104
+  - template: boss_theme_voice
+    starts:
+    - - 8
+      - 0.0
+    velocity: 100
+  - template: violin_burst_voice
+    starts:
+    - - 6
+      - 0.0
+    - - 11
+      - 0.0
+    velocity: 100
+  - template: counter_voice
+    starts:
+    - - 8
+      - 0.0
+    velocity: 86
+  - template: brass_call_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 88
+  - template: brass_stab
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 90
+  - template: tuba_pedal
+    velocity: 70
+  - template: cello_knives
+    repeats: 6
+    velocity: 80
+  - template: bass_drive
+    velocity: 86
+  - template: string_bed
+    velocity: 64
+  - template: timpani_hit
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.5
+    - - 4
+      - 0.0
+      - 0
+      - 0.5
+    - - 8
+      - 0.0
+      - 0
+      - 0.5
+    velocity: 86
+  - drums_phase3
+  - template: bell_toll
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 76
+  - template: choir_wash
+    velocity: 56
+  - template: warm_pad_layer
+    velocity: 40
+- id: desperation_loop
+  kind: loop_component
+  label: desperation - boss is dying, slow held + flailing flourish
+  bars: 12
+  intensity: 0.7
+  density: 0.55
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  harmony:
+  - Dm
+  - A7
+  - Dm
+  - Bb
+  - Gm
+  - A7
+  - Dm
+  - Dm
+  - Dm
+  - A7
+  - Dm
+  - Dm
+  postprocess:
+    reverb_wet: 0.03
+    reverb_decay_seconds: 0.8
+  layers:
+  - violin_vibrato
+  - template: desperation_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 86
+  - template: violin_burst_voice
+    starts:
+    - - 3
+      - 0.0
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    velocity: 92
+  - template: counter_voice
+    starts:
+    - - 4
+      - 0.0
+    velocity: 76
+  - template: bass_pulse_slow
+    velocity: 76
+  - kind: pad_chords
+    instruments:
+    - violins_i
+    - violas
+    - celli
+    instrument_octave_offsets:
+      violins_i: 1
+      violas: 0
+      celli: -1
+    octave: 3
+    duration_beats: 4.0
+    velocity: 60
+    articulation: legato
+    voicing: open
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  - template: brass_stab
+    hits:
+    - - 3
+      - 2.0
+    - - 7
+      - 2.0
+    - - 11
+      - 2.0
+    velocity: 76
+  - drums_desperation
+  - template: bell_toll
+    hits:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 70
+  - template: choir_wash
+    velocity: 56
+  - template: warm_pad_layer
+    velocity: 38
+- id: outro
+  kind: outro
+  label: cadence to held Dm
+  bars: 4
+  intensity: 0.6
+  density: 0.4
+  loopable: false
+  harmony:
+  - Gm
+  - A7sus4
+  - Dm
+  - Dm
+  postprocess:
+    reverb_wet: 0.08
+    reverb_decay_seconds: 1.8
+  layers:
+  - violin_vibrato
+  - kind: motif
+    instrument: solo_violin
+    motif: boss_theme
+    velocity: 88
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts:
+    - - 0
+      - 0.0
+  - template: string_bed
+    velocity: 64
+  - template: bass_pulse_slow
+    velocity: 64
+  - kind: drums
+    instrument: war_drums
+    humanize_ms: 0
+    events:
+    - drum: concert_bass_drum
+      beat: 0.0
+      velocity: 88
+      bars:
+      - 3
+    - drum: crash
+      beat: 0.0
+      velocity: 86
+      bars:
+      - 3
+  - kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 84
+    articulation: marcato
+    hits:
+    - - 3
+      - 0.0
+      - 0
+      - 1.0
+  - kind: chord_hits
+    instrument: bells
+    octave: 5
+    velocity: 70
+    duration_beats: 4.0
+    articulation: bell
+    humanize_ms: 0
+    hits:
+    - - 3
+      - 0.0
+  - template: choir_wash
+    velocity: 56
+  - template: warm_pad_layer
+    velocity: 38
 group_postprocess:
-  strings:    {gain_db: 1.0,  lowpass_hz: 13500, high_shelf_hz: 5500, high_shelf_db: 0.6, transient_tame: 0.02, reverb_wet: 0.005}
-  winds:      {gain_db: 0.5,  lowpass_hz: 13000, high_shelf_hz: 5000, high_shelf_db: 0.8, presence_low_hz: 1500, presence_high_hz: 5000, presence_db: 1.2, transient_tame: 0.02, reverb_wet: 0.006}
-  brass:      {gain_db: 0.0,  lowpass_hz: 11500, high_shelf_hz: 5200, high_shelf_db: 0.4, transient_tame: 0.04, reverb_wet: 0.005}
-  percussion: {gain_db: -1.0, lowpass_hz: 10500, high_shelf_hz: 5500, high_shelf_db: -0.2, transient_tame: 0.05, reverb_wet: 0.004}
-  mallets:    {gain_db: -2.0, lowpass_hz: 11000, high_shelf_hz: 5500, high_shelf_db: 0.0, transient_tame: 0.06, reverb_wet: 0.012}
-  choir_pad:  {gain_db: -4.0, lowpass_hz: 9500,  high_shelf_hz: 5000, high_shelf_db: -0.4, transient_tame: 0.04, reverb_wet: 0.012}
+  strings:
+    gain_db: 13.5
+    lowpass_hz: 13500
+    high_shelf_hz: 5500
+    high_shelf_db: 0.6
+    transient_tame: 0.02
+    reverb_wet: 0.005
+  winds:
+    gain_db: 5.0
+    lowpass_hz: 13000
+    high_shelf_hz: 5000
+    high_shelf_db: 0.8
+    presence_low_hz: 1500
+    presence_high_hz: 5000
+    presence_db: 1.2
+    transient_tame: 0.02
+    reverb_wet: 0.006
+  brass:
+    gain_db: 7.0
+    lowpass_hz: 11500
+    high_shelf_hz: 5200
+    high_shelf_db: 0.4
+    transient_tame: 0.04
+    reverb_wet: 0.005
+  percussion:
+    gain_db: 5.0
+    lowpass_hz: 10500
+    high_shelf_hz: 5500
+    high_shelf_db: -0.2
+    transient_tame: 0.05
+    reverb_wet: 0.004
+  mallets:
+    gain_db: 12.0
+    lowpass_hz: 11000
+    high_shelf_hz: 5500
+    high_shelf_db: 0.0
+    transient_tame: 0.06
+    reverb_wet: 0.012
+  choir_pad:
+    gain_db: 12.0
+    lowpass_hz: 9500
+    high_shelf_hz: 5000
+    high_shelf_db: -0.4
+    transient_tame: 0.04
+    reverb_wet: 0.012
