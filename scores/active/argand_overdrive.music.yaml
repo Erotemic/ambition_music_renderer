@@ -1,0 +1,917 @@
+schema: ambition.musicir.v1
+id: argand_overdrive
+title: "Argand Overdrive \u2014 the complex plane, distorted"
+seed: 20260624
+notes: 'Heavy-rock sibling of The Argand Waltz: a driving 3/4 metal waltz (rotation
+  = Euler e^{i theta}) on the same D-major palindrome theme, real/imaginary two-voice
+  interplay, and cube-roots-of-unity bridge (D-F#-Bb). Distorted power chords + rock
+  kit + bass under a Sonatina violin lead and symphonic strings. TODO: vary the strum/power-chord
+  velocities more (humanize + an accent pattern) so the rhythm guitars feel less mechanical.'
+tempo:
+  bpm: 150
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  runtime_stems:
+    max_gain_db: 26.0
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  lowpass_hz: 12000
+  eq_bands:
+  - type: low_shelf
+    hz: 90
+    q: 0.8
+    db: 1.5
+  - type: peak
+    hz: 350
+    q: 0.9
+    db: -2.0
+  - type: peak
+    hz: 3000
+    q: 1.1
+    db: -1.5
+  - type: high_shelf
+    hz: 8500
+    q: 0.7
+    db: -1.0
+  reverb_wet: 0.07
+  reverb_decay_seconds: 1.4
+  stereo_width: 0.2
+  compressor_threshold_db: -16
+  compressor_ratio: 2.2
+  compressor_attack_ms: 14
+  compressor_release_ms: 140
+  compressor_makeup_db: 1.0
+  limiter_drive: 0.9
+  normalize: true
+  target_peak_db: -1.5
+instruments:
+- name: solo_violin
+  group: lead
+  program: violin
+  volume: 112
+  pan: 56
+  expression: 116
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violin_solo_marcato
+    prefer:
+    - notation
+    - marcato
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_section
+  group: strings
+  program: string_ensemble_1
+  volume: 80
+  pan: 60
+  expression: 96
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1_marcato
+    prefer:
+    - notation
+    - marcato
+    optional: true
+    fallback_backend: pretty-midi
+- name: cello
+  group: strings
+  program: cello
+  volume: 84
+  pan: 42
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: rhythm_gtr_l
+  group: guitars
+  program: distortion_guitar
+  volume: 92
+  pan: 28
+  expression: 104
+- name: rhythm_gtr_r
+  group: guitars
+  program: distortion_guitar
+  volume: 92
+  pan: 100
+  expression: 104
+- name: lead_gtr
+  group: guitars
+  program: overdrive_guitar
+  volume: 84
+  pan: 64
+  expression: 100
+- name: bass
+  group: bass
+  program: picked_bass
+  volume: 106
+  pan: 50
+  expression: 110
+- name: rock_kit
+  group: drums
+  is_drum: true
+  volume: 116
+  pan: 64
+  expression: 122
+- name: organ
+  group: keys
+  program: drawbar_organ
+  volume: 58
+  pan: 54
+  expression: 84
+motifs:
+- id: real_part
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.74
+  - 0.8
+  - 0.88
+  - 0.96
+  - 1.0
+  - 0.92
+  - 0.84
+  - 0.76
+  - 0.7
+- id: imag_part
+  root: D4
+  intervals:
+  - 4
+  - 5
+  - 7
+  - 9
+  - 7
+  - 5
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 0.75
+  - 0.75
+  velocities:
+  - 0.6
+  - 0.66
+  - 0.72
+  - 0.78
+  - 0.72
+  - 0.66
+  - 0.6
+  - 0.54
+  - 0.5
+- id: real_answer
+  root: A4
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.78
+  - 0.84
+  - 0.92
+  - 0.98
+  - 0.9
+  - 0.82
+  - 0.76
+  - 0.7
+- id: zep_hook
+  root: D3
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  - 0
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.25
+  velocities:
+  - 0.95
+  - 0.7
+  - 0.92
+  - 0.8
+  - 1.0
+  - 0.78
+  - 0.86
+  - 0.9
+  - 0.66
+layer_templates:
+  verse_riff:
+    kind: guitar_chug
+    takes:
+    - instrument: rhythm_gtr_l
+      timing_offset_ms: -6
+      velocity_offset: 0
+    - instrument: rhythm_gtr_r
+      timing_offset_ms: 9
+      velocity_offset: -3
+    octave: 2
+    shape: fifth_octave
+    pattern:
+    - - 0
+      - 0.0
+      - 0.5
+      - 1.0
+    - - 0
+      - 1.0
+      - 0.4
+      - 0.85
+    - - 0
+      - 1.5
+      - 0.25
+      - 0.6
+    - - 0
+      - 2.0
+      - 0.5
+      - 0.92
+    - - 0
+      - 2.5
+      - 0.25
+      - 0.68
+    velocity: 86
+    spread_ms: 7
+    gate: 0.62
+    articulation: marcato
+    humanize_ms: 1.4
+    humanize_velocity_pct: 4
+    root_policy: chord_root
+    min_pitch: 38
+  verse_riff_b:
+    kind: guitar_chug
+    takes:
+    - instrument: rhythm_gtr_l
+      timing_offset_ms: -6
+      velocity_offset: 0
+    - instrument: rhythm_gtr_r
+      timing_offset_ms: 9
+      velocity_offset: -3
+    octave: 2
+    shape: fifth_octave
+    pattern:
+    - - 0
+      - 0.0
+      - 0.33
+      - 1.0
+    - - 0
+      - 0.33
+      - 0.17
+      - 0.66
+    - - 0
+      - 0.5
+      - 0.5
+      - 0.9
+    - - 0
+      - 1.0
+      - 0.33
+      - 0.95
+    - - 0
+      - 1.33
+      - 0.17
+      - 0.64
+    - - 0
+      - 1.5
+      - 0.5
+      - 0.88
+    - - 0
+      - 2.0
+      - 0.5
+      - 0.93
+    - - 0
+      - 2.5
+      - 0.5
+      - 0.8
+    velocity: 86
+    spread_ms: 7
+    gate: 0.6
+    articulation: marcato
+    humanize_ms: 1.4
+    humanize_velocity_pct: 4
+    root_policy: chord_root
+    min_pitch: 38
+  chorus_power:
+    kind: guitar_chug
+    takes:
+    - instrument: rhythm_gtr_l
+      timing_offset_ms: -5
+      velocity_offset: 0
+    - instrument: rhythm_gtr_r
+      timing_offset_ms: 8
+      velocity_offset: -3
+    octave: 2
+    shape: fifth_octave
+    pattern:
+    - - 0
+      - 0.0
+      - 1.0
+      - 1.0
+    - - 0
+      - 1.0
+      - 1.0
+      - 0.92
+    - - 0
+      - 2.0
+      - 1.0
+      - 0.96
+    velocity: 88
+    spread_ms: 10
+    gate: 0.92
+    articulation: marcato
+    humanize_ms: 1.2
+    humanize_velocity_pct: 3
+    root_policy: chord_root
+    min_pitch: 38
+  rock_bass:
+    kind: bassline
+    instrument: bass
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 0.5
+    - - 0
+      - 0.5
+      - 0.5
+    - - 0
+      - 1.0
+      - 0.5
+    - - 0
+      - 1.5
+      - 0.5
+    - - 0
+      - 2.0
+      - 0.5
+    - - 12
+      - 2.5
+      - 0.5
+    velocity: 92
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+  rock_drums:
+    kind: drums
+    instrument: rock_kit
+    humanize_ms: 2.0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      velocity: 100
+    - drum: kick
+      beats:
+      - 0.5
+      - 2.5
+      velocity: 78
+      probability: 0.6
+    - drum: snare
+      beats:
+      - 1.0
+      velocity: 96
+    - drum: snare
+      beats:
+      - 2.0
+      velocity: 84
+      probability: 0.7
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      velocity: 54
+    - drum: crash
+      beat: 0.0
+      velocity: 80
+      bars:
+      - 0
+      - 4
+      - 8
+      - 12
+    - drum: ride
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      velocity: 40
+      probability: 0.4
+  string_power:
+    kind: pad_chords
+    instruments:
+    - violins_section
+    octave: 4
+    every_bars: 1
+    duration_beats: 2.8
+    velocity: 40
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 10
+  organ_bed:
+    kind: pad_chords
+    instruments:
+    - organ
+    octave: 3
+    every_bars: 1
+    duration_beats: 2.9
+    velocity: 30
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 8
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components:
+  - verse
+  - chorus
+  - bridge
+  - verse2
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 3
+    bridge_stems:
+    - lead
+    - strings
+    - guitars
+    - bass
+    fade_stems:
+    - keys
+state_map:
+  default:
+    section: verse
+    stems:
+      lead: 1.0
+      strings: 0.7
+      guitars: 0.9
+      bass: 0.92
+      drums: 0.95
+      keys: 0.5
+sections:
+- id: intro
+  kind: intro
+  bars: 8
+  intensity: 0.7
+  density: 0.62
+  loopable: false
+  harmony:
+  - D
+  - D
+  - Bm
+  - Bm
+  - G
+  - G
+  - A
+  - A
+  layers:
+  - verse_riff
+  - rock_bass
+  - rock_drums
+  - kind: guitar_lead
+    instruments:
+    - lead_gtr
+    motif: zep_hook
+    roots:
+    - D3
+    - D3
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    velocity: 88
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 6
+    pitch_scoop_cents: 12
+    position_scoop_scale: 0.5
+    gate: 0.92
+    tuning: standard
+    max_fret: 19
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - A4
+    starts:
+    - - 5
+      - 0.0
+    velocity: 96
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+- id: verse
+  kind: loop_component
+  bars: 16
+  intensity: 0.82
+  density: 0.74
+  loopable: true
+  harmony: &id001
+  - D
+  - Bm
+  - G
+  - A
+  - D
+  - Bm
+  - Em
+  - A
+  - D
+  - Bm
+  - G
+  - A
+  - F#m
+  - G
+  - A
+  - D
+  layers:
+  - rock_bass
+  - rock_drums
+  - organ_bed
+  - verse_riff
+  - kind: guitar_lead
+    instruments:
+    - lead_gtr
+    motif: zep_hook
+    roots:
+    - D3
+    - D3
+    - D3
+    - D3
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    - - 10
+      - 0.0
+    - - 14
+      - 0.0
+    velocity: 86
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 6
+    pitch_scoop_cents: 12
+    position_scoop_scale: 0.5
+    gate: 0.92
+    tuning: standard
+    max_fret: 19
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 108
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - D3
+    - D3
+    starts:
+    - - 0
+      - 1.0
+    - - 8
+      - 1.0
+    velocity: 78
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: chorus
+  kind: loop_component
+  bars: 16
+  intensity: 0.92
+  density: 0.8
+  loopable: true
+  harmony:
+  - G
+  - A
+  - D
+  - Bm
+  - G
+  - A
+  - Bm
+  - A
+  - G
+  - A
+  - D
+  - F#m
+  - G
+  - A
+  - A
+  - A
+  layers:
+  - rock_bass
+  - rock_drums
+  - string_power
+  - organ_bed
+  - chorus_power
+  - kind: motif
+    instrument: solo_violin
+    motif: real_answer
+    roots:
+    - D5
+    - A4
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 112
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  - kind: motif
+    instrument: violins_section
+    motif: real_answer
+    roots:
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    velocity: 70
+    articulation: legato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - A2
+    - D3
+    starts:
+    - - 0
+      - 1.5
+    - - 8
+      - 1.5
+    velocity: 80
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: bridge
+  kind: loop_component
+  bars: 8
+  intensity: 0.8
+  density: 0.72
+  loopable: true
+  harmony:
+  - D
+  - F#
+  - Bb
+  - D
+  - F#
+  - Bb
+  - G
+  - A
+  layers:
+  - rock_bass
+  - rock_drums
+  - organ_bed
+  - verse_riff
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    velocity: 104
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  - kind: guitar_lead
+    instruments:
+    - lead_gtr
+    motif: real_answer
+    roots:
+    - D4
+    starts:
+    - - 4
+      - 0.0
+    velocity: 96
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 6
+    pitch_scoop_cents: 18
+    position_scoop_scale: 0.7
+    gate: 0.92
+    tuning: standard
+    max_fret: 19
+  valid_exit_local_bars:
+  - 4
+  - 8
+- id: verse2
+  kind: loop_component
+  bars: 16
+  intensity: 0.86
+  density: 0.78
+  loopable: true
+  harmony: *id001
+  layers:
+  - rock_bass
+  - rock_drums
+  - organ_bed
+  - verse_riff_b
+  - kind: guitar_lead
+    instruments:
+    - lead_gtr
+    motif: zep_hook
+    roots:
+    - D3
+    - D3
+    - D3
+    - D3
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    - - 10
+      - 0.0
+    - - 14
+      - 0.0
+    velocity: 86
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 6
+    pitch_scoop_cents: 12
+    position_scoop_scale: 0.5
+    gate: 0.92
+    tuning: standard
+    max_fret: 19
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 110
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - D3
+    - D3
+    starts:
+    - - 0
+      - 1.0
+    - - 8
+      - 1.0
+    velocity: 80
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: outro
+  kind: outro
+  bars: 8
+  intensity: 0.7
+  density: 0.55
+  loopable: false
+  harmony:
+  - D
+  - Bm
+  - G
+  - A
+  - G
+  - Em
+  - A
+  - D
+  layers:
+  - chorus_power
+  - rock_bass
+  - rock_drums
+  - string_power
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    velocity: 96
+    articulation: marcato
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+group_postprocess:
+  lead:
+    gain_db: 20.0
+    reverb_wet: 0.06
+  strings:
+    gain_db: 16.0
+    reverb_wet: 0.05
+  guitars:
+    gain_db: -3.0
+    highpass_hz: 90
+    lowpass_hz: 8000
+    high_shelf_hz: 3500
+    high_shelf_db: -2.0
+  bass:
+    gain_db: -2.0
+    highpass_hz: 34
+    lowpass_hz: 2400
+  drums:
+    gain_db: -2.0
+    highpass_hz: 40
+  keys:
+    gain_db: 14.0
+    highpass_hz: 120
