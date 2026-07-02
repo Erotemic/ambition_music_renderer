@@ -100,7 +100,9 @@ def add_note(
     # note instead of lengthening it.
     start = max(0.0, start)
     dur_scale = gate if gate is not None else ARTICULATION_GATE.get(articulation, 0.86)
-    end = start + max(0.025, ctx.beat_to_time(dur_beats * dur_scale))
+    end = start + max(0.025, ctx.beat_duration_to_seconds(start_beat, dur_beats * dur_scale))
+    if ctx.dynamics_scale is not None:
+        vel = vel * float(ctx.dynamics_scale(start_beat))
     if humanize_velocity_pct:
         vel = vel * (1.0 + float(ctx.rng.normal(0.0, humanize_velocity_pct / 100.0)))
     velocity = int(clamp(round(vel), 1, 127))
@@ -122,15 +124,15 @@ def add_note(
             "nominal_duration_beats": float(dur_beats),
             "start_time": float(start),
             "end_time": float(end),
-            "start_beat": float(start / 60.0 * ctx.bpm),
-            "end_beat": float(end / 60.0 * ctx.bpm),
+            "start_beat": float(ctx.time_to_beat(start)),
+            "end_beat": float(ctx.time_to_beat(end)),
         }
     )
     if pitch_bend_curve:
         # Interpolate the curve in time and write as a sequence of pitch bends.
         # Cents are clamped to MIDI's ±2 semitone default range here (200 cents
         # max). For deeper bends, expand `synth.pitch_wheel_sensitivity` upstream.
-        note_duration = ctx.beat_to_time(dur_beats)
+        note_duration = ctx.beat_duration_to_seconds(start_beat, dur_beats)
         for beat_off, cents in pitch_bend_curve:
             bend_time = start + max(
                 0.0, float(beat_off) * (note_duration / max(dur_beats, 1e-6))
@@ -154,7 +156,7 @@ def add_note(
             # life without requiring the score to spell out pitch-bend curves for
             # every note.  Keep it modest: pitch-bend affects the full MIDI
             # channel, so authors should reserve it for mostly monophonic leads.
-            delay_s = ctx.beat_to_time(float(pitch_vibrato_delay_beats))
+            delay_s = ctx.beat_duration_to_seconds(start_beat, float(pitch_vibrato_delay_beats))
             vibrato_start = start + max(0.0, delay_s)
             if end - vibrato_start > 0.12:
                 rate = max(0.1, float(pitch_vibrato_rate_hz))

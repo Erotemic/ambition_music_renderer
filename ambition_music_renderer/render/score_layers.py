@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import copy
 import math
+import sys
 from typing import Any
 
 import numpy as np
 import pretty_midi
 
 from ..profiler import profile
-from .score_core import RenderContext
+from .score_core import RenderContext, TempoMap
 from .score_events import add_chord, add_drum, add_instrument, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
 from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
 from .synth import sanitize_same_pitch_overlaps
@@ -689,10 +690,117 @@ def render_layer_automation(
 
 
 @profile
+def render_layer_notes(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Literal note events — the full-control escape hatch.
+
+    Every other layer kind generates notes from harmony and patterns; this one
+    plays exactly what is written.  Compact list form is
+    ``[local_bar, beat, note, dur_beats, velocity]`` (velocity optional);
+    dict form adds per-note ``gate``/``articulation``/``bend``/``vibrato_cents``
+    etc.  ``note`` may be a list of pitches to voice a chord::
+
+        - kind: notes
+          instrument: storyteller
+          notes:
+            - [0, 0.0, G4, 2.0, 62]
+            - [1, 3.0, [G3, B3, D4, A4], 6.0, 54]
+            - {bar: 2, beat: 0.0, note: B4, dur: 3.0, vel: 58, gate: 0.8,
+               bend: [[0.0, 0], [0.5, 100]]}
+    """
+    insts = resolve_instruments(ctx, layer)
+    default_vel = float(layer.get("velocity", 64))
+    default_art = layer.get("articulation", "normal")
+    hk = _layer_human(layer, 0.0)
+    intensity = float(section.get("intensity", 1.0))
+    for row in layer.get("notes", []):
+        if isinstance(row, dict):
+            bar = float(row.get("bar", 0))
+            beat = float(row.get("beat", 0.0))
+            pitches = row.get("note", row.get("notes"))
+            dur = float(row.get("dur", row.get("duration_beats", 1.0)))
+            vel = float(row.get("vel", row.get("velocity", default_vel)))
+            extra = {
+                "articulation": row.get("articulation", default_art),
+                "gate": row.get("gate", layer.get("gate")),
+                "pitch_bend_curve": [
+                    (float(b), float(c)) for b, c in (row.get("bend") or [])
+                ] or None,
+                "pitch_scoop_cents": float(row.get("scoop_cents", 0.0)),
+                "pitch_vibrato_cents": float(row.get("vibrato_cents", 0.0)),
+                "pitch_vibrato_rate_hz": float(row.get("vibrato_rate_hz", 5.4)),
+            }
+        else:
+            if len(row) < 4:
+                raise ValueError(
+                    f"notes rows need [bar, beat, note, dur_beats(, velocity)]; got {row!r}"
+                )
+            bar, beat, pitches, dur = float(row[0]), float(row[1]), row[2], float(row[3])
+            vel = float(row[4]) if len(row) > 4 else default_vel
+            extra = {"articulation": default_art, "gate": layer.get("gate")}
+        if not isinstance(pitches, list):
+            pitches = [pitches]
+        for inst in insts:
+            for pitch in pitches:
+                add_note(
+                    ctx,
+                    inst,
+                    pitch,
+                    section["start_bar"] + bar,
+                    beat,
+                    dur,
+                    vel * intensity,
+                    **{k: v for k, v in extra.items() if v is not None},
+                    **hk,
+                )
+
+
+def _dynamics_scale_fn(
+    section: dict[str, Any], layer: dict[str, Any], beats_per_bar: float
+):
+    """Build a velocity-scale function of absolute beat from `dynamics:` curves.
+
+    Backend-independent phrase dynamics: unlike CC automation (which only
+    moves instruments whose SFZ maps that CC), this scales the authored note
+    velocities themselves::
+
+        dynamics:
+          - {start_bar: 8, bars: 8, from: 0.7, to: 1.0, curve: smooth}
+
+    Bars are local to the section; outside all curves the scale is 1.0.
+    """
+    curves = layer.get("dynamics") or []
+    if not curves:
+        return None
+    section_start_beat = float(section["start_bar"]) * beats_per_bar
+    spans = []
+    for cfg in curves:
+        b0 = section_start_beat + float(cfg.get("start_bar", 0.0)) * beats_per_bar
+        b1 = b0 + float(cfg.get("bars", section["bars"])) * beats_per_bar
+        spans.append((b0, b1, float(cfg.get("from", 1.0)), float(cfg.get("to", 1.0)),
+                      str(cfg.get("curve", "linear"))))
+
+    def scale(beat: float) -> float:
+        for b0, b1, lo, hi, curve in spans:
+            if b0 <= beat <= b1:
+                a = (beat - b0) / max(b1 - b0, 1e-9)
+                if curve == "smooth":
+                    a = a * a * (3 - 2 * a)
+                elif curve == "exp":
+                    a = a * a
+                return lo * (1 - a) + hi * a
+        return 1.0
+
+    return scale
+
+
+@profile
 def render_layer(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
 ) -> None:
     kind = layer["kind"]
+    ctx.dynamics_scale = _dynamics_scale_fn(section, layer, ctx.beats_per_bar)
     if kind == "pad_chords":
         render_layer_pad_chords(ctx, section, layer)
     elif kind == "arpeggio":
@@ -719,11 +827,16 @@ def render_layer(
         render_layer_guitar_chug(ctx, section, layer)
     elif kind == "guitar_lead":
         render_layer_guitar_lead(ctx, section, layer)
+    elif kind == "notes":
+        render_layer_notes(ctx, section, layer)
     elif kind == "automation":
         render_layer_automation(ctx, section, layer)
+        ctx.dynamics_scale = None
         return
     else:
+        ctx.dynamics_scale = None
         raise KeyError(f"unknown layer kind {kind!r}")
+    ctx.dynamics_scale = None
     apply_automation(ctx, section, layer)
 
 
@@ -754,6 +867,7 @@ def build_score(
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     pm = pretty_midi.PrettyMIDI(initial_tempo=bpm)
+    tempo_map = TempoMap.from_spec(spec) if (spec.get("tempo", {}) or {}).get("map") else None
     ctx = RenderContext(
         spec=spec,
         sample_rate=int(spec.get("render", {}).get("sample_rate", 48000)),
@@ -766,7 +880,26 @@ def build_score(
         section_starts={},
         motifs={m["id"]: m for m in spec.get("motifs", [])},
         instrument_specs={},
+        tempo=tempo_map,
     )
+    if tempo_map is not None:
+        # A tempo ramp inside a loopable section makes the loop seam jump
+        # tempo audibly; ramps belong in intros/outros/transitions.
+        cursor_bar = 0
+        for section in spec["sections"]:
+            bars = int(section["bars"])
+            if section.get("loopable"):
+                b0 = cursor_bar * beats_per_bar
+                b1 = (cursor_bar + bars) * beats_per_bar
+                v0, v1 = tempo_map.bpm_at(b0), tempo_map.bpm_at(b1)
+                if abs(v1 - v0) > 0.01 * max(v0, v1):
+                    print(
+                        f"[ambition_music_renderer] WARNING: loopable section "
+                        f"{section.get('id')!r} starts at {v0:.1f} bpm but ends at "
+                        f"{v1:.1f} bpm; the loop seam will audibly jump tempo.",
+                        file=sys.stderr,
+                    )
+            cursor_bar += bars
     for inst_spec in spec.get("instruments", []):
         add_instrument(ctx, inst_spec)
     starts = section_starts(spec["sections"])
@@ -790,15 +923,16 @@ def build_score(
 
 
 def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    seconds_per_beat = 60.0 / bpm
+    tempo = TempoMap.from_spec(spec)
     cursor = 0
     out = []
     for section in spec["sections"]:
         bars = int(section["bars"])
         start_beat = cursor * beats_per_bar
         end_beat = (cursor + bars) * beats_per_bar
+        start_seconds = tempo.beat_to_time(start_beat)
+        end_seconds = tempo.beat_to_time(end_beat)
         out.append(
             {
                 "id": section["id"],
@@ -808,9 +942,9 @@ def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
                 "bars": bars,
                 "start_beat": start_beat,
                 "end_beat": end_beat,
-                "start_seconds": start_beat * seconds_per_beat,
-                "end_seconds": end_beat * seconds_per_beat,
-                "duration_seconds": (end_beat - start_beat) * seconds_per_beat,
+                "start_seconds": start_seconds,
+                "end_seconds": end_seconds,
+                "duration_seconds": end_seconds - start_seconds,
                 "loopable": bool(section.get("loopable", False)),
                 "valid_exit_local_bars": section.get("valid_exit_local_bars", []),
             }

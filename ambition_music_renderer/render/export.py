@@ -14,6 +14,7 @@ import soundfile as sf
 
 from ..profiler import profile
 from ..audio_utils import coerce_stereo
+from .score_core import TempoMap
 
 def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,9 +82,11 @@ def timeline_markers_from_spec(
     such as Emmy Extended expose A/B/return form markers even though the game
     still treats them as one loop component.
     """
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    seconds_per_bar = beats_per_bar * 60.0 / bpm
+    tempo = TempoMap.from_spec(spec)
+
+    def bar_to_seconds(bar0: float) -> float:
+        return tempo.beat_to_time(bar0 * beats_per_bar)
     markers: list[dict[str, Any]] = []
     for section in sections or []:
         sid = str(section.get("id", f"section_{len(markers)+1}"))
@@ -106,10 +109,10 @@ def timeline_markers_from_spec(
                 start_s = float(item.get("time_seconds") or 0.0)
             elif "bar" in item:
                 # Bar values are 1-based for human readability in YAML.
-                start_s = max(0.0, (float(item.get("bar") or 1.0) - 1.0) * seconds_per_bar)
+                start_s = max(0.0, bar_to_seconds(float(item.get("bar") or 1.0) - 1.0))
             elif "start_bar" in item:
                 # start_bar remains 0-based for code-generated markers.
-                start_s = max(0.0, float(item.get("start_bar") or 0.0) * seconds_per_bar)
+                start_s = max(0.0, bar_to_seconds(float(item.get("start_bar") or 0.0)))
             else:
                 continue
             marker_id = str(item.get("id", item.get("name", f"marker_{idx}")))

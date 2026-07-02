@@ -358,7 +358,12 @@ For `first_goblin_tune_v2`, the top-level wrapper currently renders/installs the
 
 Music scores are YAML files under `scores/`. At a high level:
 
-- `tempo` / `meter` - BPM and beats per bar.
+- `tempo` / `meter` - BPM and beats per bar. `tempo.map` adds ritardando /
+  accelerando: ordered `{bar, bpm, ramp_bars}` entries ramp linearly from the
+  previous tempo starting at `bar` (absolute, fractional allowed) and hold
+  after. All note timing, CC automation, section metadata, and export markers
+  follow the map. Avoid ramps inside `loopable` sections (the loop seam jumps
+  tempo; the renderer warns).
 - `render` - sample rate, OGG quality, backend, SoundFont pin, and render-specific settings.
 - `postprocess`, `stem_postprocess`, `group_postprocess` - EQ, reverb, limiter/compressor, stereo width, and related mastering controls at different mix levels.
 - `constraints` - optional voicing rules such as minimizing motion or avoiding clusters.
@@ -380,11 +385,29 @@ Common layer kinds include:
 - `root_hits`
 - `drums`
 - `automation`
+- `notes` - literal note events, the full-control escape hatch. Rows are
+  `[local_bar, beat, note, dur_beats, velocity]` (note may be a list for a
+  chord) or dicts adding per-note `gate`/`articulation`/`bend`/`vibrato_cents`.
 - `guitar_strum` - chord-symbol input compiled to plausible six-string down/up strums.
 - `guitar_chug` - power-chord/palm-muted rhythm guitar with optional separate take definitions.
 - `guitar_lead` - motif input compiled to monophonic guitar-like lead notes with position-aware scoops.
 
 Most note-producing layers accept timing and velocity humanization. Motif layers can also carry pitch-bend curves for slides or bends. Guitar layers add a tiny custom performance compiler: it assigns notes to six strings, staggers strums physically, and makes double-tracking explicit as separate takes rather than generic stereo widening.
+
+Every note-producing layer also accepts `dynamics` - phrase-level crescendo /
+decrescendo curves that scale the authored velocities (backend-independent,
+unlike CC automation, which only moves instruments whose SFZ maps that CC):
+
+```yaml
+dynamics:
+  - {start_bar: 8, bars: 8, from: 0.7, to: 1.0, curve: smooth}
+```
+
+Two related surfaces that already existed but are easy to miss: instrument
+specs accept any `CC_NUMBERS` name (`modulation: 78` emits CC1 at t=0 - some
+SFZ libraries such as VPO3 are silent without it), and any layer can carry an
+`automation` list for CC ramps/LFOs over the section (`cc: expression`,
+`from`/`to`/`curve`).
 
 ## Constraint flags
 

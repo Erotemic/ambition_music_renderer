@@ -13,8 +13,9 @@ and exports OGG Vorbis section/stem assets plus a full soundtrack preview.
 from __future__ import annotations
 
 import dataclasses as dc
+import math
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pretty_midi
@@ -233,6 +234,118 @@ CC_NUMBERS = {
 }
 
 
+@dc.dataclass(frozen=True)
+class TempoMap:
+    """Piecewise-linear tempo (bpm as a function of beat).
+
+    Authored as ``tempo.map`` in MusicIR YAML::
+
+        tempo:
+          bpm: 144
+          map:
+            - {bar: 62, bpm: 120, ramp_bars: 4}   # ritardando over 4 bars
+            - {bar: 67, bpm: 84, ramp_bars: 1}    # pool on the final phrase
+
+    Each entry ramps linearly from the previous tempo, starting at ``bar``
+    (absolute, fractional allowed) and reaching ``bpm`` after ``ramp_bars``,
+    then holds until the next entry.  With no ``map`` the cue is constant
+    tempo and behaves exactly as before.
+
+    ``knots`` are ``(beat, bpm)`` waypoints; between knots bpm is linear in
+    the beat, so beat->time integrates in closed form:
+    ``dt = 60 * db * ln(v1/v0) / (v1 - v0)`` per segment.
+    """
+
+    knots: tuple[tuple[float, float], ...]  # ((beat, bpm), ...) sorted by beat
+    _times: tuple[float, ...] = dc.field(default=(), compare=False)
+
+    @staticmethod
+    def constant(bpm: float) -> "TempoMap":
+        return TempoMap(knots=((0.0, float(bpm)),), _times=(0.0,))
+
+    @staticmethod
+    def from_spec(spec: dict[str, Any]) -> "TempoMap":
+        tempo_cfg = spec.get("tempo", {}) or {}
+        base_bpm = float(tempo_cfg.get("bpm", spec.get("bpm", 120)))
+        entries = tempo_cfg.get("map") or []
+        if not entries:
+            return TempoMap.constant(base_bpm)
+        beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+        knots: list[tuple[float, float]] = [(0.0, base_bpm)]
+        for entry in entries:
+            start_beat = float(entry["bar"]) * beats_per_bar
+            target = float(entry["bpm"])
+            ramp_beats = float(entry.get("ramp_bars", 0.0)) * beats_per_bar
+            prev_beat, prev_bpm = knots[-1]
+            if start_beat < prev_beat - 1e-9:
+                raise ValueError(
+                    f"tempo.map entries must be ordered by bar; bar {entry['bar']} "
+                    f"starts before the previous entry ends"
+                )
+            # Hold the previous tempo up to the ramp start, then ramp.
+            if start_beat > prev_beat + 1e-9:
+                knots.append((start_beat, prev_bpm))
+            knots.append((start_beat + max(ramp_beats, 1e-6), target))
+        return TempoMap(knots=tuple(knots), _times=TempoMap._integrate(tuple(knots)))
+
+    @staticmethod
+    def _integrate(knots: tuple[tuple[float, float], ...]) -> tuple[float, ...]:
+        times = [0.0]
+        for (b0, v0), (b1, v1) in zip(knots, knots[1:]):
+            times.append(times[-1] + TempoMap._segment_time(b0, v0, b1, v1, b1))
+        return tuple(times)
+
+    @staticmethod
+    def _segment_time(b0: float, v0: float, b1: float, v1: float, beat: float) -> float:
+        """Seconds from ``b0`` to ``beat`` (``b0 <= beat <= b1``), bpm linear."""
+        db = beat - b0
+        if db <= 0.0:
+            return 0.0
+        if abs(v1 - v0) < 1e-9:
+            return 60.0 * db / v0
+        # bpm at `beat` along the linear segment
+        v = v0 + (v1 - v0) * (beat - b0) / (b1 - b0)
+        slope = (v1 - v0) / (b1 - b0)
+        return 60.0 / slope * math.log(v / v0)
+
+    def bpm_at(self, beat: float) -> float:
+        knots = self.knots
+        if beat <= knots[0][0]:
+            return knots[0][1]
+        for (b0, v0), (b1, v1) in zip(knots, knots[1:]):
+            if beat <= b1:
+                return v0 + (v1 - v0) * (beat - b0) / (b1 - b0)
+        return knots[-1][1]
+
+    def beat_to_time(self, beat: float) -> float:
+        knots = self.knots
+        if beat <= knots[0][0]:
+            return 60.0 * (beat - knots[0][0]) / knots[0][1]
+        for i, ((b0, v0), (b1, v1)) in enumerate(zip(knots, knots[1:])):
+            if beat <= b1:
+                return self._times[i] + self._segment_time(b0, v0, b1, v1, beat)
+        b_last, v_last = knots[-1]
+        return self._times[-1] + 60.0 * (beat - b_last) / v_last
+
+    def time_to_beat(self, time: float) -> float:
+        """Inverse of :meth:`beat_to_time` (bisection inside one segment)."""
+        knots = self.knots
+        if time <= 0.0:
+            return knots[0][0] + time * knots[0][1] / 60.0
+        for i, ((b0, _v0), (b1, _v1)) in enumerate(zip(knots, knots[1:])):
+            if time <= self._times[i + 1]:
+                lo, hi = b0, b1
+                for _ in range(60):
+                    mid = 0.5 * (lo + hi)
+                    if self.beat_to_time(mid) < time:
+                        lo = mid
+                    else:
+                        hi = mid
+                return 0.5 * (lo + hi)
+        b_last, v_last = knots[-1]
+        return b_last + (time - self._times[-1]) * v_last / 60.0
+
+
 @dc.dataclass
 class RenderContext:
     spec: dict[str, Any]
@@ -257,9 +370,27 @@ class RenderContext:
     active_section_id: str | None = None
     active_layer_id: str | None = None
     active_layer_kind: str | None = None
+    # `tempo.map` support; None means constant `bpm` (the historical model).
+    tempo: TempoMap | None = None
+    # Set per-layer while rendering: scales note velocity by beat position
+    # (`dynamics:` crescendo/decrescendo curves). None = no scaling.
+    dynamics_scale: "Callable[[float], float] | None" = None
 
     def beat_to_time(self, beat: float) -> float:
+        if self.tempo is not None:
+            return self.tempo.beat_to_time(beat)
         return beat * 60.0 / self.bpm
+
+    def time_to_beat(self, time: float) -> float:
+        if self.tempo is not None:
+            return self.tempo.time_to_beat(time)
+        return time * self.bpm / 60.0
+
+    def beat_duration_to_seconds(self, start_beat: float, dur_beats: float) -> float:
+        """Duration of ``dur_beats`` starting at ``start_beat`` in seconds."""
+        if self.tempo is None:
+            return dur_beats * 60.0 / self.bpm
+        return self.tempo.beat_to_time(start_beat + dur_beats) - self.tempo.beat_to_time(start_beat)
 
     def bar_to_beat(self, bar: float, beat: float = 0.0) -> float:
         return bar * self.beats_per_bar + beat
