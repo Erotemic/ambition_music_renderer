@@ -1,0 +1,646 @@
+schema: ambition.musicir.v1
+id: between_objectives
+title: Between Objectives
+seed: 2026070212
+notes: >-
+  Dreamy suspension cue for drifting between objectives - an AI with no
+  gradient to climb, floating. Bramble-Blast-inspired in signature only:
+  maj7/add9/sus harmony that never hard-cadences (Asus4 stands in for V, so
+  the loop re-enters Dmaj7 without a leading tone), a dotted-eighth kalimba
+  ostinato in constant gentle motion (the identity layer - it never stops),
+  a patient solo flute that enters late and breathes, answered by a bowed
+  vibraphone. The bridge blooms into borrowed bVI/bVII color (Bbmaj7/Cadd9)
+  while the tempo sags and recovers. Built to loop invisibly: the outro is
+  the intro's texture, seam at the opening tempo.
+
+tempo:
+  bpm: 84
+  map:
+    # The bloom sags dreamily...
+    - {bar: 40, bpm: 78, ramp_bars: 4}
+    # ...and breathes back up to tempo well before the seam.
+    - {bar: 49, bpm: 84, ramp_bars: 3}
+
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 12.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  lowpass_hz: 11500
+  presence_low_hz: 1600
+  presence_high_hz: 3800
+  presence_db: 0.6
+  transient_tame: 0.03
+  reverb_wet: 0.13
+  reverb_decay_seconds: 1.9
+  reverb_damping_hz: 4600
+  stereo_width: 0.28
+  compressor_threshold_db: -16.0
+  compressor_ratio: 2.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 140.0
+  compressor_makeup_db: 0.5
+  compressor_knee_db: 6.0
+  limiter_drive: 1.02
+  normalize: true
+  target_peak_db: -1.5
+
+stem_postprocess:
+  highpass_hz: 28
+  transient_tame: 0.02
+  reverb_wet: 0.02
+  reverb_decay_seconds: 0.8
+  stereo_width: 0.06
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  lead:
+    gain_db: 10.0
+    lowpass_hz: 9500
+    reverb_wet: 0.10
+  bells:
+    gain_db: 15.0
+    lowpass_hz: 10000
+    reverb_wet: 0.12
+  sparkle:
+    gain_db: 10.0
+    highpass_hz: 500
+    lowpass_hz: 11000
+    reverb_wet: 0.10
+  arp:
+    gain_db: 6.0
+    highpass_hz: 180
+    lowpass_hz: 9000
+    # Dotted-eighth echo at 84 BPM (0.536 s): the arp answers itself and the
+    # bed shimmers without getting busier.
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - {effect: delay, delay_seconds: 0.536, feedback: 0.14, mix: 0.10}
+  pads:
+    gain_db: 7.0
+    lowpass_hz: 7000
+    reverb_wet: 0.08
+  bass:
+    gain_db: -7.0
+    highpass_hz: 30
+    lowpass_hz: 2400
+    compressor_threshold_db: -18
+    compressor_ratio: 2.5
+    compressor_attack_ms: 8.0
+    compressor_release_ms: 120.0
+  harp:
+    gain_db: 16.0
+    highpass_hz: 120
+    lowpass_hz: 9500
+    reverb_wet: 0.10
+  drums:
+    gain_db: 2.0
+    highpass_hz: 40
+    transient_tame: 0.02
+    reverb_wet: 0.06
+
+instruments:
+  # The identity layer: a round, soft pluck in constant gentle motion.
+  - name: arp_kalimba
+    group: arp
+    program: kalimba
+    volume: 96
+    pan: 56
+    expression: 100
+  - name: arp_crystal
+    group: arp
+    program: fx_crystal
+    volume: 68
+    pan: 74
+    expression: 88
+  - name: warm_pad
+    group: pads
+    program: pad_warm
+    volume: 72
+    pan: 60
+    expression: 84
+  - name: halo_pad
+    group: pads
+    program: pad_new_age
+    volume: 62
+    pan: 70
+    expression: 80
+  - name: sub_bass
+    group: bass
+    program: synth_bass_2
+    volume: 100
+    pan: 64
+    expression: 104
+  # Patient lead: solo flute, long breaths, big rests.
+  - name: lead_flute
+    group: lead
+    program: flute
+    volume: 100
+    pan: 58
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Woodwinds - Performance/Flute Solo 1 Sustain (looped, decay).sfz"
+      optional: true
+      fallback_backend: pretty-midi
+  # The answering voice: bowed vibraphone, slow-speaking and ethereal.
+  - name: bowed_vibe
+    group: bells
+    program: vibraphone
+    volume: 98
+    pan: 70
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      sfz: "/data/audio-tools/sfz/Versilian/VCSL/VCSL-1.2.2-RC/Idiophones/Struck Idiophones/Vibraphone - Bowed.sfz"
+      optional: true
+      fallback_backend: pretty-midi
+  - name: celesta_double
+    group: sparkle
+    program: celesta
+    volume: 76
+    pan: 46
+    expression: 88
+    instrument_backend:
+      kind: sfz
+      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Percussion/Celeste.sfz"
+      optional: true
+      fallback_backend: pretty-midi
+  - name: dream_harp
+    group: harp
+    program: orchestral_harp
+    volume: 90
+    pan: 48
+    expression: 96
+    instrument_backend:
+      kind: sfz
+      sfz: /data/audio-tools/sfz/Versilian/EtherealwindsHarpII_CE/Harp_Normal.sfz
+      optional: true
+      fallback_backend: pretty-midi
+  - name: kit
+    group: drums
+    is_drum: true
+    volume: 92
+    pan: 64
+    expression: 100
+
+layer_templates:
+  # THE BED. Dotted-eighth cross-rhythm (0.75 x4 then two straight eighths)
+  # on quality-neutral tones (root / 5th / 5th-an-octave-up) so minor bars
+  # never hear a wrong third - the maj7/add9 color lives in the pads. The top
+  # note is the fifth (A4 over D), NOT the octave: an octave root sat a
+  # semitone under the pad's maj7 (D4 vs C#4) and read sour on the pluck.
+  # It stays below the lead's D5+ register.
+  arp_bed:
+    kind: ostinato
+    instrument: arp_kalimba
+    octave: 3
+    intervals: [0, 7, 19, 7, 19, 7]
+    rhythm: [0.75, 0.75, 0.75, 0.75, 0.5, 0.5]
+    velocity: 60
+    articulation: normal
+    humanize_ms: 4
+    humanize_velocity_pct: 6
+
+  # High glitter for the lead-free drift sections only (it lives in the
+  # lead's register, so it sits out whenever the flute sings).
+  crystal_drift:
+    kind: arpeggio
+    instrument: arp_crystal
+    octave: 5
+    pattern: [0, 2, 1, 3]
+    step: 1.0
+    duration_beats: 0.9
+    velocity: 38
+    density: 0.85
+    articulation: staccato
+    voicing: closed
+    humanize_ms: 6
+    humanize_velocity_pct: 6
+
+  pad_bed:
+    kind: pad_chords
+    instrument: warm_pad
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.9
+    velocity: 44
+    articulation: pad
+    voicing: open
+    constraints:
+      max_notes: 4
+      # minimize_motion (spec-level) lets the upper voices drift up an
+      # octave per chord; without a ceiling the "warm" pad floated its maj7
+      # color into octave 5-6 and thinned out. Cap it to a D5 top so the
+      # color stays under the lead.
+      max_pitch: 74
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  # Root+fifth only, an octave below the lead: a sustained shadow of the
+  # arp bed's pitch classes. Triad voicings at octave 4 put the halo's top
+  # in the flute's register and rubbed its passing tones.
+  pad_halo:
+    kind: pad_chords
+    instrument: halo_pad
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.8
+    velocity: 36
+    articulation: pad
+    voicing: root_fifth
+    constraints:
+      # Hard ceiling below the flute's A4 floor: minimize_motion otherwise
+      # floated this "shadow" pad up into the lead's octave, which is where
+      # the F#5-vs-flute rub came from. Kept as a low root+fifth halo.
+      max_pitch: 64
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+
+  # Warm slow bounce: dotted long-short, root only plus a fifth pickup.
+  sub_bounce:
+    kind: bassline
+    instrument: sub_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 1.4]
+      - [0, 1.5, 1.3]
+      - [7, 3.0, 0.9]
+    velocity: 72
+    articulation: normal
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  sub_breathe:
+    kind: bassline
+    instrument: sub_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 2.8]
+      - [0, 3.0, 0.9]
+    velocity: 66
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  # Airy halftime: soft kick bounce, rimshot backbeat on 3, shaker eighths.
+  perc_air:
+    kind: drums
+    instrument: kit
+    humanize_ms: 3
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick,       beats: [0.0, 2.5],                               velocity: 58}
+      - {drum: side_stick, beats: [2.0],                                    velocity: 44}
+      - {drum: shaker,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 19}
+      - {drum: triangle,   beats: [3.5],                                    velocity: 22, every: 2}
+      - {drum: tambourine, beats: [1.0, 3.0],                               velocity: 15, probability: 0.6}
+
+  perc_air_full:
+    kind: drums
+    instrument: kit
+    humanize_ms: 3
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick,       beats: [0.0, 2.5],                               velocity: 64}
+      - {drum: side_stick, beats: [2.0],                                    velocity: 50}
+      - {drum: shaker,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 22}
+      - {drum: open_hat,   beats: [3.5],                                    velocity: 24, every: 2}
+      - {drum: triangle,   beats: [1.5],                                    velocity: 22, every: 2}
+      - {drum: crash,      beats: [0.0],                                    velocity: 34, every: 8}
+
+  perc_bloom:
+    kind: drums
+    instrument: kit
+    humanize_ms: 4
+    humanize_velocity_pct: 10
+    events:
+      - {drum: kick,       beats: [0.0],                                    velocity: 52}
+      - {drum: shaker,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 15}
+      - {drum: triangle,   beats: [2.0],                                    velocity: 24, every: 2}
+
+  harp_bloom:
+    kind: arpeggio
+    instrument: dream_harp
+    octave: 3
+    pattern: [0, 1, 2, 3, 2, 1]
+    step: 0.5
+    # Short pluck: at 1.2 the strings rang across barlines and smeared the
+    # borrowed-chord changes (F over Cadd9); the group reverb supplies the
+    # wash instead.
+    duration_beats: 0.7
+    velocity: 50
+    density: 0.95
+    articulation: normal
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+
+state_map:
+  default:
+    stems: {lead: 1.0, bells: 1.0, sparkle: 1.0, arp: 1.0, pads: 1.0, bass: 1.0, harp: 1.0, drums: 1.0}
+  calm:
+    stems: {lead: 0.5, bells: 0.9, sparkle: 0.7, arp: 1.0, pads: 1.0, bass: 1.0, harp: 1.0, drums: 0.6}
+  tension:
+    stems: {lead: 1.0, bells: 0.7, sparkle: 0.6, arp: 1.0, pads: 0.8, bass: 1.0, harp: 0.7, drums: 1.0}
+
+playback:
+  loop: true
+
+sections:
+  # ------------------------------------------------------------------ 0:00
+  # Pure bed from beat one - no cold start. This is exactly the texture the
+  # outro hands back to, so the seam is invisible.
+  - id: drift_in
+    kind: intro
+    label: drift in - the bed
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4]
+    layers:
+      - arp_bed
+      - crystal_drift
+      - pad_bed
+      - sub_bounce
+      - perc_air
+
+  # ------------------------------------------------------------------ 0:23
+  # The answering voice speaks first: bowed vibraphone sketches the shape
+  # of the melody-to-come in long, slow-speaking tones.
+  - id: first_light
+    kind: verse
+    label: first light - vibe pre-melody
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4]
+    layers:
+      - arp_bed
+      - pad_bed
+      - sub_bounce
+      - perc_air
+      - kind: notes
+        instrument: bowed_vibe
+        notes:
+          - [0, 0.0, A4, 3.0, 54]
+          - [1, 0.0, F#4, 4.0, 52]
+          - [2, 2.0, B4, 2.0, 54]
+          - [3, 0.0, D5, 4.0, 56]
+          - [4, 0.0, F#4, 4.0, 52]
+          - [5, 2.0, D5, 2.0, 54]
+          - [6, 0.0, B4, 4.0, 52]
+          - [7, 0.0, A4, 4.0, 50]
+
+  # ------------------------------------------------------------------ 0:46
+  # The flute enters late and patient: long breaths, big rests, every held
+  # note a chord tone - the color stays in the harmony.
+  - id: lead_enters
+    kind: verse
+    label: the flute sings
+    bars: 16
+    intensity: 1.0
+    loopable: false
+    harmony: [Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4,
+              Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4]
+    layers:
+      - arp_bed
+      - pad_bed
+      - pad_halo
+      - sub_bounce
+      - perc_air
+      - kind: notes
+        instrument: lead_flute
+        # Slight release gap so back-to-back phrase notes don't smear into
+        # one legato blur (cleaner articulation; also stops the pitch-tracker
+        # merging a whole phrase into one "note").
+        gate: 0.9
+        notes:
+          # Phrase 1: a call that rises to the third and settles.
+          - [0, 2.0, A4, 1.0, 66]
+          - [0, 3.0, D5, 1.0, 70]
+          - [1, 0.0, F#5, 2.5, 76]
+          - [1, 2.5, E5, 0.5, 64]
+          - [1, 3.0, D5, 1.0, 68]
+          - [2, 0.0, B4, 3.0, 70]
+          # Phrase 2: the answer leans on the relative minor.
+          - [4, 0.0, D5, 2.0, 72]
+          - [4, 2.0, F#5, 2.0, 74]
+          - [5, 0.0, E5, 0.5, 64]
+          - [5, 0.5, D5, 1.5, 70]
+          - [5, 2.0, B4, 2.0, 66]
+          - [6, 0.0, D5, 2.0, 70]
+          - [6, 2.0, B4, 2.0, 66]
+          - [7, 0.0, A4, 3.0, 64]
+          # Phrase 3: reaching - the peak of the first verse.
+          - [8, 1.5, D5, 0.5, 66]
+          - [8, 2.0, E5, 0.5, 68]
+          - [8, 2.5, F#5, 1.5, 74]
+          - [9, 0.0, A5, 3.0, 80]
+          - [9, 3.0, F#5, 1.0, 70]
+          - [10, 0.0, G5, 2.0, 76]
+          - [10, 2.0, B5, 2.0, 78]
+          - [11, 0.0, A5, 0.5, 70]
+          - [11, 0.5, G5, 1.0, 72]
+          - [11, 1.5, D5, 2.5, 68]
+          # Phrase 4: the fall, suspended on the sus chord.
+          - [12, 0.0, F#5, 2.0, 74]
+          - [12, 2.0, D5, 2.0, 70]
+          - [13, 0.0, E5, 0.5, 64]
+          - [13, 0.5, D5, 1.5, 68]
+          - [13, 2.0, B4, 2.0, 66]
+          - [14, 0.0, D5, 2.0, 68]
+          - [14, 2.0, B4, 2.0, 64]
+          - [15, 0.0, E5, 3.5, 68]
+      - kind: notes
+        # The vibe answers only in the flute's rests (and once a fifth
+        # below a held note - never a second).
+        instrument: bowed_vibe
+        notes:
+          - [3, 0.5, D5, 1.0, 58]
+          - [3, 1.5, B4, 1.0, 56]
+          - [3, 2.5, G4, 1.5, 54]
+          - [7, 2.0, E5, 2.0, 56]
+          - [15, 2.0, A4, 2.0, 54]
+
+  # ------------------------------------------------------------------ 1:32
+  # Call and answer: the vibe leads, the flute replies - the lift section
+  # moves one chord per bar under the same floating vocabulary.
+  - id: answer
+    kind: chorus
+    label: the answer - handing off
+    bars: 8
+    intensity: 1.05
+    loopable: false
+    harmony: [Bm7, Gmaj7, Dmaj7, Asus4, Bm7, Gmaj7, Em7, Asus4]
+    layers:
+      - arp_bed
+      - pad_bed
+      - pad_halo
+      - sub_bounce
+      - perc_air_full
+      - kind: notes
+        instrument: bowed_vibe
+        notes:
+          - [0, 0.0, B4, 1.5, 62]
+          - [0, 1.5, D5, 1.0, 64]
+          - [0, 2.5, F#5, 1.5, 66]
+          - [1, 0.0, D5, 2.0, 62]
+          - [1, 2.0, B4, 2.0, 60]
+          - [2, 0.0, A4, 2.0, 58]
+          - [2, 2.0, F#4, 2.0, 56]
+          - [4, 0.0, F#5, 2.0, 64]
+          - [4, 2.0, D5, 2.0, 62]
+          - [5, 0.0, B4, 3.0, 60]
+      - kind: notes
+        instrument: lead_flute
+        gate: 0.9
+        notes:
+          - [3, 0.0, E5, 2.0, 68]
+          - [3, 2.0, D5, 2.0, 66]
+          - [6, 0.0, G5, 2.0, 72]
+          - [6, 2.0, E5, 2.0, 68]
+          - [7, 0.0, D5, 1.0, 64]
+          - [7, 1.0, E5, 3.0, 70]
+
+  # ------------------------------------------------------------------ 1:55
+  # The bloom: borrowed bVI/bVII color, the tempo sags, the harp wakes up,
+  # the flute rests. Celesta drops falling pairs at the phrase tails.
+  - id: bloom
+    kind: bridge
+    label: bloom - borrowed color
+    bars: 12
+    intensity: 0.9
+    loopable: false
+    harmony: [Bbmaj7, Bbmaj7, Cadd9, Cadd9, Dmaj7, Dmaj7,
+              Bbmaj7, Cadd9, Em7, Em7, Asus4, Asus4]
+    layers:
+      - arp_bed
+      - pad_bed
+      - pad_halo
+      - sub_breathe
+      - perc_bloom
+      - harp_bloom
+      - kind: notes
+        instrument: bowed_vibe
+        notes:
+          - [0, 0.0, D5, 6.0, 58]
+          - [2, 0.0, E5, 6.0, 58]
+          - [4, 0.0, F#5, 6.0, 60]
+          - [6, 0.0, F5, 3.5, 56]
+          - [7, 0.0, E5, 3.5, 56]
+          - [8, 0.0, B4, 6.0, 54]
+          - [10, 0.0, A4, 7.0, 52]
+      - kind: notes
+        instrument: celesta_double
+        notes:
+          - [1, 2.0, F5, 1.0, 68]
+          - [1, 3.0, D5, 1.0, 66]
+          - [3, 2.0, G5, 1.0, 68]
+          - [3, 3.0, E5, 1.0, 66]
+          - [5, 2.0, A5, 1.0, 70]
+          - [5, 3.0, F#5, 1.0, 66]
+          - [9, 2.0, G4, 1.0, 66]
+          - [9, 3.0, B4, 1.0, 66]
+
+  # ------------------------------------------------------------------ 2:32
+  # The duet: the flute restates the melody a shade bolder, the celesta
+  # doubles it in unison, the vibe answers in the rests.
+  - id: return_duet
+    kind: chorus
+    label: duet - the view between
+    bars: 16
+    intensity: 1.1
+    loopable: false
+    harmony: [Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4,
+              Bm7, Gmaj7, Dmaj7, Asus4, Bm7, Gmaj7, Em7, Asus4]
+    layers:
+      - arp_bed
+      - pad_bed
+      - pad_halo
+      - sub_bounce
+      - perc_air_full
+      - kind: notes
+        instruments: [lead_flute, celesta_double]
+        gate: 0.9
+        notes:
+          - [0, 0.0, F#5, 3.0, 76]
+          - [0, 3.0, E5, 0.5, 66]
+          - [0, 3.5, D5, 0.5, 66]
+          - [1, 0.0, A4, 2.0, 68]
+          - [1, 2.0, D5, 2.0, 72]
+          - [2, 0.0, B4, 2.0, 70]
+          - [2, 2.0, D5, 2.0, 72]
+          - [4, 0.0, F#5, 2.0, 74]
+          - [4, 2.0, D5, 2.0, 70]
+          - [5, 0.0, B4, 4.0, 66]
+          - [6, 0.0, D5, 3.0, 70]
+          - [7, 0.0, E5, 4.0, 70]
+          # Over the lift: the peak of the whole cue.
+          - [8, 0.0, F#5, 2.0, 76]
+          - [8, 2.0, B5, 2.0, 78]
+          - [9, 0.0, A5, 0.5, 70]
+          - [9, 0.5, G5, 1.5, 74]
+          - [9, 2.0, D5, 2.0, 68]
+          - [10, 0.0, F#5, 3.0, 74]
+          - [11, 0.0, E5, 4.0, 70]
+          - [12, 0.0, D5, 2.0, 70]
+          - [12, 2.0, F#5, 2.0, 72]
+          - [13, 0.0, G5, 2.0, 72]
+          - [13, 2.0, D5, 2.0, 68]
+          - [14, 0.0, E5, 2.0, 68]
+          - [14, 2.0, G5, 2.0, 70]
+          - [15, 0.0, E5, 1.0, 66]
+          - [15, 1.0, D5, 3.0, 64]
+      - kind: notes
+        instrument: bowed_vibe
+        notes:
+          - [3, 0.0, D5, 2.0, 60]
+          - [3, 2.0, B4, 2.0, 58]
+          - [6, 3.0, B4, 1.0, 56]
+          - [7, 2.0, A4, 2.0, 56]
+          - [11, 2.0, A4, 2.0, 58]
+          - [15, 2.0, A4, 2.0, 56]
+
+  # ------------------------------------------------------------------ 3:18
+  # Same texture as drift_in; the vibe says goodbye early, then the last
+  # four bars are the pure bed - bar 0 reads as the next drift.
+  - id: drift_out
+    kind: outro
+    label: drift out - next objective
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [Dmaj7, Dmaj7, Gadd9, Gadd9, Bm7, Bm7, Gadd9, Asus4]
+    layers:
+      - arp_bed
+      - crystal_drift
+      - pad_bed
+      - sub_bounce
+      - perc_air
+      - kind: notes
+        instrument: bowed_vibe
+        notes:
+          - [1, 0.0, F#4, 4.0, 50]
+          - [3, 0.0, D5, 4.0, 52]

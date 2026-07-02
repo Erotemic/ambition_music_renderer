@@ -100,7 +100,7 @@ def audit_events(
                 "time": _fmt_time(start),
                 "start_seconds": _round3(start),
                 "overlap_seconds": _round3(overlap),
-                "bar": int(float(b["start_beat"]) // beats_per_bar) + 1,
+                "bar": int((float(b["start_beat"]) + 1e-6) // beats_per_bar) + 1,
                 "section": b.get("section") or a.get("section"),
                 "notes": [a.get("note"), b.get("note")],
                 "interval_semitones": diff,
@@ -134,7 +134,7 @@ def audit_events(
         exposed.append({
             "time": _fmt_time(float(e["start_time"])),
             "start_seconds": _round3(float(e["start_time"])),
-            "bar": int(float(e["start_beat"]) // beats_per_bar) + 1,
+            "bar": int((float(e["start_beat"]) + 1e-6) // beats_per_bar) + 1,
             "section": e.get("section"),
             "note": e.get("note"),
             "chord": chord,
@@ -169,7 +169,10 @@ def _chord_root_pc(chord: str) -> int | None:
 def _chord_at(spec: dict[str, Any], beat: float, beats_per_bar: float) -> str:
     from ..render.score_theory import chord_for_bar
 
-    bar = int(beat // beats_per_bar)
+    # start_beat accumulates float error (a bar-56 note can arrive as beat
+    # 223.99999999999997); nudge before flooring so boundary notes land in
+    # the bar they were authored in.
+    bar = int((beat + 1e-6) // beats_per_bar)
     cursor = 0
     for section in spec.get("sections", []):
         bars = int(section.get("bars", 0))

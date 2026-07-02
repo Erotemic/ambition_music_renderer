@@ -101,3 +101,6 @@ legacy_outputs
 
 # Agent scratch drop-zone: default bundle output (audio/plots/diagnostics)
 agent/
+
+# Generated audit reports (regenerated per render)
+scores/active/reports/
