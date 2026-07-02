@@ -12,10 +12,9 @@ from pathlib import Path
 
 from .._paths import output_root
 
-np = lazy.load("numpy")
 sf = lazy.load("soundfile")
 
-from ._common import db
+from ._common import db, peak, rms
 
 
 @profile
@@ -23,10 +22,8 @@ def stats(path: Path) -> tuple[float, float, float]:
     data, sample_rate = sf.read(path, always_2d=True, dtype="float32")
     if data.size == 0:
         return 0.0, 0.0, 0.0
-    peak = float(np.max(np.abs(data)))
-    rms = float(np.sqrt(np.mean(np.square(data), dtype=np.float64)))
     duration = data.shape[0] / float(sample_rate)
-    return peak, rms, duration
+    return peak(data), rms(data), duration
 
 
 @profile
@@ -77,9 +74,9 @@ def run(args: AuditCueBalanceConfig) -> int:
         f"{'section':<12} {'stem':<12} {'peak':>9} {'peak_db':>9} {'rms':>9} {'rms_db':>9} {'dur':>7}"
     )
     for section, stem, path in files:
-        peak, rms, duration = stats(path)
+        peak_value, rms_value, duration = stats(path)
         print(
-            f"{section:<12} {stem:<12} {peak:9.4f} {db(peak):9.1f} {rms:9.4f} {db(rms):9.1f} {duration:7.2f}"
+            f"{section:<12} {stem:<12} {peak_value:9.4f} {db(peak_value):9.1f} {rms_value:9.4f} {db(rms_value):9.1f} {duration:7.2f}"
         )
     return 0
 

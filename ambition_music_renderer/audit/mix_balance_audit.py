@@ -210,11 +210,11 @@ def _format_summary(payload: dict[str, Any]) -> str:
 
 
 def render_plot(payload: dict[str, Any], path: Path, *, plot_format: str = "jpg", jpeg_quality: int = 90) -> bool:
-    from .dissonance_audit import _ensure_matplotlib, _save_figure
+    from ._common import ensure_matplotlib, save_figure
 
-    if not _ensure_matplotlib():
+    plt = ensure_matplotlib()
+    if plt is None:
         return False
-    import matplotlib.pyplot as plt  # noqa
     import numpy as np
 
     sections = payload.get("sections", [])
@@ -249,7 +249,7 @@ def render_plot(payload: dict[str, Any], path: Path, *, plot_format: str = "jpg"
                     color="white" if grid[i, j] < -18 else "black")
     ax.set_title(f"Mix budget (state_weight x group_gain, dB below best group/section) — {payload.get('id')}")
     fig.colorbar(im, ax=ax, label="dB below section's best-budgeted group")
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality, dpi=180)
     return True
 
 

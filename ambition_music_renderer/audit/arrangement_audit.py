@@ -26,68 +26,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-pretty_midi = lazy.load("pretty_midi")
-
-
 from ._common import round3 as _round3
+from ._score_common import chord_for_abs_bar, chord_pitch_classes, events_for_spec, state_weights
 
-
-@profile
-def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
-    from ..render.score_layers import build_score
-
-    pm, groups, _section_meta = build_score(spec)
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
-    if not events:
-        for inst in pm.instruments:
-            name = inst.name or f"program_{inst.program}"
-            for note in inst.notes:
-                events.append(
-                    {
-                        "instrument": name,
-                        "group": groups.get(name, name),
-                        "section": None,
-                        "layer": None,
-                        "layer_kind": None,
-                        "pitch": int(note.pitch),
-                        "note": pretty_midi.note_number_to_name(int(note.pitch)),
-                        "velocity": int(note.velocity),
-                        "start_beat": float(note.start / 60.0 * bpm),
-                        "end_beat": float(note.end / 60.0 * bpm),
-                    }
-                )
-    return events, bpm, beats_per_bar
-
-
-@profile
-def _section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | None, int]:
-    cursor = 0
-    for section in spec.get("sections", []):
-        bars = int(section.get("bars", 0))
-        if cursor <= bar0 < cursor + bars:
-            return section, bar0 - cursor
-        cursor += bars
-    return None, bar0
-
-
-@profile
-def _chord_pcs(spec: dict[str, Any], bar0: int) -> set[int]:
-    from ..render.score_theory import chord_for_bar, chord_pitches
-
-    section, local_bar = _section_for_bar(spec, bar0)
-    if not section:
-        return set()
-    chord = chord_for_bar(section, local_bar)
-    return {int(p) % 12 for p in chord_pitches(chord, octave=4, voicing="closed")}
-
-
-@profile
-def _state_weights(spec: dict[str, Any], state: str = "default") -> dict[str, float]:
-    states = spec.get("state_map") or {}
-    data = states.get(state) or next(iter(states.values()), {}) if states else {}
-    return {str(k): float(v) for k, v in (data.get("stems") or {}).items()}
+pretty_midi = lazy.load("pretty_midi")
 
 
 @profile
@@ -103,7 +45,7 @@ def _active_events(events: list[dict[str, Any]], beat: float) -> list[dict[str, 
 
 @profile
 def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_rows: int = 40) -> dict[str, Any]:
-    events, bpm, beats_per_bar = _events_for_spec(spec)
+    events, bpm, beats_per_bar = events_for_spec(spec)
     warnings: list[str] = []
     if not events:
         return {
@@ -116,7 +58,7 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_rows: in
             "harmonic_outliers": [],
         }
 
-    default_weights = _state_weights(spec, "default")
+    default_weights = state_weights(spec, "default")
     group_raw: Counter[str] = Counter()
     group_weighted: Counter[str] = Counter()
     group_note_counts: Counter[str] = Counter()
@@ -174,7 +116,7 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_rows: in
         bar_density_counter[bar0] += 1
         bar_velocity_weight[bar0] += _weighted_event_value(ev)
         pitch = int(ev.get("pitch", 60))
-        pcs = _chord_pcs(spec, bar0)
+        pcs = chord_pitch_classes(chord_for_abs_bar(spec, bar0))
         if pcs and (pitch % 12) not in pcs and dur >= 0.7 and int(ev.get("velocity", 64)) >= 34:
             layer_kind = str(ev.get("layer_kind") or "")
             # Motif notes are often passing/neighbor tones. Still report them,

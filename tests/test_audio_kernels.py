@@ -94,3 +94,28 @@ def test_compressor_keeps_shape_dtype_and_finite_values():
     assert out.shape == audio.shape
     assert out.dtype == np.float32
     assert np.isfinite(out).all()
+
+
+def test_to_mono_handles_every_layout():
+    from ambition_music_renderer.audit._common import to_mono
+
+    left = np.linspace(-0.5, 0.5, 64, dtype=np.float32)
+    right = np.linspace(0.25, -0.25, 64, dtype=np.float32)
+
+    stereo = np.stack([left, right], axis=1)  # (N, 2) sample-first
+    expected = (left + right) * 0.5
+    np.testing.assert_allclose(to_mono(stereo), expected, rtol=1e-6, atol=1e-7)
+    assert to_mono(stereo).dtype == np.float32
+
+    # 1-D mono passes through unchanged.
+    np.testing.assert_allclose(to_mono(left), left, rtol=1e-6, atol=1e-7)
+
+    # (N, 1) used to fall through to mean(axis=0) — averaging over TIME —
+    # which collapsed the whole signal to a single sample row.
+    column = left[:, None]
+    out = to_mono(column)
+    assert out.shape == (len(left),)
+    np.testing.assert_allclose(out, left, rtol=1e-6, atol=1e-7)
+
+    # Channel-first (C, N) is transposed, not truncated.
+    np.testing.assert_allclose(to_mono(stereo.T), expected, rtol=1e-6, atol=1e-7)

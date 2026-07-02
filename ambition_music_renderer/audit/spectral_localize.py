@@ -41,6 +41,8 @@ import lazy_loader as lazy
 import kwconf
 from pathlib import Path
 
+from ._common import to_mono
+
 np = lazy.load("numpy")
 
 
@@ -51,15 +53,6 @@ DEFAULT_BANDS = {
     "vhigh (3-6k)": (3000.0, 6000.0),
     "air (6-12k)": (6000.0, 12000.0),
 }
-
-
-@profile
-def to_mono(audio: np.ndarray) -> np.ndarray:
-    if audio.ndim == 1:
-        return audio.astype("float32")
-    if audio.shape[-1] == 2:
-        return audio.mean(axis=-1).astype("float32")
-    return audio.mean(axis=0).astype("float32")
 
 
 @profile

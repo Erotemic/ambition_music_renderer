@@ -15,8 +15,6 @@ from __future__ import annotations
 
 from ..profiler import profile
 
-import lazy_loader as lazy
-
 import kwconf
 import json
 import math
@@ -24,31 +22,16 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-pretty_midi = lazy.load("pretty_midi")
-
-# Optional plotting dependency, loaded on first use so importing this module
-# stays cheap (matplotlib is the single heaviest import in the audit package).
-plt = None
-HAS_MATPLOTLIB: bool | None = None
-
-
-def _ensure_matplotlib() -> bool:
-    """Import matplotlib lazily; return whether plotting is available."""
-    global plt, HAS_MATPLOTLIB
-    if HAS_MATPLOTLIB is not None:
-        return HAS_MATPLOTLIB
-    try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as _plt
-
-        plt = _plt
-        HAS_MATPLOTLIB = True
-    except Exception:  # pragma: no cover - plotting is best-effort.
-        plt = None
-        HAS_MATPLOTLIB = False
-    return HAS_MATPLOTLIB
+from ._common import ensure_matplotlib, round3 as _round3, save_figure
+from ._score_common import (
+    chord_for_abs_bar,
+    chord_pitch_classes,
+    events_for_spec,
+    section_for_bar,
+    section_starts,
+    source_hint,
+    state_weights,
+)
 
 PC_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 MAJOR_SCALE = {0, 2, 4, 5, 7, 9, 11}
@@ -78,53 +61,9 @@ INTERVAL_PRESSURE = {
 }
 
 
-from ._common import round3 as _round3
-
-
 @profile
 def _pc_name(pc: int) -> str:
     return PC_NAMES[int(pc) % 12]
-
-
-@profile
-def _section_starts(spec: dict[str, Any]) -> dict[str, int]:
-    starts: dict[str, int] = {}
-    cursor = 0
-    for section in spec.get("sections", []):
-        starts[str(section.get("id", ""))] = cursor
-        cursor += int(section.get("bars", 0))
-    return starts
-
-
-@profile
-def _section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | None, int]:
-    cursor = 0
-    for section in spec.get("sections", []):
-        bars = int(section.get("bars", 0))
-        if cursor <= bar0 < cursor + bars:
-            return section, bar0 - cursor
-        cursor += bars
-    return None, bar0
-
-
-@profile
-def _chord_for_abs_bar(spec: dict[str, Any], bar0: int) -> str:
-    from ..render.score_theory import chord_for_bar
-
-    section, local = _section_for_bar(spec, bar0)
-    if not section:
-        return ""
-    return chord_for_bar(section, local)
-
-
-@profile
-def _chord_pcs(chord: str) -> set[int]:
-    from ..render.score_theory import chord_pitches
-
-    try:
-        return {int(p) % 12 for p in chord_pitches(chord, octave=4, voicing="closed")}
-    except Exception:
-        return set()
 
 
 @profile
@@ -144,7 +83,7 @@ def _infer_section_keys(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
     for section in spec.get("sections", []):
         sid = str(section.get("id", ""))
         harmony = [str(ch) for ch in (section.get("harmony") or [])]
-        chord_pcs = [_chord_pcs(ch) for ch in harmony]
+        chord_pcs = [chord_pitch_classes(ch) for ch in harmony]
         chord_roots = [_chord_root_pc(ch) for ch in harmony]
         best: tuple[float, int, str, set[int]] | None = None
         for tonic in range(12):
@@ -175,49 +114,6 @@ def _infer_section_keys(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 @profile
-def _state_weights(spec: dict[str, Any], state: str = "default") -> dict[str, float]:
-    states = spec.get("state_map") or {}
-    if not isinstance(states, dict):
-        return {}
-    data = states.get(state) or next(iter(states.values()), {}) if states else {}
-    if not isinstance(data, dict):
-        return {}
-    stems = data.get("stems") or {}
-    return {str(k): float(v) for k, v in stems.items()} if isinstance(stems, dict) else {}
-
-
-@profile
-def _events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
-    from ..render.score_layers import build_score
-
-    pm, groups, _section_meta = build_score(spec)
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
-    if not events:
-        for inst in pm.instruments:
-            name = inst.name or f"program_{inst.program}"
-            for note in inst.notes:
-                events.append(
-                    {
-                        "instrument": name,
-                        "group": groups.get(name, name),
-                        "section": None,
-                        "layer": None,
-                        "layer_kind": None,
-                        "pitch": int(note.pitch),
-                        "note": pretty_midi.note_number_to_name(int(note.pitch)),
-                        "velocity": int(note.velocity),
-                        "start_time": float(note.start),
-                        "end_time": float(note.end),
-                        "start_beat": float(note.start / 60.0 * bpm),
-                        "end_beat": float(note.end / 60.0 * bpm),
-                    }
-                )
-    return events, bpm, beats_per_bar
-
-
-@profile
 def _interval_class_to_chord(pc: int, chord_pcs: set[int]) -> tuple[int | None, float, str]:
     if not chord_pcs:
         return None, 0.0, ""
@@ -231,116 +127,6 @@ def _interval_class_to_chord(pc: int, chord_pcs: set[int]) -> tuple[int | None, 
             best_ic = ic
             best_pressure = pressure
     return best_ic, max(0.0, best_pressure), INTERVAL_CLASS_NAMES.get(best_ic or 0, "")
-
-
-@profile
-def _layer_templates(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    templates = spec.get("layer_templates") or {}
-    return {str(k): v for k, v in templates.items() if isinstance(v, dict)} if isinstance(templates, dict) else {}
-
-
-@profile
-def _motifs(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    out: dict[str, dict[str, Any]] = {}
-    for motif in spec.get("motifs", []) or []:
-        if isinstance(motif, dict) and "id" in motif:
-            out[str(motif["id"])] = motif
-    return out
-
-
-@profile
-def _motif_source_hint(
-    spec: dict[str, Any],
-    ev: dict[str, Any],
-    layer: dict[str, Any],
-    section_starts: dict[str, int],
-    beats_per_bar: float,
-) -> tuple[str, int | None, int | None, Any]:
-    """Return a best-effort YAML source hint for a motif note event."""
-    layer_name = str(ev.get("layer") or "?")
-    section_id = str(ev.get("section") or "")
-    section_start = section_starts.get(section_id, 0)
-    local_bar = float(ev.get("nominal_bar", ev.get("start_beat", 0.0) / beats_per_bar)) - section_start
-    nominal_beat = float(ev.get("nominal_beat", 0.0))
-    roots = layer.get("roots") or None
-    root = layer.get("root")
-    starts = layer.get("starts") or [[0, 0.0]]
-    every_bars = float(layer.get("every_bars", 2.0))
-    repeats = int(layer.get("repeats", 1))
-    best_rep: int | None = None
-    best_start: list[Any] | None = None
-    best_distance = 1e9
-    for rep in range(repeats):
-        for start in starts:
-            start_bar = float(start[0]) + rep * every_bars
-            start_beat = float(start[1])
-            # Compare in absolute beats inside section.
-            distance = abs(((local_bar - start_bar) * beats_per_bar + nominal_beat) - start_beat)
-            if local_bar >= start_bar - 1e-6 and distance < best_distance:
-                best_distance = distance
-                best_rep = rep
-                best_start = start
-    motif_index: int | None = None
-    motif_interval: Any = None
-    motif_id = str(layer.get("motif", ""))
-    motif = _motifs(spec).get(motif_id, {})
-    if best_rep is not None and best_start is not None and motif:
-        start_bar = float(best_start[0]) + best_rep * every_bars
-        start_beat = float(best_start[1])
-        rel_beat = (local_bar - start_bar) * beats_per_bar + nominal_beat - start_beat
-        rhythm = [float(x) for x in motif.get("rhythm", [1.0])]
-        cursor = 0.0
-        for idx, dur in enumerate(rhythm):
-            scaled = dur * float(layer.get("rhythm_scale", 1.0))
-            if cursor - 1e-4 <= rel_beat < cursor + scaled - 1e-4:
-                motif_index = idx
-                break
-            cursor += scaled
-        if motif_index is not None:
-            intervals = motif.get("intervals")
-            notes = motif.get("notes")
-            if isinstance(intervals, list) and intervals:
-                motif_interval = intervals[motif_index % len(intervals)]
-            elif isinstance(notes, list) and notes:
-                motif_interval = notes[motif_index % len(notes)]
-    if roots and best_rep is not None:
-        root_idx = best_rep % len(roots)
-        root_val = roots[root_idx]
-        hint = f"layer_templates.{layer_name}.roots[{root_idx}]={root_val}"
-    elif root is not None:
-        hint = f"layer_templates.{layer_name}.root={root}"
-    else:
-        hint = f"layer_templates.{layer_name}"
-    if motif_index is not None:
-        hint += f"; motifs.{motif_id}.intervals[{motif_index}]={motif_interval}"
-    return hint, best_rep, motif_index, motif_interval
-
-
-@profile
-def _source_hint(
-    spec: dict[str, Any],
-    ev: dict[str, Any],
-    section_starts: dict[str, int],
-    beats_per_bar: float,
-) -> tuple[str, int | None, int | None, Any]:
-    from ..render.score_theory import chord_for_bar
-
-    templates = _layer_templates(spec)
-    layer_name = str(ev.get("layer") or "?")
-    layer = templates.get(layer_name, {})
-    kind = str(layer.get("kind") or ev.get("layer_kind") or "")
-    if kind == "motif":
-        return _motif_source_hint(spec, ev, layer, section_starts, beats_per_bar)
-    bar0 = int(float(ev.get("start_beat", 0.0)) // beats_per_bar)
-    section, local_bar = _section_for_bar(spec, bar0)
-    chord = chord_for_bar(section, local_bar) if section else ""
-    section_id = str((section or {}).get("id") or ev.get("section") or "?")
-    return (
-        f"sections.{section_id}.harmony[{local_bar}]={chord}; layer_templates.{layer_name}",
-        None,
-        None,
-        None,
-    )
 
 
 @profile
@@ -362,7 +148,7 @@ def _sample_contexts(
     for idx in range(sample_count):
         beat = min(end - 1e-6, start + (idx + 0.5) * (end - start) / sample_count)
         bar0 = int(beat // beats_per_bar)
-        section, local_bar = _section_for_bar(spec, bar0)
+        section, local_bar = section_for_bar(spec, bar0)
         sid = str((section or {}).get("id") or ev.get("section") or "")
         chord = chord_for_bar(section, local_bar) if section else ""
         key = section_keys.get(sid, {"name": "unknown", "pcs": set()})
@@ -373,7 +159,7 @@ def _sample_contexts(
                 "beat": beat,
                 "section": sid,
                 "chord": chord,
-                "chord_pcs": _chord_pcs(chord),
+                "chord_pcs": chord_pitch_classes(chord),
                 "chord_root_pc": _chord_root_pc(chord),
                 "key_name": key.get("name", "unknown"),
                 "key_pcs": key.get("pcs", set()),
@@ -390,10 +176,10 @@ def audit_spec(
     max_candidates: int = 80,
     min_score: float = 0.28,
 ) -> dict[str, Any]:
-    events, bpm, beats_per_bar = _events_for_spec(spec)
+    events, bpm, beats_per_bar = events_for_spec(spec)
     section_keys = _infer_section_keys(spec)
-    section_starts = _section_starts(spec)
-    default_weights = _state_weights(spec, "default")
+    starts = section_starts(spec)
+    default_weights = state_weights(spec, "default")
     candidates: list[dict[str, Any]] = []
     layer_scores: Counter[str] = Counter()
     group_scores: Counter[str] = Counter()
@@ -508,7 +294,7 @@ def audit_spec(
         start_beat = float(ev.get("start_beat", 0.0))
         bar0 = int(start_beat // beats_per_bar)
         beat_in_bar = start_beat - bar0 * beats_per_bar
-        source_hint, repeat_index, motif_index, motif_interval = _source_hint(spec, ev, section_starts, beats_per_bar)
+        hint, repeat_index, motif_index, motif_interval = source_hint(spec, ev, starts, beats_per_bar)
         chord = chord_names.most_common(1)[0][0] if chord_names else ""
         key_name = key_names.most_common(1)[0][0] if key_names else "unknown"
         worst_interval = Counter(intervals).most_common(1)[0][0] if intervals else ""
@@ -519,7 +305,7 @@ def audit_spec(
             "bar": bar0 + 1,
             "beat": _round3(beat_in_bar + 1.0),
             "section": ev.get("section"),
-            "local_bar": _section_for_bar(spec, bar0)[1] + 1,
+            "local_bar": section_for_bar(spec, bar0)[1] + 1,
             "chord": chord,
             "inferred_key": key_name,
             "note": ev.get("note"),
@@ -537,7 +323,7 @@ def audit_spec(
             "out_of_key_and_chord_fraction": _round3(out_key_and_chord_frac),
             "safe_extension_fraction": _round3(safe_extension_frac),
             "worst_chord_interval": worst_interval,
-            "source_hint": source_hint,
+            "source_hint": hint,
             "repeat_index": repeat_index,
             "motif_index": motif_index,
             "motif_interval": motif_interval,
@@ -607,19 +393,6 @@ def _write_tsv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 @profile
-def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 90) -> None:
-    fmt = plot_format.lower()
-    save_kwargs: dict[str, Any] = {"dpi": 150, "bbox_inches": "tight"}
-    if fmt in {"jpg", "jpeg"}:
-        save_kwargs["format"] = "jpeg"
-        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
-    else:
-        save_kwargs["format"] = fmt
-    fig.savefig(path, **save_kwargs)
-    plt.close(fig)
-
-
-@profile
 def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[str, Any] | None:
     """Per-note sourness over time, for the sour piano-roll.
 
@@ -644,9 +417,9 @@ def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[
         pitch = int(ev["pitch"])
         pc = pitch % 12
         bar = int(float(ev["start_beat"]) // bpb)
-        section, _ = _section_for_bar(spec, bar)
-        chord = _chord_for_abs_bar(spec, bar)
-        chord_pcs = _chord_pcs(chord) if chord else set()
+        section, _ = section_for_bar(spec, bar)
+        chord = chord_for_abs_bar(spec, bar)
+        chord_pcs = chord_pitch_classes(chord) if chord else set()
         key_pcs = keys.get((section or {}).get("id"), {}).get("pcs", set())
         if pc in chord_pcs:
             sour = 0.0
@@ -697,7 +470,8 @@ def render_pianoroll(
 
 @profile
 def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not _ensure_matplotlib():
+    plt = ensure_matplotlib()
+    if plt is None:
         return False
     rows = payload.get("top_layers", [])[:12]
     if not rows:
@@ -712,7 +486,7 @@ def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, 
     ax.set_xlabel("total sour-note score")
     ax.set_title(f"Sour-note score by layer — {payload.get('id')}")
     ax.grid(True, axis="x", alpha=0.3)
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
     return True
 
 

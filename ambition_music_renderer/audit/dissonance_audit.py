@@ -14,8 +14,6 @@ from __future__ import annotations
 
 from ..profiler import profile
 
-import lazy_loader as lazy
-
 import kwconf
 import json
 import math
@@ -23,31 +21,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-pretty_midi = lazy.load("pretty_midi")
-
-# Optional plotting dependency, loaded on first use so importing this module
-# stays cheap (matplotlib is the single heaviest import in the audit package).
-plt = None
-HAS_MATPLOTLIB: bool | None = None
-
-
-def _ensure_matplotlib() -> bool:
-    """Import matplotlib lazily; return whether plotting is available."""
-    global plt, HAS_MATPLOTLIB
-    if HAS_MATPLOTLIB is not None:
-        return HAS_MATPLOTLIB
-    try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as _plt
-
-        plt = _plt
-        HAS_MATPLOTLIB = True
-    except Exception:  # pragma: no cover - plotting is best-effort.
-        plt = None
-        HAS_MATPLOTLIB = False
-    return HAS_MATPLOTLIB
+from ._common import ensure_matplotlib, round3 as _round3, save_figure
+from ._score_common import chord_for_abs_bar, chord_pitch_classes, section_for_bar
 
 INTERVAL_CLASS_NAMES = {
     0: "unison/octave",
@@ -70,77 +45,6 @@ INTERVAL_CLASS_SEVERITY = {
     5: 0.035,
     6: 0.72,
 }
-
-
-from ._common import round3 as _round3
-
-
-@profile
-def _section_for_bar(spec: dict[str, Any], bar: int) -> tuple[dict[str, Any] | None, int]:
-    cursor = 0
-    for section in spec.get("sections", []):
-        bars = int(section.get("bars", 0))
-        if cursor <= bar < cursor + bars:
-            return section, bar - cursor
-        cursor += bars
-    return None, bar
-
-
-@profile
-def _chord_for_abs_bar(spec: dict[str, Any], bar: int) -> str:
-    from ..render.score_theory import chord_for_bar
-
-    section, local = _section_for_bar(spec, bar)
-    if not section:
-        return ""
-    return chord_for_bar(section, local)
-
-
-@profile
-def _fallback_events(pm: pretty_midi.PrettyMIDI, groups: dict[str, str], bpm: float) -> list[dict[str, Any]]:
-    events: list[dict[str, Any]] = []
-    for inst in pm.instruments:
-        name = inst.name or f"program_{inst.program}"
-        for note in inst.notes:
-            events.append(
-                {
-                    "instrument": name,
-                    "group": groups.get(name, name),
-                    "section": None,
-                    "layer": None,
-                    "layer_kind": None,
-                    "pitch": int(note.pitch),
-                    "note": pretty_midi.note_number_to_name(int(note.pitch)),
-                    "velocity": int(note.velocity),
-                    "nominal_bar": None,
-                    "nominal_beat": None,
-                    "nominal_duration_beats": None,
-                    "start_time": float(note.start),
-                    "end_time": float(note.end),
-                    "start_beat": float(note.start / 60.0 * bpm),
-                    "end_beat": float(note.end / 60.0 * bpm),
-                }
-            )
-    return events
-
-
-@profile
-def _chord_pitch_classes(chord: str) -> set[int]:
-    from ..render.score_theory import chord_intervals, note_to_midi
-
-    try:
-        root, intervals, slash_bass = chord_intervals(chord)
-        root_pc = note_to_midi(f"{root}4") % 12
-        pcs = {(root_pc + int(i)) % 12 for i in intervals}
-        if slash_bass:
-            bass_root = slash_bass.strip().split()[0]
-            import re
-            match = re.match(r"^([A-G](?:#|b)?)", bass_root)
-            if match:
-                pcs.add(note_to_midi(f"{match.group(1)}4") % 12)
-        return pcs
-    except Exception:
-        return set()
 
 
 @profile
@@ -179,7 +83,7 @@ def _pair_score(a: dict[str, Any], b: dict[str, Any], chord: str | None = None) 
     # tones form seconds/sevenths across octaves. Keep close-register seconds
     # and tritones visible, but discount broad chord-tone color.
     if chord:
-        pcs = _chord_pitch_classes(chord)
+        pcs = chord_pitch_classes(chord)
         if pcs:
             a_in = (pa % 12) in pcs
             b_in = (pb % 12) in pcs
@@ -238,10 +142,10 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
     """Return JSON-serializable dissonance hotspot diagnostics."""
     from ..render.score_layers import build_score
 
-    pm, groups, section_meta = build_score(spec)
+    pm, _groups, section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = list(getattr(pm, "_ambition_note_events", []) or _fallback_events(pm, groups, bpm))
+    events = list(getattr(pm, "_ambition_note_events", []) or [])
     if not events:
         return {
             "schema": "ambition.music_dissonance_audit.v1",
@@ -266,8 +170,8 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
             continue
         abs_bar0 = int(center // beats_per_bar)
         beat_in_bar = center - abs_bar0 * beats_per_bar
-        section, local_bar0 = _section_for_bar(spec, abs_bar0)
-        chord = _chord_for_abs_bar(spec, abs_bar0)
+        section, local_bar0 = section_for_bar(spec, abs_bar0)
+        chord = chord_for_abs_bar(spec, abs_bar0)
         pair_details: list[dict[str, Any]] = []
         total_score = 0.0
         for i in range(len(active)):
@@ -405,21 +309,6 @@ def _write_markdown_summary(payload: dict[str, Any], path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf8")
 
 
-@profile
-def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 90) -> None:
-    fmt = plot_format.lower()
-    save_kwargs: dict[str, Any] = {"dpi": 180, "bbox_inches": "tight"}
-    if fmt == "jpg":
-        fmt = "jpeg"
-    if fmt in {"jpeg", "jpg"}:
-        save_kwargs["format"] = "jpeg"
-        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality)}
-    else:
-        save_kwargs["format"] = fmt
-    fig.savefig(path, **save_kwargs)
-    plt.close(fig)
-
-
 def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, Any] | None:
     """Per-note clash + out-of-key severity over time, for the piano-roll plot.
 
@@ -430,8 +319,8 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
     from ..render.score_layers import build_score
     from . import sour_note_audit as _sour
 
-    pm, groups, section_meta = build_score(spec)
-    events = list(getattr(pm, "_ambition_note_events", []) or _fallback_events(pm, groups, 120.0))
+    pm, _groups, section_meta = build_score(spec)
+    events = list(getattr(pm, "_ambition_note_events", []) or [])
     if not events:
         return None
     bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -444,7 +333,7 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
         active = _dedup_active_by_pitch(_active_events(events, center))
         if len(active) < 2:
             continue
-        chord = _chord_for_abs_bar(spec, int(center // bpb))
+        chord = chord_for_abs_bar(spec, int(center // bpb))
         for i in range(len(active)):
             for j in range(i + 1, len(active)):
                 score, _ = _pair_score(active[i], active[j], chord)
@@ -529,7 +418,8 @@ def render_pianoroll(
 
 @profile
 def _write_layer_pair_heatmap(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not _ensure_matplotlib():
+    plt = ensure_matplotlib()
+    if plt is None:
         return False
     rows = payload.get("top_layer_pairs", [])
     if not rows:
@@ -566,7 +456,7 @@ def _write_layer_pair_heatmap(payload: dict[str, Any], path: Path, *, plot_forma
             if value > 0.001:
                 ax.text(j, i, f"{value:.2f}", ha="center", va="center", fontsize=7)
     fig.colorbar(image, ax=ax, shrink=0.85)
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality, dpi=180)
     return True
 
 
@@ -674,7 +564,7 @@ def write_reports(
         heatmap_path = plots_dir / f"dissonance_layer_pairs.{ext}"
         if _write_layer_pair_heatmap(payload, heatmap_path, plot_format=plot_format, jpeg_quality=jpeg_quality):
             paths["layer_pair_plot"] = str(heatmap_path)
-        if not _ensure_matplotlib():
+        if ensure_matplotlib() is None:
             warnings = list(payload.get("warnings") or [])
             note = "matplotlib unavailable; skipped dissonance plot generation"
             if note not in warnings:

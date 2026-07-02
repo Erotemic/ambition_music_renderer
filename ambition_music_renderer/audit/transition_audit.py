@@ -17,14 +17,13 @@ import lazy_loader as lazy
 import kwconf
 import csv
 import math
-from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
 np = lazy.load("numpy")
 sf = lazy.load("soundfile")
 
-from ._common import db, peak, rms
+from ._common import db, ensure_matplotlib, peak, rms
 
 try:
     from rich import print as rich_print
@@ -347,21 +346,6 @@ def spectrogram_db(
     )
 
 
-@lru_cache(maxsize=1)
-@profile
-def load_matplotlib():
-    try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-
-        return plt
-    except Exception as ex:  # pragma: no cover - optional authoring dependency
-        rich_print(f"[yellow]plotting skipped[/yellow] matplotlib is unavailable: {ex}")
-        return None
-
-
 def save_plot(fig, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
@@ -381,7 +365,7 @@ def plot_transition_components(
     crossfade_shape: str = "linear",
     incoming_start: str = "smooth",
 ) -> Path | None:
-    plt = load_matplotlib()
+    plt = ensure_matplotlib()
     if plt is None:
         return None
     outgoing, incoming, summed, sample_rate = transition_components(
@@ -435,7 +419,7 @@ def plot_transition_envelope(
     window_ms: float,
     hop_ms: float,
 ) -> Path | None:
-    plt = load_matplotlib()
+    plt = ensure_matplotlib()
     if plt is None:
         return None
     audio, sample_rate = read_audio(preview_path)
@@ -477,7 +461,7 @@ def plot_tail_head_comparison(
     window_ms: float,
     hop_ms: float,
 ) -> Path | None:
-    plt = load_matplotlib()
+    plt = ensure_matplotlib()
     if plt is None:
         return None
     audio_a, sr_a = read_audio(path_a)
@@ -524,7 +508,7 @@ def plot_preview_spectrogram(
     crossfade_seconds: float,
     context_seconds: float,
 ) -> Path | None:
-    plt = load_matplotlib()
+    plt = ensure_matplotlib()
     if plt is None:
         return None
     audio, sample_rate = read_audio(preview_path)

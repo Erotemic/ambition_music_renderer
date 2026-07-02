@@ -21,7 +21,7 @@ from typing import Any
 
 np = lazy.load("numpy")
 
-from ._common import db as _db
+from ._common import db as _db, peak as _peak, rms as _rms
 
 BANDS = [
     ("sub", 20.0, 80.0),
@@ -107,8 +107,8 @@ def analyze_audio(path: Path, *, frame_seconds: float = 0.5) -> dict[str, Any]:
     audio, sr, decoder = _read_audio(path)
     mono = _mono(audio)
     duration = float(len(mono) / sr) if sr else 0.0
-    peak = float(np.max(np.abs(mono))) if mono.size else 0.0
-    rms = float(np.sqrt(np.mean(np.square(mono), dtype=np.float64))) if mono.size else 0.0
+    peak = _peak(mono)
+    rms = _rms(mono)
 
     envelope: list[dict[str, float]] = []
     spectral_frames: list[np.ndarray] = []
@@ -121,8 +121,8 @@ def analyze_audio(path: Path, *, frame_seconds: float = 0.5) -> dict[str, Any]:
         chunk = mono[start:stop]
         if chunk.size < 16:
             continue
-        frame_rms = float(np.sqrt(np.mean(np.square(chunk), dtype=np.float64)))
-        frame_peak = float(np.max(np.abs(chunk)))
+        frame_rms = _rms(chunk)
+        frame_peak = _peak(chunk)
         window = np.hanning(len(chunk)).astype("float32")
         spec = np.fft.rfft(chunk * window)
         freqs = np.fft.rfftfreq(len(chunk), d=1.0 / sr)

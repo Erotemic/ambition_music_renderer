@@ -12,9 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Sequence
 
-import lazy_loader as lazy
-
-np = lazy.load("numpy")
+from ._common import ensure_matplotlib, save_figure
 
 
 def render_note_pianoroll(
@@ -43,15 +41,11 @@ def render_note_pianoroll(
     """
     if not notes:
         return False
-    try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-        from matplotlib.collections import LineCollection
-        from matplotlib.gridspec import GridSpec
-    except Exception:  # pragma: no cover - plotting is best-effort
+    plt = ensure_matplotlib()
+    if plt is None:  # pragma: no cover - plotting is best-effort
         return False
+    from matplotlib.collections import LineCollection
+    from matplotlib.gridspec import GridSpec
 
     pitches = [int(n["pitch"]) for n in notes]
     vmax = max((float(n["value"]) for n in notes), default=0.0) or 1.0
@@ -114,13 +108,5 @@ def render_note_pianoroll(
     else:
         ax.set_xlabel("beat")
 
-    fmt = plot_format.lower()
-    save_kwargs: dict[str, Any] = {"dpi": 150, "bbox_inches": "tight"}
-    if fmt in {"jpg", "jpeg"}:
-        save_kwargs["format"] = "jpeg"
-        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality)}
-    else:
-        save_kwargs["format"] = fmt
-    fig.savefig(path, **save_kwargs)
-    plt.close(fig)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
     return True

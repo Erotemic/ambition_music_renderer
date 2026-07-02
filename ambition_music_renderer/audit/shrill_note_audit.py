@@ -21,41 +21,15 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from ._common import ensure_matplotlib, round3 as _round3, save_figure
+from ._score_common import events_for_spec, section_for_bar, section_starts, source_hint
+
 pretty_midi = lazy.load("pretty_midi")
-
-from .sour_note_audit import _events_for_spec, _section_for_bar, _section_starts, _source_hint
-
-# Optional plotting dependency, loaded on first use so importing this module
-# stays cheap (matplotlib is the single heaviest import in the audit package).
-plt = None
-HAS_MATPLOTLIB: bool | None = None
-
-
-def _ensure_matplotlib() -> bool:
-    """Import matplotlib lazily; return whether plotting is available."""
-    global plt, HAS_MATPLOTLIB
-    if HAS_MATPLOTLIB is not None:
-        return HAS_MATPLOTLIB
-    try:
-        import matplotlib
-
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as _plt
-
-        plt = _plt
-        HAS_MATPLOTLIB = True
-    except Exception:  # pragma: no cover - plotting is best-effort.
-        plt = None
-        HAS_MATPLOTLIB = False
-    return HAS_MATPLOTLIB
 
 PRESENCE_HZ = 4000.0
 PIERCING_HZ = 6000.0
 WHISTLE_HZ = 8000.0
 EXTREME_HZ = 10000.0
-
-
-from ._common import round3 as _round3
 
 
 @profile
@@ -147,8 +121,8 @@ def audit_spec(
     min_frequency_hz: float = PRESENCE_HZ,
     max_candidates: int = 120,
 ) -> dict[str, Any]:
-    events, bpm, beats_per_bar = _events_for_spec(spec)
-    section_starts = _section_starts(spec)
+    events, bpm, beats_per_bar = events_for_spec(spec)
+    starts = section_starts(spec)
     section_by_bar, local_by_bar = _section_maps(spec)
     candidates: list[dict[str, Any]] = []
     layer_scores: Counter[str] = Counter()
@@ -204,7 +178,7 @@ def audit_spec(
             continue
         bar0 = int(start_beat // beats_per_bar)
         beat_in_bar = start_beat - bar0 * beats_per_bar
-        source_hint, repeat_index, motif_index, motif_interval = _source_hint(spec, ev, section_starts, beats_per_bar)
+        hint, repeat_index, motif_index, motif_interval = source_hint(spec, ev, starts, beats_per_bar)
         row = {
             "score": _round3(score),
             "severity": tier,
@@ -214,7 +188,7 @@ def audit_spec(
             "bar": bar0 + 1,
             "beat": _round3(beat_in_bar + 1.0),
             "section": ev.get("section") or section_by_bar.get(bar0),
-            "local_bar": local_by_bar.get(bar0, _section_for_bar(spec, bar0)[1]) + 1,
+            "local_bar": local_by_bar.get(bar0, section_for_bar(spec, bar0)[1]) + 1,
             "note": ev.get("note") or pretty_midi.note_number_to_name(pitch),
             "pitch": pitch,
             "layer": layer,
@@ -226,7 +200,7 @@ def audit_spec(
             "same_group_overlap_count": ctx["same_group_overlap_count"],
             "same_group_high_neighbor_count": ctx["same_group_high_neighbor_count"],
             "nearest_lower_gap_semitones": ctx["nearest_lower_gap_semitones"],
-            "source_hint": source_hint,
+            "source_hint": hint,
             "repeat_index": repeat_index,
             "motif_index": motif_index,
             "motif_interval": motif_interval,
@@ -298,21 +272,9 @@ def _write_tsv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 @profile
-def _save_figure(fig: Any, path: Path, *, plot_format: str, jpeg_quality: int = 90) -> None:
-    fmt = plot_format.lower()
-    save_kwargs: dict[str, Any] = {"dpi": 150, "bbox_inches": "tight"}
-    if fmt in {"jpg", "jpeg"}:
-        save_kwargs["format"] = "jpeg"
-        save_kwargs["pil_kwargs"] = {"quality": int(jpeg_quality), "optimize": True}
-    else:
-        save_kwargs["format"] = fmt
-    fig.savefig(path, **save_kwargs)
-    plt.close(fig)
-
-
-@profile
 def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not _ensure_matplotlib():
+    plt = ensure_matplotlib()
+    if plt is None:
         return False
     candidates = payload.get("candidates", [])
     if not candidates:
@@ -339,13 +301,14 @@ def _write_timeline_plot(payload: dict[str, Any], path: Path, *, plot_format: st
             textcoords="offset points",
             fontsize=7,
         )
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
     return True
 
 
 @profile
 def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, jpeg_quality: int) -> bool:
-    if not _ensure_matplotlib():
+    plt = ensure_matplotlib()
+    if plt is None:
         return False
     rows = payload.get("top_layers", [])[:12]
     if not rows:
@@ -360,7 +323,7 @@ def _write_layer_plot(payload: dict[str, Any], path: Path, *, plot_format: str, 
     ax.set_xlabel("total shrill-note score")
     ax.set_title(f"Shrill-note score by layer — {payload.get('id')}")
     ax.grid(True, axis="x", alpha=0.3)
-    _save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
+    save_figure(fig, path, plot_format=plot_format, jpeg_quality=jpeg_quality)
     return True
 
 
