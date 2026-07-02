@@ -211,7 +211,7 @@ motifs:
   # placed in the gap AFTER the hook's hanging note releases.
   - id: summit_sparkle
     root: A4
-    intervals: [9, 5, 0, 5]
+    intervals: [9, 2, 0, 2]
     rhythm: [0.5, 0.5, 0.5, 0.5]
     velocities: [0.85, 0.76, 0.70, 0.80]
 
@@ -381,18 +381,13 @@ sections:
       - warm_bed
       - rhodes_stabs
       - template: hook_main
-        roots: [A4, A4, A4, B4]
+        # Roots follow the harmony: the D bars answer with a D-rooted
+        # statement (all chord tones, hanging on the sixth) instead of
+        # spraying maj7/9th tensions - the A-rooted call, answered low.
+        roots: [A4, D4, A4, B4]
         starts: [[0, 0.0]]
         repeats: 4
         every_bars: 2
-      - kind: motif
-        instrument: whistle_synth
-        motif: summit_sparkle
-        roots: [A4]
-        starts: [[3, 2.0]]
-        velocity: 68
-        gate: 0.9
-        humanize_ms: 6
 
   # ------------------------------------------------------------------ 0:16
   - id: verse_step
@@ -481,9 +476,10 @@ sections:
       - kind: motif
         instrument: whistle_synth
         motif: summit_sparkle
-        # A4-rooted over the D bars, B4-rooted over the E bar - the riff is
-        # always spelled from the current chord.
-        roots: [A4, B4, A4]
+        # Always A4-rooted: the first note lands in UNISON with the hook's
+        # releasing hang note, then dips to tones consonant with both the
+        # chord and the hook's E5 tail - a handover, not a fight.
+        roots: [A4]
         starts: [[3, 2.0]]
         repeats: 3
         every_bars: 4
@@ -654,7 +650,7 @@ sections:
       - kind: motif
         instrument: whistle_synth
         motif: summit_sparkle
-        roots: [A4, B4, A4]
+        roots: [A4]
         starts: [[3, 2.0]]
         repeats: 3
         every_bars: 4
@@ -679,15 +675,10 @@ sections:
       - warm_bed
       - rhodes_stabs
       - template: hook_main
-        roots: [A4, A4, A4, B4]
+        # Roots follow the harmony: the D bars answer with a D-rooted
+        # statement (all chord tones, hanging on the sixth) instead of
+        # spraying maj7/9th tensions - the A-rooted call, answered low.
+        roots: [A4, D4, A4, B4]
         starts: [[0, 0.0]]
         repeats: 4
         every_bars: 2
-      - kind: motif
-        instrument: whistle_synth
-        motif: summit_sparkle
-        roots: [A4]
-        starts: [[3, 2.0]]
-        velocity: 68
-        gate: 0.9
-        humanize_ms: 6

@@ -992,8 +992,10 @@ class PluginsModal(kwconf.ModalCLI):
 from .audit.arrangement_audit import ArrangementAuditConfig
 from .audit.audit_cue_balance import AuditCueBalanceConfig
 from .audit.dissonance_audit import DissonanceAuditConfig
+from .audit.lead_collision import LeadCollisionConfig
 from .audit.level_report import LevelReportConfig
 from .audit.mix_balance_audit import MixBalanceAuditConfig
+from .audit.pitch_stability import PitchStabilityConfig
 from .audit.reference_audio_audit import ReferenceAudioAuditConfig
 from .audit.shrill_note_audit import ShrillNoteAuditConfig
 from .audit.sour_note_audit import SourNoteAuditConfig
@@ -1009,7 +1011,9 @@ class AuditModal(kwconf.ModalCLI):
 
     arrangement = ArrangementAuditConfig
     dissonance = DissonanceAuditConfig
+    lead_collision = LeadCollisionConfig
     mix_balance = MixBalanceAuditConfig
+    pitch_stability = PitchStabilityConfig
     reference_audio = ReferenceAudioAuditConfig
     shrill_notes = ShrillNoteAuditConfig
     sour_notes = SourNoteAuditConfig

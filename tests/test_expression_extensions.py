@@ -209,3 +209,78 @@ def test_instrument_controls_bad_key_rejected():
     spec["instruments"][0]["controls"] = {"blend": 64}
     with pytest.raises(KeyError):
         build_score(spec)
+
+
+def test_lead_collision_flags_simultaneous_seconds():
+    from ambition_music_renderer.audit.lead_collision import audit_spec as lead_audit
+
+    spec = _base_spec(sections=[{
+        "id": "a", "bars": 2, "harmony": ["C", "C"],
+        "layers": [
+            {"kind": "notes", "instrument": "piano",
+             "notes": [[0, 0.0, "E5", 4.0, 90]]},
+            {"kind": "notes", "instrument": "piano", "_source_layer": "other",
+             "notes": [[0, 1.0, "D5", 2.0, 90]]},
+        ],
+    }])
+    report = lead_audit(spec)
+    assert report["collision_count"] >= 1
+    top = report["collisions"][0]
+    assert set(top["notes"]) == {"E5", "D5"}
+    assert top["interval_semitones"] == 2
+
+
+def test_lead_collision_ignores_consonant_and_background():
+    from ambition_music_renderer.audit.lead_collision import audit_spec as lead_audit
+
+    spec = _base_spec(sections=[{
+        "id": "a", "bars": 2, "harmony": ["C", "C"],
+        "layers": [
+            {"kind": "notes", "instrument": "piano",
+             "notes": [[0, 0.0, "E5", 4.0, 90]]},
+            # a third apart: fine
+            {"kind": "notes", "instrument": "piano", "_source_layer": "other",
+             "notes": [[0, 1.0, "G5", 2.0, 90]]},
+            # background pad seconds are NOT this audit's business
+            {"kind": "pad_chords", "instrument": "piano", "octave": 4,
+             "duration_beats": 4.0},
+        ],
+    }])
+    report = lead_audit(spec)
+    assert report["collision_count"] == 0
+
+
+def test_lead_collision_flags_exposed_tension():
+    from ambition_music_renderer.audit.lead_collision import audit_spec as lead_audit
+
+    spec = _base_spec(sections=[{
+        "id": "a", "bars": 2, "harmony": ["D", "D"],
+        "layers": [
+            # E over D held 3 beats = an exposed 9th
+            {"kind": "notes", "instrument": "piano",
+             "notes": [{"bar": 0, "beat": 0.0, "note": "E5", "dur": 3.0, "vel": 80, "gate": 1.0}]},
+        ],
+    }])
+    report = lead_audit(spec)
+    assert report["exposed_tension_count"] >= 1
+    assert report["exposed_tensions"][0]["tension"] == "9th"
+
+
+def test_pitch_stability_flags_wobble_and_clean_steady():
+    pytest.importorskip("librosa")
+    import numpy as np
+    from ambition_music_renderer.audit.pitch_stability import analyze_stem
+
+    sr = 22050
+    t = np.arange(int(sr * 2.0)) / sr
+    # steady 440 for 2s: clean
+    steady = 0.2 * np.sin(2 * np.pi * 440.0 * t).astype(np.float32)
+    r = analyze_stem(steady, sr, min_note_s=0.5)
+    assert r["wobble_count"] == 0
+    # 440 wobbling +-60 cents at 0.7 Hz: flagged
+    inst_freq = 440.0 * 2 ** (0.05 * np.sin(2 * np.pi * 0.7 * t))
+    phase = 2 * np.pi * np.cumsum(inst_freq) / sr
+    wobbly = 0.2 * np.sin(phase).astype(np.float32)
+    r = analyze_stem(wobbly, sr, min_note_s=0.5)
+    assert r["wobble_count"] >= 1
+    assert r["wobble"][0]["deviation_cents"] > 30

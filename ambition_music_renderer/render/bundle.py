@@ -329,6 +329,26 @@ def create_bundle(
             mix_balance_warnings = list(mix_balance_payload.get("warnings") or [])
         except Exception as exc:  # never let a diagnostic break a render
             mix_balance_warnings = [f"mix_balance audit failed: {exc}"]
+        # Lead-vs-lead collisions run by DEFAULT (spec-static, milliseconds):
+        # two foreground melodies a second apart is the mistake a listener
+        # hears immediately, and rows carry wall-clock timestamps so an ear
+        # note like "1:27" maps straight to a line in the report.
+        lead_collision_warnings: list[str] = []
+        try:
+            from ..audit.lead_collision import audit_spec as audit_lead_collision
+
+            lead_payload = audit_lead_collision(spec)
+            (reports_dir / "lead_collision.json").write_text(
+                json.dumps(lead_payload, indent=2), encoding="utf8"
+            )
+            for row in (lead_payload.get("collisions") or [])[:4]:
+                lead_collision_warnings.append(
+                    f"lead collision at {row['time']}: {row['notes'][0]}+{row['notes'][1]} "
+                    f"({row['layers'][0]} vs {row['layers'][1]}, {row['interval_semitones']} st, "
+                    f"section {row['section']})"
+                )
+        except Exception as exc:  # never let a diagnostic break a render
+            lead_collision_warnings = [f"lead_collision audit failed: {exc}"]
         # Instrument resolution provenance: records exactly what every library_ref /
         # GM program resolved to on disk, plus octave-folds / unmapped drums /
         # fallbacks — so "asked for X, got Y" is never invisible.
@@ -549,6 +569,7 @@ def create_bundle(
                 id_warning,
                 *resolution_warnings,
                 *mix_balance_warnings,
+                *lead_collision_warnings,
                 *mix_warnings,
                 *quality_brief_warnings,
                 *adaptive_composition_warnings,
