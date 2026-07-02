@@ -23,11 +23,6 @@ import kwconf
 from .generated_layout import generated_manifest_search_roots
 from .generated_layout import latest_manifest_in_roots
 from .bundle_options import BundleOptions
-from .bundle_options import BACKEND_CHOICES
-from .bundle_options import DEFAULT_BACKEND
-from .bundle_options import PLOT_FORMATS
-from .bundle_options import RENDER_AUDIO_MODES
-from .bundle_options import RUNTIME_STEM_GAIN_MODES
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
 from .._paths import agent_root as _agent_root
@@ -56,19 +51,6 @@ class CueBundleConfig(BundleOptions):
     def __post_init__(self) -> None:
         super().__post_init__()
         self.jobs = int(self.jobs)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        config = cls.cli(argv=argv, data=kwargs)
-        from .bundle import create_bundle_from_config
-        from .bundle_archive import print_bundle_summary
-
-        report = create_bundle_from_config(config)
-        if config.json:
-            print(json.dumps(report, indent=2, default=str))
-        print_bundle_summary(report)
-        return 0 if report.get("ok", True) else 1
-
 
 
 def _plot_db(value: float) -> float:
@@ -201,10 +183,6 @@ def safe_rel(path: Path, root: Path | None = None) -> str:
         return str(path)
 
 
-
-
-def file_uri(path: Path) -> str:
-    return path.resolve().as_uri()
 
 
 def terminal_link(path: Path, label: str | None = None) -> str:

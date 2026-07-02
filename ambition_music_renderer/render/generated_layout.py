@@ -75,7 +75,9 @@ def replace_directory_symlink(link: Path, target: Path) -> bool:
     if link.is_symlink() or not link.exists():
         if link.is_symlink() or link.exists():
             link.unlink()
-        tmp = link.with_name(f".{link.name}.tmp")
+        # PID-suffixed so two concurrent renders of the same cue cannot unlink
+        # each other's tmp link between symlink_to and replace.
+        tmp = link.with_name(f".{link.name}.{os.getpid()}.tmp")
         if tmp.is_symlink() or tmp.exists():
             tmp.unlink()
         try:
@@ -133,7 +135,28 @@ def mark_generated_run_latest(layout: GeneratedRunLayout) -> Path:
 
     layout.run_dir.mkdir(parents=True, exist_ok=True)
     replace_directory_symlink(layout.latest_link, layout.run_dir)
+    # ``building`` means "render in progress"; once the run is latest the link
+    # is stale and used to linger forever, making completed and in-progress
+    # renders indistinguishable.
+    clear_generated_building(layout)
     return layout.latest_link
+
+
+def clear_generated_building(layout: GeneratedRunLayout) -> None:
+    """Remove the ``building`` marker after a run finishes or fails."""
+
+    link = layout.building_link
+    if link.is_symlink() or link.exists():
+        try:
+            link.unlink()
+        except OSError:
+            pass
+    pointer = link.with_name(f"{link.name}.path")
+    if pointer.exists():
+        try:
+            pointer.unlink()
+        except OSError:
+            pass
 
 
 @profile

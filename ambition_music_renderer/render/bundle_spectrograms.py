@@ -171,21 +171,31 @@ def write_spectrograms(
             if isinstance(rel, str):
                 candidates.append(("audio", outdir / rel, f"preview_{name}"))
 
+    if len(candidates) > limit:
+        note = plots_dir / "spectrograms_truncated.txt"
+        note.parent.mkdir(parents=True, exist_ok=True)
+        note.write_text(
+            f"only the first {limit} of {len(candidates)} stems/previews were plotted\n",
+            encoding="utf8",
+        )
     for kind, path, label in candidates[:limit]:
         try:
+            file_sample_rate = sample_rate
             if kind == "npy":
                 audio = np.load(path).astype("float32", copy=False)
             else:
                 import soundfile as sf
 
-                audio, _sample_rate = sf.read(path, always_2d=True, dtype="float32")
+                # Use the file's real rate: if it differs from the manifest,
+                # trusting the manifest would mislabel every frequency axis.
+                audio, file_sample_rate = sf.read(path, always_2d=True, dtype="float32")
             suffix = "jpg" if plot_format in {"jpg", "jpeg"} else "png"
             dest = plots_dir / f"{label}.spectrogram.{suffix}"
-            save_audio_spectrogram_plot(audio, label, dest, sample_rate=sample_rate, signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
+            save_audio_spectrogram_plot(audio, label, dest, sample_rate=int(file_sample_rate), signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
             if dest.exists():
                 written.append(dest)
             high_dest = plots_dir / f"{label}.spectrogram_high_detail.{suffix}"
-            save_high_detail_spectrogram_plot(audio, label, high_dest, sample_rate=sample_rate, signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
+            save_high_detail_spectrogram_plot(audio, label, high_dest, sample_rate=int(file_sample_rate), signal_module=signal, pyplot=plt, jpeg_quality=jpeg_quality)
             if high_dest.exists():
                 written.append(high_dest)
             shrill_dest = plots_dir / f"{label}.spectrogram_shrill_detail.{suffix}"

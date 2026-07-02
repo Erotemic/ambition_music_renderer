@@ -139,7 +139,7 @@ def build_rerun_script(
     bundle_dir: Path,
     cue: str,
     backend: str,
-    outdir: Path,
+    outdir: Path | None,
     publish: bool,
     runtime_stem_gain_mode: str,
     plot_format: str,
@@ -151,10 +151,11 @@ def build_rerun_script(
     render_in_process: bool = False,
     spectrograms: bool = False,
     all_audits: bool = False,
+    bundle_root: Path | None = None,
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
     cmd = [
-        "uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue_bundle",
+        "uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle",
         str(cue),
         "--backend",
         str(backend),
@@ -164,7 +165,15 @@ def build_rerun_script(
     if runtime_stem_max_gain_db is not None:
         cmd.extend(["--runtime_stem_max_gain_db", str(runtime_stem_max_gain_db)])
     cmd.extend(["--plot_format", str(plot_format)])
-    cmd.extend(["--outdir", str(outdir), "--force", "--render_audio_mode", str(render_audio_mode)])
+    # Only pin --outdir when the original run used an explicit outdir. Default
+    # runs use the versioned generated/ layout; pinning the old hash directory
+    # would make a rerun after a spec edit write the new hash's outputs into
+    # the old hash's directory.
+    if outdir is not None:
+        cmd.extend(["--outdir", str(outdir)])
+    if bundle_root is not None:
+        cmd.extend(["--bundle_root", str(bundle_root)])
+    cmd.extend(["--force", "--render_audio_mode", str(render_audio_mode)])
     if profile_render:
         cmd.append("--profile_render")
     if render_in_process:

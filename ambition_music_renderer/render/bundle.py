@@ -38,9 +38,8 @@ from .bundle_audio_reports import (
     write_state_mix_report,
     write_stem_export_report,
 )
+from .bundle_options import DEFAULT_BACKEND, RENDER_AUDIO_MODES
 from .bundle_base import (
-    DEFAULT_BACKEND,
-    RENDER_AUDIO_MODES,
     CommandResult,
     CueBundleConfig,
     copy_current_scratch_stems,
@@ -51,6 +50,7 @@ from .bundle_base import (
     find_score,
     latest_manifest,
     load_yaml,
+    manifest_audio_entries,
     manifest_duration,
     missing_score_debug,
     package_dir,
@@ -62,10 +62,20 @@ from .bundle_base import (
     safe_rel,
     terminal_link,
 )
-from .bundle_spectral_reports import write_spectral_fingerprint, write_stem_amplitude_report
+from .bundle_spectral_reports import (
+    write_spectral_fingerprint,
+    write_stem_amplitude_report,
+    write_stem_loudness_report,
+)
 from .bundle_spectrograms import write_spectrograms
 from .bundle_quality_brief import write_quality_brief
-from .generated_layout import begin_generated_run, generated_run_layout, mark_generated_run_latest, resolve_latest_generated_dir
+from .generated_layout import (
+    begin_generated_run,
+    clear_generated_building,
+    generated_run_layout,
+    mark_generated_run_latest,
+    resolve_latest_generated_dir,
+)
 
 @profile
 def create_bundle(
@@ -110,6 +120,8 @@ def create_bundle(
         raise ValueError(f"render_audio_mode must be one of {RENDER_AUDIO_MODES}, got {render_audio_mode!r}")
 
     generated_layout = None
+    explicit_outdir = Path(outdir) if outdir is not None else None
+    explicit_bundle_root = Path(bundle_root) if bundle_root is not None else None
     if outdir is None:
         cue_generated_dir = default_generated_root() / cue_id
         if skip_render:
@@ -168,8 +180,15 @@ def create_bundle(
         line_profile_requested = bool(os.environ.get("LINE_PROFILE"))
         command_mode = "direct" if render_in_process else "subprocess"
         if profile_render or line_profile_requested:
-            if profile_render:
-                os.environ.setdefault("LINE_PROFILE", "1")
+            if profile_render and not line_profile_requested:
+                # profiler.py binds line_profiler (or the identity decorator)
+                # at import time, long before this flag is seen — setting the
+                # env var here cannot retroactively enable line profiling.
+                progress_line(
+                    "WARNING: --profile_render without LINE_PROFILE=1 in the "
+                    "environment runs in-process but produces no .lprof output; "
+                    "prepend LINE_PROFILE=1 to the command to get line profiles"
+                )
             render_in_process = True
             command_mode = "direct"
             render_data["profile_workers"] = True
@@ -186,6 +205,8 @@ def create_bundle(
             )
         )
         if commands[-1].returncode != 0:
+            if generated_layout is not None:
+                clear_generated_building(generated_layout)
             return {
                 "cue": cue_id,
                 "ok": False,
@@ -202,8 +223,17 @@ def create_bundle(
     progress_line("loading adaptive manifest")
     manifest_path = latest_manifest(outdir, cue_id)
     if manifest_path is None:
+        if generated_layout is not None:
+            clear_generated_building(generated_layout)
         raise FileNotFoundError(f"no adaptive manifest found in {outdir} for {cue_id}")
     manifest = json.loads(manifest_path.read_text(encoding="utf8"))
+    # Relative paths inside the manifest are relative to the directory the
+    # manifest lives in (the versioned run dir). With --skip_render and no
+    # `latest` link, `outdir` can resolve to the flat cue dir while the newest
+    # manifest is found under .versioned/<hash>/ — anchoring file resolution to
+    # the manifest keeps them paired instead of silently producing an empty
+    # analysis tree.
+    manifest_root = manifest_path.parent
     render_hash = str(manifest.get("hash", "unknown"))
     duration = manifest_duration(manifest)
 
@@ -223,7 +253,7 @@ def create_bundle(
     adaptive_composition_warnings: list[str] = []
     audio_shrillness_warnings: list[str] = []
     with tempfile.TemporaryDirectory(prefix=f"{cue_id}_{render_hash}_analysis_") as td:
-        analysis_root = prepare_manifest_analysis_root(outdir, manifest, Path(td))
+        analysis_root = prepare_manifest_analysis_root(manifest_root, manifest, Path(td))
         if all_audits:
             commands.append(
                 run_logged(
@@ -272,6 +302,16 @@ def create_bundle(
         write_audio_metadata_report(analysis_root, manifest, reports_dir)
         write_state_mix_report(spec, manifest, reports_dir)
         mix_diag_path, mix_warnings = summarize_mix_diagnostics(manifest, reports_dir)
+        # Stem loudness is the README's "start here when a mix sounds obviously
+        # wrong" report; it reads only manifest diagnostics, so it belongs in
+        # every bundle, not just --all_audits.
+        write_stem_loudness_report(
+            manifest,
+            reports_dir,
+            plots_dir=plots_dir,
+            plot_format=plot_format,
+            jpeg_quality=jpeg_quality,
+        )
         # Mix-balance / lead-audibility audit runs by DEFAULT (it is spec-static and
         # cheap) so a buried lead instrument — a lead whose group is allocated far
         # less mix budget than the bed — is caught on every listening render, not
@@ -412,7 +452,7 @@ def create_bundle(
         # Import lazily so this module can be used by tests without importing the CLI.
         from ..cli import publish_cue
 
-        ok = publish_cue(cue_id, outdir, dest_root)
+        ok = publish_cue(cue_id, manifest_root, dest_root)
         if ok:
             published = str(dest_root / cue_id / "full.ogg")
         else:
@@ -429,18 +469,26 @@ def create_bundle(
     source_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(score_path, source_dir / score_path.name)
     (source_dir / "normalized_spec.json").write_text(json.dumps(spec, indent=2), encoding="utf8")
-    copied_audio = copy_manifest_referenced_files(outdir, manifest, bundle_dir)
+    copied_audio = copy_manifest_referenced_files(manifest_root, manifest, bundle_dir)
+    if manifest_audio_entries(manifest) and not copied_audio:
+        progress_line(
+            f"WARNING: none of the audio files referenced by {manifest_path.name} "
+            f"exist under {manifest_root}; the bundle contains reports only"
+        )
     copy_tree_if_exists(reports_dir, bundle_dir / "reports")
     copy_tree_if_exists(plots_dir, bundle_dir / "plots")
     shutil.copy2(manifest_path, bundle_dir / manifest_path.name)
     if include_scratch_stems:
-        copy_current_scratch_stems(outdir, manifest, bundle_dir)
+        copy_current_scratch_stems(manifest_root, manifest, bundle_dir)
 
     rerun_script = build_rerun_script(
         bundle_dir,
         cue_id,
         backend,
-        outdir,
+        # Only pin --outdir for explicit-outdir runs; default versioned-layout
+        # runs should re-resolve their layout so a spec edit gets a fresh hash
+        # directory instead of writing into this one.
+        explicit_outdir,
         publish,
         runtime_stem_gain_mode,
         plot_format,
@@ -452,6 +500,7 @@ def create_bundle(
         render_in_process,
         write_spectrogram_plots,
         all_audits,
+        bundle_root=explicit_bundle_root,
     )
 
     if generated_layout is not None:
@@ -556,32 +605,6 @@ def create_bundle_from_config(config: CueBundleConfig) -> dict[str, object]:
         profile_render=config.profile_render,
         render_in_process=config.render_in_process,
     )
-
-
-def cue_bundle_main(
-    argv: list[str] | str | bool | None = None,
-    *,
-    cmdline: bool | None = None,
-    print_json: bool = True,
-    **kwargs: object,
-) -> int:
-    """kwconf-backed Python/CLI entrypoint for ``cue_bundle``.
-
-    Examples:
-        >>> cue_bundle_main(cmdline=False, cue='for_emmy_forever_ago', skip_render=True)  # doctest: +SKIP
-    """
-    if cmdline is False:
-        argv = False
-    elif cmdline is True and argv is None:
-        argv = True
-    config = CueBundleConfig.cli(argv=argv, data=kwargs)
-    report = create_bundle_from_config(config)
-    if print_json or getattr(config, "json", False):
-        print(json.dumps(report, indent=2, default=str))
-    print_bundle_summary(report)
-    return 0 if report.get("ok", True) else 1
-
-
 
 
 

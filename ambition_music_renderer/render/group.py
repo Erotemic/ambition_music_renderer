@@ -301,27 +301,3 @@ def build_manifest(
         "state_map": spec.get("state_map", {}),
         "notes": spec.get("notes", ""),
     }
-
-
-
-
-SECTION_FULL_MASTERING_MODES = ("section_postprocess", "global_master_slices")
-
-
-def adaptive_section_mastering_config(spec: dict[str, Any]) -> dict[str, Any]:
-    render_cfg = spec.get("render", {}) or {}
-    cfg = render_cfg.get("adaptive_section_mastering") or render_cfg.get("adaptive_sections") or {}
-    if not isinstance(cfg, dict):
-        cfg = {}
-    mode = str(cfg.get("mode", cfg.get("full_mix_mode", "section_postprocess")))
-    if mode not in SECTION_FULL_MASTERING_MODES:
-        raise ValueError(
-            f"render.adaptive_section_mastering.mode must be one of {SECTION_FULL_MASTERING_MODES}, got {mode!r}"
-        )
-    return {
-        "mode": mode,
-        "ignore_section_postprocess_for_full_mix": bool(
-            cfg.get("ignore_section_postprocess_for_full_mix", mode == "global_master_slices")
-        ),
-        "notes": str(cfg.get("notes", "")),
-    }

@@ -39,7 +39,7 @@ from ..kwconf_runner import KwconfCommand
 from .._paths import project_root
 
 
-RUNTIME_STEM_GAIN_MODES = ("native", "shared")
+from .bundle_options import RUNTIME_STEM_GAIN_MODES
 
 SECTION_FULL_MASTERING_MODES = ("section_postprocess", "global_master_slices")
 

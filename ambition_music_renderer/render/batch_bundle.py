@@ -46,10 +46,6 @@ class BundleResult:
     full_zip: Path | None = None
 
 
-def _score_dirs() -> Path:
-    return package_dir() / "scores"
-
-
 def _cue_id_from_path(path: Path) -> str:
     name = path.name
     for suffix in (".music.yaml", ".yaml", ".yml"):
@@ -58,34 +54,8 @@ def _cue_id_from_path(path: Path) -> str:
     return path.stem
 
 
-def discover_cues(*, scope: str, include_examples: bool = False) -> list[str]:
-    roots: list[Path]
-    scores = _score_dirs()
-    if scope == "active":
-        roots = [scores / "active"]
-    elif scope == "examples":
-        roots = [scores / "examples"]
-    elif scope == "all":
-        roots = [scores / "active", scores / "examples", scores / "experiments"]
-    else:
-        raise ValueError(f"unknown scope: {scope}")
-    if include_examples and scores / "examples" not in roots:
-        roots.append(scores / "examples")
-    cues: set[str] = set()
-    for root in roots:
-        if not root.is_dir():
-            continue
-        for path in sorted(root.glob("*.music.yaml")):
-            cues.add(_cue_id_from_path(path))
-        for path in sorted(root.glob("*.yaml")):
-            cues.add(_cue_id_from_path(path))
-    return sorted(cues)
-
-
-def resolve_cues(raw_cues: Iterable[str], *, scope: str, include_examples: bool) -> list[str]:
+def resolve_cues(raw_cues: Iterable[str]) -> list[str]:
     cues = list(raw_cues)
-    if not cues:
-        cues = discover_cues(scope=scope, include_examples=include_examples)
     resolved: list[str] = []
     missing: list[str] = []
     seen: set[str] = set()
@@ -125,26 +95,15 @@ def _fmt_link(path: Path | None) -> str:
 
 def _build_command(args, cue: str) -> list[str]:
     from .bundle import CueBundleConfig
+    from .bundle_options import PASSTHROUGH_FIELDS
 
-    data = {
-        "cue": cue,
-        "backend": args.backend,
-        "runtime_stem_gain_mode": args.runtime_stem_gain_mode,
-        "jobs": args.render_jobs,
-        "plot_format": args.plot_format,
-        "jpeg_quality": args.jpeg_quality,
-        "runtime_stem_max_gain_db": args.runtime_stem_max_gain_db,
-        "force": args.force,
-        "publish": args.publish,
-        "zip_bundle": args.zip_bundle,
-        "zip_report_bundle": args.zip_report_bundle,
-        "spectrograms": args.spectrograms,
-        "all_audits": args.all_audits,
-        "render_audio_mode": args.render_audio_mode,
-        "profile_render": args.profile_render,
-        "include_scratch_stems": args.include_scratch_stems,
-        "bundle_root": args.bundle_root,
-    }
+    # Forward every shared BundleOptions field, exactly like the single-cue
+    # path does. A hand-copied subset here silently dropped --dest_root,
+    # --skip_render, and friends on multi-cue runs — the drift PASSTHROUGH_FIELDS
+    # exists to prevent.
+    data: dict[str, object] = {field: getattr(args, field) for field in PASSTHROUGH_FIELDS}
+    data["cue"] = cue
+    data["jobs"] = args.render_jobs
     return KwconfCommand(
         CueBundleConfig,
         module="ambition_music_renderer.render.bundle",
@@ -157,40 +116,51 @@ def _worker(job: BundleJob, events: "queue.Queue[tuple[str, str, object]]") -> B
     start_wall_time = time.time()
     start = time.monotonic()
     latest_stage = "starting"
-    job.log_path.parent.mkdir(parents=True, exist_ok=True)
-    events.put(("stage", job.cue, latest_stage))
-    with job.log_path.open("w", encoding="utf8") as log:
-        log.write("$ " + shlex.join(job.command) + "\n\n")
-        log.flush()
-        proc = subprocess.Popen(
-            job.command,
-            cwd=package_dir(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
+    result: BundleResult | None = None
+    # The coordinator loops until it has seen one "done" event per job, so
+    # this worker must post "done" on EVERY exit path — a raised exception
+    # that skipped the event used to deadlock the whole batch run.
+    try:
+        job.log_path.parent.mkdir(parents=True, exist_ok=True)
+        events.put(("stage", job.cue, latest_stage))
+        with job.log_path.open("w", encoding="utf8") as log:
+            log.write("$ " + shlex.join(job.command) + "\n\n")
+            log.flush()
+            proc = subprocess.Popen(
+                job.command,
+                cwd=package_dir(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                errors="replace",
+                bufsize=1,
+            )
+            assert proc.stdout is not None
+            for line in proc.stdout:
+                log.write(line)
+                if line.startswith("[music bundle] "):
+                    latest_stage = line.strip().removeprefix("[music bundle] ")
+                    events.put(("stage", job.cue, latest_stage))
+            returncode = proc.wait()
+        elapsed = time.monotonic() - start
+        bundle_root = default_bundle_root()
+        for idx, item in enumerate(job.command):
+            if item == "--bundle_root" and idx + 1 < len(job.command):
+                bundle_root = Path(job.command[idx + 1])
+                break
+            if item.startswith("--bundle_root="):
+                bundle_root = Path(item.split("=", 1)[1])
+                break
+        bundle_dir, report_zip, full_zip = _find_job_artifacts(job.cue, bundle_root, start_wall_time)
+        result = BundleResult(job.cue, returncode, elapsed, job.log_path, latest_stage, bundle_dir, report_zip, full_zip)
+        return result
+    except BaseException as ex:
+        result = BundleResult(
+            job.cue, -1, time.monotonic() - start, job.log_path, f"coordinator error: {ex}"
         )
-        assert proc.stdout is not None
-        for line in proc.stdout:
-            log.write(line)
-            if line.startswith("[music bundle] "):
-                latest_stage = line.strip().removeprefix("[music bundle] ")
-                events.put(("stage", job.cue, latest_stage))
-        returncode = proc.wait()
-    elapsed = time.monotonic() - start
-    bundle_root = default_bundle_root()
-    for idx, item in enumerate(job.command):
-        if item == "--bundle_root" and idx + 1 < len(job.command):
-            bundle_root = Path(job.command[idx + 1])
-            break
-        if item.startswith("--bundle_root="):
-            bundle_root = Path(item.split("=", 1)[1])
-            break
-    start_wall = start_wall_time
-    bundle_dir, report_zip, full_zip = _find_job_artifacts(job.cue, bundle_root, start_wall)
-    result = BundleResult(job.cue, returncode, elapsed, job.log_path, latest_stage, bundle_dir, report_zip, full_zip)
-    events.put(("done", job.cue, result))
-    return result
+        raise
+    finally:
+        events.put(("done", job.cue, result))
 
 
 def _executor_mode(workers: int) -> tuple[str, int]:
@@ -349,11 +319,12 @@ def run_batch_bundle(args) -> int:
     rc = 1
     workers = int(getattr(args, "jobs", 1))
     try:
-        cues = resolve_cues(
-            args.cues,
-            scope=getattr(args, "scope", "active"),
-            include_examples=getattr(args, "include_examples", False),
-        )
+        if getattr(args, "outdir", None):
+            raise SystemExit(
+                "--outdir is single-cue only: a shared explicit outdir across a "
+                "multi-cue batch would collide; use --bundle_root instead"
+            )
+        cues = resolve_cues(args.cues)
         if not cues:
             print("no cues selected", file=sys.stderr)
             rc = 2

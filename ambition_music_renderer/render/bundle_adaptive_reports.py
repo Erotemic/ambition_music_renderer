@@ -25,19 +25,7 @@ from .bundle_spectral_reports import (
     _spectral_band_features,
 )
 
-def adaptive_section_mastering_config_from_spec(spec: dict) -> dict[str, object]:
-    render_cfg = spec.get("render", {}) or {}
-    cfg = render_cfg.get("adaptive_section_mastering") or render_cfg.get("adaptive_sections") or {}
-    if not isinstance(cfg, dict):
-        cfg = {}
-    mode = str(cfg.get("mode", cfg.get("full_mix_mode", "section_postprocess")))
-    return {
-        "mode": mode,
-        "ignore_section_postprocess_for_full_mix": bool(
-            cfg.get("ignore_section_postprocess_for_full_mix", mode == "global_master_slices")
-        ),
-        "notes": str(cfg.get("notes", "")),
-    }
+from .isolated import adaptive_section_mastering_config as adaptive_section_mastering_config_from_spec
 
 def write_adaptive_section_report(
     outdir: Path,
