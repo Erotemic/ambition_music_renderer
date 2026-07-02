@@ -105,12 +105,37 @@ is_zip_file() {
     file "$path" | grep -qiE 'Zip archive|Microsoft OOXML|Java archive'
 }
 
+# Marker is per-archive: several archives can legitimately share one dest
+# (VPO extracts its SFZ-scripts zip AND its wave-files zip into the same
+# tree). A single shared marker made whichever archive arrived second a
+# silent no-op - that is how a scripts-only (silent) VPO install happens.
+# The legacy shared marker is still honored for single-archive dests so a
+# pre-existing install does not re-download everything.
+extraction_marker() {
+    local archive_name="$1"
+    local dest="$2"
+    printf '%s/.ambition_audio_tools_extracted.%s' "$dest" "$(basename "$archive_name")"
+}
+
+already_extracted() {
+    local archive_name="$1"
+    local dest="$2"
+    if [[ -e "$(extraction_marker "$archive_name" "$dest")" ]]; then
+        return 0
+    fi
+    if [[ -e "$dest/.ambition_audio_tools_extracted" && "$dest" != *Virtual-Playing-Orchestra* ]]; then
+        return 0
+    fi
+    return 1
+}
+
 extract_archive() {
     local archive="$1"
     local dest="$2"
     local label="$3"
-    local marker="$dest/.ambition_audio_tools_extracted"
-    if [[ -e "$marker" ]]; then
+    local marker
+    marker="$(extraction_marker "$archive" "$dest")"
+    if already_extracted "$archive" "$dest"; then
         log "already extracted: $label -> $dest"
         return 0
     fi
@@ -156,6 +181,12 @@ download_and_extract() {
     local archive_name="$3"
     local dest_dir="$4"
     local archive="$ARCHIVES/$archive_name"
+    # An installed library must not force a re-download just because the
+    # archive cache was pruned (VCSL alone is ~4 GB).
+    if [[ "$DRY_RUN" != "1" ]] && already_extracted "$archive_name" "$dest_dir"; then
+        log "already extracted (skipping download): $label -> $dest_dir"
+        return 0
+    fi
     download "$url" "$archive" "$label"
     if [[ "$DRY_RUN" == "1" ]]; then
         return 0
@@ -254,6 +285,10 @@ try_download_vpo_zip() {
     local archive_name="$3"
     local dest_dir="$4"
     local archive="$ARCHIVES/$archive_name"
+    if [[ "$DRY_RUN" != "1" ]] && already_extracted "$archive_name" "$dest_dir"; then
+        log "already extracted (skipping download): $label -> $dest_dir"
+        return 0
+    fi
     if [[ ! -s "$archive" ]]; then
         if ! download "$url" "$archive" "$label"; then
             log "VPO auto-download failed; see $MANUAL"
@@ -323,6 +358,35 @@ archive_contains_pattern() {
     local archive="$1"
     local pattern="$2"
     archive_list "$archive" | grep -Eiq "$pattern"
+}
+
+normalize_vpo_tree() {
+    # The VPO script zips and wave zip disagree about nesting (some carry a
+    # top-level Virtual-Playing-Orchestra3/ folder, some do not). The SFZ
+    # scripts reference samples as ..\libs\..., so libs/ must live NEXT TO the
+    # instrument folders (Strings/, Brass/, ...). Find where the instrument
+    # folders actually are and move a stray sibling libs/ in with them.
+    local dest="$1"
+    if [[ "$DRY_RUN" == "1" ]]; then
+        return 0
+    fi
+    [[ -d "$dest" ]] || return 0
+    local inner=""
+    if [[ -d "$dest/Strings" ]]; then
+        inner="$dest"
+    else
+        inner="$(find "$dest" -mindepth 1 -maxdepth 3 -type d -name Strings 2>/dev/null | head -n 1)"
+        inner="${inner%/Strings}"
+    fi
+    [[ -n "$inner" ]] || return 0
+    if [[ ! -d "$inner/libs" ]]; then
+        local libs
+        libs="$(find "$dest" -mindepth 1 -maxdepth 3 -type d -name libs -not -path "$inner/*" 2>/dev/null | head -n 1)"
+        if [[ -n "$libs" ]]; then
+            log "VPO: moving $libs -> $inner/libs so ..\\libs\\ sample paths resolve"
+            mv "$libs" "$inner/libs"
+        fi
+    fi
 }
 
 validate_vpo_install() {
@@ -429,7 +493,10 @@ for sfz in sfz_files:
 problem_rows.sort(key=lambda row: (-row[0], str(row[2]).lower()))
 
 vpo_root = sfz_root / "Virtual-Playing-Orchestra3"
-nbo_samples = list(vpo_root.rglob("libs/NoBudgetOrch/*")) if vpo_root.exists() else []
+# NB: the audio files live several levels below NoBudgetOrch (Section/Articulation/
+# file.wav); a single-level "NoBudgetOrch/*" glob sees only the subdirectories and
+# reported a healthy install as sample-less.
+nbo_samples = list(vpo_root.rglob("NoBudgetOrch/**/*")) if vpo_root.exists() else []
 nbo_audio = [p for p in nbo_samples if p.suffix.lower() in sample_exts and p.is_file()]
 
 lines = []
@@ -644,9 +711,11 @@ VCSL, and Sonatina Symphonic Orchestra.
 Important VPO note: the scripts alone are not enough. VPO must have both the
 Wave Files archive and the Standard and/or Performance SFZ scripts extracted into
 the same Virtual-Playing-Orchestra3 tree. A healthy install contains a `libs/`
-directory, including `libs/NoBudgetOrch/`. If the report says VPO SFZ files exist
-but NoBudgetOrch samples are missing, download the Wave Files archive in a
-browser, place it in the inbox folder above, and rerun this script.
+directory, including `libs/NoBudgetOrch/`. The script now downloads the wave
+files automatically (the primary /go/ slug redirects to archive.org, which
+serves plain zips). If every auto source fails, download the Wave Files archive
+in a browser from https://virtualplaying.com/virtual-playing-orchestra/, place
+it in the inbox folder above, and rerun this script.
 
 Useful catalog pages for manual extras:
 - https://sfzinstruments.github.io/guitars/
@@ -763,16 +832,26 @@ if want_pro; then
 fi
 
 VPO_DEST="$SFZ_ROOT/Virtual-Playing-Orchestra3"
-try_download_vpo_zip_from_sources "Virtual Playing Orchestra wave files" "Virtual-Playing-Orchestra3-Wave-Files.zip" "$VPO_DEST" \
-    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-1-wave-files/" \
-    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-1-wave-files-gdrive/" \
-    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-1-wave-files-onedrive/" || true
-try_download_vpo_zip_from_sources "Virtual Playing Orchestra standard SFZ scripts" "Virtual-Playing-Orchestra3-Standard-SFZ-Scripts.zip" "$VPO_DEST" \
-    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-2-4-standard-scripts/" || true
+# The wave files (~600 MB, version 3.2) are the part earlier revisions of this
+# script never actually landed: the old v3-1 /go/ slugs are 404 and the shared
+# extraction marker skipped the zip even when it arrived. The primary /go/
+# slug 301s to archive.org, which serves the zip to plain curl; the direct
+# archive.org URL is the fallback if virtualplaying.com rearranges its slugs
+# again, and the Google Drive slug is a last resort (may serve an HTML
+# interstitial, which is_zip_file rejects).
+try_download_vpo_zip_from_sources "Virtual Playing Orchestra wave files (v3.2)" "Virtual-Playing-Orchestra3-2-wave-files.zip" "$VPO_DEST" \
+    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-2-wave-files-archive/" \
+    "https://archive.org/download/virtual-playing-orchestra-3-2-wave-files/Virtual-Playing-Orchestra3-2-wave-files.zip" \
+    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-2-wave-files-gdrive/" || true
+try_download_vpo_zip_from_sources "Virtual Playing Orchestra standard SFZ scripts (v3.3)" "Virtual-Playing-Orchestra3-3-standard-scripts.zip" "$VPO_DEST" \
+    "https://virtualplaying.com/go/virtual-playing-orchestra-v3-3-standard-scripts/" \
+    "https://virtualplaying.com/vp-downloads/Virtual-Playing-Orchestra3-3-standard-scripts.zip" || true
 if want_pro; then
-    try_download_vpo_zip_from_sources "Virtual Playing Orchestra performance SFZ scripts" "Virtual-Playing-Orchestra3-Performance-SFZ-Scripts.zip" "$VPO_DEST" \
-        "https://virtualplaying.com/go/virtual-playing-orchestra-v3-2-4-performance-scripts/" || true
+    try_download_vpo_zip_from_sources "Virtual Playing Orchestra performance SFZ scripts (v3.3)" "Virtual-Playing-Orchestra3-3-performance-scripts.zip" "$VPO_DEST" \
+        "https://virtualplaying.com/go/virtual-playing-orchestra-v3-3-performance-scripts/" \
+        "https://virtualplaying.com/vp-downloads/Virtual-Playing-Orchestra3-3-performance-scripts.zip" || true
 fi
+normalize_vpo_tree "$VPO_DEST"
 validate_vpo_install "$VPO_DEST" || true
 
 download_and_extract_optional "Karoryfer Shinyguitar" "https://github.com/sfzinstruments/karoryfer.shinyguitar/releases/download/v1.002/Karoryfer.Shinyguitar.v1.002.zip" "Karoryfer.Shinyguitar.v1.002.zip" "$SFZ_ROOT/Karoryfer/Shinyguitar" || true
