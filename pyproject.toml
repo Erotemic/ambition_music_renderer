@@ -15,15 +15,13 @@ dependencies = [
   "pyfluidsynth",
   "soundfile",
   "PyYAML",
-  "music21",
-  "midiutil",
   "mido",
-  "pydub",
   "ubelt",
   "kwconf>=0.10.0",
   "rich",
   "pyloudnorm",
-  "matchering",
+  # librosa is unused by the package itself but the agent/ studio tooling
+  # (song_studio, instrument_browser) leans on it for spectral checks.
   "librosa",
   "lazy_loader",
 ]
@@ -49,7 +47,6 @@ dev = ["pytest", "ruff", "line_profiler"]
 
 [project.scripts]
 ambition-music-renderer = "ambition_music_renderer.cli:main"
-render-ambition-music = "ambition_music_renderer.render.musicir_config:main"
 
 [tool.setuptools.packages.find]
 include = ["ambition_music_renderer*"]

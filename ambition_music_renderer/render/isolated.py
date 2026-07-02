@@ -39,7 +39,7 @@ from ..kwconf_runner import KwconfCommand
 from .._paths import project_root
 
 
-from .bundle_options import RUNTIME_STEM_GAIN_MODES
+from .bundle_options import BACKEND_CHOICES, RUNTIME_STEM_GAIN_MODES
 
 SECTION_FULL_MASTERING_MODES = ("section_postprocess", "global_master_slices")
 
@@ -53,7 +53,7 @@ class RenderIsolatedConfig(kwconf.Config):
     outdir: Path = kwconf.Value(Path("output"), parser=Path, help="render output directory")
     backend: str = kwconf.Value(
         "pretty-midi",
-        choices=["fallback", "auto", "fluidsynth-cli", "pretty-midi"],
+        choices=list(BACKEND_CHOICES),
         help="renderer backend",
     )
     simple_mix: bool = kwconf.Flag(

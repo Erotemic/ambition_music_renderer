@@ -9,7 +9,6 @@ before a render tries to execute a host-specific effect chain.
 from __future__ import annotations
 
 import importlib.util
-import json
 import os
 import platform
 import shutil
@@ -19,7 +18,6 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
-import kwconf
 
 from .instrument_libraries import (
     collect_sfz_library_diagnostics,
@@ -27,7 +25,7 @@ from .instrument_libraries import (
 )
 
 
-PYTHON_MODULES = ("pedalboard", "pyloudnorm", "pretty_midi", "music21", "soundfile")
+PYTHON_MODULES = ("pedalboard", "pyloudnorm", "pretty_midi", "soundfile")
 EXTERNAL_BINARIES = (
     "sfizz_render",
     "lv2ls",
@@ -402,7 +400,11 @@ def validate_effect_spec(
     """Return warnings/errors for one effect spec."""
 
     messages: list[dict[str, Any]] = []
-    missing_optional_severity = "warning" if bool(spec.get("optional", False)) else "error"
+    # Match the renderer's skip rule (plugin_chain._is_optional_step): a step
+    # is skippable when `optional: true` OR `required: false`, so a spec the
+    # renderer would warn-and-skip must not validate as a hard error.
+    optional = bool(spec.get("optional") or spec.get("required") is False)
+    missing_optional_severity = "warning" if optional else "error"
     kind = str(
         spec.get("kind")
         or spec.get("type")
@@ -493,98 +495,3 @@ def load_score(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"score YAML did not load to a mapping: {path}")
     return data
-
-
-
-class AudioPluginDoctor(kwconf.Config):
-    fast: bool = kwconf.Flag(False, help="skip plugin-count probes")
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        print(json.dumps(collect_plugin_diagnostics(probe_counts=not args.fast), indent=2))
-        return 0
-
-
-class AudioPluginListVST3(kwconf.Config):
-    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        roots = [Path(p) for p in args.path] or None
-        print(json.dumps(discover_vst3_plugins(roots), indent=2))
-        return 0
-
-
-class AudioPluginListLV2(kwconf.Config):
-    limit: int | None = kwconf.Value(None)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        print(json.dumps(discover_lv2_plugins(limit=args.limit), indent=2))
-        return 0
-
-
-class AudioPluginListCLAP(kwconf.Config):
-    path: list[str] = kwconf.Value(default_factory=list, help="additional/override search root")
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        roots = [Path(p) for p in args.path] or None
-        print(json.dumps(discover_clap_plugins(roots), indent=2))
-        return 0
-
-
-class AudioPluginLV2Info(kwconf.Config):
-    uri: str = kwconf.Value(None, position=1)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        print(json.dumps(lv2_info(args.uri), indent=2))
-        return 0
-
-
-class AudioPluginListSFZLibraries(kwconf.Config):
-    limit: int = kwconf.Value(200)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        print(json.dumps(collect_sfz_library_diagnostics(limit=args.limit), indent=2))
-        return 0
-
-
-class AudioPluginValidateScore(kwconf.Config):
-    score: Path = kwconf.Value(None, position=1, parser=Path)
-
-    @classmethod
-    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-        args = cls.cli(argv=argv, data=kwargs)
-        score_path = args.score.resolve()
-        report = validate_score_plugins(load_score(score_path), base_dir=score_path.parent)
-        print(json.dumps(report, indent=2))
-        return 0 if report.get("ok") else 1
-
-
-class AudioPluginsModal(kwconf.ModalCLI):
-    """Inspect optional VST3/LV2/SFZ music-renderer infrastructure."""
-
-    doctor = AudioPluginDoctor
-    list_vst3 = AudioPluginListVST3
-    list_lv2 = AudioPluginListLV2
-    list_clap = AudioPluginListCLAP
-    list_sfz_libraries = AudioPluginListSFZLibraries
-    lv2_info = AudioPluginLV2Info
-    validate_score = AudioPluginValidateScore
-
-
-def main(argv: list[str] | None = None) -> int:
-    return int(AudioPluginsModal.main(argv=argv))
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

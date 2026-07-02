@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -49,14 +50,24 @@ def _resolve(path: str | Path, *, base_dir: Path | None = None) -> Path:
 
 
 def _set_parameters(plugin: Any, parameters: dict[str, Any]) -> None:
-    for key, value in dict(parameters or {}).items():
+    params = dict(parameters or {})
+    # `strict` is our control key, not a plugin parameter; it used to be
+    # iterated and set on the plugin itself, which could raise on the very
+    # option meant to control error handling.
+    strict = bool(params.pop("strict", False))
+    for key, value in params.items():
         try:
             setattr(plugin, str(key), value)
-        except Exception:
-            # Pedalboard plugin parameter surfaces differ by plugin.  Preserve a
-            # strong error only for authors who explicitly ask for it.
-            if bool(parameters.get("strict", False)):
+        except Exception as ex:
+            # Pedalboard plugin parameter surfaces differ by plugin. Never
+            # drop an authored parameter silently — that is dead config.
+            if strict:
                 raise
+            print(
+                f"[ambition_music_renderer] VST3 parameter {key!r} could not be "
+                f"set on {type(plugin).__name__}: {ex}",
+                file=sys.stderr,
+            )
 
 
 def build_plugin(spec: dict[str, Any], *, base_dir: Path | None = None) -> Any:
@@ -110,7 +121,24 @@ def build_plugin(spec: dict[str, Any], *, base_dir: Path | None = None) -> Any:
     if effect in {"lowpass", "lowpass_filter", "lp"}:
         return pb.LowpassFilter(cutoff_frequency_hz=float(spec.get("cutoff_hz", spec.get("hz", 9000.0))))
     if effect in {"vst3", "vst", "plugin"}:
-        plugin_path = _resolve(spec["path"], base_dir=base_dir)
+        # Accept the same spec shapes `plugins validate_score` accepts: a
+        # `path` (score-relative or absolute) or a `plugin` name resolved
+        # against the discovered VST3 search dirs. The validator used to
+        # green-light `plugin:` specs this function then crashed on.
+        raw = spec.get("path") or spec.get("plugin")
+        if not raw:
+            raise ValueError("vst3 effect step needs a `path` or `plugin` key")
+        plugin_path = _resolve(raw, base_dir=base_dir)
+        if not plugin_path.exists():
+            from ..audio_plugins import resolve_vst3_reference
+
+            resolved = resolve_vst3_reference(str(raw), base_dir=base_dir)
+            if resolved is None:
+                raise FileNotFoundError(
+                    f"VST3 {raw!r} not found as a path or a discoverable plugin "
+                    "name; run `plugins list_vst3` to see local candidates"
+                )
+            plugin_path = Path(resolved)
         plugin = pb.load_plugin(str(plugin_path))
         _set_parameters(plugin, dict(spec.get("parameters") or {}))
         return plugin

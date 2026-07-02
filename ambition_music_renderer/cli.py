@@ -46,6 +46,7 @@ from ._paths import SCORE_SUFFIXES as _SCORE_SUFFIXES
 import kwconf
 
 from .profiler import profile
+from .render.bundle_options import BACKEND_CHOICES
 from .render.bundle_options import BundleOptions
 from .render.bundle_options import PASSTHROUGH_FIELDS
 from .render.generated_layout import begin_generated_run
@@ -112,8 +113,6 @@ EXTRA_RADIO_CUES = (
     "violin_boss_relentless",
 )
 
-SCORE_DIRS = ("active", "examples", "archive")
-
 # Filename treated as a manual override inside any preview/ directory. When
 # present, this is the file that gets copied to assets/.../<cue>/full.ogg
 # instead of the renderer's auto-named full_soundtrack_preview.ogg.
@@ -138,12 +137,15 @@ def output_root() -> Path:
 
 
 def find_score(cue: str) -> Path | None:
-    """Locate a cue YAML by name. Searches scores/{active,examples,archive}/.
+    """Locate a cue YAML by name, searching every ``_paths.SCORE_DIRS`` subdir.
 
     Accepts a bare cue id (e.g. ``lofi_study_loop``) or a relative/absolute
-    path to a YAML.
+    path to a YAML. Delegates to ``_paths.find_score`` with its default
+    subdirs so ``cue list``, ``cue render``, ``cue bundle`` and
+    ``plugins validate_score`` all agree on which cues exist (a local
+    3-dir copy used to exclude ``experiments/`` from half the commands).
     """
-    return _find_score(cue, subdirs=SCORE_DIRS)
+    return _find_score(cue)
 
 
 def find_full_mix(preview_dir: Path, cue: str) -> Path | None:
@@ -183,7 +185,7 @@ def discover_active_radio_cues() -> tuple[str, ...]:
     cues: set[str] = set()
     for path in active.iterdir():
         name = path.name
-        for suffix in (".music.yaml", ".yaml"):
+        for suffix in (".music.yaml", *_SCORE_SUFFIXES):
             if name.endswith(suffix):
                 cue = name[: -len(suffix)]
                 if cue and cue not in SANDBOX_CUES and cue not in ADAPTIVE_CUES:
@@ -270,7 +272,7 @@ def render_cue(
     return result.returncode == 0
 
 
-def render_mode_for_cue(cue: str, args) -> tuple[bool, bool]:
+def render_mode_for_cue(cue: str, args=None) -> tuple[bool, bool]:
     """Return (simple_mix, full_mix_only) for top-level render commands.
 
     Goblin-style adaptive encounter cues ship as per-section full mixes. The
@@ -500,11 +502,16 @@ def _process_simple_mix_cue(
     outdir = generated_root() / cue
     if action in ("render", "render-publish"):
         if force_render or needs_render(cue, yaml_path, outdir):
+            # Route through the same adaptive-cue detection as single-cue
+            # renders: a hardcoded simple_mix=True used to fully render an
+            # adaptive cue only for publish_cue to refuse it afterwards.
+            simple_mix, full_mix_only = render_mode_for_cue(cue)
             if not render_cue_to_versioned_generated(
                 cue,
                 yaml_path,
                 backend=backend,
-                simple_mix=True,
+                simple_mix=simple_mix,
+                full_mix_only=full_mix_only,
             ):
                 return "render"
         else:
@@ -697,7 +704,11 @@ class RenderCommand(kwconf.Config):
 
 
     cue: str = kwconf.Value(None, position=1, help="cue id or YAML path")
-    backend: str = kwconf.Value("pretty-midi", help="renderer backend")
+    backend: str = kwconf.Value(
+        "pretty-midi",
+        choices=list(BACKEND_CHOICES),
+        help="renderer backend",
+    )
     simple_mix: bool = kwconf.Flag(True, help="emit only the mastered preview")
     full_mix_only: bool = kwconf.Flag(False, help="emit mastered preview plus per-section full mixes")
     publish: bool = kwconf.Flag(False, help="after rendering, install full.ogg into the game asset tree")
