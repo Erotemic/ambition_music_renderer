@@ -1,0 +1,611 @@
+schema: ambition.musicir.v1
+id: fable
+title: Fable
+seed: 2026070201
+notes: >-
+  A story with a moral. The cue is a narrative arc in 6/8: "once upon a time"
+  opens sparse (harp, celesta, a hint of the theme), "the telling" carries the
+  tale on an upright-piano narrator over harp and low strings, "the wolf" turns
+  to E minor with B7 harmonic-minor color, and "the moral" retells the teller
+  theme in retrograde on celesta - the question's hanging scale-degree-2 becomes
+  the moral's first word, and the melody finally lands on the tonic. Every
+  melodic voice is the same two-bar theme or its mirror, so the whole cue is one
+  sentence told three ways.
+
+tempo:
+  bpm: 144
+
+meter:
+  beats_per_bar: 6
+  beat_unit: 8
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 12.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 34
+  lowpass_hz: 10500
+  high_shelf_hz: 6400
+  high_shelf_db: -1.3
+  presence_low_hz: 1500
+  presence_high_hz: 3400
+  presence_db: -0.2
+  transient_tame: 0.06
+  transient_lowpass_hz: 7000
+  reverb_wet: 0.15
+  reverb_decay_seconds: 1.8
+  reverb_damping_hz: 4300
+  post_reverb_high_shelf_hz: 5400
+  post_reverb_high_shelf_db: -1.1
+  stereo_width: 0.16
+  compressor_threshold_db: -17.0
+  compressor_ratio: 1.35
+  compressor_attack_ms: 24.0
+  compressor_release_ms: 170.0
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 8.0
+  limiter_drive: 0.8
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  highpass_hz: 32
+  lowpass_hz: 10500
+  transient_tame: 0.05
+  transient_lowpass_hz: 7200
+  reverb_wet: 0.02
+  reverb_decay_seconds: 0.8
+  reverb_damping_hz: 4600
+  stereo_width: 0.05
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  keys:
+    gain_db: 7.0
+    lowpass_hz: 9500
+    high_shelf_hz: 5600
+    high_shelf_db: -1.0
+    transient_tame: 0.05
+    reverb_wet: 0.03
+  harp:
+    gain_db: 8.0
+    lowpass_hz: 8600
+    high_shelf_hz: 5400
+    high_shelf_db: -1.4
+    transient_tame: 0.12
+    reverb_wet: 0.03
+  cello:
+    gain_db: -8.0
+    lowpass_hz: 6800
+    transient_tame: 0.04
+    reverb_wet: 0.04
+  low:
+    gain_db: 1.5
+    lowpass_hz: 5200
+    transient_tame: 0.05
+  pad:
+    gain_db: 14.0
+    lowpass_hz: 6200
+    reverb_wet: 0.06
+  glimmer:
+    gain_db: 12.0
+    highpass_hz: 300
+    lowpass_hz: 7800
+    high_shelf_hz: 5600
+    high_shelf_db: -1.6
+    transient_tame: 0.16
+    reverb_wet: 0.04
+
+instruments:
+  - name: storyteller
+    group: keys
+    program: acoustic_grand_piano
+    volume: 104
+    pan: 50
+    expression: 110
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.upright_piano_kw
+      prefer: [upright, piano]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: low_story
+    group: low
+    program: acoustic_grand_piano
+    volume: 96
+    pan: 44
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.upright_piano_kw
+      prefer: [upright, piano]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: harp
+    group: harp
+    program: orchestral_harp
+    volume: 88
+    pan: 62
+    expression: 98
+    instrument_backend:
+      kind: sfz
+      library_ref: folk.harp
+      prefer: [harp, normal]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: cello
+    group: cello
+    program: cello
+    volume: 98
+    pan: 42
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.cello
+      prefer: [bowed, velocity, cello]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: string_pad
+    group: pad
+    program: string_ensemble_1
+    volume: 54
+    pan: 55
+    expression: 72
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violas
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: celesta
+    group: glimmer
+    program: celesta
+    volume: 66
+    pan: 72
+    expression: 88
+
+motifs:
+  - id: fable_teller
+    root: G4
+    # The question. An arch that climbs to the octave and falls back, ending
+    # on scale degree 2 (an add9 over the tonic) - a sentence left hanging.
+    intervals: [0, 4, 7, 9, 12, 9, 7, 4, 2]
+    rhythm: [2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0]
+    velocities: [0.50, 0.56, 0.64, 0.70, 0.76, 0.70, 0.62, 0.54, 0.48]
+  - id: fable_answer
+    root: D5
+    # The answer. Starts on the teller's peak register and settles down a
+    # fifth, resolving where the question could not.
+    intervals: [0, 2, 0, -3, -5, -7]
+    rhythm: [2.0, 1.0, 1.0, 2.0, 3.0, 3.0]
+    velocities: [0.56, 0.60, 0.54, 0.50, 0.46, 0.40]
+  - id: wolf_prowl
+    root: E3
+    # The wolf. Natural-minor arch with the b6 (C over Em) at the top; the
+    # leading-tone bite is left to the B7 harmony rather than the melody.
+    intervals: [0, 3, 7, 8, 7, 3, 2, 0]
+    rhythm: [2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0]
+    velocities: [0.55, 0.58, 0.66, 0.72, 0.66, 0.58, 0.52, 0.48]
+  - id: wolf_call
+    root: B4
+    # A short shadow answer: the half-step B-C rub is the wolf at the door,
+    # but the phrase lands on consonant 6-5 over the C bars it is placed on.
+    intervals: [0, 1, 0, -2, -4]
+    rhythm: [1.5, 1.5, 1.0, 2.0, 6.0]
+    velocities: [0.48, 0.54, 0.50, 0.44, 0.38]
+
+layer_templates:
+  low_floor:
+    kind: bassline
+    instrument: low_story
+    octave: 2
+    # Root and fifth on the two dotted-quarter pulses of the 6/8 bar.
+    pattern: [[0, 0.0, 0.62], [7, 3.0, 0.36]]
+    velocity: 58
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  low_floor_wolf:
+    kind: bassline
+    instrument: low_story
+    octave: 2
+    pattern: [[0, 0.0, 0.60], [0, 3.0, 0.44], [7, 4.5, 0.30]]
+    velocity: 60
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  harp_spin:
+    kind: arpeggio
+    instrument: harp
+    octave: 3
+    pattern: [0, 2, 4, 2, 1, 2]
+    step: 1.0
+    duration_beats: 0.9
+    velocity: 46
+    density: 0.82
+    articulation: pluck
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+
+  harp_once_upon:
+    kind: arpeggio
+    instrument: harp
+    octave: 3
+    pattern: [0, 1, 2, 1]
+    step: 1.5
+    duration_beats: 1.2
+    velocity: 42
+    density: 0.7
+    articulation: pluck
+    voicing: open
+    humanize_ms: 9
+    humanize_velocity_pct: 6
+
+  harp_wolf:
+    kind: arpeggio
+    instrument: harp
+    octave: 2
+    pattern: [0, 2, 1, 2]
+    step: 1.5
+    duration_beats: 1.1
+    velocity: 44
+    density: 0.66
+    articulation: pluck
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+
+  keys_haze:
+    kind: pad_chords
+    instrument: storyteller
+    octave: 3
+    every_bars: 1
+    duration_beats: 5.4
+    velocity: 36
+    articulation: pad
+    voicing: open
+    constraints:
+      max_notes: 3
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+
+  keys_haze_wolf:
+    kind: chord_hits
+    instrument: storyteller
+    octave: 2
+    hits: [[0, 0.0]]
+    duration_beats: 5.4
+    velocity: 40
+    articulation: tenuto
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  pad_warmth:
+    kind: pad_chords
+    instruments: [string_pad]
+    octave: 3
+    every_bars: 1
+    duration_beats: 5.5
+    velocity: 36
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+
+  cello_cushion:
+    kind: pad_chords
+    instruments: [cello]
+    octave: 2
+    every_bars: 1
+    duration_beats: 5.5
+    velocity: 34
+    articulation: pad
+    voicing: root_fifth
+    constraints:
+      max_notes: 2
+    humanize_ms: 12
+    humanize_velocity_pct: 3
+
+  celesta_glint:
+    kind: arpeggio
+    instrument: celesta
+    octave: 5
+    pattern: [0, 2, 4, 2]
+    step: 1.5
+    duration_beats: 0.8
+    velocity: 26
+    density: 0.3
+    articulation: bell
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+
+playback:
+  mode: section_stem_matrix
+  intro: once_upon
+  loop_components: [the_telling, the_wolf]
+  outro: the_moral
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [keys, harp, low, cello, pad]
+    fade_stems: [glimmer]
+
+state_map:
+  default:
+    section: the_telling
+    stems: {keys: 0.80, harp: 0.70, low: 0.75, cello: 0.60, pad: 0.50, glimmer: 0.30}
+  calm:
+    section: the_telling
+    stems: {keys: 0.55, harp: 0.45, low: 0.50, cello: 0.30, pad: 0.35, glimmer: 0.15}
+  tension:
+    section: the_wolf
+    stems: {keys: 0.75, harp: 0.50, low: 0.85, cello: 0.90, pad: 0.55, glimmer: 0.0}
+
+sections:
+  - id: once_upon
+    kind: intro
+    label: once upon a time
+    bars: 8
+    intensity: 0.4
+    density: 0.45
+    loopable: false
+    harmony: [G, G, Em7, Em7, C, C, Dsus4, D]
+    layers:
+      - harp_once_upon
+      - pad_warmth
+      - cello_cushion
+      - celesta_glint
+      - kind: motif
+        instrument: celesta
+        motif: fable_teller
+        # The theme whispered before the story starts.
+        roots: [G5]
+        starts: [[4, 0.0]]
+        velocity: 44
+        articulation: bell
+        gate: 0.7
+        humanize_ms: 8
+        humanize_velocity_pct: 5
+
+  - id: the_telling
+    kind: loop_component
+    label: the telling
+    bars: 32
+    intensity: 0.6
+    density: 0.58
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - G
+      - G
+      - Em
+      - Em
+      - C
+      - C
+      - G
+      - G
+      - Am
+      - Am
+      - D
+      - D
+      - G
+      - G
+      - C
+      - C
+      - G
+      - G
+      - Bm
+      - Bm
+      - C
+      - C
+      - G
+      - G
+      - Em
+      - Em
+      - C
+      - C
+      - Am
+      - D
+      - G
+      - G
+    layers:
+      - low_floor
+      - harp_spin
+      - keys_haze
+      - pad_warmth
+      - cello_cushion
+      - celesta_glint
+      - kind: motif
+        instrument: storyteller
+        motif: fable_teller
+        # The teller speaks at the top of each stanza (G bars only; the motif
+        # is root-transposed, not scale-aware, so starts stay on the tonic).
+        roots: [G4, G4]
+        starts: [[0, 0.0], [16, 0.0]]
+        velocity: 66
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: storyteller
+        motif: fable_answer
+        # The answer settles over the plagal C-C bars and lands on G.
+        roots: [D5, D5]
+        starts: [[4, 0.0], [20, 0.0]]
+        velocity: 58
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: storyteller
+        motif: fable_teller
+        # A quieter mid-stanza retelling on the G bars at 12 and 30.
+        roots: [G4]
+        starts: [[12, 0.0]]
+        velocity: 56
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: cello
+        motif: fable_teller
+        # Stanza two: the cello retells the theme an octave down under the
+        # piano, entering on the G bars at 22.
+        roots: [G2]
+        starts: [[22, 0.0]]
+        velocity: 56
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 10
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: celesta
+        motif: fable_answer
+        # Glimmer echo of the answer at the end of stanza two.
+        roots: [D6]
+        starts: [[26, 0.0]]
+        velocity: 36
+        articulation: bell
+        gate: 0.65
+        humanize_ms: 6
+        humanize_velocity_pct: 5
+
+  - id: the_wolf
+    kind: loop_component
+    label: the wolf
+    bars: 16
+    intensity: 0.66
+    density: 0.56
+    loopable: true
+    valid_exit_local_bars: [8, 16]
+    harmony:
+      - Em
+      - Em
+      - C
+      - C
+      - Am
+      - Am
+      - B7
+      - B7
+      - Em
+      - Em
+      - C
+      - C
+      - Am
+      - B7
+      - Em
+      - Em
+    layers:
+      - low_floor_wolf
+      - harp_wolf
+      - keys_haze_wolf
+      - pad_warmth
+      - kind: motif
+        instrument: cello
+        motif: wolf_prowl
+        roots: [E3, E3]
+        starts: [[0, 0.0], [8, 0.0]]
+        velocity: 68
+        articulation: legato
+        gate: 0.92
+        humanize_ms: 10
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: storyteller
+        motif: wolf_call
+        # Placed on the C bars so the B-C rub resolves onto 6-5 of C.
+        roots: [B4, B4]
+        starts: [[2, 0.0], [10, 0.0]]
+        velocity: 54
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: cello
+        motif: wolf_prowl
+        # Closing half-cadence prowl into the loop restart.
+        roots: [E3]
+        starts: [[14, 0.0]]
+        velocity: 62
+        articulation: legato
+        gate: 0.92
+        humanize_ms: 10
+        humanize_velocity_pct: 4
+
+  - id: the_moral
+    kind: outro
+    label: the moral
+    bars: 12
+    intensity: 0.38
+    density: 0.4
+    loopable: false
+    harmony: [C, C, G/B, G/B, Am, Am, D, D, C, C, G, G]
+    layers:
+      - low_floor
+      - harp_once_upon
+      - pad_warmth
+      - cello_cushion
+      - kind: motif
+        instrument: celesta
+        motif: fable_teller
+        transform: retrograde
+        # The moral is the story reflected: the retrograde starts on the
+        # question's hanging degree 2 and finally lands on the tonic.
+        roots: [G5, G5]
+        starts: [[2, 0.0], [10, 0.0]]
+        velocity: 48
+        articulation: bell
+        gate: 0.75
+        humanize_ms: 7
+        humanize_velocity_pct: 5
+      - kind: motif
+        instrument: storyteller
+        motif: fable_teller
+        transform: retrograde
+        # The narrator doubles the moral an octave below the celesta.
+        roots: [G4]
+        starts: [[2, 0.0]]
+        velocity: 54
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: motif
+        instrument: storyteller
+        motif: fable_answer
+        # One last answer before the close.
+        roots: [D5]
+        starts: [[6, 0.0]]
+        velocity: 50
+        articulation: legato
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 4
