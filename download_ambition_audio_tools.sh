@@ -465,7 +465,13 @@ def audit_sfz(path: Path) -> tuple[int, int, list[str]]:
             candidates.append(path.parent / rel)
             candidates.append(path.parent.parent / "Samples" / rel)
             candidates.append(path.parent.parent.parent / "Samples" / rel)
-        if not any(c.exists() for c in candidates):
+        try:
+            found = any(c.exists() for c in candidates)
+        except OSError:
+            # Transient EMFILE on virtiofs must not kill the whole report;
+            # treat the sample as present rather than false-positive it.
+            found = True
+        if not found:
             if len(missing) < 8:
                 missing.append(raw)
     return total, total - len(missing), missing
@@ -868,6 +874,8 @@ if want_pro; then
     download_and_extract_optional "Karoryfer x bigcat cello" "https://github.com/sfzinstruments/karoryfer-bigcat.cello/releases/download/v1.001/Karoryfer_Bigcat_cello.v1.001.zip" "Karoryfer_Bigcat_cello.v1.001.zip" "$SFZ_ROOT/Karoryfer/BigcatCello" || true
     download_and_extract_optional "Karoryfer String Cyborgs" "https://github.com/sfzinstruments/karoryfer.string-cyborgs/releases/download/v1.001/Karoryfer.String_Cyborgs.v1.001.zip" "Karoryfer.String_Cyborgs.v1.001.zip" "$SFZ_ROOT/Karoryfer/StringCyborgs" || true
     download_and_extract_optional "Karoryfer Horse Pulse" "https://github.com/sfzinstruments/Karoryfer.HorsePulse/releases/download/v1.000/Karoryfer_Horse_Pulse_1000.zip" "Karoryfer_Horse_Pulse_1000.zip" "$SFZ_ROOT/Karoryfer/HorsePulse" || true
+    download_and_extract_optional "Karoryfer Meatbass (bowed double bass)" "https://github.com/sfzinstruments/karoryfer.meatbass/releases/download/v1.001/Karoryfer.Meatbass.v1.001.zip" "Karoryfer.Meatbass.v1.001.zip" "$SFZ_ROOT/Karoryfer/Meatbass" || true
+    download_and_extract_optional "Karoryfer Weresax (baritone/alto saxophones)" "https://github.com/sfzinstruments/karoryfer.weresax/releases/download/v1.003/Karoryfer.Weresax.v.1.003.zip" "Karoryfer.Weresax.v.1.003.zip" "$SFZ_ROOT/Karoryfer/Weresax" || true
     if [[ "$ORCHESTRA_EXTRAS" != "0" ]]; then
         # VCSL / Sonatina ship their samples in the repo itself; their GitHub
         # "releases" carry NO uploaded asset (only the auto-generated source

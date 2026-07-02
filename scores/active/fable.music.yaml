@@ -186,8 +186,12 @@ instruments:
     expression: 72
     instrument_backend:
       kind: sfz
-      library_ref: strings.violas
-      prefer: [notation, sustain]
+      # VPO viola section: VSCO2-CE + Sonatina samples layered, fuller than
+      # either donor alone. The sustain variant is velocity-driven (sfizz
+      # ignores the mod-wheel patch's gain_cc1), which suits the wolf's
+      # velocity-dynamics swell.
+      library_ref: viola-SEC-sustain
+      prefer: [viola, sec, sustain]
       optional: true
       fallback_backend: pretty-midi
   - name: celesta
