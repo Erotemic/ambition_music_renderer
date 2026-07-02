@@ -190,11 +190,10 @@ def _render_sfizz_cli(
         # Distro builds of sfizz_render have differed enough that a fallback
         # probe here is more reliable than asking score YAML to know the host.
         templates.extend([
-            # Current distro builds accept named SFZ/MIDI/WAV options but do
-            # not necessarily accept a sample-rate option.  Try this form
-            # before older positional guesses so successful SFZ rendering does
-            # not fall through to pretty-midi.
-            [binary, "--sfz", "{sfz}", "--midi", "{midi}", "--wav", "{wav}"],
+            # Prefer the form that pins the requested sample rate: when the
+            # build supports it, rendering at the target rate avoids a silent
+            # resample from the binary's default rate. Builds that reject the
+            # option fail this probe and fall through to the rate-less form.
             [
                 binary,
                 "--sfz",
@@ -206,6 +205,7 @@ def _render_sfizz_cli(
                 "--sample-rate",
                 "{sample_rate}",
             ],
+            [binary, "--sfz", "{sfz}", "--midi", "{midi}", "--wav", "{wav}"],
             [binary, "{sfz}", "{midi}", "{wav}"],
             [binary, "{sfz}", "{midi}", "{wav}", "{sample_rate}"],
         ])
@@ -288,9 +288,11 @@ def _midi_messages_for_pedalboard(pm: pretty_midi.PrettyMIDI) -> list[mido.Messa
                     time=float(note.end),
                 )
             )
-    # Place note_on before note_off at the same timestamp to avoid zero-length
-    # cancellations when repeated notes abut exactly.
-    return sorted(messages, key=lambda msg: (float(msg.time), 0 if msg.type == "note_on" else 1))
+    # Standard same-timestamp ordering: note_off BEFORE note_on. With the old
+    # on-before-off ordering, when repeated notes abut exactly the previous
+    # note's off arrived after the new note's on and could choke the note that
+    # just started (hosts release by key number).
+    return sorted(messages, key=lambda msg: (float(msg.time), 0 if msg.type == "note_off" else 1))
 
 
 def _set_plugin_parameter(plugin: Any, key: str, value: Any) -> bool:
