@@ -232,7 +232,7 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_rows: in
                     "layers": "+".join(sorted({str(ev.get("layer")) for ev in low})),
                 }
             )
-        lows = [ev for ev in active if int(ev.get("pitch", 60)) < 48]
+        lows = low
         highs = [ev for ev in active if int(ev.get("pitch", 60)) >= 72]
         for low_ev in lows:
             for hi_ev in highs:

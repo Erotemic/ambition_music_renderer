@@ -12,6 +12,8 @@ Lower numbers = less squeak.
 
 from __future__ import annotations
 
+import sys
+
 from ..profiler import profile
 
 import lazy_loader as lazy
@@ -51,7 +53,11 @@ class SpectralCompareConfig(kwconf.Config):
     """Compare spectral energy in rendered scratch stems."""
 
     cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
-    window: list[float] = kwconf.Value(default_factory=lambda: [38.0, 43.0], nargs=2)
+    window: list[float] = kwconf.Value(
+        default_factory=lambda: [0.0, -1.0],
+        nargs=2,
+        help="analysis window seconds; a negative hi means 'to end of track'",
+    )
     sr: int = kwconf.Value(48000)
     label: str = kwconf.Value("")
 
@@ -69,10 +75,20 @@ def run(args: SpectralCompareConfig) -> int:
     for p in stems:
         name = p.stem.split(".")[-1]
         mono = to_mono(np.load(p))
+        # A negative hi is the bundle's "to end of track" sentinel (matching
+        # spectral_localize); it used to become a negative slice index and
+        # silently drop the last second, or empty the segment entirely.
+        hi = float(len(mono)) / args.sr if t_hi < 0 else t_hi
+        if int(t_lo * args.sr) >= len(mono):
+            print(
+                f"WARNING: window start {t_lo:.1f}s is past the end of {name} "
+                f"({len(mono) / args.sr:.1f}s); energies report as zero",
+                file=sys.stderr,
+            )
         by_group[name] = {
-            "mid": band_energy(mono, args.sr, t_lo, t_hi, 300, 1000),
-            "vhigh": band_energy(mono, args.sr, t_lo, t_hi, 3000, 6000),
-            "air": band_energy(mono, args.sr, t_lo, t_hi, 6000, 12000),
+            "mid": band_energy(mono, args.sr, t_lo, hi, 300, 1000),
+            "vhigh": band_energy(mono, args.sr, t_lo, hi, 3000, 6000),
+            "air": band_energy(mono, args.sr, t_lo, hi, 6000, 12000),
         }
 
     total = {b: sum(by_group[g][b] for g in by_group) for b in ("mid", "vhigh", "air")}

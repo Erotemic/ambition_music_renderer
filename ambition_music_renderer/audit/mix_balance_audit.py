@@ -27,10 +27,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-try:  # optional, only needed for the plot
-    import kwconf  # type: ignore
-except Exception:  # pragma: no cover
-    kwconf = None
+import kwconf
 
 # Layer kinds whose notes are a foreground melodic line (a "lead").
 LEAD_LAYER_KINDS = {"guitar_lead", "motif"}
@@ -65,7 +62,7 @@ def _section_state_weights(spec: dict[str, Any]) -> dict[str, dict[str, float]]:
     return out
 
 
-def audit_spec(spec: dict[str, Any], *, buried_db: float = 10.0,
+def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
                lead_velocity_floor: float = 30.0) -> dict[str, Any]:
     """Return per-section group balance and buried-lead warnings.
 
@@ -294,24 +291,22 @@ def write_reports(payload: dict[str, Any], reports_dir: Path, *, plots_dir: Path
     return paths
 
 
-if kwconf is not None:
+class MixBalanceAuditConfig(kwconf.Config):
+    """Static mix-balance / lead-audibility audit for one score."""
 
-    class MixBalanceAuditConfig(kwconf.Config):
-        __command__ = "mix_balance"
-        __default__ = {
-            "spec": kwconf.Value(None, position=1, help="path to a .music.yaml"),
-            "buried_db": kwconf.Value(12.0, help="dB below section peak that flags a buried lead"),
-            "reports_dir": kwconf.Value(".", help="output directory"),
-            "plot_format": kwconf.Value("jpg"),
-        }
+    spec: Path = kwconf.Value(None, position=1, parser=Path, help="path to a .music.yaml")
+    buried_db: float = kwconf.Value(12.0, help="dB below section peak that flags a buried lead")
+    reports_dir: Path = kwconf.Value(Path("."), parser=Path, help="output directory")
+    plot_format: str = kwconf.Value("jpg")
 
-        @classmethod
-        def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
-            return run(cls.cli(argv=argv, **kwargs))
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
 
-    def run(args: "MixBalanceAuditConfig") -> int:
-        payload = audit_file(Path(args["spec"]), buried_db=float(args["buried_db"]))
-        out = Path(args["reports_dir"])
-        write_reports(payload, out, plots_dir=out, plot_format=str(args["plot_format"]))
-        print(_format_summary(payload))
-        return 0
+
+def run(args: MixBalanceAuditConfig) -> int:
+    payload = audit_file(Path(args.spec), buried_db=float(args.buried_db))
+    out = Path(args.reports_dir)
+    write_reports(payload, out, plots_dir=out, plot_format=str(args.plot_format))
+    print(_format_summary(payload))
+    return 0

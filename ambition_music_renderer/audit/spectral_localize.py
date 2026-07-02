@@ -9,7 +9,8 @@ the YAML is ambiguous about which layer is responsible.
 
 Usage:
 
-    spectral_localize.py <cue_outdir> [--window LO HI] [--bucket SECS]
+    python -m ambition_music_renderer audit spectral_localize <cue_outdir> \
+        [--window LO HI] [--bucket SECS]
 
 `<cue_outdir>` is the output directory passed to `render_isolated`, e.g.
 `tools/ambition_music_renderer/generated/how_to_kill_a_mockingbird/`. The
@@ -21,8 +22,9 @@ Workflow:
 1. Render the cue with debug stems retained:
    ``python -m ambition_music_renderer.render.isolated <yaml> --outdir <dir>
    --keep-debug-stems``
-2. ``spectral_localize.py <dir> --window 38 43`` to see which group
-   contributes which fraction of each band's energy in the window.
+2. ``python -m ambition_music_renderer audit spectral_localize <dir> --window 38 43``
+   to see which group contributes which fraction of each band's energy in
+   the window.
 3. The dominant group in the offending band is the one to investigate in
    the YAML. From there you can re-enter the layer→template→motif chain
    to find the YAML edit that actually changes the rendered audio.

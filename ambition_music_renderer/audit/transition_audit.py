@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Analyze and preview adaptive music section transitions outside the game.
 
-The tool reads generated cue output from ``render_isolated.py`` and reports
+The tool reads generated cue output from the ``render_isolated`` worker
+(``ambition_music_renderer.render.isolated``) and reports
 basic level/transition metrics for two full-mix section files. It writes WAV
 previews, CSV metrics, PNG plots, and a Markdown report so a transition can be
 audited visually when the ear is not enough.
@@ -76,12 +77,25 @@ def high_band_ratio(
         return 0.0
     max_frames = 131072
     if mono.size > max_frames:
-        step = max(1, int(math.ceil(mono.size / max_frames)))
-        mono = mono[::step]
-    window = np.hanning(mono.size)
-    spectrum = np.fft.rfft(mono * window)
-    power = np.square(np.abs(spectrum))
-    freqs = np.fft.rfftfreq(mono.size, d=1.0 / float(sample_rate))
+        # Naive stride decimation aliases, so it cannot honestly answer an
+        # "energy above cutoff" question when the effective Nyquist drops
+        # below the cutoff. Average whole FFT frames over the undecimated
+        # signal instead: same cost bound, no aliasing, correct axis.
+        window = np.hanning(max_frames)
+        starts = list(range(0, mono.size - max_frames + 1, max_frames))
+        if starts[-1] + max_frames < mono.size:
+            starts.append(mono.size - max_frames)  # cover the tail
+        power = np.zeros(max_frames // 2 + 1)
+        for start in starts:
+            frame = mono[start : start + max_frames]
+            power += np.square(np.abs(np.fft.rfft(frame * window)))
+        power /= len(starts)
+        freqs = np.fft.rfftfreq(max_frames, d=1.0 / float(sample_rate))
+    else:
+        window = np.hanning(mono.size)
+        spectrum = np.fft.rfft(mono * window)
+        power = np.square(np.abs(spectrum))
+        freqs = np.fft.rfftfreq(mono.size, d=1.0 / float(sample_rate))
     total = float(np.sum(power))
     if total <= 1e-20:
         return 0.0
@@ -158,15 +172,14 @@ def fade(length: int, *, direction: str, shape: str = "linear") -> np.ndarray:
         else:
             raise ValueError(direction)
     elif shape in {"ambition_runtime", "ambition-runtime"}:
-        # Handled by transition_components because the incoming bank may start
-        # at target for intro->loop, but keep a fallback for direct callers.
-        t = phase * AMBITION_STEM_GAIN_BLEND_SECONDS
-        if direction == "in":
-            values = 1.0 - np.exp(-t / AMBITION_STEM_GAIN_BLEND_SECONDS)
-        elif direction == "out":
-            values = np.exp(-t / AMBITION_STEM_GAIN_BLEND_SECONDS)
-        else:
-            raise ValueError(direction)
+        # This shape needs real seconds (the runtime blend is a time constant,
+        # not a phase curve), which fade() does not have. transition_components
+        # implements it; a phase-based approximation here would quietly model a
+        # different curve than the game.
+        raise ValueError(
+            "the ambition_runtime shape is handled by transition_components; "
+            "fade() cannot model a time-constant blend from a phase alone"
+        )
     else:
         raise ValueError(f"unknown crossfade shape: {shape}")
     return values.astype("float32", copy=False)[:, None]
@@ -189,7 +202,9 @@ def transition_components(
         raise ValueError(f"sample-rate mismatch: {sr1} vs {sr2}")
     sr = sr1
     context_frames = max(1, int(round(context_seconds * sr)))
-    crossfade_frames = max(1, int(round(crossfade_seconds * sr)))
+    # The crossfade region lives inside the context window; a longer crossfade
+    # used to broadcast a full-length gain against a shorter tail slice.
+    crossfade_frames = min(max(1, int(round(crossfade_seconds * sr))), context_frames)
     first_tail = first[-context_frames:]
     second_head = ensure_length(second, context_frames)
 

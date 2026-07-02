@@ -148,10 +148,9 @@ def _pair_score(a: dict[str, Any], b: dict[str, Any], chord: str | None = None) 
     pa = int(a["pitch"])
     pb = int(b["pitch"])
     if pa == pb:
-        # Same pitch doubled across two timbres is usually not a clash. Keep a
-        # tiny density score only when it is a cross-layer/instrument doubling.
-        if a.get("instrument") == b.get("instrument"):
-            return 0.0, None
+        # Same pitch doubled across timbres is not a clash (and both call
+        # sites dedup by pitch before pairing anyway).
+        return 0.0, None
     diff = abs(pa - pb)
     ic = min(diff % 12, 12 - (diff % 12))
     base = INTERVAL_CLASS_SEVERITY.get(ic, 0.0)
@@ -461,8 +460,10 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
     for ev in events:
         pitch = int(ev["pitch"])
         b0 = int(float(ev["start_beat"]) // bucket_beats)
+        # ceil() is already one-past-the-end; scanning one bucket further let a
+        # note inherit a clash score from after it had ended.
         b1 = int(math.ceil(float(ev["end_beat"]) / bucket_beats))
-        clash = max((clash_at.get((bi, pitch), 0.0) for bi in range(b0, b1 + 1)), default=0.0)
+        clash = max((clash_at.get((bi, pitch), 0.0) for bi in range(b0, b1)), default=0.0)
         notes.append({"pitch": pitch, "x0": float(ev["start_beat"]), "x1": float(ev["end_beat"]), "value": clash})
 
     # Out-of-key overlay reuses the sour-note audit verbatim, so the markers are

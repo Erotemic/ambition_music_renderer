@@ -75,6 +75,9 @@ def integrated_lufs(audio: np.ndarray, sample_rate: int) -> float | None:
     pyln = _load_pyloudnorm()
     if pyln is None:
         return None
+    if audio.shape[0] < int(0.4 * sample_rate) + 1:
+        # shorter than one BS.1770 gating block; pyloudnorm raises
+        return None
     meter = pyln.Meter(sample_rate)
     return float(meter.integrated_loudness(audio))
 
@@ -187,8 +190,18 @@ def run(args: LevelReportConfig) -> int:
         print(f"no audio matched {args.root}/{args.glob}", file=sys.stderr)
         return 1
 
-    rows = [analyze(p) for p in paths]
+    rows = []
+    errors: list[str] = []
+    for p in paths:
+        try:
+            rows.append(analyze(p))
+        except Exception as ex:
+            # A truncated/corrupt render is exactly the regression --check
+            # should flag; one bad file must not abort the whole report.
+            errors.append(f"{p}: {type(ex).__name__}: {ex}")
     print(render(rows, args.target_rms_db, args.rms_tol, args.format == "tsv"))
+    for err in errors:
+        print(f"ERROR: unreadable audio: {err}", file=sys.stderr)
     if _load_pyloudnorm() is None:
         print("\n(install pyloudnorm for an integrated-LUFS column)", file=sys.stderr)
     if args.check:
@@ -201,6 +214,8 @@ def run(args: LevelReportConfig) -> int:
                 f"\nCLIP: {len(clipping)} cue(s) exceed {CLIP_DBTP:.0f} dBTP: {names}",
                 file=sys.stderr,
             )
+            return 1
+        if errors:
             return 1
     return 0
 

@@ -29,18 +29,25 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
 
     # per-instrument note pitches (to predict folding / silence)
     pitches: dict[str, list[int]] = {}
+    build_warnings: list[str] = []
     try:
         pm, _groups, _meta = build_score(spec)
         for ev in getattr(pm, "_ambition_note_events", []) or []:
             pitches.setdefault(str(ev.get("instrument")), []).append(int(ev["pitch"]))
-    except Exception:
-        pass
+    except Exception as ex:
+        # This audit exists to make "asked for X, got Y" visible; a swallowed
+        # score-build failure used to report every instrument as resolved with
+        # zero notes — a lying diagnostic.
+        build_warnings.append(
+            f"score build failed ({type(ex).__name__}: {ex}); note ranges and "
+            f"octave-fold predictions are unavailable"
+        )
     note_lo = {k: min(v) for k, v in pitches.items() if v}
     note_hi = {k: max(v) for k, v in pitches.items() if v}
     note_n = {k: len(v) for k, v in pitches.items()}
 
     rows: list[dict[str, Any]] = []
-    warnings: list[str] = []
+    warnings: list[str] = list(build_warnings)
     for inst in spec.get("instruments", []):
         name = str(inst.get("name"))
         is_drum = bool(inst.get("is_drum"))
