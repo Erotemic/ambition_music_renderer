@@ -14,6 +14,11 @@ notes: >-
 
 tempo:
   bpm: 144
+  map:
+    # Ritardando through the moral's final retrograde statement...
+    - {bar: 64, bpm: 122, ramp_bars: 3.5}
+    # ...and a pool on the landing: the last tonic stretches like a held breath.
+    - {bar: 67.5, bpm: 92, ramp_bars: 0.5}
 
 meter:
   beats_per_bar: 6
@@ -547,7 +552,11 @@ sections:
       - low_floor_wolf
       - harp_wolf
       - keys_haze_wolf
-      - pad_warmth
+      - template: pad_warmth
+        # The violas lean in across the whole section (bar-by-bar velocity
+        # crescendo; backend-independent, unlike CC automation).
+        dynamics:
+          - {start_bar: 0, bars: 16, from: 0.82, to: 1.2, curve: smooth}
       - kind: pedal
         instrument: cello
         octave: 2
@@ -564,6 +573,9 @@ sections:
         gate: 0.92
         humanize_ms: 10
         humanize_velocity_pct: 4
+        # The second prowl stalks closer than the first.
+        dynamics:
+          - {start_bar: 0, bars: 16, from: 0.88, to: 1.16, curve: smooth}
       - kind: motif
         instrument: storyteller
         motif: wolf_call
@@ -613,6 +625,34 @@ sections:
         gate: 0.75
         humanize_ms: 7
         humanize_velocity_pct: 5
+        # The story gets quieter as it ends.
+        dynamics:
+          - {start_bar: 10, bars: 2, from: 1.0, to: 0.78, curve: smooth}
+      - kind: notes
+        # 'The end.' - a hand-voiced close under the retrograde's landing:
+        # harp rolls G(add9) bottom-up into the final downbeat.
+        instrument: harp
+        articulation: pluck
+        humanize_ms: 3
+        notes:
+          - [11, 3.30, G2, 6.0, 40]
+          - [11, 3.55, D3, 6.0, 40]
+          - [11, 3.80, G3, 6.0, 42]
+          - [11, 4.05, B3, 5.5, 42]
+          - [11, 4.30, D4, 5.5, 44]
+          - [11, 4.55, A4, 5.0, 42]
+          - [11, 4.80, G4, 5.0, 46]
+      - kind: notes
+        # The narrator closes the book: a deep tonic octave, let ring.
+        instrument: low_story
+        notes:
+          - {bar: 11, beat: 4.0, note: [G1, G2], dur: 6.0, vel: 44, gate: 1.2}
+      - kind: notes
+        # One last music-box period after everything settles.
+        instrument: celesta
+        articulation: bell
+        notes:
+          - {bar: 11, beat: 5.5, note: G6, dur: 3.0, vel: 50, gate: 1.4}
       - kind: motif
         instrument: storyteller
         motif: fable_teller
