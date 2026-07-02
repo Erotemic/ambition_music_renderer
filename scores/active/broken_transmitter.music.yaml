@@ -1,0 +1,736 @@
+schema: ambition.musicir.v1
+id: broken_transmitter
+title: Broken Transmitter
+seed: 2026070206
+notes: >-
+  Experimental folk indie rock with an industrial fault line. One melody -
+  "the transmission" - is sung by a clean guitar in E dorian, and the piece
+  is the story of a machine slowly corrupting it: the mode decays dorian ->
+  aeolian -> phrygian as chugging low guitar, behind-the-bridge scrapes, and
+  a distorted pedal tone push in. The signal collapses (ritardando, melody in
+  authored fragments), the machine cuts out, and the tune comes back alone
+  with its bright sixth restored. Folk core: acoustic strums, growly electric
+  bass, brushy kit, rhodes. Machine core: black-pickup twang through a
+  pedalboard distortion+delay chain, bowed contrabass drone, floor-tom pulse.
+
+tempo:
+  bpm: 112
+  map:
+    # Lean forward into the collision chorus...
+    - {bar: 64, bpm: 118, ramp_bars: 3}
+    # ...then the transmitter dies: long ritardando through the collapse,
+    - {bar: 82, bpm: 76, ramp_bars: 9}
+    # the afterglow settles,
+    - {bar: 92, bpm: 68, ramp_bars: 6}
+    # and the last phrase pools like tape slowing to a stop.
+    - {bar: 102, bpm: 56, ramp_bars: 2}
+
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 12.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  lowpass_hz: 11500
+  presence_low_hz: 1600
+  presence_high_hz: 3800
+  presence_db: 0.5
+  transient_tame: 0.04
+  reverb_wet: 0.11
+  reverb_decay_seconds: 1.4
+  reverb_damping_hz: 4800
+  stereo_width: 0.18
+  compressor_threshold_db: -16.0
+  compressor_ratio: 1.6
+  compressor_attack_ms: 18.0
+  compressor_release_ms: 140.0
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 7.0
+  limiter_drive: 0.9
+  normalize: true
+  target_peak_db: -1.8
+
+stem_postprocess:
+  highpass_hz: 30
+  transient_tame: 0.04
+  reverb_wet: 0.02
+  reverb_decay_seconds: 0.7
+  stereo_width: 0.05
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  voice:
+    gain_db: 18.0
+    lowpass_hz: 9000
+    reverb_wet: 0.05
+  folk:
+    gain_db: 6.0
+    highpass_hz: 90
+    lowpass_hz: 9500
+    transient_tame: 0.06
+  keys:
+    gain_db: 8.0
+    lowpass_hz: 8500
+    reverb_wet: 0.04
+  low:
+    gain_db: 5.0
+    highpass_hz: 34
+    lowpass_hz: 3800
+  machine:
+    gain_db: -4.0
+    highpass_hz: 70
+    lowpass_hz: 7500
+    # The industrial chain: hard drive into a dark filter, then a short
+    # mechanical slap echo. This is what makes the black-pickup twang read
+    # as a machine rather than a guitar.
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - {effect: distortion, drive_db: 16}
+          - {effect: lowpass, cutoff_hz: 5200}
+          - {effect: delay, delay_seconds: 0.134, feedback: 0.22, mix: 0.14}
+  drums:
+    gain_db: -4.0
+    highpass_hz: 40
+    transient_tame: 0.02
+    reverb_wet: 0.05
+
+instruments:
+  - name: voice_guitar
+    group: voice
+    program: clean_guitar
+    volume: 100
+    pan: 60
+    expression: 108
+    instrument_backend:
+      kind: sfz
+      library_ref: green twang
+      prefer: [green, twang]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: folk_guitar
+    group: folk
+    program: steel_guitar
+    volume: 88
+    pan: 44
+    expression: 96
+    # Shinyguitar's CC100 'Blend' crossfade sits at 0 by default, which
+    # silences the acoustic layer entirely; mid-position brings it in.
+    controls: {100: 64}
+    instrument_backend:
+      kind: sfz
+      sfz: /data/audio-tools/sfz/Karoryfer/Shinyguitar/Shinyguitar/Programs/acoustic.sfz
+      optional: true
+      fallback_backend: pretty-midi
+  - name: rhodes
+    group: keys
+    program: electric_piano_1
+    volume: 78
+    pan: 72
+    expression: 88
+    instrument_backend:
+      kind: sfz
+      library_ref: epiano.rhodes
+      prefer: [rhodes, looped]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: upright
+    group: keys
+    program: acoustic_grand_piano
+    volume: 84
+    pan: 52
+    expression: 96
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.upright_piano_kw
+      prefer: [upright, piano]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: bass_growl
+    group: low
+    program: fingered_bass
+    volume: 92
+    pan: 58
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: bass.growly
+      prefer: [growlybass, clean]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: bass_bow
+    group: low
+    program: contrabass
+    volume: 88
+    pan: 50
+    expression: 96
+    instrument_backend:
+      kind: sfz
+      # NOT the *_legato_map variants: those only sound on overlapped notes.
+      sfz: /data/audio-tools/sfz/Karoryfer/Meatbass/Meatbass/Programs/arco_looped_basic_map.sfz
+      optional: true
+      fallback_backend: pretty-midi
+  - name: machine_guitar
+    group: machine
+    program: distortion_guitar
+    volume: 92
+    pan: 70
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: 07-black_twang
+      prefer: [black, twang]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: scrape_guitar
+    group: machine
+    program: fx_soundtrack
+    volume: 78
+    pan: 82
+    expression: 92
+    instrument_backend:
+      kind: sfz
+      library_ref: 09-black_behind_the_bridge
+      prefer: [black, behind, bridge]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: kit
+    group: drums
+    is_drum: true
+    volume: 96
+    pan: 64
+    expression: 100
+
+motifs:
+  # THE TRANSMISSION - the one melody the whole piece is about.
+  # Question phrase: rises to the fifth and settles home; plain-spoken,
+  # syncopated like a sung line rather than an instrumental lick.
+  - id: transmission_a
+    root: E4
+    intervals: [0, 7, 5, 3, 5, 3, 0, -2, 0]
+    rhythm: [1.5, 1.0, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 2.0]
+    velocities: [0.72, 0.86, 0.70, 0.64, 0.68, 0.74, 0.62, 0.58, 0.54]
+  # Answer phrase, DORIAN: climbs to the raised sixth (C# over E) - the
+  # bright, hopeful note the machine will later steal.
+  - id: transmission_b_dorian
+    root: E4
+    intervals: [3, 5, 7, 9, 7, 5, 2, 0]
+    rhythm: [0.5, 0.5, 1.0, 1.5, 1.0, 1.0, 1.5, 1.0]
+    velocities: [0.66, 0.72, 0.80, 0.92, 0.78, 0.68, 0.60, 0.52]
+  # The same answer, AEOLIAN: the sixth has decayed a semitone (C natural).
+  # Identical rhythm and contour - only the light has gone out of it.
+  - id: transmission_b_aeolian
+    root: E4
+    intervals: [3, 5, 7, 8, 7, 5, 2, 0]
+    rhythm: [0.5, 0.5, 1.0, 1.5, 1.0, 1.0, 1.5, 1.0]
+    velocities: [0.62, 0.68, 0.76, 0.86, 0.74, 0.64, 0.56, 0.48]
+  # Chorus melody: the transmission lifted to start on the fifth, wider arc.
+  - id: broadcast
+    root: B4
+    intervals: [0, 3, 5, 3, 0, -2, -4, -2, 0]
+    rhythm: [1.0, 0.5, 1.5, 1.0, 1.0, 0.5, 1.0, 0.5, 1.0]
+    velocities: [0.78, 0.72, 0.90, 0.76, 0.70, 0.62, 0.66, 0.60, 0.56]
+  # The machine's own figure, PHRYGIAN: a grinding half-step (E-F) over a
+  # dropped fifth. Never pretty, never resolves.
+  - id: machine_grind
+    root: E3
+    intervals: [0, 1, 0, -5, -4, -5, 0, 1]
+    rhythm: [0.75, 0.25, 1.0, 0.75, 0.25, 0.5, 0.25, 0.25]
+    velocities: [0.88, 0.72, 0.80, 0.84, 0.70, 0.76, 0.66, 0.90]
+
+layer_templates:
+  # ---- folk core -------------------------------------------------------
+  folk_strum:
+    kind: guitar_strum
+    instrument: folk_guitar
+    hits: [[0, 0.0, down], [0, 1.5, up], [0, 2.0, down], [0, 3.0, down], [0, 3.5, up]]
+    every_bars: 1
+    duration_beats: 1.3
+    spread_ms: 34
+    max_span: 5
+    max_notes: 5
+    velocity: 50
+    velocity_slope: -1.8
+    humanize_ms: 6
+    humanize_velocity_pct: 6
+
+  folk_strum_sparse:
+    kind: guitar_strum
+    instrument: folk_guitar
+    hits: [[0, 0.0, down], [0, 2.5, up]]
+    every_bars: 1
+    duration_beats: 2.2
+    spread_ms: 46
+    max_span: 5
+    max_notes: 5
+    velocity: 42
+    velocity_slope: -1.5
+    humanize_ms: 9
+    humanize_velocity_pct: 7
+
+  bass_walk:
+    kind: bassline
+    instrument: bass_growl
+    octave: 2
+    pattern: [[0, 0.0, 0.9], [0, 1.5, 0.4], [7, 2.0, 0.9], [5, 3.5, 0.45]]
+    velocity: 66
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+
+  bow_drone:
+    kind: pedal
+    instrument: bass_bow
+    octave: 1
+    velocity: 52
+    articulation: pad
+    humanize_ms: 8
+
+  rhodes_haze:
+    kind: pad_chords
+    instrument: rhodes
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.6
+    velocity: 40
+    articulation: pad
+    voicing: closed
+    constraints:
+      max_notes: 3
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  piano_pulse:
+    kind: chord_hits
+    instrument: upright
+    octave: 3
+    hits: [[0, 0.0], [0, 2.5]]
+    duration_beats: 1.4
+    velocity: 52
+    articulation: normal
+    voicing: closed
+    humanize_ms: 7
+    humanize_velocity_pct: 5
+
+  # ---- kit -------------------------------------------------------------
+  drums_brush:
+    kind: drums
+    instrument: kit
+    humanize_ms: 3
+    humanize_velocity_pct: 6
+    events:
+      - {drum: kick,       beats: [0.0, 2.5],                       velocity: 66}
+      - {drum: side_stick, beats: [1.0, 3.0],                       velocity: 54}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.0, 3.5],             velocity: 30, probability: 0.85}
+      - {drum: shaker,     beats: [0.0, 1.0, 2.0, 3.0],             velocity: 24, probability: 0.7}
+
+  drums_full:
+    kind: drums
+    instrument: kit
+    humanize_ms: 2.5
+    humanize_velocity_pct: 5
+    events:
+      - {drum: kick,       beats: [0.0, 1.75, 2.5],                 velocity: 76}
+      - {drum: snare,      beats: [1.0, 3.0],                       velocity: 72}
+      - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 34}
+      - {drum: open_hat,   beats: [3.5],                            velocity: 40, every: 2, offset: 1}
+      - {drum: crash,      beats: [0.0],                            velocity: 56, every: 8}
+
+  drums_machine:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,       beats: [0.0, 0.75, 1.5, 2.0, 2.75, 3.5], velocity: 82}
+      - {drum: floor_tom,  beats: [1.0, 3.0],                       velocity: 74}
+      - {drum: electric_snare, beats: [1.0, 3.0],                   velocity: 60}
+      - {drum: closed_hat, beats: [0.5, 1.25, 2.5, 3.25],           velocity: 40}
+
+  # ---- machine core ----------------------------------------------------
+  chug_pulse:
+    kind: guitar_chug
+    takes:
+      - {instrument: machine_guitar, timing_offset_ms: -6, velocity_offset: 0}
+      - {instrument: machine_guitar, timing_offset_ms: 9, velocity_offset: -4}
+    octave: 2
+    shape: fifth_octave
+    pattern:
+      - [0, 0.0, 0.4, 1.0]
+      - [0, 0.5, 0.35, 0.7]
+      - [0, 1.0, 0.4, 0.9]
+      - [1, 1.75, 0.22, 0.85]
+      - [0, 2.0, 0.4, 1.0]
+      - [0, 2.5, 0.35, 0.7]
+      - [1, 3.25, 0.22, 0.9]
+      - [0, 3.5, 0.4, 0.8]
+    velocity: 78
+    spread_ms: 6
+    gate: 0.4
+    humanize_ms: 1.2
+
+  chug_ghost:
+    kind: guitar_chug
+    takes:
+      - {instrument: machine_guitar, timing_offset_ms: 0, velocity_offset: 0}
+    octave: 2
+    shape: fifth_octave
+    pattern:
+      - [0, 0.0, 0.35, 1.0]
+      - [0, 1.5, 0.3, 0.7]
+      - [0, 2.0, 0.35, 0.9]
+      - [0, 3.5, 0.3, 0.65]
+    velocity: 40
+    spread_ms: 6
+    gate: 0.38
+    humanize_ms: 2
+
+  static_scrape:
+    kind: texture
+    instrument: scrape_guitar
+    octave: 3
+    velocity: 30
+    density: 0.5
+    step: 1.0
+    duration_beats: 0.6
+    articulation: staccato
+    humanize_ms: 18
+    humanize_velocity_pct: 12
+
+state_map:
+  default:
+    stems: {voice: 1.0, folk: 1.0, keys: 0.9, low: 1.0, machine: 0.8, drums: 0.95}
+  calm:
+    stems: {voice: 1.0, folk: 1.0, keys: 1.0, low: 0.9, machine: 0.0, drums: 0.6}
+  tension:
+    stems: {voice: 0.8, folk: 0.5, keys: 0.7, low: 1.0, machine: 1.0, drums: 1.0}
+
+playback:
+  loop: false
+
+sections:
+  # 1 ---------------------------------------------------------------- 0:00
+  - id: cold_open
+    kind: intro
+    label: cold open
+    bars: 8
+    intensity: 0.8
+    loopable: false
+    harmony: [Em, Em, Cmaj7, Cmaj7, G, G, Asus4, A]
+    layers:
+      - rhodes_haze
+      - template: static_scrape
+        velocity: 22
+        density: 0.3
+      - kind: motif
+        instrument: voice_guitar
+        motif: transmission_a
+        # The tune alone, before the band or the machine exist. Loose timing.
+        roots: [E4]
+        starts: [[2, 0.0], [5, 0.0]]
+        velocity: 62
+        articulation: normal
+        gate: 0.85
+        humanize_ms: 22
+        humanize_velocity_pct: 9
+
+  # 2 ---------------------------------------------------------------- 0:17
+  - id: verse_signal
+    kind: verse
+    label: verse - the signal
+    bars: 16
+    intensity: 1.0
+    loopable: false
+    harmony: [Em, Em, C, C, G, G, A, A, Em, Em, C, C, G, D, Em, Em]
+    layers:
+      - folk_strum
+      - bass_walk
+      - drums_brush
+      - rhodes_haze
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_a
+        roots: [E4, E4]
+        starts: [[0, 0.5], [8, 0.5]]
+        velocity: 74
+        gate: 0.88
+        humanize_ms: 9
+        humanize_velocity_pct: 5
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_b_dorian
+        # The dorian answer lands its bright C# on the A bars, and at the
+        # repeat states it straight over the Em tonic.
+        roots: [E4, E4]
+        starts: [[6, 0.5], [14, 0.5]]
+        velocity: 72
+        gate: 0.88
+        humanize_ms: 9
+        humanize_velocity_pct: 5
+
+  # 3 ---------------------------------------------------------------- 0:51
+  - id: chorus_wide
+    kind: chorus
+    label: chorus - broadcast
+    bars: 16
+    intensity: 1.1
+    loopable: false
+    harmony: [G, D, Em, C, G, D, Em, C, G, D, Em, C, Am, C, D, D]
+    layers:
+      - folk_strum
+      - bass_walk
+      - drums_full
+      - piano_pulse
+      - rhodes_haze
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: broadcast
+        roots: [B4, B4, B4]
+        starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
+        velocity: 78
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 5
+      - kind: motif
+        instrument: upright
+        motif: broadcast
+        # Piano shadows the broadcast an octave down, a quarter-beat
+        # behind the voice - a loose heterophonic double.
+        roots: [B3]
+        starts: [[8, 0.75]]
+        velocity: 58
+        articulation: legato
+        gate: 0.95
+        humanize_ms: 10
+        humanize_velocity_pct: 5
+
+  # 4 ---------------------------------------------------------------- 1:25
+  - id: machine_intrusion
+    kind: bridge
+    label: the machine gets in
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [Em, Em, Em, Em, Em, Em, Em, Em]
+    layers:
+      - template: chug_pulse
+        # From nothing to full grind across the section.
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.55, to: 1.15, curve: smooth}
+      - drums_machine
+      - template: static_scrape
+        velocity: 40
+        density: 0.75
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.6, to: 1.2, curve: smooth}
+      - rhodes_haze
+      - bow_drone
+      - kind: motif
+        instrument: machine_guitar
+        motif: machine_grind
+        roots: [E3, E3, E3]
+        starts: [[2, 0.0], [4, 0.0], [6, 0.0]]
+        velocity: 72
+        articulation: staccato
+        gate: 0.5
+        humanize_ms: 3
+        humanize_velocity_pct: 3
+
+  # 5 ---------------------------------------------------------------- 1:42
+  - id: verse_haunted
+    kind: verse
+    label: verse - haunted
+    bars: 16
+    intensity: 0.95
+    loopable: false
+    harmony: [Em, Em, C, C, G, G, Am, Am, Em, Em, C, C, G, D, Em, Em]
+    layers:
+      - folk_strum_sparse
+      - drums_brush
+      - rhodes_haze
+      - bow_drone
+      - template: chug_ghost
+        # The machine never leaves again - it idles under the folk song.
+        dynamics:
+          - {start_bar: 0, bars: 16, from: 0.7, to: 1.0, curve: linear}
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_a
+        roots: [E4, E4]
+        starts: [[0, 0.5], [8, 0.5]]
+        velocity: 70
+        gate: 0.88
+        humanize_ms: 11
+        humanize_velocity_pct: 6
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_b_aeolian
+        # Same answer, but the sixth has decayed: C natural over A minor,
+        # then the b6 straight over the tonic at the repeat.
+        roots: [E4, E4]
+        starts: [[6, 0.5], [14, 0.5]]
+        velocity: 68
+        gate: 0.88
+        humanize_ms: 11
+        humanize_velocity_pct: 6
+
+  # 6 ---------------------------------------------------------------- 2:16
+  - id: chorus_collide
+    kind: chorus
+    label: chorus - collision
+    bars: 16
+    intensity: 1.15
+    loopable: false
+    harmony: [G, D, Em, C, G, D, Em, C, G, D, Em, C, Am, C, D, D]
+    layers:
+      - folk_strum
+      - bass_walk
+      - drums_full
+      - piano_pulse
+      - template: chug_pulse
+        dynamics:
+          - {start_bar: 0, bars: 16, from: 0.8, to: 1.1, curve: smooth}
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: broadcast
+        roots: [B4, B4, B4]
+        starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
+        velocity: 80
+        gate: 0.9
+        humanize_ms: 8
+        humanize_velocity_pct: 5
+      - kind: notes
+        # Feedback answers: the machine sings back wrong - long bent squeals
+        # placed in the gaps between broadcast phrases.
+        instrument: machine_guitar
+        articulation: legato
+        notes:
+          - {bar: 3, beat: 2.0, note: E5, dur: 3.5, vel: 66,
+             bend: [[0.0, 0], [0.6, 180], [2.4, 140], [3.2, -60]]}
+          - {bar: 7, beat: 2.0, note: G5, dur: 3.5, vel: 62,
+             bend: [[0.0, -120], [0.8, 0], [2.6, 90], [3.2, 200]]}
+          - {bar: 11, beat: 2.5, note: B4, dur: 4.5, vel: 68,
+             bend: [[0.0, 0], [1.0, 200], [3.0, 180], [4.0, 0]]}
+          - {bar: 14, beat: 0.5, note: F5, dur: 5.0, vel: 64,
+             bend: [[0.0, 0], [2.0, -100], [4.0, -200]]}
+
+  # 7 ---------------------------------------------------------------- 2:49
+  - id: collapse
+    kind: bridge
+    label: the transmitter dies
+    bars: 12
+    intensity: 1.0
+    loopable: false
+    harmony: [Em, Em, Em, Em, Em, Em, Em, Em, Em, Em, Em, Em]
+    layers:
+      - bow_drone
+      - template: chug_pulse
+        # Grinds up to full force, then the pattern itself starts to die out.
+        dynamics:
+          - {start_bar: 0, bars: 6, from: 1.0, to: 1.25, curve: smooth}
+          - {start_bar: 6, bars: 6, from: 1.25, to: 0.3, curve: exp}
+      - template: static_scrape
+        velocity: 46
+        density: 0.9
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.8, to: 1.3, curve: smooth}
+          - {start_bar: 8, bars: 4, from: 1.3, to: 0.2, curve: exp}
+      - template: drums_machine
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 1.0, to: 1.1, curve: linear}
+          - {start_bar: 8, bars: 4, from: 1.1, to: 0.25, curve: exp}
+      - kind: motif
+        instrument: machine_guitar
+        motif: machine_grind
+        roots: [E3, E3, E3, E3]
+        starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]]
+        velocity: 76
+        articulation: staccato
+        gate: 0.5
+        humanize_ms: 3
+      - kind: notes
+        # The transmission in FRAGMENTS: pieces of the tune surface through
+        # the noise in the wrong octaves, cutting off mid-word as the
+        # ritardando drags everything down.
+        instrument: voice_guitar
+        articulation: normal
+        notes:
+          - [4, 0.5, E4, 1.5, 64]
+          - [4, 2.0, B4, 1.0, 58]
+          - [6, 1.0, A3, 1.0, 52]
+          - [7, 0.0, G4, 0.75, 60]
+          - [7, 3.0, E4, 0.5, 46]
+          - {bar: 9, beat: 0.5, note: B3, dur: 2.5, vel: 44, gate: 1.1}
+          - {bar: 10, beat: 2.0, note: F4, dur: 3.0, vel: 40, gate: 1.2,
+             bend: [[0.0, 0], [2.5, -100]]}
+
+  # 8 ---------------------------------------------------------------- 3:24
+  - id: afterglow
+    kind: outro
+    label: afterglow - signal restored
+    bars: 12
+    intensity: 0.7
+    loopable: false
+    harmony: [Em, Em, Cmaj7, Cmaj7, G, G, A, A, Em, Cmaj7, Em, Em]
+    layers:
+      - folk_strum_sparse
+      - rhodes_haze
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_a
+        roots: [E4]
+        starts: [[0, 0.5]]
+        velocity: 66
+        gate: 0.9
+        humanize_ms: 14
+        humanize_velocity_pct: 7
+      - kind: guitar_lead
+        instrument: voice_guitar
+        motif: transmission_b_dorian
+        # The bright sixth comes home: C# again, over the A major bars.
+        roots: [E4]
+        starts: [[6, 0.5]]
+        velocity: 64
+        gate: 0.9
+        humanize_ms: 14
+        humanize_velocity_pct: 7
+      - kind: notes
+        # Hand-authored close: Em(add9) rolled on the acoustic, the voice
+        # guitar holding the tonic, one last dead chug like a door closing.
+        instrument: folk_guitar
+        articulation: pluck
+        humanize_ms: 4
+        notes:
+          - [8, 0.00, E2, 8.0, 46]
+          - [8, 0.30, B2, 8.0, 44]
+          - [8, 0.60, E3, 7.5, 46]
+          - [8, 0.90, G3, 7.5, 44]
+          - [8, 1.20, B3, 7.0, 46]
+          - [8, 1.50, F#4, 7.0, 42]
+      - kind: notes
+        instrument: voice_guitar
+        notes:
+          - {bar: 8, beat: 1.0, note: E4, dur: 9.0, vel: 52, gate: 1.2}
+      - kind: notes
+        instrument: machine_guitar
+        notes:
+          - {bar: 10, beat: 2.0, note: [E2, B2], dur: 2.5, vel: 34, gate: 0.5}

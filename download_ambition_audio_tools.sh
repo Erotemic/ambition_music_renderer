@@ -861,6 +861,14 @@ normalize_vpo_tree "$VPO_DEST"
 validate_vpo_install "$VPO_DEST" || true
 
 download_and_extract_optional "Karoryfer Shinyguitar" "https://github.com/sfzinstruments/karoryfer.shinyguitar/releases/download/v1.002/Karoryfer.Shinyguitar.v1.002.zip" "Karoryfer.Shinyguitar.v1.002.zip" "$SFZ_ROOT/Karoryfer/Shinyguitar" || true
+# Shinyguitar's per-articulation programs reference samples as `acoustic\...`
+# relative to Programs/, but the zip puts them in ../Samples/; only main.sfz
+# (which needs an ARIA $sample_dir define we cannot pass to sfizz_render)
+# would resolve them. Symlink the sample dirs so the plain programs work.
+if [[ "$DRY_RUN" != "1" && -d "$SFZ_ROOT/Karoryfer/Shinyguitar/Shinyguitar/Samples" ]]; then
+    ln -sfn ../Samples/acoustic "$SFZ_ROOT/Karoryfer/Shinyguitar/Shinyguitar/Programs/acoustic"
+    ln -sfn ../Samples/electric "$SFZ_ROOT/Karoryfer/Shinyguitar/Shinyguitar/Programs/electric"
+fi
 download_and_extract_optional "Karoryfer Growlybass" "https://github.com/sfzinstruments/karoryfer.growlybass/releases/download/v1.002/Karoryfer.Growlybass.v1.002.zip" "Karoryfer.Growlybass.v1.002.zip" "$SFZ_ROOT/Karoryfer/Growlybass" || true
 download_and_extract_optional "Karoryfer Gogodze Phu Vol II drums" "https://github.com/sfzinstruments/karoryfer.gogodze-phu-vol-ii/releases/download/v1.001/Karoryfer_Gogodze_Phu_vol_II.v1.001.zip" "Karoryfer_Gogodze_Phu_vol_II.v1.001.zip" "$SFZ_ROOT/Karoryfer/GogodzePhuVolII" || true
 download_and_extract_optional "Ganjo guitar-banjo" "https://github.com/sfzinstruments/ganjo/archive/refs/heads/master.zip" "sfzinstruments.ganjo.master.zip" "$SFZ_ROOT/SFZInstruments/Ganjo" || download_and_extract_optional "Ganjo guitar-banjo" "https://github.com/sfzinstruments/ganjo/archive/refs/heads/main.zip" "sfzinstruments.ganjo.main.zip" "$SFZ_ROOT/SFZInstruments/Ganjo" || true

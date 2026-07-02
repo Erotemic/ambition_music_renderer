@@ -46,6 +46,21 @@ def add_instrument(ctx: RenderContext, spec: dict[str, Any]) -> None:
     for key, cc_num in CC_NUMBERS.items():
         if key in spec and key not in {"volume", "pan", "expression"}:
             add_cc(inst, cc_num, int(spec[key]), 0.0)
+    # Arbitrary CC init for sample banks with custom control schemes, e.g.
+    # Karoryfer's Shinyguitar is silent until its CC100 "Blend" control is
+    # mid-position. Keys may be CC numbers or CC_NUMBERS names:
+    #   controls: {100: 64, sustain: 0}
+    for key, value in dict(spec.get("controls") or {}).items():
+        if isinstance(key, int) or str(key).isdigit():
+            cc_num = int(key)
+        elif key in CC_NUMBERS:
+            cc_num = CC_NUMBERS[key]
+        else:
+            raise KeyError(
+                f"instrument {name!r}: unknown controls key {key!r}; use a MIDI "
+                f"CC number or one of {sorted(CC_NUMBERS)}"
+            )
+        add_cc(inst, cc_num, int(value), 0.0)
 
 
 def resolve_instruments(ctx: RenderContext, layer: dict[str, Any]) -> list[str]:

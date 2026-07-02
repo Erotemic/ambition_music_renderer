@@ -194,3 +194,18 @@ def test_dynamics_do_not_leak_between_layers():
     notes = sorted(pm.instruments[0].notes, key=lambda n: n.start)
     assert notes[0].velocity == pytest.approx(10, abs=1)
     assert notes[1].velocity == 100
+
+
+def test_instrument_controls_cc_init():
+    spec = _base_spec()
+    spec["instruments"][0]["controls"] = {100: 64, "sustain": 0}
+    pm, _g, _m = build_score(spec)
+    ccs = {(c.number, c.value) for c in pm.instruments[0].control_changes if c.time == 0.0}
+    assert (100, 64) in ccs and (64, 0) in ccs
+
+
+def test_instrument_controls_bad_key_rejected():
+    spec = _base_spec()
+    spec["instruments"][0]["controls"] = {"blend": 64}
+    with pytest.raises(KeyError):
+        build_score(spec)
