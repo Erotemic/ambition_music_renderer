@@ -16,7 +16,7 @@ tempo:
   bpm: 120
   map:
     # The plateau: the bridge sags dreamily...
-    - {bar: 72, bpm: 112, ramp_bars: 4}
+    - {bar: 70, bpm: 112, ramp_bars: 5}
     # ...then accelerates out, overshooting into the final chorus...
     - {bar: 82, bpm: 123, ramp_bars: 4}
     # ...and settles back to the opening tempo before the loop seam.
@@ -84,7 +84,7 @@ group_postprocess:
       - kind: pedalboard
         optional: true
         effects:
-          - {effect: chorus, rate_hz: 0.8, depth: 0.15, mix: 0.3}
+          - {effect: chorus, rate_hz: 1.6, depth: 0.05, mix: 0.22}
           - {effect: delay, delay_seconds: 0.375, feedback: 0.18, mix: 0.12}
   sparkle:
     gain_db: 20.0
@@ -95,7 +95,7 @@ group_postprocess:
       - kind: pedalboard
         optional: true
         effects:
-          - {effect: delay, delay_seconds: 0.25, feedback: 0.3, mix: 0.22}
+          - {effect: delay, delay_seconds: 0.25, feedback: 0.22, mix: 0.15}
   bass:
     gain_db: 0.0
     highpass_hz: 32
@@ -206,12 +206,14 @@ motifs:
     intervals: [0, 2, 4, 7]
     rhythm: [0.5, 0.5, 0.5, 2.5]
     velocities: [0.72, 0.78, 0.84, 0.95]
-  # Whistle answer in the chorus: a high sparkle falling back to the fifth.
+  # Whistle answer in the chorus: a short falling riff, every note a tone of
+  # the bar's own chord ([9,5,0] from the chord's 5th = 3rd, root, 5th), and
+  # placed in the gap AFTER the hook's hanging note releases.
   - id: summit_sparkle
-    root: A5
-    intervals: [4, 2, 0, -3, 0]
-    rhythm: [0.5, 0.5, 0.5, 1.0, 1.5]
-    velocities: [0.85, 0.78, 0.72, 0.80, 0.66]
+    root: A4
+    intervals: [9, 5, 0, 5]
+    rhythm: [0.5, 0.5, 0.5, 0.5]
+    velocities: [0.85, 0.76, 0.70, 0.80]
 
 layer_templates:
   bass_bounce:
@@ -274,6 +276,7 @@ layer_templates:
     humanize_ms: 2.5
     humanize_velocity_pct: 5
     events:
+      - {drum: crash,      beats: [0.0],                            velocity: 58, bars: [0]}
       - {drum: kick,       beats: [0.0, 2.5],                       velocity: 74}
       - {drum: snare,      beats: [2.0],                            velocity: 60}
       - {drum: shaker,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 26}
@@ -376,11 +379,20 @@ sections:
       - four_floor
       - crystal_arp
       - warm_bed
+      - rhodes_stabs
       - template: hook_main
         roots: [A4, A4, A4, B4]
         starts: [[0, 0.0]]
         repeats: 4
         every_bars: 2
+      - kind: motif
+        instrument: whistle_synth
+        motif: summit_sparkle
+        roots: [A4]
+        starts: [[3, 2.0]]
+        velocity: 68
+        gate: 0.9
+        humanize_ms: 6
 
   # ------------------------------------------------------------------ 0:16
   - id: verse_step
@@ -469,10 +481,10 @@ sections:
       - kind: motif
         instrument: whistle_synth
         motif: summit_sparkle
-        # The whistle answers the hook in the gaps; the E-bar answer is
-        # B5-rooted so every note is an E-major tone.
-        roots: [A5, B5, A5]
-        starts: [[3, 0.0]]
+        # A4-rooted over the D bars, B4-rooted over the E bar - the riff is
+        # always spelled from the current chord.
+        roots: [A4, B4, A4]
+        starts: [[3, 2.0]]
         repeats: 3
         every_bars: 4
         velocity: 76
@@ -564,8 +576,8 @@ sections:
       - kind: motif
         instrument: whistle_synth
         motif: summit_sparkle
-        roots: [A5]
-        starts: [[3, 0.0]]
+        roots: [A4]
+        starts: [[3, 2.0]]
         velocity: 76
         gate: 0.9
         humanize_ms: 6
@@ -607,10 +619,9 @@ sections:
         # the re-ascent begins before the drums do.
         instrument: whistle_synth
         notes:
-          - {bar: 7, beat: 2.0, note: A5, dur: 2.0, vel: 72,
-             bend: [[0.0, 0], [1.6, -180]]}
-          - {bar: 10, beat: 0.0, note: E5, dur: 4.0, vel: 74,
-             bend: [[0.0, -150], [2.0, 0], [3.5, 0]]}
+          - {bar: 7, beat: 2.0, note: A5, dur: 2.0, vel: 68,
+             bend: [[0.0, 0], [1.6, -90]]}
+          - {bar: 10, beat: 0.0, note: E5, dur: 4.0, vel: 74}
       - kind: motif
         instrument: rhodes
         motif: step_chant
@@ -643,8 +654,8 @@ sections:
       - kind: motif
         instrument: whistle_synth
         motif: summit_sparkle
-        roots: [A5, B5, A5]
-        starts: [[3, 0.0]]
+        roots: [A4, B4, A4]
+        starts: [[3, 2.0]]
         repeats: 3
         every_bars: 4
         velocity: 76
@@ -666,8 +677,17 @@ sections:
       - four_floor
       - crystal_arp
       - warm_bed
+      - rhodes_stabs
       - template: hook_main
         roots: [A4, A4, A4, B4]
         starts: [[0, 0.0]]
         repeats: 4
         every_bars: 2
+      - kind: motif
+        instrument: whistle_synth
+        motif: summit_sparkle
+        roots: [A4]
+        starts: [[3, 2.0]]
+        velocity: 68
+        gate: 0.9
+        humanize_ms: 6
