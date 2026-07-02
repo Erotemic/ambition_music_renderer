@@ -18,12 +18,13 @@ tempo:
   map:
     # Lean forward into the collision chorus...
     - {bar: 64, bpm: 118, ramp_bars: 3}
-    # ...then the transmitter dies: long ritardando through the collapse,
-    - {bar: 82, bpm: 76, ramp_bars: 9}
+    # ...then the transmitter dies: ritardando through the collapse,
+    - {bar: 82, bpm: 88, ramp_bars: 9}
     # the afterglow settles,
-    - {bar: 92, bpm: 68, ramp_bars: 6}
-    # and the last phrase pools like tape slowing to a stop.
-    - {bar: 102, bpm: 56, ramp_bars: 2}
+    - {bar: 92, bpm: 98, ramp_bars: 4}
+    # and breathes back up to the opening tempo so the loop seam is
+    # invisible: the last bar hands off to bar 0 at the same 112.
+    - {bar: 100, bpm: 112, ramp_bars: 4}
 
 meter:
   beats_per_bar: 4
@@ -77,8 +78,12 @@ stem_postprocess:
   target_peak_db: -3.0
 
 group_postprocess:
+  lead:
+    gain_db: 13.0
+    lowpass_hz: 9500
+    reverb_wet: 0.06
   voice:
-    gain_db: 18.0
+    gain_db: 16.0
     lowpass_hz: 9000
     reverb_wet: 0.05
   folk:
@@ -115,6 +120,17 @@ group_postprocess:
     reverb_wet: 0.05
 
 instruments:
+  - name: lead_violin
+    group: lead
+    program: violin
+    volume: 96
+    pan: 56
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Strings - Performance/Violin Solo 1 Sustain (looped).sfz"
+      optional: true
+      fallback_backend: pretty-midi
   - name: voice_guitar
     group: voice
     program: clean_guitar
@@ -246,7 +262,7 @@ motifs:
   # Chorus melody: the transmission lifted to start on the fifth, wider arc.
   - id: broadcast
     root: B4
-    intervals: [0, 3, 5, 3, 0, -2, -4, -2, 0]
+    intervals: [0, 3, 5, 3, 0, -2, -5, -2, 0]
     rhythm: [1.0, 0.5, 1.5, 1.0, 1.0, 0.5, 1.0, 0.5, 1.0]
     velocities: [0.78, 0.72, 0.90, 0.76, 0.70, 0.62, 0.66, 0.60, 0.56]
   # The machine's own figure, PHRYGIAN: a grinding half-step (E-F) over a
@@ -291,7 +307,9 @@ layer_templates:
     kind: bassline
     instrument: bass_growl
     octave: 2
-    pattern: [[0, 0.0, 0.9], [0, 1.5, 0.4], [7, 2.0, 0.9], [5, 3.5, 0.45]]
+    # Octave pickup instead of a passing 4th: the 4th lands a half-step
+    # under the next chord's 3rd on every G->D change and reads as mud.
+    pattern: [[0, 0.0, 0.9], [0, 1.5, 0.4], [7, 2.0, 0.9], [12, 3.5, 0.45]]
     velocity: 66
     articulation: normal
     humanize_ms: 5
@@ -418,14 +436,14 @@ layer_templates:
 
 state_map:
   default:
-    stems: {voice: 1.0, folk: 1.0, keys: 0.9, low: 1.0, machine: 0.8, drums: 0.95}
+    stems: {lead: 1.0, voice: 1.0, folk: 1.0, keys: 0.9, low: 1.0, machine: 0.8, drums: 0.95}
   calm:
-    stems: {voice: 1.0, folk: 1.0, keys: 1.0, low: 0.9, machine: 0.0, drums: 0.6}
+    stems: {lead: 1.0, voice: 1.0, folk: 1.0, keys: 1.0, low: 0.9, machine: 0.0, drums: 0.6}
   tension:
-    stems: {voice: 0.8, folk: 0.5, keys: 0.7, low: 1.0, machine: 1.0, drums: 1.0}
+    stems: {lead: 0.9, voice: 0.8, folk: 0.5, keys: 0.7, low: 1.0, machine: 1.0, drums: 1.0}
 
 playback:
-  loop: false
+  loop: true
 
 sections:
   # 1 ---------------------------------------------------------------- 0:00
@@ -438,6 +456,10 @@ sections:
     harmony: [Em, Em, Cmaj7, Cmaj7, G, G, Asus4, A]
     layers:
       - rhodes_haze
+      # Same bed the afterglow hands off: when the track loops, bar 0 reads
+      # as the next verse of the same song, not a cold start.
+      - template: folk_strum_sparse
+        velocity: 36
       - template: static_scrape
         velocity: 22
         density: 0.3
@@ -466,23 +488,47 @@ sections:
       - bass_walk
       - drums_brush
       - rhodes_haze
-      - kind: guitar_lead
-        instrument: voice_guitar
+      - kind: motif
+        instrument: lead_violin
         motif: transmission_a
         roots: [E4, E4]
         starts: [[0, 0.5], [8, 0.5]]
-        velocity: 74
+        velocity: 72
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: guitar_lead
+        instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
+        motif: transmission_a
+        roots: [E4, E4]
+        starts: [[0, 0.5], [8, 0.5]]
+        velocity: 62
         gate: 0.88
         humanize_ms: 9
         humanize_velocity_pct: 5
+      - kind: motif
+        instrument: lead_violin
+        motif: transmission_b_dorian
+        roots: [E4, E4]
+        starts: [[6, 0.5], [14, 0.5]]
+        velocity: 70
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
       - kind: guitar_lead
         instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
         motif: transmission_b_dorian
         # The dorian answer lands its bright C# on the A bars, and at the
         # repeat states it straight over the Em tonic.
         roots: [E4, E4]
         starts: [[6, 0.5], [14, 0.5]]
-        velocity: 72
+        velocity: 60
         gate: 0.88
         humanize_ms: 9
         humanize_velocity_pct: 5
@@ -501,12 +547,24 @@ sections:
       - drums_full
       - piano_pulse
       - rhodes_haze
-      - kind: guitar_lead
-        instrument: voice_guitar
+      - kind: motif
+        instrument: lead_violin
         motif: broadcast
         roots: [B4, B4, B4]
         starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
-        velocity: 78
+        velocity: 76
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: guitar_lead
+        instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
+        motif: broadcast
+        roots: [B4, B4, B4]
+        starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
+        velocity: 66
         gate: 0.9
         humanize_ms: 8
         humanize_velocity_pct: 5
@@ -572,23 +630,47 @@ sections:
         # The machine never leaves again - it idles under the folk song.
         dynamics:
           - {start_bar: 0, bars: 16, from: 0.7, to: 1.0, curve: linear}
-      - kind: guitar_lead
-        instrument: voice_guitar
+      - kind: motif
+        instrument: lead_violin
         motif: transmission_a
         roots: [E4, E4]
         starts: [[0, 0.5], [8, 0.5]]
-        velocity: 70
+        velocity: 68
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: guitar_lead
+        instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
+        motif: transmission_a
+        roots: [E4, E4]
+        starts: [[0, 0.5], [8, 0.5]]
+        velocity: 58
         gate: 0.88
         humanize_ms: 11
         humanize_velocity_pct: 6
+      - kind: motif
+        instrument: lead_violin
+        motif: transmission_b_aeolian
+        roots: [E4, E4]
+        starts: [[6, 0.5], [14, 0.5]]
+        velocity: 66
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
       - kind: guitar_lead
         instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
         motif: transmission_b_aeolian
         # Same answer, but the sixth has decayed: C natural over A minor,
         # then the b6 straight over the tonic at the repeat.
         roots: [E4, E4]
         starts: [[6, 0.5], [14, 0.5]]
-        velocity: 68
+        velocity: 56
         gate: 0.88
         humanize_ms: 11
         humanize_velocity_pct: 6
@@ -602,36 +684,65 @@ sections:
     loopable: false
     harmony: [G, D, Em, C, G, D, Em, C, G, D, Em, C, Am, C, D, D]
     layers:
-      - folk_strum
-      - bass_walk
+      - template: folk_strum
+        # Voiced up like a capo so the strum's low strings stay out of the
+        # chug's register instead of tangling with it.
+        octave: 4
+        max_notes: 4
+      - template: bass_walk
+        # Root-locked under the chug: the walking 4th approach tone reads
+        # as mud when the machine occupies the same register.
+        pattern: [[0, 0.0, 0.9], [0, 1.5, 0.4], [7, 2.0, 0.9], [12, 3.5, 0.45]]
       - drums_full
       - piano_pulse
       - template: chug_pulse
+        # In the collision the machine locks to the song's own harmony:
+        # no phrygian stabs here, just weight (the F stabs stay in the
+        # intrusion and the collapse, where they are the point).
+        pattern:
+          - [0, 0.0, 0.4, 1.0]
+          - [0, 0.5, 0.35, 0.7]
+          - [0, 1.0, 0.4, 0.9]
+          - [7, 1.75, 0.22, 0.85]
+          - [0, 2.0, 0.4, 1.0]
+          - [0, 2.5, 0.35, 0.7]
+          - [12, 3.25, 0.22, 0.9]
+          - [0, 3.5, 0.4, 0.8]
         dynamics:
           - {start_bar: 0, bars: 16, from: 0.8, to: 1.1, curve: smooth}
-      - kind: guitar_lead
-        instrument: voice_guitar
+      - kind: motif
+        instrument: lead_violin
         motif: broadcast
         roots: [B4, B4, B4]
         starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
-        velocity: 80
+        velocity: 78
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: guitar_lead
+        instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
+        motif: broadcast
+        roots: [B4, B4, B4]
+        starts: [[0, 0.5], [4, 0.5], [8, 0.5]]
+        velocity: 68
         gate: 0.9
         humanize_ms: 8
         humanize_velocity_pct: 5
       - kind: notes
-        # Feedback answers: the machine sings back wrong - long bent squeals
-        # placed in the gaps between broadcast phrases.
+        # Feedback answers in the gaps between phrases: fewer, quieter, and
+        # anchored on chord tones; the bends wander less than a whole step.
         instrument: machine_guitar
         articulation: legato
         notes:
-          - {bar: 3, beat: 2.0, note: E5, dur: 3.5, vel: 66,
-             bend: [[0.0, 0], [0.6, 180], [2.4, 140], [3.2, -60]]}
-          - {bar: 7, beat: 2.0, note: G5, dur: 3.5, vel: 62,
-             bend: [[0.0, -120], [0.8, 0], [2.6, 90], [3.2, 200]]}
-          - {bar: 11, beat: 2.5, note: B4, dur: 4.5, vel: 68,
-             bend: [[0.0, 0], [1.0, 200], [3.0, 180], [4.0, 0]]}
-          - {bar: 14, beat: 0.5, note: F5, dur: 5.0, vel: 64,
-             bend: [[0.0, 0], [2.0, -100], [4.0, -200]]}
+          - {bar: 3, beat: 2.0, note: E5, dur: 3.0, vel: 58,
+             bend: [[0.0, 0], [0.8, 90], [2.2, 60], [2.8, 0]]}
+          - {bar: 10, beat: 0.5, note: B4, dur: 3.0, vel: 60,
+             bend: [[0.0, 0], [1.0, 110], [2.2, 80], [2.8, 0]]}
+          - {bar: 14, beat: 0.5, note: E5, dur: 4.0, vel: 54,
+             bend: [[0.0, 0], [2.0, -60], [3.5, -110]]}
 
   # 7 ---------------------------------------------------------------- 2:49
   - id: collapse
@@ -694,22 +805,46 @@ sections:
     layers:
       - folk_strum_sparse
       - rhodes_haze
-      - kind: guitar_lead
-        instrument: voice_guitar
+      - kind: motif
+        instrument: lead_violin
         motif: transmission_a
         roots: [E4]
         starts: [[0, 0.5]]
-        velocity: 66
+        velocity: 62
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: guitar_lead
+        instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
+        motif: transmission_a
+        roots: [E4]
+        starts: [[0, 0.5]]
+        velocity: 54
         gate: 0.9
         humanize_ms: 14
         humanize_velocity_pct: 7
+      - kind: motif
+        instrument: lead_violin
+        motif: transmission_b_dorian
+        roots: [E4]
+        starts: [[6, 0.5]]
+        velocity: 60
+        articulation: legato
+        gate: 1.05
+        humanize_ms: 8
+        humanize_velocity_pct: 4
       - kind: guitar_lead
         instrument: voice_guitar
+        position_scoop_scale: 0.0
+        pitch_scoop_cents: 0.0
         motif: transmission_b_dorian
         # The bright sixth comes home: C# again, over the A major bars.
         roots: [E4]
         starts: [[6, 0.5]]
-        velocity: 64
+        velocity: 52
         gate: 0.9
         humanize_ms: 14
         humanize_velocity_pct: 7
@@ -720,16 +855,16 @@ sections:
         articulation: pluck
         humanize_ms: 4
         notes:
-          - [8, 0.00, E2, 8.0, 46]
-          - [8, 0.30, B2, 8.0, 44]
-          - [8, 0.60, E3, 7.5, 46]
-          - [8, 0.90, G3, 7.5, 44]
-          - [8, 1.20, B3, 7.0, 46]
-          - [8, 1.50, F#4, 7.0, 42]
+          - [8, 0.00, E2, 5.0, 46]
+          - [8, 0.30, B2, 5.0, 44]
+          - [8, 0.60, E3, 4.5, 46]
+          - [8, 0.90, G3, 4.5, 44]
+          - [8, 1.20, B3, 4.0, 46]
+          - [8, 1.50, F#4, 4.0, 42]
       - kind: notes
         instrument: voice_guitar
         notes:
-          - {bar: 8, beat: 1.0, note: E4, dur: 9.0, vel: 52, gate: 1.2}
+          - {bar: 8, beat: 1.0, note: E4, dur: 5.0, vel: 52, gate: 1.0}
       - kind: notes
         instrument: machine_guitar
         notes:
