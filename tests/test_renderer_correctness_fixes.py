@@ -144,3 +144,21 @@ def test_fallback_backend_guitar_family():
     assert _program_family(24) == "pluck"  # nylon guitar
     assert _program_family(30) == "pluck"  # distortion guitar
     assert _program_family(19) == "pad"  # church organ
+
+
+def test_sfz_missing_samples_detector(tmp_path: Path):
+    from ambition_music_renderer.audio_plugins import _sfz_missing_samples
+
+    (tmp_path / "samples").mkdir()
+    (tmp_path / "samples" / "c4.wav").write_bytes(b"RIFF")
+    good = tmp_path / "good.sfz"
+    good.write_text("<region>\nsample=samples\\c4.wav\nlokey=c4\n")
+    assert _sfz_missing_samples(good) is None
+    # SFZ-only checkout: text resolves, samples were never installed.
+    bad = tmp_path / "bad.sfz"
+    bad.write_text("<region>\nsample=..\\libs\\missing\\c4.wav\nlokey=c4\n")
+    assert _sfz_missing_samples(bad) is not None
+    # builtin generators are not files and must not trip the detector
+    synth = tmp_path / "synth.sfz"
+    synth.write_text("<region>\nsample=*sine\n")
+    assert _sfz_missing_samples(synth) is None

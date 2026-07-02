@@ -11,6 +11,7 @@ from __future__ import annotations
 import importlib.util
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -384,11 +385,64 @@ def validate_instrument_backend_spec(
             "message": f"SFZ library reference did not resolve: {requested!r}",
         })
     else:
-        messages.append({
-            "severity": "info",
-            "message": f"SFZ instrument resolved: {resolved}",
-        })
+        missing = _sfz_missing_samples(Path(resolved))
+        if missing is not None:
+            # A .sfz whose sample files were never installed (e.g. an SFZ-only
+            # VPO3 checkout) resolves fine but renders pure silence.  Catch it
+            # here instead of at render time.
+            messages.append({
+                "severity": severity,
+                "message": (
+                    f"SFZ resolved but its samples are missing (e.g. {missing}); "
+                    f"the instrument would render silence: {resolved}"
+                ),
+            })
+        else:
+            messages.append({
+                "severity": "info",
+                "message": f"SFZ instrument resolved: {resolved}",
+            })
     return messages
+
+
+def _sfz_missing_samples(sfz_path: Path, probe_limit: int = 8) -> str | None:
+    """Return an example missing sample path if none of the first samples exist.
+
+    Reads the SFZ text (following one level of ``#include``), resolves the
+    first few ``sample=`` opcodes against ``default_path``/the SFZ directory,
+    and reports the first one when ALL probed samples are absent.  Any single
+    existing sample means the library is installed and we stay quiet.
+    """
+    try:
+        text = sfz_path.read_text(encoding="utf8", errors="replace")
+    except Exception:
+        return None
+    base = sfz_path.parent
+    for inc in re.findall(r"#include\s+\"([^\"]+)\"", text)[:4]:
+        try:
+            text += "\n" + (base / inc.replace("\\", "/")).read_text(
+                encoding="utf8", errors="replace"
+            )
+        except Exception:
+            continue
+    default_match = re.search(r"default_path=(\S+)", text)
+    default_dir = default_match.group(1).replace("\\", "/") if default_match else ""
+    samples = re.findall(r"sample=([^\n<]+?)(?:\s+\w+=|\s*\n|$)", text)
+    probed = 0
+    first_missing: str | None = None
+    for raw in samples:
+        rel = raw.strip().replace("\\", "/")
+        if not rel or rel.startswith("*"):  # *sine / *noise builtins
+            continue
+        candidate = (base / default_dir / rel).resolve()
+        if candidate.exists():
+            return None
+        if first_missing is None:
+            first_missing = str(candidate)
+        probed += 1
+        if probed >= probe_limit:
+            break
+    return first_missing if probed else None
 
 
 def validate_effect_spec(
