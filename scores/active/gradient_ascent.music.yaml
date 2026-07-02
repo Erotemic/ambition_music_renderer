@@ -1,0 +1,673 @@
+schema: ambition.musicir.v1
+id: gradient_ascent
+title: Gradient Ascent
+seed: 2026070208
+notes: >-
+  Upbeat psychedelic synth-pop about the joy of climbing an objective
+  function. One iconic square-wave hook (a tresillo figure that leaps to the
+  sixth and hangs there), a pre-chorus that literally ascends - the same
+  figure sequenced up bVI -> bVII -> I - and a chorus that dances on the
+  local maximum. The psych bridge is the plateau: half-speed hook fragments,
+  borrowed-minor color, a tempo dip that accelerates back out. Built to loop
+  invisibly in-game: the outro groove is the intro groove, the seam lands at
+  the opening tempo, and the hook states itself in the first bar.
+
+tempo:
+  bpm: 120
+  map:
+    # The plateau: the bridge sags dreamily...
+    - {bar: 72, bpm: 112, ramp_bars: 4}
+    # ...then accelerates out, overshooting into the final chorus...
+    - {bar: 82, bpm: 123, ramp_bars: 4}
+    # ...and settles back to the opening tempo before the loop seam.
+    - {bar: 100, bpm: 120, ramp_bars: 4}
+
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 12.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  lowpass_hz: 12500
+  presence_low_hz: 1800
+  presence_high_hz: 4200
+  presence_db: 0.8
+  transient_tame: 0.02
+  reverb_wet: 0.09
+  reverb_decay_seconds: 1.1
+  reverb_damping_hz: 5200
+  stereo_width: 0.22
+  compressor_threshold_db: -14.0
+  compressor_ratio: 2.4
+  compressor_attack_ms: 6.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 0.5
+  compressor_knee_db: 5.0
+  limiter_drive: 1.05
+  normalize: true
+  target_peak_db: -1.5
+
+stem_postprocess:
+  highpass_hz: 28
+  transient_tame: 0.02
+  reverb_wet: 0.015
+  reverb_decay_seconds: 0.6
+  stereo_width: 0.06
+  normalize: false
+  target_peak_db: -3.0
+
+group_postprocess:
+  hook:
+    gain_db: 4.0
+    lowpass_hz: 10500
+    reverb_wet: 0.05
+    # Analog thickness: slow chorus + a dotted-eighth echo (0.375 s at 120)
+    # is the classic synth-pop sheen.
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - {effect: chorus, rate_hz: 0.8, depth: 0.15, mix: 0.3}
+          - {effect: delay, delay_seconds: 0.375, feedback: 0.18, mix: 0.12}
+  sparkle:
+    gain_db: 20.0
+    highpass_hz: 400
+    lowpass_hz: 11000
+    reverb_wet: 0.08
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - {effect: delay, delay_seconds: 0.25, feedback: 0.3, mix: 0.22}
+  bass:
+    gain_db: 0.0
+    highpass_hz: 32
+    lowpass_hz: 3200
+    compressor_threshold_db: -16
+    compressor_ratio: 3.0
+    compressor_attack_ms: 4.0
+    compressor_release_ms: 70.0
+  pads:
+    gain_db: 8.0
+    lowpass_hz: 7500
+    reverb_wet: 0.07
+  keys:
+    gain_db: 18.0
+    lowpass_hz: 9000
+    reverb_wet: 0.04
+  arp:
+    gain_db: 12.0
+    highpass_hz: 300
+    lowpass_hz: 9500
+  drums:
+    gain_db: 2.0
+    highpass_hz: 38
+    transient_tame: 0.0
+    reverb_wet: 0.04
+
+instruments:
+  # The iconic voice: square lead doubled by a saw an octave down.
+  - name: lead_square
+    group: hook
+    program: lead_square
+    volume: 100
+    pan: 62
+    expression: 106
+  - name: lead_saw
+    group: hook
+    program: lead_saw
+    volume: 84
+    pan: 68
+    expression: 96
+  - name: whistle_synth
+    group: sparkle
+    program: lead_calliope
+    volume: 118
+    pan: 78
+    expression: 100
+  - name: crystal
+    group: arp
+    program: fx_crystal
+    volume: 74
+    pan: 48
+    expression: 92
+  - name: bass_synth
+    group: bass
+    program: synth_bass_1
+    volume: 102
+    pan: 64
+    expression: 108
+  - name: warm_pad
+    group: pads
+    program: pad_warm
+    volume: 68
+    pan: 58
+    expression: 84
+  - name: poly_pad
+    group: pads
+    program: pad_poly
+    volume: 62
+    pan: 72
+    expression: 80
+  - name: rhodes
+    group: keys
+    program: electric_piano_1
+    volume: 86
+    pan: 50
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: epiano.rhodes
+      prefer: [rhodes, looped]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: kit
+    group: drums
+    is_drum: true
+    volume: 100
+    pan: 64
+    expression: 108
+
+motifs:
+  # THE HOOK. Tresillo rhythm (3+3+2 eighths) leaping to the sixth and
+  # hanging on it - two bars, states itself immediately, never wears out.
+  - id: ascent_hook
+    root: A4
+    intervals: [7, 4, 0, 2, 4, 7, 9, 7]
+    rhythm: [0.75, 0.75, 0.5, 0.5, 0.5, 1.0, 2.5, 1.5]
+    velocities: [0.92, 0.78, 0.70, 0.74, 0.80, 0.88, 1.0, 0.72]
+  # Chant verse: repeated-note, clipped, off-beat pickups.
+  - id: step_chant
+    root: A4
+    intervals: [0, 0, 2, 4, 2, 0, -2, 0]
+    rhythm: [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 4.0]
+    velocities: [0.80, 0.72, 0.76, 0.90, 0.74, 0.68, 0.64, 0.58]
+  # The ascent figure: four rising steps; the prechorus sequences it up
+  # bVI -> bVII -> I so the climb is literal.
+  - id: climb_step
+    root: F4
+    intervals: [0, 2, 4, 7]
+    rhythm: [0.5, 0.5, 0.5, 2.5]
+    velocities: [0.72, 0.78, 0.84, 0.95]
+  # Whistle answer in the chorus: a high sparkle falling back to the fifth.
+  - id: summit_sparkle
+    root: A5
+    intervals: [4, 2, 0, -3, 0]
+    rhythm: [0.5, 0.5, 0.5, 1.0, 1.5]
+    velocities: [0.85, 0.78, 0.72, 0.80, 0.66]
+
+layer_templates:
+  bass_bounce:
+    kind: bassline
+    instrument: bass_synth
+    octave: 2
+    # Octave pump on eighths - the engine of the whole song.
+    pattern:
+      - [0, 0.0, 0.45]
+      - [12, 0.5, 0.35]
+      - [0, 1.0, 0.45]
+      - [12, 1.5, 0.35]
+      - [0, 2.0, 0.45]
+      - [12, 2.5, 0.35]
+      - [0, 3.0, 0.45]
+      - [7, 3.5, 0.35]
+    velocity: 76
+    articulation: staccato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  bass_half:
+    kind: bassline
+    instrument: bass_synth
+    octave: 2
+    pattern: [[0, 0.0, 1.6], [0, 2.0, 0.8], [12, 3.0, 0.8]]
+    velocity: 70
+    articulation: normal
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  four_floor:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,       beats: [0.0, 1.0, 2.0, 3.0],             velocity: 84}
+      - {drum: hand_clap,  beats: [1.0, 3.0],                       velocity: 72}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5],                  velocity: 36}
+      - {drum: open_hat,   beats: [3.5],                            velocity: 44}
+      - {drum: tambourine, beats: [0.5, 1.5, 2.5, 3.5],             velocity: 26, probability: 0.8}
+
+  four_floor_big:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,       beats: [0.0, 1.0, 2.0, 3.0],             velocity: 90}
+      - {drum: snare,      beats: [1.0, 3.0],                       velocity: 74}
+      - {drum: hand_clap,  beats: [1.0, 3.0],                       velocity: 80}
+      - {drum: closed_hat, beats: [0.25, 0.5, 0.75, 1.25, 1.5, 1.75, 2.25, 2.5, 2.75, 3.25, 3.5], velocity: 30, probability: 0.9}
+      - {drum: open_hat,   beats: [3.75],                           velocity: 46}
+      - {drum: crash,      beats: [0.0],                            velocity: 62, every: 8}
+
+  drums_plateau:
+    kind: drums
+    instrument: kit
+    humanize_ms: 2.5
+    humanize_velocity_pct: 5
+    events:
+      - {drum: kick,       beats: [0.0, 2.5],                       velocity: 74}
+      - {drum: snare,      beats: [2.0],                            velocity: 60}
+      - {drum: shaker,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 26}
+      - {drum: hand_clap,  beats: [2.0],                            velocity: 52, probability: 0.7}
+
+  crystal_arp:
+    kind: arpeggio
+    instrument: crystal
+    # Octave 4: an octave under the hook's hanging note, so the arp reads
+    # as glitter under the melody instead of a second-rubbing neighbor.
+    octave: 4
+    pattern: [0, 2, 1, 2]
+    step: 0.5
+    duration_beats: 0.4
+    velocity: 44
+    density: 0.9
+    articulation: staccato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 5
+
+  warm_bed:
+    kind: pad_chords
+    instrument: warm_pad
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.8
+    velocity: 44
+    articulation: pad
+    voicing: open
+    constraints:
+      max_notes: 3
+    humanize_ms: 8
+    humanize_velocity_pct: 4
+
+  poly_shimmer:
+    kind: pad_chords
+    instrument: poly_pad
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.7
+    velocity: 38
+    articulation: pad
+    voicing: open
+    constraints:
+      max_notes: 3
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  rhodes_stabs:
+    kind: chord_hits
+    instrument: rhodes
+    octave: 3
+    hits: [[0, 1.5], [0, 3.5]]
+    duration_beats: 0.6
+    velocity: 62
+    articulation: staccato
+    voicing: closed
+    humanize_ms: 4
+    humanize_velocity_pct: 5
+
+  hook_main:
+    kind: motif
+    instruments: [lead_square, lead_saw]
+    motif: ascent_hook
+    every_bars: 2
+    velocity: 74
+    articulation: normal
+    gate: 0.9
+    instrument_octave_offsets: {lead_square: 0, lead_saw: -1}
+    instrument_velocity_offsets: {lead_square: 0, lead_saw: -10}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+state_map:
+  default:
+    stems: {hook: 1.0, sparkle: 1.0, bass: 1.0, pads: 0.9, keys: 1.0, arp: 0.9, drums: 1.0}
+  calm:
+    stems: {hook: 0.4, sparkle: 0.7, bass: 1.0, pads: 1.0, keys: 1.0, arp: 0.8, drums: 0.7}
+  tension:
+    stems: {hook: 1.0, sparkle: 0.8, bass: 1.0, pads: 0.7, keys: 0.9, arp: 1.0, drums: 1.0}
+
+playback:
+  loop: true
+
+sections:
+  # ------------------------------------------------------------------ 0:00
+  # The hook states itself over the full groove in bar one - and this is
+  # also exactly the texture the outro hands back to, so the loop seam is
+  # invisible.
+  - id: groove_in
+    kind: intro
+    label: groove in - the hook
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [A, A, D, D, A, A, E, E]
+    layers:
+      - bass_bounce
+      - four_floor
+      - crystal_arp
+      - warm_bed
+      - template: hook_main
+        roots: [A4, A4, A4, B4]
+        starts: [[0, 0.0]]
+        repeats: 4
+        every_bars: 2
+
+  # ------------------------------------------------------------------ 0:16
+  - id: verse_step
+    kind: verse
+    label: verse - taking steps
+    bars: 16
+    intensity: 0.95
+    loopable: false
+    harmony: [A, A, D, D, A, A, D, E, A, A, D, D, F#m, F#m, D, E]
+    layers:
+      - bass_bounce
+      - four_floor
+      - rhodes_stabs
+      - warm_bed
+      - kind: motif
+        instrument: lead_square
+        motif: step_chant
+        roots: [A4, A4, E5, E5]
+        starts: [[0, 0.5]]
+        repeats: 4
+        every_bars: 4
+        velocity: 68
+        gate: 0.82
+        humanize_ms: 5
+        humanize_velocity_pct: 4
+
+  # ------------------------------------------------------------------ 0:48
+  - id: prechorus_climb
+    kind: bridge
+    label: prechorus - the ascent
+    bars: 8
+    intensity: 1.05
+    loopable: false
+    harmony: [F, F, G, G, A, A, E, E]
+    layers:
+      - bass_bounce
+      - four_floor_big
+      - warm_bed
+      - poly_shimmer
+      - kind: motif
+        instrument: lead_square
+        motif: climb_step
+        # The gradient made audible: the same step sequenced up the
+        # borrowed bVI, bVII, then home - each start one chord higher.
+        roots: [F4, G4, A4, A4]
+        starts: [[0, 0.5]]
+        repeats: 4
+        every_bars: 2
+        velocity: 76
+        gate: 0.9
+        humanize_ms: 4
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.85, to: 1.12, curve: smooth}
+      - kind: motif
+        instrument: whistle_synth
+        motif: climb_step
+        roots: [F5, G5, A5, A5]
+        starts: [[1, 0.5]]
+        repeats: 4
+        every_bars: 2
+        velocity: 58
+        gate: 0.85
+        humanize_ms: 6
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.8, to: 1.1, curve: smooth}
+
+  # ------------------------------------------------------------------ 1:04
+  - id: chorus_summit
+    kind: chorus
+    label: chorus - local maximum
+    bars: 16
+    intensity: 1.1
+    loopable: false
+    harmony: [A, Bm, F#m, D, A, Bm, D, E, A, Bm, F#m, D, Bm, D, E, E]
+    layers:
+      - bass_bounce
+      - four_floor_big
+      - warm_bed
+      - poly_shimmer
+      - rhodes_stabs
+      - template: hook_main
+        roots: [A4]
+        starts: [[0, 0.0]]
+        repeats: 8
+        every_bars: 2
+      - kind: motif
+        instrument: whistle_synth
+        motif: summit_sparkle
+        # The whistle answers the hook in the gaps; the E-bar answer is
+        # B5-rooted so every note is an E-major tone.
+        roots: [A5, B5, A5]
+        starts: [[3, 0.0]]
+        repeats: 3
+        every_bars: 4
+        velocity: 76
+        gate: 0.9
+        humanize_ms: 6
+        humanize_velocity_pct: 5
+
+  # ------------------------------------------------------------------ 1:36
+  - id: verse_return
+    kind: verse
+    label: verse - more steps
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [A, A, D, D, F#m, F#m, D, E]
+    layers:
+      - bass_bounce
+      - four_floor
+      - rhodes_stabs
+      - crystal_arp
+      - warm_bed
+      - kind: motif
+        instrument: lead_square
+        motif: step_chant
+        roots: [A4, E5]
+        starts: [[0, 0.5]]
+        repeats: 2
+        every_bars: 4
+        velocity: 68
+        gate: 0.82
+        humanize_ms: 5
+        humanize_velocity_pct: 4
+
+  # ------------------------------------------------------------------ 1:52
+  - id: prechorus_two
+    kind: bridge
+    label: prechorus - steeper
+    bars: 8
+    intensity: 1.08
+    loopable: false
+    harmony: [F, F, G, G, A, A, E, E]
+    layers:
+      - bass_bounce
+      - four_floor_big
+      - warm_bed
+      - poly_shimmer
+      - kind: motif
+        instrument: lead_square
+        motif: climb_step
+        roots: [F4, G4, A4, A4]
+        starts: [[0, 0.5]]
+        repeats: 4
+        every_bars: 2
+        velocity: 78
+        gate: 0.9
+        humanize_ms: 4
+        dynamics:
+          - {start_bar: 0, bars: 8, from: 0.9, to: 1.15, curve: smooth}
+      - kind: motif
+        instrument: whistle_synth
+        motif: climb_step
+        roots: [F5, G5, A5, A5]
+        starts: [[1, 0.5]]
+        repeats: 4
+        every_bars: 2
+        velocity: 60
+        gate: 0.85
+        humanize_ms: 6
+
+  # ------------------------------------------------------------------ 2:08
+  - id: chorus_two
+    kind: chorus
+    label: chorus - still climbing
+    bars: 8
+    intensity: 1.1
+    loopable: false
+    harmony: [A, Bm, F#m, D, A, Bm, D, E]
+    layers:
+      - bass_bounce
+      - four_floor_big
+      - warm_bed
+      - poly_shimmer
+      - rhodes_stabs
+      - template: hook_main
+        roots: [A4]
+        starts: [[0, 0.0]]
+        repeats: 4
+        every_bars: 2
+      - kind: motif
+        instrument: whistle_synth
+        motif: summit_sparkle
+        roots: [A5]
+        starts: [[3, 0.0]]
+        velocity: 76
+        gate: 0.9
+        humanize_ms: 6
+
+  # ------------------------------------------------------------------ 2:24
+  # The plateau: half-speed hook fragments drift over borrowed-minor color
+  # while the tempo sags and then accelerates back out.
+  - id: psych_plateau
+    kind: bridge
+    label: bridge - the plateau
+    bars: 12
+    intensity: 0.85
+    loopable: false
+    harmony: [F#m, F#m, D, D, F, F, G, G, Bm, Bm, E, E]
+    layers:
+      - bass_half
+      - drums_plateau
+      - poly_shimmer
+      - warm_bed
+      - kind: motif
+        instruments: [lead_square, lead_saw]
+        motif: ascent_hook
+        # The hook at half speed: the same climb, dreamed.
+        rhythm_scale: 2.0
+        # A-rooted over the F#m bars (relative-minor shading; the hang lands
+        # as the 3rd of D), F-rooted over the borrowed bVI.
+        roots: [A4, F4]
+        starts: [[0, 0.0]]
+        repeats: 2
+        every_bars: 4
+        velocity: 62
+        gate: 1.0
+        instrument_octave_offsets: {lead_square: 0, lead_saw: -1}
+        instrument_velocity_offsets: {lead_square: 0, lead_saw: -8}
+        humanize_ms: 8
+        humanize_velocity_pct: 4
+      - kind: notes
+        # A synth fall off the plateau's edge, answered by a rise back up -
+        # the re-ascent begins before the drums do.
+        instrument: whistle_synth
+        notes:
+          - {bar: 7, beat: 2.0, note: A5, dur: 2.0, vel: 72,
+             bend: [[0.0, 0], [1.6, -180]]}
+          - {bar: 10, beat: 0.0, note: E5, dur: 4.0, vel: 74,
+             bend: [[0.0, -150], [2.0, 0], [3.5, 0]]}
+      - kind: motif
+        instrument: rhodes
+        motif: step_chant
+        roots: [F#4]
+        starts: [[8, 0.5]]
+        velocity: 58
+        gate: 0.9
+        humanize_ms: 9
+        humanize_velocity_pct: 5
+
+  # ------------------------------------------------------------------ 2:47
+  - id: chorus_final
+    kind: chorus
+    label: final chorus - the view
+    bars: 16
+    intensity: 1.15
+    loopable: false
+    harmony: [A, Bm, F#m, D, A, Bm, D, E, A, Bm, F#m, D, Bm, D, E, E]
+    layers:
+      - bass_bounce
+      - four_floor_big
+      - warm_bed
+      - poly_shimmer
+      - rhodes_stabs
+      - template: hook_main
+        roots: [A4]
+        starts: [[0, 0.0]]
+        repeats: 8
+        every_bars: 2
+      - kind: motif
+        instrument: whistle_synth
+        motif: summit_sparkle
+        roots: [A5, B5, A5]
+        starts: [[3, 0.0]]
+        repeats: 3
+        every_bars: 4
+        velocity: 76
+        gate: 0.9
+        humanize_ms: 6
+
+  # ------------------------------------------------------------------ 3:19
+  # Same texture as groove_in: the loop hands off here with the hook still
+  # going, so bar 0 reads as the next lap of the same climb.
+  - id: groove_out
+    kind: outro
+    label: groove out - next lap
+    bars: 8
+    intensity: 1.0
+    loopable: false
+    harmony: [A, A, D, D, A, A, E, E]
+    layers:
+      - bass_bounce
+      - four_floor
+      - crystal_arp
+      - warm_bed
+      - template: hook_main
+        roots: [A4, A4, A4, B4]
+        starts: [[0, 0.0]]
+        repeats: 4
+        every_bars: 2
