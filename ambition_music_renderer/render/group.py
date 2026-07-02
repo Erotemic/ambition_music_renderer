@@ -3,11 +3,7 @@
 from __future__ import annotations
 
 import copy
-import gc
-import json
-import math
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -17,11 +13,8 @@ import pretty_midi
 from ..profiler import profile
 from ..instrument_libraries import resolve_sfz_reference
 from ..audio_utils import coerce_stereo
-from .effects import post_process
-from .export import write_ogg_from_audio
-from .score_core import RENDERER_VERSION, choose_soundfont, load_yaml
-from .score_layers import build_score
-from .synth import render_synth_audio, sanitize_same_pitch_overlaps, spec_hash
+from .score_core import RENDERER_VERSION
+from .synth import render_synth_audio
 
 @profile
 def copy_with_instruments(
@@ -48,37 +41,6 @@ def slice_audio(
     a = max(0, int(round(start_seconds * sample_rate)))
     b = max(a, int(round(end_seconds * sample_rate)))
     return audio[a:b]
-
-
-def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    seconds_per_beat = 60.0 / bpm
-    cursor = 0
-    out = []
-    for section in spec["sections"]:
-        bars = int(section["bars"])
-        start_beat = cursor * beats_per_bar
-        end_beat = (cursor + bars) * beats_per_bar
-        out.append(
-            {
-                "id": section["id"],
-                "label": section.get("label", section["id"]),
-                "kind": section.get("kind", "section"),
-                "start_bar": cursor,
-                "bars": bars,
-                "start_beat": start_beat,
-                "end_beat": end_beat,
-                "start_seconds": start_beat * seconds_per_beat,
-                "end_seconds": end_beat * seconds_per_beat,
-                "duration_seconds": (end_beat - start_beat) * seconds_per_beat,
-                "loopable": bool(section.get("loopable", False)),
-                "valid_exit_local_bars": section.get("valid_exit_local_bars", []),
-            }
-        )
-        cursor += bars
-    return out
-
 
 
 @profile
@@ -363,178 +325,3 @@ def adaptive_section_mastering_config(spec: dict[str, Any]) -> dict[str, Any]:
         ),
         "notes": str(cfg.get("notes", "")),
     }
-
-
-def render_all(args) -> dict[str, Any]:
-    spec_path = Path(args.spec).resolve()
-    spec = load_yaml(spec_path)
-    render_cfg = spec.get("render", {})
-    sample_rate = int(render_cfg.get("sample_rate", 48000))
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    output_root = Path(args.outdir).resolve()
-    output_root.mkdir(parents=True, exist_ok=True)
-    soundfont = choose_soundfont(args.soundfont or render_cfg.get("soundfont"))
-    backend = args.backend or render_cfg.get("backend", "auto")
-    cue_hash = spec_hash(spec_path, soundfont, backend)
-    quality = float(render_cfg.get("ogg_quality", 5.0))
-    pm, groups, section_meta = build_score(spec)
-    sanitize_same_pitch_overlaps(pm)
-    total_seconds = (
-        section_meta[-1]["end_seconds"] if section_meta else pm.get_end_time()
-    )
-    target_samples = int(math.ceil(total_seconds * sample_rate))
-    group_names = sorted(set(groups.values()))
-    output_files: dict[str, Any] = {"preview": {}, "adaptive": {}}
-
-    with tempfile.TemporaryDirectory() as d:
-        tempdir = Path(d)
-        # Render stems first, apply stem/bus tone controls without normalizing
-        # them upward, write adaptive stem pieces, and sum the exact processed
-        # stems to build the full preview. This guarantees that bus EQ and stem
-        # gains affect both adaptive playback and the full soundtrack preview.
-        full_stem_sum = np.zeros((target_samples, 2), dtype=np.float32)
-        stem_base_settings = copy.deepcopy(spec.get("stem_postprocess", {}))
-        group_post = spec.get("group_postprocess", {}) or {}
-        for group in group_names:
-            if getattr(args, "verbose", False):
-                print(f"[render] stem {group}", flush=True)
-            group_raw = render_group_audio(
-                pm,
-                groups,
-                group,
-                backend,
-                soundfont,
-                sample_rate,
-                tempdir,
-                total_seconds,
-                bpm,
-                base_dir=spec_path.parent,
-                render_cfg=render_cfg,
-            )
-            group_raw = ensure_audio_length(group_raw, target_samples)
-            group_settings = copy.deepcopy(stem_base_settings)
-            group_settings.update(group_post.get(group, {}))
-            # Stems should preserve authored relative gain. The default is no
-            # upward normalization unless YAML explicitly asks for it.
-            group_settings.setdefault("normalize", False)
-            group_settings.setdefault("target_peak_db", -2.5)
-            if getattr(args, "verbose", False):
-                print(f"[post] stem {group} settings={group_settings}", flush=True)
-            import time as _time
-
-            _t0 = _time.time()
-            group_audio = post_process(group_raw, sample_rate, group_settings, base_dir=spec_path.parent)
-            if getattr(args, "verbose", False):
-                print(
-                    f"[post-done] stem {group} elapsed={_time.time() - _t0:.2f}s shape={group_audio.shape}",
-                    flush=True,
-                )
-            _t0 = _time.time()
-            full_stem_sum += ensure_audio_length(group_audio, target_samples)
-            if getattr(args, "verbose", False):
-                print(
-                    f"[sum-done] stem {group} elapsed={_time.time() - _t0:.2f}s",
-                    flush=True,
-                )
-            for meta in section_meta:
-                piece = slice_audio(
-                    group_audio, sample_rate, meta["start_seconds"], meta["end_seconds"]
-                )
-                path = (
-                    output_root
-                    / "adaptive"
-                    / meta["id"]
-                    / f"{spec['id']}_{cue_hash}.{meta['id']}.{group}.ogg"
-                )
-                if getattr(args, "verbose", False):
-                    print(f"[write] stem {group} section {meta['id']}", flush=True)
-                _t0 = _time.time()
-                write_ogg_from_audio(
-                    piece, sample_rate, path, quality=quality, keep_wav=args.keep_wav
-                )
-                if getattr(args, "verbose", False):
-                    print(
-                        f"[write-done] stem {group} section {meta['id']} elapsed={_time.time() - _t0:.2f}s",
-                        flush=True,
-                    )
-                output_files["adaptive"].setdefault(meta["id"], {})[group] = str(
-                    path.relative_to(output_root)
-                )
-            del group_raw, group_audio
-            gc.collect()
-
-        if getattr(args, "verbose", False):
-            print("[post] master from processed stems", flush=True)
-        full_audio = post_process(
-            full_stem_sum, sample_rate, spec.get("postprocess", {}), base_dir=spec_path.parent
-        )
-        preview_path = (
-            output_root
-            / "preview"
-            / f"{spec['id']}_{cue_hash}.full_soundtrack_preview.ogg"
-        )
-        if getattr(args, "verbose", False):
-            print("[write] preview", flush=True)
-        write_ogg_from_audio(
-            full_audio,
-            sample_rate,
-            preview_path,
-            quality=quality,
-            keep_wav=args.keep_wav,
-        )
-        output_files["preview"]["full_soundtrack"] = str(
-            preview_path.relative_to(output_root)
-        )
-
-        # Full section renders. Prefer global-master slices for adaptive full
-        # sections when requested; legacy render_all has no section-local full
-        # postprocess path, so both modes slice the mastered stem sum.
-        section_mastering = adaptive_section_mastering_config(spec)
-        ignored_section_postprocess = []
-        if section_mastering["mode"] == "global_master_slices":
-            sections_by_id = {s0.get("id"): s0 for s0 in spec.get("sections", [])}
-            ignored_section_postprocess = [
-                str(meta["id"])
-                for meta in section_meta
-                if isinstance(sections_by_id.get(meta["id"], {}), dict)
-                and sections_by_id.get(meta["id"], {}).get("postprocess")
-            ]
-        for meta in section_meta:
-            section_dir = output_root / "adaptive" / meta["id"]
-            section_dir.mkdir(parents=True, exist_ok=True)
-            piece = slice_audio(
-                full_audio, sample_rate, meta["start_seconds"], meta["end_seconds"]
-            )
-            path = section_dir / f"{spec['id']}_{cue_hash}.{meta['id']}.full.ogg"
-            if getattr(args, "verbose", False):
-                print(f"[write] section full {meta['id']}", flush=True)
-            write_ogg_from_audio(
-                piece, sample_rate, path, quality=quality, keep_wav=args.keep_wav
-            )
-            output_files["adaptive"].setdefault(meta["id"], {})["full"] = str(
-                path.relative_to(output_root)
-            )
-
-        if args.keep_midi:
-            midi_out = output_root / "debug" / f"{spec['id']}_{cue_hash}.mid"
-            midi_out.parent.mkdir(parents=True, exist_ok=True)
-            pm.write(str(midi_out))
-            output_files["debug_midi"] = str(midi_out.relative_to(output_root))
-
-    manifest = build_manifest(
-        spec, cue_hash, section_meta, group_names, output_files, sample_rate
-    )
-    manifest.setdefault("diagnostics", {})["adaptive_section_mastering"] = {
-        **adaptive_section_mastering_config(spec),
-        "ignored_section_postprocess_sections": locals().get("ignored_section_postprocess", []),
-    }
-    manifest_path = output_root / f"{spec['id']}_{cue_hash}.adaptive_manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf8")
-    return {
-        "manifest": str(manifest_path),
-        "preview": str(preview_path),
-        "hash": cue_hash,
-    }
-
-

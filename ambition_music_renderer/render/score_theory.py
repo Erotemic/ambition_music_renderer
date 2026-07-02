@@ -56,8 +56,10 @@ def chord_intervals(chord_symbol: str) -> tuple[str, list[int], str | None]:
     if not m:
         raise ValueError(f"cannot parse chord root from {chord_symbol!r}")
     root = m.group(1)
-    suffix = m.group(2).lower()
-    if "dim" in suffix or "o" in suffix:
+    # Normalize the jazz "CM7" major-seventh convention before lowercasing,
+    # which would otherwise silently turn it into a *minor* seventh.
+    suffix = re.sub(r"M(?=\d)", "maj", m.group(2)).lower()
+    if "dim" in suffix or re.match(r"^[o°]", suffix):
         intervals = [0, 3, 6]
     elif "aug" in suffix or "+" in suffix:
         intervals = [0, 4, 8]
@@ -72,10 +74,13 @@ def chord_intervals(chord_symbol: str) -> tuple[str, list[int], str | None]:
     add9 = "add9" in suffix
     six_nine = "6/9" in suffix or "6add9" in suffix
     major_seventh_quality = "maj7" in suffix or "maj9" in suffix or "Δ" in suffix
+    # A 9 preceded by b/# is an alteration (C7b9), not the natural ninth; the
+    # old `"9" in suffix` test stacked the natural 9 on top of b9/#9 clusters.
+    natural_nine = bool(re.search(r"(?<![b#])9", suffix))
     dominant_extension = (
         "7" in suffix
         or "13" in suffix
-        or ("9" in suffix and not add9 and not six_nine and "maj9" not in suffix)
+        or (natural_nine and not add9 and not six_nine and "maj9" not in suffix)
     )
     if major_seventh_quality:
         intervals.append(11)
@@ -83,7 +88,7 @@ def chord_intervals(chord_symbol: str) -> tuple[str, list[int], str | None]:
         intervals.append(10)
     if "6" in suffix and 9 not in intervals:
         intervals.append(9)
-    if "9" in suffix or add9:
+    if natural_nine:
         intervals.append(14)
     if "#11" in suffix:
         intervals.append(18)
@@ -172,6 +177,8 @@ def transform_motif(
         return out
     if isinstance(transform, dict):
         kind = transform.get("kind")
+        if pivot is None and transform.get("pivot") is not None:
+            pivot = int(transform["pivot"])
     else:
         kind = transform
     if kind == "retrograde":

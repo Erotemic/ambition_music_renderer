@@ -13,6 +13,7 @@ from ..profiler import profile
 from .score_core import RenderContext
 from .score_events import add_chord, add_drum, add_instrument, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
 from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
+from .synth import sanitize_same_pitch_overlaps
 
 @profile
 def render_layer_pad_chords(
@@ -513,6 +514,13 @@ def render_layer_guitar_chug(
     else:
         default_insts = []
     takes = gp.take_specs(layer, default_insts)
+    if not takes:
+        # Every other layer kind errors on an unresolvable instrument; a chug
+        # layer with neither takes nor instrument(s)/group used to silently
+        # render nothing.
+        raise KeyError(
+            "guitar_chug layer needs `takes` or `instrument`/`instruments`/`group`"
+        )
     pattern = layer.get("pattern", [[0, 0.0, 0.5], [0, 0.5, 0.5], [7, 1.0, 0.5], [0, 1.5, 0.5]])
     root_octave = int(layer.get("octave", 2))
     velocity = float(layer.get("velocity", 92))
@@ -772,6 +780,10 @@ def build_score(
             render_layer(ctx, section, layer)
     pm._ambition_note_events = list(ctx.note_events)  # type: ignore[attr-defined]
     pm._ambition_instrument_specs = copy.deepcopy(ctx.instrument_specs)  # type: ignore[attr-defined]
+    # Sanitize here so every consumer (isolated worker, legacy path, audits
+    # rendering audio) gets the same-pitch overlap fix; callers used to have to
+    # remember to call it and the production worker path forgot.
+    sanitize_same_pitch_overlaps(pm)
     return pm, ctx.groups, section_meta
 
 

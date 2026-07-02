@@ -8,6 +8,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -83,8 +84,13 @@ def _new_fluidsynth(soundfont: str, sample_rate: int) -> tuple[Any, int]:
     try:
         fl.setting("synth.reverb.active", 0)
         fl.setting("synth.chorus.active", 0)
-    except Exception:
-        pass
+    except Exception as ex:
+        # If this fails, FluidSynth's internal reverb/chorus stays on and every
+        # render silently stacks a second room on top of the YAML postprocess.
+        print(
+            f"[ambition_music_renderer] could not disable FluidSynth internal reverb/chorus: {ex}",
+            file=sys.stderr,
+        )
     sfid = fl.sfload(soundfont)
     return fl, sfid
 

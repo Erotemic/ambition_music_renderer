@@ -243,10 +243,10 @@ def take_specs(layer: dict[str, Any], default_instruments: list[str]) -> list[di
     raw = layer.get("takes")
     if raw:
         out: list[dict[str, Any]] = []
-        for idx, item in enumerate(raw):
+        for item in raw:
             if isinstance(item, str):
-                out.append({"instrument": item, "seed_offset": idx})
+                out.append({"instrument": item})
             else:
                 out.append(dict(item))
         return out
-    return [{"instrument": name, "seed_offset": idx} for idx, name in enumerate(default_instruments)]
+    return [{"instrument": name} for name in default_instruments]

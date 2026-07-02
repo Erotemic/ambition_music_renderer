@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import math
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -200,7 +201,14 @@ def _audio_kernels():
         return None
     try:
         from . import kernels
-    except Exception:
+    except Exception as ex:
+        # The pure-Python comb/allpass loops are orders of magnitude slower;
+        # never fall back silently or long renders look mysteriously hung.
+        print(
+            f"[ambition_music_renderer] compiled DSP kernels unavailable ({ex}); "
+            "using slow pure-Python reverb fallback",
+            file=sys.stderr,
+        )
         return None
     return kernels
 
@@ -421,9 +429,11 @@ def compressor(
         gr_db = np.zeros_like(over)
         # Above knee: linear ratio
         gr_db[above] = -(over[above] - over[above] / ratio)
-        # Soft-knee region: quadratic interpolation
-        x = (over[soft] + knee / 2) / knee
-        gr_db[soft] = -(x * x * (over[soft] / ratio + knee / 4 - over[soft]))
+        # Soft-knee region: standard quadratic knee. Continuous with the
+        # above-knee branch at over = knee/2 and monotonic through the knee
+        # (the previous interpolation could *boost* inside the knee and jumped
+        # by several dB at the knee top).
+        gr_db[soft] = (1.0 / ratio - 1.0) * np.square(over[soft] + knee / 2) / (2.0 * knee)
     else:
         gr_db = np.where(over > 0, -(over - over / ratio), 0.0)
 
@@ -556,11 +566,12 @@ def post_process(
 
         audio = apply_effect_chain(audio, sample_rate, list(effect_chain), base_dir=base_dir)
 
-    if (
+    lufs_requested = (
         settings.get("target_lufs") is not None
         or settings.get("loudness_target_lufs") is not None
         or settings.get("loudness") is not None
-    ):
+    )
+    if lufs_requested:
         from ..loudness import apply_loudness_settings
 
         audio = apply_loudness_settings(audio, sample_rate, settings)
@@ -570,11 +581,15 @@ def post_process(
     if not settings.get("limiter_enabled", True):
         return audio.astype(np.float32, copy=False)
     target_peak = settings.get("true_peak_db", settings.get("target_peak_db", -1.0))
+    # When a LUFS target was applied, the limiter must only *cap* at the peak
+    # target; peak-normalizing here would re-gain the audio and silently undo
+    # the loudness normalization the YAML asked for.
+    normalize = bool(settings.get("normalize", True)) and not lufs_requested
     return soft_limit(
         audio,
         float(target_peak),
         drive=float(settings.get("limiter_drive", 1.08)),
-        normalize=bool(settings.get("normalize", True)),
+        normalize=normalize,
     )
 
 

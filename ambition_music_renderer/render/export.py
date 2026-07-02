@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +17,12 @@ from ..audio_utils import coerce_stereo
 
 def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    sf.write(path, audio, sample_rate, subtype="PCM_16")
+    # Same sanitize as the OGG path: a NaN reaching PCM16 becomes garbage, and
+    # the debug WAV should not differ from the OGG written beside it.
+    pcm = np.nan_to_num(
+        np.clip(coerce_stereo(audio), -1.0, 1.0), nan=0.0, posinf=0.0, neginf=0.0
+    ).astype(np.float32, copy=False)
+    sf.write(path, pcm, sample_rate, subtype="PCM_16")
 
 
 def format_ogg_timestamp(seconds: float) -> str:
@@ -55,7 +61,11 @@ def write_metadata_sidecar(ogg_path: Path, metadata: dict[str, object] | None) -
         sidecar = ogg_path.with_name(ogg_path.name + ".metadata.json")
         sidecar.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf8")
         return sidecar
-    except Exception:
+    except Exception as ex:
+        print(
+            f"[ambition_music_renderer] could not write metadata sidecar for {ogg_path.name}: {ex}",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -157,7 +167,7 @@ def section_chapter_metadata(
         kind = str(section.get("kind", "section"))
         start_s = float(section.get("start_seconds", 0.0) or 0.0)
         meta[f"CHAPTER{idx:03d}"] = format_ogg_timestamp(start_s)
-        meta[f"CHAPTER{idx:03d}NAME"] = label if label != sid else sid
+        meta[f"CHAPTER{idx:03d}NAME"] = label
         meta[f"CHAPTER{idx:03d}ID"] = sid
         meta[f"CHAPTER{idx:03d}KIND"] = kind
     meta["AMBITION_MARKER_COUNT"] = len(sections or [])

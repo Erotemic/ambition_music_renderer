@@ -14,13 +14,6 @@ import numpy as np
 from .audio_utils import coerce_stereo
 
 
-def peak_dbfs(audio: np.ndarray) -> float:
-    peak = float(np.max(np.abs(audio))) if audio.size else 0.0
-    if peak <= 1e-12:
-        return float("-inf")
-    return float(20.0 * np.log10(peak))
-
-
 def peak_limit(audio: np.ndarray, target_peak_db: float) -> np.ndarray:
     x = coerce_stereo(audio).copy()
     peak = float(np.max(np.abs(x))) if x.size else 0.0
@@ -30,19 +23,6 @@ def peak_limit(audio: np.ndarray, target_peak_db: float) -> np.ndarray:
     if peak > target:
         x *= target / peak
     return x.astype(np.float32)
-
-
-def integrated_lufs(audio: np.ndarray, sample_rate: int, block_size: float = 0.400) -> float | None:
-    """Measure integrated loudness, returning None if pyloudnorm is unavailable."""
-    try:
-        import pyloudnorm as pyln  # type: ignore
-    except Exception:
-        return None
-    x = coerce_stereo(audio)
-    if len(x) == 0 or float(np.max(np.abs(x))) <= 1e-12:
-        return None
-    meter = pyln.Meter(int(sample_rate), block_size=float(block_size))
-    return float(meter.integrated_loudness(x))
 
 
 def normalize_lufs(
@@ -87,8 +67,6 @@ def apply_loudness_settings(audio: np.ndarray, sample_rate: int, settings: dict[
     ``loudness: {target_lufs: -16, true_peak_db: -1.5}``
     """
     cfg = settings.get("loudness") or {}
-    if cfg is None:
-        cfg = {}
     if not isinstance(cfg, dict):
         cfg = {"target_lufs": cfg}
     target = cfg.get("target_lufs", settings.get("target_lufs", settings.get("loudness_target_lufs")))

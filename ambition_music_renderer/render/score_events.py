@@ -96,11 +96,11 @@ def add_note(
     start = ctx.beat_to_time(start_beat)
     if humanize_ms:
         start += float(ctx.rng.normal(0.0, humanize_ms / 1000.0))
+    # Clamp before computing the end so negative jitter near t=0 shifts the
+    # note instead of lengthening it.
+    start = max(0.0, start)
     dur_scale = gate if gate is not None else ARTICULATION_GATE.get(articulation, 0.86)
     end = start + max(0.025, ctx.beat_to_time(dur_beats * dur_scale))
-    start = max(0.0, start)
-    if end <= start:
-        end = start + 0.025
     if humanize_velocity_pct:
         vel = vel * (1.0 + float(ctx.rng.normal(0.0, humanize_velocity_pct / 100.0)))
     velocity = int(clamp(round(vel), 1, 127))
@@ -373,9 +373,16 @@ def apply_automation(
             else resolve_instruments(ctx, layer)
         )
         cc = auto.get("cc", "expression")
-        cc_num = CC_NUMBERS.get(
-            cc, int(cc) if isinstance(cc, int) or str(cc).isdigit() else 11
-        )
+        if isinstance(cc, int) or str(cc).isdigit():
+            cc_num = int(cc)
+        elif cc in CC_NUMBERS:
+            cc_num = CC_NUMBERS[cc]
+        else:
+            # A typo used to silently become CC 11 (expression) — dead config.
+            raise KeyError(
+                f"unknown automation cc {cc!r}; use a MIDI CC number or one of "
+                f"{sorted(CC_NUMBERS)}"
+            )
         start_bar = section["start_bar"] + float(auto.get("start_bar", 0.0))
         dur_bars = float(auto.get("bars", section["bars"]))
         start_val = float(auto.get("from", 80))

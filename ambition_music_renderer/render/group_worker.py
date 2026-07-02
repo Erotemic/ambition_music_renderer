@@ -86,8 +86,14 @@ def _worker_main(ns) -> int:
     outdir = Path(ns.outdir)
     with tempfile.TemporaryDirectory() as td:
         with timings.phase("render_group_audio", group=ns.group, backend=ns.backend):
+            # base_dir/render_cfg matter: they carry render.sfizz.* resolution,
+            # render.strict_backends, and score-relative paths. The worker used
+            # to omit them, so those config keys were silently inert on the
+            # production render path.
             raw = render_group_audio(
-                pm, groups, ns.group, ns.backend, soundfont, sr, Path(td), total, bpm
+                pm, groups, ns.group, ns.backend, soundfont, sr, Path(td), total, bpm,
+                base_dir=spec_path.parent,
+                render_cfg=render_cfg,
             )
         with timings.phase("postprocess_group", group=ns.group):
             raw = ensure_audio_length(raw, target)
@@ -95,7 +101,7 @@ def _worker_main(ns) -> int:
             settings.update((spec.get("group_postprocess", {}) or {}).get(ns.group, {}))
             settings.setdefault("normalize", False)
             settings.setdefault("target_peak_db", -2.5)
-            audio = post_process(raw, sr, settings)
+            audio = post_process(raw, sr, settings, base_dir=spec_path.parent)
     with timings.phase("write_scratch_npy", group=ns.group):
         npy = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{ns.group}.npy"
         npy.parent.mkdir(parents=True, exist_ok=True)

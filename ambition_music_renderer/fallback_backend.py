@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import sys
 
 import numpy as np
 import pretty_midi
@@ -47,6 +48,12 @@ def _program_family(program: int) -> str | None:
         return "mallet"
     if 0 <= program <= 7:
         return "piano"
+    if 16 <= program <= 23:
+        # Organs/accordion: sustained harmonic stacks, closest built-in voice
+        # is the pad model (no attack transient, held sustain).
+        return "pad"
+    if 24 <= program <= 31:
+        return "pluck"
     if 32 <= program <= 39:
         return "bass"
     if 40 <= program <= 45 or 48 <= program <= 51:
@@ -116,6 +123,8 @@ def _instrument_family(inst: pretty_midi.Instrument) -> str:
         return "choir"
     if "pad" in name:
         return "pad"
+    if any(k in name for k in ("guitar", "banjo", "mandolin", "ukulele", "pluck")):
+        return "pluck"
     if any(k in name for k in ("piano", "keys")):
         return "piano"
     return "generic"
@@ -300,6 +309,18 @@ def _synth_note_fallback(
             0.0, 1.0, min(n, max(6, int(0.005 * sr))), endpoint=True, dtype=np.float32
         )
         env[: len(ramp)] *= ramp
+    elif family == "pluck":
+        # Guitars / plucked strings: brighter harmonic stack than the harp
+        # with a faster decay, so strums and picked lines read as plucks
+        # instead of the featureless generic sustain they used to get.
+        raw = _harm_stack([0.62, 0.34, 0.22, 0.13, 0.08, 0.05, 0.03])
+        sig = _lowpass_mono(raw, 0.62)
+        decay_tau = max(0.28, duration * 0.60)
+        env = np.exp(-t / decay_tau).astype(np.float32)
+        ramp = np.linspace(
+            0.0, 1.0, min(n, max(6, int(0.004 * sr))), endpoint=True, dtype=np.float32
+        )
+        env[: len(ramp)] *= ramp
     elif family == "timpani":
         body_freq = max(40.0, frequency * 0.5)
         sweep_t = np.exp(-t / 0.045)
@@ -441,6 +462,14 @@ def render_fallback(
     total_samples = int(math.ceil((end_time + 0.75) * sample_rate))
     mix = np.zeros((total_samples, 2), dtype=np.float32)
     rng = np.random.default_rng(_midi_content_seed(pm))
+    dropped_bends = [inst.name or f"program {inst.program}" for inst in pm.instruments if inst.pitch_bends]
+    if dropped_bends:
+        # Goals: the fallback must be honest about features it cannot render.
+        print(
+            "[ambition_music_renderer] fallback backend ignores pitch bends "
+            f"(slides/scoops/vibrato flattened) on: {', '.join(sorted(set(dropped_bends)))}",
+            file=sys.stderr,
+        )
     for inst in pm.instruments:
         family = _instrument_family(inst)
         # MIDI CC envelopes are stairstep. Sampling at note attack lets the
@@ -476,8 +505,16 @@ def render_fallback(
             mix[start : start + n] += _pan_stereo(mono[:n] * vol, pan)
     # Leave authored/stem relative loudness alone. Only protect the
     # fallback renderer from obvious clipping; normalization-up happens
-    # later only if the YAML master postprocess asks for it.
+    # later only if the YAML master postprocess asks for it. Because this
+    # runs per stem group, engaging it rewrites *relative* stem balance —
+    # so never do it silently.
     peak = float(np.max(np.abs(mix)))
     if peak > 0.92:
+        print(
+            "[ambition_music_renderer] fallback backend clip guard engaged "
+            f"(peak {peak:.2f} -> 0.92); this stem is rescaled relative to the "
+            "others — turn down the hot source instruments/layers instead",
+            file=sys.stderr,
+        )
         mix *= 0.92 / peak
     return mix.astype(np.float32, copy=False)
