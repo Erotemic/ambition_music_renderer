@@ -104,13 +104,25 @@ group_postprocess:
     lowpass_hz: 6200
     reverb_wet: 0.06
   glimmer:
-    gain_db: 12.0
+    gain_db: 20.0
     highpass_hz: 300
     lowpass_hz: 7800
     high_shelf_hz: 5600
     high_shelf_db: -1.6
     transient_tame: 0.16
     reverb_wet: 0.04
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - effect: chorus
+            rate_hz: 0.4
+            depth: 0.10
+            mix: 0.22
+          - effect: delay
+            delay_seconds: 0.8333
+            feedback: 0.15
+            mix: 0.10
 
 instruments:
   - name: storyteller
@@ -179,6 +191,15 @@ instruments:
     volume: 66
     pan: 72
     expression: 88
+    instrument_backend:
+      kind: sfz
+      # Sonatina Celeste: plain velocity response. The VPO3 celesta silently
+      # requires CC1 dynamics (xfin_lovel=63) and renders nothing at the
+      # whispered velocities this part plays.
+      library_ref: celeste
+      prefer: [celeste]
+      optional: true
+      fallback_backend: pretty-midi
 
 motifs:
   - id: fable_teller
@@ -337,7 +358,7 @@ layer_templates:
     pattern: [0, 2, 4, 2]
     step: 1.5
     duration_beats: 0.8
-    velocity: 26
+    velocity: 38
     density: 0.3
     articulation: bell
     humanize_ms: 7
@@ -385,7 +406,7 @@ sections:
         # The theme whispered before the story starts.
         roots: [G5]
         starts: [[4, 0.0]]
-        velocity: 44
+        velocity: 56
         articulation: bell
         gate: 0.7
         humanize_ms: 8
@@ -491,7 +512,7 @@ sections:
         # Glimmer echo of the answer at the end of stanza two.
         roots: [D6]
         starts: [[26, 0.0]]
-        velocity: 36
+        velocity: 48
         articulation: bell
         gate: 0.65
         humanize_ms: 6
@@ -527,6 +548,12 @@ sections:
       - harp_wolf
       - keys_haze_wolf
       - pad_warmth
+      - kind: pedal
+        instrument: cello
+        octave: 2
+        velocity: 38
+        articulation: pad
+        humanize_ms: 6
       - kind: motif
         instrument: cello
         motif: wolf_prowl
@@ -581,7 +608,7 @@ sections:
         # question's hanging degree 2 and finally lands on the tonic.
         roots: [G5, G5]
         starts: [[2, 0.0], [10, 0.0]]
-        velocity: 48
+        velocity: 60
         articulation: bell
         gate: 0.75
         humanize_ms: 7
