@@ -46,7 +46,7 @@ def repo_root(start: Path | None = None) -> Path:
     """Return the parent game repository root when the renderer is a submodule."""
     renderer = project_root(start)
     for candidate in (renderer, *renderer.parents):
-        if (candidate / "crates" / "ambition_gameplay_core").exists():
+        if (candidate / "crates" / "ambition_actors").exists():
             return candidate
     if renderer.parent.name == "tools":
         return renderer.parent.parent

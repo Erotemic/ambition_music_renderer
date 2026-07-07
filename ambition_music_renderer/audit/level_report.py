@@ -38,7 +38,7 @@ sf = lazy.load("soundfile")
 from ._common import db, peak, rms
 
 REPO_ROOT = repo_root()
-DEFAULT_ROOT = REPO_ROOT / "crates/ambition_gameplay_core/assets/audio/music/generated"
+DEFAULT_ROOT = REPO_ROOT / "crates/ambition_actors/assets/audio/music/generated"
 CLIP_DBTP = -1.0  # ITU true-peak ceiling convention; above this we flag.
 
 

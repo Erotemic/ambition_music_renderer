@@ -298,7 +298,7 @@ def default_publish_dest_root() -> Path:
     return (
         repo_root()
         / "crates"
-        / "ambition_gameplay_core"
+        / "ambition_actors"
         / "assets"
         / "audio"
         / "music"
