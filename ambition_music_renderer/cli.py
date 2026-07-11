@@ -83,10 +83,10 @@ def _progress(iterable, *, total, desc):
 # These render with --simple-mix and publish the mastered preview.
 SANDBOX_CUES = ("lofi_study_loop", "long_lofi_drift", "pulse_drift_voyage")
 
-# Adaptive cues handled by the dedicated pipeline
-# (scripts/regen_first_goblin_tune_v2.sh).
-# This module deliberately skips them in the bulk `radio` pass; their
-# multi-stem layout is owned elsewhere.
+# Adaptive (multi-section) cues. Marked so the general render/publish path
+# renders them full-mix-only and publishes each adaptive/<section>/<section>.full.ogg
+# (see `render_mode_for_cue` / `publish_adaptive_full_sections`). They ride the
+# normal bulk `radio` pass now — there is no dedicated per-cue installer.
 ADAPTIVE_CUES = ("first_goblin_tune_v2",)
 
 
@@ -173,10 +173,9 @@ def find_full_mix(preview_dir: Path, cue: str) -> Path | None:
 def discover_active_radio_cues() -> tuple[str, ...]:
     """List cues from scores/active/ that should appear on the radio.
 
-    Excludes:
-      - Cues already in ``SANDBOX_CUES`` (handled by that path).
-      - Cues in ``ADAPTIVE_CUES`` (handled by
-        ``scripts/regen_first_goblin_tune_v2.sh``).
+    Excludes cues already in ``SANDBOX_CUES`` (handled by that path). Adaptive
+    cues (``ADAPTIVE_CUES``) ARE included — the render/publish path detects them
+    and publishes their per-section adaptive full mixes.
     Returns a sorted, deduped tuple so the order is stable across runs.
     """
     active = package_dir() / "scores" / "active"
@@ -188,7 +187,7 @@ def discover_active_radio_cues() -> tuple[str, ...]:
         for suffix in (".music.yaml", *_SCORE_SUFFIXES):
             if name.endswith(suffix):
                 cue = name[: -len(suffix)]
-                if cue and cue not in SANDBOX_CUES and cue not in ADAPTIVE_CUES:
+                if cue and cue not in SANDBOX_CUES:
                     cues.add(cue)
                 break
     return tuple(sorted(cues))
@@ -1002,7 +1001,6 @@ from .audit.sour_note_audit import SourNoteAuditConfig
 from .audit.spectral_compare import SpectralCompareConfig
 from .audit.spectral_localize import SpectralLocalizeConfig
 from .audit.transition_audit import TransitionAuditConfig
-from .legacy.install_first_goblin_tune_v2 import InstallFirstGoblinTuneConfig
 from .legacy.make_first_goblin_transition_lab import FirstGoblinTransitionLabConfig
 
 
@@ -1027,7 +1025,6 @@ class AuditModal(kwconf.ModalCLI):
 class LegacyModal(kwconf.ModalCLI):
     """Quarantined legacy helpers kept importable until we verify deletion safety."""
 
-    install_first_goblin_tune_v2 = InstallFirstGoblinTuneConfig
     make_first_goblin_transition_lab = FirstGoblinTransitionLabConfig
 
 

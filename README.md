@@ -74,7 +74,6 @@ Bundle report generation also calls these helpers through the packaged modal CLI
 - `ambition_music_renderer/render/bundle.py` - one-command cue regeneration, diagnostics, reports, plots, and uploadable bundles.
 - `ambition_music_renderer/render/isolated.py` and `render/group_worker.py` - adaptive stem render entrypoints.
 - `ambition_music_renderer/audit/*.py` - active analysis helpers (`levels`, `cue_balance`, `arrangement`, `dissonance`, `spectral_localize`, `spectral_compare`, `transition`, etc.).
-- `ambition_music_renderer/legacy/install_first_goblin_tune_v2.py` - quarantined legacy installer for the first-goblin tune asset path, exposed as `python -m ambition_music_renderer legacy install_first_goblin_tune_v2`.
 - `scores/active/` - cues actively used or being prepared for runtime.
 - `scores/examples/` - reference/example cues.
 - `scores/archive/` - historical cues kept for reference.
@@ -349,7 +348,7 @@ composition review. Do not use audition files as evidence of in-game loudness.
 Runtime assets live under:
 
 ```text
-crates/ambition_gameplay_core/assets/audio/music/generated/<cue>/
+crates/ambition_actors/assets/audio/music/generated/<cue>/
 ```
 
 For `first_goblin_tune_v2`, the top-level wrapper currently renders/installs the active cue path used by the sandbox. By default, prefer full-mix render/install for the cue the game actually loads. Use stem rendering when auditing or reviving stem-driven runtime playback.
