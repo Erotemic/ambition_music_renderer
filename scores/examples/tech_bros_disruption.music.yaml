@@ -140,6 +140,18 @@ layer_templates:
       - {group: mallets,   cc: expression, from: 70, to: 105, curve: smooth, points: 16}
       - {group: choir_pad, cc: expression, from: 50, to: 86,  curve: smooth, points: 12}
 
+  # Intro-only swell: establish a trustworthy headphone reference immediately
+  # while retaining a modest lift into the exploring loop.
+  intro_expression_swell:
+    kind: automation
+    automation:
+      - {group: winds,      cc: expression, from: 76, to: 94,  curve: smooth, points: 16}
+      - {group: brass,      cc: expression, from: 68, to: 90,  curve: smooth, points: 12}
+      - {group: strings,    cc: expression, from: 90, to: 104, curve: smooth, points: 16}
+      - {group: mallets,    cc: expression, from: 86, to: 102, curve: smooth, points: 16}
+      - {group: choir_pad,  cc: expression, from: 80, to: 94,  curve: smooth, points: 16}
+      - {group: percussion, cc: expression, from: 74, to: 92,  curve: smooth, points: 12}
+
   # Sub-bass pulse (the "synthwave bass" foundation).
   sub_bass_voice:
     kind: motif
@@ -212,6 +224,12 @@ layer_templates:
     voicing: open
     humanize_ms: 4
     humanize_velocity_pct: 3
+    # Preserve the airy color without allowing voice leading to wander into
+    # B8-F#9 fundamentals. The patch may still generate bright harmonics.
+    constraints:
+      min_pitch: 45
+      max_pitch: 83
+      max_notes: 4
 
   # Lead theme (saw lead).
   lead_saw_voice:
@@ -266,6 +284,10 @@ layer_templates:
     voicing: closed
     humanize_ms: 2
     humanize_velocity_pct: 3
+    constraints:
+      min_pitch: 42
+      max_pitch: 85
+      max_notes: 4
 
   # Synth brass sustained pad (climax only).
   synth_brass_pad:
@@ -279,6 +301,10 @@ layer_templates:
     voicing: closed
     humanize_ms: 3
     humanize_velocity_pct: 3
+    constraints:
+      min_pitch: 42
+      max_pitch: 83
+      max_notes: 4
 
   # Bell synth sparkle on phrase tops (fx_crystal preset).
   bell_sparkle:
@@ -396,10 +422,10 @@ state_map:
 sections:
   - id: intro
     kind: intro
-    label: server room glow - sub bass and arp emerge
+    label: server room glow - audible foundation before the groove
     bars: 8
-    intensity: 0.50
-    density: 0.40
+    intensity: 0.57
+    density: 0.49
     loopable: false
     harmony: ["F#m", "D", "A", "C#m", "F#m", "D", "A", "C#m"]
     # Intimate ambience for the section.
@@ -407,28 +433,30 @@ sections:
       reverb_wet: 0.075
       reverb_decay_seconds: 1.30
     layers:
-      - expression_swell
-      # Sub-bass starts on bar 0.
-      - {template: sub_bass_voice, repeats: 8, velocity: 80}
-      # Arp comes in on bar 2.
+      - intro_expression_swell
+      # A continuous foundation starts immediately so headphone listeners do
+      # not compensate for a misleadingly sparse opening.
+      - {template: sub_bass_voice, repeats: 8, velocity: 88}
+      - {template: synth_pad, velocity: 58}
+      # The arp remains restrained, preserving a real lift into exploring.
       - kind: arpeggio
         instrument: arp_synth
         octave: 3
         pattern: [0, 1, 2, 1]
         step: 0.5
         duration_beats: 0.40
-        velocity: 60
+        velocity: 68
         density: 1.0
         voicing: closed
         articulation: pluck
       # Atmospheric pad runs the whole intro.
-      - {template: atmos_wash, velocity: 50}
-      - {template: metallic_layer, velocity: 38}
+      - {template: atmos_wash, velocity: 58}
+      - {template: metallic_layer, velocity: 42}
       # Single bell-synth chime on bar 0 and bar 7.
       - kind: chord_hits
         instrument: bell_synth
         octave: 5
-        velocity: 64
+        velocity: 54
         duration_beats: 4.0
         articulation: bell
         humanize_ms: 0
