@@ -1,0 +1,1165 @@
+schema: ambition.musicir.v1
+id: tech_bros_disruption_recompiled
+title: Disruption Index - Extended Cut (Register Study)
+seed: 25048391
+notes: >-
+  A longer exploratory cut of tech_bros_disruption that protects the original rapid saw/square confrontation
+  grammar while testing two specific refinements. First, the sustained background synth pad is register-bounded
+  below C6; the old voice-leading path could drift into B8-F#9 fundamentals (about 7.9-11.8 kHz), which
+  made the otherwise attractive sheen intermittently whistle-like. Second, the first climax statement
+  keeps the original dissonant F-natural/D-sharp contour at full force, while alternate repetitions retain
+  the pitches at reduced velocity so the first clash can remain special instead of becoming a constant
+  accent. After the original 16-bar confrontation, an eight-bar breach bridge drops into a lower register,
+  a new 24-bar counteroffensive swaps the saw and square roles before restoring the doubled climax, and
+  an eight-bar return bridge and eight-bar loop handoff keep the low saw/square relay alive while
+  rotating through E back into the F#-minor exploring loop. The intro now establishes a safe, audible
+  reference level from its first bar instead of inviting headphone users to turn up a misleadingly sparse
+  opening; its continuous bed is fuller while the isolated bell peak is reduced. A quiet low-register
+  saw/square relay appears in the intro and returns more clearly in the ambush bridge, so the later breach
+  timbre is remembered rather than introduced halfway through the cue. The linear audition is 112 bars
+  (about 217 seconds at 124 BPM); runtime playback remains adaptive.
+
+tempo:
+  bpm: 124
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.030
+  reverb_decay_seconds: 0.85
+  reverb_damping_hz: 7000
+  stereo_width: 0.06
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.004
+  reverb_decay_seconds: 0.40
+  reverb_damping_hz: 7000
+  stereo_width: 0.040
+  limiter_drive: 0.92
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  # "Strings" group = pads + sub-bass.
+- {name: pad_warm, group: strings, program: pad_warm, volume: 80, pan: 70, expression: 92, modulation: 
+    4}
+- {name: pad_poly, group: strings, program: pad_poly, volume: 76, pan: 56, expression: 88, 
+    modulation: 4}
+- {name: sub_bass, group: strings, program: synth_bass_1, volume: 96, pan: 64, expression: 100}
+
+  # "Winds" group = synth leads (the melodic foreground).
+- {name: lead_saw, group: winds, program: lead_saw, volume: 96, pan: 70, expression: 102, modulation: 
+    6}
+- {name: lead_square, group: winds, program: lead_square, volume: 88, pan: 50, expression: 96, 
+    modulation: 4}
+- {name: lead_voice, group: winds, program: lead_voice, volume: 84, pan: 64, expression: 90, 
+    modulation: 5}
+
+  # "Brass" group = synth brass for stabs + fanfare.
+- {name: synth_brass_a, group: brass, program: synth_brass_1, volume: 92, pan: 70, expression: 100, 
+    modulation: 3}
+- {name: synth_brass_b, group: brass, program: synth_brass_2, volume: 88, pan: 50, expression: 96, 
+    modulation: 3}
+
+  # "Mallets" group = the 16th-note arpeggiator + bell sparkle.
+- {name: arp_synth, group: mallets, program: synth_bass_2, volume: 88, pan: 60, expression: 96}
+- {name: bell_synth, group: mallets, program: fx_crystal, volume: 70, pan: 80, expression: 84}
+
+  # "Choir_pad" group = atmospheric textures + dread.
+- {name: atmos, group: choir_pad, program: fx_atmosphere, volume: 70, pan: 64, expression: 84, 
+    modulation: 4}
+- {name: pad_metallic, group: choir_pad, program: pad_metallic, volume: 60, pan: 64, expression: 80, 
+    modulation: 3}
+
+  # Percussion = electronic kit.
+- {name: kit, group: percussion, is_drum: true, volume: 102, pan: 64, expression: 110}
+
+motifs:
+  # Lead theme — syncopated 8th-note phrase with a leap up to b3 (A5).
+  # F#5 A5 F#5 E5 F#5 A5 C#6 B5
+- id: lead_theme
+  root: F#5
+  intervals: [0, 3, 0, -2, 0, 3, 7, 5]
+  rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+  velocities: [1.00, 0.86, 0.92, 0.84, 0.96, 0.86, 1.00, 0.92]
+
+  # Lead variation B — descending sequence with chromatic.
+  # C#6 B5 A5 G#5 F#5 G#5 A5 F#5
+- id: lead_theme_b
+  root: F#5
+  intervals: [7, 5, 3, 2, 0, 2, 3, 0]
+  rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+  velocities: [0.96, 0.88, 0.90, 0.86, 0.98, 0.88, 0.92, 0.94]
+
+  # Climax lead — extended high-register phrase, builds tension.
+  # F#5 A5 C#6 F#6 F6 D#6 C#6 A5 F#5 G#5 A5 F#5
+- id: lead_climax
+  root: F#5
+  intervals: [0, 3, 7, 12, 11, 9, 7, 3, 0, 2, 3, 0]
+  rhythm: [0.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.5]
+  velocities: [0.94, 0.84, 0.92, 1.00, 0.94, 0.92, 0.94, 0.86, 0.92, 0.84, 0.86, 0.88]
+# Same notes as lead_climax, but the two exposed dissonant tones are quieter.
+# Use on alternate statements; never replace the first confrontation statement.
+- id: lead_climax_restrained
+  root: F#5
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 12
+  - 11
+  - 9
+  - 7
+  - 3
+  - 0
+  - 2
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  velocities:
+  - 0.94
+  - 0.84
+  - 0.92
+  - 0.96
+  - 0.82
+  - 0.8
+  - 0.9
+  - 0.84
+  - 0.9
+  - 0.8
+  - 0.82
+  - 0.86
+
+  # Sub-bass: tonic + fifth pulse. F#1 F#1 C#2 F#1 (over 4 beats)
+- id: sub_bass_pulse
+  root: F#1
+  intervals: [0, 0, 7, 0]
+  rhythm: [1.0, 1.0, 1.0, 1.0]
+  velocities: [1.00, 0.84, 0.92, 0.86]
+
+  # Sub-bass variation — adds the b6 (D) for tension.
+  # F#1 F#1 D2 C#2 (suggests F#m -> D -> C#m progression rhythmically)
+- id: sub_bass_motion
+  root: F#1
+  intervals: [0, 0, 8, 7]
+  rhythm: [1.0, 1.0, 1.0, 1.0]
+  velocities: [1.00, 0.84, 0.94, 0.92]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+    - {group: winds, cc: expression, from: 70, to: 110, curve: smooth, points: 16}
+    - {group: brass, cc: expression, from: 60, to: 105, curve: smooth, points: 16}
+    - {group: strings, cc: expression, from: 70, to: 100, curve: smooth, points: 16}
+    - {group: mallets, cc: expression, from: 70, to: 105, curve: smooth, points: 16}
+    - {group: choir_pad, cc: expression, from: 50, to: 86, curve: smooth, points: 12}
+
+  # Intro-specific swell: begin at a trustworthy listening level and still grow.
+  # The old 50-70 CC floor made the first seconds seem like the user's volume was
+  # too low even though the later sections were already mastered near full scale.
+  intro_expression_swell:
+    kind: automation
+    automation:
+    - {group: winds, cc: expression, from: 78, to: 96, curve: smooth, points: 16}
+    - {group: strings, cc: expression, from: 90, to: 104, curve: smooth, points: 16}
+    - {group: mallets, cc: expression, from: 86, to: 102, curve: smooth, points: 16}
+    - {group: choir_pad, cc: expression, from: 80, to: 94, curve: smooth, points: 16}
+    - {group: percussion, cc: expression, from: 74, to: 92, curve: smooth, points: 12}
+
+  # Sub-bass pulse (the "synthwave bass" foundation).
+  sub_bass_voice:
+    kind: motif
+    instrument: sub_bass
+    motif: sub_bass_pulse
+    velocity: 88
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # Sub-bass with motion (used in main_b for variation).
+  sub_bass_motion_voice:
+    kind: motif
+    instrument: sub_bass
+    motif: sub_bass_motion
+    velocity: 88
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # 16th-note arpeggiator (the sequencer pattern).
+  arp_16th:
+    kind: arpeggio
+    instrument: arp_synth
+    octave: 3
+    pattern: [0, 1, 2, 1, 0, 2, 1, 2]
+    step: 0.25
+    duration_beats: 0.20
+    velocity: 78
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Slower 8th-note arp for bridge (less frantic).
+  arp_8th:
+    kind: arpeggio
+    instrument: arp_synth
+    octave: 3
+    pattern: [0, 2, 1, 2]
+    step: 0.5
+    duration_beats: 0.40
+    velocity: 70
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Sustained pad chord — pad_warm + pad_poly stacked.
+  synth_pad:
+    kind: pad_chords
+    instruments: [pad_warm, pad_poly]
+    # Keep the two synth pads lush but avoid the clipped G9 upper partials
+    # highlighted in the sour-note audit. pad_poly supplies body an octave
+    # below instead of doubling the bright top.
+    instrument_octave_offsets: {pad_warm: 0, pad_poly: -1}
+    instrument_velocity_offsets: {pad_warm: 0, pad_poly: -8}
+    octave: 3
+    duration_beats: 4.0
+    velocity: 66
+    articulation: pad
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    # Keep the pad fundamentals between A2 and B5. The airy patch can still
+    # generate upper harmonics without literal 8-12 kHz note fundamentals.
+    constraints:
+      min_pitch: 45
+      max_pitch: 83
+      max_notes: 4
+
+  # Lead theme (saw lead).
+  lead_saw_voice:
+    kind: motif
+    instrument: lead_saw
+    motif: lead_theme
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Lead theme variation B (square lead).
+  lead_square_voice:
+    kind: motif
+    instrument: lead_square
+    motif: lead_theme_b
+    velocity: 88
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Climactic lead (saw lead, octave higher).
+  lead_climax_voice:
+    kind: motif
+    instrument: lead_saw
+    motif: lead_climax
+    velocity: 96
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Alternate confrontation statement: same contour, less repeated dissonant emphasis.
+  lead_climax_restrained_voice:
+    kind: motif
+    instrument: lead_saw
+    motif: lead_climax_restrained
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Lower-register role reversal for the new counteroffensive middle phase.
+  lead_climax_square_low:
+    kind: motif
+    instrument: lead_square
+    motif: lead_climax_restrained
+    transpose: -12
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # Lead-voice double under the saw climax.
+  lead_voice_double:
+    kind: motif
+    instrument: lead_voice
+    motif: lead_climax
+    transpose: -12
+    velocity: 78
+    articulation: tenuto
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Synth brass chord stab — used at phrase boundaries.
+  synth_brass_stab:
+    kind: chord_hits
+    instruments: [synth_brass_a, synth_brass_b]
+    instrument_octave_offsets: {synth_brass_a: 0, synth_brass_b: -1}
+    octave: 3
+    velocity: 88
+    duration_beats: 1.5
+    articulation: marcato
+    voicing: closed
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    # Prevent long-form voice leading from walking brass stabs upward.
+    constraints:
+      min_pitch: 42
+      max_pitch: 85
+      max_notes: 4
+
+  # Synth brass sustained pad (climax only).
+  synth_brass_pad:
+    kind: pad_chords
+    instruments: [synth_brass_a, synth_brass_b]
+    instrument_octave_offsets: {synth_brass_a: 0, synth_brass_b: -1}
+    octave: 3
+    duration_beats: 4.0
+    velocity: 70
+    articulation: legato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+    # Keep the sustained brass bed below the whistle-like register.
+    constraints:
+      min_pitch: 42
+      max_pitch: 83
+      max_notes: 4
+
+  # Bell synth sparkle on phrase tops (fx_crystal preset).
+  bell_sparkle:
+    kind: chord_hits
+    instrument: bell_synth
+    octave: 5
+    velocity: 76
+    duration_beats: 4.0
+    articulation: bell
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Atmosphere wash — fx_atmosphere providing dread bed.
+  atmos_wash:
+    kind: pad_chords
+    instrument: atmos
+    octave: 4
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 60
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Metallic pad — adds the cold-machine flavor.
+  metallic_layer:
+    kind: pad_chords
+    instrument: pad_metallic
+    octave: 3
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 44
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Drums — half-time synthwave (kick on 1+3, electric snare on 2+4, hats 8ths).
+  drums_synthwave_basic:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 88}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 76}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 32}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 36}
+
+  # Drums with hat 16ths and ghost snare (busier).
+  drums_synthwave_busy:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 90}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 78}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 38}
+    - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 28}
+    - {drum: open_hat, beats: [1.5, 3.5], velocity: 30}
+    - {drum: side_stick, beat: 3.75, velocity: 30, probability: 0.6}
+
+  # 4-on-the-floor club groove (climax).
+  drums_club:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 1.0, 2.0, 3.0], velocity: 96}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 84}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 50}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 40}
+    - {drum: open_hat, beats: [0.25, 1.25, 2.25, 3.25], velocity: 24}
+    - {drum: ride, beats: [0.0, 1.0, 2.0, 3.0], velocity: 22}
+    - {drum: crash, beat: 0.0, velocity: 84, bars: [0, 4, 8, 12]}
+
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components:
+  - main_a
+  - main_b
+  - bridge
+  - main_c
+  - breach_bridge
+  - main_d
+  - cooldown
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, choir_pad]
+    fade_stems: [winds, brass, mallets, percussion]
+
+state_map:
+  starting: {section: intro}
+
+  exploring:
+    preferred_section: main_a
+    stems: {strings: 1.0, mallets: 0.85, percussion: 0.65, winds: 0.45, brass: 0.0, choir_pad: 0.55}
+
+  hacking:
+    preferred_section: main_b
+    stems: {strings: 1.0, mallets: 1.0, percussion: 0.75, winds: 0.65, brass: 0.20, choir_pad: 0.55}
+
+  ambushed:
+    preferred_section: bridge
+    stems: {strings: 1.0, mallets: 0.40, percussion: 0.20, winds: 0.50, brass: 0.0, choir_pad: 0.85}
+
+  confrontation:
+    preferred_section: main_c
+    stems: {strings: 1.0, mallets: 1.0, percussion: 1.0, winds: 1.0, brass: 1.0, choir_pad: 0.55}
+  reeling:
+    preferred_section: breach_bridge
+    stems:
+      strings: 1.0
+      mallets: 0.55
+      percussion: 0.35
+      winds: 0.58
+      brass: 0.15
+      choir_pad: 0.78
+
+  overclocked:
+    preferred_section: main_d
+    stems:
+      strings: 1.0
+      mallets: 1.0
+      percussion: 1.0
+      winds: 1.0
+      brass: 0.95
+      choir_pad: 0.52
+  cooling:
+    preferred_section: cooldown
+    stems:
+      strings: 1.0
+      mallets: 0.62
+      percussion: 0.38
+      winds: 0.52
+      brass: 0.12
+      choir_pad: 0.72
+
+  retreating:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+
+sections:
+- id: intro
+  kind: intro
+  label: server room glow - audible foundation and a ghost of the later relay
+  bars: 8
+  intensity: 0.58
+  density: 0.50
+  loopable: false
+  harmony: ["F#m", "D", "A", "C#m", "F#m", "D", "A", "C#m"]
+    # Intimate ambience for the section.
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.30
+  layers:
+  - intro_expression_swell
+      # A continuous, mid-level foundation begins immediately. This is a safety
+      # choice as well as an arrangement choice: the listener should know their
+      # headphone volume is adequate before the full groove arrives.
+  - {template: sub_bass_voice, repeats: 8, velocity: 88}
+  - {template: synth_pad, velocity: 58}
+  - kind: arpeggio
+    instrument: arp_synth
+    octave: 3
+    pattern: [0, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.40
+    velocity: 68
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+  - {template: atmos_wash, velocity: 58}
+  - {template: metallic_layer, velocity: 42}
+      # Foreshadow the low breach timbre without spending its climax contour.
+      # This two-bar saw/square exchange returns more clearly in the ambush bridge.
+  - {template: lead_saw_voice, starts: [[4, 0.0]], transpose: -12, velocity: 50}
+  - {template: lead_square_voice, starts: [[6, 0.0]], transpose: -12, velocity: 46}
+      # The old bell dominated the intro peak while contributing little perceived
+      # loudness. Keep the chime, but let the continuous bed set the volume reference.
+  - kind: chord_hits
+    instrument: bell_synth
+    octave: 5
+    velocity: 54
+    duration_beats: 4.0
+    articulation: bell
+    humanize_ms: 0
+    hits: [[0, 0.0], [7, 0.0]]
+      # Drums still arrive gradually, preserving the lift into exploring.
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - {drum: kick, beat: 0.0, velocity: 70, bars: [4, 5, 6, 7]}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 26, bars: [6, 7]}
+
+- id: main_a
+  kind: loop_component
+  label: exploring - lead saw theme over 16th-note arp
+  bars: 16
+  intensity: 0.74
+  density: 0.65
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["F#m", "D", "A", "E", "F#m", "D", "A", "E", "F#m", "C#m", "Bm", "E", "F#m", "D", "A", "E"]
+  layers:
+  - {template: lead_saw_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 90}
+  - {template: arp_16th, density: 1.0, velocity: 78}
+  - {template: sub_bass_voice, repeats: 16, velocity: 86}
+  - {template: synth_pad, velocity: 68}
+  - drums_synthwave_basic
+  - {template: atmos_wash, velocity: 56}
+  - {template: metallic_layer, velocity: 40}
+
+- id: main_b
+  kind: loop_component
+  label: hacking - lead square variation, busier drums
+  bars: 16
+  intensity: 0.78
+  density: 0.70
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["F#m", "A", "Bm", "E", "F#m", "C#m", "D", "E", "F#m", "Bm", "D", "C#m", "F#m", "A", "D", "E"]
+  layers:
+  - {template: lead_square_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 90}
+      # Saw lead doubles 4 bars later for call-and-response.
+  - {template: lead_saw_voice, starts: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0]], velocity: 80}
+  - {template: arp_16th, density: 1.0, velocity: 80}
+  - {template: sub_bass_motion_voice, repeats: 16, velocity: 88}
+  - {template: synth_pad, velocity: 70}
+  - {template: synth_brass_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 78}
+  - drums_synthwave_busy
+  - {template: bell_sparkle, hits: [[0, 0.0], [8, 0.0]], velocity: 64}
+  - {template: atmos_wash, velocity: 60}
+  - {template: metallic_layer, velocity: 42}
+
+- id: bridge
+  kind: loop_component
+  label: ambushed - breakdown, just pad + slow arp
+  bars: 8
+  intensity: 0.50
+  density: 0.35
+  loopable: true
+  valid_exit_local_bars: [4, 8]
+  harmony: ["Bm", "D", "A", "F#m", "Bm", "C#m", "D", "E"]
+    # Drier, more intimate ambience for the bridge.
+  postprocess:
+    reverb_wet: 0.025
+    reverb_decay_seconds: 0.70
+  layers:
+      # Lead voice (vocal-ish synth) carries a long melodic line.
+  - kind: motif
+    instrument: lead_voice
+    motif: lead_theme_b
+    velocity: 76
+    articulation: legato
+    humanize_ms: 4
+    starts: [[0, 0.0], [4, 0.0]]
+      # A more legible preview of the low breach voice. It answers in the empty
+      # half-bars between the lead_voice statements, so the later bridge reads as
+      # a return and intensification rather than a new instrument arriving late.
+  - {template: lead_climax_restrained_voice, starts: [[2, 0.0]], transpose: -12, velocity: 56}
+  - {template: lead_square_voice, starts: [[6, 0.0]], transpose: -12, velocity: 52}
+  - {template: arp_8th, density: 0.85, velocity: 60}
+      # Sub-bass thinned out — only on bar 0 and bar 4.
+  - kind: motif
+    instrument: sub_bass
+    motif: sub_bass_pulse
+    velocity: 70
+    articulation: tenuto
+    humanize_ms: 0
+    starts: [[0, 0.0], [4, 0.0]]
+  - {template: synth_pad, velocity: 70}
+      # Drums minimal — kick on 1+3, no snare backbeat.
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - {drum: kick, beats: [0.0, 2.0], velocity: 60}
+    - {drum: side_stick, beats: [1.0, 3.0], velocity: 28}
+  - {template: atmos_wash, velocity: 70}
+  - {template: metallic_layer, velocity: 50}
+
+- id: main_c
+  kind: loop_component
+  label: confrontation - club drop, full ensemble
+  bars: 16
+  intensity: 0.94
+  density: 0.85
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: ["F#m", "D", "A", "E", "F#m", "Bm", "C#m", "E", "F#m", "A", "Bm", "C#m", "F#m", "D", "E", "E"]
+    # Cathedral ambience for the section.
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.40
+# Dynamic experiment: full dissonant statement at bar 0, restrained repeats at 4/12,
+# and the original rapid square replies at 2/6/10/14.
+  layers:
+  - template: lead_climax_voice
+    starts:
+    - - 0
+      - 0.0
+    velocity: 96
+  - template: lead_climax_restrained_voice
+    starts:
+    - - 4
+      - 0.0
+    velocity: 92
+  - template: lead_climax_voice
+    starts:
+    - - 8
+      - 0.0
+    velocity: 93
+  - template: lead_climax_restrained_voice
+    starts:
+    - - 12
+      - 0.0
+    velocity: 90
+  - template: lead_voice_double
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 80
+  - template: lead_voice_double
+    starts:
+    - - 4
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 74
+    note_velocity_pattern:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 0.96
+    - 0.84
+    - 0.82
+    - 0.92
+    - 1.0
+    - 1.0
+    - 0.9
+    - 0.9
+    - 1.0
+  - template: lead_square_voice
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    - - 10
+      - 0.0
+    - - 14
+      - 0.0
+    velocity: 86
+  - template: arp_16th
+    density: 1.0
+    velocity: 84
+  - template: sub_bass_voice
+    repeats: 16
+    velocity: 92
+  - template: synth_pad
+    velocity: 70
+  - template: synth_brass_pad
+    velocity: 70
+  - template: synth_brass_stab
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 90
+  - drums_club
+  - template: bell_sparkle
+    hits:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 72
+  - template: atmos_wash
+    velocity: 60
+  - template: metallic_layer
+    velocity: 42
+- id: breach_bridge
+  kind: loop_component
+  label: breach bridge - the argument drops an octave but does not stop
+  bars: 8
+  intensity: 0.64
+  density: 0.5
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Bm
+  - D
+  - A
+  - E
+  - F#m
+  - C#m
+  - D
+  - E
+  postprocess:
+    reverb_wet: 0.045
+    reverb_decay_seconds: 0.95
+  layers:
+  - template: lead_climax_restrained_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    transpose: -12
+    velocity: 72
+  - template: lead_square_voice
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    transpose: -12
+    velocity: 68
+  - template: arp_8th
+    density: 0.92
+    velocity: 64
+  - template: sub_bass_motion_voice
+    repeats: 8
+    velocity: 78
+  - template: synth_pad
+    velocity: 66
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 70
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 50
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 24
+  - template: atmos_wash
+    velocity: 66
+  - template: metallic_layer
+    velocity: 48
+- id: main_d
+  kind: loop_component
+  label: counteroffensive - three-phase saw/square role reversal
+  bars: 24
+  intensity: 0.96
+  density: 0.88
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  - 24
+  harmony:
+  - F#m
+  - D
+  - A
+  - E
+  - F#m
+  - Bm
+  - C#m
+  - E
+  - Bm
+  - D
+  - F#m
+  - E
+  - Bm
+  - C#m
+  - D
+  - E
+  - F#m
+  - A
+  - Bm
+  - C#m
+  - F#m
+  - D
+  - E
+  - E
+  postprocess:
+    reverb_wet: 0.07
+    reverb_decay_seconds: 1.3
+  layers:
+  - template: lead_climax_voice
+    starts:
+    - - 0
+      - 0.0
+    velocity: 94
+  - template: lead_climax_restrained_voice
+    starts:
+    - - 4
+      - 0.0
+    velocity: 90
+  - template: lead_square_voice
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    velocity: 86
+  - template: lead_climax_square_low
+    starts:
+    - - 8
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 91
+  - template: lead_saw_voice
+    starts:
+    - - 10
+      - 0.0
+    - - 14
+      - 0.0
+    velocity: 84
+  - template: lead_climax_voice
+    starts:
+    - - 16
+      - 0.0
+    velocity: 96
+  - template: lead_climax_restrained_voice
+    starts:
+    - - 20
+      - 0.0
+    velocity: 92
+  - template: lead_voice_double
+    starts:
+    - - 16
+      - 0.0
+    - - 20
+      - 0.0
+    velocity: 78
+  - template: lead_square_voice
+    starts:
+    - - 18
+      - 0.0
+    - - 22
+      - 0.0
+    velocity: 88
+  - template: arp_16th
+    density: 1.0
+    velocity: 85
+  - template: sub_bass_voice
+    repeats: 24
+    velocity: 92
+  - template: synth_pad
+    velocity: 70
+  - template: synth_brass_pad
+    velocity: 70
+  - template: synth_brass_stab
+    hits:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    - - 16
+      - 0.0
+    - - 20
+      - 0.0
+    velocity: 90
+  - drums_club
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 86
+      bars:
+      - 16
+      - 20
+    - drum: open_hat
+      beats:
+      - 0.75
+      - 1.75
+      - 2.75
+      - 3.75
+      velocity: 24
+      bars:
+      - 16
+      - 17
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+  - template: bell_sparkle
+    hits:
+    - - 0
+      - 0.0
+    - - 16
+      - 0.0
+    velocity: 68
+  - template: atmos_wash
+    velocity: 58
+  - template: metallic_layer
+    velocity: 44
+- id: cooldown
+  kind: loop_component
+  label: return bridge - the low two-bar relay keeps the machine in motion
+  bars: 8
+  intensity: 0.64
+  density: 0.52
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - F#m
+  - D
+  - A
+  - E
+  - F#m
+  - D
+  - A
+  - E
+  postprocess:
+    reverb_wet: 0.050
+    reverb_decay_seconds: 1.0
+  layers:
+  - template: lead_saw_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    transpose: -12
+    velocity: 68
+  - template: lead_square_voice
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    transpose: -12
+    velocity: 64
+  - template: arp_16th
+    density: 0.80
+    velocity: 62
+  - template: sub_bass_voice
+    repeats: 8
+    velocity: 74
+  - template: synth_pad
+    velocity: 64
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 68
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 52
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 20
+  - template: atmos_wash
+    velocity: 60
+  - template: metallic_layer
+    velocity: 42
+- id: outro
+  kind: outro
+  label: loop handoff - the two-bar relay carries E directly back to F# minor
+  bars: 8
+  intensity: 0.68
+  density: 0.58
+  loopable: false
+  # Mirror the first half of main_a so the final E -> opening F#m seam is the
+  # same harmonic turn the listener has already learned inside the cue.
+  harmony:
+  - F#m
+  - D
+  - A
+  - E
+  - F#m
+  - D
+  - A
+  - E
+  layers:
+  - template: lead_saw_voice
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    transpose: -12
+    velocity: 70
+  - template: lead_square_voice
+    starts:
+    - - 2
+      - 0.0
+    - - 6
+      - 0.0
+    transpose: -12
+    velocity: 66
+  - template: arp_16th
+    density: 0.88
+    velocity: 66
+  - template: sub_bass_voice
+    repeats: 8
+    velocity: 78
+  - template: synth_pad
+    velocity: 66
+  - kind: drums
+    instrument: kit
+    humanize_ms: 0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 72
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 56
+    - drum: hand_clap
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 22
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 24
+  - template: atmos_wash
+    velocity: 58
+  - template: metallic_layer
+    velocity: 40
+group_postprocess:
+  strings: {gain_db: 0.0, lowpass_hz: 14000, high_shelf_hz: 5500, high_shelf_db: 0.4, transient_tame: 
+      0.04, reverb_wet: 0.005}
+  winds: {gain_db: 1.0, lowpass_hz: 14000, high_shelf_hz: 5000, high_shelf_db: 1.0, presence_low_hz: 
+      1500, presence_high_hz: 5500, presence_db: 1.0, transient_tame: 0.02, reverb_wet: 0.005}
+  brass: {gain_db: 0.0, lowpass_hz: 12000, high_shelf_hz: 5200, high_shelf_db: 0.4, transient_tame: 
+      0.04, reverb_wet: 0.005}
+  mallets: {gain_db: 0.0, lowpass_hz: 13000, high_shelf_hz: 5500, high_shelf_db: 0.4, transient_tame: 
+      0.04, reverb_wet: 0.006}
+  percussion: {gain_db: -1.0, lowpass_hz: 11500, high_shelf_hz: 5500, high_shelf_db: 0.0, 
+      transient_tame: 0.04, reverb_wet: 0.003}
+  choir_pad: {gain_db: 2.0, lowpass_hz: 9000, high_shelf_hz: 4800, high_shelf_db: -0.8, 
+      transient_tame: 0.04, reverb_wet: 0.010}
