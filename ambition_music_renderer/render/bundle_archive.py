@@ -152,6 +152,7 @@ def build_rerun_script(
     spectrograms: bool = False,
     all_audits: bool = False,
     bundle_root: Path | None = None,
+    jobs: int = 1,
 ) -> Path:
     script = bundle_dir / "rerun_bundle.sh"
     cmd = [
@@ -161,6 +162,8 @@ def build_rerun_script(
         str(backend),
         "--runtime_stem_gain_mode",
         str(runtime_stem_gain_mode),
+        "--jobs",
+        str(jobs),
     ]
     if runtime_stem_max_gain_db is not None:
         cmd.extend(["--runtime_stem_max_gain_db", str(runtime_stem_max_gain_db)])

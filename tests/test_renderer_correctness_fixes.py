@@ -114,11 +114,17 @@ def test_rerun_script_uses_real_subcommand(tmp_path: Path):
         None,
         False,
         False,
+        jobs=6,
     )
     body = script.read_text()
     assert "cue bundle" in body, "rerun script must call the real modal subcommand"
     assert "cue_bundle" not in body
     assert "--outdir" not in body, "default-layout reruns must re-resolve their layout"
+    lines = body.splitlines()
+    jobs_line = next(i for i, line in enumerate(lines) if line.strip() == "--jobs \\")
+    assert lines[jobs_line + 1].strip().removesuffix("\\").strip() == "6", (
+        "rerun script must preserve render parallelism"
+    )
 
 
 def test_batch_build_command_forwards_all_bundle_options():

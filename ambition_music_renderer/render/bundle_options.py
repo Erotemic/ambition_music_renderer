@@ -24,10 +24,10 @@ RENDER_AUDIO_MODES = ("full", "full-mix-only", "simple-mix")
 class BundleOptions(kwconf.Config):
     """Per-cue bundle knobs shared by the single-cue and multi-cue configs.
 
-    Deliberately declares no positional cue field and no ``jobs`` field: those
-    differ between the single-cue renderer (one ``cue``; ``jobs`` = render
-    workers) and the orchestrator (``cues``; ``jobs`` = parallel cue count), so
-    each subclass owns them.
+    Deliberately declares no positional cue field and no ``jobs`` field. The
+    one-cue renderer uses ``jobs`` for stem-group workers; the top-level command
+    resolves ``jobs`` the same way for one cue but uses it for cue-level fan-out
+    when several cues are supplied.
     """
 
     backend: str = kwconf.Value(DEFAULT_BACKEND, choices=list(BACKEND_CHOICES))

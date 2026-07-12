@@ -7,9 +7,9 @@ Subcommands:
                             Add --publish to also install full.ogg into the
                             game asset tree.
     cue publish <cue>       Publish newest preview into the sandbox asset tree.
-    cue bundle <cue>...     Render+debug+package one or more cues. Pass several
-                            cue ids and -j/--jobs N to run them in parallel
-                            (one render subprocess per cue).
+    cue bundle <cue>...     Render+debug+package one or more cues. For one cue,
+                            -j/--jobs N parallelizes stem groups. For several,
+                            it parallelizes cue subprocesses.
     sandbox render-publish  Render+publish the sandbox single-track cues
                             (lofi_study_loop, long_lofi_drift, pulse_drift_voyage).
     sandbox render          Render-only for sandbox cues.
@@ -562,28 +562,34 @@ def run_bulk_cues(config, *, cues_factory, action: str) -> int:
     return _run_bulk(config, cues, action)
 
 
-def _single_bundle_config(args, cue: str):
-    """Build a per-cue ``CueBundleConfig`` from the orchestrator ``args``.
+def _single_bundle_render_jobs(args) -> int:
+    """Resolve group-render workers for a one-cue bundle invocation.
 
-    The shared ``BundleOptions`` fields copy across by name; the only divergence
-    is the positional (``cues`` -> ``cue``) and the meaning of ``jobs`` (the
-    orchestrator's ``render_jobs`` becomes the renderer's ``jobs`` worker count).
+    ``--jobs`` is the natural spelling for a one-cue command, while multi-cue
+    runs reserve it for cue-level fan-out and use ``--render_jobs`` per cue.
+    An explicit ``--render_jobs`` remains a supported override in either mode.
     """
+    if args.render_jobs is not None:
+        return max(1, int(args.render_jobs))
+    return max(1, int(args.jobs))
+
+
+def _single_bundle_config(args, cue: str):
+    """Build a per-cue ``CueBundleConfig`` from the orchestrator ``args``."""
     from .render.bundle import CueBundleConfig
 
     data = {field: getattr(args, field) for field in PASSTHROUGH_FIELDS}
     data["cue"] = cue
-    data["jobs"] = args.render_jobs
+    data["jobs"] = _single_bundle_render_jobs(args)
     return CueBundleConfig.cli(argv=False, data=data)
 
 
 @profile
 def cmd_bundle(args) -> int:
     cues = list(args.cues)
-    # Multiple cues, or an explicit cross-cue parallelism request, go through
-    # the batch runner (one render subprocess per cue). A lone serial cue stays
-    # in-process so profiling / --render_in_process / --json keep working.
-    if len(cues) > 1 or args.jobs > 1:
+    # Only a true multi-cue invocation uses the batch runner. For one cue,
+    # --jobs controls the renderer's independent stem-group workers directly.
+    if len(cues) > 1:
         from .render.batch_bundle import run_batch_bundle
 
         return run_batch_bundle(args)
@@ -749,8 +755,10 @@ class BundleCommand(BundleOptions):
     Shared per-cue knobs come from :class:`BundleOptions`. This orchestrator adds
     the multi-cue positional and the cross-cue parallelism: pass a single cue id
     to render it in-process (profiling and ``--json`` available), or several cue
-    ids and/or ``-j/--jobs N`` to fan out across cues, one render subprocess each,
-    with per-cue logs.
+    ids to fan out across cues, one render subprocess each, with per-cue logs.
+    For one cue, ``-j/--jobs N`` controls parallel stem-group rendering. For
+    several cues it controls cue-level fan-out and ``--render_jobs N`` controls
+    the workers inside each cue subprocess.
     """
 
     cues: list[str] = kwconf.Value(
@@ -759,14 +767,25 @@ class BundleCommand(BundleOptions):
         nargs="+",
         help="one or more cue ids or .music.yaml paths",
     )
-    jobs: int = kwconf.Value(1, short_alias=["j"], help="parallel cue count; >1 fans out across cues")
-    render_jobs: int = kwconf.Value(1, help="per-cue render worker count")
+    jobs: int = kwconf.Value(
+        1,
+        short_alias=["j"],
+        help=(
+            "worker count: parallel stem groups for one cue; parallel cue "
+            "subprocesses when several cues are supplied"
+        ),
+    )
+    render_jobs: int | None = kwconf.Value(
+        None,
+        help="per-cue stem-group workers for multi-cue runs; defaults to 1",
+    )
     log_root: Path | None = kwconf.Value(None, parser=Path, help="batch per-cue log root (multi-cue runs)")
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        self.jobs = int(self.jobs)
-        self.render_jobs = int(self.render_jobs)
+        self.jobs = max(1, int(self.jobs))
+        if self.render_jobs is not None:
+            self.render_jobs = max(1, int(self.render_jobs))
         if self.log_root is None:
             self.log_root = package_dir() / "batch_logs"
         elif not isinstance(self.log_root, Path):

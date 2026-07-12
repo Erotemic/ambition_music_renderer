@@ -7,7 +7,11 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from ambition_music_renderer.cli import BundleCommand, RenderCommand
+from ambition_music_renderer.cli import (
+    BundleCommand,
+    RenderCommand,
+    _single_bundle_config,
+)
 from ambition_music_renderer.render.bundle_adaptive_reports import (
     write_adaptive_composition_mastering_report,
     write_adaptive_section_report,
@@ -838,6 +842,21 @@ def test_shrill_note_audit_flags_whistle_register_sources():
         assert Path(paths["summary"]).exists()
         assert Path(paths["markdown"]).exists()
         assert "Top Candidates" in Path(paths["markdown"]).read_text()
+
+
+def test_single_bundle_jobs_control_stem_group_workers():
+    args = BundleCommand.cli(argv=["tech_bros_disruption", "--jobs", "6"])
+    config = _single_bundle_config(args, "tech_bros_disruption")
+    assert config.jobs == 6
+    assert args.render_jobs is None
+
+
+def test_single_bundle_render_jobs_can_explicitly_override_jobs():
+    args = BundleCommand.cli(
+        argv=["tech_bros_disruption", "--jobs", "6", "--render_jobs", "3"]
+    )
+    config = _single_bundle_config(args, "tech_bros_disruption")
+    assert config.jobs == 3
 
 
 def test_bundle_many_parser_accepts_parallel_flags():

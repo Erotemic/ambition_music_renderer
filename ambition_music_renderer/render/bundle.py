@@ -521,6 +521,7 @@ def create_bundle(
         write_spectrogram_plots,
         all_audits,
         bundle_root=explicit_bundle_root,
+        jobs=jobs,
     )
 
     if generated_layout is not None:

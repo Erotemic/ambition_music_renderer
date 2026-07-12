@@ -103,7 +103,7 @@ def _build_command(args, cue: str) -> list[str]:
     # exists to prevent.
     data: dict[str, object] = {field: getattr(args, field) for field in PASSTHROUGH_FIELDS}
     data["cue"] = cue
-    data["jobs"] = args.render_jobs
+    data["jobs"] = 1 if args.render_jobs is None else max(1, int(args.render_jobs))
     return KwconfCommand(
         CueBundleConfig,
         module="ambition_music_renderer.render.bundle",
@@ -311,8 +311,9 @@ def run_batch_bundle(args) -> int:
     """Fan out one render subprocess per cue.
 
     ``args`` is the ``cli.BundleCommand`` orchestrator config (the sole caller).
-    It supplies ``cues``, a cross-cue ``jobs`` parallelism, per-cue passthrough
-    flags, and ``log_root``; ``run_batch_bundle`` only reads attributes, so any
+    It supplies ``cues``, cross-cue ``jobs`` parallelism, optional per-cue
+    ``render_jobs``, passthrough flags, and ``log_root``; this function only reads
+    attributes, so any
     duck-typed config with those fields works.
     """
     total_start = time.perf_counter()
