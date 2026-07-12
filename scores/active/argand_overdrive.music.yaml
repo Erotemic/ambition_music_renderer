@@ -490,6 +490,7 @@ layer_templates:
     voicing: shell
     constraints:
       max_notes: 3
+      max_pitch: 95
     humanize_ms: 8
 playback:
   mode: section_stem_matrix

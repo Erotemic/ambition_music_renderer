@@ -118,7 +118,8 @@ layer_templates:
   star_arpeggio:
     kind: arpeggio
     instruments: [celesta, music_box]
-    instrument_octave_offsets: {celesta: 0, music_box: 1}
+    # Keep the music-box halo beside the celesta rather than a full octave above.
+    instrument_octave_offsets: {celesta: 0, music_box: 0}
     instrument_velocity_offsets: {celesta: 0, music_box: -12}
     octave: 5
     pattern: [0, 2, 3, 1, 4, 2]

@@ -220,7 +220,8 @@ layer_templates:
   twinkle_drops:
     kind: chord_hits
     instrument: twinkle
-    octave: 5
+    # Retain the lonely sparkle, but remove the isolated C#8 drop.
+    octave: 4
     velocity: 56
     duration_beats: 2.5
     articulation: bell
@@ -237,6 +238,8 @@ layer_templates:
     velocity: 58
     articulation: pad
     voicing: open
+    constraints:
+      max_pitch: 95
     humanize_ms: 0
     humanize_velocity_pct: 3
 
@@ -249,6 +252,8 @@ layer_templates:
     velocity: 46
     articulation: pad
     voicing: wide
+    constraints:
+      max_pitch: 95
     humanize_ms: 0
     humanize_velocity_pct: 3
 

@@ -111,6 +111,8 @@ layer_templates:
     velocity: 38
     articulation: pad
     voicing: wide
+    constraints:
+      max_pitch: 95
     humanize_ms: 10
     humanize_velocity_pct: 4
   rhodes_chords:
@@ -121,6 +123,8 @@ layer_templates:
     velocity: 54
     articulation: normal
     voicing: shell
+    constraints:
+      max_pitch: 95
     humanize_ms: 12
     humanize_velocity_pct: 5
   pulsing_bass:

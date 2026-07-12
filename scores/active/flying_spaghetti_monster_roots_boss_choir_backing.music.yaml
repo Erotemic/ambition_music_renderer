@@ -1,16 +1,12 @@
 schema: ambition.musicir.v1
 id: flying_spaghetti_monster_roots_boss_choir_backing
-title: One Noodle Rises - Rooted Low Gregorian Chorale r13 (FluidR3 remaster, fingered
-  bass)
+title: One Noodle Rises - Divine Roots Boss Chorale
 seed: 2026060412
-notes: 'Revision r12: redesigns the monk choir away from common-tone suspension drones.
-  The choir now follows each local A/D/E harmony with sustained root/fifth tones,
-  compressing repeated tones into longer holds where possible and resolving phrase
-  endings back to A/E. It keeps the r10/r11 renderer same-pitch-overlap safety while
-  avoiding the unresolved B/A holds that felt detached. | r13: FluidR3 soundfont,
-  chord-safe walking bass + A-Mixolydian leads, jRhodes e-piano (SFZ, GM fallback),
-  boss group mix with measured per-group gains, master EQ polish; original GM fingered
-  bass restored (tuned to -27 dBFS).'
+notes: 'Boss cue for the moment God has arrived. Preserves the r13 roots-reggae battle groove, walking fingered
+  bass, call-and-response guitars, brass amens, and continuous low root/fifth chorale. The choir is again primarily a
+  background Gregorian-style male drone: bass and baritone remain continuous, while a quieter low-tenor ooh voice adds
+  chord-tone motion only at entrances, eight-bar cadences, solo responses, and the final blessing. The result keeps the
+  orchestral clarity learned from the brighter choir experiment without making the choir the foreground melody.'
 tempo:
   bpm: 104
 meter:
@@ -167,6 +163,15 @@ instruments:
   modulation: 1
   chorus: 1
   reverb: 52
+- name: monk_tenor_oohs
+  group: holy_chant
+  program: voice_oohs
+  volume: 82
+  pan: 68
+  expression: 94
+  modulation: 1
+  chorus: 1
+  reverb: 48
 - name: brass_amen
   group: brass
   program: brass_section
@@ -797,6 +802,182 @@ motifs:
   - 0.5
   - 0.5
   - 0.5
+- id: divine_tenor_intro_v1
+  notes:
+  - D3
+  - D3
+  - C#3
+  - C#3
+  - F#3
+  - F#3
+  - G#3
+  - B3
+  - A3
+  rhythm:
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.44
+  - 0.46
+  - 0.46
+  - 0.48
+  - 0.48
+  - 0.5
+  - 0.52
+  - 0.56
+  - 0.44
+- id: divine_tenor_loop_v1
+  notes:
+  - D3
+  - C#3
+  - F#3
+  - E3
+  - A3
+  - F#3
+  - C#3
+  - B2
+  - C#3
+  - F#3
+  - E3
+  - C#3
+  - F#3
+  - E3
+  - A3
+  - G#3
+  - D3
+  - C#3
+  - F#3
+  - E3
+  - G#3
+  - F#3
+  - C#3
+  - B2
+  - F#3
+  - C#3
+  - G#3
+  - E3
+  - F#3
+  - E3
+  - G#3
+  - A3
+  rhythm:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+  velocities:
+  - 0.42
+  - 0.44
+  - 0.48
+  - 0.44
+  - 0.5
+  - 0.46
+  - 0.44
+  - 0.52
+  - 0.44
+  - 0.48
+  - 0.46
+  - 0.44
+  - 0.48
+  - 0.46
+  - 0.52
+  - 0.56
+  - 0.44
+  - 0.46
+  - 0.5
+  - 0.46
+  - 0.52
+  - 0.48
+  - 0.46
+  - 0.54
+  - 0.48
+  - 0.46
+  - 0.52
+  - 0.48
+  - 0.5
+  - 0.48
+  - 0.54
+  - 0.58
+- id: divine_tenor_solo_response_v1
+  root: A2
+  intervals:
+  - 7
+  - 10
+  - 7
+  rhythm:
+  - 1.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.48
+  - 0.56
+  - 0.44
+- id: divine_tenor_tag_v1
+  notes:
+  - A3
+  - F#3
+  - E3
+  - C#3
+  - B2
+  - G#3
+  - E3
+  - C#3
+  - A2
+  rhythm:
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 1.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.5
+  - 0.46
+  - 0.48
+  - 0.44
+  - 0.46
+  - 0.52
+  - 0.5
+  - 0.44
+  - 0.4
 layer_templates:
   skank_drive:
     kind: chord_hits
@@ -1762,8 +1943,7 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato bass monk voice for intro (gate 1.0: continuous without
-      same-pitch overlap)'
+    label: 'continuous legato bass monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_intro_chorale_baritone:
     kind: motif
@@ -1779,8 +1959,7 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato baritone monk voice for intro (gate 1.0: continuous
-      without same-pitch overlap)'
+    label: 'continuous legato baritone monk voice for intro (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_loop_chorale_bass:
     kind: motif
@@ -1796,8 +1975,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous root-resolving low monk bass voice following loop harmony (gate
-      1.0: continuous without same-pitch overlap)'
+    label: 'continuous root-resolving low monk bass voice following loop harmony (gate 1.0: continuous without same-pitch
+      overlap)'
     gate: 1.0
   low_monk_loop_chorale_baritone:
     kind: motif
@@ -1813,8 +1992,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous fifth-resolving low baritone monk voice following loop harmony
-      (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous fifth-resolving low baritone monk voice following loop harmony (gate 1.0: continuous without
+      same-pitch overlap)'
     gate: 1.0
   low_monk_solo_chorale_bass:
     kind: motif
@@ -1830,8 +2009,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous root-resolving low monk bass voice following solo harmony (gate
-      1.0: continuous without same-pitch overlap)'
+    label: 'continuous root-resolving low monk bass voice following solo harmony (gate 1.0: continuous without same-pitch
+      overlap)'
     gate: 1.0
   low_monk_solo_chorale_baritone:
     kind: motif
@@ -1847,8 +2026,8 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous fifth-resolving low baritone monk voice following solo harmony
-      (gate 1.0: continuous without same-pitch overlap)'
+    label: 'continuous fifth-resolving low baritone monk voice following solo harmony (gate 1.0: continuous without
+      same-pitch overlap)'
     gate: 1.0
   low_monk_tag_chorale_bass:
     kind: motif
@@ -1864,8 +2043,7 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato low monk bass voice for outro tag (gate 1.0: continuous
-      without same-pitch overlap)'
+    label: 'continuous legato low monk bass voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
   low_monk_tag_chorale_baritone:
     kind: motif
@@ -1881,9 +2059,77 @@ layer_templates:
     rhythm_scale: 1.0
     humanize_ms: 0
     humanize_velocity_pct: 0
-    label: 'continuous legato low baritone monk voice for outro tag (gate 1.0: continuous
-      without same-pitch overlap)'
+    label: 'continuous legato low baritone monk voice for outro tag (gate 1.0: continuous without same-pitch overlap)'
     gate: 1.0
+  divine_tenor_intro:
+    kind: motif
+    instrument: monk_tenor_oohs
+    motif: divine_tenor_intro_v1
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 58
+    articulation: legato
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    gate: 0.98
+    label: low male tenor shadow moving inside the continuous intro drone
+  divine_tenor_loop:
+    kind: motif
+    instrument: monk_tenor_oohs
+    motif: divine_tenor_loop_v1
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 56
+    articulation: legato
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    gate: 0.98
+    label: one low held chord tone per bar; subtle inner motion, not a choir lead
+  divine_tenor_solo_response:
+    kind: motif
+    instrument: monk_tenor_oohs
+    motif: divine_tenor_solo_response_v1
+    roots:
+    - E2
+    - A2
+    - E2
+    - A2
+    - A2
+    - E2
+    - A2
+    - A2
+    starts:
+    - - 3
+      - 0.0
+    repeats: 8
+    every_bars: 4
+    velocity: 52
+    articulation: tenuto
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    gate: 0.92
+    label: low male amen at each guitar phrase ending, buried into the drone
+  divine_tenor_tag:
+    kind: motif
+    instrument: monk_tenor_oohs
+    motif: divine_tenor_tag_v1
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 64
+    velocity: 56
+    articulation: legato
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    gate: 0.98
+    label: descending low-tenor blessing folded into the bass and baritone choir
 playback:
   mode: section_stem_matrix
   intro: roots_boss_intro
@@ -1911,8 +2157,8 @@ state_map:
       keys: 0.74
       bass: 0.92
       jam_guitar: 0.68
-      holy_chant: 0.7
-      brass: 0.42
+      holy_chant: 0.74
+      brass: 0.55
       drums: 0.88
   solo:
     preferred_section: roots_boss_solo_loop
@@ -1922,22 +2168,22 @@ state_map:
       bass: 0.94
       jam_guitar: 0.88
       holy_chant: 0.7
-      brass: 0.48
+      brass: 0.58
       drums: 0.92
   chant_high:
     section: roots_boss_loop
     stems:
-      skank: 0.72
-      keys: 0.62
+      skank: 0.7
+      keys: 0.6
       bass: 0.82
-      jam_guitar: 0.56
-      holy_chant: 0.7
-      brass: 0.36
-      drums: 0.78
+      jam_guitar: 0.52
+      holy_chant: 0.88
+      brass: 0.42
+      drums: 0.74
 sections:
 - id: roots_boss_intro
   kind: intro
-  label: dread skank count-in with sacred choir answering from above
+  label: dread skank count-in under a low cloister drone
   bars: 4
   intensity: 0.72
   density: 0.72
@@ -1954,6 +2200,7 @@ sections:
   - picked_bass_click
   - low_monk_intro_chorale_bass
   - low_monk_intro_chorale_baritone
+  - divine_tenor_intro
   - rockers_boss_drums
 - id: roots_boss_loop
   kind: loop_component
@@ -2007,6 +2254,7 @@ sections:
   - picked_bass_click
   - low_monk_loop_chorale_bass
   - low_monk_loop_chorale_baritone
+  - divine_tenor_loop
   - guitar_boss_hook
   - amen_brass_hits
   - rockers_boss_drums
@@ -2062,6 +2310,7 @@ sections:
   - picked_bass_click
   - low_monk_solo_chorale_bass
   - low_monk_solo_chorale_baritone
+  - divine_tenor_solo_response
   - guitar_solo_call
   - guitar_solo_response
   - amen_brass_hits
@@ -2085,6 +2334,7 @@ sections:
   - picked_bass_click
   - low_monk_tag_chorale_bass
   - low_monk_tag_chorale_baritone
+  - divine_tenor_tag
   - guitar_boss_hook
   - amen_brass_hits
   - rockers_boss_drums
@@ -2099,15 +2349,18 @@ group_postprocess:
     transient_tame: 0.05
     reverb_wet: 0.005
   holy_chant:
-    gain_db: 6.0
-    highpass_hz: 150
-    lowpass_hz: 5200
+    gain_db: 5.5
+    highpass_hz: 72
+    lowpass_hz: 4800
     high_shelf_hz: 3600
-    high_shelf_db: -1.0
-    reverb_wet: 0.1
-    reverb_decay_seconds: 2.6
+    high_shelf_db: -1.2
+    reverb_wet: 0.09
+    reverb_decay_seconds: 2.5
+    presence_low_hz: 520
+    presence_high_hz: 1650
+    presence_db: 0.55
   skank:
-    gain_db: 10.0
+    gain_db: 9.0
     highpass_hz: 220
     lowpass_hz: 7000
     presence_low_hz: 1800
@@ -2116,7 +2369,7 @@ group_postprocess:
     transient_tame: 0.0
     reverb_wet: 0.02
   jam_guitar:
-    gain_db: 6.0
+    gain_db: 5.5
     highpass_hz: 160
     lowpass_hz: 6400
     presence_low_hz: 1400
@@ -2124,7 +2377,7 @@ group_postprocess:
     presence_db: 1.0
     reverb_wet: 0.04
   keys:
-    gain_db: 8.0
+    gain_db: 7.5
     highpass_hz: 120
     lowpass_hz: 6200
     high_shelf_hz: 4000
@@ -2137,7 +2390,7 @@ group_postprocess:
     transient_tame: 0.0
     reverb_wet: 0.02
   brass:
-    gain_db: 2.0
+    gain_db: 3.5
     highpass_hz: 180
     lowpass_hz: 6600
     reverb_wet: 0.04

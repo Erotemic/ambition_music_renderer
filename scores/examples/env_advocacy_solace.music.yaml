@@ -151,6 +151,8 @@ layer_templates:
     velocity: 64
     articulation: legato
     voicing: open
+    constraints:
+      max_pitch: 95
     humanize_ms: 8
     humanize_velocity_pct: 3
 

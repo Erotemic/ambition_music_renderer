@@ -1,13 +1,12 @@
 schema: ambition.musicir.v1
 id: flying_spaghetti_monster_roots_stage_choir_backing
-title: One Love, One Noodle - Continuous Monk Choir Stage
+title: One Love, One Noodle - Pastafarian Mob Stage
 seed: 2026060413
-notes: Stage/non-boss variant derived from the roots-reggae Flying Spaghetti Monster cue after the r12
-  boss chorale pass. Keeps the calmer Bob Marley / roots-reggae pocket, one-drop percussion, muted skank
-  guitar, warm keys, and light jam guitar; replaces the older intermittent plainchant/response layers
-  with a continuous low monk chorale that follows the A/D/E/Bm harmony by root/fifth tones. The choir
-  is meant to add a holy Gregorian floor without becoming a lead melody, with no intentional rests and
-  explicit gate=1.0 to avoid same-pitch MIDI note-off dropouts.
+notes: 'Stage/non-boss roots-reggae battle cue. Keeps the relaxed one-drop pocket, muted skank, warm keys, dub bass, melodica
+  color, sparse mob chants, and the boss-derived production polish. The former overdrive/steel lead guitar arrangement has
+  been completely replaced: a warm tenor sax now carries the two featured interludes, while a clean jazz guitar contributes
+  short pentatonic turnarounds and replies throughout the loop. Both guitar roles are now mixed at an intentionally audible
+  reference level: the skank provides a clear rhythmic bed and the clean guitar remains noodly without returning as the harsh bent lead around 0:40.'
 tempo:
   bpm: 76
 meter:
@@ -15,130 +14,151 @@ meter:
   beat_unit: 4
 render:
   sample_rate: 48000
-  ogg_quality: 5
+  ogg_quality: 6
   backend: pretty-midi
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
 constraints:
   voice_leading: minimize_motion
   no_clusters: true
 postprocess:
-  gain_db: -0.8
+  gain_db: -0.15
   highpass_hz: 34
-  lowpass_hz: 9800
+  lowpass_hz: 10400
   presence_low_hz: 1200
-  presence_high_hz: 3600
-  presence_db: 0.7
-  reverb_wet: 0.105
-  reverb_decay_seconds: 1.28
+  presence_high_hz: 3800
+  presence_db: 0.45
+  reverb_wet: 0.09
+  reverb_decay_seconds: 1.15
   reverb_damping_hz: 5200
-  stereo_width: 0.12
-  compressor_threshold_db: -17.5
-  compressor_ratio: 2.9
-  compressor_attack_ms: 13.0
-  compressor_release_ms: 135.0
-  compressor_makeup_db: 1.0
+  stereo_width: 0.15
+  compressor_threshold_db: -17.2
+  compressor_ratio: 3.1
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 112.0
+  compressor_makeup_db: 1.35
   compressor_knee_db: 7.0
-  limiter_drive: 0.96
+  limiter_drive: 1.0
   normalize: true
-  target_peak_db: -6.2
+  target_peak_db: -5.2
 stem_postprocess:
-  gain_db: 0.0
+  gain_db: 0.5
   highpass_hz: 32
-  reverb_wet: 0.05
-  reverb_decay_seconds: 0.82
+  reverb_wet: 0.045
+  reverb_decay_seconds: 0.72
   reverb_damping_hz: 5600
-  stereo_width: 0.06
-  limiter_drive: 0.86
+  stereo_width: 0.1
+  limiter_drive: 0.92
   normalize: false
-  target_peak_db: -3.0
+  target_peak_db: -2.8
 instruments:
 - name: skank_guitar
   group: skank
   program: muted_guitar
-  volume: 72
+  volume: 84
   pan: 34
-  expression: 86
+  expression: 100
   chorus: 8
-  reverb: 12
+  reverb: 10
 - name: chiming_guitar
   group: skank
   program: clean_guitar
-  volume: 48
+  volume: 60
   pan: 86
-  expression: 68
+  expression: 82
   chorus: 18
-  reverb: 18
+  reverb: 14
 - name: bubble_organ
   group: keys
   program: drawbar_organ
-  volume: 66
+  volume: 74
   pan: 58
-  expression: 84
+  expression: 90
   modulation: 5
   chorus: 12
-  reverb: 18
+  reverb: 15
 - name: warm_epiano
   group: keys
   program: electric_piano_1
-  volume: 48
+  volume: 52
   pan: 72
-  expression: 68
+  expression: 74
   chorus: 16
-  reverb: 14
+  reverb: 12
+  instrument_backend:
+    kind: sfz
+    library_ref: epiano.rhodes
+    prefer:
+    - stereo
+    - looped
+    - both
+    optional: true
+    fallback_backend: pretty-midi
 - name: dub_bass
   group: bass
   program: fingered_bass
-  volume: 84
+  volume: 92
   pan: 48
-  expression: 96
-- name: lead_noodle_guitar
-  group: jam_guitar
-  program: overdrive_guitar
-  volume: 74
-  pan: 78
-  expression: 92
-  modulation: 4
-  chorus: 16
-  reverb: 18
-- name: slide_answer_guitar
+  expression: 104
+- name: picked_bass_shadow
+  group: bass
+  program: picked_bass
+  volume: 34
+  pan: 42
+  expression: 64
+- name: roots_clean_guitar
   group: jam_guitar
   program: clean_guitar
-  volume: 56
-  pan: 44
-  expression: 82
-  modulation: 4
-  chorus: 14
-  reverb: 18
+  volume: 88
+  pan: 42
+  expression: 108
+  modulation: 1
+  chorus: 3
+  reverb: 12
+- name: tenor_noodle_sax
+  group: horn_lead
+  program: tenor_sax
+  volume: 66
+  pan: 76
+  expression: 84
+  modulation: 3
+  chorus: 3
+  reverb: 16
 - name: melodica_whistle
   group: melodic_color
   program: recorder
-  volume: 34
+  volume: 42
   pan: 82
-  expression: 58
-  reverb: 18
+  expression: 68
+  reverb: 16
 - name: one_drop_kit
   group: drums
   is_drum: true
-  volume: 82
+  volume: 88
   pan: 64
-  expression: 96
+  expression: 102
 - name: stage_low_monk_oohs
   group: holy_chant
   program: voice_oohs
-  volume: 92
+  volume: 84
   pan: 46
-  expression: 104
-  modulation: 1
-  chorus: 1
-  reverb: 50
-- name: stage_low_monk_aahs
-  group: holy_chant
-  program: choir_aahs
-  volume: 80
-  pan: 58
   expression: 96
   modulation: 1
   chorus: 1
-  reverb: 50
+  reverb: 34
+- name: stage_low_monk_aahs
+  group: holy_chant
+  program: choir_aahs
+  volume: 76
+  pan: 58
+  expression: 90
+  modulation: 1
+  chorus: 1
+  reverb: 32
 motifs:
 - id: noodle_zion_backbone
   root: A3
@@ -237,7 +257,64 @@ motifs:
   - 0.54
   - 0.48
   - 0.42
-- id: jam_guitar_noodle_prayer
+- id: stage_mob_chant_call_v2
+  root: A2
+  intervals:
+  - 0
+  - 7
+  - 0
+  rhythm:
+  - 1.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.74
+  - 0.56
+  - 0.66
+- id: stage_mob_chant_response_v2
+  root: A2
+  intervals:
+  - 7
+  - 12
+  - 7
+  rhythm:
+  - 1.0
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.62
+  - 0.5
+  - 0.58
+- id: roots_jazz_turnaround_e
+  root: E4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.5
+  velocities:
+  - 0.48
+  - 0.56
+  - 0.64
+  - 0.56
+  - 0.5
+  - 0.46
+  - 0.42
+  - 0.34
+- id: roots_jazz_turnaround_a
   root: A4
   intervals:
   - 0
@@ -245,8 +322,60 @@ motifs:
   - 4
   - 7
   - 9
-  - 12
-  - 14
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.46
+  - 0.52
+  - 0.6
+  - 0.66
+  - 0.56
+  - 0.5
+  - 0.44
+  - 0.4
+  - 0.32
+- id: roots_jazz_reply_d
+  root: D4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.5
+  velocities:
+  - 0.5
+  - 0.58
+  - 0.66
+  - 0.58
+  - 0.5
+  - 0.36
+- id: tenor_noodle_call
+  root: D4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 9
   - 12
   - 9
   - 7
@@ -255,10 +384,10 @@ motifs:
   - 4
   - 7
   - 9
-  - 12
-  - 9
   - 7
   - 4
+  - 2
+  - 0
   - 2
   - 0
   rhythm:
@@ -272,7 +401,59 @@ motifs:
   - 0.5
   - 0.5
   - 0.5
+  - 0.75
+  - 0.25
   - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.58
+  - 0.64
+  - 0.72
+  - 0.76
+  - 0.82
+  - 0.68
+  - 0.62
+  - 0.58
+  - 0.54
+  - 0.62
+  - 0.7
+  - 0.76
+  - 0.66
+  - 0.58
+  - 0.52
+  - 0.48
+  - 0.52
+  - 0.4
+- id: tenor_noodle_variation
+  root: D4
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 4
+  - 7
+  - 11
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  - 4
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
   - 0.5
   - 0.5
   - 0.5
@@ -282,253 +463,30 @@ motifs:
   - 0.5
   - 0.5
   - 0.5
-  - 1.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 1.0
+  - 1.0
   velocities:
+  - 0.54
+  - 0.6
+  - 0.66
   - 0.72
-  - 0.58
-  - 0.62
-  - 0.76
   - 0.78
-  - 0.86
-  - 0.62
+  - 0.66
+  - 0.58
+  - 0.52
+  - 0.6
   - 0.7
+  - 0.76
   - 0.68
   - 0.62
   - 0.56
-  - 0.58
-  - 0.64
-  - 0.74
-  - 0.78
-  - 0.86
-  - 0.64
-  - 0.68
-  - 0.58
-  - 0.54
+  - 0.5
   - 0.46
-- id: stage_low_monk_bass_chorale_v1
-  notes:
-  - A3
-  - D3
-  - A3
-  - E3
-  - A3
-  - D3
-  - E3
-  - A3
-  - D3
-  - A3
-  - E3
-  - D3
-  - A3
-  - E3
-  - A3
-  - D3
-  - A3
-  - E3
-  - A3
-  - D3
-  - E3
-  - A3
-  - D3
-  - A3
-  - E3
-  - D3
-  - A3
-  - E3
-  - A3
-  - D3
-  - A3
-  - E3
-  - A3
-  - D3
-  - E3
-  - A3
-  rhythm:
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 8.0
-  - 8.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 8.0
-  - 8.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  velocities:
   - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-  - 0.54
-- id: stage_low_monk_baritone_chorale_v1
-  notes:
-  - E3
-  - A3
-  - E3
-  - B3
-  - E3
-  - A3
-  - B3
-  - E3
-  - A3
-  - E3
-  - B3
-  - A3
-  - E3
-  - B3
-  - E3
-  - A3
-  - E3
-  - B3
-  - E3
-  - A3
-  - B3
-  - E3
-  - A3
-  - E3
-  - B3
-  - A3
-  - E3
-  - B3
-  - E3
-  - A3
-  - E3
-  - B3
-  - E3
-  - A3
-  - B3
-  - E3
-  rhythm:
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 8.0
-  - 8.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 8.0
-  - 8.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  - 4.0
-  velocities:
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
-  - 0.44
+  - 0.38
 layer_templates:
   reggae_skank:
     kind: chord_hits
@@ -1202,6 +1160,8 @@ layer_templates:
     instrument_velocity_offsets:
       bubble_organ: 0
       warm_epiano: -8
+    constraints:
+      max_pitch: 95
   deep_dub_bass:
     kind: bassline
     instrument: dub_bass
@@ -1305,7 +1265,6 @@ layer_templates:
     kind: motif
     instruments:
     - melodica_whistle
-    - lead_noodle_guitar
     motif: noodle_zion_backbone
     root: A3
     starts:
@@ -1318,85 +1277,32 @@ layer_templates:
     humanize_ms: 13
     humanize_velocity_pct: 7
     instrument_velocity_offsets:
-      melodica_whistle: -10
-      lead_noodle_guitar: 2
+      melodica_whistle: -6
     instrument_octave_offsets:
       melodica_whistle: 1
-      lead_noodle_guitar: 0
-    instrument_pitch_scoop_cents:
-      lead_noodle_guitar: 3.0
-    instrument_pitch_bend_curves:
-      lead_noodle_guitar:
-      - - 0.0
-        - 0
-      - - 0.55
-        - 28
-      - - 0.92
-        - 0
   backbone_answer:
     kind: motif
     instruments:
     - bubble_organ
-    - slide_answer_guitar
     motif: noodle_zion_answer
     root: E3
     starts:
     - - 4
       - 0.5
-    every_bars: 8
-    repeats: 5
+    - - 20
+      - 0.5
+    - - 36
+      - 0.5
+    repeats: 1
     velocity: 42
     articulation: tenuto
     humanize_ms: 14
     humanize_velocity_pct: 8
     instrument_velocity_offsets:
-      bubble_organ: -8
-      slide_answer_guitar: 0
+      bubble_organ: -4
     instrument_octave_offsets:
       bubble_organ: 0
-      slide_answer_guitar: 1
-    instrument_pitch_scoop_cents:
-      slide_answer_guitar: 4.0
-    instrument_pitch_bend_curves:
-      slide_answer_guitar:
-      - - 0.0
-        - 0
-      - - 0.5
-        - 22
-      - - 0.95
-        - 0
-  jam_guitar_solos:
-    kind: motif
-    instruments:
-    - lead_noodle_guitar
-    - slide_answer_guitar
-    motif: jam_guitar_noodle_prayer
-    root: A4
-    starts:
-    - - 14
-      - 0.0
-    - - 30
-      - 0.0
-    every_bars: 16
-    repeats: 1
-    velocity: 66
-    articulation: legato
-    humanize_ms: 12
-    humanize_velocity_pct: 8
-    instrument_velocity_offsets:
-      lead_noodle_guitar: 3
-      slide_answer_guitar: -8
-    instrument_octave_offsets:
-      lead_noodle_guitar: 1
-      slide_answer_guitar: 0
-    pitch_scoop_cents: 4.0
-    pitch_bend_curve:
-    - - 0.0
-      - 0
-    - - 0.4
-      - 32
-    - - 0.82
-      - 0
+    label: organ answer appears in alternating eight-bar cycles, leaving the sax interludes uncluttered
   warm_keys_pad:
     kind: pad_chords
     instruments:
@@ -1412,40 +1318,165 @@ layer_templates:
     instrument_velocity_offsets:
       warm_epiano: -2
       soft_aahs: 0
-  stage_low_monk_chorale_bass:
+    constraints:
+      max_pitch: 95
+  picked_bass_click:
+    kind: bassline
+    instrument: picked_bass_shadow
+    octave: 2
+    pattern:
+    - - 0
+      - 0.25
+      - 0.24
+    - - 9
+      - 1.5
+      - 0.18
+    - - 7
+      - 2.25
+      - 0.2
+    - - 2
+      - 3.5
+      - 0.16
+    velocity: 34
+    articulation: staccato
+    humanize_ms: 6
+    humanize_velocity_pct: 5
+  stage_mob_chant_call:
     kind: motif
     instrument: stage_low_monk_oohs
-    motif: stage_low_monk_bass_chorale_v1
+    motif: stage_mob_chant_call_v2
+    roots:
+    - A2
+    - E2
+    - A2
+    - E2
+    - A2
     starts:
-    - - 0
+    - - 7
       - 0.0
-    repeats: 1
-    every_bars: 64
-    velocity: 58
-    articulation: legato
-    rhythm_scale: 1.0
-    humanize_ms: 0
-    humanize_velocity_pct: 0
-    gate: 1.0
-    label: continuous root-resolving low monk bass voice for stage loop (gate 1.0 prevents same-pitch
-      overlap dropouts)
-  stage_low_monk_chorale_baritone:
+    repeats: 5
+    every_bars: 8
+    velocity: 62
+    articulation: tenuto
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+    gate: 0.88
+    label: brief low Pastafarian mob call at each eight-bar cadence
+  stage_mob_chant_response:
     kind: motif
     instrument: stage_low_monk_aahs
-    motif: stage_low_monk_baritone_chorale_v1
+    motif: stage_mob_chant_response_v2
+    roots:
+    - A2
+    - E2
+    - A2
+    - E2
+    - A2
     starts:
-    - - 0
+    - - 7
+      - 0.5
+    repeats: 5
+    every_bars: 8
+    velocity: 54
+    articulation: tenuto
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+    gate: 0.86
+    label: short crowd response; intentionally not a continuous divine chorale
+  guitar_noodle_e_turnarounds:
+    kind: motif
+    instrument: roots_clean_guitar
+    motif: roots_jazz_turnaround_e
+    root: E4
+    starts:
+    - - 3
+      - 0.0
+    - - 19
+      - 0.0
+    - - 35
       - 0.0
     repeats: 1
-    every_bars: 64
-    velocity: 48
+    velocity: 67
     articulation: legato
-    rhythm_scale: 1.0
-    humanize_ms: 0
-    humanize_velocity_pct: 0
-    gate: 1.0
-    label: continuous fifth-resolving low baritone monk voice for stage loop (gate 1.0 prevents same-pitch
-      overlap dropouts)
+    gate: 0.82
+    humanize_ms: 12
+    humanize_velocity_pct: 7
+    pitch_scoop_cents: 1.5
+    label: warm one-bar jazz-guitar turnaround over the E cadences
+  guitar_noodle_a_turnarounds:
+    kind: motif
+    instrument: roots_clean_guitar
+    motif: roots_jazz_turnaround_a
+    root: A4
+    starts:
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    - - 23
+      - 0.0
+    - - 27
+      - 0.0
+    - - 39
+      - 0.0
+    repeats: 1
+    velocity: 64
+    articulation: legato
+    gate: 0.8
+    humanize_ms: 13
+    humanize_velocity_pct: 8
+    pitch_scoop_cents: 1.0
+    label: restrained pentatonic guitar noodles between the main phrases
+  tenor_sax_interlude_a:
+    kind: motif
+    instrument: tenor_noodle_sax
+    motif: tenor_noodle_call
+    root: D4
+    starts:
+    - - 13
+      - 0.0
+    repeats: 1
+    velocity: 68
+    articulation: legato
+    gate: 0.9
+    humanize_ms: 14
+    humanize_velocity_pct: 7
+    pitch_scoop_cents: 2.0
+    label: warm tenor-sax feature replacing the harsh first guitar solo
+  tenor_sax_interlude_b:
+    kind: motif
+    instrument: tenor_noodle_sax
+    motif: tenor_noodle_variation
+    root: D4
+    starts:
+    - - 29
+      - 0.0
+    repeats: 1
+    velocity: 66
+    articulation: legato
+    gate: 0.9
+    humanize_ms: 15
+    humanize_velocity_pct: 8
+    pitch_scoop_cents: 2.0
+    label: related tenor-sax variation for the second featured interlude
+  guitar_noodle_replies:
+    kind: motif
+    instrument: roots_clean_guitar
+    motif: roots_jazz_reply_d
+    root: D4
+    starts:
+    - - 15
+      - 2.0
+    - - 31
+      - 2.0
+    repeats: 1
+    velocity: 69
+    articulation: legato
+    gate: 0.84
+    humanize_ms: 12
+    humanize_velocity_pct: 7
+    pitch_scoop_cents: 1.5
+    label: two-beat jazz-guitar tag after each sax feature; clears the recurring backbone entrance
 playback:
   mode: section_stem_matrix
   loop_components:
@@ -1460,23 +1491,25 @@ playback:
     fade_stems:
     - jam_guitar
     - holy_chant
+    - horn_lead
     - melodic_color
     - drums
 state_map:
   default:
     section: roots_stage_loop
     stems:
-      skank: 0.76
-      keys: 0.66
-      bass: 0.68
-      jam_guitar: 0.72
-      holy_chant: 0.62
-      melodic_color: 0.34
-      drums: 0.62
+      skank: 0.92
+      keys: 0.74
+      bass: 0.76
+      jam_guitar: 0.95
+      holy_chant: 0.42
+      melodic_color: 0.5
+      drums: 0.68
+      horn_lead: 0.66
 sections:
 - id: roots_stage_loop
   kind: loop_component
-  label: roots reggae one-love noodle stage loop - revised
+  label: roots-reggae Pastafarian mob stage loop - sax-led interludes and warm guitar noodles
   bars: 40
   intensity: 0.64
   density: 0.68
@@ -1533,9 +1566,80 @@ sections:
   - reggae_skank
   - organ_bubble
   - deep_dub_bass
-  - stage_low_monk_chorale_bass
-  - stage_low_monk_chorale_baritone
+  - picked_bass_click
   - one_drop_drums
   - backbone_melody
   - backbone_answer
-  - jam_guitar_solos
+  - stage_mob_chant_call
+  - stage_mob_chant_response
+  - guitar_noodle_e_turnarounds
+  - guitar_noodle_a_turnarounds
+  - tenor_sax_interlude_a
+  - guitar_noodle_replies
+  - tenor_sax_interlude_b
+group_postprocess:
+  bass:
+    gain_db: 1.0
+    highpass_hz: 34
+    lowpass_hz: 2400
+    presence_low_hz: 550
+    presence_high_hz: 1150
+    presence_db: 0.6
+    reverb_wet: 0.005
+  skank:
+    gain_db: 7.0
+    highpass_hz: 210
+    lowpass_hz: 7200
+    presence_low_hz: 1700
+    presence_high_hz: 3500
+    presence_db: 1.0
+    reverb_wet: 0.018
+  keys:
+    gain_db: 6.0
+    highpass_hz: 110
+    lowpass_hz: 6500
+    high_shelf_hz: 4200
+    high_shelf_db: -0.8
+    reverb_wet: 0.026
+  jam_guitar:
+    gain_db: 11.0
+    highpass_hz: 105
+    lowpass_hz: 5000
+    high_shelf_hz: 3900
+    high_shelf_db: -1.1
+    presence_low_hz: 700
+    presence_high_hz: 2200
+    presence_db: 1.2
+    reverb_wet: 0.032
+  melodic_color:
+    gain_db: 5.0
+    highpass_hz: 240
+    lowpass_hz: 6200
+    high_shelf_hz: 4200
+    high_shelf_db: -1.2
+    reverb_wet: 0.04
+  holy_chant:
+    gain_db: 1.5
+    highpass_hz: 85
+    lowpass_hz: 4600
+    presence_low_hz: 650
+    presence_high_hz: 1800
+    presence_db: 0.6
+    reverb_wet: 0.055
+    reverb_decay_seconds: 1.35
+  drums:
+    gain_db: 1.0
+    highpass_hz: 38
+    lowpass_hz: 10500
+    reverb_wet: 0.015
+  horn_lead:
+    gain_db: 4.0
+    highpass_hz: 155
+    lowpass_hz: 6400
+    high_shelf_hz: 4500
+    high_shelf_db: -0.75
+    presence_low_hz: 750
+    presence_high_hz: 2500
+    presence_db: 0.55
+    reverb_wet: 0.045
+    reverb_decay_seconds: 0.95

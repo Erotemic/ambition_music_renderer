@@ -334,6 +334,8 @@ layer_templates:
     voicing: closed
     constraints:
       max_notes: 3
+      # Keep generated chord extensions in a warm background register.
+      max_pitch: 83
     humanize_ms: 10
     humanize_velocity_pct: 4
 
