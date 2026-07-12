@@ -187,10 +187,10 @@ layer_templates:
     velocity: 88
     articulation: marcato
     voicing: wide
-    # Keep generated arena-guitar hits below whistle-register. The high
-    # bridge/chorus spikes were generated chord voicings, not intentional notes.
+    # Keep generated arena-guitar and backing-brass hits below whistle register.
+    # The high bridge spikes are generated chord voicings, not lead material.
     instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
-    constraints: {min_pitch: 40, max_pitch: 95}
+    constraints: {min_pitch: 40, max_pitch: 83}
     humanize_ms: 4
 
   stadium_pads:
@@ -205,7 +205,7 @@ layer_templates:
     articulation: pad
     voicing: drop2
     constraints:
-      max_pitch: 84
+      max_pitch: 83
       min_pitch: 38
     humanize_ms: 12
 
@@ -335,7 +335,7 @@ sections:
         articulation: marcato
         voicing: wide
         instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
-        constraints: {min_pitch: 40, max_pitch: 95}
+        constraints: {min_pitch: 40, max_pitch: 83}
 
   - id: main_assault
     bars: 12
@@ -372,7 +372,7 @@ sections:
         articulation: marcato
         voicing: wide
         instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
-        constraints: {min_pitch: 40, max_pitch: 95}
+        constraints: {min_pitch: 40, max_pitch: 83}
       - kind: automation
         group: lead
         automation:
@@ -413,7 +413,7 @@ sections:
         articulation: marcato
         voicing: wide
         instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
-        constraints: {min_pitch: 40, max_pitch: 95}
+        constraints: {min_pitch: 40, max_pitch: 83}
 
   - id: boss_tag
     bars: 4
@@ -435,7 +435,7 @@ sections:
         articulation: marcato
         voicing: wide
         instrument_octave_offsets: {rhythm_guitars: -1, wide_guitars: -1}
-        constraints: {min_pitch: 40, max_pitch: 95}
+        constraints: {min_pitch: 40, max_pitch: 83}
       - kind: root_hits
         instruments: [picked_bass, synth_bass]
         hits: [[3, 3.5, 0, 0.50]]
