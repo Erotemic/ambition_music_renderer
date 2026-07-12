@@ -1,0 +1,671 @@
+schema: ambition.musicir.v1
+id: to_be_superluminal_is_to_live_in_darkness
+title: To Be Superluminal Is to Live in Darkness
+seed: 2026071201
+notes: >-
+  A long-form Sanic level cue about outrunning the light cone and discovering
+  that speed beyond perception is not brightness but isolation. This is not a
+  variation on You Are Too Slow: it uses a darker B-minor center, interlocking
+  3+3+2 motion, restrained low choir and strings, a human/synthetic lead pair,
+  and five adaptive loop movements that develop one thematic idea instead of
+  repeating a single taunt.
+
+  The main four-beat call climbs B-D-F#-A-B but folds back through G and E; the
+  melodic horizon is visible but never inhabited. A lower answer and a two-bar
+  umbra theme gradually recombine in the superluminal section. The highest
+  foreground pitch is B5, and background generators are kept below D6 so speed
+  reads as detail and counterpoint rather than whistle-register glare.
+
+  The 88-bar authored form lasts roughly 132 seconds at 160 BPM. The intro
+  establishes a credible headphone reference level in its first bar; its sense
+  of acceleration comes from density and orchestration rather than near-silence.
+  Every loop component ends on dominant tension or compatible common tones, and
+  the afterimage/outro both return naturally to B minor without a power-down
+  collapse.
+
+tempo:
+  bpm: 160
+
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+  runtime_stems:
+    target_peak_db: -10.0
+    max_gain_db: 16.0
+
+postprocess:
+  gain_db: -0.7
+  highpass_hz: 31
+  lowpass_hz: 11600
+  high_shelf_hz: 5600
+  high_shelf_db: -1.2
+  presence_low_hz: 1500
+  presence_high_hz: 4300
+  presence_db: 0.25
+  transient_tame: 0.055
+  transient_lowpass_hz: 8400
+  reverb_wet: 0.060
+  reverb_decay_seconds: 1.10
+  reverb_damping_hz: 5200
+  post_reverb_high_shelf_hz: 5600
+  post_reverb_high_shelf_db: -0.8
+  stereo_width: 0.13
+  compressor_threshold_db: -18.5
+  compressor_ratio: 2.05
+  compressor_attack_ms: 13.0
+  compressor_release_ms: 125.0
+  compressor_makeup_db: 0.7
+  compressor_knee_db: 6.0
+  limiter_drive: 0.86
+  normalize: true
+  target_peak_db: -3.2
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  lowpass_hz: 12000
+  transient_tame: 0.035
+  transient_lowpass_hz: 8800
+  reverb_wet: 0.010
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 5600
+  stereo_width: 0.04
+  limiter_drive: 0.84
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: pulse_clav,       group: pulse,      program: clavinet,          volume: 69, pan: 47, expression: 82, chorus: 2}
+  - {name: pulse_glass,      group: pulse,      program: electric_piano_2,  volume: 54, pan: 80, expression: 70, chorus: 7, reverb: 14}
+  - {name: sub_drive,        group: bass,       program: synth_bass_1,      volume: 84, pan: 59, expression: 92}
+  - {name: bass_shadow,      group: bass,       program: fingered_bass,     volume: 49, pan: 68, expression: 68}
+  - {name: night_strings,    group: atmosphere, program: pad_bowed,         volume: 59, pan: 52, expression: 76, modulation: 7, reverb: 24}
+  - {name: black_chorus,     group: atmosphere, program: voice_oohs,        volume: 42, pan: 72, expression: 60, reverb: 28}
+  - {name: dark_lead,        group: lead,       program: lead_basslead,     volume: 76, pan: 55, expression: 86, modulation: 2}
+  - {name: light_shadow,     group: lead,       program: lead_square,       volume: 45, pan: 78, expression: 60, modulation: 1}
+  - {name: cello_trace,      group: shadow,     program: cello,             volume: 62, pan: 43, expression: 74, modulation: 4, reverb: 18}
+  - {name: signal_vibe,      group: signal,     program: vibraphone,        volume: 49, pan: 86, expression: 62, reverb: 22}
+  - {name: impact_brass,     group: impacts,    program: synth_brass_2,     volume: 69, pan: 52, expression: 76, reverb: 10}
+  - {name: speed_kit,        group: percussion, is_drum: true,              volume: 79, pan: 64, expression: 91}
+
+motifs:
+  - id: light_cone_call
+    notes: [B4, D5, F#5, A5, F#5, E5, F#5, C#5, D5, B4]
+    rhythm: [0.50, 0.25, 0.25, 0.50, 0.50, 0.50, 0.25, 0.25, 0.50, 0.50]
+    velocities: [0.76, 0.82, 0.88, 0.94, 0.82, 0.72, 0.80, 0.68, 0.75, 0.64]
+
+  - id: shadow_answer
+    notes: [F#4, A4, B4, D5, C#5, A4, G4, F#4]
+    rhythm: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50]
+    velocities: [0.64, 0.70, 0.76, 0.84, 0.76, 0.68, 0.62, 0.56]
+
+  - id: umbra_theme
+    notes: [B4, D5, C#5, A4, F#4, G4, E4, F#4, B4, A4, F#4, E4, D4, F#4, A4, B4]
+    rhythm: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50,
+             0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50]
+    velocities: [0.72, 0.78, 0.70, 0.66, 0.61, 0.67, 0.58, 0.63,
+                 0.74, 0.68, 0.62, 0.58, 0.55, 0.64, 0.72, 0.78]
+
+  - id: threshold_fragment
+    notes: [B4, D5, F#5, E5, D5, B4]
+    rhythm: [0.50, 0.25, 0.25, 0.50, 0.50, 2.00]
+    velocities: [0.68, 0.76, 0.84, 0.75, 0.67, 0.52]
+
+  - id: superluminal_theme
+    notes: [B4, D5, F#5, A5, B5, A5, F#5, E5,
+            D5, F#5, A5, F#5, E5, C#5, D5, B4]
+    rhythm: [0.25, 0.25, 0.50, 0.25, 0.25, 0.50, 0.50, 0.50,
+             0.50, 0.25, 0.25, 0.50, 0.50, 0.50, 0.50, 2.00]
+    velocities: [0.78, 0.82, 0.88, 0.92, 0.96, 0.88, 0.82, 0.76,
+                 0.74, 0.82, 0.88, 0.82, 0.76, 0.70, 0.76, 0.60]
+
+  - id: afterimage
+    notes: [B4, F#5, E5, D5, B4, A4, F#4, B4]
+    rhythm: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50]
+    velocities: [0.64, 0.72, 0.68, 0.62, 0.58, 0.54, 0.50, 0.56]
+
+  - id: signal_code
+    notes: [B5, F#5, A5, E5]
+    rhythm: [0.25, 0.25, 0.50, 3.00]
+    velocities: [0.60, 0.48, 0.55, 0.34]
+
+layer_templates:
+  intro_rise:
+    kind: automation
+    automation:
+      - {group: atmosphere, cc: expression, from: 72, to: 76, curve: smooth, points: 16}
+      - {group: pulse,      cc: expression, from: 78, to: 82, curve: smooth, points: 16}
+      - {group: bass,       cc: expression, from: 88, to: 92, curve: smooth, points: 12}
+      - {group: lead,       cc: expression, from: 74, to: 86, curve: smooth, points: 10}
+      - {group: percussion, cc: expression, from: 84, to: 91, curve: smooth, points: 12}
+
+  outro_settle:
+    kind: automation
+    automation:
+      - {group: impacts,    cc: expression, from: 74, to: 40, curve: smooth, points: 12}
+      - {group: percussion, cc: expression, from: 84, to: 60, curve: smooth, points: 14}
+      - {group: lead,       cc: expression, from: 84, to: 68, curve: smooth, points: 12}
+      - {group: atmosphere, cc: expression, from: 76, to: 70, curve: smooth, points: 10}
+
+  dark_pad:
+    kind: pad_chords
+    instruments: [night_strings, black_chorus]
+    instrument_octave_offsets: {night_strings: 0, black_chorus: -1}
+    instrument_velocity_offsets: {night_strings: 0, black_chorus: -15}
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.72
+    velocity: 45
+    articulation: pad
+    voicing: guitar_shell
+    constraints: {min_pitch: 45, max_pitch: 71}
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+
+  low_dark_pad:
+    kind: pad_chords
+    instruments: [night_strings, black_chorus]
+    instrument_octave_offsets: {night_strings: -1, black_chorus: -1}
+    instrument_velocity_offsets: {night_strings: -3, black_chorus: -12}
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.76
+    velocity: 42
+    articulation: pad
+    voicing: root_fifth
+    constraints: {min_pitch: 40, max_pitch: 71}
+    humanize_ms: 9
+    humanize_velocity_pct: 3
+
+  pulse_sequence:
+    kind: arpeggio
+    instruments: [pulse_clav, pulse_glass]
+    instrument_octave_offsets: {pulse_clav: 0, pulse_glass: 1}
+    instrument_velocity_offsets: {pulse_clav: 0, pulse_glass: -16}
+    octave: 3
+    pattern: [0, 2, 1, 3, 2, 1, 0, 2]
+    step: 0.25
+    duration_beats: 0.12
+    velocity: 46
+    density: 0.86
+    articulation: staccato
+    voicing: open
+    min_pitch: B2
+    max_pitch: B5
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+
+  pulse_sequence_sparse:
+    kind: arpeggio
+    instruments: [pulse_clav, pulse_glass]
+    instrument_octave_offsets: {pulse_clav: 0, pulse_glass: 1}
+    instrument_velocity_offsets: {pulse_clav: 0, pulse_glass: -18}
+    octave: 3
+    pattern: [0, 2, 1, 3, 2, 1, 0, 2]
+    step: 0.50
+    duration_beats: 0.22
+    velocity: 42
+    density: 0.74
+    articulation: staccato
+    voicing: open
+    min_pitch: B2
+    max_pitch: B5
+    humanize_ms: 2
+    humanize_velocity_pct: 4
+
+  phase_ostinato:
+    kind: arpeggio
+    instrument: pulse_clav
+    octave: 3
+    pattern: [0, 1, 2, 1, 3, 2, 1, 2]
+    step: 0.25
+    duration_beats: 0.10
+    velocity: 41
+    density: 0.76
+    articulation: staccato
+    voicing: open
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  velocity_bass:
+    kind: bassline
+    instrument: sub_drive
+    octave: 1
+    pattern:
+      - [0, 0.00, 0.30]
+      - [12, 0.75, 0.18]
+      - [7, 1.50, 0.30]
+      - [0, 2.00, 0.22]
+      - [12, 2.75, 0.18]
+      - [7, 3.50, 0.28]
+    velocity: 73
+    articulation: staccato
+    min_pitch: B1
+    max_pitch: B3
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  bass_afterimage:
+    kind: bassline
+    instrument: bass_shadow
+    octave: 2
+    pattern:
+      - [0, 0.00, 0.72]
+      - [7, 1.50, 0.42]
+      - [12, 2.50, 0.58]
+      - [7, 3.50, 0.32]
+    velocity: 48
+    articulation: tenuto
+    min_pitch: B1
+    max_pitch: B3
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  call_lead:
+    kind: motif
+    instruments: [dark_lead, light_shadow]
+    instrument_octave_offsets: {dark_lead: 0, light_shadow: -1}
+    instrument_velocity_offsets: {dark_lead: 0, light_shadow: -22}
+    motif: light_cone_call
+    velocity: 77
+    articulation: staccato
+    gate: 0.78
+    min_pitch: D4
+    max_pitch: B5
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  answer_lead:
+    kind: motif
+    instruments: [cello_trace, dark_lead]
+    instrument_octave_offsets: {cello_trace: 0, dark_lead: -1}
+    instrument_velocity_offsets: {cello_trace: 0, dark_lead: -20}
+    motif: shadow_answer
+    velocity: 67
+    articulation: tenuto
+    gate: 0.88
+    min_pitch: D3
+    max_pitch: D5
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  umbra_lead:
+    kind: motif
+    instruments: [cello_trace, dark_lead]
+    instrument_octave_offsets: {cello_trace: 0, dark_lead: 0}
+    instrument_velocity_offsets: {cello_trace: 0, dark_lead: -13}
+    motif: umbra_theme
+    velocity: 66
+    articulation: tenuto
+    gate: 0.88
+    min_pitch: D4
+    max_pitch: D5
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  threshold_lead:
+    kind: motif
+    instruments: [dark_lead, light_shadow]
+    instrument_octave_offsets: {dark_lead: 0, light_shadow: -1}
+    instrument_velocity_offsets: {dark_lead: 0, light_shadow: -24}
+    motif: threshold_fragment
+    velocity: 69
+    articulation: staccato
+    gate: 0.80
+    min_pitch: B3
+    max_pitch: F#5
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  superluminal_lead:
+    kind: motif
+    instruments: [dark_lead, light_shadow, cello_trace]
+    instrument_octave_offsets: {dark_lead: 0, light_shadow: -1, cello_trace: -1}
+    instrument_velocity_offsets: {dark_lead: 0, light_shadow: -22, cello_trace: -18}
+    motif: superluminal_theme
+    velocity: 82
+    articulation: staccato
+    gate: 0.80
+    min_pitch: B3
+    max_pitch: B5
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  afterimage_lead:
+    kind: motif
+    instruments: [cello_trace, dark_lead]
+    instrument_octave_offsets: {cello_trace: 0, dark_lead: -1}
+    instrument_velocity_offsets: {cello_trace: 0, dark_lead: -20}
+    motif: afterimage
+    velocity: 62
+    articulation: tenuto
+    gate: 0.88
+    min_pitch: D3
+    max_pitch: F#5
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  signal_glint:
+    kind: motif
+    instrument: signal_vibe
+    motif: signal_code
+    velocity: 45
+    articulation: bell
+    gate: 0.82
+    min_pitch: E5
+    max_pitch: B5
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+
+  horizon_hits:
+    kind: chord_hits
+    instrument: impact_brass
+    hits: [[0, 0.0], [3, 3.5], [7, 3.5], [11, 3.5], [15, 3.0]]
+    octave: 3
+    velocity: 65
+    duration_beats: 0.34
+    articulation: hit
+    voicing: open
+    min_pitch: B2
+    max_pitch: B5
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  breakbeat_light:
+    kind: drums
+    instrument: speed_kit
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,           beats: [0.0, 1.5, 2.5, 3.25], velocity: 60}
+      - {drum: electric_snare, beats: [1.0, 3.0], velocity: 46}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 19}
+      - {drum: shaker,         beats: [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75], velocity: 12}
+
+  breakbeat_full:
+    kind: drums
+    instrument: speed_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    events:
+      - {drum: kick,           beats: [0.0, 0.75, 1.5, 2.0, 2.75, 3.5], velocity: 68}
+      - {drum: electric_snare, beats: [1.0, 3.0], velocity: 52}
+      - {drum: hand_clap,      beats: [1.0, 3.0], velocity: 20}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 24}
+      - {drum: open_hat,       beats: [1.75, 3.75], velocity: 15}
+      - {drum: shaker,         beats: [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75], velocity: 14}
+
+  half_time_break:
+    kind: drums
+    instrument: speed_kit
+    humanize_ms: 2
+    humanize_velocity_pct: 4
+    events:
+      - {drum: kick,           beats: [0.0, 1.75, 2.5], velocity: 62}
+      - {drum: electric_snare, beats: [2.0], velocity: 50}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 18}
+      - {drum: open_hat,       beats: [3.75], velocity: 13}
+
+  superluminal_break:
+    kind: drums
+    instrument: speed_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,           beats: [0.0, 0.75, 1.5, 2.0, 2.5, 3.25, 3.75], velocity: 72}
+      - {drum: electric_snare, beats: [1.0, 3.0], velocity: 55}
+      - {drum: hand_clap,      beats: [1.0, 3.0], velocity: 22}
+      - {drum: closed_hat,     beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75], velocity: 17}
+      - {drum: open_hat,       beats: [1.75, 3.75], velocity: 14}
+      - {drum: shaker,         beats: [0.125, 0.625, 1.125, 1.625, 2.125, 2.625, 3.125, 3.625], velocity: 12}
+
+playback:
+  mode: section_stem_matrix
+  intro: beyond_the_light_cone
+  loop_components: [blue_shift, umbra, light_cone_break, superluminal, afterimage]
+  outro: return_to_light
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [atmosphere, pulse, bass]
+    fade_stems: [impacts]
+
+state_map:
+  default:
+    preferred_section: blue_shift
+    stems: {pulse: 0.92, bass: 0.96, atmosphere: 0.78, lead: 0.88, shadow: 0.72, signal: 0.42, impacts: 0.35, percussion: 0.82}
+  exploring:
+    preferred_section: umbra
+    stems: {pulse: 0.78, bass: 0.88, atmosphere: 0.96, lead: 0.70, shadow: 0.90, signal: 0.46, impacts: 0.18, percussion: 0.60}
+  fast:
+    preferred_section: light_cone_break
+    stems: {pulse: 0.98, bass: 1.0, atmosphere: 0.72, lead: 0.96, shadow: 0.68, signal: 0.52, impacts: 0.56, percussion: 0.94}
+  boost:
+    preferred_section: superluminal
+    stems: {pulse: 1.0, bass: 1.0, atmosphere: 0.74, lead: 1.0, shadow: 0.82, signal: 0.60, impacts: 0.78, percussion: 1.0}
+  aftermath:
+    preferred_section: afterimage
+    stems: {pulse: 0.74, bass: 0.84, atmosphere: 0.94, lead: 0.66, shadow: 0.88, signal: 0.54, impacts: 0.14, percussion: 0.52}
+  leaving:
+    transition: outro_at_next_valid_exit_bar
+    outro: return_to_light
+
+sections:
+  - id: beyond_the_light_cone
+    kind: intro
+    label: acceleration before perception fails
+    bars: 8
+    intensity: 1.00
+    density: 0.54
+    loopable: false
+    harmony: [Bm(add9), Gmaj7(#11), D6/A, A(add9), Bm(add9), Em9, Gmaj7, F#7sus4]
+    layers:
+      - intro_rise
+      - {template: dark_pad, velocity: 58}
+      - {template: pulse_sequence_sparse, density: 0.66, velocity: 53}
+      - {template: velocity_bass, velocity: 80}
+      - {template: bass_afterimage, velocity: 56}
+      - {template: threshold_lead, starts: [[4, 0.0]], velocity: 60}
+      - {template: signal_glint, starts: [[7, 0.0]], velocity: 38}
+      - {template: breakbeat_light}
+
+  - id: blue_shift
+    kind: loop_component
+    label: motion becomes color
+    bars: 16
+    intensity: 0.82
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [8, 16]
+    harmony:
+      - Bm(add9)
+      - Gmaj7(#11)
+      - D6/A
+      - A(add9)
+      - Em9
+      - Gmaj7/B
+      - Dmaj9
+      - F#7sus4
+      - Bm(add9)
+      - Gmaj7
+      - D6/A
+      - A(add9)
+      - Em9
+      - Gmaj7
+      - A6
+      - F#7sus4
+    layers:
+      - {template: dark_pad, velocity: 45}
+      - {template: pulse_sequence, density: 0.82, velocity: 44}
+      - {template: velocity_bass, velocity: 72}
+      - {template: bass_afterimage, velocity: 46}
+      - {template: call_lead, starts: [[0, 0.0], [8, 0.0]], velocity: 74}
+      - {template: answer_lead, starts: [[4, 0.0], [12, 0.0]], velocity: 64}
+      - {template: signal_glint, starts: [[7, 0.0], [15, 0.0]], velocity: 40}
+      - breakbeat_full
+
+  - id: umbra
+    kind: loop_component
+    label: beyond the photon horizon
+    bars: 16
+    intensity: 0.78
+    density: 0.66
+    loopable: true
+    valid_exit_local_bars: [8, 16]
+    harmony:
+      - Bm9
+      - Dmaj7/A
+      - Em9/G
+      - Gmaj7
+      - Cmaj7(#11)
+      - Em/B
+      - A6
+      - F#7sus4
+      - Bm9
+      - Dmaj7/A
+      - Em9/G
+      - Gmaj7
+      - Cmaj7(#11)
+      - Em/B
+      - A6
+      - F#7sus4
+    layers:
+      - {template: low_dark_pad, velocity: 45}
+      - {template: pulse_sequence_sparse, density: 0.72, velocity: 41}
+      - {template: velocity_bass, velocity: 68}
+      - {template: bass_afterimage, velocity: 46}
+      - {template: umbra_lead, starts: [[0, 0.0], [8, 0.0]], velocity: 64}
+      - {template: threshold_lead, starts: [[6, 0.0], [14, 0.0]], velocity: 58}
+      - {template: signal_glint, starts: [[7, 0.0], [15, 0.0]], velocity: 36}
+      - half_time_break
+
+  - id: light_cone_break
+    kind: loop_component
+    label: the world cannot return the signal
+    bars: 16
+    intensity: 0.92
+    density: 0.84
+    loopable: true
+    valid_exit_local_bars: [8, 16]
+    harmony:
+      - Bm
+      - Gmaj7
+      - D6
+      - A(add9)
+      - Bm
+      - Em9
+      - Gmaj7
+      - F#7
+      - Bm
+      - Gmaj7
+      - D6
+      - A(add9)
+      - Em9
+      - Gmaj7
+      - A6
+      - F#7sus4
+    layers:
+      - {template: dark_pad, velocity: 46}
+      - {template: pulse_sequence, density: 0.92, velocity: 47}
+      - {template: phase_ostinato, velocity: 39}
+      - {template: velocity_bass, velocity: 76}
+      - {template: bass_afterimage, velocity: 47}
+      - {template: call_lead, starts: [[0, 0.0], [8, 0.0]], velocity: 78}
+      - {template: answer_lead, starts: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0]], velocity: 66}
+      - {template: threshold_lead, starts: [[4, 0.0], [12, 0.0]], velocity: 65}
+      - {template: horizon_hits, hits: [[0, 0.0], [3, 3.5], [7, 3.5], [11, 3.5], [15, 3.0]], velocity: 63}
+      - breakbeat_full
+
+  - id: superluminal
+    kind: loop_component
+    label: to outrun light is to lose the witness
+    bars: 16
+    intensity: 1.0
+    density: 0.94
+    loopable: true
+    valid_exit_local_bars: [8, 16]
+    harmony:
+      - Bm9
+      - Gmaj7(#11)
+      - D6/A
+      - A(add9)
+      - Em9
+      - Gmaj7
+      - Dmaj9
+      - F#7sus4
+      - Bm9
+      - Gmaj7
+      - Gmaj7/B
+      - D6/A
+      - Em9
+      - Gmaj7
+      - A6
+      - F#7
+    layers:
+      - {template: dark_pad, velocity: 48}
+      - {template: pulse_sequence, density: 0.98, velocity: 49}
+      - {template: phase_ostinato, velocity: 43}
+      - {template: velocity_bass, velocity: 79}
+      - {template: bass_afterimage, velocity: 49}
+      - {template: superluminal_lead, starts: [[0, 0.0], [8, 0.0]], velocity: 81}
+      - {template: answer_lead, starts: [[4, 0.0], [12, 0.0]], velocity: 67}
+      - {template: horizon_hits, hits: [[0, 0.0], [3, 3.5], [7, 3.5], [8, 0.0], [11, 3.5], [15, 3.0]], velocity: 68}
+      - {template: signal_glint, starts: [[7, 0.0], [15, 0.0]], velocity: 44}
+      - superluminal_break
+
+  - id: afterimage
+    kind: loop_component
+    label: the observer remembers a shape that has already gone
+    bars: 8
+    intensity: 0.72
+    density: 0.58
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: [Bm(add9), Gmaj7(#11), D6/A, A(add9), Em9, Gmaj7, A6, F#7sus4]
+    layers:
+      - {template: dark_pad, velocity: 44}
+      - {template: pulse_sequence_sparse, density: 0.62, velocity: 39}
+      - {template: velocity_bass, velocity: 65}
+      - {template: bass_afterimage, velocity: 45}
+      - {template: afterimage_lead, starts: [[0, 0.0], [4, 0.0]], velocity: 59}
+      - {template: signal_glint, starts: [[3, 0.0], [7, 0.0]], velocity: 38}
+      - breakbeat_light
+
+  - id: return_to_light
+    kind: outro
+    label: the loop receives the afterimage
+    bars: 8
+    intensity: 0.68
+    density: 0.52
+    loopable: false
+    harmony: [Bm(add9), Gmaj7(#11), D6/A, A(add9), Em9, Gmaj7, A6, F#7sus4]
+    layers:
+      - outro_settle
+      - {template: dark_pad, velocity: 43}
+      - {template: pulse_sequence_sparse, density: 0.58, velocity: 38}
+      - {template: velocity_bass, velocity: 62}
+      - {template: bass_afterimage, velocity: 43}
+      - {template: afterimage_lead, starts: [[0, 0.0], [4, 0.0]], velocity: 57}
+      - {template: signal_glint, starts: [[7, 0.0]], velocity: 36}
+      - breakbeat_light
+
+group_postprocess:
+  pulse:      {gain_db: -0.2, highpass_hz: 110, lowpass_hz: 9400, high_shelf_hz: 5200, high_shelf_db: -1.0, presence_low_hz: 1300, presence_high_hz: 3300, presence_db: 0.5, transient_tame: 0.03, reverb_wet: 0.004}
+  bass:       {gain_db: -0.3, highpass_hz: 31, lowpass_hz: 7200, high_shelf_hz: 4300, high_shelf_db: -0.5, transient_tame: 0.02, reverb_wet: 0.001}
+  atmosphere: {gain_db: -0.8, highpass_hz: 55, lowpass_hz: 6900, high_shelf_hz: 4400, high_shelf_db: -1.4, presence_low_hz: 900, presence_high_hz: 2500, presence_db: 0.3, reverb_wet: 0.030, reverb_decay_seconds: 1.55}
+  lead:       {gain_db: 0.7, highpass_hz: 150, lowpass_hz: 10100, high_shelf_hz: 5200, high_shelf_db: -0.8, presence_low_hz: 1500, presence_high_hz: 4200, presence_db: 0.8, transient_tame: 0.04, reverb_wet: 0.006}
+  shadow:     {gain_db: -0.5, highpass_hz: 95, lowpass_hz: 7600, high_shelf_hz: 4400, high_shelf_db: -1.1, presence_low_hz: 750, presence_high_hz: 2500, presence_db: 0.4, reverb_wet: 0.014}
+  signal:     {gain_db: -0.4, highpass_hz: 340, lowpass_hz: 8800, high_shelf_hz: 5200, high_shelf_db: -1.2, transient_tame: 0.04, reverb_wet: 0.012}
+  impacts:    {gain_db: -0.6, highpass_hz: 85, lowpass_hz: 8600, high_shelf_hz: 4800, high_shelf_db: -0.9, transient_tame: 0.06, reverb_wet: 0.006}
+  percussion: {gain_db: -1.6, highpass_hz: 34, lowpass_hz: 11600, high_shelf_hz: 6000, high_shelf_db: -0.4, transient_tame: 0.04, reverb_wet: 0.002}

@@ -10,7 +10,7 @@ notes: >-
   stems combine cleanly.
 
 tempo:
-  bpm: 174
+  bpm: 160
 meter:
   beats_per_bar: 4
   beat_unit: 4
@@ -24,6 +24,10 @@ render:
   ogg_quality: 6
   backend: pretty-midi
   runtime_stems:
+    # Keep the in-game stem mix aligned with the catalog without changing
+    # any internal balance.  The previous -8 dBFS shared peak target made
+    # this relentless 174 BPM cue jump out beside neighboring tracks.
+    target_peak_db: -9.75
     max_gain_db: 18.0
 
 postprocess:
@@ -45,7 +49,10 @@ postprocess:
   compressor_knee_db: 4.5
   limiter_drive: 0.90
   normalize: true
-  target_peak_db: -2.0
+  # Global 1.75 dB catalog trim.  With peak normalization enabled, the
+  # target peak is the correct place to lower the mastered cue without
+  # altering compression, orchestration, or stem balance.
+  target_peak_db: -3.75
 
 stem_postprocess:
   gain_db: 0.0
@@ -73,14 +80,19 @@ instruments:
 motifs:
   - id: dash_hook
     root: E5
-    intervals: [0, 4, 7, 9, 12, 9, 7, 4, 5, 7, 4, 2, 0]
-    rhythm:    [0.25, 0.25, 0.25, 0.25, 0.50, 0.25, 0.25, 0.50, 0.25, 0.25, 0.50, 0.50, 0.50]
-    velocities: [0.92, 0.74, 0.82, 0.88, 1.00, 0.78, 0.82, 0.84, 0.78, 0.90, 0.76, 0.70, 0.86]
+    # Four-and-a-half-beat call: retain the improved E-major arch, then use
+    # F# -> B as an intentional half-bar pickup into the following B chord.
+    # This matches the reply's long-taunt cadence without ending on the old
+    # low D# or leaving the call feeling prematurely clipped.
+    intervals: [0, 4, 7, 9, 7, 4, 2, 4, 7, 4, 2, 7]
+    rhythm:    [0.25, 0.25, 0.50, 0.25, 0.25, 0.50, 0.25, 0.25, 0.50, 0.50, 0.50, 0.50]
+    velocities: [0.88, 0.72, 0.82, 0.88, 0.76, 0.80, 0.70, 0.78, 0.84, 0.80, 0.72, 0.84]
 
   - id: taunt_reply
     root: B4
-    intervals: [0, 3, 5, 7, 5, 3, 0, -2, 0, 5, 7, 12]
-    rhythm:    [0.25, 0.25, 0.50, 0.50, 0.25, 0.25, 0.50, 0.50, 0.25, 0.25, 0.50, 0.75]
+    # Keep the taunt inside E major / A-major color: C# replaces the repeated D-natural.
+    intervals: [0, 2, 5, 7, 5, 2, 0, -2, 0, 5, 7, 12]
+    rhythm:    [0.25, 0.25, 0.50, 0.50, 0.25, 0.25, 0.50, 0.50, 0.25, 0.25, 0.50, 0.50]
     velocities: [0.76, 0.86, 0.72, 0.84, 0.68, 0.76, 0.80, 0.62, 0.74, 0.88, 0.90, 1.00]
 
   - id: sparkle_turn
@@ -118,9 +130,9 @@ layer_templates:
     every_bars: 4
     repeats: 8
     starts: [[0, 0.0]]
-    velocity: 90
+    velocity: 86
     articulation: staccato
-    gate: 0.68
+    gate: 0.74
     instrument_velocity_offsets: {square_dash: 0, saw_edge: -16}
     instrument_octave_offsets: {square_dash: 0, saw_edge: -1}
     humanize_ms: 1
@@ -243,7 +255,7 @@ sections:
     layers:
       - {template: bass_momentum, velocity: 76}
       - {template: rubber_bass_pops, velocity: 44}
-      - {template: lead_dash_hook, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], repeats: 1, velocity: 90}
+      - {template: lead_dash_hook, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], repeats: 1, velocity: 86}
       - {template: lead_taunt_reply, starts: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0]], repeats: 1, velocity: 72}
       - {template: ring_arps, density: 0.42, velocity: 46}
       - {template: ring_turnaround, starts: [[7, 3.0], [15, 3.0]], repeats: 1, velocity: 56}

@@ -1,8 +1,12 @@
-# FSM stage guitar loudness correction
+# You Are Too Slow — matched call/response cadence
 
-Apply from `/home/joncrall/code/ambition/tools/ambition_music_renderer`.
+This overlay is relative to `tools/ambition_music_renderer`.
 
-This is a level-only correction for the stage/non-boss cue. It raises both the
-rhythm-guitar bed and the clean noodly guitar while preserving all notes,
-timing, patches, register limits, and dark anti-shrill filtering. The boss cue
-is untouched.
+Changes only `scores/active/you_are_too_slow.music.yaml`:
+
+- slows the cue from 170 BPM to 160 BPM;
+- lengthens `dash_hook` from 3.5 to exactly 4.5 beats;
+- ends the call with F#5 -> B5, with B5 landing on the following B chord;
+- trims the reply's final duration from 0.75 to 0.50 beats so both call and
+  response are exactly 4.5 beats;
+- preserves all other notes, orchestration, register cleanup, and loudness trim.
