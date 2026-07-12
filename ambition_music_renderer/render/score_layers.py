@@ -16,12 +16,21 @@ from .score_events import add_chord, add_drum, add_instrument, add_note, apply_a
 from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
 from .synth import sanitize_same_pitch_overlaps
 
+
+def _positive_float(layer: dict[str, Any], key: str, default: float) -> float:
+    """Read a strictly positive layer parameter with an actionable error."""
+    value = float(layer.get(key, default))
+    if not math.isfinite(value) or value <= 0.0:
+        kind = layer.get("kind", "layer")
+        raise ValueError(f"{kind} {key} must be finite and > 0; got {value!r}")
+    return value
+
 @profile
 def render_layer_pad_chords(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
 ) -> None:
     insts = resolve_instruments(ctx, layer)
-    every = float(layer.get("every_bars", 1.0))
+    every = _positive_float(layer, "every_bars", 1.0)
     dur = float(layer.get("duration_beats", ctx.beats_per_bar * every))
     octave = int(layer.get("octave", 4))
     velocity = float(layer.get("velocity", 60)) * float(section.get("intensity", 1.0))
@@ -29,8 +38,10 @@ def render_layer_pad_chords(
     voicing = layer.get("voicing", "open")
     hk = _layer_human(layer, 8.0)
     constraints = _layer_constraints(ctx.spec, layer)
-    for local in range(0, int(section["bars"]), max(1, int(every))):
-        chord = chord_for_bar(section, local)
+    local = 0.0
+    section_bars = float(section["bars"])
+    while local < section_bars - 1e-9:
+        chord = chord_for_bar(section, int(math.floor(local + 1e-9)))
         for inst in insts:
             add_chord(
                 ctx,
@@ -46,6 +57,7 @@ def render_layer_pad_chords(
                 constraints=constraints,
                 **hk,
             )
+        local += every
 
 
 @profile
@@ -54,7 +66,9 @@ def render_layer_arpeggio(
 ) -> None:
     insts = resolve_instruments(ctx, layer)
     pattern = [int(x) for x in layer.get("pattern", [0, 2, 1, 2])]
-    step = float(layer.get("step", 0.5))
+    if not pattern:
+        raise ValueError("arpeggio pattern must not be empty")
+    step = _positive_float(layer, "step", 0.5)
     dur = float(layer.get("duration_beats", step))
     octave = int(layer.get("octave", 4))
     velocity = float(layer.get("velocity", 64))
@@ -100,7 +114,15 @@ def render_layer_ostinato(
 ) -> None:
     insts = resolve_instruments(ctx, layer)
     intervals = [int(x) for x in layer.get("intervals", [0, 7, 12, 7])]
+    if not intervals:
+        raise ValueError("ostinato intervals must not be empty")
     rhythm = [float(x) for x in layer.get("rhythm", [0.5] * len(intervals))]
+    if not rhythm:
+        raise ValueError("ostinato rhythm must not be empty")
+    if any(not math.isfinite(dur) or dur <= 0.0 for dur in rhythm):
+        raise ValueError(
+            f"ostinato rhythm durations must be finite and > 0; got {rhythm!r}"
+        )
     root_octave = int(layer.get("octave", 3))
     velocity = float(layer.get("velocity", 60))
     articulation = layer.get("articulation", "spiccato")
@@ -420,7 +442,7 @@ def render_layer_guitar_strum(
     hk = _layer_human(layer, 1.5)
     hits = layer.get("hits")
     if not hits:
-        every = float(layer.get("every_bars", 1.0))
+        every = _positive_float(layer, "every_bars", 1.0)
         beats = layer.get("beats", [0.0])
         hits = []
         local = 0.0
@@ -433,7 +455,7 @@ def render_layer_guitar_strum(
         # This lets authors define one-bar down/up strums and repeat them across
         # the section without spelling out every local bar.
         base_hits = [list(item) for item in hits]
-        every = float(layer.get("every_bars", 1.0))
+        every = _positive_float(layer, "every_bars", 1.0)
         expanded = []
         period = 0.0
         while period < float(section["bars"]) - 1e-9:

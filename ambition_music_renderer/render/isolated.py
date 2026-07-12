@@ -506,7 +506,7 @@ def _render_main(ns) -> int:
         master_settings = dict(spec.get("postprocess", {}) or {})
         master_settings.setdefault("normalize", True)
         master_settings.setdefault("target_peak_db", -1.2)
-        master = post_process(raw_full, sr, master_settings)
+        master = post_process(raw_full, sr, master_settings, base_dir=spec_path.parent)
         preview = (
             outdir / "preview" / f"{spec['id']}_{cue_hash}.full_soundtrack_preview.ogg"
         )
@@ -617,7 +617,9 @@ def _render_main(ns) -> int:
                 )
                 section_settings = dict(master_settings)
                 section_settings.update(section_pp)
-                piece = post_process(raw_piece, sr, section_settings)
+                piece = post_process(
+                    raw_piece, sr, section_settings, base_dir=spec_path.parent
+                )
             else:
                 piece = slice_audio(
                     master, sr, sec["start_seconds"], sec["end_seconds"]

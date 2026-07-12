@@ -65,12 +65,30 @@ def add_instrument(ctx: RenderContext, spec: dict[str, Any]) -> None:
 
 def resolve_instruments(ctx: RenderContext, layer: dict[str, Any]) -> list[str]:
     if "instrument" in layer:
-        return [layer["instrument"]]
-    if "instruments" in layer:
-        return list(layer["instruments"])
-    if "group" in layer:
-        return [name for name, group in ctx.groups.items() if group == layer["group"]]
-    raise KeyError(f"layer needs instrument/instruments/group: {layer}")
+        names = [layer["instrument"]]
+    elif "instruments" in layer:
+        names = list(layer["instruments"])
+    elif "group" in layer:
+        group_name = layer["group"]
+        names = [name for name, group in ctx.groups.items() if group == group_name]
+        if not names:
+            known_groups = sorted(set(ctx.groups.values()))
+            raise KeyError(
+                f"layer references unknown or empty instrument group {group_name!r}; "
+                f"known groups: {known_groups}"
+            )
+    else:
+        raise KeyError(f"layer needs instrument/instruments/group: {layer}")
+
+    if not names:
+        raise ValueError("layer resolved to an empty instrument list")
+    unknown = [name for name in names if name not in ctx.instruments]
+    if unknown:
+        raise KeyError(
+            f"layer references unknown instrument(s) {unknown}; "
+            f"known instruments: {sorted(ctx.instruments)}"
+        )
+    return names
 
 
 def add_note(
@@ -253,18 +271,29 @@ def _apply_voicing_constraints(
     max_pitch = constraints.get("max_pitch")
     min_pitch = constraints.get("min_pitch")
     max_notes = constraints.get("max_notes")
+    min_p = 0 if min_pitch is None else int(min_pitch)
+    max_p = 127 if max_pitch is None else int(max_pitch)
+    if not 0 <= min_p <= 127 or not 0 <= max_p <= 127:
+        raise ValueError(
+            f"voicing pitch bounds must be within MIDI range 0..127; "
+            f"got min_pitch={min_pitch!r}, max_pitch={max_pitch!r}"
+        )
+    if min_p > max_p:
+        raise ValueError(f"voicing min_pitch {min_p} exceeds max_pitch {max_p}")
     bounded: list[int] = []
     for p0 in out:
-        p = int(round(float(p0)))
-        if max_pitch is not None:
-            max_p = int(max_pitch)
-            while p > max_p:
-                p -= 12
-        if min_pitch is not None:
-            min_p = int(min_pitch)
-            while p < min_p:
-                p += 12
-        bounded.append(p)
+        original = int(round(float(p0)))
+        candidates = [
+            original + 12 * octave_shift
+            for octave_shift in range(-11, 12)
+            if min_p <= original + 12 * octave_shift <= max_p
+        ]
+        if not candidates:
+            raise ValueError(
+                f"cannot place pitch {original} (pitch class {original % 12}) "
+                f"inside voicing bounds [{min_p}, {max_p}]"
+            )
+        bounded.append(min(candidates, key=lambda p: (abs(p - original), p)))
     # Final guard: clamp every voice into the valid MIDI range and drop
     # exact duplicates so the constraint stages can't produce out-of-range
     # pitches that would crash the MIDI writer.

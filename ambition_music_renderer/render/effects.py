@@ -366,12 +366,12 @@ def simple_reverb(
     )
     feedback = float(clamp(feedback, 0.0, 0.97))
 
-    # Damping coefficient from cutoff: alpha for one-pole = exp(-2π * fc / sr).
-    damping = float(clamp(math.exp(-2.0 * math.pi * float(damping_hz) / sr), 0.0, 0.97))
-    # Convert "fraction of signal that survives one filter step" to the
-    # internal damping convention used by `_comb_filter` (where damping=0
-    # means no smoothing, damping near 1 is heavy lowpassing).
-    internal_damping = float(clamp(1.0 - damping, 0.0, 0.97))
+    # One-pole feedback low-pass coefficient. In `_comb_filter`, this value
+    # multiplies the previous filter state, so lower cutoffs produce values
+    # nearer 1 and therefore darker, more heavily smoothed reverb tails.
+    internal_damping = float(
+        clamp(math.exp(-2.0 * math.pi * float(damping_hz) / sr), 0.0, 0.97)
+    )
 
     wet_chans = []
     for chan in (0, 1):

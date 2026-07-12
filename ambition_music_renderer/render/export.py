@@ -28,11 +28,11 @@ def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> None:
 
 def format_ogg_timestamp(seconds: float) -> str:
     """Return an OGM/Vorbis chapter timestamp like ``HH:MM:SS.mmm``."""
-    seconds = max(0.0, float(seconds))
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = seconds - hours * 3600 - minutes * 60
-    return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
+    total_ms = max(0, int(round(float(seconds) * 1000.0)))
+    hours, remainder_ms = divmod(total_ms, 3_600_000)
+    minutes, remainder_ms = divmod(remainder_ms, 60_000)
+    secs, millis = divmod(remainder_ms, 1000)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}.{millis:03d}"
 
 
 def ogg_metadata_args(metadata: dict[str, object] | None) -> list[str]:
@@ -256,6 +256,7 @@ def write_ogg_from_audio(
     )
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr.decode("utf8", errors="replace"))
+    write_metadata_sidecar(ogg_path, metadata)
     if keep_wav:
         write_wav(ogg_path.with_suffix(".wav"), audio, sample_rate)
     return ogg_path
