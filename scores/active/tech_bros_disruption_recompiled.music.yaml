@@ -14,9 +14,9 @@ notes: >-
   an eight-bar return bridge and eight-bar loop handoff keep the low saw/square relay alive while
   rotating through E back into the F#-minor exploring loop. The intro now establishes a safe, audible
   reference level from its first bar instead of inviting headphone users to turn up a misleadingly sparse
-  opening; its continuous bed is fuller while the isolated bell peak is reduced. A quiet low-register
-  saw/square relay appears in the intro and returns more clearly in the ambush bridge, so the later breach
-  timbre is remembered rather than introduced halfway through the cue. The linear audition is 112 bars
+  opening; the bass and expression floor remain, but the sustained synth bed is lighter and the original
+  two-beat arpeggio again carries the opening identity. The later breach timbre is still foreshadowed in
+  the ambush bridge rather than being spent in the intro. The linear audition is 112 bars
   (about 217 seconds at 124 BPM); runtime playback remains adaptive.
 
 tempo:
@@ -534,7 +534,7 @@ state_map:
 sections:
 - id: intro
   kind: intro
-  label: server room glow - audible foundation and a ghost of the later relay
+  label: server room glow - audible floor with the original pulse foregrounded
   bars: 8
   intensity: 0.58
   density: 0.50
@@ -550,23 +550,23 @@ sections:
       # choice as well as an arrangement choice: the listener should know their
       # headphone volume is adequate before the full groove arrives.
   - {template: sub_bass_voice, repeats: 8, velocity: 88}
-  - {template: synth_pad, velocity: 58}
+  - {template: synth_pad, velocity: 44}
   - kind: arpeggio
     instrument: arp_synth
     octave: 3
     pattern: [0, 1, 2, 1]
     step: 0.5
     duration_beats: 0.40
-    velocity: 68
+    velocity: 76
     density: 1.0
     voicing: closed
     articulation: pluck
-  - {template: atmos_wash, velocity: 58}
-  - {template: metallic_layer, velocity: 42}
-      # Foreshadow the low breach timbre without spending its climax contour.
-      # This two-bar saw/square exchange returns more clearly in the ambush bridge.
-  - {template: lead_saw_voice, starts: [[4, 0.0]], transpose: -12, velocity: 50}
-  - {template: lead_square_voice, starts: [[6, 0.0]], transpose: -12, velocity: 46}
+  - {template: atmos_wash, velocity: 54}
+  - {template: metallic_layer, velocity: 38}
+      # Keep the later relay only as an almost subliminal ghost. Retaining these
+      # event shapes also preserves deterministic humanization in every later section.
+  - {template: lead_saw_voice, starts: [[4, 0.0]], transpose: -12, velocity: 12}
+  - {template: lead_square_voice, starts: [[6, 0.0]], transpose: -12, velocity: 10}
       # The old bell dominated the intro peak while contributing little perceived
       # loudness. Keep the chime, but let the continuous bed set the volume reference.
   - kind: chord_hits
