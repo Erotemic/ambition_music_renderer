@@ -1,0 +1,148 @@
+schema: ambition.musicir.v1
+id: mary_o_flag_victory
+title: Mary-O Flag Victory
+seed: 2026072501
+notes: >-
+  Short, original course-clear music stinger for Mary-O's flagpole sequence.
+  Two brisk bars: a square-wave climb, a playful answering turn, brass
+  punctuation, and a broad G-major finish. This is intentionally non-looping
+  and provider-specific; it is not an engine-wide victory theme.
+
+tempo:
+  bpm: 156
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 42
+  lowpass_hz: 11800
+  presence_low_hz: 1700
+  presence_high_hz: 5200
+  presence_db: 0.7
+  reverb_wet: 0.055
+  reverb_decay_seconds: 0.72
+  reverb_damping_hz: 7000
+  stereo_width: 0.10
+  compressor_threshold_db: -17.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 5.0
+  compressor_release_ms: 72.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 4.0
+  limiter_drive: 0.90
+  normalize: true
+  target_peak_db: -3.2
+
+stem_postprocess:
+  highpass_hz: 38
+  reverb_wet: 0.012
+  reverb_decay_seconds: 0.38
+  reverb_damping_hz: 7200
+  stereo_width: 0.035
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: victory_square, group: lead, program: lead_square, volume: 84, pan: 72, expression: 102}
+  - {name: victory_bell, group: sparkle, program: celesta, volume: 64, pan: 84, expression: 88}
+  - {name: victory_brass, group: brass, program: synth_brass_1, volume: 74, pan: 48, expression: 92}
+  - {name: victory_bass, group: bass, program: synth_bass_1, volume: 70, pan: 54, expression: 88}
+  - {name: victory_kit, group: percussion, is_drum: true, volume: 64, pan: 64, expression: 84}
+
+state_map:
+  default:
+    section: flag_victory
+    stems: {lead: 1.0, sparkle: 0.76, brass: 0.84, bass: 0.82, percussion: 0.72}
+
+sections:
+  - id: flag_victory
+    kind: intro
+    label: short course-clear fanfare
+    bars: 2
+    intensity: 0.90
+    density: 0.78
+    loopable: false
+    harmony: [G, C]
+    layers:
+      - kind: notes
+        instrument: victory_square
+        articulation: staccato
+        humanize_ms: 1
+        humanize_velocity_pct: 2
+        notes:
+          - [0, 0.00, G4, 0.42, 92]
+          - [0, 0.50, B4, 0.42, 98]
+          - [0, 1.00, D5, 0.62, 104]
+          - [0, 1.75, A4, 0.20, 88]
+          - [0, 2.00, C5, 0.42, 94]
+          - [0, 2.50, E5, 0.42, 100]
+          - [0, 3.00, G5, 0.72, 110]
+          - [1, 0.00, F#5, 0.20, 96]
+          - [1, 0.25, E5, 0.20, 90]
+          - [1, 0.50, D5, 0.46, 96]
+          - [1, 1.12, B4, 0.20, 88]
+          - [1, 1.38, D5, 0.20, 92]
+          - [1, 1.64, G5, 0.54, 106]
+          - [1, 2.50, G5, 1.65, 112]
+
+      - kind: notes
+        instrument: victory_bell
+        articulation: bell
+        notes:
+          - [0, 0.00, G5, 0.28, 60]
+          - [0, 0.50, B5, 0.28, 64]
+          - [0, 1.00, D6, 0.42, 68]
+          - [0, 2.00, C6, 0.28, 58]
+          - [0, 2.50, E6, 0.28, 64]
+          - [0, 3.00, G6, 0.54, 72]
+          - [1, 1.64, D6, 0.34, 64]
+          - [1, 2.50, G6, 1.55, 76]
+
+      - kind: notes
+        instrument: victory_brass
+        articulation: marcato
+        notes:
+          - {bar: 0, beat: 0.0, note: [G3, D4, G4], dur: 0.42, vel: 74}
+          - {bar: 0, beat: 2.0, note: [C4, E4, G4], dur: 0.42, vel: 72}
+          - {bar: 1, beat: 0.0, note: [D4, F#4, A4], dur: 0.36, vel: 70}
+          - {bar: 1, beat: 2.5, note: [G3, D4, G4, B4, D5], dur: 1.75, vel: 90, gate: 1.08}
+
+      - kind: notes
+        instrument: victory_bass
+        articulation: normal
+        notes:
+          - [0, 0.00, G2, 0.78, 76]
+          - [0, 1.00, D3, 0.62, 70]
+          - [0, 2.00, C3, 0.78, 74]
+          - [0, 3.00, E3, 0.62, 68]
+          - [1, 0.00, D3, 0.78, 74]
+          - [1, 1.00, A2, 0.52, 66]
+          - [1, 1.64, D3, 0.46, 70]
+          - [1, 2.50, G2, 1.78, 84]
+
+      - kind: drums
+        instrument: victory_kit
+        humanize_ms: 1
+        humanize_velocity_pct: 2
+        events:
+          - {drum: crash, beat: 0.0, bars: [0], velocity: 64}
+          - {drum: kick, beats: [0.0, 2.0], velocity: 66}
+          - {drum: snare, beats: [1.0, 3.0], velocity: 54}
+          - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 24}
+          - {drum: floor_tom, beat: 1.50, bars: [1], velocity: 48}
+          - {drum: low_tom, beat: 1.88, bars: [1], velocity: 54}
+          - {drum: high_tom, beat: 2.16, bars: [1], velocity: 58}
+          - {drum: crash, beat: 2.50, bars: [1], velocity: 80}
+          - {drum: kick, beat: 2.50, bars: [1], velocity: 78}
