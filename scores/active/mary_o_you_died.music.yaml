@@ -1,0 +1,151 @@
+schema: ambition.musicir.v1
+id: mary_o_you_died
+title: "Mary-O: You Died"
+seed: 2026072504
+notes: >-
+  An original short death sting for Mary-O. One quick upward pickup immediately
+  gives way to a strict descending tumble: down, down, down, ending in a comic
+  low thud. It evokes the compact theatrical grammar of a classic platformer
+  death cue without reproducing Mario's melody, harmony, or note sequence.
+
+tempo:
+  bpm: 150
+meter:
+  beats_per_bar: 2
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+
+postprocess:
+  gain_db: -1.0
+  highpass_hz: 34
+  lowpass_hz: 10800
+  presence_low_hz: 1800
+  presence_high_hz: 4600
+  presence_db: 0.4
+  transient_tame: 0.05
+  transient_lowpass_hz: 7800
+  reverb_wet: 0.045
+  reverb_decay_seconds: 0.62
+  reverb_damping_hz: 6000
+  stereo_width: 0.07
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 92.0
+  compressor_makeup_db: 0.8
+  compressor_knee_db: 4.0
+  limiter_drive: 0.92
+  normalize: true
+  target_peak_db: -4.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.014
+  reverb_decay_seconds: 0.36
+  reverb_damping_hz: 5800
+  stereo_width: 0.035
+  limiter_drive: 0.88
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: stumble_lead, group: melody, program: lead_square, volume: 82, pan: 70, expression: 94, modulation: 1}
+  - {name: apology_bell, group: melody, program: celesta, volume: 48, pan: 82, expression: 68}
+  - {name: string_plunks, group: harmony, program: pizzicato_strings, volume: 58, pan: 48, expression: 74}
+  - {name: falling_tuba, group: bass, program: tuba, volume: 78, pan: 58, expression: 90}
+  - {name: mishap_kit, group: percussion, is_drum: true, volume: 68, pan: 64, expression: 88}
+
+sections:
+  - id: death_sting
+    kind: stinger
+    label: mary-o death sting
+    bars: 4
+    intensity: 1.0
+    density: 0.68
+    loopable: false
+    layers:
+      - kind: notes
+        instrument: stumble_lead
+        articulation: staccato
+        gate: 0.74
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          # One quick upward pickup, then an uninterrupted descending line.
+          - [0, 0.00, G5, 0.25, 90]
+          - [0, 0.25, B5, 0.25, 96]
+          - [0, 0.50, A5, 0.25, 88]
+          - [0, 0.75, G5, 0.25, 86]
+          - [0, 1.00, F5, 0.50, 82]
+          - [0, 1.50, E5, 0.50, 80]
+          - [1, 0.00, D5, 0.50, 78]
+          - [1, 0.50, C5, 0.50, 76]
+          - [1, 1.00, Bb4, 0.50, 74]
+          - [1, 1.50, A4, 0.50, 72]
+          - [2, 0.00, G4, 0.50, 72]
+          - [2, 0.50, F4, 0.50, 70]
+          - [2, 1.00, Eb4, 0.50, 68]
+          - [2, 1.50, D4, 0.50, 66]
+          - [3, 0.00, C4, 0.50, 66]
+          - [3, 0.50, Bb3, 0.50, 64]
+          - [3, 1.00, G3, 1.00, 76]
+
+      - kind: notes
+        instrument: apology_bell
+        articulation: bell
+        gate: 0.90
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          # The bell only marks the brief upward pickup; it never rises again.
+          - [0, 0.25, B6, 0.32, 48]
+
+      - kind: notes
+        instrument: string_plunks
+        articulation: pluck
+        gate: 0.70
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - {bar: 0, beat: 0.0, note: [G3, B3, D4], dur: 0.68, vel: 56}
+          - {bar: 1, beat: 0.0, note: [Eb3, G3, Bb3], dur: 0.68, vel: 52}
+          - {bar: 2, beat: 0.0, note: [C3, Eb3, G3], dur: 0.68, vel: 50}
+          - {bar: 3, beat: 0.0, note: [G2, D3, G3], dur: 1.25, vel: 54}
+
+      - kind: notes
+        instrument: falling_tuba
+        articulation: marcato
+        gate: 0.88
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - [0, 0.00, G2, 0.90, 62]
+          - [1, 0.00, Eb2, 0.90, 66]
+          - [2, 0.00, C2, 0.90, 70]
+          - [3, 0.00, G1, 2.00, 82]
+
+      - kind: drums
+        instrument: mishap_kit
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        events:
+          - {drum: side_stick, beat: 0.0, bars: [0], velocity: 36}
+          - {drum: woodblock_hi, beat: 0.25, bars: [0], velocity: 28}
+          - {drum: low_tom, beat: 0.0, bars: [1], velocity: 44}
+          - {drum: floor_tom, beat: 0.0, bars: [2], velocity: 54}
+          - {drum: concert_bass_drum, beat: 0.0, bars: [3], velocity: 70}
+
+group_postprocess:
+  melody: {gain_db: 0.0, lowpass_hz: 9400, transient_tame: 0.04, reverb_wet: 0.014}
+  harmony: {gain_db: -2.2, lowpass_hz: 7000, transient_tame: 0.06, reverb_wet: 0.010}
+  bass: {gain_db: 1.0, lowpass_hz: 4000, transient_tame: 0.03, reverb_wet: 0.004}
+  percussion: {gain_db: -0.6, lowpass_hz: 7400, transient_tame: 0.08, reverb_wet: 0.003}
