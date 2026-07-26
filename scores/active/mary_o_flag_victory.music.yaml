@@ -1,6 +1,7 @@
 schema: ambition.musicir.v1
 id: mary_o_flag_victory
 title: Mary-O Flag Victory
+one_shot: true
 seed: 2026072501
 notes: >-
   Short, original course-clear music stinger for Mary-O's flagpole sequence.

@@ -1,6 +1,7 @@
 schema: ambition.musicir.v1
 id: mary_o_you_died
 title: "Mary-O: You Died"
+one_shot: true
 seed: 2026072504
 notes: >-
   An original short death sting for Mary-O. One quick upward pickup immediately
