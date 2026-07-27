@@ -255,10 +255,16 @@ def render_group_audio(
             rendered.append(inst_audio)
         if not rendered:
             return np.zeros((max(1, int(sample_rate * minimum_duration)), 2), dtype=np.float32)
-        max_len = max(len(x) for x in rendered)
+        # Normalize layout BEFORE any length math. `coerce_stereo` accepts
+        # channel-first buffers and transposes them, so `len(x)` on a raw stem
+        # can be the CHANNEL count, not the sample count — mixing the two
+        # layouts sized `out` from one and added the other, and a single
+        # channel-first stem took down the whole cue.
+        stereo = [coerce_stereo(x) for x in rendered]
+        max_len = max(len(x) for x in stereo)
         out = np.zeros((max_len, 2), dtype=np.float32)
-        for x in rendered:
-            out[: len(x), :] += coerce_stereo(x)
+        for x in stereo:
+            out[: len(x), :] += x
         return out.astype(np.float32)
 
     sub_pm = copy_with_instruments(pm, insts, bpm)
