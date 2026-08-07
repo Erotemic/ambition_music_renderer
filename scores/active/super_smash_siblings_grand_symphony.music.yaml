@@ -2,12 +2,14 @@ schema: ambition.musicir.v1
 id: super_smash_siblings_grand_symphony
 title: The Distance Starts Losing - Grand Symphony
 seed: 2026080607
-notes: 'Major melodic and orchestration rewrite. The piece stays continuously energized, but the lead writing now
-  breathes: long held tones, rests, pickups, and singable D-minor/Dorian phrases sit over a disciplined rhythmic
-  engine. Fast notes are primarily accompaniment and are reserved for the late orchestral surge rather than used
-  as constant melodic flourish. The single listener-approved Em horn blast near 0:18.95 is preserved as a standalone
-  gear-change landmark. Experimental harmony is otherwise rare, with the Eb-over-D ceiling break near 1:30 retained
-  as the other exceptional color.'
+notes: 'Listener-guided melodic polish after the spacious rewrite. The score keeps
+  the single Em brass blast near 0:18.95 and the broad summit entrance near 1:28,
+  but makes tonality and memorable long-line melody the default. The passages around
+  0:20, 0:45, and 1:10-1:20 are substantially rewritten; recurring extensions and
+  close semitone rubs are removed unless they have a clear functional role. Foreground
+  phrases leave real breathing space over an active rhythmic engine, and the final
+  four bars now form an unresolved dominant turnaround that hands directly back to
+  the opening D-minor downbeat for a seamless loop.'
 tempo:
   bpm: 152
 meter:
@@ -110,7 +112,7 @@ group_postprocess:
     transient_tame: 0.022
     reverb_wet: 0.007
   harp:
-    gain_db: 3.0
+    gain_db: 5.0
     highpass_hz: 70
     lowpass_hz: 13500
     high_shelf_hz: 6800
@@ -458,9 +460,9 @@ instruments:
 - name: harp
   group: harp
   program: orchestral_harp
-  volume: 76
+  volume: 88
   pan: 78
-  expression: 92
+  expression: 98
   instrument_backend:
     kind: sfz
     library_ref: folk.harp
@@ -477,10 +479,10 @@ motifs:
   - 0
   - 7
   - 10
-  - 8
-  - 5
   - 7
+  - 5
   - 3
+  - 5
   - 2
   - 0
   rhythm:
@@ -488,42 +490,42 @@ motifs:
   - 1.75
   - 0.75
   - 2.75
-  - 1.5
+  - 1.25
   - 1.0
-  - 1.75
+  - 1.5
   - 0.75
   - 3.0
   durations:
   - 0.48
   - 1.42
   - 0.42
-  - 2.18
+  - 0.38
   - 0.82
-  - 0.92
-  - 1.28
+  - 0.7
+  - 1.1
   - 0.42
   - 2.8
   velocities:
-  - 0.88
-  - 1.0
-  - 0.92
+  - 0.9
   - 0.98
-  - 0.84
-  - 0.94
-  - 0.88
-  - 0.82
+  - 0.92
   - 1.0
+  - 0.88
+  - 0.96
+  - 0.9
+  - 0.98
+  - 0.92
 - id: main_answer
   root: D4
   intervals:
   - 7
   - 10
   - 12
-  - 14
   - 10
-  - 7
+  - 10
+  - 2
   - 5
-  - 3
+  - 5
   - 0
   rhythm:
   - 1.5
@@ -546,15 +548,15 @@ motifs:
   - 1.0
   - 1.7
   velocities:
-  - 0.86
-  - 0.92
-  - 0.98
-  - 1.0
   - 0.9
-  - 0.94
-  - 0.88
-  - 0.86
+  - 0.98
+  - 0.92
   - 1.0
+  - 0.88
+  - 0.96
+  - 0.9
+  - 0.98
+  - 0.92
 - id: first_push
   root: D4
   intervals:
@@ -563,9 +565,9 @@ motifs:
   - 10
   - 12
   - 8
-  - 7
+  - 3
   - 5
-  - 7
+  - 8
   - 0
   rhythm:
   - 0.5
@@ -589,151 +591,143 @@ motifs:
   - 1.25
   velocities:
   - 0.9
-  - 1.0
-  - 0.92
   - 0.98
-  - 0.88
-  - 0.94
-  - 0.86
-  - 0.94
+  - 0.92
   - 1.0
+  - 0.88
+  - 0.96
+  - 0.9
+  - 0.98
+  - 0.92
 - id: after_blast_line
   root: D4
   intervals:
   - 12
-  - 10
-  - 7
-  - 5
-  - 7
+  - 15
   - 8
-  - 10
-  - 7
   - 5
   - 0
+  - 2
+  - 5
+  - 12
   rhythm:
-  - 1.75
-  - 0.75
-  - 2.5
-  - 1.0
-  - 1.75
-  - 2.25
-  - 0.75
   - 2.0
   - 1.0
+  - 2.0
+  - 1.0
+  - 2.5
+  - 1.5
+  - 2.0
   - 4.0
   durations:
-  - 1.38
-  - 0.42
-  - 2.02
-  - 0.62
-  - 1.32
-  - 1.8
-  - 0.42
-  - 1.52
-  - 0.62
-  - 3.4
+  - 1.6
+  - 0.6
+  - 1.5
+  - 0.6
+  - 0.58
+  - 1.0
+  - 1.5
+  - 2.6
   velocities:
   - 0.9
-  - 0.84
   - 0.98
-  - 0.86
-  - 0.94
+  - 0.92
   - 1.0
-  - 0.9
+  - 0.88
   - 0.96
-  - 0.84
-  - 1.0
+  - 0.9
+  - 0.98
 - id: wide_stride
   root: D4
   intervals:
-  - 7
   - 12
-  - 10
-  - 8
-  - 5
-  - 10
+  - 15
+  - 19
+  - 17
+  - 14
   - 15
   - 12
-  - 10
+  - 12
   - 8
+  - 7
   rhythm:
-  - 1.25
   - 1.0
-  - 0.75
-  - 2.75
-  - 1.25
-  - 1.0
-  - 2.0
-  - 0.75
   - 1.5
+  - 2.0
+  - 1.5
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
+  - 2.0
   - 3.0
   durations:
-  - 0.9
-  - 0.72
-  - 0.42
-  - 2.18
-  - 0.82
-  - 0.72
-  - 1.55
-  - 0.42
-  - 1.05
-  - 2.2
-  velocities:
-  - 0.86
-  - 0.96
-  - 0.9
+  - 0.7
   - 1.0
-  - 0.86
-  - 0.94
+  - 1.5
+  - 1.0
+  - 1.5
+  - 1.5
+  - 1.5
+  - 1.5
+  - 1.5
+  - 2.5
+  velocities:
+  - 0.9
+  - 0.98
+  - 0.92
   - 1.0
   - 0.88
+  - 0.96
+  - 0.9
+  - 0.98
   - 0.92
   - 1.0
 - id: wide_answer
   root: D4
   intervals:
-  - 3
+  - 8
+  - 15
+  - 12
+  - 11
+  - 7
   - 5
   - 8
   - 12
-  - 9
-  - 7
-  - 2
+  - 15
   - 5
-  - 2
-  - 0
   rhythm:
-  - 0.75
   - 1.5
-  - 0.75
-  - 2.25
   - 1.5
-  - 0.75
-  - 1.75
-  - 1.0
+  - 2.5
+  - 1.5
+  - 2.0
+  - 2.0
+  - 1.5
+  - 2.0
   - 1.5
   - 3.0
   durations:
-  - 0.42
   - 1.1
-  - 0.42
-  - 1.15
   - 1.0
-  - 0.4
-  - 1.22
-  - 0.62
+  - 0.6
   - 1.0
-  - 2.6
+  - 0.6
+  - 1.4
+  - 1.0
+  - 1.5
+  - 1.0
+  - 2.3
   velocities:
-  - 0.86
-  - 0.94
   - 0.9
-  - 1.0
+  - 0.98
   - 0.92
-  - 0.86
-  - 0.94
+  - 1.0
   - 0.88
+  - 0.96
   - 0.9
+  - 0.98
+  - 0.92
   - 1.0
 - id: challenge_call
   root: G3
@@ -742,14 +736,14 @@ motifs:
   - 7
   - 10
   - 12
+  - 10
   - 7
   - 5
-  - 2
   - 7
   rhythm:
   - 1.0
   - 1.5
-  - 0.5
+  - 0.75
   - 2.75
   - 1.25
   - 1.0
@@ -758,7 +752,7 @@ motifs:
   durations:
   - 0.68
   - 1.12
-  - 0.3
+  - 0.42
   - 2.15
   - 0.8
   - 0.62
@@ -767,208 +761,172 @@ motifs:
   velocities:
   - 0.9
   - 0.98
-  - 0.9
+  - 0.92
   - 1.0
   - 0.88
-  - 0.92
-  - 0.86
-  - 1.0
+  - 0.96
+  - 0.9
+  - 0.98
 - id: challenge_answer
   root: D4
   intervals:
   - 0
   - 3
   - 7
-  - 8
   - 5
-  - 5
-  - 3
-  - 0
+  - 10
+  - 14
+  - 15
+  - 12
   rhythm:
-  - 0.5
+  - 0.75
   - 1.75
   - 0.75
   - 2.5
-  - 1.0
+  - 1.25
   - 1.5
   - 1.5
   - 3.0
   durations:
-  - 0.3
+  - 0.42
   - 1.32
   - 0.42
-  - 0.52
-  - 0.65
+  - 1.8
+  - 0.85
   - 1.05
   - 1.05
-  - 2.5
+  - 1.35
   velocities:
   - 0.9
   - 0.98
-  - 0.9
+  - 0.92
   - 1.0
   - 0.88
-  - 0.94
+  - 0.96
   - 0.9
-  - 1.0
+  - 0.98
 - id: competence_line
   root: D4
   intervals:
   - 0
   - 7
   - 10
+  - 12
+  - 8
+  - 5
   - 8
   - 12
-  - 15
-  - 17
   - 14
+  - 15
   - 12
-  - 10
-  - 7
   rhythm:
-  - 0.75
-  - 1.25
-  - 0.75
-  - 2.25
-  - 0.75
-  - 1.25
+  - 1.0
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
   - 2.5
-  - 0.75
-  - 1.25
+  - 1.0
+  - 3.0
   - 1.5
-  - 3.5
+  - 2.5
+  - 4.0
   durations:
-  - 0.45
-  - 0.9
-  - 0.42
-  - 1.72
-  - 0.42
-  - 0.9
-  - 2.05
-  - 0.42
-  - 0.9
-  - 1.05
+  - 0.7
+  - 1.5
+  - 0.7
+  - 2.5
+  - 1.5
+  - 2.0
+  - 0.2
+  - 2.4
+  - 0.2
+  - 2.0
   - 3.0
   velocities:
   - 0.9
   - 0.98
+  - 0.92
+  - 1.0
+  - 0.88
+  - 0.96
   - 0.9
   - 0.98
   - 0.92
-  - 0.96
   - 1.0
-  - 0.9
   - 0.94
-  - 0.9
-  - 1.0
 - id: competence_answer
   root: D4
   intervals:
-  - 14
-  - 10
-  - 5
   - 5
   - 8
-  - 7
-  - 10
+  - 12
+  - 15
+  - 12
   - 14
-  - 12
-  - 7
-  - 0
-  rhythm:
-  - 1.5
-  - 0.75
-  - 1.5
-  - 0.75
-  - 1.25
-  - 0.75
-  - 2.5
-  - 0.5
-  - 1.5
-  - 1.5
-  - 3.5
-  durations:
-  - 1.15
-  - 0.42
-  - 1.05
-  - 0.42
-  - 0.85
-  - 0.42
-  - 0.9
-  - 0.28
-  - 0.45
-  - 1.0
-  - 3.0
-  velocities:
-  - 0.92
-  - 0.86
-  - 0.96
-  - 0.86
-  - 0.92
-  - 0.88
-  - 1.0
-  - 0.9
-  - 0.96
-  - 0.9
-  - 1.0
-- id: pre_summit_line
-  root: D4
-  intervals:
-  - 0
-  - 7
-  - 10
-  - 12
-  - 8
   - 17
-  - 12
   - 11
-  - 7
   rhythm:
-  - 1.0
   - 1.5
-  - 0.75
-  - 2.75
+  - 1.5
+  - 2.5
+  - 1.5
+  - 2.0
+  - 2.0
+  - 2.0
+  - 3.0
+  durations:
+  - 1.0
   - 1.0
   - 2.0
-  - 0.75
-  - 1.5
-  - 4.0
-  durations:
-  - 0.68
-  - 1.08
-  - 0.42
-  - 2.18
-  - 0.62
-  - 1.55
-  - 0.42
-  - 1.05
-  - 3.5
+  - 1.0
+  - 1.0
+  - 1.4
+  - 1.4
+  - 2.2
   velocities:
   - 0.9
   - 0.98
-  - 0.9
+  - 0.92
   - 1.0
   - 0.88
-  - 1.0
+  - 0.96
   - 0.9
-  - 0.94
-  - 1.0
+  - 0.98
+- id: pre_summit_line
+  root: D4
+  intervals:
+  - 7
+  - 10
+  - 11
+  rhythm:
+  - 3.0
+  - 3.0
+  - 4.0
+  durations:
+  - 2.2
+  - 2.2
+  - 2.5
+  velocities:
+  - 0.9
+  - 0.98
+  - 0.92
 - id: summit_line
   root: D4
   intervals:
   - 12
-  - 15
-  - 13
-  - 10
-  - 12
+  - 14
   - 17
+  - 14
   - 15
   - 12
-  - 8
+  - 15
+  - 19
+  - 15
   rhythm:
   - 4.5
-  - 0.75
-  - 2.25
+  - 1.0
+  - 2.0
   - 1.5
   - 3.0
   - 1.0
@@ -977,38 +935,38 @@ motifs:
   - 4.0
   durations:
   - 5.0
-  - 0.42
-  - 1.45
-  - 0.72
-  - 2.15
-  - 0.62
-  - 0.9
-  - 0.5
-  - 2.7
+  - 0.7
+  - 1.5
+  - 0.38
+  - 2.2
+  - 0.7
+  - 1.1
+  - 0.7
+  - 3.0
   velocities:
-  - 1.0
   - 0.9
   - 0.98
-  - 0.9
+  - 0.92
   - 1.0
+  - 0.88
+  - 0.96
   - 0.9
   - 0.98
-  - 0.9
-  - 1.0
+  - 0.92
 - id: summit_answer
   root: D4
   intervals:
   - 8
-  - 10
   - 12
   - 15
+  - 15
+  - 20
   - 17
-  - 15
-  - 12
+  - 14
   - 11
   - 7
   - 5
-  - 0
+  - 7
   rhythm:
   - 1.25
   - 0.75
@@ -1025,26 +983,26 @@ motifs:
   - 0.88
   - 0.42
   - 1.05
-  - 1.55
+  - 0.2
   - 0.42
   - 1.05
   - 0.42
   - 1.28
   - 0.42
-  - 1.02
+  - 0.38
   - 3.5
   velocities:
   - 0.9
-  - 0.94
   - 0.98
-  - 1.0
-  - 0.9
-  - 0.98
-  - 0.88
-  - 0.96
-  - 0.88
   - 0.92
   - 1.0
+  - 0.88
+  - 0.96
+  - 0.9
+  - 0.98
+  - 0.92
+  - 1.0
+  - 0.94
 - id: final_command
   root: D4
   intervals:
@@ -1053,89 +1011,57 @@ motifs:
   - 12
   - 15
   - 12
-  - 8
-  - 12
+  - 14
   - 7
-  - 0
+  - 11
   rhythm:
   - 1.5
-  - 1.0
   - 1.5
+  - 2.5
   - 2.0
-  - 1.0
-  - 1.0
-  - 1.5
-  - 1.5
+  - 2.5
+  - 2.5
+  - 1.75
   - 4.0
   durations:
-  - 1.1
-  - 0.62
-  - 1.1
-  - 1.55
-  - 0.62
-  - 0.62
-  - 1.05
-  - 1.0
-  - 5.3
-  velocities:
-  - 0.94
-  - 0.96
   - 1.0
   - 1.0
-  - 0.92
-  - 0.94
-  - 1.0
-  - 0.92
-  - 1.0
-- id: pressure_close
-  root: G3
-  intervals:
-  - 12
-  - 19
-  - 15
-  - 10
-  - 14
-  - 19
-  - 13
-  - 16
-  - 21
-  - 18
-  - 14
-  rhythm:
-  - 1.25
-  - 1.25
-  - 1.25
-  - 1.25
-  - 1.5
-  - 1.25
-  - 1.25
-  - 1.25
+  - 2.0
   - 1.5
   - 1.5
-  - 3.0
-  durations:
-  - 0.72
-  - 0.82
-  - 0.62
-  - 0.72
-  - 0.9
-  - 0.72
-  - 0.62
-  - 0.72
-  - 0.9
-  - 0.72
-  - 2.4
+  - 1.7
+  - 1.0
+  - 0.85
   velocities:
   - 0.9
   - 0.98
-  - 0.9
   - 0.92
-  - 0.96
-  - 0.94
-  - 0.92
-  - 0.96
   - 1.0
+  - 0.88
   - 0.96
+  - 0.9
+  - 0.98
+- id: pressure_close
+  root: G3
+  intervals:
+  - 7
+  - 10
+  - 12
+  - 11
+  rhythm:
+  - 2.5
+  - 3.0
+  - 3.5
+  - 4.0
+  durations:
+  - 1.8
+  - 2.2
+  - 2.6
+  - 2.0
+  velocities:
+  - 0.9
+  - 0.98
+  - 0.92
   - 1.0
 layer_templates:
   strings_quarter_stride:
@@ -1573,7 +1499,7 @@ state_map:
       percussion: 0.94
       harp: 0.92
 playback:
-  loop: false
+  loop: true
 sections:
 - id: already_moving
   kind: intro
@@ -1583,9 +1509,9 @@ sections:
   density: 0.78
   loopable: false
   harmony:
-  - Dm9
-  - Bbmaj7/D
-  - Gm6/D
+  - Dm
+  - Bb/D
+  - Gm/D
   - A7sus4
   - Dm/F
   - C/E
@@ -1663,22 +1589,23 @@ sections:
       trombones_stacc: -4
 - id: first_correction
   kind: verse
-  label: first correction - one isolated gear change, then back to the road
+  label: first correction - the horn blast opens a door, then the line regains 
+    its footing
   bars: 12
   intensity: 1.02
   density: 0.82
   loopable: false
   harmony:
-  - Dm9
-  - Bbmaj7/D
-  - Gm6/D
+  - Dm
+  - Bb/D
+  - Gm/D
   - A7sus4
   - Em9add11
-  - A7/E
+  - C/E
   - Dm/F
-  - Bbmaj7
-  - Gm6
-  - Cadd9
+  - Bb
+  - Gm
+  - C
   - A7sus4
   - A7
   layers:
@@ -1717,7 +1644,7 @@ sections:
     motif: after_blast_line
     root: D4
     starts:
-    - - 6
+    - - 7
       - 0.25
     velocity: 88
     articulation: tenuto
@@ -1761,27 +1688,26 @@ sections:
       trombones_stacc: -4
 - id: the_gap_narrows
   kind: bridge
-  label: the gap narrows - broad melody, no decorative chatter
+  label: the gap narrows - two broad phrases over a clear descending road
   bars: 12
   intensity: 1.05
   density: 0.82
   loopable: false
   harmony:
-  - Dm9
-  - C/D
-  - Bbmaj7
-  - Gm6
+  - Dm
+  - C
+  - Bb
+  - Gm
   - Dm/F
   - C/E
   - Bb/D
   - A7
-  - Gm6
-  - Bbmaj7
-  - Cadd9
-  - A7sus4
+  - Gm
+  - Bb
+  - C
+  - A7
   layers:
   - strings_eighth_stride
-  - viola_bed
   - horn_bed
   - cello_stride
   - bass_stride
@@ -1855,27 +1781,27 @@ sections:
       trombones_stacc: -4
 - id: rules_under_stress
   kind: bridge
-  label: rules under stress - rhythmic pressure, harmonically legible
+  label: rules under stress - pressure comes from rhythm and bass motion, not 
+    chromatic clutter
   bars: 12
   intensity: 1.08
   density: 0.86
   loopable: false
   harmony:
-  - Gm6
-  - Bbmaj7
+  - Gm
+  - Bb
   - Dm/A
-  - A7
+  - A7sus4
   - Dm/F
   - C/E
   - Bb/D
   - A7
-  - Gm6
+  - Gm
   - Dm/F
   - E7/G#
   - A7
   layers:
   - strings_eighth_stride
-  - string_bed
   - cello_stride
   - bass_stride
   - bass_drum_stride
@@ -1920,25 +1846,6 @@ sections:
     instrument_velocity_offsets:
       horns_sus: 0
       violas: -9
-  - kind: motif
-    instruments:
-    - trumpets_sus
-    - violins_i
-    motif: pressure_close
-    root: G3
-    starts:
-    - - 8
-      - 0.5
-    velocity: 94
-    articulation: tenuto
-    gate: 0.96
-    humanize_ms: 3
-    instrument_octave_offsets:
-      trumpets_sus: 0
-      violins_i: 1
-    instrument_velocity_offsets:
-      trumpets_sus: 0
-      violins_i: -9
   - kind: chord_hits
     instruments:
     - horns_stacc
@@ -1969,27 +1876,27 @@ sections:
       trombones_stacc: -4
 - id: hands_know_first
   kind: bridge
-  label: hands know first - the melody gets broader as the engine gets faster
+  label: hands know first - one long melody learns to stand taller, then brass 
+    points at the summit
   bars: 12
   intensity: 1.12
   density: 0.9
   loopable: false
   harmony:
-  - Dm9
-  - Bbmaj7/D
-  - Gm6/D
-  - A7
+  - Dm
+  - Bb/D
+  - Gm/D
+  - A7sus4
   - Dm/F
-  - C/E
+  - Bb/D
   - Gm/D
   - A7
-  - Dm9
-  - Bbmaj7
-  - Gm6
+  - Gm
+  - Bb
+  - C
   - A7
   layers:
   - strings_eighth_stride
-  - horn_bed
   - cello_stride
   - bass_stride
   - bass_drum_stride
@@ -2022,8 +1929,8 @@ sections:
     motif: competence_answer
     root: D4
     starts:
-    - - 5
-      - 0.25
+    - - 8
+      - 0.0
     velocity: 96
     articulation: tenuto
     gate: 0.96
@@ -2034,22 +1941,6 @@ sections:
     instrument_velocity_offsets:
       horns_sus: -5
       trumpets_sus: 0
-  - kind: motif
-    instruments:
-    - violins_i
-    motif: pre_summit_line
-    root: D4
-    starts:
-    - - 9
-      - 0.5
-    velocity: 94
-    articulation: tenuto
-    gate: 0.96
-    humanize_ms: 3
-    instrument_octave_offsets:
-      violins_i: 1
-    instrument_velocity_offsets:
-      violins_i: 0
   - kind: chord_hits
     instruments:
     - horns_stacc
@@ -2057,10 +1948,8 @@ sections:
     - trombones_stacc
     hits:
     - - 0
-      - 0
-    - - 4
-      - 3.0
-    - - 8
+      - 0.0
+    - - 7
       - 3.0
     - - 11
       - 2.75
@@ -2080,31 +1969,31 @@ sections:
       trombones_stacc: -4
 - id: the_distance_starts_losing
   kind: chorus
-  label: the distance starts losing - the orchestra discovers another ceiling
+  label: the distance starts losing - broad melody over the newly revealed 
+    orchestral ceiling
   bars: 16
   intensity: 1.2
   density: 0.96
   loopable: false
   harmony:
-  - Dm9
-  - Ebmaj9#11add13/D
-  - Dm9
-  - Gm/D
-  - Bbmaj7/D
-  - A7sus4/D
-  - Dm9
+  - Dm
+  - Gm6/D
+  - Dm/F
+  - Dm/A
+  - Bb
+  - A7sus4
+  - Dm
   - C/E
-  - Bbmaj7
-  - Gm6
+  - Bb
+  - Gm
   - A7
   - Dm/F
-  - Gm6
-  - Bbmaj7
+  - Gm
+  - Bb
   - A7
   - Dm6/9
   layers:
   - strings_sixteenth_surge
-  - viola_bed
   - trombone_bed
   - cello_stride
   - bass_stride
@@ -2165,19 +2054,15 @@ sections:
     - trombones_stacc
     hits:
     - - 0
-      - 0
-    - - 1
-      - 0
+      - 0.0
     - - 4
-      - 0
+      - 0.0
     - - 7
       - 3.0
     - - 8
-      - 0
+      - 0.0
     - - 12
-      - 0
-    - - 15
-      - 0
+      - 0.0
     - - 15
       - 2.75
     octave: 3
@@ -2196,27 +2081,25 @@ sections:
       trombones_stacc: -4
 - id: no_more_ceiling
   kind: outro
-  label: no more ceiling - one command, then the whole machine lands
+  label: turn the wheel - the summit becomes the dominant pickup into the next 
+    lap
   bars: 4
   intensity: 1.24
   density: 0.98
-  loopable: false
+  loopable: true
   harmony:
-  - Gm6
-  - Bbmaj7
+  - Gm
+  - Bb
   - A7sus4
-  - Dm6/9
+  - A7
   layers:
-  - strings_sixteenth_surge
+  - strings_quarter_stride
+  - string_bed
   - viola_bed
-  - trombone_bed
   - cello_stride
   - bass_stride
-  - tuba_stride
-  - harp_broad
   - bass_drum_stride
-  - snare_drive
-  - cymbal_final
+  - snare_stride
   - timpani_final
   - kind: motif
     instruments:
@@ -2250,14 +2133,14 @@ sections:
     - trombones_stacc
     hits:
     - - 0
-      - 0
+      - 0.0
     - - 2
-      - 0
+      - 0.0
     - - 3
-      - 0
+      - 2.75
     octave: 3
-    velocity: 110
-    duration_beats: 0.65
+    velocity: 104
+    duration_beats: 0.45
     articulation: marcato
     voicing: triad
     include_slash_bass: false
