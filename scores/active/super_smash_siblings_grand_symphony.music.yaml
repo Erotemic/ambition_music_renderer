@@ -1,0 +1,2946 @@
+schema: ambition.musicir.v1
+id: super_smash_siblings_grand_symphony
+title: The Distance Starts Losing - Grand Symphony
+seed: 2026080605
+notes: 'A through-composed symphonic power piece for Super Smash Siblings about competence arriving in real time. It begins already in motion and stays exhilarated: a compact leap-and-fall cell keeps reappearing with altered placement, wider intervals, compressed timing, and increasingly fluent orchestration. Harmonic motion deliberately uses modal color, dominant pedals, chromatic upward sequences, and sharp extensions instead of a conventional minor-to-major victory turn. The last twenty bars reveal a much larger orchestral ceiling without a quiet pre-climax valley. Full Sonatina/VCSL orchestra plus sampled harp, with General MIDI fallbacks.'
+tempo:
+  bpm: 152
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  runtime_stems:
+    max_gain_db: 22.0
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 30
+  lowpass_hz: 13800
+  eq_bands:
+  - type: low_shelf
+    hz: 82
+    q: 0.75
+    db: 1.2
+  - type: peak
+    hz: 285
+    q: 0.9
+    db: -1.5
+  - type: peak
+    hz: 2350
+    q: 1.0
+    db: 0.9
+  - type: high_shelf
+    hz: 8200
+    q: 0.7
+    db: 0.7
+  reverb_wet: 0.13
+  reverb_decay_seconds: 1.8
+  reverb_damping_hz: 6600
+  stereo_width: 0.18
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 12.0
+  compressor_release_ms: 120.0
+  compressor_makeup_db: 1.2
+  compressor_knee_db: 5.5
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.2
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.014
+  reverb_decay_seconds: 0.7
+  reverb_damping_hz: 7000
+  stereo_width: 0.05
+  limiter_drive: 0.87
+  normalize: false
+  target_peak_db: -3.8
+group_postprocess:
+  brass:
+    gain_db: 1.6
+    highpass_hz: 42
+    lowpass_hz: 12300
+    presence_low_hz: 1450
+    presence_high_hz: 4400
+    presence_db: 1.0
+    compressor_threshold_db: -18
+    compressor_ratio: 2.3
+    compressor_attack_ms: 11
+    compressor_release_ms: 100
+    reverb_wet: 0.022
+  strings:
+    gain_db: 1.9
+    highpass_hz: 38
+    lowpass_hz: 13400
+    high_shelf_hz: 6400
+    high_shelf_db: 0.8
+    reverb_wet: 0.028
+  woodwinds:
+    gain_db: 5.4
+    highpass_hz: 92
+    lowpass_hz: 13000
+    presence_low_hz: 1700
+    presence_high_hz: 5300
+    presence_db: 1.2
+    reverb_wet: 0.038
+  percussion:
+    gain_db: 0.5
+    highpass_hz: 28
+    lowpass_hz: 12100
+    compressor_threshold_db: -15
+    compressor_ratio: 3.4
+    compressor_attack_ms: 5
+    compressor_release_ms: 86
+    transient_tame: 0.022
+    reverb_wet: 0.007
+  harp:
+    gain_db: 3.0
+    highpass_hz: 70
+    lowpass_hz: 13500
+    high_shelf_hz: 6800
+    high_shelf_db: 0.9
+    reverb_wet: 0.04
+instruments:
+- name: horns_sus
+  group: brass
+  program: french_horn
+  volume: 92
+  pan: 70
+  expression: 104
+  modulation: 7
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer:
+    - notation
+    - horns
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: trumpets_sus
+  group: brass
+  program: trumpet
+  volume: 90
+  pan: 82
+  expression: 100
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trumpets_sustain
+    prefer:
+    - notation
+    - trumpets
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: trombones_sus
+  group: brass
+  program: trombone
+  volume: 94
+  pan: 44
+  expression: 104
+  modulation: 4
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trombones_sustain
+    prefer:
+    - notation
+    - trombones
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: tuba_sus
+  group: brass
+  program: tuba
+  volume: 94
+  pan: 34
+  expression: 102
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.tuba_sustain
+    prefer:
+    - notation
+    - tuba
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: horns_stacc
+  group: brass
+  program: french_horn
+  volume: 100
+  pan: 68
+  expression: 108
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_staccato
+    prefer:
+    - notation
+    - horns
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: trumpets_stacc
+  group: brass
+  program: trumpet
+  volume: 102
+  pan: 84
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trumpets_staccato
+    prefer:
+    - notation
+    - trumpets
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: trombones_stacc
+  group: brass
+  program: trombone
+  volume: 102
+  pan: 42
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trombones_staccato
+    prefer:
+    - notation
+    - trombones
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_i
+  group: strings
+  program: string_ensemble_1
+  volume: 86
+  pan: 84
+  expression: 98
+  modulation: 9
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_ii
+  group: strings
+  program: string_ensemble_2
+  volume: 82
+  pan: 72
+  expression: 94
+  modulation: 8
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_2
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_i_stacc
+  group: strings
+  program: string_ensemble_1
+  volume: 96
+  pan: 84
+  expression: 108
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1_staccato
+    prefer:
+    - notation
+    - 1st violins staccato
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_ii_stacc
+  group: strings
+  program: string_ensemble_2
+  volume: 92
+  pan: 72
+  expression: 104
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_2_staccato
+    prefer:
+    - notation
+    - 2nd violins staccato
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: violas
+  group: strings
+  program: viola
+  volume: 84
+  pan: 52
+  expression: 96
+  modulation: 7
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celli
+  group: strings
+  program: cello
+  volume: 90
+  pan: 40
+  expression: 100
+  modulation: 6
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celli_stacc
+  group: strings
+  program: cello
+  volume: 100
+  pan: 40
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli_staccato
+    prefer:
+    - notation
+    - celli staccato
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: double_basses
+  group: strings
+  program: contrabass
+  volume: 92
+  pan: 30
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.basses
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: flutes
+  group: woodwinds
+  program: flute
+  volume: 104
+  pan: 86
+  expression: 98
+  modulation: 6
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.flutes_sustain
+    prefer:
+    - notation
+    - flutes
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: oboes
+  group: woodwinds
+  program: oboe
+  volume: 102
+  pan: 64
+  expression: 96
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.oboes_sustain
+    prefer:
+    - notation
+    - oboes
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: clarinets
+  group: woodwinds
+  program: clarinet
+  volume: 100
+  pan: 52
+  expression: 96
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.clarinets_sustain
+    prefer:
+    - notation
+    - clarinets
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 100
+  pan: 48
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.timpani
+    prefer:
+    - timpani
+    - hit
+    - normal
+    optional: true
+    fallback_backend: pretty-midi
+- name: concert_bass_drum
+  group: percussion
+  is_drum: true
+  volume: 108
+  pan: 52
+  expression: 116
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.bass_drum
+    prefer:
+    - bass drum 1
+    - concert bass drum
+    note_remap:
+      concert_bass_drum: C4
+    optional: true
+    fallback_backend: pretty-midi
+- name: orchestral_snare
+  group: percussion
+  is_drum: true
+  volume: 106
+  pan: 66
+  expression: 114
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.snare
+    prefer:
+    - snare drum rope tension
+    - snare drum
+    note_remap:
+      snare: C4
+    optional: true
+    fallback_backend: pretty-midi
+- name: orchestral_cymbal
+  group: percussion
+  is_drum: true
+  volume: 104
+  pan: 72
+  expression: 112
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.cymbal
+    prefer:
+    - suspended cymbal
+    - crash cymbal
+    note_remap:
+      crash: C4
+    optional: true
+    fallback_backend: pretty-midi
+- name: harp
+  group: harp
+  program: orchestral_harp
+  volume: 76
+  pan: 78
+  expression: 92
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.harp
+    prefer:
+    - harp
+    - normal
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+motifs:
+- id: distance_seed_a
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 14
+  - 15
+  - 12
+  - 17
+  - 11
+  - 12
+  - 19
+  - 16
+  - 14
+  - 19
+  - 17
+  - 12
+  rhythm:
+  - 0.5
+  - 0.75
+  - 0.25
+  - 1.25
+  - 0.5
+  - 1.75
+  - 0.25
+  - 0.75
+  - 0.5
+  - 1.0
+  - 0.25
+  - 1.5
+  - 0.5
+  - 1.25
+  - 3.0
+  durations:
+  - 0.28
+  - 0.38
+  - 0.15
+  - 0.74
+  - 0.28
+  - 1.28
+  - 0.13
+  - 0.42
+  - 0.25
+  - 0.68
+  - 0.14
+  - 1.02
+  - 0.24
+  - 0.72
+  - 2.55
+  velocities:
+  - 0.82
+  - 0.92
+  - 0.98
+  - 0.84
+  - 1.0
+  - 0.94
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.86
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.92
+  - 0.98
+- id: distance_seed_b
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 5
+  - 14
+  - 12
+  - 19
+  - 17
+  - 14
+  - 11
+  - 14
+  - 17
+  - 19
+  - 19
+  - 12
+  rhythm:
+  - 0.25
+  - 0.5
+  - 1.0
+  - 0.25
+  - 0.75
+  - 1.5
+  - 0.5
+  - 0.25
+  - 0.75
+  - 1.25
+  - 0.25
+  - 0.5
+  - 1.75
+  - 0.5
+  - 3.0
+  durations:
+  - 0.14
+  - 0.3
+  - 0.72
+  - 0.13
+  - 0.42
+  - 1.08
+  - 0.28
+  - 0.14
+  - 0.44
+  - 0.82
+  - 0.13
+  - 0.28
+  - 1.24
+  - 0.28
+  - 2.72
+  velocities:
+  - 0.86
+  - 0.94
+  - 0.98
+  - 0.88
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.94
+  - 0.9
+  - 1.0
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.96
+  - 1.0
+- id: distance_seed_c
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 12
+  - 15
+  - 12
+  - 17
+  - 19
+  - 11
+  - 12
+  - 19
+  - 17
+  - 14
+  - 19
+  - 17
+  - 14
+  - 12
+  rhythm:
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.25
+  - 0.25
+  - 0.75
+  - 1.5
+  - 0.25
+  - 0.5
+  - 0.25
+  - 1.0
+  - 0.5
+  - 0.25
+  - 1.75
+  - 0.5
+  - 0.75
+  - 3.0
+  durations:
+  - 0.38
+  - 0.13
+  - 0.26
+  - 0.82
+  - 0.13
+  - 0.42
+  - 1.05
+  - 0.13
+  - 0.26
+  - 0.13
+  - 0.62
+  - 0.26
+  - 0.13
+  - 1.18
+  - 0.25
+  - 0.42
+  - 0.75
+  velocities:
+  - 0.82
+  - 0.92
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.86
+  - 0.98
+  - 0.94
+  - 1.0
+  - 0.92
+  - 0.96
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.92
+  - 1.0
+- id: open_vector_a
+  root: F4
+  intervals:
+  - 0
+  - 7
+  - 11
+  - 9
+  - 14
+  - 16
+  - 12
+  - 19
+  - 18
+  - 14
+  - 21
+  - 19
+  - 16
+  - 11
+  - 12
+  - 24
+  rhythm:
+  - 1.25
+  - 0.25
+  - 0.5
+  - 1.75
+  - 0.5
+  - 0.25
+  - 2.25
+  - 0.5
+  - 0.75
+  - 0.25
+  - 1.5
+  - 0.5
+  - 0.25
+  - 1.0
+  - 1.75
+  - 3.0
+  durations:
+  - 0.88
+  - 0.13
+  - 0.28
+  - 1.4
+  - 0.24
+  - 0.13
+  - 1.85
+  - 0.27
+  - 0.44
+  - 0.14
+  - 1.04
+  - 0.27
+  - 0.13
+  - 0.62
+  - 1.28
+  - 2.8
+  velocities:
+  - 0.82
+  - 0.9
+  - 0.96
+  - 0.92
+  - 0.98
+  - 0.9
+  - 1.0
+  - 0.9
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.94
+  - 0.88
+  - 0.96
+  - 0.92
+  - 1.0
+- id: open_vector_b
+  root: F4
+  intervals:
+  - 12
+  - 7
+  - 9
+  - 16
+  - 14
+  - 21
+  - 19
+  - 12
+  - 18
+  - 16
+  - 23
+  - 21
+  - 19
+  - 14
+  - 17
+  - 12
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.5
+  - 0.25
+  - 0.75
+  - 1.75
+  - 0.25
+  - 0.5
+  - 1.25
+  - 0.25
+  - 0.75
+  - 1.5
+  - 0.5
+  - 0.25
+  - 1.25
+  - 3.0
+  durations:
+  - 0.26
+  - 0.28
+  - 1.08
+  - 0.13
+  - 0.42
+  - 1.18
+  - 0.13
+  - 0.28
+  - 0.8
+  - 0.13
+  - 0.42
+  - 1.04
+  - 0.28
+  - 0.13
+  - 0.82
+  - 2.72
+  velocities:
+  - 0.88
+  - 0.94
+  - 1.0
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.92
+  - 0.9
+  - 0.98
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.9
+  - 0.98
+  - 1.0
+- id: pressure_ladder_a
+  root: G3
+  intervals:
+  - 0
+  - 7
+  - 3
+  - 5
+  - 7
+  - 10
+  - 8
+  - 12
+  - 11
+  - 14
+  - 17
+  - 19
+  - 14
+  - 11
+  - 17
+  - 7
+  rhythm:
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.25
+  - 0.25
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  - 0.25
+  - 0.75
+  - 1.5
+  - 3.0
+  durations:
+  - 0.13
+  - 0.26
+  - 0.13
+  - 0.4
+  - 0.13
+  - 0.27
+  - 0.84
+  - 0.13
+  - 0.42
+  - 0.13
+  - 0.25
+  - 0.64
+  - 0.13
+  - 0.4
+  - 1.04
+  - 2.4
+  velocities:
+  - 0.88
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.92
+  - 0.98
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.92
+- id: pressure_ladder_b
+  root: G3
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 5
+  - 7
+  - 10
+  - 10
+  - 12
+  - 11
+  - 14
+  - 17
+  - 19
+  - 14
+  - 11
+  - 17
+  - 7
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  - 0.25
+  - 0.5
+  - 0.25
+  - 1.25
+  - 0.25
+  - 0.5
+  - 0.75
+  - 0.25
+  - 1.5
+  - 3.0
+  durations:
+  - 0.26
+  - 0.13
+  - 0.42
+  - 0.13
+  - 0.26
+  - 0.62
+  - 0.13
+  - 0.26
+  - 0.13
+  - 0.86
+  - 0.13
+  - 0.26
+  - 0.42
+  - 0.13
+  - 1.02
+  - 2.35
+  velocities:
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.92
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.96
+  - 0.92
+  - 1.0
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.92
+- id: mastery_compact
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 5
+  - 14
+  - 12
+  - 17
+  - 10
+  - 12
+  - 19
+  - 23
+  - 14
+  - 17
+  - 19
+  - 14
+  - 12
+  rhythm:
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 1.0
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 1.25
+  - 0.25
+  - 0.5
+  - 0.75
+  - 2.0
+  durations:
+  - 0.13
+  - 0.28
+  - 0.13
+  - 0.4
+  - 0.13
+  - 0.68
+  - 0.13
+  - 0.27
+  - 0.13
+  - 0.42
+  - 0.13
+  - 0.86
+  - 0.13
+  - 0.26
+  - 0.42
+  - 1.7
+  velocities:
+  - 0.86
+  - 0.94
+  - 1.0
+  - 0.9
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.92
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.98
+  - 1.0
+  - 0.96
+  - 0.92
+  - 1.0
+- id: mastery_line_a
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 5
+  - 15
+  - 12
+  - 19
+  - 17
+  - 24
+  - 22
+  - 17
+  - 26
+  - 24
+  - 19
+  - 14
+  - 17
+  - 11
+  - 11
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.25
+  - 0.25
+  - 0.5
+  - 2.0
+  - 0.25
+  - 0.5
+  - 1.5
+  - 0.25
+  - 0.75
+  - 1.75
+  - 0.25
+  - 0.5
+  - 1.0
+  - 0.25
+  - 1.5
+  - 4.0
+  durations:
+  - 0.26
+  - 0.3
+  - 0.88
+  - 0.13
+  - 0.27
+  - 1.58
+  - 0.13
+  - 0.28
+  - 1.1
+  - 0.13
+  - 0.42
+  - 1.26
+  - 0.13
+  - 0.27
+  - 0.65
+  - 0.13
+  - 1.06
+  - 1.2
+  velocities:
+  - 0.88
+  - 0.96
+  - 1.0
+  - 0.9
+  - 1.0
+  - 0.98
+  - 0.94
+  - 1.0
+  - 0.98
+  - 0.92
+  - 1.0
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.96
+  - 0.92
+  - 1.0
+  - 1.0
+- id: mastery_line_b
+  root: D4
+  intervals:
+  - 12
+  - 7
+  - 10
+  - 17
+  - 14
+  - 5
+  - 19
+  - 12
+  - 23
+  - 24
+  - 19
+  - 26
+  - 17
+  - 19
+  - 14
+  - 15
+  - 12
+  - 24
+  rhythm:
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.25
+  - 0.25
+  - 0.75
+  - 1.75
+  - 0.25
+  - 0.5
+  - 0.25
+  - 1.5
+  - 0.5
+  - 0.25
+  - 1.75
+  - 0.25
+  - 0.75
+  - 1.25
+  - 4.0
+  durations:
+  - 0.42
+  - 0.13
+  - 0.27
+  - 0.86
+  - 0.13
+  - 0.42
+  - 1.22
+  - 0.13
+  - 0.28
+  - 0.13
+  - 1.02
+  - 0.27
+  - 0.13
+  - 1.18
+  - 0.13
+  - 0.42
+  - 0.82
+  - 3.65
+  velocities:
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.98
+  - 0.9
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.96
+  - 1.0
+  - 0.92
+  - 0.96
+  - 1.0
+  - 1.0
+- id: needle_run
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 3
+  - 7
+  - 8
+  - 12
+  - 10
+  - 15
+  - 14
+  - 19
+  - 17
+  - 22
+  - 19
+  - 24
+  - 26
+  - 24
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.25
+  - 1.5
+  durations:
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.11
+  - 0.24
+  - 0.11
+  - 0.11
+  - 1.2
+  velocities:
+  - 0.72
+  - 0.78
+  - 0.84
+  - 0.88
+  - 0.82
+  - 0.92
+  - 0.86
+  - 0.96
+  - 0.9
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 1.0
+  - 1.0
+- id: final_override
+  root: D4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 14
+  - 12
+  - 19
+  - 17
+  - 26
+  - 23
+  - 22
+  - 19
+  - 14
+  - 11
+  - 14
+  - 17
+  - 24
+  rhythm:
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 1.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 1.0
+  - 0.5
+  - 0.25
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  - 4.0
+  durations:
+  - 0.28
+  - 0.13
+  - 0.42
+  - 0.13
+  - 0.9
+  - 0.13
+  - 0.26
+  - 0.13
+  - 0.68
+  - 0.28
+  - 0.13
+  - 0.42
+  - 0.13
+  - 0.28
+  - 0.7
+  - 5.5
+  velocities:
+  - 0.9
+  - 0.98
+  - 1.0
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.96
+  - 1.0
+  - 0.98
+  - 0.94
+  - 1.0
+  - 0.96
+  - 1.0
+  - 1.0
+  - 1.0
+layer_templates:
+  violins_i_sweep:
+    kind: pad_chords
+    instrument: violins_i
+    octave: 5
+    every_bars: 1
+    duration_beats: 3.9
+    velocity: 54
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  violins_ii_sweep:
+    kind: pad_chords
+    instrument: violins_ii
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.9
+    velocity: 50
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  viola_sweep:
+    kind: pad_chords
+    instrument: violas
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.9
+    velocity: 47
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  horn_chorale:
+    kind: pad_chords
+    instrument: horns_sus
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.82
+    velocity: 43
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  trombone_chorale:
+    kind: pad_chords
+    instrument: trombones_sus
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.82
+    velocity: 35
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+  violin_eighths:
+    kind: arpeggio
+    instruments:
+    - violins_i_stacc
+    - violins_ii_stacc
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 0.44
+    velocity: 55
+    articulation: spiccato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      violins_i_stacc: 2
+      violins_ii_stacc: -3
+  violin_sixteenths:
+    kind: arpeggio
+    instruments:
+    - violins_i_stacc
+    - violins_ii_stacc
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    step: 0.25
+    duration_beats: 0.22
+    velocity: 50
+    articulation: spiccato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      violins_i_stacc: 3
+      violins_ii_stacc: -2
+  cello_drive:
+    kind: arpeggio
+    instrument: celli_stacc
+    octave: 3
+    voicing: root_fifth_octave
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.44
+    velocity: 64
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  bass_foundation:
+    kind: bassline
+    instrument: double_basses
+    octave: 1
+    pattern:
+    - - 0
+      - 0
+      - 0.9
+    - - 12
+      - 2
+      - 0.72
+    - - 0
+      - 3
+      - 0.56
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  tuba_foundation:
+    kind: bassline
+    instrument: tuba_sus
+    octave: 2
+    pattern:
+    - - 0
+      - 0
+      - 1.0
+    - - 12
+      - 2
+      - 0.72
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+  harp_flow:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 2
+    - 1
+    - 0
+    - 1
+    step: 0.5
+    duration_beats: 0.46
+    velocity: 48
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  bass_drum_grand:
+    kind: drums
+    instrument: concert_bass_drum
+    humanize_ms: 2
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 88
+      duration_beats: 0.14
+  snare_march:
+    kind: drums
+    instrument: orchestral_snare
+    humanize_ms: 2
+    events:
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 82
+      duration_beats: 0.08
+    - drum: snare
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 38
+      duration_beats: 0.05
+      probability: 0.48
+  cymbal_arch:
+    kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 90
+      duration_beats: 0.58
+      every: 4
+  timpani_8:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 88
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.62
+    - - 0
+      - 2.0
+      - 12
+      - 0.44
+    - - 2
+      - 0.0
+      - 0
+      - 0.62
+    - - 2
+      - 2.0
+      - 12
+      - 0.44
+    - - 4
+      - 0.0
+      - 0
+      - 0.62
+    - - 4
+      - 2.0
+      - 12
+      - 0.44
+    - - 6
+      - 0.0
+      - 0
+      - 0.62
+    - - 6
+      - 2.0
+      - 12
+      - 0.44
+    - - 7
+      - 2.0
+      - 0
+      - 0.24
+    - - 7
+      - 2.5
+      - 12
+      - 0.22
+    - - 7
+      - 3.0
+      - 0
+      - 0.22
+    - - 7
+      - 3.5
+      - 12
+      - 0.2
+    - - 7
+      - 3.75
+      - 12
+      - 0.18
+  timpani_12:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 88
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.62
+    - - 0
+      - 2.0
+      - 12
+      - 0.44
+    - - 2
+      - 0.0
+      - 0
+      - 0.62
+    - - 2
+      - 2.0
+      - 12
+      - 0.44
+    - - 4
+      - 0.0
+      - 0
+      - 0.62
+    - - 4
+      - 2.0
+      - 12
+      - 0.44
+    - - 6
+      - 0.0
+      - 0
+      - 0.62
+    - - 6
+      - 2.0
+      - 12
+      - 0.44
+    - - 8
+      - 0.0
+      - 0
+      - 0.62
+    - - 8
+      - 2.0
+      - 12
+      - 0.44
+    - - 10
+      - 0.0
+      - 0
+      - 0.62
+    - - 10
+      - 2.0
+      - 12
+      - 0.44
+    - - 11
+      - 2.0
+      - 0
+      - 0.24
+    - - 11
+      - 2.5
+      - 12
+      - 0.22
+    - - 11
+      - 3.0
+      - 0
+      - 0.22
+    - - 11
+      - 3.5
+      - 12
+      - 0.2
+    - - 11
+      - 3.75
+      - 12
+      - 0.18
+  timpani_16:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 88
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.62
+    - - 0
+      - 2.0
+      - 12
+      - 0.44
+    - - 2
+      - 0.0
+      - 0
+      - 0.62
+    - - 2
+      - 2.0
+      - 12
+      - 0.44
+    - - 4
+      - 0.0
+      - 0
+      - 0.62
+    - - 4
+      - 2.0
+      - 12
+      - 0.44
+    - - 6
+      - 0.0
+      - 0
+      - 0.62
+    - - 6
+      - 2.0
+      - 12
+      - 0.44
+    - - 8
+      - 0.0
+      - 0
+      - 0.62
+    - - 8
+      - 2.0
+      - 12
+      - 0.44
+    - - 10
+      - 0.0
+      - 0
+      - 0.62
+    - - 10
+      - 2.0
+      - 12
+      - 0.44
+    - - 12
+      - 0.0
+      - 0
+      - 0.62
+    - - 12
+      - 2.0
+      - 12
+      - 0.44
+    - - 14
+      - 0.0
+      - 0
+      - 0.62
+    - - 14
+      - 2.0
+      - 12
+      - 0.44
+    - - 15
+      - 2.0
+      - 0
+      - 0.24
+    - - 15
+      - 2.5
+      - 12
+      - 0.22
+    - - 15
+      - 3.0
+      - 0
+      - 0.22
+    - - 15
+      - 3.5
+      - 12
+      - 0.2
+    - - 15
+      - 3.75
+      - 12
+      - 0.18
+  timpani_4_final:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 100
+    articulation: marcato
+    humanize_ms: 1
+    hits:
+    - - 0
+      - 0
+      - 0
+      - 0.8
+    - - 1
+      - 0
+      - 7
+      - 0.7
+    - - 2
+      - 0
+      - 0
+      - 0.8
+    - - 2
+      - 2
+      - 7
+      - 0.5
+    - - 3
+      - 0
+      - 0
+      - 1.5
+    - - 3
+      - 2
+      - 12
+      - 1.0
+  cymbal_final:
+    kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      bars:
+      - 0
+      - 2
+      - 3
+      velocity: 100
+      duration_beats: 0.75
+  violin_vector_sixteenths:
+    kind: arpeggio
+    instruments:
+    - violins_i_stacc
+    - violins_ii_stacc
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    step: 0.25
+    duration_beats: 0.19
+    velocity: 55
+    articulation: spiccato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      violins_i_stacc: 3
+      violins_ii_stacc: -2
+  cello_sync_drive:
+    kind: bassline
+    instrument: celli_stacc
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.34
+    - - 7
+      - 0.75
+      - 0.28
+    - - 12
+      - 1.5
+      - 0.46
+    - - 7
+      - 2.0
+      - 0.22
+    - - 0
+      - 2.75
+      - 0.34
+    - - 12
+      - 3.25
+      - 0.48
+    velocity: 66
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  bass_sync_foundation:
+    kind: bassline
+    instrument: double_basses
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 0.8
+    - - 12
+      - 1.5
+      - 0.42
+    - - 7
+      - 2.75
+      - 0.34
+    - - 0
+      - 3.5
+      - 0.34
+    velocity: 74
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  tuba_sync_foundation:
+    kind: bassline
+    instrument: tuba_sus
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.85
+    - - 7
+      - 2.75
+      - 0.42
+    - - 12
+      - 3.5
+      - 0.32
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+  bass_drum_hunt:
+    kind: drums
+    instrument: concert_bass_drum
+    humanize_ms: 2
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 1.5
+      - 2.75
+      velocity: 84
+      duration_beats: 0.12
+  snare_332:
+    kind: drums
+    instrument: orchestral_snare
+    humanize_ms: 2
+    events:
+    - drum: snare
+      beats:
+      - 0.0
+      - 1.5
+      - 3.0
+      velocity: 76
+      duration_beats: 0.07
+    - drum: snare
+      beats:
+      - 0.75
+      - 2.25
+      - 3.5
+      velocity: 40
+      duration_beats: 0.045
+      probability: 0.7
+  harp_sparks:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    step: 0.25
+    duration_beats: 0.18
+    velocity: 42
+    articulation: normal
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  cymbal_pressure:
+    kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 88
+      duration_beats: 0.56
+      every: 4
+  cymbal_every_two:
+    kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 94
+      duration_beats: 0.62
+      every: 2
+  bass_pedal_foundation:
+    kind: bassline
+    instrument: double_basses
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 0.8
+    - - 12
+      - 1.5
+      - 0.42
+    - - 0
+      - 2.75
+      - 0.34
+    - - 12
+      - 3.5
+      - 0.34
+    velocity: 74
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  tuba_pedal_foundation:
+    kind: bassline
+    instrument: tuba_sus
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.85
+    - - 12
+      - 2.75
+      - 0.42
+    - - 0
+      - 3.5
+      - 0.32
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+state_map:
+  default:
+    stems:
+      brass: 0.96
+      strings: 0.98
+      woodwinds: 0.94
+      percussion: 0.94
+      harp: 0.92
+playback:
+  loop: false
+sections:
+- id: already_moving
+  kind: intro
+  label: already moving - the problem arrives at speed
+  bars: 8
+  intensity: 0.96
+  density: 0.9
+  loopable: false
+  harmony:
+  - Dm9add11
+  - A7b9b13add11
+  - G13add9
+  - A7b9add11
+  - Dm9add11
+  - A7b9b13add11
+  - Gm11add9
+  - A7b9add11
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - violin_eighths
+  - cello_sync_drive
+  - bass_sync_foundation
+  - bass_drum_hunt
+  - snare_332
+  - timpani_8
+  - kind: motif
+    instruments:
+    - horns_sus
+    - trumpets_sus
+    motif: distance_seed_a
+    root: D4
+    starts:
+    - - 0
+      - 0.25
+    velocity: 88
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      trumpets_sus: 0
+    instrument_velocity_offsets:
+      horns_sus: -5
+      trumpets_sus: 0
+  - kind: motif
+    instruments:
+    - violins_i
+    - oboes
+    motif: distance_seed_b
+    root: D4
+    starts:
+    - - 4
+      - 0.5
+    velocity: 84
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      violins_i: 1
+      oboes: 0
+    instrument_velocity_offsets:
+      violins_i: -7
+      oboes: 0
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0.0
+    - - 3
+      - 3.5
+    - - 4
+      - 0.0
+    - - 7
+      - 3.0
+    octave: 3
+    velocity: 88
+    duration_beats: 0.38
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: first_correction
+  kind: verse
+  label: first correction - the same move, faster and higher
+  bars: 12
+  intensity: 1.02
+  density: 0.96
+  loopable: false
+  harmony:
+  - Dm9add11
+  - A7b9b13add11
+  - G13add9
+  - A7b9add11
+  - Em9add11
+  - B7b9b13add11
+  - A13add9
+  - B7b9add11
+  - Fm9add11
+  - C7b9#9b13add11
+  - Bb13add9
+  - C7b9add11
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - trombone_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_sync_foundation
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_pressure
+  - timpani_12
+  - kind: motif
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    motif: distance_seed_a
+    root: D4
+    starts:
+    - - 0
+      - 0.25
+    velocity: 94
+    articulation: marcato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+  - kind: motif
+    instruments:
+    - violins_i
+    - flutes
+    motif: distance_seed_b
+    root: E4
+    starts:
+    - - 4
+      - 0.5
+    velocity: 88
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      violins_i: 1
+      flutes: 1
+    instrument_velocity_offsets:
+      violins_i: -8
+      flutes: 0
+  - kind: motif
+    instruments:
+    - horns_sus
+    - trumpets_sus
+    - violins_i
+    motif: distance_seed_c
+    root: F4
+    starts:
+    - - 8
+      - 0.25
+    velocity: 90
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      trumpets_sus: 0
+      violins_i: 1
+    instrument_velocity_offsets:
+      horns_sus: -6
+      trumpets_sus: 0
+      violins_i: -10
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0
+    - - 2
+      - 3
+    - - 4
+      - 0
+    - - 6
+      - 3
+    - - 8
+      - 0
+    - - 10
+      - 3
+    - - 11
+      - 2.75
+    octave: 3
+    velocity: 92
+    duration_beats: 0.34
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: the_gap_narrows
+  kind: bridge
+  label: the gap narrows - long breath over a moving floor
+  bars: 12
+  intensity: 1.05
+  density: 0.95
+  loopable: false
+  harmony:
+  - Fmaj9#11add13
+  - Cmaj9add11add13
+  - Dm11add9
+  - Bbmaj9#11add13
+  - Gm11add9
+  - C13add9
+  - Fmaj9#11add13
+  - A7add9b13add11
+  - Dm11b13add9
+  - G13add9
+  - Bbmaj9#11add13
+  - A7b9add11
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_sync_foundation
+  - harp_flow
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_pressure
+  - timpani_12
+  - kind: motif
+    instruments:
+    - violins_i
+    - flutes
+    - oboes
+    motif: open_vector_a
+    root: F4
+    starts:
+    - - 0
+      - 0.0
+    velocity: 86
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      violins_i: 1
+      flutes: 1
+      oboes: 0
+    instrument_velocity_offsets:
+      violins_i: -9
+      flutes: 0
+      oboes: -4
+  - kind: motif
+    instruments:
+    - horns_sus
+    - clarinets
+    motif: open_vector_b
+    root: F4
+    starts:
+    - - 6
+      - 0.5
+    velocity: 86
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      clarinets: 0
+    instrument_velocity_offsets:
+      horns_sus: -7
+      clarinets: 0
+  - kind: motif
+    instruments:
+    - flutes
+    - violins_i
+    motif: needle_run
+    root: D5
+    starts:
+    - - 10
+      - 2.0
+    velocity: 80
+    articulation: staccato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      flutes: 0
+      violins_i: 0
+    instrument_velocity_offsets:
+      flutes: 0
+      violins_i: -8
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 1
+      - 3.0
+    - - 3
+      - 3.5
+    - - 5
+      - 3.0
+    - - 7
+      - 3.5
+    - - 9
+      - 3.0
+    - - 11
+      - 2.5
+    octave: 3
+    velocity: 86
+    duration_beats: 0.32
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: rules_under_stress
+  kind: bridge
+  label: rules under stress - the staircase starts skipping steps
+  bars: 12
+  intensity: 1.08
+  density: 0.98
+  loopable: false
+  harmony:
+  - Gm11b13add9
+  - D7b9b13add11
+  - C13add9
+  - D7b9
+  - Abm7add9add11
+  - Eb7b9#9b13add11
+  - Db13add9
+  - Eb7b9
+  - Am11b13add9
+  - E7b9b13add11
+  - D13add9
+  - E7b9
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - trombone_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_sync_foundation
+  - tuba_sync_foundation
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_pressure
+  - timpani_12
+  - harp_sparks
+  - kind: motif
+    instruments:
+    - trombones_stacc
+    - celli
+    motif: pressure_ladder_a
+    root: G3
+    starts:
+    - - 0
+      - 0.25
+    velocity: 92
+    articulation: marcato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      trombones_stacc: 0
+      celli: 0
+    instrument_velocity_offsets:
+      trombones_stacc: 0
+      celli: -8
+  - kind: motif
+    instruments:
+    - horns_stacc
+    - violas
+    motif: pressure_ladder_b
+    root: Ab3
+    starts:
+    - - 4
+      - 0.0
+    velocity: 92
+    articulation: marcato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_stacc: 0
+      violas: 1
+    instrument_velocity_offsets:
+      horns_stacc: 0
+      violas: -10
+  - kind: motif
+    instruments:
+    - trumpets_stacc
+    - violins_i
+    motif: pressure_ladder_a
+    root: A3
+    starts:
+    - - 8
+      - 0.5
+    velocity: 94
+    articulation: marcato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      trumpets_stacc: 1
+      violins_i: 1
+    instrument_velocity_offsets:
+      trumpets_stacc: 0
+      violins_i: -10
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0
+    - - 3
+      - 3
+    - - 4
+      - 0
+    - - 7
+      - 3
+    - - 8
+      - 0
+    - - 11
+      - 2.5
+    - - 11
+      - 3.25
+    octave: 3
+    velocity: 96
+    duration_beats: 0.3
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: hands_know_first
+  kind: bridge
+  label: hands know first - the motif outruns conscious thought
+  bars: 12
+  intensity: 1.11
+  density: 1.0
+  loopable: false
+  harmony:
+  - Dm9add11
+  - A7b9#9b13add11
+  - G13add9
+  - A7b9#9b13add11
+  - Dm9add11
+  - A7b9#9b13add11
+  - G13add9
+  - A7b9#9b13add11
+  - Dm9add11
+  - A7sus4b9add11
+  - G13add9
+  - A7b9#9b13add11
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_sync_foundation
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_pressure
+  - timpani_12
+  - kind: motif
+    instruments:
+    - violins_i
+    - flutes
+    motif: distance_seed_a
+    root: D4
+    starts:
+    - - 0
+      - 0.25
+    velocity: 90
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      violins_i: 1
+      flutes: 1
+    instrument_velocity_offsets:
+      violins_i: -10
+      flutes: 0
+    rhythm_scale: 0.84
+  - kind: motif
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    motif: distance_seed_b
+    root: D4
+    starts:
+    - - 4
+      - 0.5
+    velocity: 96
+    articulation: marcato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+    rhythm_scale: 0.74
+  - kind: motif
+    instruments:
+    - horns_sus
+    - trumpets_sus
+    - violins_i
+    motif: mastery_compact
+    root: D4
+    starts:
+    - - 8
+      - 0.25
+    velocity: 94
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      trumpets_sus: 0
+      violins_i: 1
+    instrument_velocity_offsets:
+      horns_sus: -5
+      trumpets_sus: 0
+      violins_i: -10
+    rhythm_scale: 0.68
+  - kind: motif
+    instruments:
+    - flutes
+    - oboes
+    motif: needle_run
+    root: D5
+    starts:
+    - - 9
+      - 2.5
+    velocity: 84
+    articulation: staccato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      flutes: 0
+      oboes: 0
+    instrument_velocity_offsets:
+      flutes: 0
+      oboes: -4
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0
+    - - 2
+      - 3.0
+    - - 4
+      - 0
+    - - 6
+      - 3.0
+    - - 8
+      - 0
+    - - 9
+      - 2.5
+    - - 10
+      - 1.5
+    - - 11
+      - 0
+    - - 11
+      - 2.5
+    octave: 3
+    velocity: 98
+    duration_beats: 0.3
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: the_distance_starts_losing
+  kind: chorus
+  label: the distance starts losing - another ceiling disappears
+  bars: 16
+  intensity: 1.19
+  density: 1.0
+  loopable: false
+  harmony:
+  - Dm9add11
+  - Ebmaj9#11add13/D
+  - G13add9/D
+  - A7b9b13add11/D
+  - Dm9add11
+  - Bbmaj9#11add13
+  - Gm11add9
+  - A7b9b13add11
+  - Dm9add11
+  - Amaj7add11/C#
+  - Gm6/9#11/D
+  - A7b9b13add11/D
+  - Ebmaj9#11add13/D
+  - A7add9b13/D
+  - Dm6/9
+  - Dm6/9
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - trombone_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_pedal_foundation
+  - tuba_pedal_foundation
+  - harp_sparks
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_every_two
+  - timpani_16
+  - kind: motif
+    instruments:
+    - horns_sus
+    - trumpets_sus
+    - violins_i
+    motif: mastery_line_a
+    root: D4
+    starts:
+    - - 0
+      - 0.0
+    velocity: 98
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      trumpets_sus: 0
+      violins_i: 1
+    instrument_velocity_offsets:
+      horns_sus: -5
+      trumpets_sus: 0
+      violins_i: -9
+  - kind: motif
+    instruments:
+    - trombones_sus
+    - flutes
+    - violins_ii
+    motif: mastery_line_b
+    root: D4
+    starts:
+    - - 8
+      - 0.25
+    velocity: 96
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      trombones_sus: -1
+      flutes: 1
+      violins_ii: 1
+    instrument_velocity_offsets:
+      trombones_sus: -8
+      flutes: 0
+      violins_ii: -10
+  - kind: motif
+    instruments:
+    - flutes
+    - oboes
+    - violins_i
+    motif: needle_run
+    root: D5
+    starts:
+    - - 4
+      - 2.0
+    velocity: 86
+    articulation: staccato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      flutes: 0
+      oboes: 0
+      violins_i: 0
+    instrument_velocity_offsets:
+      flutes: 0
+      oboes: -4
+      violins_i: -8
+  - kind: motif
+    instruments:
+    - flutes
+    - clarinets
+    - violins_i
+    motif: needle_run
+    root: E5
+    starts:
+    - - 12
+      - 1.5
+    velocity: 88
+    articulation: staccato
+    gate: 0.9
+    humanize_ms: 3
+    instrument_octave_offsets:
+      flutes: 0
+      clarinets: 0
+      violins_i: 0
+    instrument_velocity_offsets:
+      flutes: 0
+      clarinets: -6
+      violins_i: -8
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0
+    - - 0
+      - 1.5
+    - - 1
+      - 3
+    - - 2
+      - 2.75
+    - - 4
+      - 0
+    - - 5
+      - 3
+    - - 6
+      - 2.75
+    - - 8
+      - 0
+    - - 8
+      - 1.5
+    - - 10
+      - 2.75
+    - - 12
+      - 0
+    - - 13
+      - 3
+    - - 14
+      - 2
+    - - 15
+      - 0
+    - - 15
+      - 2.5
+    - - 15
+      - 3.25
+    octave: 3
+    velocity: 104
+    duration_beats: 0.4
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4
+- id: no_more_ceiling
+  kind: outro
+  label: no more ceiling - still dangerous, now completely owned
+  bars: 4
+  intensity: 1.24
+  density: 1.0
+  loopable: false
+  harmony:
+  - Gm13add9add11
+  - A7b9#9b13add11/D
+  - A7sus4b9add11
+  - Dm6/9
+  layers:
+  - violins_i_sweep
+  - violins_ii_sweep
+  - viola_sweep
+  - horn_chorale
+  - trombone_chorale
+  - violin_vector_sixteenths
+  - cello_sync_drive
+  - bass_pedal_foundation
+  - tuba_pedal_foundation
+  - harp_sparks
+  - bass_drum_hunt
+  - snare_332
+  - cymbal_final
+  - timpani_4_final
+  - kind: motif
+    instruments:
+    - horns_sus
+    - trumpets_sus
+    - violins_i
+    - flutes
+    motif: final_override
+    root: D4
+    starts:
+    - - 0
+      - 0.0
+    velocity: 102
+    articulation: tenuto
+    gate: 0.96
+    humanize_ms: 3
+    instrument_octave_offsets:
+      horns_sus: -1
+      trumpets_sus: 0
+      violins_i: 1
+      flutes: 1
+    instrument_velocity_offsets:
+      horns_sus: -4
+      trumpets_sus: 0
+      violins_i: -8
+      flutes: -3
+  - kind: chord_hits
+    instruments:
+    - horns_stacc
+    - trumpets_stacc
+    - trombones_stacc
+    hits:
+    - - 0
+      - 0
+    - - 1
+      - 1.5
+    - - 2
+      - 0
+    - - 2
+      - 2.75
+    - - 3
+      - 0
+    octave: 3
+    velocity: 110
+    duration_beats: 0.62
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets:
+      horns_stacc: 0
+      trumpets_stacc: 1
+      trombones_stacc: 0
+    instrument_velocity_offsets:
+      horns_stacc: -5
+      trumpets_stacc: 0
+      trombones_stacc: -4

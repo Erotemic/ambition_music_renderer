@@ -20,6 +20,7 @@ from typing import Any
 def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
     from ..instrument_libraries import resolve_sfz_reference
     from ..backends.sfizz_backend import sfz_key_span
+    from ..render.backend_notes import backend_note_remap
     from ..render.score_layers import build_score
 
     render_cfg = spec.get("render") or {}
@@ -70,10 +71,19 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                 prefer=prefer, roots=roots,
             )
             span = sfz_key_span(str(resolved)) if resolved else None
+            authored_pitches = list(pitches.get(name) or [])
+            try:
+                note_remap = backend_note_remap(be)
+            except (TypeError, ValueError) as ex:
+                note_remap = {}
+                row["note_remap_error"] = str(ex)
+                warnings.append(f"{name!r}: invalid backend note remap: {ex}")
+            rendered_pitches = [note_remap.get(p, p) for p in authored_pitches]
+            remapped_count = sum(1 for a, b in zip(authored_pitches, rendered_pitches) if a != b)
             oob = 0
-            if span and pitches.get(name):
+            if span and rendered_pitches:
                 lo, hi = span
-                oob = sum(1 for p in pitches[name] if p < lo or p > hi)
+                oob = sum(1 for p in rendered_pitches if p < lo or p > hi)
             row.update({
                 "backend": "sfz",
                 "requested": requested,
@@ -83,25 +93,34 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                 "fallback_backend": be.get("fallback_backend", sfizz_cfg.get("fallback_backend")),
                 "key_span": list(span) if span else None,
                 "notes_out_of_range": oob,
+                "backend_note_remap": {str(src): dst for src, dst in sorted(note_remap.items())} or None,
+                "remapped_note_count": remapped_count,
+                "render_part_low": min(rendered_pitches) if rendered_pitches else None,
+                "render_part_high": max(rendered_pitches) if rendered_pitches else None,
             })
             if resolved is None:
                 row["status"] = "UNRESOLVED → will fall back to GM"
                 warnings.append(f"{name!r}: SFZ {requested!r} did not resolve to any file; "
                                 f"will fall back to GM.")
             elif oob and is_drum:
-                # drum maps key→sound; out-of-range keys are NOT folded — they are
-                # simply unmapped (that drum piece is silent).
+                # Drum maps use key→piece semantics. Backend note remaps are
+                # applied before this check, so remaining misses really are silent.
                 row["status"] = f"resolved; {oob}/{note_n.get(name,0)} drum hits UNMAPPED (silent)"
+                rendered_lo = row.get("render_part_low")
+                rendered_hi = row.get("render_part_high")
                 warnings.append(
                     f"{name!r} (drum kit): requested {requested!r} → {Path(str(resolved)).name} maps "
-                    f"keys {span[0]}..{span[1]}, but {oob}/{note_n.get(name,0)} hits use keys outside "
-                    f"that ({note_lo[name]}..{note_hi[name]}) — those pieces are SILENT (no remap).")
+                    f"keys {span[0]}..{span[1]}, but {oob}/{note_n.get(name,0)} rendered hits remain "
+                    f"outside that ({rendered_lo}..{rendered_hi}) after backend note remapping.")
             elif oob:
                 row["status"] = f"resolved; {oob}/{note_n.get(name,0)} notes octave-folded into range"
                 warnings.append(
                     f"{name!r}: requested {requested!r} → {Path(str(resolved)).name}; "
                     f"{oob}/{note_n.get(name,0)} notes ({note_lo[name]}..{note_hi[name]}) fall outside "
                     f"the sampled range {span[0]}..{span[1]} and are octave-folded.")
+            elif remapped_count:
+                noun = "drum hits" if is_drum else "notes"
+                row["status"] = f"resolved; {remapped_count}/{note_n.get(name,0)} {noun} remapped for SFZ"
             else:
                 row["status"] = "resolved"
         else:
@@ -135,11 +154,14 @@ def _summary(payload: dict[str, Any]) -> str:
              "what each instrument actually resolved to:", ""]
     for r in payload["instruments"]:
         if r["backend"] == "sfz":
+            rendered_part = ""
+            if r.get("remapped_note_count"):
+                rendered_part = f" → render {r.get('render_part_low')}..{r.get('render_part_high')}"
             lines.append(
                 f"  {r['instrument']:<20} [{r['group']}]  requested {r.get('requested')!r}"
                 f" → {r.get('resolved_name') or 'UNRESOLVED'}"
                 f"  span {r.get('key_span')}  part {r.get('part_low')}..{r.get('part_high')}"
-                f"  · {r['status']}")
+                f"{rendered_part}  · {r['status']}")
         else:
             lines.append(
                 f"  {r['instrument']:<20} [{r['group']}]  GM program {r.get('program')}"
@@ -166,7 +188,9 @@ def write_reports(payload: dict[str, Any], reports_dir: Path) -> dict[str, str]:
         req = r.get("requested")
         md.append(f"| {r['instrument']} | {r['group']} | `{req}` | "
                   f"`{r.get('resolved_name') or '—'}` | {r.get('key_span') or '—'} | "
-                  f"{r.get('part_low')}..{r.get('part_high')} | {r['status']} |")
+                  f"{r.get('part_low')}..{r.get('part_high')}"
+                  f"{' → ' + str(r.get('render_part_low')) + '..' + str(r.get('render_part_high')) if r.get('remapped_note_count') else ''}"
+                  f" | {r['status']} |")
     (reports_dir / "instrument_resolution.md").write_text("\n".join(md))
     paths["markdown"] = str(reports_dir / "instrument_resolution.md")
     return paths

@@ -46,3 +46,63 @@ def test_resolution_records_requested_and_resolved_keys():
     # whether or not the library is installed here, the provenance fields exist
     assert row["requested"] == "bass.growly"
     assert "resolved" in row and "key_span" in row and "notes_out_of_range" in row
+
+
+def test_sampled_drum_note_remap_is_reflected_in_range_audit(monkeypatch, tmp_path):
+    import ambition_music_renderer.backends.sfizz_backend as sfizz_backend
+    import ambition_music_renderer.instrument_libraries as instrument_libraries
+
+    sfz_path = tmp_path / "orchestral-snare.sfz"
+    sfz_path.write_text("<region> key=60 sample=snare.wav\n")
+    monkeypatch.setattr(
+        instrument_libraries,
+        "resolve_sfz_reference",
+        lambda *args, **kwargs: sfz_path,
+    )
+    monkeypatch.setattr(sfizz_backend, "sfz_key_span", lambda path: (60, 65))
+
+    spec = {
+        "id": "mapped_drum",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [
+            {
+                "name": "snare",
+                "group": "percussion",
+                "is_drum": True,
+                "instrument_backend": {
+                    "kind": "sfz",
+                    "library_ref": "orchestra.snare",
+                    "note_remap": {"snare": "C4"},
+                },
+            }
+        ],
+        "layer_templates": {
+            "snare_hits": {
+                "kind": "drums",
+                "instrument": "snare",
+                "events": [{"drum": "snare", "beats": [1.0, 3.0]}],
+            }
+        },
+        "sections": [
+            {
+                "id": "s",
+                "kind": "loop_component",
+                "bars": 1,
+                "intensity": 1.0,
+                "harmony": ["C"],
+                "layers": ["snare_hits"],
+            }
+        ],
+        "state_map": {"default": {"section": "s", "stems": {}}},
+    }
+
+    row = ir.audit_spec(spec)["instruments"][0]
+    assert row["part_low"] == 38
+    assert row["part_high"] == 38
+    assert row["render_part_low"] == 60
+    assert row["render_part_high"] == 60
+    assert row["backend_note_remap"] == {"38": 60}
+    assert row["remapped_note_count"] == 2
+    assert row["notes_out_of_range"] == 0
+    assert "remapped for SFZ" in row["status"]

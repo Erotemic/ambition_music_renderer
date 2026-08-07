@@ -1,0 +1,5291 @@
+schema: ambition.musicir.v1
+id: wrong_planet_great_reception
+title: Wrong Planet, Great Reception
+seed: 2026080623
+notes: 'Indie-pop / synth-pop instrumental built like a cheerful transmission from somewhere that has never heard Earth pop but somehow reinvented the hook. An eight-bar bubbly gurgling intro opens into punchy electronic drums, springy synth bass, warm pads, clipped electric-piano chords, crystalline replies, and a high-vibrato saw lead. The central four-bar hook is deliberately simple enough to sing after one listen: two tiny pickups vault into a long high note, leave a hole, then answer downward. It returns unchanged often enough to become an earworm, while the accompaniment and counter-lines mutate around it. Alien FX are sparse, chord-attached punctuation rather than random dissonance. Mix polish keeps the arrangement intact while rebalancing percussion/bass against the whimsical and key layers. The sparse opening is level-raised, and a four-bar loop handoff reuses only intro bars 4-7 so raw game playback can wrap from the file end into intro bar 0 as one continuous eight-bar cycle.
+  Loudness-rider polish leaves every note and layer intact, gently compresses/attenuates the lead bus, and applies smooth section-level audio gain before mastering so sparse and lead-heavy passages remain within a narrow game-safe loudness window.'
+tempo:
+  bpm: 128
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  soundfont: /data/audio-tools/soundfonts/GeneralUser-GS.sf2
+  section_mix_transition_beats: 2.0
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 31
+  lowpass_hz: 14500
+  eq_bands:
+  - type: low_shelf
+    hz: 82
+    q: 0.72
+    db: 1.1
+  - type: peak
+    hz: 330
+    q: 0.85
+    db: -1.3
+  - type: peak
+    hz: 2350
+    q: 1.0
+    db: 0.9
+  - type: high_shelf
+    hz: 8200
+    q: 0.7
+    db: 1.2
+  reverb_wet: 0.06
+  reverb_decay_seconds: 1.05
+  reverb_damping_hz: 7800
+  stereo_width: 0.15
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.2
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 92.0
+  compressor_makeup_db: 1.4
+  compressor_knee_db: 5.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.2
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.005
+  reverb_decay_seconds: 0.4
+  reverb_damping_hz: 7800
+  stereo_width: 0.045
+  limiter_drive: 0.9
+  normalize: false
+  target_peak_db: -3.5
+group_postprocess:
+  lead:
+    gain_db: -1.5
+    highpass_hz: 120
+    lowpass_hz: 13800
+    presence_low_hz: 1700
+    presence_high_hz: 5200
+    presence_db: 0.7
+    reverb_wet: 0.018
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.6
+    compressor_attack_ms: 9.0
+    compressor_release_ms: 92.0
+    compressor_makeup_db: 0.0
+    compressor_knee_db: 6.0
+  whimsy:
+    gain_db: 5.0
+    highpass_hz: 160
+    lowpass_hz: 12800
+    stereo_width: 0.12
+    reverb_wet: 0.028
+  pads:
+    gain_db: 0.6
+    highpass_hz: 105
+    lowpass_hz: 11800
+    reverb_wet: 0.03
+  keys:
+    gain_db: 2.4
+    highpass_hz: 95
+    lowpass_hz: 12800
+    reverb_wet: 0.012
+  bass:
+    gain_db: -0.1
+    highpass_hz: 30
+    lowpass_hz: 5200
+    compressor_threshold_db: -17.0
+    compressor_ratio: 3.0
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 78.0
+  percussion:
+    gain_db: -1.0
+    highpass_hz: 28
+    lowpass_hz: 13800
+    compressor_threshold_db: -15.0
+    compressor_ratio: 3.6
+    compressor_attack_ms: 4.0
+    compressor_release_ms: 68.0
+    transient_tame: 0.01
+    reverb_wet: 0.002
+instruments:
+- name: signal_lead
+  group: lead
+  program: lead_saw
+  volume: 100
+  pan: 68
+  expression: 108
+  modulation: 12
+- name: signal_double
+  group: lead
+  program: lead_square
+  volume: 66
+  pan: 52
+  expression: 82
+  modulation: 7
+- name: bubble_goblin
+  group: whimsy
+  program: fx_goblins
+  volume: 72
+  pan: 48
+  expression: 88
+  modulation: 9
+- name: bubble_chiff
+  group: whimsy
+  program: lead_chiff
+  volume: 70
+  pan: 76
+  expression: 88
+  modulation: 5
+- name: echo_speck
+  group: whimsy
+  program: fx_echoes
+  volume: 52
+  pan: 86
+  expression: 72
+  modulation: 8
+- name: crystal
+  group: whimsy
+  program: fx_crystal
+  volume: 58
+  pan: 40
+  expression: 78
+- name: pad_glow
+  group: pads
+  program: pad_new_age
+  volume: 68
+  pan: 52
+  expression: 84
+  modulation: 4
+- name: pad_warm
+  group: pads
+  program: pad_warm
+  volume: 62
+  pan: 78
+  expression: 82
+  modulation: 3
+- name: epiano
+  group: keys
+  program: electric_piano_2
+  volume: 72
+  pan: 60
+  expression: 90
+- name: clav
+  group: keys
+  program: clavinet
+  volume: 58
+  pan: 72
+  expression: 76
+- name: pop_bass
+  group: bass
+  program: synth_bass_1
+  volume: 104
+  pan: 64
+  expression: 108
+- name: arp_bass
+  group: whimsy
+  program: synth_bass_2
+  volume: 64
+  pan: 58
+  expression: 82
+- name: kit
+  group: percussion
+  is_drum: true
+  volume: 108
+  pan: 64
+  expression: 112
+motifs: []
+layer_templates:
+  glow_pad:
+    kind: pad_chords
+    instruments:
+    - pad_glow
+    - pad_warm
+    instrument_octave_offsets:
+      pad_glow: 1
+      pad_warm: 0
+    instrument_velocity_offsets:
+      pad_glow: -6
+      pad_warm: 0
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.8
+    velocity: 46
+    articulation: pad
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+  epiano_chops:
+    kind: chord_hits
+    instrument: epiano
+    octave: 4
+    hits:
+    - - 0
+      - 0.5
+    - - 0
+      - 2.5
+    - - 1
+      - 0.5
+    - - 1
+      - 2.5
+    - - 2
+      - 0.5
+    - - 2
+      - 2.5
+    - - 3
+      - 0.5
+    - - 3
+      - 2.5
+    - - 4
+      - 0.5
+    - - 4
+      - 2.5
+    - - 5
+      - 0.5
+    - - 5
+      - 2.5
+    - - 6
+      - 0.5
+    - - 6
+      - 2.5
+    - - 7
+      - 0.5
+    - - 7
+      - 2.5
+    - - 8
+      - 0.5
+    - - 8
+      - 2.5
+    - - 9
+      - 0.5
+    - - 9
+      - 2.5
+    - - 10
+      - 0.5
+    - - 10
+      - 2.5
+    - - 11
+      - 0.5
+    - - 11
+      - 2.5
+    - - 12
+      - 0.5
+    - - 12
+      - 2.5
+    - - 13
+      - 0.5
+    - - 13
+      - 2.5
+    - - 14
+      - 0.5
+    - - 14
+      - 2.5
+    - - 15
+      - 0.5
+    - - 15
+      - 2.5
+    velocity: 58
+    duration_beats: 0.62
+    articulation: normal
+    voicing: triad
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  clav_offbeats:
+    kind: chord_hits
+    instrument: clav
+    octave: 4
+    hits:
+    - - 0
+      - 1.5
+    - - 0
+      - 3.5
+    - - 1
+      - 1.5
+    - - 1
+      - 3.5
+    - - 2
+      - 1.5
+    - - 2
+      - 3.5
+    - - 3
+      - 1.5
+    - - 3
+      - 3.5
+    - - 4
+      - 1.5
+    - - 4
+      - 3.5
+    - - 5
+      - 1.5
+    - - 5
+      - 3.5
+    - - 6
+      - 1.5
+    - - 6
+      - 3.5
+    - - 7
+      - 1.5
+    - - 7
+      - 3.5
+    - - 8
+      - 1.5
+    - - 8
+      - 3.5
+    - - 9
+      - 1.5
+    - - 9
+      - 3.5
+    - - 10
+      - 1.5
+    - - 10
+      - 3.5
+    - - 11
+      - 1.5
+    - - 11
+      - 3.5
+    - - 12
+      - 1.5
+    - - 12
+      - 3.5
+    - - 13
+      - 1.5
+    - - 13
+      - 3.5
+    - - 14
+      - 1.5
+    - - 14
+      - 3.5
+    - - 15
+      - 1.5
+    - - 15
+      - 3.5
+    velocity: 48
+    duration_beats: 0.2
+    articulation: staccato
+    voicing: triad
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+  bass_bounce:
+    kind: bassline
+    instrument: pop_bass
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.48
+    - - 12
+      - 0.75
+      - 0.26
+    - - 0
+      - 1.5
+      - 0.38
+    - - 7
+      - 2.25
+      - 0.28
+    - - 12
+      - 3.0
+      - 0.34
+    - - 7
+      - 3.5
+      - 0.22
+    velocity: 82
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  bubble_arp:
+    kind: arpeggio
+    instrument: bubble_chiff
+    octave: 5
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 3
+    step: 0.25
+    duration_beats: 0.16
+    velocity: 42
+    density: 0.84
+    voicing: open
+    articulation: pluck
+    humanize_ms: 1
+    humanize_velocity_pct: 5
+  low_arp:
+    kind: arpeggio
+    instrument: arp_bass
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    - 1
+    step: 0.25
+    duration_beats: 0.18
+    velocity: 48
+    density: 0.92
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+  drums_intro:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.5
+      velocity: 76
+      duration_beats: 0.1
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 60
+      duration_beats: 0.08
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 26
+      duration_beats: 0.04
+  drums_pop:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.5
+      - 2.5
+      velocity: 88
+      duration_beats: 0.1
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 84
+      duration_beats: 0.08
+    - drum: hand_clap
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 42
+      duration_beats: 0.06
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 32
+      duration_beats: 0.04
+    - drum: open_hat
+      beats:
+      - 1.5
+      - 3.5
+      velocity: 26
+      duration_beats: 0.06
+  drums_chorus:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      velocity: 94
+      duration_beats: 0.1
+    - drum: electric_snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 88
+      duration_beats: 0.08
+    - drum: hand_clap
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 52
+      duration_beats: 0.06
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 35
+      duration_beats: 0.04
+    - drum: open_hat
+      beats:
+      - 0.5
+      - 2.5
+      velocity: 34
+      duration_beats: 0.08
+sections:
+- id: bubbles_before_language
+  bars: 8
+  intensity: 1.0
+  density: 0.76
+  loopable: false
+  harmony:
+  - Bmaj7
+  - C#m7
+  - Emaj7
+  - F#7
+  - Bmaj7
+  - C#m7
+  - Emaj7
+  - F#7
+  layers:
+  - glow_pad
+  - bubble_arp
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.0
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 0.5
+      note: F#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 0.0
+      note: E4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 0.5
+      note: C#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 2.5
+      note: E4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 0.0
+      note: E3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 1.25
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 2.5
+      note: E3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 3.0
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 3.5
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 0.0
+      note: A#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 0.5
+      note: F#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 1.25
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 2.5
+      note: A#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 3.0
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: F#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 0.0
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: F#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 4
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 0.0
+      note: E4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 0.5
+      note: C#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 2.5
+      note: E4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 0.0
+      note: E3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 1.25
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 2.5
+      note: E3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 3.0
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 6
+      beat: 3.5
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 0.0
+      note: A#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 0.5
+      note: F#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 1.25
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 2.5
+      note: A#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 3.0
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: F#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 1
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 1
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 5
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 5
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 7
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 7
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 1
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 6
+      beat: 2.75
+      note: D#5
+      dur: 0.16
+      vel: 66
+    - bar: 6
+      beat: 3.0
+      note: F#5
+      dur: 0.16
+      vel: 68
+    - bar: 7
+      beat: 0.0
+      note: B5
+      dur: 0.78
+      vel: 74
+      vibrato_cents: 30
+      vibrato_rate_hz: 7.1
+  - template: drums_intro
+    dynamics:
+    - start_bar: 0
+      bars: 8
+      from: 0.5
+      to: 0.9
+      curve: smooth
+  mix_gain_db: 9.0
+- id: first_contact
+  bars: 8
+  intensity: 0.92
+  density: 0.88
+  loopable: false
+  harmony:
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - bass_bounce
+  - low_arp
+  - drums_pop
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 7
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 7
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 1
+  mix_gain_db: 1.0
+- id: signal_lift
+  bars: 8
+  intensity: 0.98
+  density: 0.94
+  loopable: false
+  harmony:
+  - C#m7
+  - Emaj7
+  - Bmaj7
+  - F#7
+  - C#m7
+  - Emaj7
+  - F#7
+  - F#7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - clav_offbeats
+  - bass_bounce
+  - bubble_arp
+  - drums_pop
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 0
+      beat: 1.0
+      note: G#4
+      dur: 0.34
+      vel: 76
+    - bar: 0
+      beat: 1.5
+      note: B4
+      dur: 0.34
+      vel: 78
+    - bar: 1
+      beat: 0.5
+      note: D#5
+      dur: 0.72
+      vel: 82
+      vibrato_cents: 24
+      vibrato_rate_hz: 6.9
+    - bar: 2
+      beat: 2.0
+      note: F#5
+      dur: 0.28
+      vel: 82
+    - bar: 2
+      beat: 2.5
+      note: D#5
+      dur: 0.28
+      vel: 78
+    - bar: 3
+      beat: 0.0
+      note: B4
+      dur: 1.1
+      vel: 84
+      vibrato_cents: 28
+      vibrato_rate_hz: 7.0
+    - bar: 4
+      beat: 1.0
+      note: C#5
+      dur: 0.3
+      vel: 80
+    - bar: 4
+      beat: 1.5
+      note: E5
+      dur: 0.3
+      vel: 82
+    - bar: 5
+      beat: 0.5
+      note: G#5
+      dur: 0.76
+      vel: 88
+      vibrato_cents: 30
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.5
+      note: D#5
+      dur: 0.18
+      vel: 82
+    - bar: 6
+      beat: 2.75
+      note: F#5
+      dur: 0.18
+      vel: 86
+    - bar: 7
+      beat: 0.0
+      note: A#5
+      dur: 1.35
+      vel: 92
+      vibrato_cents: 38
+      vibrato_rate_hz: 7.2
+    humanize_ms: 2
+  mix_gain_db: 0.0
+- id: great_reception
+  bars: 12
+  intensity: 1.06
+  density: 1.02
+  loopable: false
+  harmony:
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - clav_offbeats
+  - bass_bounce
+  - bubble_arp
+  - drums_chorus
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 86.0
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 100.0
+      articulation: tenuto
+      vibrato_cents: 38.0
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 84.0
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 88.0
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 82.0
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 88.0
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 88.0
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 80.0
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 90.0
+      articulation: tenuto
+      vibrato_cents: 22.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 82.0
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 40.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 82.0
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 80.0
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 86.0
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 96.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 86.0
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 78.0
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 86.0
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 100.0
+      articulation: tenuto
+      vibrato_cents: 38.0
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 84.0
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 88.0
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 82.0
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 88.0
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 88.0
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 80.0
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 90.0
+      articulation: tenuto
+      vibrato_cents: 22.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 82.0
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 40.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 82.0
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 80.0
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 86.0
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 96.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 86.0
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 78.0
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    - bar: 8
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 86.0
+      articulation: tenuto
+    - bar: 8
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    - bar: 8
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 100.0
+      articulation: tenuto
+      vibrato_cents: 38.0
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 84.0
+      articulation: tenuto
+    - bar: 8
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 88.0
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 82.0
+      articulation: tenuto
+    - bar: 9
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 88.0
+      articulation: tenuto
+    - bar: 9
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 9
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 9
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 88.0
+      articulation: tenuto
+    - bar: 9
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 80.0
+      articulation: tenuto
+    - bar: 9
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 90.0
+      articulation: tenuto
+      vibrato_cents: 22.0
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 82.0
+      articulation: tenuto
+    - bar: 10
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 10
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 40.0
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 82.0
+      articulation: tenuto
+    - bar: 10
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 80.0
+      articulation: tenuto
+    - bar: 11
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 86.0
+      articulation: tenuto
+    - bar: 11
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 96.0
+      articulation: tenuto
+      vibrato_cents: 36.0
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 11
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 86.0
+      articulation: tenuto
+    - bar: 11
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 78.0
+      articulation: tenuto
+    - bar: 11
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 86.0
+      articulation: tenuto
+      vibrato_cents: 16.0
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 84.0
+      articulation: tenuto
+    - bar: 11
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 88.0
+      articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+  - kind: notes
+    instrument: signal_double
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 44.72
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 52.0
+      articulation: tenuto
+      vibrato_cents: 24.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 43.68
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 45.76
+      articulation: tenuto
+      vibrato_cents: 11.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 42.64
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 45.76
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 45.76
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 41.6
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 46.8
+      articulation: tenuto
+      vibrato_cents: 14.3
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 42.64
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 26.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 42.64
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 41.6
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 44.72
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 49.92
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 44.72
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 40.56
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 44.72
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 52.0
+      articulation: tenuto
+      vibrato_cents: 24.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 43.68
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 45.76
+      articulation: tenuto
+      vibrato_cents: 11.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 42.64
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 45.76
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 45.76
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 41.6
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 46.8
+      articulation: tenuto
+      vibrato_cents: 14.3
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 42.64
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 26.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 42.64
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 41.6
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 44.72
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 49.92
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 44.72
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 40.56
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    - bar: 8
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 44.72
+      articulation: tenuto
+    - bar: 8
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    - bar: 8
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 52.0
+      articulation: tenuto
+      vibrato_cents: 24.7
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 43.68
+      articulation: tenuto
+    - bar: 8
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 45.76
+      articulation: tenuto
+      vibrato_cents: 11.7
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 42.64
+      articulation: tenuto
+    - bar: 9
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 45.76
+      articulation: tenuto
+    - bar: 9
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 9
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 9
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 45.76
+      articulation: tenuto
+    - bar: 9
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 41.6
+      articulation: tenuto
+    - bar: 9
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 46.8
+      articulation: tenuto
+      vibrato_cents: 14.3
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 42.64
+      articulation: tenuto
+    - bar: 10
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 10
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 50.96
+      articulation: tenuto
+      vibrato_cents: 26.0
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 42.64
+      articulation: tenuto
+    - bar: 10
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 41.6
+      articulation: tenuto
+    - bar: 11
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 44.72
+      articulation: tenuto
+    - bar: 11
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 49.92
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 11
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 44.72
+      articulation: tenuto
+    - bar: 11
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 40.56
+      articulation: tenuto
+    - bar: 11
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 44.72
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 43.68
+      articulation: tenuto
+    - bar: 11
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 45.76
+      articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 7
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 7
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 11
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 11
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 0
+  mix_gain_db: -1.75
+- id: wrong_planet_bridge
+  bars: 8
+  intensity: 0.97
+  density: 0.92
+  loopable: false
+  harmony:
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - F#7
+  - G#m7
+  - C#m7
+  - Emaj7
+  - F#7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - bass_bounce
+  - low_arp
+  - drums_pop
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: G#4
+      dur: 0.24
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 0
+      beat: 1.0
+      note: B4
+      dur: 0.2
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: D#5
+      dur: 0.3
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 1
+      beat: 2.5
+      note: G#4
+      dur: 0.28
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 2
+      beat: 0.0
+      note: F#4
+      dur: 0.22
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.22
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 2
+      beat: 1.0
+      note: D#5
+      dur: 0.42
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 3
+      beat: 3.0
+      note: C#5
+      dur: 0.3
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: B4
+      dur: 0.2
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 4
+      beat: 0.75
+      note: D#5
+      dur: 0.2
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 4
+      beat: 1.0
+      note: G#5
+      dur: 0.55
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 5
+      beat: 2.25
+      note: E5
+      dur: 0.3
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: G#4
+      dur: 0.2
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 6
+      beat: 1.0
+      note: B4
+      dur: 0.2
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 6
+      beat: 1.5
+      note: E5
+      dur: 0.42
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+    - bar: 7
+      beat: 2.75
+      note: F#5
+      dur: 0.36
+      vel: 56
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -35
+      - - 0.18
+        - 15
+      - - 0.3
+        - 0
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 1
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 1
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 5
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 5
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 7
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 7
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 1
+  mix_gain_db: 0.75
+- id: great_reception_louder
+  bars: 12
+  intensity: 1.1
+  density: 1.08
+  loopable: false
+  harmony:
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - clav_offbeats
+  - bass_bounce
+  - bubble_arp
+  - low_arp
+  - drums_chorus
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 88.58
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 103.0
+      articulation: tenuto
+      vibrato_cents: 41.04
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 86.52
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 90.64
+      articulation: tenuto
+      vibrato_cents: 19.44
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 84.46
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 90.64
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 90.64
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 82.4
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 92.7
+      articulation: tenuto
+      vibrato_cents: 23.76
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 84.46
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 43.2
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 84.46
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 82.4
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 88.58
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 98.88
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 88.58
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 80.34
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 88.58
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 103.0
+      articulation: tenuto
+      vibrato_cents: 41.04
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 86.52
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 90.64
+      articulation: tenuto
+      vibrato_cents: 19.44
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 84.46
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 90.64
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 90.64
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 82.4
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 92.7
+      articulation: tenuto
+      vibrato_cents: 23.76
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 84.46
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 43.2
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 84.46
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 82.4
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 88.58
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 98.88
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 88.58
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 80.34
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    - bar: 8
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 88.58
+      articulation: tenuto
+    - bar: 8
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    - bar: 8
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 103.0
+      articulation: tenuto
+      vibrato_cents: 41.04
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 86.52
+      articulation: tenuto
+    - bar: 8
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 90.64
+      articulation: tenuto
+      vibrato_cents: 19.44
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 84.46
+      articulation: tenuto
+    - bar: 9
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 90.64
+      articulation: tenuto
+    - bar: 9
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 9
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 9
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 90.64
+      articulation: tenuto
+    - bar: 9
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 82.4
+      articulation: tenuto
+    - bar: 9
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 92.7
+      articulation: tenuto
+      vibrato_cents: 23.76
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 84.46
+      articulation: tenuto
+    - bar: 10
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 10
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 100.94
+      articulation: tenuto
+      vibrato_cents: 43.2
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 84.46
+      articulation: tenuto
+    - bar: 10
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 82.4
+      articulation: tenuto
+    - bar: 11
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 88.58
+      articulation: tenuto
+    - bar: 11
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 98.88
+      articulation: tenuto
+      vibrato_cents: 38.88
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 11
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 88.58
+      articulation: tenuto
+    - bar: 11
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 80.34
+      articulation: tenuto
+    - bar: 11
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 88.58
+      articulation: tenuto
+      vibrato_cents: 17.28
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 86.52
+      articulation: tenuto
+    - bar: 11
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 90.64
+      articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+  - kind: notes
+    instrument: signal_double
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#4
+      dur: 0.18
+      vel: 49.88
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B4
+      dur: 0.92
+      vel: 58.0
+      articulation: tenuto
+      vibrato_cents: 17.1
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#4
+      dur: 0.3
+      vel: 48.72
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#4
+      dur: 0.56
+      vel: 51.04
+      articulation: tenuto
+      vibrato_cents: 8.1
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E4
+      dur: 0.2
+      vel: 47.56
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#4
+      dur: 0.38
+      vel: 51.04
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#4
+      dur: 0.84
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#4
+      dur: 0.44
+      vel: 51.04
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#4
+      dur: 0.18
+      vel: 46.4
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#4
+      dur: 0.7
+      vel: 52.2
+      articulation: tenuto
+      vibrato_cents: 9.9
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 47.56
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#4
+      dur: 0.94
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#4
+      dur: 0.3
+      vel: 47.56
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B3
+      dur: 0.56
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#4
+      dur: 0.2
+      vel: 46.4
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#4
+      dur: 0.38
+      vel: 49.88
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#4
+      dur: 0.72
+      vel: 55.68
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E4
+      dur: 0.36
+      vel: 49.88
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 45.24
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#4
+      dur: 0.5
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#4
+      dur: 0.18
+      vel: 49.88
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B4
+      dur: 0.92
+      vel: 58.0
+      articulation: tenuto
+      vibrato_cents: 17.1
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#4
+      dur: 0.3
+      vel: 48.72
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#4
+      dur: 0.56
+      vel: 51.04
+      articulation: tenuto
+      vibrato_cents: 8.1
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E4
+      dur: 0.2
+      vel: 47.56
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#4
+      dur: 0.38
+      vel: 51.04
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#4
+      dur: 0.84
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#4
+      dur: 0.44
+      vel: 51.04
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#4
+      dur: 0.18
+      vel: 46.4
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#4
+      dur: 0.7
+      vel: 52.2
+      articulation: tenuto
+      vibrato_cents: 9.9
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 47.56
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#4
+      dur: 0.94
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#4
+      dur: 0.3
+      vel: 47.56
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B3
+      dur: 0.56
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#4
+      dur: 0.2
+      vel: 46.4
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#4
+      dur: 0.38
+      vel: 49.88
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#4
+      dur: 0.72
+      vel: 55.68
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E4
+      dur: 0.36
+      vel: 49.88
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 45.24
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#4
+      dur: 0.5
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    - bar: 8
+      beat: 0.5
+      note: D#4
+      dur: 0.18
+      vel: 49.88
+      articulation: tenuto
+    - bar: 8
+      beat: 0.75
+      note: F#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    - bar: 8
+      beat: 1.0
+      note: B4
+      dur: 0.92
+      vel: 58.0
+      articulation: tenuto
+      vibrato_cents: 17.1
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 2.25
+      note: F#4
+      dur: 0.3
+      vel: 48.72
+      articulation: tenuto
+    - bar: 8
+      beat: 2.75
+      note: D#4
+      dur: 0.56
+      vel: 51.04
+      articulation: tenuto
+      vibrato_cents: 8.1
+      vibrato_rate_hz: 7.1
+    - bar: 8
+      beat: 3.5
+      note: E4
+      dur: 0.2
+      vel: 47.56
+      articulation: tenuto
+    - bar: 9
+      beat: 0.0
+      note: F#4
+      dur: 0.38
+      vel: 51.04
+      articulation: tenuto
+    - bar: 9
+      beat: 0.5
+      note: A#4
+      dur: 0.84
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 9
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 9
+      beat: 2.0
+      note: F#4
+      dur: 0.44
+      vel: 51.04
+      articulation: tenuto
+    - bar: 9
+      beat: 2.75
+      note: C#4
+      dur: 0.18
+      vel: 46.4
+      articulation: tenuto
+    - bar: 9
+      beat: 3.0
+      note: D#4
+      dur: 0.7
+      vel: 52.2
+      articulation: tenuto
+      vibrato_cents: 9.9
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 47.56
+      articulation: tenuto
+    - bar: 10
+      beat: 0.75
+      note: D#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 10
+      beat: 1.0
+      note: G#4
+      dur: 0.94
+      vel: 56.84
+      articulation: tenuto
+      vibrato_cents: 18.0
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 2.25
+      note: D#4
+      dur: 0.3
+      vel: 47.56
+      articulation: tenuto
+    - bar: 10
+      beat: 2.75
+      note: B3
+      dur: 0.56
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 10
+      beat: 3.5
+      note: C#4
+      dur: 0.2
+      vel: 46.4
+      articulation: tenuto
+    - bar: 11
+      beat: 0.0
+      note: D#4
+      dur: 0.38
+      vel: 49.88
+      articulation: tenuto
+    - bar: 11
+      beat: 0.5
+      note: G#4
+      dur: 0.72
+      vel: 55.68
+      articulation: tenuto
+      vibrato_cents: 16.2
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 1.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 11
+      beat: 1.75
+      note: E4
+      dur: 0.36
+      vel: 49.88
+      articulation: tenuto
+    - bar: 11
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 45.24
+      articulation: tenuto
+    - bar: 11
+      beat: 2.75
+      note: D#4
+      dur: 0.5
+      vel: 49.88
+      articulation: tenuto
+      vibrato_cents: 7.2
+      vibrato_rate_hz: 7.1
+    - bar: 11
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 48.72
+      articulation: tenuto
+    - bar: 11
+      beat: 3.75
+      note: G#4
+      dur: 0.18
+      vel: 51.04
+      articulation: tenuto
+    humanize_ms: 2
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 1
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 1
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 5
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 5
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 7
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 7
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 9
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 9
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 11
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 11
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 0
+  - kind: notes
+    instrument: echo_speck
+    notes:
+    - bar: 3
+      beat: 3.5
+      note: B6
+      dur: 0.42
+      vel: 44
+    - bar: 7
+      beat: 3.5
+      note: D#7
+      dur: 0.42
+      vel: 46
+    - bar: 11
+      beat: 3.5
+      note: F#7
+      dur: 0.55
+      vel: 48
+  mix_gain_db: -2.0
+- id: still_transmitting
+  bars: 8
+  intensity: 1.04
+  density: 0.98
+  loopable: false
+  harmony:
+  - Bmaj7
+  - D#m7
+  - G#m7
+  - Emaj7
+  - Bmaj7
+  - D#m7
+  - Emaj7
+  - Bmaj7
+  layers:
+  - glow_pad
+  - epiano_chops
+  - bass_bounce
+  - bubble_arp
+  - drums_chorus
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 84.28
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 86.24
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 43.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 82.32
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 86.24
+      articulation: tenuto
+      vibrato_cents: 20.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 80.36
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 86.24
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 96.04
+      articulation: tenuto
+      vibrato_cents: 41.4
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 86.24
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 78.4
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 88.2
+      articulation: tenuto
+      vibrato_cents: 25.3
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 80.36
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 96.04
+      articulation: tenuto
+      vibrato_cents: 46.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 80.36
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 84.28
+      articulation: tenuto
+      vibrato_cents: 18.4
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 78.4
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 84.28
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 94.08
+      articulation: tenuto
+      vibrato_cents: 41.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 84.28
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 76.44
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 84.28
+      articulation: tenuto
+      vibrato_cents: 18.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 86.24
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 84.28
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 86.24
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 98.0
+      articulation: tenuto
+      vibrato_cents: 43.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 82.32
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 86.24
+      articulation: tenuto
+      vibrato_cents: 20.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 80.36
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 86.24
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 96.04
+      articulation: tenuto
+      vibrato_cents: 41.4
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 86.24
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 78.4
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 88.2
+      articulation: tenuto
+      vibrato_cents: 25.3
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 80.36
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 96.04
+      articulation: tenuto
+      vibrato_cents: 46.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 80.36
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 84.28
+      articulation: tenuto
+      vibrato_cents: 18.4
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 78.4
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 84.28
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 94.08
+      articulation: tenuto
+      vibrato_cents: 41.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 84.28
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 76.44
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 84.28
+      articulation: tenuto
+      vibrato_cents: 18.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 82.32
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 86.24
+      articulation: tenuto
+    humanize_ms: 1
+  - kind: notes
+    instrument: signal_double
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 39.56
+      articulation: tenuto
+    - bar: 0
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 40.48
+      articulation: tenuto
+    - bar: 0
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 46.0
+      articulation: tenuto
+      vibrato_cents: 24.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 38.64
+      articulation: tenuto
+    - bar: 0
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 40.48
+      articulation: tenuto
+      vibrato_cents: 11.7
+      vibrato_rate_hz: 7.1
+    - bar: 0
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 37.72
+      articulation: tenuto
+    - bar: 1
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 40.48
+      articulation: tenuto
+    - bar: 1
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 45.08
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 1
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 1
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 40.48
+      articulation: tenuto
+    - bar: 1
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 36.8
+      articulation: tenuto
+    - bar: 1
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 41.4
+      articulation: tenuto
+      vibrato_cents: 14.3
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 37.72
+      articulation: tenuto
+    - bar: 2
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 2
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 45.08
+      articulation: tenuto
+      vibrato_cents: 26.0
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 37.72
+      articulation: tenuto
+    - bar: 2
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 39.56
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 2
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 36.8
+      articulation: tenuto
+    - bar: 3
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 39.56
+      articulation: tenuto
+    - bar: 3
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 44.16
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 3
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 39.56
+      articulation: tenuto
+    - bar: 3
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 35.88
+      articulation: tenuto
+    - bar: 3
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 39.56
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 3
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 3
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 40.48
+      articulation: tenuto
+    - bar: 4
+      beat: 0.5
+      note: D#5
+      dur: 0.18
+      vel: 39.56
+      articulation: tenuto
+    - bar: 4
+      beat: 0.75
+      note: F#5
+      dur: 0.18
+      vel: 40.48
+      articulation: tenuto
+    - bar: 4
+      beat: 1.0
+      note: B5
+      dur: 0.92
+      vel: 46.0
+      articulation: tenuto
+      vibrato_cents: 24.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 2.25
+      note: F#5
+      dur: 0.3
+      vel: 38.64
+      articulation: tenuto
+    - bar: 4
+      beat: 2.75
+      note: D#5
+      dur: 0.56
+      vel: 40.48
+      articulation: tenuto
+      vibrato_cents: 11.7
+      vibrato_rate_hz: 7.1
+    - bar: 4
+      beat: 3.5
+      note: E5
+      dur: 0.2
+      vel: 37.72
+      articulation: tenuto
+    - bar: 5
+      beat: 0.0
+      note: F#5
+      dur: 0.38
+      vel: 40.48
+      articulation: tenuto
+    - bar: 5
+      beat: 0.5
+      note: A#5
+      dur: 0.84
+      vel: 45.08
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 5
+      beat: 1.75
+      note: G#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 5
+      beat: 2.0
+      note: F#5
+      dur: 0.44
+      vel: 40.48
+      articulation: tenuto
+    - bar: 5
+      beat: 2.75
+      note: C#5
+      dur: 0.18
+      vel: 36.8
+      articulation: tenuto
+    - bar: 5
+      beat: 3.0
+      note: D#5
+      dur: 0.7
+      vel: 41.4
+      articulation: tenuto
+      vibrato_cents: 14.3
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 0.5
+      note: B4
+      dur: 0.18
+      vel: 37.72
+      articulation: tenuto
+    - bar: 6
+      beat: 0.75
+      note: D#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 6
+      beat: 1.0
+      note: G#5
+      dur: 0.94
+      vel: 45.08
+      articulation: tenuto
+      vibrato_cents: 26.0
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 2.25
+      note: D#5
+      dur: 0.3
+      vel: 37.72
+      articulation: tenuto
+    - bar: 6
+      beat: 2.75
+      note: B4
+      dur: 0.56
+      vel: 39.56
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 6
+      beat: 3.5
+      note: C#5
+      dur: 0.2
+      vel: 36.8
+      articulation: tenuto
+    - bar: 7
+      beat: 0.0
+      note: D#5
+      dur: 0.38
+      vel: 39.56
+      articulation: tenuto
+    - bar: 7
+      beat: 0.5
+      note: G#5
+      dur: 0.72
+      vel: 44.16
+      articulation: tenuto
+      vibrato_cents: 23.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 1.5
+      note: F#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 7
+      beat: 1.75
+      note: E5
+      dur: 0.36
+      vel: 39.56
+      articulation: tenuto
+    - bar: 7
+      beat: 2.5
+      note: B4
+      dur: 0.18
+      vel: 35.88
+      articulation: tenuto
+    - bar: 7
+      beat: 2.75
+      note: D#5
+      dur: 0.5
+      vel: 39.56
+      articulation: tenuto
+      vibrato_cents: 10.4
+      vibrato_rate_hz: 7.1
+    - bar: 7
+      beat: 3.5
+      note: F#5
+      dur: 0.18
+      vel: 38.64
+      articulation: tenuto
+    - bar: 7
+      beat: 3.75
+      note: G#5
+      dur: 0.18
+      vel: 40.48
+      articulation: tenuto
+    humanize_ms: 2
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 1
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 1
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 5
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 5
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 0
+  - kind: notes
+    instrument: echo_speck
+    notes:
+    - bar: 7
+      beat: 0.0
+      note: F#6
+      dur: 0.24
+      vel: 42
+    - bar: 7
+      beat: 0.5
+      note: B6
+      dur: 0.24
+      vel: 46
+    - bar: 7
+      beat: 1.0
+      note: D#7
+      dur: 0.24
+      vel: 44
+    - bar: 7
+      beat: 2.0
+      note: B6
+      dur: 1.45
+      vel: 48
+      vibrato_cents: 18
+      vibrato_rate_hz: 6.2
+  mix_gain_db: -1.5
+- id: loop_handoff
+  bars: 4
+  intensity: 1.0
+  density: 0.76
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  harmony:
+  - Bmaj7
+  - C#m7
+  - Emaj7
+  - F#7
+  layers:
+  - glow_pad
+  - bubble_arp
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.0
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 0.5
+      note: F#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 2.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 0
+      beat: 3.5
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 0.0
+      note: E4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 0.5
+      note: C#4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 1.25
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 1.75
+      note: G#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 2.5
+      note: E4
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 3.0
+      note: D#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 0.0
+      note: E3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: B3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 1.25
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: F#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 2.5
+      note: E3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 3.0
+      note: G#3
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 2
+      beat: 3.5
+      note: B3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 0.0
+      note: A#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 0.5
+      note: F#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 1.25
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 1.75
+      note: C#4
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 2.5
+      note: A#3
+      dur: 0.18
+      vel: 62
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 3.0
+      note: G#4
+      dur: 0.28
+      vel: 66
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 45
+      - - 0.12
+        - -15
+      - - 0.22
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: F#3
+      dur: 0.18
+      vel: 58
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -55
+      - - 0.12
+        - 20
+      - - 0.22
+        - 0
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+  - kind: notes
+    instrument: crystal
+    notes:
+    - bar: 1
+      beat: 0.75
+      note: G#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 1
+      beat: 3.25
+      note: D#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    - bar: 3
+      beat: 0.75
+      note: A#6
+      dur: 0.2
+      vel: 50
+      articulation: bell
+    - bar: 3
+      beat: 3.25
+      note: C#7
+      dur: 0.28
+      vel: 46
+      articulation: bell
+    humanize_ms: 1
+  - kind: notes
+    instrument: signal_lead
+    notes:
+    - bar: 2
+      beat: 2.75
+      note: D#5
+      dur: 0.16
+      vel: 66
+    - bar: 2
+      beat: 3.0
+      note: F#5
+      dur: 0.16
+      vel: 68
+    - bar: 3
+      beat: 0.0
+      note: B5
+      dur: 0.78
+      vel: 74
+      vibrato_cents: 30
+      vibrato_rate_hz: 7.1
+  - template: drums_intro
+    dynamics:
+    - start_bar: 0
+      bars: 4
+      from: 0.9
+      to: 0.5
+      curve: smooth
+  mix_gain_db: 8.5
+playback:
+  loop: true

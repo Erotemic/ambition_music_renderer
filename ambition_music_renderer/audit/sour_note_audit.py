@@ -27,6 +27,7 @@ from ._score_common import (
     chord_for_abs_bar,
     chord_pitch_classes,
     events_for_spec,
+    harmonic_events,
     section_for_bar,
     section_starts,
     source_hint,
@@ -176,7 +177,8 @@ def audit_spec(
     max_candidates: int = 80,
     min_score: float = 0.28,
 ) -> dict[str, Any]:
-    events, bpm, beats_per_bar = events_for_spec(spec)
+    all_events, bpm, beats_per_bar = events_for_spec(spec)
+    events, ignored_unpitched = harmonic_events(spec, all_events)
     section_keys = _infer_section_keys(spec)
     starts = section_starts(spec)
     default_weights = state_weights(spec, "default")
@@ -189,7 +191,8 @@ def audit_spec(
         return {
             "schema": "ambition.music_sour_note_audit.v1",
             "id": spec.get("id"),
-            "warnings": ["score generated no note events"],
+            "warnings": ["score generated no pitched note events"],
+            "ignored_unpitched_note_count": ignored_unpitched,
             "candidates": [],
             "top_layers": [],
             "top_groups": [],
@@ -197,25 +200,6 @@ def audit_spec(
         }
 
     for ev in events:
-        group_name = str(ev.get("group") or ev.get("instrument") or "").lower()
-        layer_name = str(ev.get("layer") or "").lower()
-        layer_kind_name = str(ev.get("layer_kind") or "").lower()
-        instrument_name = str(ev.get("instrument") or "").lower()
-        # Drum/percussion MIDI notes are control symbols for kit pieces, not
-        # pitched harmony. Treating kick/snare/hat note numbers as melody
-        # produced hundreds of false sour-note candidates in otherwise useful
-        # bundle reports. Dissonance and amplitude reports still cover drum
-        # loudness/clutter; this audit is intentionally pitch-harmony only.
-        if (
-            layer_kind_name == "drums"
-            or group_name in {"drums", "percussion"}
-            or "drum" in group_name
-            or "percussion" in group_name
-            or "kit" in instrument_name
-            or "drum" in layer_name
-        ):
-            continue
-
         pitch = int(ev.get("pitch", 60))
         pc = pitch % 12
         contexts = _sample_contexts(spec, ev, beats_per_bar, section_keys, bucket_beats)
@@ -352,6 +336,7 @@ def audit_spec(
         "beats_per_bar": beats_per_bar,
         "bucket_beats": bucket_beats,
         "note_count": len(events),
+        "ignored_unpitched_note_count": ignored_unpitched,
         "candidate_count": len(candidates),
         "section_keys": {
             sid: {k: v for k, v in data.items() if k != "pcs"} | {"pcs": sorted(_pc_name(pc) for pc in data.get("pcs", set()))}
@@ -404,7 +389,8 @@ def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[
     from ..render.score_layers import build_score
 
     pm, _groups, section_meta = build_score(spec)
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None
     bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))

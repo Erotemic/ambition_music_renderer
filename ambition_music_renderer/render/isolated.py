@@ -227,6 +227,80 @@ def _scale_audio(audio: np.ndarray, gain_db: float) -> np.ndarray:
     return (audio * (10.0 ** (gain_db / 20.0))).astype("float32", copy=False)
 
 
+def section_mix_gain_envelope(
+    spec: dict,
+    meta: list[dict],
+    sample_rate: int,
+    frame_count: int,
+) -> tuple[np.ndarray, dict[str, float]]:
+    """Build a smooth composition-level gain rider from section metadata.
+
+    ``mix_gain_db`` is deliberately an audio-domain mix control, not a note
+    velocity or arrangement control.  It lets a sparse intro, dense hook, and
+    loop handoff inhabit one loudness system before the global master chain.
+    Transitions are interpolated in dB around section boundaries so a level
+    correction cannot create an audible step.
+    """
+    if frame_count <= 0:
+        return np.ones(0, dtype=np.float32), {}
+
+    sections = {str(row.get("id")): row for row in spec.get("sections", [])}
+    gains_db = {
+        str(sec.get("id")): float(sections.get(str(sec.get("id")), {}).get("mix_gain_db", 0.0))
+        for sec in meta
+    }
+    envelope_db = np.zeros(frame_count, dtype=np.float32)
+    ordered: list[tuple[int, int, str, float]] = []
+    for sec in meta:
+        sec_id = str(sec.get("id"))
+        start = max(0, min(frame_count, int(round(float(sec.get("start_seconds", 0.0)) * sample_rate))))
+        end = max(start, min(frame_count, int(round(float(sec.get("end_seconds", 0.0)) * sample_rate))))
+        gain_db = gains_db.get(sec_id, 0.0)
+        envelope_db[start:end] = gain_db
+        ordered.append((start, end, sec_id, gain_db))
+
+    bpm = float((spec.get("tempo") or {}).get("bpm", 120.0))
+    render_cfg = spec.get("render") or {}
+    default_transition_beats = float(render_cfg.get("section_mix_transition_beats", 1.0))
+    for idx in range(1, len(ordered)):
+        prev_start, prev_end, prev_id, prev_gain = ordered[idx - 1]
+        next_start, next_end, next_id, next_gain = ordered[idx]
+        if abs(next_gain - prev_gain) < 1e-9:
+            continue
+        next_spec = sections.get(next_id, {})
+        beats = float(next_spec.get("mix_gain_transition_beats", default_transition_beats))
+        if beats <= 0.0 or bpm <= 0.0:
+            continue
+        transition_frames = max(2, int(round((beats * 60.0 / bpm) * sample_rate)))
+        boundary = next_start
+        left = max(prev_start, boundary - transition_frames // 2)
+        right = min(next_end, boundary + transition_frames - transition_frames // 2)
+        if right <= left:
+            continue
+        envelope_db[left:right] = np.linspace(
+            prev_gain, next_gain, right - left, endpoint=False, dtype=np.float32
+        )
+
+    envelope = np.power(10.0, envelope_db / 20.0).astype(np.float32)
+    return envelope, gains_db
+
+
+def apply_section_mix_gains(
+    stem_audio: dict[str, np.ndarray],
+    spec: dict,
+    meta: list[dict],
+    sample_rate: int,
+    frame_count: int,
+) -> dict[str, float]:
+    envelope, gains_db = section_mix_gain_envelope(spec, meta, sample_rate, frame_count)
+    if envelope.size == 0 or not any(abs(value) > 1e-9 for value in gains_db.values()):
+        return gains_db
+    scale = envelope[:, None]
+    for group, audio in list(stem_audio.items()):
+        stem_audio[group] = (audio * scale).astype(np.float32, copy=False)
+    return gains_db
+
+
 def in_game_preview_mixes(
     spec: dict, group_names: list[str]
 ) -> dict[str, dict[str, float]]:
@@ -498,6 +572,10 @@ def _render_main(ns) -> int:
                         path.relative_to(outdir)
                     )
 
+    section_mix_gains_db = apply_section_mix_gains(
+        stem_audio, spec, meta, sr, target
+    )
+
     # ---- Full mastered preview (matches the YAML postprocess intent) ----
     with timings.phase("mix_master_preview"):
         raw_full = np.zeros((target, 2), dtype="float32")
@@ -571,8 +649,13 @@ def _render_main(ns) -> int:
     # after all native buffers are known.  The worker writes native stems before
     # the parent can know the shared reference gain; overwriting here preserves
     # the current worker isolation model while making runtime stem export useful.
-    if ns.runtime_stem_gain_mode == "shared" and not (ns.simple_mix or ns.full_mix_only):
-        for group, audio in runtime_stem_audio.items():
+    if not (ns.simple_mix or ns.full_mix_only):
+        export_stems = (
+            runtime_stem_audio
+            if ns.runtime_stem_gain_mode == "shared"
+            else stem_audio
+        )
+        for group, audio in export_stems.items():
             for sec in meta:
                 piece = slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
                 path = (
@@ -724,6 +807,7 @@ def _render_main(ns) -> int:
     manifest["full_mix_only"] = bool(ns.full_mix_only)
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
+    manifest["section_mix_gains_db"] = section_mix_gains_db
     manifest["diagnostics"] = {
         "raw_full": raw_full_stats,
         "mastered_full": master_stats,

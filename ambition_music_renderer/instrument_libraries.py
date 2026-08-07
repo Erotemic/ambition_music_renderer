@@ -111,6 +111,93 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("bassdrum snare cymbals", "snare", "bassdrum", "cymbals"),
         avoid=("timpani", "bells", "xylophone", "vibraphone"),
     ),
+    # Sonatina Symphonic Orchestra and VCSL orchestral roles.  These aliases
+    # intentionally describe musical roles rather than installation-specific paths;
+    # scores keep an audible GM fallback when a sampled patch is unavailable.
+    "orchestra.horns_sustain": SfzLibraryAlias(
+        ref="orchestra.horns_sustain",
+        required_any=(("sonatina", "horns"), ("horns", "sustain"), ("horns", "sus")),
+        prefer=("notation", "horns sustain", "horns sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
+    ),
+    "orchestra.horns_staccato": SfzLibraryAlias(
+        ref="orchestra.horns_staccato",
+        required_any=(("sonatina", "horns"), ("horns", "staccato"), ("horns", "stc")),
+        prefer=("notation", "horns staccato", "horns stc", "staccato", "stc"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
+    ),
+    "orchestra.trumpets_sustain": SfzLibraryAlias(
+        ref="orchestra.trumpets_sustain",
+        required_any=(("sonatina", "trumpets"), ("trumpets", "sustain"), ("trumpets", "sus")),
+        prefer=("notation", "trumpets sustain", "trumpets sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
+    ),
+    "orchestra.trumpets_staccato": SfzLibraryAlias(
+        ref="orchestra.trumpets_staccato",
+        required_any=(("sonatina", "trumpets"), ("trumpets", "staccato"), ("trumpets", "stc")),
+        prefer=("notation", "trumpets staccato", "trumpets stc", "staccato", "stc"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
+    ),
+    "orchestra.trombones_sustain": SfzLibraryAlias(
+        ref="orchestra.trombones_sustain",
+        required_any=(("sonatina", "trombones"), ("trombones", "sustain"), ("trombones", "sus")),
+        prefer=("notation", "trombones sustain", "trombones sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
+    ),
+    "orchestra.trombones_staccato": SfzLibraryAlias(
+        ref="orchestra.trombones_staccato",
+        required_any=(("sonatina", "trombones"), ("trombones", "staccato"), ("trombones", "stc")),
+        prefer=("notation", "trombones staccato", "trombones stc", "staccato", "stc"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
+    ),
+    "orchestra.tuba_sustain": SfzLibraryAlias(
+        ref="orchestra.tuba_sustain",
+        required_any=(("sonatina", "tuba"), ("tuba", "sustain"), ("tuba", "sus")),
+        prefer=("notation", "tuba sustain", "tuba sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
+    ),
+    "orchestra.flutes_sustain": SfzLibraryAlias(
+        ref="orchestra.flutes_sustain",
+        required_any=(("sonatina", "flutes"), ("flutes", "sustain"), ("flutes", "sus")),
+        prefer=("notation", "flutes sustain", "flutes sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "flutter", "trill", "solo", "ks"),
+    ),
+    "orchestra.oboes_sustain": SfzLibraryAlias(
+        ref="orchestra.oboes_sustain",
+        required_any=(("sonatina", "oboes"), ("oboes", "sustain"), ("oboes", "sus")),
+        prefer=("notation", "oboes sustain", "oboes sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "trill", "solo", "ks"),
+    ),
+    "orchestra.clarinets_sustain": SfzLibraryAlias(
+        ref="orchestra.clarinets_sustain",
+        required_any=(("sonatina", "clarinets"), ("clarinets", "sustain"), ("clarinets", "sus")),
+        prefer=("notation", "clarinets sustain", "clarinets sus", "sustain", "sus"),
+        avoid=("performance", "includes", "looped", "stacc", "stc", "trill", "solo", "ks"),
+    ),
+    "orchestra.timpani": SfzLibraryAlias(
+        ref="orchestra.timpani",
+        required_any=(("sonatina", "timpani"), ("vcsl", "timpani"), ("timpani",)),
+        prefer=("timpani", "hit", "normal", "notation"),
+        avoid=("roll", "crescendo", "crsc", "tremolo", "mallet"),
+    ),
+    "orchestra.snare": SfzLibraryAlias(
+        ref="orchestra.snare",
+        required_any=(("vcsl", "snare"), ("snare", "drum")),
+        prefer=("snare drum rope tension", "snare drum", "snare", "low"),
+        avoid=("brush", "side", "rim", "stick", "marching tenor", "sample"),
+    ),
+    "orchestra.bass_drum": SfzLibraryAlias(
+        ref="orchestra.bass_drum",
+        required_any=(("vcsl", "bass", "drum"), ("bass", "drum")),
+        prefer=("bass drum 1", "concert bass drum", "bass drum"),
+        avoid=("kit", "kick", "sample", "legacy"),
+    ),
+    "orchestra.cymbal": SfzLibraryAlias(
+        ref="orchestra.cymbal",
+        required_any=(("vcsl", "cymbal"), ("cymbal",)),
+        prefer=("suspended cymbal", "crash cymbal", "cymbal suspended", "crash", "suspended"),
+        avoid=("finger", "hi hat", "hihat", "ride", "china", "sizzle", "sample"),
+    ),
     # Direct libraries from the pro audio-tools downloader.  These aliases let a
     # score request a musical role while the local library catalog chooses the
     # best available SFZ patch.
@@ -150,6 +237,24 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
                "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
     ),
+    "strings.violins_1_staccato": SfzLibraryAlias(
+        ref="strings.violins_1_staccato",
+        required_any=(
+            ("sonatina", "1st", "violins", "staccato"),
+            ("1st", "violins", "staccato"),
+        ),
+        prefer=("notation", "1st violins staccato", "staccato"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
+    ),
+    "strings.violins_2_staccato": SfzLibraryAlias(
+        ref="strings.violins_2_staccato",
+        required_any=(
+            ("sonatina", "2nd", "violins", "staccato"),
+            ("2nd", "violins", "staccato"),
+        ),
+        prefer=("notation", "2nd violins staccato", "staccato"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
+    ),
     # Marcato (accented) variants — louder/punchier, for cutting over a rock band.
     "strings.violin_solo_marcato": SfzLibraryAlias(
         ref="strings.violin_solo_marcato",
@@ -176,6 +281,15 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("notation", "celli sustain", "sustain"),
         avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
                "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
+    ),
+    "strings.celli_staccato": SfzLibraryAlias(
+        ref="strings.celli_staccato",
+        required_any=(
+            ("sonatina", "celli", "staccato"),
+            ("celli", "staccato"),
+        ),
+        prefer=("notation", "celli staccato", "staccato"),
+        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
     ),
     "strings.basses": SfzLibraryAlias(
         ref="strings.basses",

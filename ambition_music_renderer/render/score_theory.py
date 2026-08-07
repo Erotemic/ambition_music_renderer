@@ -108,7 +108,11 @@ def chord_intervals(chord_symbol: str) -> tuple[str, list[int], str | None]:
 
 
 def chord_pitches(
-    chord_symbol: str, octave: int = 4, *, voicing: str = "closed"
+    chord_symbol: str,
+    octave: int = 4,
+    *,
+    voicing: str = "closed",
+    include_slash_bass: bool = True,
 ) -> list[int]:
     root, intervals, slash_bass = chord_intervals(chord_symbol)
     root_midi = note_to_midi(f"{root}{octave}")
@@ -139,7 +143,20 @@ def chord_pitches(
         notes.sort()
     elif voicing_key == "guitar_shell" and len(notes) >= 3:
         notes = [notes[0] - 12, notes[1], notes[2]]
-    if slash_bass and voicing_key not in {"root_fifth", "fifth", "root_fifth_octave", "power", "power_chord", "guitar_shell", "rhythm_shell"}:
+    if (
+        include_slash_bass
+        and slash_bass
+        and voicing_key
+        not in {
+            "root_fifth",
+            "fifth",
+            "root_fifth_octave",
+            "power",
+            "power_chord",
+            "guitar_shell",
+            "rhythm_shell",
+        }
+    ):
         bass_root = re.match(r"^([A-G](?:#|b)?)", slash_bass.strip())
         if bass_root:
             notes.insert(0, note_to_midi(f"{bass_root.group(1)}{octave - 1}"))
@@ -202,7 +219,7 @@ def motif_notes(
     root: str | int | None = None,
     transform: Any = None,
     transpose: int = 0,
-) -> tuple[list[int], list[float], list[float]]:
+) -> tuple[list[int], list[float], list[float], list[float]]:
     motif = ctx.motifs[motif_id]
     if "notes" in motif:
         notes = [
@@ -222,8 +239,14 @@ def motif_notes(
                 notes = transform_motif(notes, tr)
         else:
             notes = transform_motif(notes, transform)
+    # ``rhythm`` is the inter-onset spacing. Historically it also doubled as
+    # note duration, which made expressive motifs tend toward a mechanical
+    # one-note-after-another pulse. ``durations`` separates sounding length from
+    # onset spacing: shorter values create written rests, longer values allow
+    # suspensions/overlap, and existing scores retain their previous behavior.
     rhythm = [float(x) for x in motif.get("rhythm", [1.0] * len(notes))]
+    durations = [float(x) for x in motif.get("durations", rhythm)]
     velocities = [float(x) for x in motif.get("velocities", [1.0] * len(notes))]
-    return notes, rhythm, velocities
+    return notes, rhythm, durations, velocities
 
 

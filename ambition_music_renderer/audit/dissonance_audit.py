@@ -22,7 +22,12 @@ from pathlib import Path
 from typing import Any
 
 from ._common import ensure_matplotlib, round3 as _round3, save_figure
-from ._score_common import chord_for_abs_bar, chord_pitch_classes, section_for_bar
+from ._score_common import (
+    chord_for_abs_bar,
+    chord_pitch_classes,
+    harmonic_events,
+    section_for_bar,
+)
 
 INTERVAL_CLASS_NAMES = {
     0: "unison/octave",
@@ -145,13 +150,15 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
     pm, _groups, section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    events, ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return {
             "schema": "ambition.music_dissonance_audit.v1",
             "id": spec.get("id"),
             "hotspots": [],
-            "warnings": ["score generated no note events"],
+            "ignored_unpitched_note_count": ignored_unpitched,
+            "warnings": ["score generated no pitched note events"],
         }
 
     end_beat = max(float(ev["end_beat"]) for ev in events)
@@ -240,6 +247,7 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
         "beats_per_bar": beats_per_bar,
         "bucket_beats": bucket_beats,
         "note_count": len(events),
+        "ignored_unpitched_note_count": ignored_unpitched,
         "section_count": len(section_meta),
         "hotspot_count": len(hotspots),
         "hotspots": hotspots[:max_hotspots],
@@ -320,7 +328,8 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
     from . import sour_note_audit as _sour
 
     pm, _groups, section_meta = build_score(spec)
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None
     bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))

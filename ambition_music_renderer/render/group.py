@@ -13,6 +13,7 @@ import pretty_midi
 from ..profiler import profile
 from ..instrument_libraries import resolve_sfz_reference
 from ..audio_utils import coerce_stereo
+from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
 from .synth import render_synth_audio
 
@@ -170,6 +171,8 @@ def render_group_audio(
             inst_pm = copy_with_instruments(pm, [inst], bpm)
             sfz_path = _resolve_instrument_sfz(inst_backend, base_dir=base_dir, sfizz_cfg=sfizz_cfg)
             if sfz_path is not None:
+                sfz_pm = copy_with_instruments(pm, [inst], bpm)
+                apply_backend_note_remap(sfz_pm, inst_backend)
                 settings = dict(sfizz_cfg)
                 settings.update(dict(inst_backend.get("settings") or {}))
                 if "command" in inst_backend:
@@ -178,7 +181,7 @@ def render_group_audio(
                     settings["binary"] = inst_backend["binary"]
                 try:
                     sfizz_audio = render_sfizz(
-                        inst_pm,
+                        sfz_pm,
                         sfz_path=sfz_path,
                         sample_rate=sample_rate,
                         tempdir=tempdir,
@@ -200,7 +203,7 @@ def render_group_audio(
                     # samples) or nothing matches (unmet keyswitch/CC/range),
                     # yielding silence. Treat that like a failure so the stem is
                     # not silently lost.
-                    if _instrument_has_notes(inst_pm) and _is_effectively_silent(sfizz_audio):
+                    if _instrument_has_notes(sfz_pm) and _is_effectively_silent(sfizz_audio):
                         msg = (
                             f"instrument {inst.name!r} SFZ {sfz_path} rendered SILENCE despite active "
                             f"notes (missing samples, or an unmet keyswitch/CC/range)"

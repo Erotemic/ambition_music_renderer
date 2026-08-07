@@ -211,3 +211,27 @@ def source_hint(
         None,
         None,
     )
+
+
+@profile
+def unpitched_instrument_names(spec: dict[str, Any]) -> set[str]:
+    """Instrument names whose MIDI pitches are trigger keys, not harmony."""
+
+    return {
+        str(inst.get("name"))
+        for inst in spec.get("instruments", []) or []
+        if isinstance(inst, dict) and inst.get("name") is not None and bool(inst.get("is_drum"))
+    }
+
+
+@profile
+def harmonic_events(
+    spec: dict[str, Any], events: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], int]:
+    """Remove unpitched trigger-key events from pitch/harmony diagnostics."""
+
+    unpitched = unpitched_instrument_names(spec)
+    if not unpitched:
+        return list(events), 0
+    kept = [ev for ev in events if str(ev.get("instrument")) not in unpitched]
+    return kept, len(events) - len(kept)

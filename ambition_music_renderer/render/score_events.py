@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import itertools
 import math
 from typing import Any
 
@@ -216,12 +217,18 @@ def add_chord(
     octave: int = 4,
     articulation: str = "pad",
     voicing: str = "open",
+    include_slash_bass: bool = True,
     humanize_ms: float = 0.0,
     humanize_velocity_pct: float = 0.0,
     gate: float | None = None,
     constraints: dict[str, Any] | None = None,
 ) -> None:
-    notes = chord_pitches(chord, octave=octave, voicing=voicing)
+    notes = chord_pitches(
+        chord,
+        octave=octave,
+        voicing=voicing,
+        include_slash_bass=include_slash_bass,
+    )
     if constraints:
         notes = _apply_voicing_constraints(ctx, inst_name, notes, constraints)
     for idx, p in enumerate(notes):
@@ -259,12 +266,14 @@ def _apply_voicing_constraints(
     """
     out = list(notes)
     mode = constraints.get("voice_leading")
+    layer_id = getattr(ctx, "active_layer_id", None)
+    state_key = f"{layer_id}\0{inst_name}" if layer_id else inst_name
     if mode == "minimize_motion":
-        prev = ctx.last_voicing.get(inst_name)
+        prev = ctx.last_voicing.get(state_key)
         if prev is not None and len(prev) >= len(out):
-            # Permute new notes to align with prev — for each previous voice,
-            # pick the new note (octave-shifted into the closest octave) that
-            # minimizes pitch motion. Keep the lowest as bass.
+            # Assign all upper voices together. A register penalty keeps the
+            # solution close to the score's authored octave instead of letting
+            # a locally cheap octave shift ratchet upward on every progression.
             out = _voice_lead_minimize(prev, out)
     if constraints.get("no_clusters"):
         out = _spread_clusters(out)
@@ -308,46 +317,56 @@ def _apply_voicing_constraints(
     if max_notes is not None:
         limit = max(1, int(max_notes))
         out = out[:limit]
-    ctx.last_voicing[inst_name] = list(out)
+    ctx.last_voicing[state_key] = list(out)
     return out
 
 
 def _voice_lead_minimize(prev: list[int], new: list[int]) -> list[int]:
-    """Greedy nearest-voice mapping. Bass voice (lowest of `new`) stays put;
-    upper voices are octave-shifted to the closest version of one of the
-    remaining new notes."""
+    """Minimize upper-voice motion without allowing octave-register drift.
+
+    The lowest authored note remains the bass. Upper chord tones are assigned
+    globally to prior voices, considering at most one octave of displacement
+    in either direction. Octave shifts receive a modest penalty, so repeated
+    progressions stay near their authored register instead of accumulating the
+    greedy algorithm's one-way octave ratchet.
+    """
     if not new:
         return new
+
     bass = min(new)
-    rest_new = [n for n in new if n != bass] + [n for n in new if n == bass][1:]
-    rest_prev = sorted(prev)[1:] if len(prev) > 1 else []
-    out = [bass]
-    available = list(rest_new)
-    for prev_note in rest_prev:
-        if not available:
-            break
-        # Shift each candidate to the nearest octave of prev_note, then pick
-        # the candidate with the smallest residual distance.
-        best = None
-        best_dist = 10**9
-        for cand in available:
-            shifted = cand
-            while shifted < prev_note - 6:
-                shifted += 12
-            while shifted > prev_note + 6:
-                shifted -= 12
-            d = abs(shifted - prev_note)
-            if d < best_dist:
-                best = (cand, shifted)
-                best_dist = d
-        if best is None:
-            break
-        chosen_orig, chosen_shifted = best
-        out.append(chosen_shifted)
-        available.remove(chosen_orig)
-    # Append any leftover new notes in their original octave.
-    out.extend(available)
-    return out
+    upper_new = list(new)
+    upper_new.remove(bass)
+    if not upper_new:
+        return [bass]
+
+    upper_prev = sorted(prev)[1:]
+    voice_count = len(upper_new)
+    if len(upper_prev) < voice_count:
+        return list(new)
+
+    best_key: tuple[float, int, float, tuple[int, ...]] | None = None
+    best_voicing: list[int] | None = None
+    octave_shift_penalty = 4.0
+
+    for selected_prev in itertools.combinations(upper_prev, voice_count):
+        for ordered_tones in itertools.permutations(upper_new):
+            for shifts in itertools.product((-12, 0, 12), repeat=voice_count):
+                voiced = [tone + shift for tone, shift in zip(ordered_tones, shifts)]
+                if any(pitch < 0 or pitch > 127 for pitch in voiced):
+                    continue
+                motion = float(
+                    sum(abs(pitch - previous) for pitch, previous in zip(voiced, selected_prev))
+                )
+                octave_count = sum(abs(shift) // 12 for shift in shifts)
+                total = motion + octave_shift_penalty * octave_count
+                key = (total, octave_count, motion, tuple(sorted(voiced)))
+                if best_key is None or key < best_key:
+                    best_key = key
+                    best_voicing = voiced
+
+    if best_voicing is None:
+        return list(new)
+    return [bass, *best_voicing]
 
 
 def _spread_clusters(notes: list[int]) -> list[int]:

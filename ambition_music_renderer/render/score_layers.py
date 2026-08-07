@@ -54,6 +54,7 @@ def render_layer_pad_chords(
                 octave=octave,
                 articulation=articulation,
                 voicing=voicing,
+                include_slash_bass=bool(layer.get("include_slash_bass", True)),
                 constraints=constraints,
                 **hk,
             )
@@ -86,6 +87,7 @@ def render_layer_arpeggio(
             chord_for_bar(section, local),
             octave=octave,
             voicing=layer.get("voicing", "closed"),
+            include_slash_bass=bool(layer.get("include_slash_bass", True)),
         )
         count = int(ctx.beats_per_bar / step)
         for i in range(count):
@@ -207,12 +209,14 @@ def render_layer_motif(
             local_bar, start_beat = float(start[0]) + rep * every_bars, float(start[1])
             if local_bar >= section["bars"]:
                 continue
-            notes, rhythm, velocities = motif_notes(
+            notes, rhythm, durations, velocities = motif_notes(
                 ctx, layer["motif"], root=root, transform=transform, transpose=transpose
             )
             beat = start_beat
+            rhythm_scale = float(layer.get("rhythm_scale", 1.0))
             for i, p0 in enumerate(notes):
-                dur = rhythm[i % len(rhythm)] * float(layer.get("rhythm_scale", 1.0))
+                advance = rhythm[i % len(rhythm)] * rhythm_scale
+                dur = durations[i % len(durations)] * rhythm_scale
                 vel_scale = velocities[i % len(velocities)]
                 if note_velocity_pattern:
                     vel_scale *= float(
@@ -246,7 +250,7 @@ def render_layer_motif(
                         pitch_bend_curve=bend_curve_pairs,
                         **hk,
                     )
-                beat += dur
+                beat += advance
 
 
 @profile
@@ -281,6 +285,7 @@ def render_layer_chord_hits(
                 octave=octave + int(inst_octave_offsets.get(inst, 0)),
                 articulation=layer.get("articulation", "marcato"),
                 voicing=layer.get("voicing", "closed"),
+                include_slash_bass=bool(layer.get("include_slash_bass", True)),
                 constraints=constraints,
                 **hk,
             )
@@ -650,12 +655,14 @@ def render_layer_guitar_lead(
             local_bar, start_beat = float(start[0]) + rep * every_bars, float(start[1])
             if local_bar >= section["bars"]:
                 continue
-            notes, rhythm, velocities = motif_notes(
+            notes, rhythm, durations, velocities = motif_notes(
                 ctx, layer["motif"], root=root, transform=transform, transpose=transpose
             )
             beat = start_beat
+            rhythm_scale = float(layer.get("rhythm_scale", 1.0))
             for i, p0 in enumerate(notes):
-                dur = rhythm[i % len(rhythm)] * float(layer.get("rhythm_scale", 1.0))
+                advance = rhythm[i % len(rhythm)] * rhythm_scale
+                dur = durations[i % len(durations)] * rhythm_scale
                 vel_scale = velocities[i % len(velocities)]
                 if note_velocity_pattern:
                     vel_scale *= float(note_velocity_pattern[i % len(note_velocity_pattern)])
@@ -702,7 +709,7 @@ def render_layer_guitar_lead(
                         pitch_vibrato_delay_beats=vibrato_delay_beats,
                         **hk,
                     )
-                beat += dur
+                beat += advance
 
 def render_layer_automation(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]

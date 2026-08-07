@@ -99,3 +99,41 @@ def test_generic_aliases_avoid_wrong_vpo_roles(tmp_path: Path):
         path.write_text("<group>\n", encoding="utf8")
     assert resolve_sfz_reference(library_ref="bass.electric", roots=[root]) == right_bass.resolve()
     assert resolve_sfz_reference(library_ref="drums.rock", roots=[root]) == right_drum.resolve()
+
+
+def test_orchestral_role_aliases_choose_matching_sonatina_and_vcsl_patches(tmp_path: Path):
+    cases = {
+        "orchestra.horns_sustain": "Sonatina/SymphonicOrchestra/Brass/Horns Sustain.sfz",
+        "orchestra.horns_staccato": "Sonatina/SymphonicOrchestra/Brass/Horns Staccato.sfz",
+        "orchestra.trumpets_sustain": "Sonatina/SymphonicOrchestra/Brass/Trumpets Sustain.sfz",
+        "orchestra.trumpets_staccato": "Sonatina/SymphonicOrchestra/Brass/Trumpets Staccato.sfz",
+        "orchestra.trombones_sustain": "Sonatina/SymphonicOrchestra/Brass/Trombones Sustain.sfz",
+        "orchestra.trombones_staccato": "Sonatina/SymphonicOrchestra/Brass/Trombones Staccato.sfz",
+        "orchestra.tuba_sustain": "Sonatina/SymphonicOrchestra/Brass/Tuba Sustain.sfz",
+        "orchestra.flutes_sustain": "Sonatina/SymphonicOrchestra/Woodwinds/Flutes Sustain.sfz",
+        "orchestra.oboes_sustain": "Sonatina/SymphonicOrchestra/Woodwinds/Oboes Sustain.sfz",
+        "orchestra.clarinets_sustain": "Sonatina/SymphonicOrchestra/Woodwinds/Clarinets Sustain.sfz",
+        "orchestra.timpani": "Sonatina/SymphonicOrchestra/Percussion/Timpani Hits.sfz",
+        "strings.violins_1_staccato": "Sonatina/SymphonicOrchestra/Strings/1st Violins Staccato.sfz",
+        "strings.violins_2_staccato": "Sonatina/SymphonicOrchestra/Strings/2nd Violins Staccato.sfz",
+        "strings.celli_staccato": "Sonatina/SymphonicOrchestra/Strings/Celli Staccato.sfz",
+        "orchestra.snare": "Versilian/VCSL/Membranophones/Struck Membranophones/Snare Drum, Rope Tension.sfz",
+        "orchestra.bass_drum": "Versilian/VCSL/Membranophones/Struck Membranophones/Bass Drum 1.sfz",
+        "orchestra.cymbal": "Versilian/VCSL/Idiophones/Struck Idiophones/Suspended Cymbal.sfz",
+    }
+    for ref, rel in cases.items():
+        root = tmp_path / ref.replace(".", "_") / "sfz"
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+        assert resolve_sfz_reference(library_ref=ref, roots=[root]) == path.resolve(), ref
+
+
+def test_orchestral_cymbal_alias_avoids_finger_cymbals(tmp_path: Path):
+    root = tmp_path / "sfz"
+    finger = root / "Versilian/VCSL/Idiophones/Struck Idiophones/Finger Cymbals.sfz"
+    suspended = root / "Versilian/VCSL/Idiophones/Struck Idiophones/Suspended Cymbal.sfz"
+    for path in (finger, suspended):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="orchestra.cymbal", roots=[root]) == suspended.resolve()
