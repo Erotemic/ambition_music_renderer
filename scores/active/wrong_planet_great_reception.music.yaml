@@ -1,9 +1,21 @@
 schema: ambition.musicir.v1
-id: wrong_planet_great_reception
-title: Wrong Planet, Great Reception
+id: wrong_planet_great_reception_v2
+title: Wrong Planet, Great Reception v2
 seed: 2026080623
-notes: 'Indie-pop / synth-pop instrumental built like a cheerful transmission from somewhere that has never heard Earth pop but somehow reinvented the hook. An eight-bar bubbly gurgling intro opens into punchy electronic drums, springy synth bass, warm pads, clipped electric-piano chords, crystalline replies, and a high-vibrato saw lead. The central four-bar hook is deliberately simple enough to sing after one listen: two tiny pickups vault into a long high note, leave a hole, then answer downward. It returns unchanged often enough to become an earworm, while the accompaniment and counter-lines mutate around it. Alien FX are sparse, chord-attached punctuation rather than random dissonance. Mix polish keeps the arrangement intact while rebalancing percussion/bass against the whimsical and key layers. The sparse opening is level-raised, and a four-bar loop handoff reuses only intro bars 4-7 so raw game playback can wrap from the file end into intro bar 0 as one continuous eight-bar cycle.
-  Loudness-rider polish leaves every note and layer intact, gently compresses/attenuates the lead bus, and applies smooth section-level audio gain before mastering so sparse and lead-heavy passages remain within a narrow game-safe loudness window.'
+notes: 'Indie-pop / synth-pop instrumental built like a cheerful transmission from somewhere that has never heard
+  Earth pop but somehow reinvented the hook. An eight-bar bubbly gurgling intro opens into punchy electronic drums,
+  springy synth bass, warm pads, clipped electric-piano chords, crystalline replies, and a high-vibrato saw lead.
+  The central four-bar hook is deliberately simple enough to sing after one listen: two tiny pickups vault into
+  a long high note, leave a hole, then answer downward. It returns unchanged often enough to become an earworm,
+  while the accompaniment and counter-lines mutate around it. Alien FX are sparse, chord-attached punctuation rather
+  than random dissonance. Mix polish keeps the arrangement intact while rebalancing percussion/bass against the
+  whimsical and key layers. The sparse opening is level-raised, and a four-bar loop handoff reuses only intro bars
+  4-7 so raw game playback can wrap from the file end into intro bar 0 as one continuous eight-bar cycle. Loudness-rider
+  polish leaves every note and layer intact, gently compresses/attenuates the lead bus, and applies smooth section-level
+  audio gain before mastering so sparse and lead-heavy passages remain within a narrow game-safe loudness window.
+  A/B variant v2: preserve the proven arrangement and loudness rider, extend the final note of the opening lead
+  teaser to 2.2 beats, keep the bubbly chiff/goblin texture present throughout the body, and raise the lead bus
+  by only 0.6 dB. The original wrong_planet_great_reception cue remains unchanged.'
 tempo:
   bpm: 128
 meter:
@@ -63,7 +75,7 @@ stem_postprocess:
   target_peak_db: -3.5
 group_postprocess:
   lead:
-    gain_db: -1.5
+    gain_db: -0.9
     highpass_hz: 120
     lowpass_hz: 13800
     presence_low_hz: 1700
@@ -1368,7 +1380,7 @@ sections:
     - bar: 7
       beat: 0.0
       note: B5
-      dur: 0.78
+      dur: 2.2
       vel: 74
       vibrato_cents: 30
       vibrato_rate_hz: 7.1
@@ -1428,6 +1440,321 @@ sections:
       vel: 46
       articulation: bell
     humanize_ms: 1
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: 1.0
 - id: signal_lift
   bars: 8
@@ -1522,6 +1849,321 @@ sections:
       vibrato_cents: 38
       vibrato_rate_hz: 7.2
     humanize_ms: 2
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: C#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: E3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: C#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: E3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: E3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: 0.0
 - id: great_reception
   bars: 12
@@ -2630,6 +3272,477 @@ sections:
       vel: 46
       articulation: bell
     humanize_ms: 0
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 8
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 8
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 8
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 9
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 9
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 9
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 10
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 10
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 10
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 11
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 11
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 11
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: -1.75
 - id: wrong_planet_bridge
   bars: 8
@@ -2902,6 +4015,321 @@ sections:
       vel: 46
       articulation: bell
     humanize_ms: 1
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: E3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: C#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: E3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: 0.75
 - id: great_reception_louder
   bars: 12
@@ -4064,6 +5492,477 @@ sections:
       note: F#7
       dur: 0.55
       vel: 48
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 8
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 8
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 8
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 9
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 9
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 9
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 10
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 10
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 10
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 11
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 11
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 11
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: -2.0
 - id: still_transmitting
   bars: 8
@@ -4846,6 +6745,321 @@ sections:
       vel: 48
       vibrato_cents: 18
       vibrato_rate_hz: 6.2
+  - kind: notes
+    instrument: bubble_goblin
+    notes:
+    - bar: 0
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 0
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 0
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 1
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 1
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 2
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 2
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 3
+      beat: 2.0
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 3
+      beat: 3.5
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 4
+      beat: 1.75
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 4
+      beat: 3.25
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 5
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 5
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 0.5
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 6
+      beat: 1.75
+      note: G#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 6
+      beat: 3.25
+      note: E3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 0.25
+      note: D#3
+      dur: 0.18
+      vel: 30
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
+    - bar: 7
+      beat: 2.0
+      note: A#3
+      dur: 0.14
+      vel: 27
+      articulation: staccato
+      bend:
+      - - 0.0
+        - 28
+      - - 0.1
+        - -10
+      - - 0.16
+        - 0
+    - bar: 7
+      beat: 3.5
+      note: F#3
+      dur: 0.2
+      vel: 32
+      articulation: staccato
+      bend:
+      - - 0.0
+        - -36
+      - - 0.1
+        - 14
+      - - 0.18
+        - 0
   mix_gain_db: -1.5
 - id: loop_handoff
   bars: 4
@@ -5275,7 +7489,7 @@ sections:
     - bar: 3
       beat: 0.0
       note: B5
-      dur: 0.78
+      dur: 2.2
       vel: 74
       vibrato_cents: 30
       vibrato_rate_hz: 7.1

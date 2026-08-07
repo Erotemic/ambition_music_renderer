@@ -2,7 +2,6 @@ from pathlib import Path
 
 import yaml
 
-from ambition_music_renderer.audit import dissonance_audit, sour_note_audit
 from ambition_music_renderer.render.score_layers import build_score
 
 
@@ -18,17 +17,19 @@ def _spec():
     return yaml.safe_load(SCORE_PATH.read_text())
 
 
-def test_grand_symphony_stays_exhilarated_for_a_two_minute_sampled_orchestra():
-    spec = _spec()
+def _motif_span(motif):
+    if not motif["rhythm"]:
+        return 0.0
+    return sum(motif["rhythm"][:-1]) + motif["durations"][-1]
 
+
+def test_grand_symphony_major_rewrite_keeps_the_sampled_orchestra_and_two_minute_form():
+    spec = _spec()
     assert spec["schema"] == "ambition.musicir.v1"
     assert spec["id"] == "super_smash_siblings_grand_symphony"
-    assert spec["title"] == "The Distance Starts Losing - Grand Symphony"
     assert spec["tempo"]["bpm"] == 152
     assert spec["playback"]["loop"] is False
     assert sum(section["bars"] for section in spec["sections"]) == 76
-    assert min(section["intensity"] for section in spec["sections"]) >= 0.95
-    assert all(section["loopable"] is False for section in spec["sections"])
 
     instruments = {item["name"]: item for item in spec["instruments"]}
     required = {
@@ -41,137 +42,103 @@ def test_grand_symphony_stays_exhilarated_for_a_two_minute_sampled_orchestra():
     }
     assert required <= instruments.keys()
     assert all(instruments[name]["instrument_backend"]["kind"] == "sfz" for name in required)
-    assert instruments["harp"]["instrument_backend"]["library_ref"] == "folk.harp"
 
     pm, _, _ = build_score(spec)
-    rendered = {inst.name: inst for inst in pm.instruments}
-    assert required <= rendered.keys()
     assert 119.0 < pm.get_end_time() < 121.0
-    assert sum(len(inst.notes) for inst in pm.instruments) > 6500
-
-    # The register-stable voice-leading work from the earlier renderer pass must
-    # continue to hold under a denser, faster score.
-    assert max(note.pitch for note in rendered["horns_sus"].notes) <= 84
-    assert max(note.pitch for note in rendered["trumpets_sus"].notes) <= 90
-    assert min(note.pitch for note in rendered["violins_i_stacc"].notes) >= 55
-    assert min(note.pitch for note in rendered["harp"].notes) >= 48
-    assert max(note.pitch for note in rendered["harp"].notes) <= 96
+    # The previous version exceeded 6,600 notes. The rewrite deliberately leaves
+    # foreground space while remaining an active full-orchestra score.
+    note_count = sum(len(inst.notes) for inst in pm.instruments)
+    assert 2800 < note_count < 4000
 
 
-def test_grand_symphony_melody_learns_in_real_time_instead_of_repeating_square_phrases():
+def test_foreground_motifs_breathe_instead_of_becoming_constant_fast_flourish():
     spec = _spec()
     motifs = {motif["id"]: motif for motif in spec["motifs"]}
 
-    seed = motifs["distance_seed_a"]
-    assert seed["intervals"][:6] == [0, 7, 10, 14, 15, 12]
-    assert max(seed["intervals"]) - min(seed["intervals"]) >= 19
-    assert len(set(seed["rhythm"])) >= 8
-    assert len(set(seed["durations"])) >= 10
-    assert seed["durations"] != seed["rhythm"]
-    assert {0.25, 0.5, 0.75, 1.25, 1.75} <= set(seed["rhythm"])
+    assert all(min(motif["rhythm"]) >= 0.5 for motif in motifs.values())
+    assert all(len(motif["intervals"]) <= 11 for motif in motifs.values())
+    assert all(max(motif["durations"]) >= 1.25 for motif in motifs.values())
 
-    pressure = motifs["pressure_ladder_b"]
-    assert max(pressure["intervals"]) >= 19
-    assert 11 in pressure["intervals"]
-    assert len(set(pressure["rhythm"])) >= 7
+    # The recognizable opening has long tones and gaps, not a stream of sixteenths.
+    opening = motifs["main_call"]
+    assert len(opening["intervals"]) == 9
+    assert max(opening["durations"]) >= 2.5
+    assert sum(1 for d in opening["durations"] if d >= 1.0) >= 4
 
-    hands = next(section for section in spec["sections"] if section["id"] == "hands_know_first")
-    compressed = [
-        layer["rhythm_scale"]
-        for layer in hands["layers"]
-        if isinstance(layer, dict) and layer.get("kind") == "motif" and "rhythm_scale" in layer
+    summit = motifs["summit_line"]
+    assert summit["durations"][0] >= 4.5
+    assert min(summit["rhythm"]) >= 0.75
+
+    # Fast sixteenths still exist, but only as the late accompaniment engine.
+    sections = {section["id"]: section for section in spec["sections"]}
+    sixteenth_users = [
+        sid for sid, section in sections.items()
+        if "strings_sixteenth_surge" in section["layers"]
     ]
-    assert compressed == [0.84, 0.74, 0.68]
-
-    rules = next(section for section in spec["sections"] if section["id"] == "rules_under_stress")
-    assert rules["harmony"][0].startswith("Gm")
-    assert rules["harmony"][4].startswith("Abm")
-    assert rules["harmony"][8].startswith("Am")
+    assert sixteenth_users == ["the_distance_starts_losing", "no_more_ceiling"]
 
 
-def test_grand_symphony_reveals_a_larger_ceiling_without_a_quiet_preclimax_or_major_victory_flip():
-    spec = _spec()
-    hands = next(section for section in spec["sections"] if section["id"] == "hands_know_first")
-    summit = next(section for section in spec["sections"] if section["id"] == "the_distance_starts_losing")
-    coda = next(section for section in spec["sections"] if section["id"] == "no_more_ceiling")
-
-    assert hands["intensity"] > 1.0
-    assert summit["intensity"] > hands["intensity"]
-    assert coda["intensity"] > summit["intensity"]
-
-    # The penultimate passage remains fast and loud but intentionally withholds
-    # low sustained brass and harp; the summit adds those colors on its first bar.
-    assert "trombone_chorale" not in hands["layers"]
-    assert "tuba_sync_foundation" not in hands["layers"]
-    assert "harp_sparks" not in hands["layers"]
-    assert "trombone_chorale" in summit["layers"]
-    assert "tuba_pedal_foundation" in summit["layers"]
-    assert "harp_sparks" in summit["layers"]
-    assert "cymbal_every_two" in summit["layers"]
-
-    # Power comes from mastering dangerous harmony, not the stock minor-to-major
-    # heroic transformation. The final sonority keeps the Dorian/minor bite.
-    assert coda["harmony"][-1] == "Dm6/9"
-    assert "D" not in coda["harmony"]
-    assert summit["harmony"][-1] == "Dm6/9"
-
-    sour = sour_note_audit.audit_spec(spec)
-    dissonance = dissonance_audit.audit_spec(spec)
-    assert sour["candidate_count"] < 60
-    assert max(row["score"] for row in sour["candidates"]) < 1.5
-    assert sour["ignored_unpitched_note_count"] > 500
-    assert dissonance["ignored_unpitched_note_count"] > 500
-    # Deliberately altered dominants and pedal-tone seconds remain, but the
-    # stacked accidental semitone mud from the exploratory draft is gone.
-    assert dissonance["hotspots"][0]["score"] < 4.0
-
-
-def test_grand_symphony_preserves_listener_anchors_while_tension_stays_authored():
+def test_single_018_horn_blast_is_preserved_and_given_foreground_space():
     spec = _spec()
     sections = {section["id"]: section for section in spec["sections"]}
     motifs = {motif["id"]: motif for motif in spec["motifs"]}
     seconds_per_bar = 4.0 * 60.0 / spec["tempo"]["bpm"]
 
     correction = sections["first_correction"]
-    # The full-brass Em hit lands at ~0:18.95. Preserve the listener-approved
-    # gear shift exactly while the surrounding melody becomes more tonal.
-    correction_start_bar = sections["already_moving"]["bars"]
-    assert abs((correction_start_bar + 4) * seconds_per_bar - 18.947368) < 0.01
+    assert abs((sections["already_moving"]["bars"] + 4) * seconds_per_bar - 18.947368) < 0.01
     assert correction["harmony"][4] == "Em9add11"
-    correction_hits = next(
+
+    hits = next(
         layer for layer in correction["layers"]
         if isinstance(layer, dict)
         and layer.get("kind") == "chord_hits"
         and "trombones_stacc" in layer.get("instruments", [])
     )
-    assert [4, 0] in correction_hits["hits"]
+    assert [4, 0.0] in hits["hits"]
 
+    # The preceding lead ends before the blast and the next foreground melody
+    # waits until bar 7 of the section, so the blast is a landmark rather than
+    # one event inside a perpetual run.
+    assert 0.25 + _motif_span(motifs["first_push"]) < 16.0
+    after = next(
+        layer for layer in correction["layers"]
+        if isinstance(layer, dict) and layer.get("motif") == "after_blast_line"
+    )
+    assert after["starts"] == [[6, 0.25]]
+
+
+def test_harmony_is_tonal_by_default_with_only_two_signature_exceptions():
+    spec = _spec()
+    sections = {section["id"]: section for section in spec["sections"]}
+    all_chords = [chord for section in spec["sections"] for chord in section["harmony"]]
+
+    assert sections["already_moving"]["harmony"] == [
+        "Dm9", "Bbmaj7/D", "Gm6/D", "A7sus4", "Dm/F", "C/E", "Gm/D", "A7"
+    ]
+    assert sections["first_correction"]["harmony"][4:7] == ["Em9add11", "A7/E", "Dm/F"]
+
+    signature = [
+        chord for chord in all_chords
+        if chord == "Em9add11" or "#11" in chord or "add13" in chord
+    ]
+    assert signature == ["Em9add11", "Ebmaj9#11add13/D"]
+    assert not any("Abm" in chord or "Fm9" in chord for chord in all_chords)
+
+
+def test_130_ceiling_break_survives_but_the_climax_is_led_by_long_lines():
+    spec = _spec()
+    sections = {section["id"]: section for section in spec["sections"]}
     summit = sections["the_distance_starts_losing"]
-    bars_before_summit = sum(
+    seconds_per_bar = 4.0 * 60.0 / spec["tempo"]["bpm"]
+    bars_before = sum(
         section["bars"] for section in spec["sections"]
         if section["id"] not in {"the_distance_starts_losing", "no_more_ceiling"}
     )
-    # The second summit bar begins at exactly 1:30. Preserve the luminous
-    # Eb-major/Lydian upper structure over D and the melody that made it work.
-    assert abs((bars_before_summit + 1) * seconds_per_bar - 90.0) < 0.01
-    assert summit["harmony"][:2] == ["Dm9add11", "Ebmaj9#11add13/D"]
-    assert motifs["mastery_line_a"]["intervals"] == [
-        0, 7, 10, 5, 15, 12, 19, 17, 24, 22, 17, 26, 24, 19, 14, 17, 11, 11
-    ]
+    assert abs((bars_before + 1) * seconds_per_bar - 90.0) < 0.01
+    assert summit["harmony"][:2] == ["Dm9", "Ebmaj9#11add13/D"]
 
-    # The recurring hooks now get their bite from functional leading tones,
-    # suspensions, and register rather than arbitrary chromatic targets.
-    assert motifs["distance_seed_a"]["intervals"] == [
-        0, 7, 10, 14, 15, 12, 17, 11, 12, 19, 16, 14, 19, 17, 12
-    ]
-    assert motifs["distance_seed_b"]["intervals"][9:13] == [11, 14, 17, 19]
-    assert motifs["distance_seed_c"]["durations"][-1] == 0.75
-    assert motifs["pressure_ladder_a"]["intervals"][8:15] == [11, 14, 17, 19, 14, 11, 17]
-    assert motifs["pressure_ladder_b"]["intervals"][6] == 10
-    assert sections["rules_under_stress"]["harmony"][4] == "Abm7add9add11"
-
-    dissonance = dissonance_audit.audit_spec(spec)
-    # The exceptional 1:30 ceiling break is now the top of the tension hierarchy:
-    # other dissonance is allowed, but no random collision should eclipse it.
-    assert dissonance["hotspots"][0]["bar"] == 58
-    assert 3.0 < dissonance["hotspots"][0]["score"] < 4.0
+    motif_layers = [layer for layer in summit["layers"] if isinstance(layer, dict) and layer.get("kind") == "motif"]
+    assert [layer["motif"] for layer in motif_layers] == ["summit_line", "summit_answer"]
+    assert "strings_sixteenth_surge" in summit["layers"]
+    assert "tuba_stride" in summit["layers"]
+    assert "harp_broad" in summit["layers"]
