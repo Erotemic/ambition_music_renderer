@@ -4,6 +4,10 @@ Author-time renderer for generated Ambition music assets. Generated outputs are 
 
 This package is the canonical code-only music generator for the project. Do not commit ad-hoc rendered `.ogg`, `.wav`, `.mid`, or temporary stem buffers unless a task explicitly says to publish runtime assets.
 
+## RULES
+
+NEVER ADD A TEST FOR A SPECIFIC SONG. TESTS ARE TOOLING TESTS ONLY. 
+
 ## Common commands
 
 Run from the repo root unless noted. `uv run --project ~/code/ambition/tools/ambition_music_renderer` installs/runs the package with the renderer project metadata, so `PYTHONPATH=tools/ambition_music_renderer` should not be needed.
