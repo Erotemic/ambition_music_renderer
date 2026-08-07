@@ -28,6 +28,7 @@ from .._paths import agent_root as _agent_root
 from .._paths import find_score as _find_score
 from .._paths import generated_root as _generated_root
 from .._paths import project_root as _project_root
+from .._paths import publish_root as _publish_root
 from .._paths import repo_root as _repo_root
 from .._paths import score_candidates as _score_candidates
 
@@ -126,15 +127,14 @@ def default_bundle_root() -> Path:
 
 
 def default_publish_dest_root() -> Path:
-    return (
-        repo_root()
-        / "crates"
-        / "ambition_actors"
-        / "assets"
-        / "audio"
-        / "music"
-        / "generated"
-    )
+    """Where cues install, as DECLARED by the consuming game.
+
+    ⛔ this used to build a path into `crates/ambition_actors`, in this file and
+    in one other — two hard-coded copies of a crate name the renderer has no way
+    to know. See `_paths.publish_root`: the consumer says, the renderer does not
+    guess, and an undeclared destination raises instead of inventing one.
+    """
+    return _publish_root()
 
 
 def find_score(cue: str) -> Path | None:

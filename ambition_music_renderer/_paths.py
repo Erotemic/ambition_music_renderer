@@ -10,6 +10,7 @@ agree.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -43,14 +44,54 @@ def project_root(start: Path | None = None) -> Path:
 
 
 def repo_root(start: Path | None = None) -> Path:
-    """Return the parent game repository root when the renderer is a submodule."""
+    """Return the parent game repository root when the renderer is a submodule.
+
+    ⛔ **This used to probe for ``crates/ambition_actors``, and that was a
+    standing bug rather than a lookup.** The renderer is a submodule of a game
+    repo whose crate names are that repo's business: ``ambition_actors`` became
+    ``ambition_platformer2d_actor_monolith``, and the monolith is scheduled to be
+    decomposed into names nobody has chosen yet. A probe keyed on one of them is
+    wrong for every value it does not hold — and it failed SILENTLY, because a
+    miss fell through to the ``tools/`` heuristic while
+    :func:`publish_root` cheerfully CREATED the directory it expected.
+
+    The renderer no longer knows what the consumer crate is called. It finds the
+    repo structurally (this project lives at ``<repo>/tools/<name>``) and is
+    TOLD where to publish; see :func:`publish_root`.
+    """
     renderer = project_root(start)
-    for candidate in (renderer, *renderer.parents):
-        if (candidate / "crates" / "ambition_actors").exists():
-            return candidate
     if renderer.parent.name == "tools":
         return renderer.parent.parent
     return renderer.parent
+
+
+class PublishRootUndeclared(RuntimeError):
+    """The caller did not say where rendered cues should be installed."""
+
+
+def publish_root() -> Path:
+    """Where rendered cues are installed in the consuming game.
+
+    ⭐ **The consumer declares this; the renderer never guesses.** It is passed
+    as ``--dest-root`` or through ``AMBITION_MUSIC_PUBLISH_ROOT``, both of which
+    the game repo's own ``regen_music.sh`` sets from the one place that knows its
+    asset layout.
+
+    Raising is the point. The previous default was a hard-coded path into a crate
+    the renderer cannot know the name of, so a wrong guess published 69 cues into
+    a directory nothing reads and exited 0. A missing declaration is a question,
+    not something to answer on the caller's behalf.
+    """
+    declared = os.environ.get("AMBITION_MUSIC_PUBLISH_ROOT")
+    if declared:
+        return Path(declared).expanduser().resolve()
+    raise PublishRootUndeclared(
+        "no publish destination was declared. Pass --dest-root, or set "
+        "AMBITION_MUSIC_PUBLISH_ROOT to the game's "
+        "<assets>/audio/music/generated directory. The renderer does not know "
+        "what the consuming crate is called, and guessing is how 69 cues were "
+        "once published into a directory nothing reads."
+    )
 
 
 def scores_root() -> Path:

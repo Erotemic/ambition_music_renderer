@@ -31,6 +31,7 @@ import sys
 from pathlib import Path
 
 from .._paths import repo_root
+from .._paths import PublishRootUndeclared, publish_root
 
 np = lazy.load("numpy")
 sf = lazy.load("soundfile")
@@ -38,7 +39,16 @@ sf = lazy.load("soundfile")
 from ._common import db, peak, rms
 
 REPO_ROOT = repo_root()
-DEFAULT_ROOT = REPO_ROOT / "crates/ambition_actors/assets/audio/music/generated"
+# The music root to scan, DECLARED by the consuming game rather than guessed
+# from a crate name this tool cannot know (it has been `ambition_actors`, is
+# `ambition_platformer2d_actor_monolith`, and moves again when the monolith is
+# decomposed). `None` when nothing declared one: `--root` is then required, and
+# saying so beats scanning a directory that does not exist and reporting zero
+# problems.
+try:
+    DEFAULT_ROOT = publish_root()
+except PublishRootUndeclared:
+    DEFAULT_ROOT = None
 CLIP_DBTP = -1.0  # ITU true-peak ceiling convention; above this we flag.
 
 
