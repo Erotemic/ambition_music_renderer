@@ -28,6 +28,7 @@ from .._paths import agent_root as _agent_root
 from .._paths import find_score as _find_score
 from .._paths import generated_root as _generated_root
 from .._paths import project_root as _project_root
+from .._paths import declared_publish_root as _declared_publish_root
 from .._paths import publish_root as _publish_root
 from .._paths import repo_root as _repo_root
 from .._paths import score_candidates as _score_candidates
@@ -133,8 +134,20 @@ def default_publish_dest_root() -> Path:
     in one other — two hard-coded copies of a crate name the renderer has no way
     to know. See `_paths.publish_root`: the consumer says, the renderer does not
     guess, and an undeclared destination raises instead of inventing one.
+
+    ⚠ **raises, so it is the USE-time answer and not an argument default.** A
+    `default_factory` runs while ARGUMENTS are parsed, which demanded a publish
+    destination for runs that never publish; use
+    [`declared_publish_dest_root`] there instead.
     """
     return _publish_root()
+
+
+def declared_publish_dest_root() -> Path | None:
+    """The same answer, or `None` when nothing declared one — for an argument
+    default. The raise moves to publish time; see `_paths.declared_publish_root`.
+    """
+    return _declared_publish_root()
 
 
 def find_score(cue: str) -> Path | None:

@@ -94,6 +94,27 @@ def publish_root() -> Path:
     )
 
 
+def declared_publish_root() -> Path | None:
+    """Where cues install, or ``None`` when nothing declared it.
+
+    ⛔ **the variant an ARGUMENT DEFAULT needs**, and its absence was a real bug:
+    `publish_root()` raises by design, and CLI configs used it as a
+    ``default_factory`` — so merely PARSING ``render <cue>`` demanded a publish
+    destination for a run that was never going to publish. Two tests failed on
+    argument parsing alone.
+
+    ⭐ the raise is not softened, it is MOVED to where the answer is used.
+    `render.bundle` already resolves a `None` destination through
+    :func:`publish_root` at publish time, so an undeclared destination still
+    fails loudly — it just fails when somebody actually tries to install
+    something. `audit.level_report` reached the same shape independently.
+    """
+    try:
+        return publish_root()
+    except PublishRootUndeclared:
+        return None
+
+
 def scores_root() -> Path:
     return project_root() / "scores"
 

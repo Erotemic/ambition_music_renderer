@@ -38,6 +38,7 @@ from ._paths import find_score as _find_score
 from ._paths import generated_root as _generated_root
 from ._paths import output_root as _output_root
 from ._paths import project_root as _project_root
+from ._paths import declared_publish_root as _declared_publish_root
 from ._paths import publish_root as _publish_root
 from ._paths import repo_root as _repo_root
 from ._paths import scores_root as _scores_root
@@ -301,8 +302,20 @@ def default_publish_dest_root() -> Path:
     in one other — two hard-coded copies of a crate name the renderer has no way
     to know. See `_paths.publish_root`: the consumer says, the renderer does not
     guess, and an undeclared destination raises instead of inventing one.
+
+    ⚠ **raises, so it is the USE-time answer and not an argument default.** A
+    `default_factory` runs while ARGUMENTS are parsed, which demanded a publish
+    destination for runs that never publish; use
+    [`declared_publish_dest_root`] there instead.
     """
     return _publish_root()
+
+
+def declared_publish_dest_root() -> Path | None:
+    """The same answer, or `None` when nothing declared one — for an argument
+    default. The raise moves to publish time; see `_paths.declared_publish_root`.
+    """
+    return _declared_publish_root()
 
 
 def _display_path(path: Path) -> Path:
@@ -718,13 +731,18 @@ class RenderCommand(kwconf.Config):
     full_mix_only: bool = kwconf.Flag(False, help="emit mastered preview plus per-section full mixes")
     publish: bool = kwconf.Flag(False, help="after rendering, install full.ogg into the game asset tree")
     dest_root: Path = kwconf.Value(
-        default_factory=default_publish_dest_root,
+        default_factory=declared_publish_dest_root,
         parser=Path,
         help="publish destination root (with --publish)",
     )
 
     def __post_init__(self) -> None:
-        if not isinstance(self.dest_root, Path):
+        # ⚠ `None` is legal and means UNDECLARED — see
+        # `_paths.declared_publish_root`. Coercing it to a `Path` here is what
+        # turned "nobody said where to publish" into a `TypeError` from
+        # `pathlib` during argument parsing. The publish path resolves it (and
+        # raises with the real message) when it is actually needed.
+        if self.dest_root is not None and not isinstance(self.dest_root, Path):
             self.dest_root = Path(self.dest_root)
 
     @classmethod
@@ -737,10 +755,15 @@ class PublishCommand(kwconf.Config):
     """Publish newest preview to sandbox assets."""
 
     cue: str = kwconf.Value(None, position=1)
-    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path, help="install destination root")
+    dest_root: Path = kwconf.Value(default_factory=declared_publish_dest_root, parser=Path, help="install destination root")
 
     def __post_init__(self) -> None:
-        if not isinstance(self.dest_root, Path):
+        # ⚠ `None` is legal and means UNDECLARED — see
+        # `_paths.declared_publish_root`. Coercing it to a `Path` here is what
+        # turned "nobody said where to publish" into a `TypeError` from
+        # `pathlib` during argument parsing. The publish path resolves it (and
+        # raises with the real message) when it is actually needed.
+        if self.dest_root is not None and not isinstance(self.dest_root, Path):
             self.dest_root = Path(self.dest_root)
 
     @classmethod
@@ -869,10 +892,15 @@ class BulkActionConfig(kwconf.Config):
     backend: str = kwconf.Value("pretty-midi")
     force_render: bool = kwconf.Flag(False)
     skip_render: bool = kwconf.Flag(False, help="treat render_publish as publish")
-    dest_root: Path = kwconf.Value(default_factory=default_publish_dest_root, parser=Path)
+    dest_root: Path = kwconf.Value(default_factory=declared_publish_dest_root, parser=Path)
 
     def __post_init__(self) -> None:
-        if not isinstance(self.dest_root, Path):
+        # ⚠ `None` is legal and means UNDECLARED — see
+        # `_paths.declared_publish_root`. Coercing it to a `Path` here is what
+        # turned "nobody said where to publish" into a `TypeError` from
+        # `pathlib` during argument parsing. The publish path resolves it (and
+        # raises with the real message) when it is actually needed.
+        if self.dest_root is not None and not isinstance(self.dest_root, Path):
             self.dest_root = Path(self.dest_root)
 
 
