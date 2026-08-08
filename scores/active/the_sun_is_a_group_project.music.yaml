@@ -1,0 +1,1953 @@
+schema: ambition.musicir.v1
+id: the_sun_is_a_group_project
+title: The Sun Is a Group Project
+seed: 202608072056
+notes: 'Complete rhythmic and loudness rebuild. The foreground is authored as literal note events so silence, anticipations,
+  held notes, and asymmetric attack spacing are structural rather than simulated by gate lengths. The four-bar singalong
+  hook uses repeated ascending cells but attacks at deliberately uneven positions. Section density grows by handoff:
+  the human-like lead and cheap square synth alternate ownership of the melody instead of stacking at the climax.
+  Sparse sections receive positive section mix gain and dense sections negative gain so playback level remains stable.
+  The acoustic/organ/bass palette keeps the communal Edward Sharpe / Neutral Milk Hotel side while the square-wave
+  handoffs and simple pop harmony retain the psychedelic MGMT influence.'
+tempo:
+  bpm: 118
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  soundfont: /data/audio-tools/soundfonts/GeneralUser-GS.sf2
+  section_mix_transition_beats: 1.5
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 32
+  lowpass_hz: 13200
+  eq_bands:
+  - type: low_shelf
+    hz: 95
+    q: 0.72
+    db: 0.3
+  - type: peak
+    hz: 330
+    q: 0.9
+    db: -0.7
+  - type: peak
+    hz: 2100
+    q: 1.0
+    db: 0.4
+  - type: high_shelf
+    hz: 7600
+    q: 0.72
+    db: 0.2
+  reverb_wet: 0.065
+  reverb_decay_seconds: 0.95
+  reverb_damping_hz: 6500
+  stereo_width: 0.1
+  compressor_threshold_db: -20.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 14.0
+  compressor_release_ms: 110.0
+  compressor_makeup_db: 0.5
+  compressor_knee_db: 7.0
+  limiter_drive: 0.9
+  normalize: true
+  target_peak_db: -4.0
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.5
+  reverb_damping_hz: 6800
+  stereo_width: 0.03
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -4.0
+group_postprocess:
+  song:
+    gain_db: 0.8
+    highpass_hz: 105
+    lowpass_hz: 10300
+    presence_low_hz: 1600
+    presence_high_hz: 4300
+    presence_db: 0.4
+    reverb_wet: 0.018
+  psych:
+    gain_db: -0.2
+    highpass_hz: 135
+    lowpass_hz: 9500
+    high_shelf_hz: 6100
+    high_shelf_db: -0.6
+    reverb_wet: 0.025
+  pluck:
+    gain_db: -0.8
+    highpass_hz: 85
+    lowpass_hz: 9000
+    transient_tame: 0.06
+    reverb_wet: 0.01
+  bass:
+    gain_db: -0.7
+    highpass_hz: 32
+    lowpass_hz: 4200
+    compressor_threshold_db: -19.0
+    compressor_ratio: 2.8
+    compressor_attack_ms: 10.0
+    compressor_release_ms: 92.0
+  organ:
+    gain_db: -1.0
+    highpass_hz: 120
+    lowpass_hz: 7600
+    reverb_wet: 0.022
+  crowd:
+    gain_db: -1.1
+    highpass_hz: 145
+    lowpass_hz: 8600
+    reverb_wet: 0.028
+  percussion:
+    gain_db: -1.2
+    highpass_hz: 30
+    lowpass_hz: 12400
+    compressor_threshold_db: -17.0
+    compressor_ratio: 3.0
+    compressor_attack_ms: 5.0
+    compressor_release_ms: 76.0
+    transient_tame: 0.015
+    reverb_wet: 0.003
+instruments:
+- name: singer
+  group: song
+  program: lead_voice
+  volume: 98
+  pan: 62
+  expression: 101
+  modulation: 5
+- name: cheap_star
+  group: psych
+  program: lead_square
+  volume: 74
+  pan: 74
+  expression: 84
+  modulation: 3
+- name: steel_strum
+  group: pluck
+  program: steel_guitar
+  volume: 78
+  pan: 43
+  expression: 94
+- name: picked_bass
+  group: bass
+  program: picked_bass
+  volume: 84
+  pan: 64
+  expression: 98
+- name: organ_glue
+  group: organ
+  program: drawbar_organ
+  volume: 68
+  pan: 70
+  expression: 82
+  modulation: 3
+- name: everybody
+  group: crowd
+  program: voice_oohs
+  volume: 58
+  pan: 55
+  expression: 72
+  modulation: 4
+- name: kit
+  group: percussion
+  is_drum: true
+  volume: 84
+  pan: 64
+  expression: 100
+motifs: []
+layer_templates:
+  strum:
+    kind: arpeggio
+    instrument: steel_strum
+    octave: 3
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 3
+    - 1
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.3
+    velocity: 49
+    density: 0.78
+    articulation: pluck
+    voicing: open
+    humanize_ms: 13
+    humanize_velocity_pct: 9
+  strum_open:
+    kind: arpeggio
+    instrument: steel_strum
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 1
+    - 2
+    step: 0.6666667
+    duration_beats: 0.34
+    velocity: 48
+    density: 0.72
+    articulation: pluck
+    voicing: open
+    humanize_ms: 14
+    humanize_velocity_pct: 10
+  bass_hook:
+    kind: bassline
+    instrument: picked_bass
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.54
+    - - 7
+      - 0.75
+      - 0.3
+    - - 12
+      - 1.5
+      - 0.68
+    - - 7
+      - 2.75
+      - 0.3
+    - - 12
+      - 3.5
+      - 0.4
+    velocity: 60
+    articulation: normal
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+  bass_space:
+    kind: bassline
+    instrument: picked_bass
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.86
+    - - 7
+      - 1.25
+      - 0.34
+    - - 12
+      - 2.25
+      - 0.74
+    - - 7
+      - 3.5
+      - 0.34
+    velocity: 57
+    articulation: tenuto
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+  organ_room:
+    kind: pad_chords
+    instrument: organ_glue
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.82
+    velocity: 39
+    articulation: tenuto
+    voicing: shell
+    humanize_ms: 11
+    humanize_velocity_pct: 4
+  organ_bloom:
+    kind: pad_chords
+    instrument: organ_glue
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.88
+    velocity: 44
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+  pulse:
+    kind: drums
+    instrument: kit
+    humanize_ms: 8
+    humanize_velocity_pct: 8
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.75
+      velocity: 70
+      duration_beats: 0.08
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 58
+      duration_beats: 0.06
+    - drum: tambourine
+      beats:
+      - 0.5
+      - 1.5
+      - 2.25
+      - 3.5
+      velocity: 31
+      duration_beats: 0.04
+      probability: 0.88
+  lift:
+    kind: drums
+    instrument: kit
+    humanize_ms: 7
+    humanize_velocity_pct: 7
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.5
+      - 2.75
+      velocity: 75
+      duration_beats: 0.08
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 62
+      duration_beats: 0.06
+    - drum: hand_clap
+      beats:
+      - 3.0
+      velocity: 43
+      duration_beats: 0.05
+    - drum: tambourine
+      beats:
+      - 0.5
+      - 1.25
+      - 2.25
+      - 3.5
+      velocity: 33
+      duration_beats: 0.04
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.75
+      - 2.0
+      - 3.25
+      velocity: 18
+      duration_beats: 0.03
+      probability: 0.72
+playback:
+  mode: section_stem_matrix
+  intro: already_here
+  loop_components:
+  - first_chorus
+  - sideways_verse
+  - second_chorus
+  - borrowed_middle
+  - everybody_knows
+  outro: still_humming
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems:
+    - pluck
+    - bass
+    - organ
+    fade_stems:
+    - song
+    - psych
+    - crowd
+    - percussion
+state_map:
+  default:
+    preferred_section: second_chorus
+    stems:
+      song: 1.0
+      psych: 0.78
+      pluck: 0.92
+      bass: 0.94
+      organ: 0.78
+      crowd: 0.62
+      percussion: 0.88
+sections:
+- id: already_here
+  kind: intro
+  label: bar one is already at listening level
+  bars: 4
+  intensity: 0.76
+  density: 0.62
+  loopable: false
+  harmony:
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  mix_gain_db: 2.1
+  layers:
+  - template: strum_open
+    velocity: 53
+    density: 0.8
+  - template: bass_hook
+    velocity: 60
+  - template: organ_room
+    velocity: 42
+  - template: pulse
+    velocity: 72
+  - kind: notes
+    instrument: singer
+    velocity: 88
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - G#4
+      - 0.3
+      - 84
+    - - 0
+      - 0.75
+      - B4
+      - 0.34
+      - 90
+    - - 0
+      - 1.5
+      - C#5
+      - 0.72
+      - 98
+    - - 0
+      - 2.75
+      - B4
+      - 0.34
+      - 86
+    - - 0
+      - 3.5
+      - G#4
+      - 0.42
+      - 80
+    - - 1
+      - 0.25
+      - F#4
+      - 0.3
+      - 78
+    - - 1
+      - 0.75
+      - G#4
+      - 0.32
+      - 82
+    - - 1
+      - 1.25
+      - B4
+      - 1.18
+      - 98
+    - - 1
+      - 2.75
+      - C#5
+      - 0.3
+      - 86
+    - - 1
+      - 3.25
+      - B4
+      - 0.56
+      - 82
+    - - 2
+      - 0.25
+      - E5
+      - 0.72
+      - 98
+    - - 2
+      - 1.75
+      - B4
+      - 0.32
+      - 82
+    - - 2
+      - 2.75
+      - G#4
+      - 0.7
+      - 84
+    - - 3
+      - 0.5
+      - E4
+      - 0.34
+      - 74
+    - - 3
+      - 1.5
+      - C#5
+      - 0.32
+      - 88
+    - - 3
+      - 2.75
+      - A4
+      - 1.05
+      - 94
+- id: first_chorus
+  kind: loop_component
+  label: the phrase is obvious before the arrangement gets clever
+  bars: 8
+  intensity: 0.82
+  density: 0.7
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  mix_gain_db: 0.7
+  layers:
+  - template: strum
+    velocity: 53
+    density: 0.82
+  - template: bass_hook
+    velocity: 61
+  - template: organ_room
+    velocity: 40
+  - template: pulse
+    velocity: 73
+  - kind: notes
+    instrument: singer
+    velocity: 92
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 0
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 0
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 0
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 0
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 1
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 1
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 1
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 1
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 1
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+    - - 2
+      - 0.0
+      - E5
+      - 0.72
+      - 104.0
+    - - 2
+      - 1.0
+      - C#5
+      - 0.38
+      - 90.0
+    - - 2
+      - 1.75
+      - B4
+      - 0.28
+      - 82.0
+    - - 2
+      - 2.25
+      - G#4
+      - 0.76
+      - 86.0
+    - - 2
+      - 3.5
+      - E4
+      - 0.28
+      - 74.0
+    - - 3
+      - 0.0
+      - F#4
+      - 0.28
+      - 78.0
+    - - 3
+      - 0.5
+      - E4
+      - 0.42
+      - 76.0
+    - - 3
+      - 1.5
+      - C#5
+      - 0.3
+      - 90.0
+    - - 3
+      - 2.0
+      - B4
+      - 0.3
+      - 84.0
+    - - 3
+      - 2.75
+      - A4
+      - 1.12
+      - 98.0
+    - - 4
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 4
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 4
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 4
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 4
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 5
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 5
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 5
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 5
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 5
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+    - - 6
+      - 0.0
+      - E5
+      - 0.72
+      - 104.0
+    - - 6
+      - 1.0
+      - C#5
+      - 0.38
+      - 90.0
+    - - 6
+      - 1.75
+      - B4
+      - 0.28
+      - 82.0
+    - - 6
+      - 2.25
+      - G#4
+      - 0.76
+      - 86.0
+    - - 6
+      - 3.5
+      - E4
+      - 0.28
+      - 74.0
+    - - 7
+      - 0.0
+      - F#4
+      - 0.28
+      - 78.0
+    - - 7
+      - 0.5
+      - E4
+      - 0.42
+      - 76.0
+    - - 7
+      - 1.5
+      - C#5
+      - 0.3
+      - 90.0
+    - - 7
+      - 2.0
+      - B4
+      - 0.3
+      - 84.0
+    - - 7
+      - 2.75
+      - A4
+      - 1.12
+      - 98.0
+- id: sideways_verse
+  kind: loop_component
+  label: same mouth rhythm, different thought
+  bars: 8
+  intensity: 0.78
+  density: 0.58
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  mix_gain_db: 1.65
+  layers:
+  - template: strum_open
+    velocity: 50
+    density: 0.74
+  - template: bass_space
+    velocity: 59
+  - template: organ_room
+    velocity: 42
+  - template: pulse
+    velocity: 70
+  - kind: notes
+    instrument: singer
+    velocity: 88
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.5
+      - E4
+      - 0.32
+      - 76.0
+    - - 0
+      - 1.0
+      - G#4
+      - 0.34
+      - 82.0
+    - - 0
+      - 1.75
+      - B4
+      - 0.82
+      - 90.0
+    - - 0
+      - 3.25
+      - G#4
+      - 0.38
+      - 78.0
+    - - 1
+      - 0.0
+      - F#4
+      - 0.28
+      - 76.0
+    - - 1
+      - 0.75
+      - E4
+      - 0.45
+      - 74.0
+    - - 1
+      - 1.5
+      - C#5
+      - 0.7
+      - 92.0
+    - - 1
+      - 2.75
+      - B4
+      - 0.3
+      - 82.0
+    - - 1
+      - 3.5
+      - A4
+      - 0.34
+      - 80.0
+    - - 2
+      - 0.25
+      - E4
+      - 0.28
+      - 74.0
+    - - 2
+      - 0.75
+      - F#4
+      - 0.28
+      - 78.0
+    - - 2
+      - 1.25
+      - G#4
+      - 1.12
+      - 90.0
+    - - 2
+      - 3.0
+      - B4
+      - 0.52
+      - 86.0
+    - - 3
+      - 0.0
+      - A4
+      - 0.3
+      - 80.0
+    - - 3
+      - 0.5
+      - G#4
+      - 0.3
+      - 78.0
+    - - 3
+      - 1.25
+      - F#4
+      - 0.52
+      - 80.0
+    - - 3
+      - 2.25
+      - D#4
+      - 1.3
+      - 86.0
+    - - 4
+      - 0.5
+      - E4
+      - 0.32
+      - 76.0
+    - - 4
+      - 1.0
+      - G#4
+      - 0.34
+      - 82.0
+    - - 4
+      - 1.75
+      - B4
+      - 0.82
+      - 90.0
+    - - 4
+      - 3.25
+      - G#4
+      - 0.38
+      - 78.0
+    - - 5
+      - 0.0
+      - F#4
+      - 0.28
+      - 76.0
+    - - 5
+      - 0.75
+      - E4
+      - 0.45
+      - 74.0
+    - - 5
+      - 1.5
+      - C#5
+      - 0.7
+      - 92.0
+    - - 5
+      - 2.75
+      - B4
+      - 0.3
+      - 82.0
+    - - 5
+      - 3.5
+      - A4
+      - 0.34
+      - 80.0
+    - - 6
+      - 0.25
+      - E4
+      - 0.28
+      - 74.0
+    - - 6
+      - 0.75
+      - F#4
+      - 0.28
+      - 78.0
+    - - 6
+      - 1.25
+      - G#4
+      - 1.12
+      - 90.0
+    - - 6
+      - 3.0
+      - B4
+      - 0.52
+      - 86.0
+    - - 7
+      - 0.0
+      - A4
+      - 0.3
+      - 80.0
+    - - 7
+      - 0.5
+      - G#4
+      - 0.3
+      - 78.0
+    - - 7
+      - 1.25
+      - F#4
+      - 0.52
+      - 80.0
+    - - 7
+      - 2.25
+      - D#4
+      - 1.3
+      - 86.0
+- id: second_chorus
+  kind: loop_component
+  label: the square wave finishes the sentence instead of doubling it
+  bars: 8
+  intensity: 0.84
+  density: 0.7
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  mix_gain_db: 0.7
+  layers:
+  - template: strum
+    velocity: 54
+    density: 0.84
+  - template: bass_hook
+    velocity: 62
+  - template: organ_bloom
+    velocity: 43
+  - template: lift
+    velocity: 75
+  - kind: notes
+    instrument: singer
+    velocity: 93
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 0
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 0
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 0
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 0
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 1
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 1
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 1
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 1
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 1
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+    - - 2
+      - 0.0
+      - E5
+      - 0.72
+      - 104.0
+    - - 2
+      - 1.0
+      - C#5
+      - 0.38
+      - 90.0
+    - - 2
+      - 1.75
+      - B4
+      - 0.28
+      - 82.0
+    - - 2
+      - 2.25
+      - G#4
+      - 0.76
+      - 86.0
+    - - 2
+      - 3.5
+      - E4
+      - 0.28
+      - 74.0
+    - - 3
+      - 0.0
+      - F#4
+      - 0.28
+      - 78.0
+    - - 3
+      - 0.5
+      - E4
+      - 0.42
+      - 76.0
+    - - 3
+      - 1.5
+      - C#5
+      - 0.3
+      - 90.0
+    - - 3
+      - 2.0
+      - B4
+      - 0.3
+      - 84.0
+    - - 3
+      - 2.75
+      - A4
+      - 1.12
+      - 98.0
+    - - 4
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 4
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 4
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 4
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 4
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 5
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 5
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 5
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 5
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 5
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+  - kind: notes
+    instrument: cheap_star
+    velocity: 78
+    articulation: tenuto
+    gate: 0.87
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+    notes:
+    - - 6
+      - 0.0
+      - E5
+      - 0.72
+      - 85.3
+    - - 6
+      - 1.0
+      - C#5
+      - 0.38
+      - 73.8
+    - - 6
+      - 1.75
+      - B4
+      - 0.28
+      - 67.2
+    - - 6
+      - 2.25
+      - G#4
+      - 0.76
+      - 70.5
+    - - 6
+      - 3.5
+      - E4
+      - 0.28
+      - 60.7
+    - - 7
+      - 0.0
+      - F#4
+      - 0.28
+      - 64.0
+    - - 7
+      - 0.5
+      - E4
+      - 0.42
+      - 62.3
+    - - 7
+      - 1.5
+      - C#5
+      - 0.3
+      - 73.8
+    - - 7
+      - 2.0
+      - B4
+      - 0.3
+      - 68.9
+    - - 7
+      - 2.75
+      - A4
+      - 1.12
+      - 80.4
+- id: borrowed_middle
+  kind: loop_component
+  label: bright song, crooked floor
+  bars: 8
+  intensity: 0.78
+  density: 0.58
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - A
+  - C
+  - E
+  - B
+  - A
+  - C
+  - D
+  - B
+  mix_gain_db: 1.65
+  layers:
+  - template: strum_open
+    velocity: 51
+    density: 0.76
+  - template: bass_space
+    velocity: 59
+  - template: organ_bloom
+    velocity: 42
+  - template: pulse
+    velocity: 70
+  - kind: notes
+    instrument: singer
+    velocity: 89
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - E4
+      - 0.3
+      - 78.0
+    - - 0
+      - 0.75
+      - A4
+      - 0.32
+      - 82.0
+    - - 0
+      - 1.5
+      - C#5
+      - 1.3
+      - 96.0
+    - - 0
+      - 3.25
+      - B4
+      - 0.24
+      - 82.0
+    - - 1
+      - 0.0
+      - G4
+      - 0.3
+      - 78.0
+    - - 1
+      - 0.75
+      - E4
+      - 0.48
+      - 76.0
+    - - 1
+      - 1.75
+      - C5
+      - 1.02
+      - 90.0
+    - - 1
+      - 3.25
+      - G4
+      - 0.34
+      - 78.0
+    - - 2
+      - 0.25
+      - E4
+      - 0.3
+      - 76.0
+    - - 2
+      - 1.0
+      - G#4
+      - 0.34
+      - 82.0
+    - - 2
+      - 1.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 2
+      - 2.25
+      - B4
+      - 1.16
+      - 96.0
+    - - 3
+      - 0.0
+      - D#5
+      - 0.32
+      - 88.0
+    - - 3
+      - 0.75
+      - B4
+      - 0.32
+      - 82.0
+    - - 3
+      - 1.5
+      - F#4
+      - 0.52
+      - 78.0
+    - - 3
+      - 2.5
+      - D#4
+      - 1.15
+      - 86.0
+    - - 4
+      - 0.25
+      - E4
+      - 0.3
+      - 78.0
+    - - 4
+      - 0.75
+      - A4
+      - 0.32
+      - 82.0
+    - - 4
+      - 1.5
+      - C#5
+      - 1.3
+      - 96.0
+    - - 4
+      - 3.25
+      - B4
+      - 0.24
+      - 82.0
+    - - 5
+      - 0.0
+      - G4
+      - 0.3
+      - 78.0
+    - - 5
+      - 0.75
+      - E4
+      - 0.48
+      - 76.0
+    - - 5
+      - 1.75
+      - C5
+      - 1.02
+      - 90.0
+    - - 5
+      - 3.25
+      - G4
+      - 0.34
+      - 78.0
+    - - 6
+      - 0.25
+      - D4
+      - 0.3
+      - 76.0
+    - - 6
+      - 1.0
+      - F#4
+      - 0.34
+      - 82.0
+    - - 6
+      - 1.75
+      - A4
+      - 0.34
+      - 86.0
+    - - 6
+      - 2.25
+      - A4
+      - 1.16
+      - 96.0
+    - - 7
+      - 0.0
+      - D#5
+      - 0.32
+      - 88.0
+    - - 7
+      - 0.75
+      - B4
+      - 0.32
+      - 82.0
+    - - 7
+      - 1.5
+      - F#4
+      - 0.52
+      - 78.0
+    - - 7
+      - 2.5
+      - D#4
+      - 1.15
+      - 86.0
+- id: everybody_knows
+  kind: loop_component
+  label: bigger by succession, not by piling everything on top
+  bars: 16
+  intensity: 0.88
+  density: 0.76
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  - 12
+  - 16
+  harmony:
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  - E
+  - B
+  - C#m7
+  - Aadd9
+  mix_gain_db: 0.25
+  layers:
+  - template: strum
+    velocity: 56
+    density: 0.88
+  - template: bass_hook
+    velocity: 64
+  - template: organ_bloom
+    velocity: 45
+  - template: lift
+    velocity: 78
+  - kind: notes
+    instrument: singer
+    velocity: 95
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 0
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 0
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 0
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 0
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 1
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 1
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 1
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 1
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 1
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+    - - 2
+      - 0.0
+      - E5
+      - 0.72
+      - 104.0
+    - - 2
+      - 1.0
+      - C#5
+      - 0.38
+      - 90.0
+    - - 2
+      - 1.75
+      - B4
+      - 0.28
+      - 82.0
+    - - 2
+      - 2.25
+      - G#4
+      - 0.76
+      - 86.0
+    - - 2
+      - 3.5
+      - E4
+      - 0.28
+      - 74.0
+    - - 3
+      - 0.0
+      - F#4
+      - 0.28
+      - 78.0
+    - - 3
+      - 0.5
+      - E4
+      - 0.42
+      - 76.0
+    - - 3
+      - 1.5
+      - C#5
+      - 0.3
+      - 90.0
+    - - 3
+      - 2.0
+      - B4
+      - 0.3
+      - 84.0
+    - - 3
+      - 2.75
+      - A4
+      - 1.12
+      - 98.0
+    - - 8
+      - 0.25
+      - G#4
+      - 0.3
+      - 84.0
+    - - 8
+      - 0.75
+      - B4
+      - 0.34
+      - 90.0
+    - - 8
+      - 1.5
+      - C#5
+      - 0.72
+      - 98.0
+    - - 8
+      - 2.75
+      - B4
+      - 0.34
+      - 86.0
+    - - 8
+      - 3.5
+      - G#4
+      - 0.42
+      - 80.0
+    - - 9
+      - 0.25
+      - F#4
+      - 0.3
+      - 78.0
+    - - 9
+      - 0.75
+      - G#4
+      - 0.32
+      - 82.0
+    - - 9
+      - 1.25
+      - B4
+      - 1.18
+      - 98.0
+    - - 9
+      - 2.75
+      - C#5
+      - 0.3
+      - 86.0
+    - - 9
+      - 3.25
+      - B4
+      - 0.56
+      - 82.0
+    - - 10
+      - 0.0
+      - E5
+      - 0.72
+      - 104.0
+    - - 10
+      - 1.0
+      - C#5
+      - 0.38
+      - 90.0
+    - - 10
+      - 1.75
+      - B4
+      - 0.28
+      - 82.0
+    - - 10
+      - 2.25
+      - G#4
+      - 0.76
+      - 86.0
+    - - 10
+      - 3.5
+      - E4
+      - 0.28
+      - 74.0
+    - - 11
+      - 0.0
+      - F#4
+      - 0.28
+      - 78.0
+    - - 11
+      - 0.5
+      - E4
+      - 0.42
+      - 76.0
+    - - 11
+      - 1.5
+      - C#5
+      - 0.3
+      - 90.0
+    - - 11
+      - 2.0
+      - B4
+      - 0.3
+      - 84.0
+    - - 11
+      - 2.75
+      - A4
+      - 1.12
+      - 98.0
+  - kind: notes
+    instrument: cheap_star
+    velocity: 80
+    articulation: tenuto
+    gate: 0.87
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+    notes:
+    - - 4
+      - 0.25
+      - G#4
+      - 0.3
+      - 70.6
+    - - 4
+      - 0.75
+      - B4
+      - 0.34
+      - 75.6
+    - - 4
+      - 1.5
+      - C#5
+      - 0.72
+      - 82.3
+    - - 4
+      - 2.75
+      - B4
+      - 0.34
+      - 72.2
+    - - 4
+      - 3.5
+      - G#4
+      - 0.42
+      - 67.2
+    - - 5
+      - 0.25
+      - F#4
+      - 0.3
+      - 65.5
+    - - 5
+      - 0.75
+      - G#4
+      - 0.32
+      - 68.9
+    - - 5
+      - 1.25
+      - B4
+      - 1.18
+      - 82.3
+    - - 5
+      - 2.75
+      - C#5
+      - 0.3
+      - 72.2
+    - - 5
+      - 3.25
+      - B4
+      - 0.56
+      - 68.9
+    - - 6
+      - 0.0
+      - E5
+      - 0.72
+      - 87.4
+    - - 6
+      - 1.0
+      - C#5
+      - 0.38
+      - 75.6
+    - - 6
+      - 1.75
+      - B4
+      - 0.28
+      - 68.9
+    - - 6
+      - 2.25
+      - G#4
+      - 0.76
+      - 72.2
+    - - 6
+      - 3.5
+      - E4
+      - 0.28
+      - 62.2
+    - - 7
+      - 0.0
+      - F#4
+      - 0.28
+      - 65.5
+    - - 7
+      - 0.5
+      - E4
+      - 0.42
+      - 63.8
+    - - 7
+      - 1.5
+      - C#5
+      - 0.3
+      - 75.6
+    - - 7
+      - 2.0
+      - B4
+      - 0.3
+      - 70.6
+    - - 7
+      - 2.75
+      - A4
+      - 1.12
+      - 82.3
+    - - 12
+      - 0.25
+      - G#4
+      - 0.3
+      - 73.9
+    - - 12
+      - 0.75
+      - B4
+      - 0.34
+      - 79.2
+    - - 12
+      - 1.5
+      - C#5
+      - 0.72
+      - 86.2
+    - - 12
+      - 2.75
+      - B4
+      - 0.34
+      - 75.7
+    - - 12
+      - 3.5
+      - G#4
+      - 0.42
+      - 70.4
+    - - 13
+      - 0.25
+      - F#4
+      - 0.3
+      - 68.6
+    - - 13
+      - 0.75
+      - G#4
+      - 0.32
+      - 72.2
+    - - 13
+      - 1.25
+      - B4
+      - 1.18
+      - 86.2
+    - - 13
+      - 2.75
+      - C#5
+      - 0.3
+      - 75.7
+    - - 13
+      - 3.25
+      - B4
+      - 0.56
+      - 72.2
+    - - 14
+      - 0.0
+      - E5
+      - 0.72
+      - 91.5
+    - - 14
+      - 1.0
+      - C#5
+      - 0.38
+      - 79.2
+    - - 14
+      - 1.75
+      - B4
+      - 0.28
+      - 72.2
+    - - 14
+      - 2.25
+      - G#4
+      - 0.76
+      - 75.7
+    - - 14
+      - 3.5
+      - E4
+      - 0.28
+      - 65.1
+    - - 15
+      - 0.0
+      - F#4
+      - 0.28
+      - 68.6
+    - - 15
+      - 0.5
+      - E4
+      - 0.42
+      - 66.9
+    - - 15
+      - 1.5
+      - C#5
+      - 0.3
+      - 79.2
+    - - 15
+      - 2.0
+      - B4
+      - 0.3
+      - 73.9
+    - - 15
+      - 2.75
+      - A4
+      - 1.12
+      - 86.2
+  - kind: notes
+    instrument: everybody
+    velocity: 62
+    articulation: tenuto
+    gate: 0.95
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+    notes:
+    - - 3
+      - 3.25
+      - E4
+      - 0.5
+      - 60
+    - - 7
+      - 3.25
+      - E4
+      - 0.5
+      - 62
+    - - 11
+      - 3.25
+      - E4
+      - 0.5
+      - 62
+    - - 15
+      - 3.25
+      - E4
+      - 0.62
+      - 64
+- id: still_humming
+  kind: outro
+  label: same playback level, fewer people
+  bars: 4
+  intensity: 0.76
+  density: 0.58
+  loopable: false
+  harmony:
+  - C#m7
+  - Aadd9
+  - B
+  - E
+  mix_gain_db: 2.2
+  layers:
+  - template: strum_open
+    velocity: 52
+    density: 0.78
+  - template: bass_space
+    velocity: 58
+  - template: organ_room
+    velocity: 42
+  - template: pulse
+    velocity: 69
+  - kind: notes
+    instrument: singer
+    velocity: 90
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    notes:
+    - - 0
+      - 0.25
+      - E5
+      - 0.72
+      - 96
+    - - 0
+      - 1.5
+      - C#5
+      - 0.34
+      - 86
+    - - 0
+      - 2.75
+      - B4
+      - 0.7
+      - 84
+    - - 1
+      - 0.5
+      - A4
+      - 0.32
+      - 80
+    - - 1
+      - 1.5
+      - F#4
+      - 0.52
+      - 78
+    - - 1
+      - 2.75
+      - E4
+      - 0.76
+      - 82
+    - - 2
+      - 0.25
+      - G#4
+      - 0.3
+      - 82
+    - - 2
+      - 0.75
+      - B4
+      - 0.34
+      - 88
+    - - 2
+      - 1.5
+      - C#5
+      - 0.72
+      - 96
+    - - 3
+      - 0.25
+      - B4
+      - 0.34
+      - 84
+    - - 3
+      - 1.25
+      - G#4
+      - 0.34
+      - 80
+    - - 3
+      - 2.25
+      - E4
+      - 1.45
+      - 92

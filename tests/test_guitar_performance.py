@@ -254,3 +254,42 @@ def test_guitar_strum_per_hit_duration_and_shell_voicing():
     beat_durs = sorted(round((n.end - n.start) * ctx.bpm / 60.0, 2) for n in ctx.instruments["gtr"].notes)
     assert min(beat_durs) == 0.75
     assert max(beat_durs) == 2.5
+
+
+def test_strum_shape_plan_preserves_authored_open_chord():
+    # Open-position Bm7: x20202. This intentionally avoids the allocator's
+    # otherwise legal seventh-fret barre voicing.
+    events, assignment = gp.strum_shape_plan(
+        ["x", 2, 0, 2, 0, 2], bpm=96, direction="down", spread_ms=24
+    )
+    assert [(item.string_index, item.fret) for item in assignment] == [
+        (1, 2), (2, 0), (3, 2), (4, 0), (5, 2)
+    ]
+    assert [int(event["pitch"]) for event in events] == [47, 50, 57, 59, 66]
+
+
+def test_guitar_strum_chord_shapes_override_allocator():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "authored_guitar_shape",
+        "tempo": {"bpm": 96},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "gtr", "group": "gtr", "program": "steel_guitar"}],
+        "sections": [{
+            "id": "bar",
+            "bars": 1,
+            "harmony": ["Bm7"],
+            "layers": [{
+                "kind": "guitar_strum",
+                "instrument": "gtr",
+                "hits": [[0, 0.0, "down", 1.0]],
+                "humanize_ms": 0,
+                "chord_shapes": {"Bm7": ["x", 2, 0, 2, 0, 2]},
+            }],
+        }],
+    }
+    pm, _groups, _meta = build_score(spec)
+    pitches = sorted(note.pitch for note in pm.instruments[0].notes)
+    assert pitches == [47, 50, 57, 59, 66]

@@ -1,0 +1,389 @@
+schema: ambition.musicir.v1
+id: everything_is_fine_please_dance
+title: Everything Is Fine, Please Dance
+seed: 202608072012
+notes: >-
+  Earworm-first rebuild. The cue is organized around one two-bar hook that is deliberately
+  simple enough to sing after a single statement: repeated tonic, a compact rise to the fifth,
+  a short descent, and a long answering second. The hook returns unchanged every two bars in
+  the main sections; development happens in bass, harmony, drums, register, and doubling rather
+  than by continually rewriting the melody. The arrangement stays small and dry so each group
+  has a clear job and the hook can dominate perceptually without simply being much louder than
+  the rest of the mix. A four-bar opening exposes the groove, the hook arrives immediately after,
+  a brief stripped section creates appetite for its return, and the final section adds octave
+  support rather than a competing counter-melody.
+
+tempo:
+  bpm: 126
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  soundfont: /data/audio-tools/soundfonts/GeneralUser-GS.sf2
+  section_mix_transition_beats: 1.0
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 30
+  lowpass_hz: 14500
+  eq_bands:
+  - {type: low_shelf, hz: 86, q: 0.72, db: 0.8}
+  - {type: peak, hz: 340, q: 0.9, db: -1.0}
+  - {type: peak, hz: 2400, q: 1.0, db: 0.7}
+  - {type: high_shelf, hz: 8200, q: 0.7, db: 0.5}
+  reverb_wet: 0.035
+  reverb_decay_seconds: 0.75
+  reverb_damping_hz: 7600
+  stereo_width: 0.10
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 88.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 5.0
+  limiter_drive: 0.93
+  normalize: true
+  target_peak_db: -2.2
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.003
+  reverb_decay_seconds: 0.35
+  reverb_damping_hz: 7600
+  stereo_width: 0.035
+  limiter_drive: 0.9
+  normalize: false
+  target_peak_db: -3.5
+group_postprocess:
+  lead:
+    gain_db: 0.8
+    highpass_hz: 125
+    lowpass_hz: 13800
+    presence_low_hz: 1700
+    presence_high_hz: 5200
+    presence_db: 0.8
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.5
+    compressor_attack_ms: 9.0
+    compressor_release_ms: 90.0
+    compressor_knee_db: 5.0
+    reverb_wet: 0.012
+  bass:
+    gain_db: -2.5
+    highpass_hz: 30
+    lowpass_hz: 5000
+    compressor_threshold_db: -17.0
+    compressor_ratio: 3.0
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 76.0
+  keys:
+    gain_db: 3.5
+    highpass_hz: 105
+    lowpass_hz: 12200
+    transient_tame: 0.035
+    reverb_wet: 0.008
+  pads:
+    gain_db: 2.0
+    highpass_hz: 130
+    lowpass_hz: 9800
+    reverb_wet: 0.022
+  percussion:
+    gain_db: -1.0
+    highpass_hz: 28
+    lowpass_hz: 13200
+    compressor_threshold_db: -15.0
+    compressor_ratio: 3.2
+    compressor_attack_ms: 4.0
+    compressor_release_ms: 64.0
+    transient_tame: 0.02
+    reverb_wet: 0.001
+
+instruments:
+- {name: hook_lead, group: lead, program: lead_square, volume: 98, pan: 69, expression: 106, modulation: 5}
+- {name: hook_warmth, group: lead, program: lead_saw, volume: 54, pan: 52, expression: 72, modulation: 3}
+- {name: rubber_bass, group: bass, program: synth_bass_1, volume: 98, pan: 64, expression: 104}
+- {name: epiano, group: keys, program: electric_piano_2, volume: 88, pan: 57, expression: 96}
+- {name: clav, group: keys, program: clavinet, volume: 82, pan: 73, expression: 90}
+- {name: warm_pad, group: pads, program: pad_warm, volume: 64, pan: 64, expression: 82, modulation: 3}
+- {name: kit, group: percussion, is_drum: true, volume: 104, pan: 64, expression: 108}
+
+motifs:
+# The whole song is built around this. Two bars, eight notes, no ornamental rewrite.
+# Scale degrees in A major: 1 1 3 5 | 3 2 1 2. The final 2 hangs for 3.5 beats,
+# so the listener gets a long anticipation before the repeated tonic returns.
+- id: main_hook
+  root: A5
+  intervals: [0, 0, 4, 7, 4, 2, 0, 2]
+  rhythm: [0.5, 0.5, 0.5, 1.5, 0.5, 0.5, 1.0, 3.0]
+  velocities: [0.88, 0.76, 0.84, 1.0, 0.82, 0.76, 0.90, 0.94]
+- id: hook_fragment
+  root: A5
+  intervals: [0, 0, 4, 7]
+  rhythm: [0.5, 0.5, 0.5, 2.5]
+  velocities: [0.84, 0.74, 0.82, 0.96]
+
+layer_templates:
+  hook_voice:
+    kind: motif
+    instrument: hook_lead
+    motif: main_hook
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+  hook_octave_support:
+    kind: motif
+    instrument: hook_warmth
+    motif: main_hook
+    velocity: 54
+    transpose: -12
+    articulation: normal
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+  bass_pocket:
+    kind: bassline
+    instrument: rubber_bass
+    octave: 2
+    pattern:
+    - [0, 0.0, 0.38]
+    - [7, 0.75, 0.20]
+    - [12, 1.5, 0.30]
+    - [7, 2.25, 0.20]
+    - [0, 2.75, 0.30]
+    - [12, 3.5, 0.28]
+    velocity: 84
+    articulation: tenuto
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+  bass_straight:
+    kind: bassline
+    instrument: rubber_bass
+    octave: 2
+    pattern:
+    - [0, 0.0, 0.55]
+    - [12, 2.0, 0.48]
+    velocity: 78
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  epiano_offbeats:
+    kind: chord_hits
+    instrument: epiano
+    octave: 4
+    hits: [[0, 0.5], [0, 1.5], [0, 2.5], [0, 3.5]]
+    every_bars: 1
+    velocity: 68
+    duration_beats: 0.38
+    articulation: staccato
+    voicing: triad
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  clav_answer:
+    kind: chord_hits
+    instrument: clav
+    octave: 4
+    hits: [[0, 3.25], [1, 1.75]]
+    every_bars: 2
+    velocity: 64
+    duration_beats: 0.22
+    articulation: staccato
+    voicing: triad
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+  pad_bed:
+    kind: pad_chords
+    instrument: warm_pad
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.75
+    velocity: 48
+    articulation: pad
+    voicing: open
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+  drums_core:
+    kind: drums
+    instrument: kit
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 1.5, 2.0, 3.25], velocity: 88, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 78, duration_beats: 0.06}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 34, duration_beats: 0.05}
+    - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 30, duration_beats: 0.03}
+  drums_full:
+    kind: drums
+    instrument: kit
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 1.5, 2.0, 3.25], velocity: 92, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 82, duration_beats: 0.06}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 42, duration_beats: 0.05}
+    - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 30, duration_beats: 0.03}
+    - {drum: open_hat, beats: [1.5, 3.5], velocity: 26, duration_beats: 0.05}
+  drums_lift:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    events:
+    - {drum: kick, beats: [0.0, 1.5, 2.0, 2.75, 3.5], velocity: 94, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 84, duration_beats: 0.06}
+    - {drum: hand_clap, beats: [1.0, 3.0], velocity: 46, duration_beats: 0.05}
+    - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 32, duration_beats: 0.03}
+    - {drum: open_hat, beats: [0.5, 2.5], velocity: 30, duration_beats: 0.05}
+    - {drum: crash, beats: [0.0], velocity: 48, duration_beats: 0.08, every: 4}
+
+playback:
+  loop: true
+
+sections:
+- id: count_in
+  kind: intro
+  label: count in - groove first, hook teaser at the door
+  bars: 4
+  intensity: 0.62
+  density: 0.56
+  loopable: false
+  harmony: [A, D, F#m, E]
+  layers:
+  - bass_pocket
+  - epiano_offbeats
+  - drums_core
+  - pad_bed
+  - kind: motif
+    instrument: hook_lead
+    motif: hook_fragment
+    velocity: 66
+    articulation: tenuto
+    starts: [[2, 0.0]]
+    repeats: 1
+  mix_gain_db: 3.0
+
+- id: hook_a
+  kind: loop_component
+  label: hook A - state the thing and mean it
+  bars: 16
+  intensity: 0.88
+  density: 0.76
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: [A, E, F#m, D, A, E, F#m, D, A, E, D, E, A, E, F#m, D]
+  layers:
+  - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0], [8, 0.0], [10, 0.0], [12, 0.0], [14, 0.0]], velocity: 92}
+  - bass_pocket
+  - epiano_offbeats
+  - clav_answer
+  - pad_bed
+  - drums_full
+  mix_gain_db: 0.0
+
+- id: absence_makes_it_worse
+  kind: bridge
+  label: absence makes it worse - four bars without the whole hook
+  bars: 8
+  intensity: 0.58
+  density: 0.48
+  loopable: false
+  harmony: [F#m, D, A, E, F#m, D, E, E]
+  layers:
+  - bass_straight
+  - epiano_offbeats
+  - pad_bed
+  - drums_core
+  - kind: motif
+    instrument: hook_lead
+    motif: hook_fragment
+    velocity: 70
+    articulation: tenuto
+    starts: [[0, 0.0], [4, 0.0]]
+    repeats: 1
+  mix_gain_db: 2.0
+
+- id: hook_b
+  kind: loop_component
+  label: hook B - exactly the same melody, better shoes
+  bars: 16
+  intensity: 0.94
+  density: 0.82
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: [A, E, F#m, D, A, E, D, E, A, E, F#m, D, A, E, D, E]
+  layers:
+  - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0], [8, 0.0], [10, 0.0], [12, 0.0], [14, 0.0]], velocity: 94}
+  - bass_pocket
+  - epiano_offbeats
+  - clav_answer
+  - pad_bed
+  - drums_full
+  mix_gain_db: -0.5
+
+- id: bridge
+  kind: bridge
+  label: bridge - same vocabulary turned inward
+  bars: 8
+  intensity: 0.66
+  density: 0.54
+  loopable: false
+  harmony: [F#m, D, A, E, F#m, D, Bm, E]
+  layers:
+  - kind: motif
+    instrument: hook_lead
+    motif: main_hook
+    velocity: 72
+    transpose: -12
+    articulation: tenuto
+    starts: [[0, 0.0], [4, 0.0]]
+    repeats: 1
+  - bass_straight
+  - epiano_offbeats
+  - pad_bed
+  - drums_core
+  mix_gain_db: 1.5
+
+- id: final_hook
+  kind: loop_component
+  label: final hook - repetition wins
+  bars: 16
+  intensity: 1.0
+  density: 0.88
+  loopable: true
+  valid_exit_local_bars: [4, 8, 12, 16]
+  harmony: [A, E, F#m, D, A, E, F#m, D, A, E, D, E, A, E, D, E]
+  layers:
+  - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0], [8, 0.0], [10, 0.0], [12, 0.0], [14, 0.0]], velocity: 96}
+  - {template: hook_octave_support, starts: [[8, 0.0], [10, 0.0], [12, 0.0], [14, 0.0]], velocity: 50}
+  - bass_pocket
+  - epiano_offbeats
+  - clav_answer
+  - pad_bed
+  - drums_lift
+  mix_gain_db: -1.0
+
+- id: handoff
+  kind: outro
+  label: handoff - leave the groove ready to wrap
+  bars: 4
+  intensity: 0.68
+  density: 0.58
+  loopable: true
+  harmony: [A, D, F#m, E]
+  layers:
+  - bass_pocket
+  - epiano_offbeats
+  - drums_core
+  - pad_bed
+  - kind: motif
+    instrument: hook_lead
+    motif: hook_fragment
+    velocity: 68
+    articulation: tenuto
+    starts: [[2, 0.0]]
+    repeats: 1
+  mix_gain_db: 2.5

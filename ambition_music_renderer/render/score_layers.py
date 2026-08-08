@@ -493,22 +493,35 @@ def render_layer_guitar_strum(
         if len(item) > 4:
             hit_duration = float(item[4])
         notes = chord_pitches(chord, octave=octave, voicing=layer.get("voicing", "closed"))
+        chord_shapes = layer.get("chord_shapes", {})
+        authored_shape = chord_shapes.get(chord) if isinstance(chord_shapes, dict) else None
         for inst in insts:
             previous = ctx.last_guitar_voicing.get(inst)
-            events, assignment = gp.strum_plan(
-                notes,
-                bpm=ctx.bpm,
-                direction=direction,
-                spread_ms=spread_ms,
-                velocity=velocity * float(section.get("intensity", 1.0)),
-                velocity_slope=velocity_slope,
-                tuning=tuning,
-                max_fret=max_fret,
-                max_span=max_span,
-                max_notes=max_notes,
-                prefer_open=prefer_open,
-                previous=previous,
-            )
+            if authored_shape is not None:
+                events, assignment = gp.strum_shape_plan(
+                    authored_shape,
+                    bpm=ctx.bpm,
+                    direction=direction,
+                    spread_ms=spread_ms,
+                    velocity=velocity * float(section.get("intensity", 1.0)),
+                    velocity_slope=velocity_slope,
+                    tuning=tuning,
+                )
+            else:
+                events, assignment = gp.strum_plan(
+                    notes,
+                    bpm=ctx.bpm,
+                    direction=direction,
+                    spread_ms=spread_ms,
+                    velocity=velocity * float(section.get("intensity", 1.0)),
+                    velocity_slope=velocity_slope,
+                    tuning=tuning,
+                    max_fret=max_fret,
+                    max_span=max_span,
+                    max_notes=max_notes,
+                    prefer_open=prefer_open,
+                    previous=previous,
+                )
             ctx.last_guitar_voicing[inst] = assignment
             for ev in events:
                 add_note(

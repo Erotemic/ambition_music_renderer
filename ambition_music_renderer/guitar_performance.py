@@ -183,6 +183,71 @@ def allocate_chord(
     return sorted(fallback, key=lambda sf: sf.string_index)
 
 
+def assignment_from_frets(
+    frets: Iterable[int | str | None],
+    *,
+    tuning: tuple[int, ...] = STANDARD_TUNING,
+) -> list[StringFret]:
+    """Build an exact playable guitar assignment from six authored fret values.
+
+    Entries are low-to-high strings. ``None``, ``x``, and ``-`` mute a string;
+    non-negative integers select an exact fret. This gives MusicIR authors a
+    backend-independent way to preserve idiomatic open chord shapes when the
+    automatic allocator would choose a technically playable but stylistically
+    wrong position.
+    """
+    vals = list(frets)
+    if len(vals) != len(tuning):
+        raise ValueError(f"guitar fret shape must have exactly {len(tuning)} entries")
+    out: list[StringFret] = []
+    for string_index, (raw, open_pitch) in enumerate(zip(vals, tuning)):
+        if raw is None or (isinstance(raw, str) and raw.strip().lower() in {"x", "-", "mute"}):
+            continue
+        fret = int(raw)
+        if fret < 0:
+            raise ValueError("guitar fret values must be non-negative or muted")
+        pitch = int(open_pitch) + fret
+        out.append(StringFret(string_index=string_index, fret=fret, pitch=pitch, source_pitch=pitch))
+    return out
+
+
+def strum_shape_plan(
+    frets: Iterable[int | str | None],
+    *,
+    bpm: float,
+    direction: str = "down",
+    spread_ms: float = 35.0,
+    velocity: float = 88.0,
+    velocity_slope: float = -2.0,
+    tuning: tuple[int, ...] = STANDARD_TUNING,
+) -> tuple[list[dict[str, float]], list[StringFret]]:
+    """Turn an authored six-string fret shape into timed strum note events."""
+    assignment = assignment_from_frets(frets, tuning=tuning)
+    ordered = sorted(assignment, key=lambda sf: sf.string_index)
+    if direction.lower().startswith("up"):
+        ordered = list(reversed(ordered))
+    beat_per_second = float(bpm) / 60.0
+    if len(ordered) <= 1:
+        offsets = [0.0]
+    else:
+        offsets = [
+            i * (float(spread_ms) / 1000.0) * beat_per_second / (len(ordered) - 1)
+            for i in range(len(ordered))
+        ]
+    events: list[dict[str, float]] = []
+    for idx, (sf, off) in enumerate(zip(ordered, offsets)):
+        events.append(
+            {
+                "pitch": float(sf.pitch),
+                "beat_offset": float(off),
+                "velocity": float(velocity + velocity_slope * idx),
+                "string": float(sf.string_index),
+                "fret": float(sf.fret),
+            }
+        )
+    return events, assignment
+
+
 def strum_plan(
     pitches: Iterable[int],
     *,
