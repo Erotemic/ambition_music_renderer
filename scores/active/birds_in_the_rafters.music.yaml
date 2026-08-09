@@ -1,0 +1,1856 @@
+schema: ambition.musicir.v1
+id: birds_in_the_rafters
+title: Birds in the Rafters
+seed: 202608082129
+notes: Standalone song grown from the strongest Birds in the Rafters room of Cedar Light. Choir-free acoustic folk ensemble
+  centered on Drop-D ringing guitar, harmony-locked cross-picking, two complementary banjo voices, upright bass, restrained
+  folk drums, harp, sparse violin, and occasional woodwind breath. The form develops continuously inside one harmonic world
+  rather than moving between medley rooms.
+tempo:
+  bpm: 90
+  map:
+  - bar: 25
+    bpm: 94
+    ramp_bars: 4
+  - bar: 41
+    bpm: 86
+    ramp_bars: 2
+  - bar: 49
+    bpm: 96
+    ramp_bars: 4
+  - bar: 73
+    bpm: 88
+    ramp_bars: 3
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  metadata_markers:
+  - id: rafters_open
+    label: I. Rafters Open - twin banjos state the song
+    bar: 1
+  - id: first_flight
+    label: II. First Flight - the full acoustic groove settles in
+    bar: 9
+  - id: open_eaves
+    label: III. Open Eaves - denser counterpicking and bass movement
+    bar: 17
+  - id: wide_sky
+    label: IV. Wide Sky - first broad lift
+    bar: 25
+  - id: dust_light
+    label: V. Dust in Sunlight - suspended acoustic middle
+    bar: 33
+  - id: loft_instrumental
+    label: VI. Loft Instrumental - banjo, harp, and violin take the foreground
+    bar: 41
+  - id: second_flight
+    label: VII. Second Flight - main progression returns with urgency
+    bar: 49
+  - id: storm_of_wings
+    label: VIII. Storm of Wings - full acoustic climax
+    bar: 57
+  - id: home_rafters
+    label: IX. Home Rafters - familiar material returns warmer
+    bar: 65
+  - id: afterimage
+    label: X. Afterimage - the room empties around the final Dadd9
+    bar: 73
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -2.0
+  highpass_hz: 38
+  lowpass_hz: 13800
+  high_shelf_hz: 6900
+  high_shelf_db: 0.2
+  transient_tame: 0.025
+  reverb_wet: 0.0
+  stereo_width: 0.03
+  compressor_threshold_db: -20.0
+  compressor_ratio: 1.35
+  compressor_attack_ms: 38.0
+  compressor_release_ms: 250.0
+  compressor_makeup_db: 0.2
+  compressor_knee_db: 8.0
+  limiter_drive: 0.8
+  normalize: true
+  target_peak_db: -6.0
+stem_postprocess:
+  highpass_hz: 34
+  lowpass_hz: 14200
+  transient_tame: 0.01
+  reverb_wet: 0.0
+  stereo_width: 0.0
+  normalize: false
+  target_peak_db: -3.5
+group_postprocess:
+  guitar_body:
+    gain_db: 2.4
+    highpass_hz: 54
+    lowpass_hz: 11600
+    presence_low_hz: 2600
+    presence_high_hz: 4700
+    presence_db: -1.05
+    high_shelf_hz: 6200
+    high_shelf_db: -0.7
+    compressor_threshold_db: -19.0
+    compressor_ratio: 1.22
+    compressor_attack_ms: 42.0
+    compressor_release_ms: 210.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.94
+        damping: 0.4
+        wet_level: 0.38
+        dry_level: 0.99
+        width: 0.98
+    transient_tame: 0.22
+    transient_lowpass_hz: 4800
+  banjo:
+    gain_db: 7.6
+    highpass_hz: 120
+    lowpass_hz: 12500
+    high_shelf_hz: 7200
+    high_shelf_db: -0.25
+    compressor_threshold_db: -22.0
+    compressor_ratio: 1.12
+    compressor_attack_ms: 34.0
+    compressor_release_ms: 190.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.86
+        damping: 0.54
+        wet_level: 0.24
+        dry_level: 0.98
+        width: 0.94
+    transient_tame: 0.035
+    transient_lowpass_hz: 6200
+  banjo_lead:
+    gain_db: 6.3
+    highpass_hz: 82
+    lowpass_hz: 9400
+    transient_tame: 0.1
+    transient_lowpass_hz: 5200
+    presence_low_hz: 2800
+    presence_high_hz: 5200
+    presence_db: -0.7
+    high_shelf_hz: 6100
+    high_shelf_db: -0.45
+    compressor_threshold_db: -22.0
+    compressor_ratio: 1.14
+    compressor_attack_ms: 36.0
+    compressor_release_ms: 210.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.91
+        damping: 0.56
+        wet_level: 0.3
+        dry_level: 0.98
+        width: 0.96
+  bass:
+    gain_db: 5.2
+    highpass_hz: 32
+    lowpass_hz: 5200
+    compressor_threshold_db: -20.0
+    compressor_ratio: 1.45
+    compressor_attack_ms: 30.0
+    compressor_release_ms: 180.0
+  drums:
+    gain_db: 6.1
+    highpass_hz: 38
+    lowpass_hz: 11800
+    transient_tame: 0.015
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.68
+        damping: 0.58
+        wet_level: 0.1
+        dry_level: 0.99
+        width: 0.9
+  orchestral_percussion:
+    gain_db: 3.2
+    highpass_hz: 28
+    lowpass_hz: 12800
+    transient_tame: 0.005
+    compressor_threshold_db: -18.0
+    compressor_ratio: 1.25
+    compressor_attack_ms: 24.0
+    compressor_release_ms: 190.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.87
+        damping: 0.55
+        wet_level: 0.17
+        dry_level: 0.98
+        width: 0.93
+  strings:
+    gain_db: 0.7
+    highpass_hz: 70
+    lowpass_hz: 12500
+    high_shelf_hz: 6500
+    high_shelf_db: 0.3
+    compressor_threshold_db: -23.0
+    compressor_ratio: 1.15
+    compressor_attack_ms: 55.0
+    compressor_release_ms: 300.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.91
+        damping: 0.55
+        wet_level: 0.22
+        dry_level: 0.96
+        width: 0.98
+  woodwinds:
+    gain_db: 1.8
+    highpass_hz: 150
+    lowpass_hz: 11800
+    high_shelf_hz: 6500
+    high_shelf_db: 0.5
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.94
+        damping: 0.52
+        wet_level: 0.28
+        dry_level: 0.95
+        width: 0.96
+  harp:
+    gain_db: 3.0
+    highpass_hz: 120
+    lowpass_hz: 13500
+    high_shelf_hz: 7200
+    high_shelf_db: 1.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: reverb
+        room_size: 0.94
+        damping: 0.48
+        wet_level: 0.29
+        dry_level: 0.96
+        width: 0.98
+instruments:
+- name: acoustic_rhythm
+  group: guitar_body
+  program: steel_guitar
+  volume: 112
+  pan: 52
+  expression: 116
+  controls:
+    100: 64
+  instrument_backend:
+    kind: sfz
+    sfz: /data/audio-tools/sfz/Karoryfer/Shinyguitar/Shinyguitar/Programs/acoustic.sfz
+    optional: true
+    fallback_backend: pretty-midi
+- name: lead_banjo
+  group: banjo_lead
+  program: banjo
+  volume: 105
+  pan: 80
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.banjo
+    prefer:
+    - ganjo
+    - banjo
+    - instrument
+    optional: true
+    fallback_backend: pretty-midi
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 112
+  pan: 58
+  expression: 112
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - notation
+    - basses pizzicato
+    - pizzicato
+    - pizz
+    - upright
+    - acoustic
+    optional: true
+    fallback_backend: pretty-midi
+- name: folk_kit
+  group: drums
+  is_drum: true
+  volume: 112
+  pan: 64
+  expression: 112
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.gogodze
+    prefer:
+    - kit
+    - drum
+    - gm
+    - gogodze
+    optional: true
+    fallback_backend: pretty-midi
+- name: harp
+  group: harp
+  program: orchestral_harp
+  volume: 104
+  pan: 82
+  expression: 108
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.harp
+    prefer:
+    - harp
+    - normal
+    - sustain
+    - etherealwinds
+    optional: true
+    fallback_backend: pretty-midi
+- name: flutes
+  group: woodwinds
+  program: flute
+  volume: 98
+  pan: 80
+  expression: 102
+  modulation: 4
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.flutes_sustain
+    prefer:
+    - notation
+    - flutes
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: orchestral_cymbal
+  group: orchestral_percussion
+  is_drum: true
+  volume: 110
+  pan: 76
+  expression: 114
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.cymbal
+    prefer:
+    - suspended cymbal
+    - crash cymbal
+    - crash
+    note_remap:
+      crash: C4
+    optional: true
+    fallback_backend: pretty-midi
+- name: oboes
+  group: woodwinds
+  program: oboe
+  volume: 96
+  pan: 48
+  expression: 102
+  modulation: 4
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.oboes_sustain
+    prefer:
+    - notation
+    - oboes
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: clarinets
+  group: woodwinds
+  program: clarinet
+  volume: 98
+  pan: 42
+  expression: 104
+  modulation: 4
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.clarinets_sustain
+    prefer:
+    - notation
+    - clarinets
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: solo_violin
+  group: strings
+  program: violin
+  volume: 114
+  pan: 84
+  expression: 112
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violin_solo
+    prefer:
+    - notation
+    - violin solo 1 sustain
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: birds_banjo
+  group: banjo
+  program: banjo
+  volume: 114
+  pan: 34
+  expression: 114
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.banjo
+    prefer:
+    - ganjo
+    - banjo
+    - instrument
+    optional: true
+    fallback_backend: pretty-midi
+motifs: []
+layer_templates:
+  strum_breathe:
+    kind: guitar_strum
+    instrument: acoustic_rhythm
+    tuning: drop_d
+    spread_ms: 24
+    velocity: 88
+    velocity_slope: -1.8
+    articulation: pluck
+    humanize_ms: 1.8
+    humanize_velocity_pct: 4.0
+    gate: 1.0
+    chord_shapes:
+      Dadd9:
+      - 0
+      - 0
+      - 0
+      - 2
+      - 3
+      - 0
+      G6/B:
+      - x
+      - 2
+      - 0
+      - 0
+      - 0
+      - 0
+      D/F#:
+      - 4
+      - x
+      - 0
+      - 2
+      - 3
+      - 2
+      Asus4:
+      - x
+      - 0
+      - 2
+      - 2
+      - 3
+      - 0
+      Bm7:
+      - x
+      - 2
+      - 0
+      - 2
+      - 0
+      - 2
+      G6:
+      - 5
+      - 2
+      - 0
+      - 0
+      - 0
+      - 0
+      D/A:
+      - x
+      - 0
+      - 0
+      - 2
+      - 3
+      - 2
+      A7sus4:
+      - x
+      - 0
+      - 2
+      - 0
+      - 3
+      - 0
+      Em7:
+      - 2
+      - 2
+      - 2
+      - 0
+      - 3
+      - 0
+      Cadd9:
+      - x
+      - 3
+      - 2
+      - 0
+      - 3
+      - 0
+      Gmaj7:
+      - 5
+      - x
+      - 0
+      - 0
+      - 0
+      - 2
+    hits:
+    - - 0
+      - 0.0
+      - down
+      - 3.96
+    - - 0
+      - 1.0
+      - down
+      - 2.96
+    - - 0
+      - 1.52
+      - up
+      - 2.44
+    - - 0
+      - 2.52
+      - up
+      - 1.44
+    - - 0
+      - 3.0
+      - down
+      - 0.96
+    - - 0
+      - 3.52
+      - up
+      - 0.44
+    every_bars: 1
+    physical_string_sustain: true
+    string_choke_ms: 2.5
+  strum_open_bloom:
+    kind: guitar_strum
+    instrument: acoustic_rhythm
+    tuning: drop_d
+    spread_ms: 27
+    velocity: 101
+    velocity_slope: -1.55
+    articulation: pluck
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3.0
+    gate: 1.0
+    chord_shapes:
+      Dadd9:
+      - 0
+      - 0
+      - 0
+      - 2
+      - 3
+      - 0
+      D/F#:
+      - 4
+      - x
+      - 0
+      - 2
+      - 3
+      - 2
+      D/A:
+      - x
+      - 0
+      - 0
+      - 2
+      - 3
+      - 2
+      Dmaj7:
+      - 0
+      - 0
+      - 0
+      - 2
+      - 2
+      - 2
+      G6/B:
+      - x
+      - 2
+      - 0
+      - 0
+      - 0
+      - 0
+      G6:
+      - 5
+      - 2
+      - 0
+      - 0
+      - 0
+      - 0
+      Gmaj7:
+      - 5
+      - x
+      - 0
+      - 0
+      - 0
+      - 2
+      Asus4:
+      - x
+      - 0
+      - 2
+      - 2
+      - 3
+      - 0
+      A7sus4:
+      - x
+      - 0
+      - 2
+      - 0
+      - 3
+      - 0
+      A/C#:
+      - x
+      - 4
+      - 2
+      - 2
+      - 2
+      - 0
+      Bm7:
+      - x
+      - 2
+      - 0
+      - 2
+      - 0
+      - 2
+      Em7:
+      - 2
+      - 2
+      - 2
+      - 0
+      - 3
+      - 0
+      Cadd9:
+      - x
+      - 3
+      - 2
+      - 0
+      - 3
+      - 0
+      Cmaj7:
+      - x
+      - 3
+      - 2
+      - 0
+      - 0
+      - 0
+      F#m7:
+      - 4
+      - x
+      - 2
+      - 2
+      - 2
+      - 0
+      F#7:
+      - 4
+      - 4
+      - 2
+      - 3
+      - 2
+      - 2
+      Eadd9:
+      - 2
+      - 2
+      - 4
+      - 1
+      - 0
+      - 0
+      Emaj7:
+      - 2
+      - 2
+      - 1
+      - 1
+      - 0
+      - 0
+      Aadd9:
+      - x
+      - 0
+      - 2
+      - 4
+      - 2
+      - 0
+      Aadd9/C#:
+      - x
+      - 4
+      - 2
+      - 2
+      - 0
+      - 0
+      Bsus4:
+      - x
+      - 2
+      - 4
+      - 4
+      - 0
+      - 0
+      B7sus4:
+      - x
+      - 2
+      - 4
+      - 2
+      - 0
+      - 0
+      C#m7:
+      - x
+      - 4
+      - 2
+      - 1
+      - 0
+      - 0
+      E/G#:
+      - 6
+      - x
+      - 2
+      - 4
+      - 0
+      - 0
+    hits:
+    - - 0
+      - 0.0
+      - down
+      - 3.96
+    - - 0
+      - 2.75
+      - up
+      - 1.2
+    every_bars: 1
+    physical_string_sustain: true
+    string_choke_ms: 2.5
+  rhythm_crosspick:
+    kind: arpeggio
+    instrument: acoustic_rhythm
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 0.94
+    velocity: 62
+    density: 0.84
+    articulation: tenuto
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 2.8
+    humanize_velocity_pct: 3.0
+  rhythm_crosspick_sparse:
+    kind: arpeggio
+    instrument: acoustic_rhythm
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 2
+    - 0
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 0.98
+    velocity: 57
+    density: 0.52
+    articulation: tenuto
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 3.2
+    humanize_velocity_pct: 3.0
+  upper_fingerpick_fast:
+    kind: arpeggio
+    instrument: lead_banjo
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 4
+    - 3
+    - 1
+    - 0
+    - 1
+    - 3
+    - 2
+    - 4
+    - 2
+    - 1
+    - 3
+    step: 0.25
+    duration_beats: 0.52
+    velocity: 64
+    density: 0.76
+    articulation: normal
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 3.0
+  upper_fingerpick_sparse:
+    kind: arpeggio
+    instrument: lead_banjo
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 1
+    - 4
+    - 2
+    step: 0.5
+    duration_beats: 0.98
+    velocity: 57
+    density: 0.5
+    articulation: normal
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 4.0
+    humanize_velocity_pct: 3.5
+  birds_banjo_roll:
+    kind: arpeggio
+    instrument: birds_banjo
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 4
+    - 1
+    - 3
+    - 0
+    - 2
+    - 3
+    - 1
+    - 4
+    - 2
+    - 1
+    - 3
+    step: 0.25
+    duration_beats: 0.28
+    velocity: 68
+    density: 0.86
+    articulation: pluck
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 3.5
+    humanize_velocity_pct: 4.0
+  banjo_thread:
+    kind: arpeggio
+    instrument: birds_banjo
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 1
+    - 4
+    - 2
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 65
+    density: 0.6599999999999999
+    articulation: pluck
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 3.2
+    humanize_velocity_pct: 3.0
+    constraints:
+      min_pitch: 48
+      max_pitch: 72
+  upright_breathe:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    velocity: 68
+    articulation: tenuto
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 3.35
+  upright_floor:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    velocity: 74
+    articulation: tenuto
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 1.55
+    - - 12
+      - 2.0
+      - 0.82
+    - - 0
+      - 3.15
+      - 0.62
+  upright_walk:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    velocity: 78
+    articulation: tenuto
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 0.86
+    - - 12
+      - 1.0
+      - 0.72
+    - - 0
+      - 2.0
+      - 0.76
+    - - 12
+      - 3.0
+      - 0.7
+  upright_surge:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    velocity: 82
+    articulation: tenuto
+    humanize_ms: 5
+    humanize_velocity_pct: 3.5
+    pattern:
+    - - 0
+      - 0.0
+      - 1.25
+    - - 12
+      - 1.5
+      - 0.62
+    - - 0
+      - 2.5
+      - 0.74
+    - - 12
+      - 3.45
+      - 0.38
+  harp_light:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: open
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 4
+    - 1
+    - 3
+    step: 0.5
+    duration_beats: 1.05
+    velocity: 48
+    density: 0.72
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  harp_triplet:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: open
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 4
+    - 3
+    - 1
+    - 2
+    - 4
+    - 1
+    - 3
+    step: 0.333333
+    duration_beats: 0.72
+    velocity: 52
+    density: 0.84
+    articulation: normal
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  harp_shower:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: open
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 3
+    - 2
+    - 1
+    step: 0.25
+    duration_beats: 0.72
+    velocity: 55
+    density: 0.82
+    articulation: normal
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  harp_glass:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    voicing: open
+    include_slash_bass: false
+    pattern:
+    - 0
+    - 3
+    - 1
+    - 4
+    - 2
+    - 3
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 1.25
+    velocity: 46
+    density: 0.66
+    articulation: normal
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  drums_birds:
+    kind: drums
+    instrument: folk_kit
+    humanize_ms: 3.5
+    humanize_velocity_pct: 5
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.75
+      - 2.5
+      velocity: 82
+    - drum: side_stick
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 68
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 45
+    - drum: floor_tom
+      beats:
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 62
+      every: 2
+      offset: 1
+    - drum: open_hat
+      beat: 3.75
+      velocity: 64
+      every: 4
+      offset: 3
+  birds_banjo_sparse:
+    kind: arpeggio
+    instrument: birds_banjo
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 4
+    - 1
+    - 3
+    - 0
+    - 2
+    - 3
+    - 1
+    - 4
+    - 2
+    - 1
+    - 3
+    step: 0.5
+    duration_beats: 0.52
+    velocity: 61
+    density: 0.58
+    articulation: pluck
+    voicing: closed
+    include_slash_bass: false
+    humanize_ms: 4.0
+    humanize_velocity_pct: 4.0
+  drums_birds_soft:
+    kind: drums
+    instrument: folk_kit
+    humanize_ms: 4.0
+    humanize_velocity_pct: 5
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.5
+      velocity: 68
+    - drum: side_stick
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 56
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 36
+    - drum: open_hat
+      beat: 3.75
+      velocity: 52
+      every: 4
+      offset: 3
+  drums_birds_lift:
+    kind: drums
+    instrument: folk_kit
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4.5
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.75
+      - 2.5
+      velocity: 86
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 78
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 44
+    - drum: floor_tom
+      beats:
+      - 2.75
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 60
+      every: 4
+      offset: 3
+    - drum: open_hat
+      beat: 3.75
+      velocity: 62
+      every: 2
+      offset: 1
+  drums_wings_climax:
+    kind: drums
+    instrument: folk_kit
+    humanize_ms: 2.5
+    humanize_velocity_pct: 4.0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 1.5
+      - 2.5
+      - 3.25
+      velocity: 90
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 88
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 48
+    - drum: floor_tom
+      beats:
+      - 2.5
+      - 2.75
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 72
+      every: 2
+      offset: 1
+    - drum: open_hat
+      beat: 3.75
+      velocity: 70
+      every: 2
+      offset: 0
+sections:
+- id: rafters_open
+  label: I. Rafters Open
+  bars: 8
+  intensity: 0.72
+  harmony: &id001
+  - Gmaj7
+  - D/F#
+  - Em7
+  - Bm7
+  - Cadd9
+  - G6/B
+  - A7sus4
+  - Dadd9
+  layers:
+  - template: strum_breathe
+    velocity: 76
+  - template: rhythm_crosspick_sparse
+    velocity: 47
+    density: 0.3
+  - template: birds_banjo_roll
+    velocity: 73
+    density: 0.9
+  - template: upper_fingerpick_sparse
+    velocity: 65
+    density: 0.7
+  - template: upright_breathe
+    velocity: 64
+  - template: harp_light
+    velocity: 38
+    density: 0.32
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 4
+      - 0.0
+      - G5
+      - 2.4
+      - 56
+    - - 7
+      - 2.0
+      - F#5
+      - 1.7
+      - 56
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+- id: first_flight
+  label: II. First Flight
+  bars: 8
+  intensity: 0.9
+  harmony: *id001
+  layers:
+  - template: strum_breathe
+    velocity: 84
+  - template: rhythm_crosspick
+    velocity: 56
+    density: 0.65
+  - template: birds_banjo_roll
+    velocity: 72
+    density: 0.88
+  - template: upper_fingerpick_sparse
+    velocity: 62
+    density: 0.56
+  - template: upright_walk
+    velocity: 78
+  - template: harp_triplet
+    velocity: 50
+    density: 0.72
+  - template: drums_birds
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - B5
+      - 2.2
+      - 68
+    - - 2
+      - 2.0
+      - A5
+      - 1.8
+      - 65
+    - - 4
+      - 0.0
+      - E5
+      - 3.2
+      - 69
+    - - 6
+      - 1.0
+      - E5
+      - 2.8
+      - 65
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+- id: open_eaves
+  label: III. Open Eaves
+  bars: 8
+  intensity: 0.98
+  harmony: &id002
+  - Gmaj7
+  - D/F#
+  - Bm7
+  - A7sus4
+  - Em7
+  - Cadd9
+  - G6/B
+  - Dadd9
+  layers:
+  - template: strum_breathe
+    velocity: 91
+  - template: rhythm_crosspick
+    velocity: 61
+    density: 0.84
+  - template: upper_fingerpick_sparse
+    velocity: 63
+    density: 0.6
+  - template: birds_banjo_roll
+    velocity: 70
+    density: 0.78
+  - template: upright_walk
+    velocity: 80
+  - template: drums_birds_lift
+  - template: harp_light
+    velocity: 46
+    density: 0.64
+  - kind: notes
+    instrument: clarinets
+    notes:
+    - - 1
+      - 0.5
+      - A4
+      - 1.5
+      - 52
+    - - 3
+      - 2.0
+      - F#4
+      - 1.6
+      - 50
+    - - 6
+      - 0.5
+      - E4
+      - 2.2
+      - 50
+    humanize_ms: 5
+    humanize_velocity_pct: 2.5
+- id: wide_sky
+  label: IV. Wide Sky
+  bars: 8
+  intensity: 1.12
+  harmony: &id003
+  - Dadd9
+  - A/C#
+  - Bm7
+  - Gmaj7
+  - D/F#
+  - Em7
+  - Cadd9
+  - A7sus4
+  layers:
+  - template: strum_open_bloom
+    velocity: 100
+  - template: rhythm_crosspick
+    velocity: 64
+    density: 0.86
+  - template: upper_fingerpick_sparse
+    velocity: 58
+    density: 0.42
+  - template: birds_banjo_roll
+    velocity: 72
+    density: 0.84
+  - template: upright_surge
+    velocity: 84
+  - template: drums_birds_lift
+  - template: harp_shower
+    velocity: 52
+    density: 0.72
+  - kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 84
+      duration_beats: 0.65
+      bars:
+      - 0
+      - 4
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - A5
+      - 3.2
+      - 72
+    - - 2
+      - 1.0
+      - B5
+      - 2.5
+      - 70
+    - - 4
+      - 0.0
+      - F#5
+      - 3.0
+      - 72
+    - - 6
+      - 0.5
+      - E5
+      - 2.8
+      - 68
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+  - kind: notes
+    instrument: flutes
+    notes:
+    - - 3
+      - 2.0
+      - A5
+      - 1.4
+      - 55
+    - - 7
+      - 0.5
+      - E5
+      - 2.0
+      - 57
+    humanize_ms: 5
+    humanize_velocity_pct: 2.5
+- id: dust_light
+  label: V. Dust in Sunlight
+  bars: 8
+  intensity: 0.68
+  harmony:
+  - Bm7
+  - Gmaj7
+  - D/F#
+  - Em7
+  - Cadd9
+  - G6/B
+  - Asus4
+  - A7sus4
+  layers:
+  - template: strum_breathe
+    velocity: 78
+  - template: rhythm_crosspick_sparse
+    velocity: 52
+    density: 0.42
+  - template: birds_banjo_sparse
+    velocity: 54
+    density: 0.4
+  - template: upright_floor
+    velocity: 70
+  - template: harp_glass
+    velocity: 45
+    density: 0.58
+  - template: drums_birds_soft
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - F#5
+      - 3.4
+      - 62
+    - - 2
+      - 0.5
+      - A5
+      - 2.8
+      - 63
+    - - 4
+      - 0.0
+      - G5
+      - 3.5
+      - 61
+    - - 6
+      - 1.0
+      - E5
+      - 3.0
+      - 60
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+  - kind: notes
+    instrument: oboes
+    notes:
+    - - 1
+      - 2.0
+      - D5
+      - 1.7
+      - 48
+    - - 5
+      - 2.0
+      - B4
+      - 1.8
+      - 47
+    humanize_ms: 5
+    humanize_velocity_pct: 2.5
+- id: loft_instrumental
+  label: VI. Loft Instrumental
+  bars: 8
+  intensity: 0.92
+  harmony: *id001
+  layers:
+  - template: strum_open_bloom
+    velocity: 86
+  - template: rhythm_crosspick_sparse
+    velocity: 55
+    density: 0.5
+  - template: upper_fingerpick_fast
+    velocity: 65
+    density: 0.78
+  - template: birds_banjo_roll
+    velocity: 74
+    density: 0.9
+  - template: upright_walk
+    velocity: 78
+  - template: harp_triplet
+    velocity: 54
+    density: 0.82
+  - template: drums_birds
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - B5
+      - 2.6
+      - 70
+    - - 1
+      - 2.0
+      - A5
+      - 1.7
+      - 67
+    - - 3
+      - 0.0
+      - F#5
+      - 3.4
+      - 71
+    - - 5
+      - 1.0
+      - E5
+      - 2.8
+      - 68
+    - - 7
+      - 0.5
+      - D5
+      - 2.2
+      - 66
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+- id: second_flight
+  label: VII. Second Flight
+  bars: 8
+  intensity: 1.04
+  harmony: *id002
+  layers:
+  - template: strum_breathe
+    velocity: 94
+  - template: rhythm_crosspick
+    velocity: 63
+    density: 0.88
+  - template: banjo_thread
+    velocity: 66
+    density: 0.72
+  - template: birds_banjo_roll
+    velocity: 70
+    density: 0.78
+  - template: upright_surge
+    velocity: 84
+  - template: drums_birds_lift
+  - template: harp_light
+    velocity: 48
+    density: 0.7
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 1
+      - 0.0
+      - D6
+      - 1.8
+      - 71
+    - - 3
+      - 1.0
+      - B5
+      - 2.4
+      - 70
+    - - 5
+      - 0.0
+      - A5
+      - 2.8
+      - 68
+    - - 7
+      - 1.0
+      - F#5
+      - 2.0
+      - 68
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+- id: storm_of_wings
+  label: VIII. Storm of Wings
+  bars: 8
+  intensity: 1.22
+  harmony: *id003
+  layers:
+  - template: strum_open_bloom
+    velocity: 105
+  - template: rhythm_crosspick
+    velocity: 65
+    density: 0.92
+  - template: upper_fingerpick_fast
+    velocity: 66
+    density: 0.7
+  - template: birds_banjo_roll
+    velocity: 75
+    density: 0.94
+  - template: upright_surge
+    velocity: 88
+  - template: drums_wings_climax
+  - template: harp_shower
+    velocity: 56
+    density: 0.82
+  - kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+    - drum: crash
+      beat: 0.0
+      velocity: 92
+      duration_beats: 0.65
+      bars:
+      - 0
+      - 4
+      - 7
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - D6
+      - 3.0
+      - 76
+    - - 2
+      - 0.5
+      - B5
+      - 2.4
+      - 73
+    - - 4
+      - 0.0
+      - A5
+      - 3.2
+      - 75
+    - - 6
+      - 0.5
+      - E5
+      - 2.6
+      - 72
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+  - kind: notes
+    instrument: flutes
+    notes:
+    - - 1
+      - 2.0
+      - F#5
+      - 1.4
+      - 58
+    - - 3
+      - 2.0
+      - A5
+      - 1.5
+      - 60
+    - - 5
+      - 2.0
+      - B5
+      - 1.4
+      - 60
+    - - 7
+      - 0.0
+      - A5
+      - 2.0
+      - 58
+    humanize_ms: 5
+    humanize_velocity_pct: 2.5
+  - kind: notes
+    instrument: clarinets
+    notes:
+    - - 1
+      - 2.0
+      - D5
+      - 1.4
+      - 52
+    - - 3
+      - 2.0
+      - E5
+      - 1.5
+      - 52
+    - - 5
+      - 2.0
+      - F#5
+      - 1.4
+      - 53
+    - - 7
+      - 0.0
+      - E5
+      - 2.0
+      - 51
+    humanize_ms: 5
+    humanize_velocity_pct: 2.5
+- id: home_rafters
+  label: IX. Home Rafters
+  bars: 8
+  intensity: 0.94
+  harmony: *id001
+  layers:
+  - template: strum_breathe
+    velocity: 89
+  - template: rhythm_crosspick
+    velocity: 59
+    density: 0.74
+  - template: birds_banjo_roll
+    velocity: 68
+    density: 0.75
+  - template: banjo_thread
+    velocity: 61
+    density: 0.5
+  - template: upright_walk
+    velocity: 78
+  - template: drums_birds
+  - template: harp_triplet
+    velocity: 48
+    density: 0.62
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - B5
+      - 2.4
+      - 66
+    - - 2
+      - 1.0
+      - A5
+      - 2.0
+      - 64
+    - - 4
+      - 0.0
+      - E5
+      - 3.0
+      - 66
+    - - 6
+      - 1.0
+      - E5
+      - 2.4
+      - 63
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+- id: afterimage
+  label: X. Afterimage
+  bars: 8
+  intensity: 0.58
+  harmony: *id001
+  layers:
+  - template: strum_open_bloom
+    velocity: 78
+  - template: rhythm_crosspick_sparse
+    velocity: 48
+    density: 0.34
+  - template: birds_banjo_sparse
+    velocity: 49
+    density: 0.3
+  - template: upright_breathe
+    velocity: 62
+  - template: harp_glass
+    velocity: 42
+    density: 0.42
+  - kind: notes
+    instrument: solo_violin
+    notes:
+    - - 0
+      - 0.0
+      - B5
+      - 2.8
+      - 58
+    - - 3
+      - 0.0
+      - F#5
+      - 3.4
+      - 57
+    - - 6
+      - 0.5
+      - E5
+      - 2.2
+      - 55
+    - - 7
+      - 2.0
+      - D5
+      - 4.8
+      - 58
+    humanize_ms: 4
+    humanize_velocity_pct: 2.5
+  - kind: guitar_strum
+    instrument: acoustic_rhythm
+    tuning: drop_d
+    spread_ms: 30
+    velocity: 88
+    velocity_slope: -1.5
+    articulation: pluck
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.5
+    gate: 1.0
+    physical_string_sustain: true
+    string_choke_ms: 2.5
+    chord_shapes:
+      Dadd9:
+      - 0
+      - 0
+      - 0
+      - 2
+      - 3
+      - 0
+    hits:
+    - - 7
+      - 0.0
+      - down
+      - 12.0
