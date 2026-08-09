@@ -137,3 +137,74 @@ def test_orchestral_cymbal_alias_avoids_finger_cymbals(tmp_path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("<group>\n", encoding="utf8")
     assert resolve_sfz_reference(library_ref="orchestra.cymbal", roots=[root]) == suspended.resolve()
+
+
+def test_vpo_male_choir_alias_prefers_actual_male_patch(tmp_path: Path):
+    root = tmp_path / "sfz"
+    female = root / "Virtual-Playing-Orchestra3" / "Vocals" / "choir-FEMALE-sustain.sfz"
+    male = root / "Virtual-Playing-Orchestra3" / "Vocals" / "choir-MALE-sustain.sfz"
+    for path in (female, male):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="vpo.choir_male", roots=[root]) == male.resolve()
+
+
+def test_alto_sax_alias_avoids_neighboring_saxophones(tmp_path: Path):
+    root = tmp_path / "sfz"
+    alto = root / "SaxLibrary" / "Alto Sax Solo Sustain.sfz"
+    tenor = root / "SaxLibrary" / "Tenor Sax Solo Sustain.sfz"
+    for path in (alto, tenor):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="winds.alto_sax", roots=[root]) == alto.resolve()
+
+
+def test_tenor_sax_alias_avoids_neighboring_saxophones(tmp_path: Path):
+    root = tmp_path / "sfz"
+    alto = root / "SaxLibrary" / "Alto Sax Solo Sustain.sfz"
+    tenor = root / "SaxLibrary" / "Tenor Sax Solo Sustain.sfz"
+    baritone = root / "SaxLibrary" / "Baritone Sax Solo Sustain.sfz"
+    for path in (alto, tenor, baritone):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="winds.tenor_sax", roots=[root]) == tenor.resolve()
+
+
+def test_marching_snare_alias_avoids_modern_single_hit(tmp_path: Path):
+    root = tmp_path / "sfz"
+    modern = root / "Versilian" / "VCSL" / "Snare Drum, Modern 1.sfz"
+    rope = root / "Versilian" / "VCSL" / "Snare Drum, Rope Tension.sfz"
+    for path in (modern, rope):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="orchestra.snare_march", roots=[root]) == rope.resolve()
+
+
+def test_snare_roll_alias_prefers_actual_roll_patch(tmp_path: Path):
+    root = tmp_path / "sfz"
+    hit = root / "Versilian" / "VCSL" / "Snare Drum, Rope Tension.sfz"
+    roll = root / "Versilian" / "VCSL" / "Snare Drum, Rope Tension Roll.sfz"
+    for path in (hit, roll):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="orchestra.snare_roll", roots=[root]) == roll.resolve()
+
+
+def test_marching_tenor_alias_chooses_drumline_patch_not_sax(tmp_path: Path):
+    root = tmp_path / "sfz"
+    sax = root / "SaxLibrary" / "Tenor Sax Solo Sustain.sfz"
+    tenor = root / "Versilian" / "VCSL" / "Membranophones" / "Marching Tenor Drum.sfz"
+    for path in (sax, tenor):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="orchestra.marching_tenor", roots=[root]) == tenor.resolve()
+
+
+def test_upright_bass_alias_prefers_pizzicato_over_sustain(tmp_path: Path):
+    root = tmp_path / "sfz"
+    sustain = root / "Sonatina" / "SymphonicOrchestra" / "Strings" / "Basses Sustain.sfz"
+    pizz = root / "Sonatina" / "SymphonicOrchestra" / "Strings" / "Basses Pizzicato.sfz"
+    for path in (sustain, pizz):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="bass.upright", roots=[root]) == pizz.resolve()

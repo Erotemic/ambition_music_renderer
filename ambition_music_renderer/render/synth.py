@@ -286,6 +286,167 @@ def render_with_fluidsynth_cli(
     return coerce_stereo(audio)
 
 
+def _initial_cc_value(inst: pretty_midi.Instrument, number: int, default: int) -> int:
+    """Return the latest controller value authored at time zero."""
+    value = int(default)
+    for cc in inst.control_changes:
+        if int(cc.number) == int(number) and float(cc.time) <= 1e-9:
+            value = int(cc.value)
+    return max(0, min(127, value))
+
+
+def _fm_modulator(phase: np.ndarray, waveform: str) -> np.ndarray:
+    waveform = str(waveform).lower().strip()
+    if waveform in {"sine", "sin"}:
+        return np.sin(phase)
+    if waveform in {"triangle", "tri"}:
+        return (2.0 / np.pi) * np.arcsin(np.sin(phase))
+    if waveform in {"square", "pulse"}:
+        return np.where(np.sin(phase) >= 0.0, 1.0, -1.0)
+    if waveform in {"saw", "sawtooth"}:
+        return signal.sawtooth(phase).astype(np.float64, copy=False)
+    raise ValueError(f"unsupported procedural FM modulator waveform {waveform!r}")
+
+
+def _bandlimited_carrier(phase: np.ndarray, waveform: str, harmonics: int) -> np.ndarray:
+    """Evaluate a compact Fourier oscillator at an already-modulated phase."""
+    waveform = str(waveform).lower().strip()
+    harmonics = max(1, int(harmonics))
+    if waveform in {"sine", "sin"}:
+        return np.sin(phase).astype(np.float64, copy=False)
+    out = np.zeros_like(phase, dtype=np.float64)
+    if waveform in {"square", "pulse"}:
+        for k in range(1, harmonics + 1, 2):
+            out += np.sin(k * phase) / k
+        out *= 4.0 / np.pi
+        return out
+    if waveform in {"triangle", "tri"}:
+        sign = 1.0
+        for k in range(1, harmonics + 1, 2):
+            out += sign * np.sin(k * phase) / (k * k)
+            sign *= -1.0
+        out *= 8.0 / (np.pi * np.pi)
+        return out
+    if waveform in {"saw", "sawtooth"}:
+        for k in range(1, harmonics + 1):
+            out += ((-1.0) ** (k + 1)) * np.sin(k * phase) / k
+        out *= 2.0 / np.pi
+        return out
+    raise ValueError(f"unsupported procedural FM carrier waveform {waveform!r}")
+
+
+def _adsr_envelope(
+    n_sustain: int,
+    n_release: int,
+    sample_rate: int,
+    *,
+    attack_ms: float,
+    decay_ms: float,
+    sustain: float,
+) -> np.ndarray:
+    total = max(1, int(n_sustain) + int(n_release))
+    env = np.ones(total, dtype=np.float64)
+    sustain = float(np.clip(sustain, 0.0, 1.0))
+    attack = min(max(0, int(round(float(attack_ms) * sample_rate / 1000.0))), n_sustain)
+    decay = min(max(0, int(round(float(decay_ms) * sample_rate / 1000.0))), max(0, n_sustain - attack))
+    if attack > 0:
+        env[:attack] = np.linspace(0.0, 1.0, attack, endpoint=False)
+    if decay > 0:
+        env[attack : attack + decay] = np.linspace(1.0, sustain, decay, endpoint=False)
+    if attack + decay < n_sustain:
+        env[attack:n_sustain] = np.maximum(env[attack:n_sustain], sustain)
+        env[attack + decay : n_sustain] = sustain
+    release_start = sustain if n_sustain > 0 else 0.0
+    if n_release > 0:
+        env[n_sustain:] = np.linspace(release_start, 0.0, n_release, endpoint=True)
+    return env
+
+
+@profile
+def render_procedural_fm(
+    pm: pretty_midi.PrettyMIDI,
+    backend_spec: dict[str, Any],
+    sample_rate: int,
+    minimum_duration: float,
+) -> np.ndarray:
+    """Render one or more MIDI instruments with a small oscillator-level FM synth.
+
+    This backend exists for timbres that cannot be expressed by General MIDI /
+    SoundFonts: the carrier oscillator is phase/frequency modulated at audio
+    rate before optional saturation.  It intentionally remains a compact synth
+    primitive rather than a cue-specific effect.
+    """
+    active = [inst for inst in pm.instruments if inst.notes]
+    total_end = max(
+        [float(minimum_duration)]
+        + [float(note.end) for inst in active for note in inst.notes]
+    )
+    env_cfg = dict(backend_spec.get("envelope") or {})
+    fm_cfg = dict(backend_spec.get("fm") or {})
+    carrier_cfg = dict(backend_spec.get("carrier") or {})
+    release_ms = float(env_cfg.get("release_ms", 75.0))
+    release_s = max(0.0, release_ms / 1000.0)
+    total_samples = max(1, int(math.ceil((total_end + release_s + 0.02) * sample_rate)))
+    out = np.zeros((total_samples, 2), dtype=np.float64)
+
+    carrier_waveform = str(carrier_cfg.get("waveform", backend_spec.get("waveform", "square")))
+    mod_waveform = str(fm_cfg.get("waveform", "sine"))
+    ratio = float(fm_cfg.get("ratio", 0.25))
+    index = float(fm_cfg.get("index", fm_cfg.get("amount", 0.12)))
+    harmonics = int(carrier_cfg.get("harmonics", backend_spec.get("harmonics", 15)))
+    attack_ms = float(env_cfg.get("attack_ms", 4.0))
+    decay_ms = float(env_cfg.get("decay_ms", 55.0))
+    sustain = float(env_cfg.get("sustain", 0.9))
+    saturation_drive = max(0.01, float(backend_spec.get("saturation_drive", 1.0)))
+    output_gain_db = float(backend_spec.get("output_gain_db", -7.0))
+    output_gain = 10.0 ** (output_gain_db / 20.0)
+
+    for inst in active:
+        volume = _initial_cc_value(inst, 7, 100) / 127.0
+        expression = _initial_cc_value(inst, 11, 127) / 127.0
+        pan = _initial_cc_value(inst, 10, 64) / 127.0
+        pan_angle = pan * (np.pi / 2.0)
+        pan_l = math.cos(pan_angle)
+        pan_r = math.sin(pan_angle)
+        for note in inst.notes:
+            start = max(0, int(round(float(note.start) * sample_rate)))
+            sustain_samples = max(1, int(round((float(note.end) - float(note.start)) * sample_rate)))
+            release_samples = max(0, int(round(release_s * sample_rate)))
+            n = sustain_samples + release_samples
+            if start >= total_samples or n <= 0:
+                continue
+            n = min(n, total_samples - start)
+            sustain_samples = min(sustain_samples, n)
+            release_samples = max(0, n - sustain_samples)
+            t = np.arange(n, dtype=np.float64) / float(sample_rate)
+            freq = pretty_midi.note_number_to_hz(int(note.pitch))
+            carrier_phase = 2.0 * np.pi * freq * t
+            mod_phase = 2.0 * np.pi * (freq * ratio) * t
+            mod = _fm_modulator(mod_phase, mod_waveform)
+            modulated_phase = carrier_phase + index * mod
+            # Limit Fourier content against the note's base frequency.  The
+            # post-filter in the score handles the remaining FM sidebands.
+            max_harmonic = max(1, int((0.45 * sample_rate) / max(freq, 1.0)))
+            note_harmonics = min(harmonics, max_harmonic)
+            carrier = _bandlimited_carrier(modulated_phase, carrier_waveform, note_harmonics)
+            env = _adsr_envelope(
+                sustain_samples,
+                release_samples,
+                sample_rate,
+                attack_ms=attack_ms,
+                decay_ms=decay_ms,
+                sustain=sustain,
+            )
+            velocity = (float(note.velocity) / 127.0) ** 0.85
+            mono = carrier * env * velocity * volume * expression * output_gain
+            if abs(saturation_drive - 1.0) > 1e-6:
+                mono = np.tanh(mono * saturation_drive) / math.tanh(saturation_drive)
+            out[start : start + n, 0] += mono * pan_l
+            out[start : start + n, 1] += mono * pan_r
+
+    return coerce_stereo(out.astype(np.float32, copy=False))
+
+
 @profile
 def render_synth_audio(
     pm: pretty_midi.PrettyMIDI,

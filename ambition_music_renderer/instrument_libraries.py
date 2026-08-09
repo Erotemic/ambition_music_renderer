@@ -78,6 +78,29 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("virtual", "playing", "orchestra", "vocals"), ("vpo", "vocals"), ("choir",), ("voice",)),
         prefer=("choir", "aah", "ooh", "sustain", "vocals"),
     ),
+    "vpo.choir_male": SfzLibraryAlias(
+        ref="vpo.choir_male",
+        required_any=(
+            ("virtual", "playing", "orchestra", "vocals", "male"),
+            ("vpo", "vocals", "male"),
+            ("choir", "male"),
+            ("male", "voice"),
+        ),
+        prefer=("male", "men", "baritone", "bass", "choir", "sustain", "vocals"),
+        avoid=("female", "soprano", "alto"),
+    ),
+    "winds.alto_sax": SfzLibraryAlias(
+        ref="winds.alto_sax",
+        required_any=(("alto", "sax"), ("alto", "saxophone"), ("sax", "alto")),
+        prefer=("alto", "sax", "saxophone", "solo", "sustain", "legato", "normal"),
+        avoid=("baritone", "tenor", "soprano", "staccato", "growl", "fx", "noise"),
+    ),
+    "winds.tenor_sax": SfzLibraryAlias(
+        ref="winds.tenor_sax",
+        required_any=(("tenor", "sax"), ("tenor", "saxophone"), ("sax", "tenor")),
+        prefer=("tenor", "sax", "saxophone", "solo", "sustain", "legato", "forte", "condenser", "normal"),
+        avoid=("alto", "baritone", "soprano", "staccato", "growl", "fx", "noise"),
+    ),
     # Manual-download families from the generated checklist.  These aliases are
     # deliberately broad so browser-downloaded archives under sfz/manual work.
     "guitar.clean": SfzLibraryAlias(
@@ -98,6 +121,19 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("clean", "growlybass", "swagbass", "finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
         avoid=("slap", "mute", "noise", "trombone", "tuba", "brass", "cello", "orchestra", "strings",
                "angry", "dirty", "vicious", "excessive", "strange", "shifty", "distort"),
+    ),
+    "bass.upright": SfzLibraryAlias(
+        ref="bass.upright",
+        required_any=(
+            ("upright", "bass"),
+            ("acoustic", "bass"),
+            ("double", "bass", "pizz"),
+            ("contrabass", "pizz"),
+            ("basses", "pizzicato"),
+            ("basses", "pizz"),
+        ),
+        prefer=("notation", "basses pizzicato", "pizzicato", "pizz", "upright", "double bass", "acoustic bass"),
+        avoid=("electric", "bowed", "arco", "sustain", "trombone", "tuba", "cello", "brass"),
     ),
     "drums.rock": SfzLibraryAlias(
         ref="drums.rock",
@@ -185,6 +221,39 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("vcsl", "snare"), ("snare", "drum")),
         prefer=("snare drum rope tension", "snare drum", "snare", "low"),
         avoid=("brush", "side", "rim", "stick", "marching tenor", "sample"),
+    ),
+    "orchestra.snare_march": SfzLibraryAlias(
+        ref="orchestra.snare_march",
+        required_any=(
+            ("snare", "rope", "tension"),
+            ("field", "snare"),
+            ("marching", "snare"),
+        ),
+        prefer=("snare drum rope tension", "rope tension", "field snare", "marching snare", "snare drum"),
+        avoid=("modern", "brush", "side", "rim", "stick", "marching tenor", "sample", "roll", "tremolo"),
+    ),
+    "orchestra.snare_roll": SfzLibraryAlias(
+        ref="orchestra.snare_roll",
+        required_any=(
+            ("snare", "roll"),
+            ("snare", "tremolo"),
+            ("rope", "tension", "roll"),
+            ("field", "snare", "roll"),
+        ),
+        prefer=("snare drum rope tension roll", "snare roll", "rope tension roll", "roll", "tremolo", "long"),
+        avoid=("crescendo", "decrescendo", "brush", "side", "rim", "marching tenor", "sample"),
+    ),
+    "orchestra.marching_tenor": SfzLibraryAlias(
+        ref="orchestra.marching_tenor",
+        required_any=(
+            ("marching", "tenor"),
+            ("tenor", "drum"),
+            ("marching", "tom"),
+            ("quad", "drum"),
+            ("quads",),
+        ),
+        prefer=("marching tenor", "tenor drum", "quads", "quad", "marching tom", "toms"),
+        avoid=("sax", "saxophone", "voice", "vocal", "snare", "sample"),
     ),
     "orchestra.bass_drum": SfzLibraryAlias(
         ref="orchestra.bass_drum",

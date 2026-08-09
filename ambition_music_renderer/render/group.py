@@ -15,7 +15,7 @@ from ..instrument_libraries import resolve_sfz_reference
 from ..audio_utils import coerce_stereo
 from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
-from .synth import render_synth_audio
+from .synth import render_procedural_fm, render_synth_audio
 
 @profile
 def copy_with_instruments(
@@ -100,6 +100,11 @@ def _instrument_prefers_sfizz(inst_backend: dict[str, Any]) -> bool:
     )
 
 
+def _instrument_prefers_procedural_fm(inst_backend: dict[str, Any]) -> bool:
+    kind = str(inst_backend.get("kind", "")).lower().strip()
+    return kind in {"procedural_fm", "fm", "fm_synth", "subtractive_fm"}
+
+
 def _resolve_instrument_sfz(
     inst_backend: dict[str, Any],
     *,
@@ -153,10 +158,22 @@ def render_group_audio(
         _instrument_prefers_sfizz(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
-    if wants_sfizz or has_instrument_sfizz:
+    has_instrument_procedural_fm = any(
+        _instrument_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
+        for inst in insts
+    )
+    if wants_sfizz or has_instrument_sfizz or has_instrument_procedural_fm:
         from ..backends.sfizz_backend import render_sfizz
 
-        default_fallback_backend = str(sfizz_cfg.get("fallback_backend", render_cfg.get("sfizz_fallback_backend", "auto")))
+        default_fallback_backend = str(
+            sfizz_cfg.get(
+                "fallback_backend",
+                render_cfg.get(
+                    "sfizz_fallback_backend",
+                    "auto" if wants_sfizz or has_instrument_sfizz else backend,
+                ),
+            )
+        )
         # Strict mode (render.strict_backends) turns every backend failure /
         # silent render into a hard error instead of warn-and-fallback. The
         # default is forgiving so one bad SFZ never silently drops a whole stem,
@@ -169,6 +186,16 @@ def render_group_audio(
             allow_fallback = _is_optional_instrument_backend(inst_backend) and not strict_backends
             fallback_backend_name = str(inst_backend.get("fallback_backend", default_fallback_backend))
             inst_pm = copy_with_instruments(pm, [inst], bpm)
+            if _instrument_prefers_procedural_fm(inst_backend):
+                rendered.append(
+                    render_procedural_fm(
+                        inst_pm,
+                        inst_backend,
+                        sample_rate,
+                        minimum_duration,
+                    )
+                )
+                continue
             sfz_path = _resolve_instrument_sfz(inst_backend, base_dir=base_dir, sfizz_cfg=sfizz_cfg)
             if sfz_path is not None:
                 sfz_pm = copy_with_instruments(pm, [inst], bpm)

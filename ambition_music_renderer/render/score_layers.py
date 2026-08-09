@@ -523,6 +523,34 @@ def render_layer_guitar_strum(
                     previous=previous,
                 )
             ctx.last_guitar_voicing[inst] = assignment
+            # A guitar string cannot keep ringing an old fret after the fretting
+            # hand moves that same physical string to the next chord.  Preserve
+            # the long MusicIR note lifetimes authors use for sympathetic ring,
+            # but choke each prior string only when that string is re-fretted or
+            # explicitly muted by the next strum.  This avoids sour cross-chord
+            # overlaps while retaining the natural ring of common/open strings.
+            physical_string_sustain = bool(layer.get("physical_string_sustain", True))
+            string_choke_ms = max(0.0, float(layer.get("string_choke_ms", 2.5)))
+            string_state = getattr(ctx, "_guitar_string_note_state", None)
+            if string_state is None:
+                string_state = {}
+                setattr(ctx, "_guitar_string_note_state", string_state)
+            current_strings = {int(sf.string_index) for sf in assignment}
+            if physical_string_sustain:
+                nominal_hit_time = ctx.bar_to_time(section["start_bar"] + local, beat)
+                for string_index in range(len(tuning)):
+                    if string_index in current_strings:
+                        continue
+                    previous_entry = string_state.get((inst, string_index))
+                    if previous_entry is None:
+                        continue
+                    previous_note, previous_event = previous_entry
+                    cutoff = max(previous_note.start + 0.025, nominal_hit_time - string_choke_ms / 1000.0)
+                    if previous_note.end > cutoff:
+                        previous_note.end = cutoff
+                        previous_event["end_time"] = float(cutoff)
+                        previous_event["end_beat"] = float(ctx.time_to_beat(cutoff))
+                    string_state.pop((inst, string_index), None)
             for ev in events:
                 add_note(
                     ctx,
@@ -536,6 +564,19 @@ def render_layer_guitar_strum(
                     gate=gate_f,
                     **hk,
                 )
+                if physical_string_sustain and "string" in ev:
+                    string_index = int(ev["string"])
+                    new_note = ctx.instruments[inst].notes[-1]
+                    new_event = ctx.note_events[-1]
+                    previous_entry = string_state.get((inst, string_index))
+                    if previous_entry is not None:
+                        previous_note, previous_event = previous_entry
+                        cutoff = max(previous_note.start + 0.025, new_note.start - string_choke_ms / 1000.0)
+                        if previous_note.end > cutoff:
+                            previous_note.end = cutoff
+                            previous_event["end_time"] = float(cutoff)
+                            previous_event["end_beat"] = float(ctx.time_to_beat(cutoff))
+                    string_state[(inst, string_index)] = (new_note, new_event)
 
 
 @profile

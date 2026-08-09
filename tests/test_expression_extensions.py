@@ -211,6 +211,44 @@ def test_instrument_controls_bad_key_rejected():
         build_score(spec)
 
 
+def test_saw_cc_automation_repeats_with_hard_resets():
+    spec = _base_spec(sections=[{
+        "id": "a", "bars": 2, "harmony": ["C", "C"],
+        "layers": [{
+            "kind": "automation",
+            "instrument": "piano",
+            "automation": [
+                {"cc": "brightness", "from": 10, "to": 110,
+                 "curve": "saw_up", "cycles": 2, "points": 9},
+            ],
+        }],
+    }])
+    pm, _g, _m = build_score(spec)
+    brightness = [
+        cc.value for cc in pm.instruments[0].control_changes if cc.number == 74
+    ]
+    assert brightness == [10, 35, 60, 85, 10, 35, 60, 85, 10]
+
+
+def test_saw_down_cc_automation_reverses_the_ramp():
+    spec = _base_spec(sections=[{
+        "id": "a", "bars": 1, "harmony": ["C"],
+        "layers": [{
+            "kind": "automation",
+            "instrument": "piano",
+            "automation": [
+                {"cc": "modulation", "from": 10, "to": 110,
+                 "curve": "saw_down", "cycles": 1, "points": 5},
+            ],
+        }],
+    }])
+    pm, _g, _m = build_score(spec)
+    modulation = [
+        cc.value for cc in pm.instruments[0].control_changes if cc.number == 1
+    ]
+    assert modulation == [110, 85, 60, 35, 110]
+
+
 def test_lead_collision_flags_simultaneous_seconds():
     from ambition_music_renderer.audit.lead_collision import audit_spec as lead_audit
 

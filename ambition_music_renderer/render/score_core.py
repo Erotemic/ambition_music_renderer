@@ -21,7 +21,7 @@ import numpy as np
 import pretty_midi
 import yaml
 
-RENDERER_VERSION = "ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1"
+RENDERER_VERSION = "ambition-musicir-renderer-v0.9.1-procedural-fm-v1"
 DEFAULT_SOUNDFONTS = [
     "/usr/share/sounds/sf3/MuseScore_General_Full.sf3",
     "/usr/share/sounds/sf3/MuseScore_General.sf3",
@@ -229,6 +229,13 @@ CC_NUMBERS = {
     "pan": 10,
     "expression": 11,
     "sustain": 64,
+    # General-MIDI sound controllers. SoundFont support varies, but banks that
+    # implement them expose useful timbral motion without baking song-specific
+    # DSP into the renderer.
+    "resonance": 71,
+    "release": 72,
+    "attack": 73,
+    "brightness": 74,
     "reverb": 91,
     "chorus": 93,
 }

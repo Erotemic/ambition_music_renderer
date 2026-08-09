@@ -453,14 +453,20 @@ def apply_automation(
         start_val = float(auto.get("from", 80))
         end_val = float(auto.get("to", 110))
         curve = auto.get("curve", "linear")
-        # `lfo` is a periodic sine sweep useful for vibrato (modulation CC) or
-        # tremolo (volume CC). `from`/`to` are the troughs/peaks; `cycles` is
-        # the number of full sine periods across the automation window. We
-        # auto-pick a generous default sample count for sine so the curve is
-        # smooth — 32 samples per cycle is plenty for typical vibrato rates.
-        if curve == "lfo":
+        # Periodic curves use `cycles` across the automation window. `lfo` is a
+        # sine sweep; `saw_up` and `saw_down` are deliberately discontinuous
+        # ramps for rhythmic timbre/vibrato-depth resets. We sample periodic
+        # curves densely enough that SoundFont synths receive smooth ramps
+        # between the intentional reset edges.
+        if curve in {"lfo", "saw_up", "saw_down"}:
             cycles = float(auto.get("cycles", 4.0))
-            points = int(auto.get("points", max(32, int(cycles * 32))))
+            default_points_per_cycle = 32 if curve == "lfo" else 16
+            points = int(
+                auto.get(
+                    "points",
+                    max(2, int(math.ceil(abs(cycles) * default_points_per_cycle)) + 1),
+                )
+            )
         else:
             points = int(auto.get("points", 12))
         for inst_name in inst_names:
@@ -478,6 +484,12 @@ def apply_automation(
                     center = (start_val + end_val) / 2.0
                     amp = (end_val - start_val) / 2.0
                     val = round(center + amp * math.sin(2.0 * math.pi * cycles * a))
+                elif curve in {"saw_up", "saw_down"}:
+                    cycles = float(auto.get("cycles", 4.0))
+                    phase = (cycles * a) % 1.0
+                    if curve == "saw_down":
+                        phase = 1.0 - phase
+                    val = round(start_val * (1 - phase) + end_val * phase)
                 else:  # linear
                     val = round(start_val * (1 - a) + end_val * a)
                 add_cc(inst, cc_num, val, ctx.bar_to_time(start_bar + dur_bars * a))

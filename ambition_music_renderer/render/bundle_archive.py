@@ -147,6 +147,7 @@ def build_rerun_script(
     zip_bundle: bool,
     zip_report_bundle: bool,
     render_audio_mode: str = "full",
+    audition_stems: bool = False,
     profile_render: bool = False,
     render_in_process: bool = False,
     spectrograms: bool = False,
@@ -177,6 +178,8 @@ def build_rerun_script(
     if bundle_root is not None:
         cmd.extend(["--bundle_root", str(bundle_root)])
     cmd.extend(["--force", "--render_audio_mode", str(render_audio_mode)])
+    if audition_stems:
+        cmd.append("--audition_stems")
     if profile_render:
         cmd.append("--profile_render")
     if render_in_process:

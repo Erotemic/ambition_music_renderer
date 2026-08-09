@@ -249,6 +249,7 @@ def test_guitar_strum_per_hit_duration_and_shell_voicing():
             "spread_ms": 1,
             "humanize_ms": 0,
             "gate": 1.0,
+            "physical_string_sustain": False,
         },
     )
     beat_durs = sorted(round((n.end - n.start) * ctx.bpm / 60.0, 2) for n in ctx.instruments["gtr"].notes)
@@ -293,3 +294,40 @@ def test_guitar_strum_chord_shapes_override_allocator():
     pm, _groups, _meta = build_score(spec)
     pitches = sorted(note.pitch for note in pm.instruments[0].notes)
     assert pitches == [47, 50, 57, 59, 66]
+
+
+def test_guitar_strum_chokes_old_fret_on_same_physical_string():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "physical_string_sustain",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "gtr", "group": "gtr", "program": "steel_guitar"}],
+        "sections": [{
+            "id": "bar",
+            "bars": 1,
+            "harmony": ["Dadd9"],
+            "layers": [{
+                "kind": "guitar_strum",
+                "instrument": "gtr",
+                "hits": [[0, 0.0, "down", 3.96], [0, 2.0, "down", "F#7", 1.96]],
+                "spread_ms": 1,
+                "humanize_ms": 0,
+                "gate": 1.0,
+                "chord_shapes": {
+                    "Dadd9": ["x", "x", 0, 2, 3, 0],
+                    "F#7": [2, 4, 2, 3, 2, 2],
+                },
+            }],
+        }],
+    }
+    pm, _groups, _meta = build_score(spec)
+    first_shape_pitches = {50, 57, 62, 64}
+    first_notes = [note for note in pm.instruments[0].notes if note.pitch in first_shape_pitches and note.start < 0.1]
+    assert len(first_notes) == 4
+    # Beat 2 at 120 bpm is 1.0s. Every old string should be released at its
+    # re-fret rather than ringing under F#7 for the original 3.96 beats.
+    assert max(note.end for note in first_notes) < 1.01
+    assert min(note.end for note in first_notes) > 0.97

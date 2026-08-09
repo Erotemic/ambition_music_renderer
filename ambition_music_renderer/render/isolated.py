@@ -64,6 +64,13 @@ class RenderIsolatedConfig(kwconf.Config):
         False,
         help="Emit mastered preview plus per-section full mixes, but skip per-stem OGGs.",
     )
+    audition_stems: bool = kwconf.Flag(
+        False,
+        help=(
+            "Emit full-length normalized per-group audition stems under preview/. "
+            "Useful with --simple-mix for lean composition review."
+        ),
+    )
     runtime_stem_gain_mode: str = kwconf.Value(
         "native",
         choices=RUNTIME_STEM_GAIN_MODES,
@@ -373,6 +380,7 @@ def is_render_current(
     *,
     simple_mix: bool,
     full_mix_only: bool,
+    audition_stems: bool,
     runtime_stem_gain_mode: str,
     runtime_stem_max_gain_db: float | None,
 ) -> tuple[bool, Path | None, str]:
@@ -395,6 +403,8 @@ def is_render_current(
         return False, manifest_path, "manifest simple_mix mode does not match"
     if bool(manifest.get("full_mix_only", False)) != full_mix_only:
         return False, manifest_path, "manifest full_mix_only mode does not match"
+    if bool(manifest.get("audition_stems", False)) != audition_stems:
+        return False, manifest_path, "manifest audition_stems mode does not match"
     if manifest.get("runtime_stem_gain_mode", "native") != runtime_stem_gain_mode:
         return False, manifest_path, "manifest runtime stem gain mode does not match"
     if runtime_stem_gain_mode == "shared":
@@ -442,6 +452,7 @@ def _render_main(ns) -> int:
             cue_hash,
             simple_mix=ns.simple_mix,
             full_mix_only=ns.full_mix_only,
+            audition_stems=ns.audition_stems,
             runtime_stem_gain_mode=ns.runtime_stem_gain_mode,
             runtime_stem_max_gain_db=ns.runtime_stem_max_gain_db,
         )
@@ -645,6 +656,37 @@ def _render_main(ns) -> int:
         for group, audio in sorted(runtime_stem_audio.items())
     }
 
+    # Optional full-length audition stems for composition review. These are
+    # deliberately independent of the adaptive/runtime export set: authors can
+    # combine --simple-mix with --audition-stems to get the mastered soundtrack
+    # plus one comfortably normalized solo file per stem group, without section
+    # stems or runtime/audition maximal previews. Native levels remain available
+    # in diagnostics; these files are only for hearing timbre and arrangement.
+    audition_stem_stats: dict[str, dict[str, float]] = {}
+    if ns.audition_stems:
+        for group, audio in sorted(stem_audio.items()):
+            audition = soft_limit(audio, target_peak_db=-2.5, drive=1.0, normalize=True)
+            audition_path = (
+                outdir
+                / "preview"
+                / f"{spec['id']}_{cue_hash}.audition_stem_{group}.ogg"
+            )
+            audition_meta = dict(cue_metadata)
+            audition_meta["PREVIEW_TYPE"] = "audition_stem"
+            audition_meta["STEM_GROUP"] = group
+            write_ogg_from_audio(
+                audition,
+                sr,
+                audition_path,
+                quality=quality,
+                keep_wav=False,
+                metadata=audition_meta,
+            )
+            output_files["preview"][f"audition_stem_{group}"] = str(
+                audition_path.relative_to(outdir)
+            )
+            audition_stem_stats[group] = _audio_stats(audition, sr)
+
     # If shared runtime gain is requested, rewrite the adaptive per-stem OGGs
     # after all native buffers are known.  The worker writes native stems before
     # the parent can know the shared reference gain; overwriting here preserves
@@ -805,6 +847,7 @@ def _render_main(ns) -> int:
     manifest["render_mode"] = "isolated_process_stem_warmmix"
     manifest["simple_mix"] = bool(ns.simple_mix)
     manifest["full_mix_only"] = bool(ns.full_mix_only)
+    manifest["audition_stems"] = bool(ns.audition_stems)
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db
@@ -822,6 +865,7 @@ def _render_main(ns) -> int:
         "runtime_target_peak_db": runtime_target_peak_db,
         "runtime_max_gain_db": runtime_max_gain_db,
         "runtime_previews": runtime_preview_stats,
+        "audition_stems": audition_stem_stats,
         "adaptive_section_mastering": {
             **section_mastering,
             "ignored_section_postprocess_sections": ignored_section_postprocess,
@@ -849,6 +893,7 @@ def _render_main(ns) -> int:
         f"outdir={shlex.quote(str(abs_outdir))}\n"
         f"backend={shlex.quote(ns.backend)}\n"
         f"full_mix_only={1 if ns.full_mix_only else 0}\n"
+        f"audition_stems={1 if ns.audition_stems else 0}\n"
         f"keep_debug_stems={1 if ns.keep_debug_stems else 0}\n"
         f"runtime_stem_gain_mode={shlex.quote(ns.runtime_stem_gain_mode)}\n"
         f"runtime_stem_max_gain_db={shlex.quote(str(runtime_max_gain_db))}\n"
@@ -857,6 +902,7 @@ def _render_main(ns) -> int:
         'rm -rf "$outdir"\n'
         'args=("${spec}" --outdir "${outdir}" --backend "${backend}" --force --runtime-stem-gain-mode "${runtime_stem_gain_mode}")\n'
         'if [ "${full_mix_only}" -eq 1 ]; then args+=(--full-mix-only); fi\n'
+        'if [ "${audition_stems}" -eq 1 ]; then args+=(--audition-stems); fi\n'
         'if [ "${keep_debug_stems}" -eq 1 ]; then args+=(--keep-debug-stems); fi\n'
         'python -m ambition_music_renderer.render.isolated "${args[@]}"\n',
         encoding="utf8",
@@ -892,11 +938,17 @@ def _render_main(ns) -> int:
                     "audition_previews": [
                         v
                         for k, v in output_files["preview"].items()
-                        if k.startswith("audition_")
+                        if k.startswith("audition_") and not k.startswith("audition_stem_")
+                    ],
+                    "audition_stems": [
+                        v
+                        for k, v in output_files["preview"].items()
+                        if k.startswith("audition_stem_")
                     ],
                     "runtime_stem_gain_mode": ns.runtime_stem_gain_mode,
                     "runtime_stem_max_gain_db": runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None,
                     "full_mix_only": bool(ns.full_mix_only),
+                    "audition_stems_enabled": bool(ns.audition_stems),
                     "kept_debug_stems": bool(ns.keep_debug_stems),
                     "hash": cue_hash,
                 },

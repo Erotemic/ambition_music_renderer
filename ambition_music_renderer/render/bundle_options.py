@@ -81,6 +81,13 @@ class BundleOptions(kwconf.Config):
             "mastered preview."
         ),
     )
+    audition_stems: bool = kwconf.Flag(
+        False,
+        help=(
+            "emit one full-length normalized audition OGG per rendered stem group "
+            "under preview/, without enabling runtime/audition maximal previews"
+        ),
+    )
     profile_render: bool = kwconf.Flag(
         False,
         help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",

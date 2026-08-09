@@ -65,6 +65,13 @@ def test_backend_defaults_prefer_pretty_midi():
     ])
     assert shared_args.runtime_stem_gain_mode == "shared"
     assert shared_args.runtime_stem_max_gain_db == 18.0
+    audition_args = RenderIsolatedConfig.cli(argv=[
+        "cue.music.yaml",
+        "--simple_mix",
+        "--audition_stems",
+    ])
+    assert audition_args.simple_mix is True
+    assert audition_args.audition_stems is True
 
 
 def test_bundle_parser_exposes_publish_and_zip_flags():
@@ -79,6 +86,7 @@ def test_bundle_parser_exposes_publish_and_zip_flags():
             "--runtime_stem_max_gain_db=18",
             "--zip_report_bundle",
             "--plot_format=jpg",
+            "--audition_stems",
         ]
     )
     assert args.cue == "for_emmy_forever_ago"
@@ -89,6 +97,7 @@ def test_bundle_parser_exposes_publish_and_zip_flags():
     assert args.runtime_stem_max_gain_db == 18.0
     assert args.zip_report_bundle is True
     assert args.plot_format == "jpg"
+    assert args.audition_stems is True
 
 
 def test_stem_export_report_compares_scratch_adaptive_and_preview_audio():
