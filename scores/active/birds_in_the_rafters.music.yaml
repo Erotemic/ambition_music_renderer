@@ -143,9 +143,9 @@ group_postprocess:
     transient_lowpass_hz: 5200
     presence_low_hz: 2800
     presence_high_hz: 5200
-    presence_db: -0.7
+    presence_db: -1.05
     high_shelf_hz: 6100
-    high_shelf_db: -0.45
+    high_shelf_db: -0.6
     compressor_threshold_db: -22.0
     compressor_ratio: 1.14
     compressor_attack_ms: 36.0
@@ -181,24 +181,6 @@ group_postprocess:
         wet_level: 0.1
         dry_level: 0.99
         width: 0.9
-  orchestral_percussion:
-    gain_db: 3.2
-    highpass_hz: 28
-    lowpass_hz: 12800
-    transient_tame: 0.005
-    compressor_threshold_db: -18.0
-    compressor_ratio: 1.25
-    compressor_attack_ms: 24.0
-    compressor_release_ms: 190.0
-    effect_chain:
-    - kind: pedalboard
-      effects:
-      - effect: reverb
-        room_size: 0.87
-        damping: 0.55
-        wet_level: 0.17
-        dry_level: 0.98
-        width: 0.93
   strings:
     gain_db: 0.7
     highpass_hz: 70
@@ -236,9 +218,9 @@ group_postprocess:
   harp:
     gain_db: 3.0
     highpass_hz: 120
-    lowpass_hz: 13500
+    lowpass_hz: 11800
     high_shelf_hz: 7200
-    high_shelf_db: 1.0
+    high_shelf_db: -0.35
     effect_chain:
     - kind: pedalboard
       effects:
@@ -341,23 +323,6 @@ instruments:
     - notation
     - flutes
     - sustain
-    optional: true
-    fallback_backend: pretty-midi
-- name: orchestral_cymbal
-  group: orchestral_percussion
-  is_drum: true
-  volume: 110
-  pan: 76
-  expression: 114
-  instrument_backend:
-    kind: sfz
-    library_ref: orchestra.cymbal
-    prefer:
-    - suspended cymbal
-    - crash cymbal
-    - crash
-    note_remap:
-      crash: C4
     optional: true
     fallback_backend: pretty-midi
 - name: oboes
@@ -1344,7 +1309,7 @@ sections:
       - 68
     - - 2
       - 2.0
-      - A5
+      - G5
       - 1.8
       - 65
     - - 4
@@ -1400,7 +1365,7 @@ sections:
       - 52
     - - 3
       - 2.0
-      - F#4
+      - E4
       - 1.6
       - 50
     - - 6
@@ -1441,17 +1406,6 @@ sections:
   - template: harp_shower
     velocity: 52
     density: 0.72
-  - kind: drums
-    instrument: orchestral_cymbal
-    humanize_ms: 1
-    events:
-    - drum: crash
-      beat: 0.0
-      velocity: 84
-      duration_beats: 0.65
-      bars:
-      - 0
-      - 4
   - kind: notes
     instrument: solo_violin
     notes:
@@ -1646,12 +1600,12 @@ sections:
       - 71
     - - 3
       - 1.0
-      - B5
+      - A5
       - 2.4
       - 70
     - - 5
       - 0.0
-      - A5
+      - G5
       - 2.8
       - 68
     - - 7
@@ -1684,18 +1638,6 @@ sections:
   - template: harp_shower
     velocity: 56
     density: 0.82
-  - kind: drums
-    instrument: orchestral_cymbal
-    humanize_ms: 1
-    events:
-    - drum: crash
-      beat: 0.0
-      velocity: 92
-      duration_beats: 0.65
-      bars:
-      - 0
-      - 4
-      - 7
   - kind: notes
     instrument: solo_violin
     notes:
@@ -1726,7 +1668,7 @@ sections:
     notes:
     - - 1
       - 2.0
-      - F#5
+      - E5
       - 1.4
       - 58
     - - 3
@@ -1804,7 +1746,7 @@ sections:
       - 66
     - - 2
       - 1.0
-      - A5
+      - G5
       - 2.0
       - 64
     - - 4
