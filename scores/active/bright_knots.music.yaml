@@ -1,3942 +1,979 @@
 schema: ambition.musicir.v1
 id: bright_knots
 title: Bright Knots
-seed: 202608081804
-notes: 'High-quality groove/lead revision. The opening third rise now begins only after the same recovery space that precedes the second rise, uses the same three-note internal cadence, omits the BAM, and hands directly into the paired descents. Transition and jam lead timbres are intentionally separate: the transition keeps a restrained sine-FM voice while jam sections use a warmer saw-carrier FM voice with more harmonic animation. Jam lead phrases are recomposed as sparse, shaped responses rather than continuous noodling. Mix gains are rebalanced from bundle diagnostics so melody no longer overwhelms Rhodes/saw/motion. Practical sound-design reference: Matt Tinkler, https://www.youtube.com/watch?v=hPy-4XBKGVo; cited as a practical reference for a well-established FM technique.'
+seed: 202608082027
+notes: >-
+  Composer-first rewrite. The prior draft treated irregularity as a large set of unrelated decimal
+  onsets and even let several five-bar transition layers spill into local bars 5-7. This version keeps
+  the abrupt rise/BAM/staircase language but compresses it into a three-bar ensemble transition, then
+  gives the jams a small number of recurring rhythmic fingerprints: a repeatable bass hook, displaced
+  Rhodes punches, a short-short-long chiff answer, and drums that answer the bass instead of tracing it.
+  Jam melodies are written as singable four-bar questions and varied answers, with deliberate holes,
+  held notes, and one emotionally excessive leap instead of continuous lead commentary. Transition and
+  jam lead timbres remain separate. The subtle low-ratio FM setup follows Matt Tinkler's practical FM
+  synthesis walkthrough as a sound-design reference for an established technique; it is not presented
+  as the origin of FM synthesis: https://www.youtube.com/watch?v=hPy-4XBKGVo
+
 tempo:
-  bpm: 122
+  bpm: 124
 meter:
   beats_per_bar: 4
   beat_unit: 4
+
 constraints:
   voice_leading: minimize_motion
   no_clusters: true
+
 render:
   sample_rate: 48000
   ogg_quality: 6
   backend: pretty-midi
   soundfont: /data/audio-tools/soundfonts/GeneralUser-GS.sf2
-  section_mix_transition_beats: 0.25
+  section_mix_transition_beats: 0.35
+
 postprocess:
-  gain_db: -2.7
-  highpass_hz: 30
+  gain_db: -0.8
+  highpass_hz: 28
   lowpass_hz: 15000
-  reverb_wet: 0.045
-  reverb_decay_seconds: 0.92
-  reverb_damping_hz: 7200
-  stereo_width: 0.1
-  compressor_threshold_db: -18.5
-  compressor_ratio: 2.5
-  compressor_attack_ms: 12.0
-  compressor_release_ms: 100.0
-  compressor_makeup_db: 0.2
-  compressor_knee_db: 4.0
-  limiter_drive: 0.92
-  normalize: true
-  target_peak_db: -2.3
+  reverb_wet: 0.035
+  reverb_decay_seconds: 0.86
+  reverb_damping_hz: 7000
+  stereo_width: 0.08
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.2
+  compressor_attack_ms: 14.0
+  compressor_release_ms: 110.0
+  compressor_makeup_db: 0.4
+  compressor_knee_db: 5.0
+  target_lufs: -15.0
+  true_peak_db: -1.5
+  limiter_drive: 0.94
+
 stem_postprocess:
   gain_db: 0.0
   highpass_hz: 28
-  reverb_wet: 0.004
-  reverb_decay_seconds: 0.42
-  reverb_damping_hz: 7800
-  stereo_width: 0.025
-  limiter_drive: 0.9
+  reverb_wet: 0.002
+  reverb_decay_seconds: 0.35
+  reverb_damping_hz: 7600
+  stereo_width: 0.02
+  limiter_drive: 0.92
   normalize: false
-  target_peak_db: -3.5
+  target_peak_db: -4.0
+
 group_postprocess:
   melody:
-    gain_db: -4.8
+    gain_db: -2.0
+    highpass_hz: 100
+    lowpass_hz: 6800
+    high_shelf_hz: 3800
+    high_shelf_db: -1.5
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.0
+    compressor_attack_ms: 12.0
+    compressor_release_ms: 95.0
+    reverb_wet: 0.012
+    stereo_width: 0.02
+  jam_lead:
+    gain_db: -1.6
     highpass_hz: 95
     lowpass_hz: 6900
-    high_shelf_hz: 3600
+    high_shelf_hz: 4100
     high_shelf_db: -1.8
-    compressor_threshold_db: -23.0
-    compressor_ratio: 2.0
-    compressor_attack_ms: 14.0
-    compressor_release_ms: 96.0
-    reverb_wet: 0.012
-    stereo_width: 0.025
-    effect_chain:
-    - kind: pedalboard
-      optional: true
-      effects:
-      - effect: distortion
-        drive_db: 1.8
-      - effect: lowpass
-        cutoff_hz: 7200
+    compressor_threshold_db: -21.5
+    compressor_ratio: 2.1
+    compressor_attack_ms: 13.0
+    compressor_release_ms: 100.0
+    reverb_wet: 0.016
+    stereo_width: 0.045
   bass:
-    gain_db: -1.4
-    highpass_hz: 30
-    lowpass_hz: 4800
+    gain_db: -0.7
+    highpass_hz: 28
+    lowpass_hz: 4300
     compressor_threshold_db: -18.0
-    compressor_ratio: 2.8
-    compressor_attack_ms: 8.0
-    compressor_release_ms: 76.0
-  motion:
-    gain_db: 0.0
-    highpass_hz: 180
-    lowpass_hz: 5200
-    high_shelf_hz: 3400
-    high_shelf_db: -4.0
-    transient_tame: 0.06
-    stereo_width: 0.055
-    reverb_wet: 0.008
-    effect_chain:
-    - kind: pedalboard
-      optional: true
-      effects:
-      - effect: distortion
-        drive_db: 6.0
-      - effect: phaser
-        rate_hz: 0.37
-        depth: 0.66
-        centre_frequency_hz: 760.0
-        feedback: 0.18
-        mix: 0.38
-      - effect: chorus
-        rate_hz: 0.51
-        depth: 0.04
-        centre_delay_ms: 7.5
-        feedback: 0.05
-        mix: 0.1
-      - effect: delay
-        delay_seconds: 0.083
-        feedback: 0.11
-        mix: 0.07
-      - effect: lowpass
-        cutoff_hz: 5900
+    compressor_ratio: 2.6
+    compressor_attack_ms: 9.0
+    compressor_release_ms: 82.0
   keys:
     gain_db: 0.4
     highpass_hz: 90
-    lowpass_hz: 12500
-    reverb_wet: 0.025
-    stereo_width: 0.06
+    lowpass_hz: 11500
     compressor_threshold_db: -22.0
-    compressor_ratio: 1.8
+    compressor_ratio: 1.7
     compressor_attack_ms: 18.0
     compressor_release_ms: 125.0
-  piano_attack:
-    gain_db: -1.2
-    highpass_hz: 110
-    lowpass_hz: 12000
-    reverb_wet: 0.035
-    stereo_width: 0.05
+    reverb_wet: 0.022
+    stereo_width: 0.065
+  motion:
+    gain_db: -1.0
+    highpass_hz: 180
+    lowpass_hz: 6200
+    high_shelf_hz: 3600
+    high_shelf_db: -2.2
+    transient_tame: 0.05
+    stereo_width: 0.04
   saw:
-    gain_db: -0.8
+    gain_db: -1.8
     highpass_hz: 115
-    lowpass_hz: 7800
-    high_shelf_hz: 4200
-    high_shelf_db: -1.8
-    stereo_width: 0.075
-    reverb_wet: 0.01
-    effect_chain:
-    - kind: pedalboard
-      optional: true
-      effects:
-      - effect: distortion
-        drive_db: 8.0
-      - effect: phaser
-        rate_hz: 0.19
-        depth: 0.66
-        centre_frequency_hz: 720.0
-        feedback: 0.2
-        mix: 0.4
-      - effect: chorus
-        rate_hz: 0.36
-        depth: 0.075
-        centre_delay_ms: 9.0
-        feedback: 0.06
-        mix: 0.15
-      - effect: lowpass
-        cutoff_hz: 7200
-  air:
-    gain_db: -3.0
-    highpass_hz: 160
     lowpass_hz: 7600
-    high_shelf_hz: 4200
-    high_shelf_db: -2.0
-    stereo_width: 0.1
-    reverb_wet: 0.03
-    effect_chain:
-    - kind: pedalboard
-      optional: true
-      effects:
-      - effect: phaser
-        rate_hz: 0.13
-        depth: 0.48
-        centre_frequency_hz: 640.0
-        feedback: 0.12
-        mix: 0.24
-      - effect: lowpass
-        cutoff_hz: 7000
+    high_shelf_hz: 4300
+    high_shelf_db: -1.7
+    reverb_wet: 0.01
+    stereo_width: 0.075
   percussion:
-    gain_db: -2.2
+    gain_db: -1.4
     highpass_hz: 28
     lowpass_hz: 14200
-    compressor_threshold_db: -16.0
-    compressor_ratio: 3.0
-    compressor_attack_ms: 5.0
-    compressor_release_ms: 64.0
-    transient_tame: 0.01
-  jam_lead:
-    gain_db: -2.2
-    highpass_hz: 105
-    lowpass_hz: 6500
-    high_shelf_hz: 3900
-    high_shelf_db: -2.2
-    compressor_threshold_db: -23.0
-    compressor_ratio: 2.3
-    compressor_attack_ms: 13.0
-    compressor_release_ms: 105.0
-    reverb_wet: 0.018
-    stereo_width: 0.045
-    effect_chain:
-    - kind: pedalboard
-      optional: true
-      effects:
-      - effect: distortion
-        drive_db: 2.4
-      - effect: chorus
-        rate_hz: 0.31
-        depth: 0.035
-        centre_delay_ms: 8.5
-        feedback: 0.035
-        mix: 0.11
-      - effect: delay
-        delay_seconds: 0.094
-        feedback: 0.09
-        mix: 0.055
-      - effect: lowpass
-        cutoff_hz: 6500
+    compressor_threshold_db: -17.0
+    compressor_ratio: 2.8
+    compressor_attack_ms: 6.0
+    compressor_release_ms: 70.0
+    transient_tame: 0.015
+
 instruments:
 - name: singline
   group: melody
   program: lead_square
-  volume: 82
-  pan: 58
-  expression: 92
-  modulation: 0
-  brightness: 58
-  resonance: 60
-  chorus: 0
-  reverb: 6
+  volume: 78
+  pan: 59
+  expression: 88
   instrument_backend:
     kind: procedural_fm
     carrier:
-      waveform: sine
-      harmonics: 1
+      waveform: triangle
+      harmonics: 5
     fm:
       waveform: sine
       ratio: 0.25
-      index: 0.055
+      index: 0.060
     envelope:
-      attack_ms: 4.0
-      decay_ms: 62.0
-      sustain: 0.9
-      release_ms: 72.0
-    saturation_drive: 1.12
-    output_gain_db: -4.1
+      attack_ms: 5.0
+      decay_ms: 58.0
+      sustain: 0.88
+      release_ms: 78.0
+    saturation_drive: 1.10
+    output_gain_db: -6.8
+
 - name: jamline
   group: jam_lead
   program: lead_saw
-  volume: 80
-  pan: 62
-  expression: 90
-  modulation: 0
-  brightness: 52
-  resonance: 54
-  chorus: 5
-  reverb: 7
+  volume: 76
+  pan: 66
+  expression: 88
   instrument_backend:
     kind: procedural_fm
     carrier:
       waveform: saw
-      harmonics: 10
+      harmonics: 11
     fm:
       waveform: sine
       ratio: 0.25
-      index: 0.115
+      index: 0.135
     envelope:
-      attack_ms: 7.0
-      decay_ms: 72.0
-      sustain: 0.84
-      release_ms: 115.0
+      attack_ms: 8.0
+      decay_ms: 70.0
+      sustain: 0.82
+      release_ms: 118.0
     saturation_drive: 1.18
-    output_gain_db: -6.2
+    output_gain_db: -7.8
+
 - name: pocket_bass
   group: bass
   program: synth_bass_1
-  volume: 92
+  volume: 93
   pan: 63
   expression: 96
   brightness: 56
-  chorus: 2
-- name: nervous_chiff
-  group: motion
-  program: clavinet
-  volume: 70
-  pan: 46
-  expression: 80
-  modulation: 14
-  brightness: 44
-  chorus: 9
-  reverb: 8
+
 - name: velvet_keys
   group: keys
   program: electric_piano_1
-  volume: 86
-  pan: 74
+  volume: 87
+  pan: 73
   expression: 94
-  chorus: 12
-  reverb: 18
-  instrument_backend:
-    kind: sfz
-    library_ref: epiano.rhodes
-    prefer:
-    - rhodes
-    - stereo
-    - looped
-    optional: true
-    fallback_backend: pretty-midi
+  chorus: 10
+  reverb: 14
+
+- name: nervous_chiff
+  group: motion
+  program: clavinet
+  volume: 69
+  pan: 47
+  expression: 80
+  brightness: 46
+  chorus: 6
+
 - name: rising_saw
   group: saw
   program: lead_saw
-  volume: 78
-  pan: 58
-  expression: 84
-  modulation: 20
-  brightness: 28
-  resonance: 76
-  chorus: 12
-  reverb: 9
+  volume: 70
+  pan: 56
+  expression: 78
+  brightness: 32
+  resonance: 68
+  chorus: 10
+
 - name: kit
   group: percussion
   is_drum: true
-  volume: 93
+  volume: 94
   pan: 64
   expression: 99
-- name: grand_attack
-  group: piano_attack
-  program: acoustic_grand_piano
-  volume: 68
-  pan: 54
-  expression: 82
-  reverb: 18
-  instrument_backend:
-    kind: sfz
-    library_ref: freepats.salamander_grand
-    prefer:
-    - salamander
-    - grand
-    - piano
-    optional: true
-    fallback_backend: pretty-midi
-- name: warm_air
-  group: air
-  program: fx_atmosphere
-  volume: 60
-  pan: 68
-  expression: 68
-  modulation: 22
-  brightness: 38
-  chorus: 13
-  reverb: 24
+
 layer_templates:
-  transition_full_core:
+  # ---------------------------------------------------------------------------
+  # The three-bar transition language. Two rises get a BAM, the third does not;
+  # paired descents land directly on the next jam. Every backing part agrees on
+  # the ensemble events without simply doubling the entire rhythm.
+  # ---------------------------------------------------------------------------
+  transition_open_lead:
     kind: notes
-    articulation: tenuto
-    humanize_ms: 2
-    humanize_velocity_pct: 1
-    notes:
-    - bar: 0
-      beat: 0.0
-      note: B3
-      dur: 0.2
-      vel: 88
-    - bar: 0
-      beat: 0.32
-      note: C#4
-      dur: 0.2
-      vel: 91
-    - bar: 0
-      beat: 0.64
-      note: E4
-      dur: 0.24
-      vel: 94
-    - bar: 2
-      beat: 0.05
-      note: C#4
-      dur: 0.2
-      vel: 89
-    - bar: 2
-      beat: 0.37
-      note: E4
-      dur: 0.2
-      vel: 92
-    - bar: 2
-      beat: 0.69
-      note: F#4
-      dur: 0.24
-      vel: 95
-    # Staircase one: preserve the speed that worked in the previous render.
-    - bar: 3
-      beat: 2.55
-      note: E4
-      dur: 0.2
-      vel: 90
-    - bar: 3
-      beat: 2.87
-      note: F#4
-      dur: 0.2
-      vel: 93
-    - bar: 3
-      beat: 3.19
-      note: A4
-      dur: 0.24
-      vel: 96
-    - bar: 4
-      beat: 0.35
-      note: G#4
-      dur: 0.27
-      vel: 94
-    - bar: 4
-      beat: 0.85
-      note: F#4
-      dur: 0.25
-      vel: 92
-    - bar: 4
-      beat: 1.29
-      note: E4
-      dur: 0.27
-      vel: 90
-    - bar: 4
-      beat: 1.71
-      note: C#4
-      dur: 0.34
-      vel: 92
-    # Staircase two: same pacing, lower answer, ending immediately at the jam.
-    - bar: 4
-      beat: 2.15
-      note: F#4
-      dur: 0.27
-      vel: 93
-    - bar: 4
-      beat: 2.65
-      note: E4
-      dur: 0.25
-      vel: 91
-    - bar: 4
-      beat: 3.09
-      note: C#4
-      dur: 0.25
-      vel: 89
-    - bar: 4
-      beat: 3.51
-      note: B3
-      dur: 0.42
-      vel: 93
     instrument: singline
-  transition_full_bam_core:
-    kind: notes
     articulation: tenuto
     humanize_ms: 1
     humanize_velocity_pct: 1
     notes:
-    - bar: 0
-      beat: 1.30
-      note: G#4
-      dur: 4.15
-      vel: 101
-    - bar: 2
-      beat: 1.34
-      note: B4
-      dur: 2.62
-      vel: 103
+    - [0, 0.18, B3, 0.18, 86]
+    - [0, 0.48, C#4, 0.18, 89]
+    - [0, 0.78, E4, 0.22, 93]
+    - [0, 1.32, G#4, 1.42, 99]
+    - [0, 3.02, C#4, 0.18, 87]
+    - [0, 3.32, E4, 0.18, 90]
+    - [0, 3.62, F#4, 0.22, 94]
+    - [1, 0.18, B4, 1.40, 101]
+    - [1, 2.05, E4, 0.18, 89]
+    - [1, 2.35, F#4, 0.18, 92]
+    - [1, 2.65, A4, 0.22, 96]
+    - [2, 0.05, G#4, 0.23, 94]
+    - [2, 0.40, F#4, 0.23, 92]
+    - [2, 0.75, E4, 0.23, 90]
+    - [2, 1.10, C#4, 0.32, 92]
+    - [2, 1.75, F#4, 0.23, 93]
+    - [2, 2.10, E4, 0.23, 91]
+    - [2, 2.45, C#4, 0.23, 89]
+    - [2, 2.80, B3, 0.55, 92]
+
+  transition_bridge_lead:
+    kind: notes
     instrument: singline
-  transition_full_bass:
-    kind: notes
-    articulation: normal
-    humanize_ms: 2
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.0
-      note: B1
-      dur: 0.14
-      vel: 78
-    - bar: 0
-      beat: 0.32
-      note: C#2
-      dur: 0.14
-      vel: 80
-    - bar: 0
-      beat: 0.64
-      note: E2
-      dur: 0.17
-      vel: 83
-    - bar: 0
-      beat: 1.3
-      note: C#2
-      dur: 3.55
-      vel: 91
-    - bar: 2
-      beat: 0.05
-      note: C#2
-      dur: 0.14
-      vel: 79
-    - bar: 2
-      beat: 0.37
-      note: E2
-      dur: 0.14
-      vel: 81
-    - bar: 2
-      beat: 0.69
-      note: F#2
-      dur: 0.17
-      vel: 84
-    - bar: 2
-      beat: 1.34
-      note: A1
-      dur: 2.9
-      vel: 90
-    - bar: 3
-      beat: 2.55
-      note: E2
-      dur: 0.14
-      vel: 80
-    - bar: 3
-      beat: 2.87
-      note: F#2
-      dur: 0.14
-      vel: 82
-    - bar: 3
-      beat: 3.19
-      note: A2
-      dur: 0.17
-      vel: 85
-    - bar: 4
-      beat: 0.35
-      note: G#2
-      dur: 0.24
-      vel: 86
-    - bar: 4
-      beat: 0.85
-      note: F#2
-      dur: 0.22
-      vel: 84
-    - bar: 4
-      beat: 1.29
-      note: E2
-      dur: 0.24
-      vel: 83
-    - bar: 4
-      beat: 1.71
-      note: C#2
-      dur: 0.28
-      vel: 86
-    - bar: 4
-      beat: 2.15
-      note: F#2
-      dur: 0.24
-      vel: 85
-    - bar: 4
-      beat: 2.65
-      note: E2
-      dur: 0.22
-      vel: 83
-    - bar: 4
-      beat: 3.09
-      note: C#2
-      dur: 0.23
-      vel: 82
-    - bar: 4
-      beat: 3.51
-      note: B1
-      dur: 0.39
-      vel: 87
-    instrument: pocket_bass
-  transition_full_rhodes:
-    kind: notes
-    articulation: tenuto
-    humanize_ms: 4
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 1.26
-      note:
-      - C#3
-      - G#3
-      - B3
-      - D#4
-      - E4
-      dur: 4.05
-      vel: 70
-    - bar: 2
-      beat: 1.30
-      note:
-      - A2
-      - E3
-      - G#3
-      - B3
-      - C#4
-      dur: 2.95
-      vel: 69
-    - bar: 3
-      beat: 2.5
-      note:
-      - E3
-      - B3
-      - C#4
-      - F#4
-      dur: 1.42
-      vel: 65
-    - bar: 4
-      beat: 0.24
-      note:
-      - E3
-      - B3
-      - F#4
-      - G#4
-      dur: 3.55
-      vel: 68
-    - bar: 5
-      beat: 0.2
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 2.65
-      vel: 67
-    - bar: 5
-      beat: 2.77
-      note:
-      - C#3
-      - G#3
-      - B3
-      - E4
-      dur: 1.55
-      vel: 70
-    - bar: 6
-      beat: 0.72
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 1.08
-      vel: 72
-    - bar: 7
-      beat: 2.16
-      note:
-      - A2
-      - E3
-      - B3
-      - C#4
-      dur: 1.58
-      vel: 68
-    instrument: velvet_keys
-  transition_full_saw:
-    kind: notes
-    articulation: pad
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 1.30
-      note:
-      - C#3
-      - G#3
-      dur: 4.05
-      vel: 47
-    - bar: 2
-      beat: 1.34
-      note:
-      - A2
-      - E3
-      dur: 2.9
-      vel: 46
-    - bar: 3
-      beat: 2.52
-      note:
-      - E3
-      - B3
-      dur: 1.36
-      vel: 41
-    - bar: 4
-      beat: 0.28
-      note:
-      - E3
-      - B3
-      dur: 3.6
-      vel: 45
-    - bar: 5
-      beat: 0.12
-      note:
-      - G#2
-      - D#3
-      dur: 2.55
-      vel: 44
-    - bar: 5
-      beat: 2.83
-      note:
-      - C#3
-      - G#3
-      dur: 1.5
-      vel: 47
-    - bar: 6
-      beat: 0.78
-      note:
-      - G#2
-      - D#3
-      dur: 1.0
-      vel: 48
-    instrument: rising_saw
-  transition_full_pulse:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 3
-    notes:
-    - bar: 0
-      beat: 0.0
-      note: C#4
-      dur: 0.09
-      vel: 58
-    - bar: 0
-      beat: 0.64
-      note: G#4
-      dur: 0.1
-      vel: 61
-    - bar: 2
-      beat: 0.37
-      note: B3
-      dur: 0.09
-      vel: 58
-    - bar: 3
-      beat: 2.87
-      note: F#4
-      dur: 0.09
-      vel: 57
-    - bar: 3
-      beat: 3.19
-      note: A4
-      dur: 0.1
-      vel: 60
-    - bar: 4
-      beat: 0.3
-      note: E4
-      dur: 0.09
-      vel: 59
-    - bar: 4
-      beat: 2.5
-      note: B3
-      dur: 0.12
-      vel: 55
-    - bar: 4
-      beat: 3.62
-      note: G#3
-      dur: 0.15
-      vel: 57
-    - bar: 6
-      beat: 0.28
-      note: G#4
-      dur: 0.08
-      vel: 60
-    - bar: 7
-      beat: 0.38
-      note: B4
-      dur: 0.07
-      vel: 61
-    - bar: 7
-      beat: 2.88
-      note: C#4
-      dur: 0.12
-      vel: 58
-    instrument: nervous_chiff
-  transition_full_drums:
-    kind: drums
-    instrument: kit
-    humanize_ms: 3
-    humanize_velocity_pct: 4
-    events:
-    - drum: high_tom
-      bars:
-      - 0
-      beats:
-      - 0.0
-      velocity: 57
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 0
-      beats:
-      - 0.32
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 0
-      beats:
-      - 0.64
-      velocity: 61
-      duration_beats: 0.06
-    - drum: kick
-      bars:
-      - 0
-      beats:
-      - 1.3
-      velocity: 84
-      duration_beats: 0.07
-    - drum: crash
-      bars:
-      - 0
-      beats:
-      - 1.3
-      velocity: 41
-      duration_beats: 0.07
-    - drum: high_tom
-      bars:
-      - 2
-      beats:
-      - 0.05
-      velocity: 57
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 2
-      beats:
-      - 0.37
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 2
-      beats:
-      - 0.69
-      velocity: 62
-      duration_beats: 0.06
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 1.34
-      velocity: 85
-      duration_beats: 0.07
-    - drum: china
-      bars:
-      - 2
-      beats:
-      - 1.34
-      velocity: 35
-      duration_beats: 0.07
-    - drum: high_tom
-      bars:
-      - 4
-      beats:
-      - 0.35
-      velocity: 58
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 4
-      beats:
-      - 0.85
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 4
-      beats:
-      - 1.29
-      velocity: 61
-      duration_beats: 0.06
-    - drum: floor_tom
-      bars:
-      - 4
-      beats:
-      - 1.71
-      velocity: 63
-      duration_beats: 0.07
-    - drum: kick
-      bars:
-      - 4
-      beats:
-      - 0.35
-      - 1.29
-      velocity: 71
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 4
-      beats:
-      - 0.85
-      - 1.71
-      velocity: 52
-      duration_beats: 0.055
-    - drum: high_tom
-      bars:
-      - 4
-      beats:
-      - 2.15
-      velocity: 59
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 4
-      beats:
-      - 2.65
-      velocity: 60
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 4
-      beats:
-      - 3.09
-      velocity: 62
-      duration_beats: 0.06
-    - drum: floor_tom
-      bars:
-      - 4
-      beats:
-      - 3.51
-      velocity: 65
-      duration_beats: 0.07
-    - drum: kick
-      bars:
-      - 4
-      beats:
-      - 2.15
-      - 3.09
-      velocity: 73
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 4
-      beats:
-      - 2.65
-      - 3.51
-      velocity: 54
-      duration_beats: 0.055
-    - drum: high_tom
-      bars:
-      - 3
-      beats:
-      - 2.55
-      velocity: 58
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 3
-      beats:
-      - 2.87
-      velocity: 60
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 3
-      beats:
-      - 3.19
-      velocity: 63
-      duration_beats: 0.06
-  transition_short_core:
-    kind: notes
-    articulation: tenuto
-    humanize_ms: 2
-    humanize_velocity_pct: 1
-    notes:
-    - bar: 0
-      beat: 0.0
-      note: C#4
-      dur: 0.17
-      vel: 90
-    - bar: 0
-      beat: 0.27
-      note: E4
-      dur: 0.17
-      vel: 93
-    - bar: 0
-      beat: 0.54
-      note: F#4
-      dur: 0.2
-      vel: 96
-    - bar: 2
-      beat: 0.0
-      note: E4
-      dur: 0.13
-      vel: 91
-    - bar: 2
-      beat: 0.19
-      note: F#4
-      dur: 0.13
-      vel: 94
-    - bar: 2
-      beat: 0.38
-      note: G#4
-      dur: 0.16
-      vel: 97
-    - bar: 2
-      beat: 1.62
-      note: B4
-      dur: 0.24
-      vel: 94
-    - bar: 2
-      beat: 1.94
-      note: G#4
-      dur: 0.22
-      vel: 91
-    - bar: 2
-      beat: 2.24
-      note: F#4
-      dur: 0.23
-      vel: 89
-    - bar: 2
-      beat: 2.56
-      note: E4
-      dur: 0.34
-      vel: 92
-    - bar: 3
-      beat: 1.9
-      note: G#4
-      dur: 0.18
-      vel: 93
-    - bar: 3
-      beat: 2.22
-      note: F#4
-      dur: 0.17
-      vel: 91
-    - bar: 3
-      beat: 2.52
-      note: E4
-      dur: 0.18
-      vel: 89
-    - bar: 3
-      beat: 2.84
-      note: C#4
-      dur: 0.78
-      vel: 92
-    instrument: singline
-  transition_short_bam_core:
-    kind: notes
     articulation: tenuto
     humanize_ms: 1
     humanize_velocity_pct: 1
     notes:
-    - bar: 0
-      beat: 1.15
-      note: A4
-      dur: 3.55
-      vel: 102
-    - bar: 2
-      beat: 0.82
-      note: C#5
-      dur: 0.62
-      vel: 103
-    instrument: singline
-  transition_short_bass:
+    - [0, 0.18, C#4, 0.18, 87]
+    - [0, 0.48, E4, 0.18, 90]
+    - [0, 0.78, F#4, 0.22, 94]
+    - [0, 1.32, A4, 1.42, 99]
+    - [0, 3.02, E4, 0.18, 88]
+    - [0, 3.32, F#4, 0.18, 91]
+    - [0, 3.62, A4, 0.22, 95]
+    - [1, 0.18, C#5, 1.40, 101]
+    - [1, 2.05, F#4, 0.18, 90]
+    - [1, 2.35, A4, 0.18, 93]
+    - [1, 2.65, B4, 0.22, 97]
+    - [2, 0.05, B4, 0.23, 95]
+    - [2, 0.40, A4, 0.23, 93]
+    - [2, 0.75, F#4, 0.23, 91]
+    - [2, 1.10, E4, 0.32, 93]
+    - [2, 1.75, A4, 0.23, 94]
+    - [2, 2.10, F#4, 0.23, 92]
+    - [2, 2.45, E4, 0.23, 90]
+    - [2, 2.80, C#4, 0.55, 93]
+
+  transition_open_bass:
     kind: notes
-    articulation: normal
-    humanize_ms: 2
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.0
-      note: C#2
-      dur: 0.12
-      vel: 79
-    - bar: 0
-      beat: 0.27
-      note: E2
-      dur: 0.12
-      vel: 81
-    - bar: 0
-      beat: 0.54
-      note: F#2
-      dur: 0.15
-      vel: 84
-    - bar: 0
-      beat: 1.15
-      note: F#1
-      dur: 3.4
-      vel: 91
-    - bar: 2
-      beat: 0.0
-      note: E2
-      dur: 0.1
-      vel: 80
-    - bar: 2
-      beat: 0.19
-      note: F#2
-      dur: 0.1
-      vel: 82
-    - bar: 2
-      beat: 0.38
-      note: G#2
-      dur: 0.13
-      vel: 85
-    - bar: 2
-      beat: 0.82
-      note: G#1
-      dur: 0.66
-      vel: 91
-    - bar: 2
-      beat: 1.62
-      note: B2
-      dur: 0.18
-      vel: 84
-    - bar: 2
-      beat: 1.94
-      note: G#2
-      dur: 0.17
-      vel: 82
-    - bar: 2
-      beat: 2.24
-      note: F#2
-      dur: 0.18
-      vel: 81
-    - bar: 2
-      beat: 2.56
-      note: E2
-      dur: 0.24
-      vel: 84
-    - bar: 3
-      beat: 1.9
-      note: G#2
-      dur: 0.18
-      vel: 84
-    - bar: 3
-      beat: 2.22
-      note: F#2
-      dur: 0.17
-      vel: 82
-    - bar: 3
-      beat: 2.52
-      note: E2
-      dur: 0.18
-      vel: 81
-    - bar: 3
-      beat: 2.84
-      note: C#2
-      dur: 0.52
-      vel: 86
     instrument: pocket_bass
-  transition_short_rhodes:
-    kind: notes
     articulation: tenuto
-    humanize_ms: 4
-    humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 1.08
-      note:
-      - F#2
-      - C#3
-      - E3
-      - G#3
-      - A3
-      dur: 3.6
-      vel: 70
-    - bar: 2
-      beat: 0.75
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 1.08
-      vel: 72
-    - bar: 2
-      beat: 2.08
-      note:
-      - E3
-      - B3
-      - F#4
-      - G#4
-      dur: 1.65
-      vel: 68
-    instrument: velvet_keys
-  transition_short_saw:
+    - [0, 0.18, B1, 0.14, 78]
+    - [0, 0.48, C#2, 0.14, 80]
+    - [0, 0.78, E2, 0.17, 83]
+    - [0, 1.32, C#2, 1.62, 91]
+    - [0, 3.02, C#2, 0.14, 79]
+    - [0, 3.32, E2, 0.14, 81]
+    - [0, 3.62, F#2, 0.17, 84]
+    - [1, 0.18, A1, 1.58, 90]
+    - [1, 2.05, E2, 0.14, 80]
+    - [1, 2.35, F#2, 0.14, 82]
+    - [1, 2.65, A2, 0.17, 85]
+    - [2, 0.05, G#2, 0.21, 86]
+    - [2, 0.40, F#2, 0.21, 84]
+    - [2, 0.75, E2, 0.21, 83]
+    - [2, 1.10, C#2, 0.28, 86]
+    - [2, 1.75, F#2, 0.21, 85]
+    - [2, 2.10, E2, 0.21, 83]
+    - [2, 2.45, C#2, 0.21, 82]
+    - [2, 2.80, B1, 0.45, 87]
+
+  transition_bridge_bass:
     kind: notes
+    instrument: pocket_bass
+    articulation: tenuto
+    notes:
+    - [0, 0.18, C#2, 0.14, 79]
+    - [0, 0.48, E2, 0.14, 81]
+    - [0, 0.78, F#2, 0.17, 84]
+    - [0, 1.32, F#1, 1.62, 92]
+    - [0, 3.02, E2, 0.14, 80]
+    - [0, 3.32, F#2, 0.14, 82]
+    - [0, 3.62, A2, 0.17, 85]
+    - [1, 0.18, E2, 1.58, 91]
+    - [1, 2.05, F#2, 0.14, 81]
+    - [1, 2.35, A2, 0.14, 83]
+    - [1, 2.65, B2, 0.17, 86]
+    - [2, 0.05, B2, 0.21, 87]
+    - [2, 0.40, A2, 0.21, 85]
+    - [2, 0.75, F#2, 0.21, 84]
+    - [2, 1.10, E2, 0.28, 87]
+    - [2, 1.75, A2, 0.21, 86]
+    - [2, 2.10, F#2, 0.21, 84]
+    - [2, 2.45, E2, 0.21, 83]
+    - [2, 2.80, C#2, 0.45, 88]
+
+  transition_open_keys:
+    kind: notes
+    instrument: velvet_keys
     articulation: pad
     humanize_ms: 3
     humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 1.15
-      note:
-      - F#2
-      - C#3
-      dur: 3.5
-      vel: 46
-    - bar: 2
-      beat: 0.82
-      note:
-      - G#2
-      - D#3
-      dur: 0.98
-      vel: 48
-    instrument: rising_saw
-  transition_short_pulse:
+    - {bar: 0, beat: 1.29, note: [C#3, G#3, B3, D#4, E4], dur: 1.47, vel: 70}
+    - {bar: 1, beat: 0.15, note: [A2, E3, G#3, B3, C#4], dur: 1.50, vel: 69}
+    - {bar: 2, beat: 0.00, note: [E3, B3, C#4, F#4], dur: 0.44, vel: 61}
+    - {bar: 2, beat: 1.67, note: [G#2, D#3, F#3, C#4], dur: 1.02, vel: 62}
+
+  transition_bridge_keys:
     kind: notes
-    articulation: normal
+    instrument: velvet_keys
+    articulation: pad
     humanize_ms: 3
-    humanize_velocity_pct: 3
+    humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 0.27
-      note: A4
-      dur: 0.08
-      vel: 60
-    - bar: 2
-      beat: 0.19
-      note: B4
-      dur: 0.07
-      vel: 62
-    - bar: 2
-      beat: 2.86
-      note: C#4
-      dur: 0.11
-      vel: 58
+    - {bar: 0, beat: 1.29, note: [F#2, C#3, E3, G#3, A3], dur: 1.47, vel: 70}
+    - {bar: 1, beat: 0.15, note: [E3, B3, F#4, G#4], dur: 1.50, vel: 69}
+    - {bar: 2, beat: 0.00, note: [A2, E3, B3, C#4], dur: 0.44, vel: 61}
+    - {bar: 2, beat: 1.67, note: [G#2, D#3, F#3, C#4], dur: 1.02, vel: 62}
+
+  transition_open_saw:
+    kind: notes
+    instrument: rising_saw
+    articulation: pad
+    notes:
+    - {bar: 0, beat: 1.36, note: [C#3, G#3], dur: 1.34, vel: 50}
+    - {bar: 1, beat: 0.22, note: [A2, E3, B3], dur: 1.28, vel: 51}
+    - {bar: 1, beat: 2.04, note: E3, dur: 0.83, vel: 46}
+    - {bar: 2, beat: 1.73, note: B2, dur: 1.15, vel: 46}
+
+  transition_bridge_saw:
+    kind: notes
+    instrument: rising_saw
+    articulation: pad
+    notes:
+    - {bar: 0, beat: 1.36, note: [F#2, C#3, A3], dur: 1.34, vel: 51}
+    - {bar: 1, beat: 0.22, note: [E3, B3, F#4], dur: 1.28, vel: 52}
+    - {bar: 1, beat: 2.04, note: F#3, dur: 0.83, vel: 47}
+    - {bar: 2, beat: 1.73, note: C#3, dur: 1.15, vel: 47}
+
+  transition_open_motion:
+    kind: notes
     instrument: nervous_chiff
-  transition_short_drums:
+    articulation: staccato
+    notes:
+    - [0, 0.48, G#4, 0.10, 57]
+    - [0, 0.78, B4, 0.10, 59]
+    - [0, 3.32, B3, 0.10, 56]
+    - [1, 2.35, C#4, 0.10, 57]
+    - [1, 2.65, E4, 0.10, 59]
+    - [2, 0.40, B3, 0.10, 56]
+    - [2, 1.10, G#3, 0.12, 57]
+    - [2, 2.10, B3, 0.10, 56]
+    - [2, 2.80, G#3, 0.12, 58]
+
+  transition_bridge_motion:
+    kind: notes
+    instrument: nervous_chiff
+    articulation: staccato
+    notes:
+    - [0, 0.48, A4, 0.10, 58]
+    - [0, 0.78, C#5, 0.10, 60]
+    - [0, 3.32, C#4, 0.10, 57]
+    - [1, 2.35, E4, 0.10, 58]
+    - [1, 2.65, F#4, 0.10, 60]
+    - [2, 0.40, C#4, 0.10, 57]
+    - [2, 1.10, A3, 0.12, 58]
+    - [2, 2.10, C#4, 0.10, 57]
+    - [2, 2.80, A3, 0.12, 59]
+
+  transition_drums:
     kind: drums
     instrument: kit
-    humanize_ms: 3
-    humanize_velocity_pct: 4
+    humanize_ms: 0
+    humanize_velocity_pct: 1
     events:
-    - drum: high_tom
-      bars:
-      - 0
-      beats:
-      - 0.0
-      velocity: 57
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 0
-      beats:
-      - 0.27
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 0
-      beats:
-      - 0.54
-      velocity: 61
-      duration_beats: 0.06
-    - drum: kick
-      bars:
-      - 0
-      beats:
-      - 1.15
-      velocity: 84
-      duration_beats: 0.07
-    - drum: crash
-      bars:
-      - 0
-      beats:
-      - 1.15
-      velocity: 38
-      duration_beats: 0.07
-    - drum: high_tom
-      bars:
-      - 2
-      beats:
-      - 0.0
-      velocity: 57
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 2
-      beats:
-      - 0.19
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 2
-      beats:
-      - 0.38
-      velocity: 62
-      duration_beats: 0.06
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 0.82
-      velocity: 84
-      duration_beats: 0.07
-    - drum: high_tom
-      bars:
-      - 2
-      beats:
-      - 1.62
-      velocity: 58
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 2
-      beats:
-      - 1.94
-      velocity: 59
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 2
-      beats:
-      - 2.24
-      velocity: 61
-      duration_beats: 0.06
-    - drum: floor_tom
-      bars:
-      - 2
-      beats:
-      - 2.56
-      velocity: 63
-      duration_beats: 0.07
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 1.62
-      - 2.24
-      velocity: 70
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 2
-      beats:
-      - 1.94
-      - 2.56
-      velocity: 52
-      duration_beats: 0.055
-    - drum: high_tom
-      bars:
-      - 3
-      beats:
-      - 1.9
-      velocity: 59
-      duration_beats: 0.05
-    - drum: mid_tom
-      bars:
-      - 3
-      beats:
-      - 2.22
-      velocity: 60
-      duration_beats: 0.05
-    - drum: low_tom
-      bars:
-      - 3
-      beats:
-      - 2.52
-      velocity: 62
-      duration_beats: 0.06
-    - drum: floor_tom
-      bars:
-      - 3
-      beats:
-      - 2.84
-      velocity: 65
-      duration_beats: 0.07
-    - drum: kick
-      bars:
-      - 3
-      beats:
-      - 1.9
-      - 2.52
-      velocity: 72
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 3
-      beats:
-      - 2.22
-      - 2.84
-      velocity: 53
-      duration_beats: 0.055
-    - drum: open_hat
-      bars:
-      - 3
-      beats:
-      - 3.55
-      velocity: 32
-      duration_beats: 0.07
+    - {drum: low_tom, bars: [0], beats: [0.18], velocity: 58, duration_beats: 0.05}
+    - {drum: mid_tom, bars: [0], beats: [0.48], velocity: 61, duration_beats: 0.05}
+    - {drum: high_tom, bars: [0], beats: [0.78], velocity: 64, duration_beats: 0.06}
+    - {drum: kick, bars: [0], beats: [1.32], velocity: 90, duration_beats: 0.08}
+    - {drum: crash, bars: [0], beats: [1.32], velocity: 54, duration_beats: 0.08}
+    - {drum: low_tom, bars: [0], beats: [3.02], velocity: 59, duration_beats: 0.05}
+    - {drum: mid_tom, bars: [0], beats: [3.32], velocity: 62, duration_beats: 0.05}
+    - {drum: high_tom, bars: [0], beats: [3.62], velocity: 65, duration_beats: 0.06}
+    - {drum: kick, bars: [1], beats: [0.18], velocity: 92, duration_beats: 0.08}
+    - {drum: china, bars: [1], beats: [0.18], velocity: 46, duration_beats: 0.08}
+    - {drum: low_tom, bars: [1], beats: [2.05], velocity: 59, duration_beats: 0.05}
+    - {drum: mid_tom, bars: [1], beats: [2.35], velocity: 62, duration_beats: 0.05}
+    - {drum: high_tom, bars: [1], beats: [2.65], velocity: 65, duration_beats: 0.06}
+    - {drum: high_tom, bars: [2], beats: [0.05, 1.75], velocity: 61, duration_beats: 0.05}
+    - {drum: mid_tom, bars: [2], beats: [0.40, 2.10], velocity: 63, duration_beats: 0.05}
+    - {drum: low_tom, bars: [2], beats: [0.75, 2.45], velocity: 65, duration_beats: 0.06}
+    - {drum: floor_tom, bars: [2], beats: [1.10, 2.80], velocity: 68, duration_beats: 0.07}
+    - {drum: kick, bars: [2], beats: [0.05, 0.75, 1.75, 2.45], velocity: 75, duration_beats: 0.07}
+    - {drum: electric_snare, bars: [2], beats: [0.40, 1.10, 2.10, 2.80], velocity: 57, duration_beats: 0.055}
+
+  # ---------------------------------------------------------------------------
+  # Jam A: the central pop groove. The bass rhythm is a four-bar hook that is
+  # repeated exactly in bars 4-7 while the pitches answer the harmony. The lead
+  # likewise repeats its first question with one deliberately excessive leap.
+  # ---------------------------------------------------------------------------
   jam_a_bass:
     kind: notes
-    articulation: normal
+    instrument: pocket_bass
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    notes:
+    - [0, 0.25, C#2, 0.72, 91]
+    - [0, 1.55, G#2, 0.25, 78]
+    - [0, 2.62, B2, 0.40, 83]
+    - [0, 3.48, C#3, 0.27, 87]
+    - [1, 0.72, B1, 0.78, 87]
+    - [1, 2.08, E2, 0.48, 84]
+    - [1, 3.34, G#2, 0.54, 82]
+    - [2, 0.38, A1, 0.80, 90]
+    - [2, 1.62, E2, 0.25, 77]
+    - [2, 2.78, B2, 0.42, 82]
+    - [2, 3.64, C#3, 0.24, 85]
+    - [3, 0.12, G#1, 1.00, 92]
+    - [3, 1.90, D#2, 0.34, 79]
+    - [3, 2.56, F#2, 0.28, 78]
+    - [3, 3.52, G#2, 0.35, 84]
+    - [4, 0.25, C#2, 0.72, 91]
+    - [4, 1.55, G#2, 0.25, 78]
+    - [4, 2.62, E2, 0.40, 83]
+    - [4, 3.48, B2, 0.27, 87]
+    - [5, 0.72, B1, 0.78, 87]
+    - [5, 2.08, E2, 0.48, 84]
+    - [5, 3.34, G#2, 0.54, 82]
+    - [6, 0.38, F#1, 0.80, 90]
+    - [6, 1.62, C#2, 0.25, 77]
+    - [6, 2.78, E2, 0.42, 82]
+    - [6, 3.64, F#2, 0.24, 85]
+    - [7, 0.12, G#1, 1.00, 92]
+    - [7, 1.90, D#2, 0.34, 79]
+    - [7, 2.56, F#2, 0.28, 78]
+    - [7, 3.52, G#2, 0.35, 84]
+
+  jam_a_keys:
+    kind: chord_hits
+    instrument: velvet_keys
+    hits:
+    - [0, 0.00]
+    - [0, 2.78]
+    - [1, 1.32]
+    - [1, 3.48]
+    - [2, 0.48]
+    - [2, 2.86]
+    - [3, 1.72]
+    - [3, 3.52]
+    - [4, 0.00]
+    - [4, 2.78]
+    - [5, 1.32]
+    - [5, 3.48]
+    - [6, 0.48]
+    - [6, 2.86]
+    - [7, 1.72]
+    - [7, 3.52]
+    duration_beats: 0.62
+    velocity: 69
+    octave: 3
+    voicing: open
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  jam_a_motion:
+    kind: notes
+    instrument: nervous_chiff
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    notes:
+    - [0, 0.82, E4, 0.10, 59]
+    - [0, 1.28, G#4, 0.10, 61]
+    - [0, 3.12, B3, 0.12, 57]
+    - [1, 0.28, G#4, 0.10, 60]
+    - [1, 2.16, D#4, 0.10, 58]
+    - [1, 3.62, B3, 0.12, 57]
+    - [2, 0.82, E4, 0.10, 59]
+    - [2, 1.28, C#4, 0.10, 58]
+    - [2, 3.12, B4, 0.12, 62]
+    - [3, 0.28, D#4, 0.10, 58]
+    - [3, 2.16, F#4, 0.10, 60]
+    - [3, 3.62, B3, 0.12, 57]
+    - [4, 0.82, E4, 0.10, 59]
+    - [4, 1.28, G#4, 0.10, 61]
+    - [4, 3.12, C#4, 0.12, 58]
+    - [5, 0.28, G#4, 0.10, 60]
+    - [5, 2.16, E4, 0.10, 59]
+    - [5, 3.62, B3, 0.12, 57]
+    - [6, 0.82, A4, 0.10, 61]
+    - [6, 1.28, C#4, 0.10, 58]
+    - [6, 3.12, E4, 0.12, 59]
+    - [7, 0.28, D#4, 0.10, 58]
+    - [7, 2.16, F#4, 0.10, 60]
+    - [7, 3.62, B3, 0.12, 57]
+
+  jam_a_saw:
+    kind: chord_hits
+    instrument: rising_saw
+    hits: [[0, 0.38], [2, 1.84], [4, 0.38], [6, 1.84]]
+    duration_beats: 2.55
+    velocity: 47
+    octave: 3
+    voicing: open
+    articulation: pad
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+
+  jam_a_lead:
+    kind: notes
+    instrument: jamline
+    articulation: tenuto
     humanize_ms: 2
     humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 0.25
-      note: C#2
-      dur: 0.68
-      vel: 88
-    - bar: 0
-      beat: 1.55
-      note: G#2
-      dur: 0.24
-      vel: 76
-    - bar: 0
-      beat: 2.62
-      note: B2
-      dur: 0.42
-      vel: 80
-    - bar: 0
-      beat: 3.48
-      note: C#3
-      dur: 0.28
-      vel: 84
-    - bar: 1
-      beat: 0.72
-      note: B1
-      dur: 0.78
-      vel: 84
-    - bar: 1
-      beat: 2.08
-      note: E2
-      dur: 0.5
-      vel: 86
-    - bar: 1
-      beat: 3.34
-      note: D#2
-      dur: 0.88
-      vel: 82
-    - bar: 2
-      beat: 0.38
-      note: A1
-      dur: 0.82
-      vel: 87
-    - bar: 2
-      beat: 1.62
-      note: E2
-      dur: 0.24
-      vel: 75
-    - bar: 2
-      beat: 2.78
-      note: B2
-      dur: 0.43
-      vel: 81
-    - bar: 2
-      beat: 3.64
-      note: C#3
-      dur: 0.24
-      vel: 83
-    - bar: 3
-      beat: 0.12
-      note: G#1
-      dur: 1.1
-      vel: 89
-    - bar: 3
-      beat: 1.9
-      note: D#2
-      dur: 0.34
-      vel: 78
-    - bar: 3
-      beat: 2.56
-      note: F#2
-      dur: 0.26
-      vel: 77
-    - bar: 3
-      beat: 3.52
-      note: G#2
-      dur: 0.36
-      vel: 83
-    - bar: 4
-      beat: 0.62
-      note: C#2
-      dur: 0.72
-      vel: 88
-    - bar: 4
-      beat: 1.28
-      note: G#2
-      dur: 0.26
-      vel: 76
-    - bar: 4
-      beat: 2.4
-      note: E2
-      dur: 0.6
-      vel: 83
-    - bar: 4
-      beat: 3.48
-      note: B1
-      dur: 0.52
-      vel: 81
-    - bar: 5
-      beat: 0.26
-      note: G1
-      dur: 1.02
-      vel: 89
-    - bar: 5
-      beat: 1.78
-      note: D2
-      dur: 0.36
-      vel: 78
-    - bar: 5
-      beat: 2.88
-      note: F#2
-      dur: 0.78
-      vel: 83
-    - bar: 6
-      beat: 0.86
-      note: A1
-      dur: 0.74
-      vel: 87
-    - bar: 6
-      beat: 2.02
-      note: B1
-      dur: 0.34
-      vel: 76
-    - bar: 6
-      beat: 3.24
-      note: E2
-      dur: 0.68
-      vel: 84
-    - bar: 7
-      beat: 0.18
-      note: G#1
-      dur: 0.54
-      vel: 88
-    - bar: 7
-      beat: 1.44
-      note: D#2
-      dur: 0.42
-      vel: 79
-    - bar: 7
-      beat: 2.84
-      note: F#2
-      dur: 0.3
-      vel: 78
-    - bar: 7
-      beat: 3.58
-      note: G#2
-      dur: 0.3
-      vel: 84
-    instrument: pocket_bass
-  jam_a_rhodes:
-    kind: notes
-    articulation: tenuto
-    humanize_ms: 4
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.0
-      note:
-      - C#3
-      - G#3
-      - B3
-      - D#4
-      - E4
-      dur: 5.45
-      vel: 71
-    - bar: 1
-      beat: 2.22
-      note:
-      - E3
-      - B3
-      - D#4
-      - G#4
-      dur: 2.45
-      vel: 68
-    - bar: 2
-      beat: 0.72
-      note:
-      - A2
-      - E3
-      - B3
-      - C#4
-      - E4
-      dur: 4.85
-      vel: 70
-    - bar: 3
-      beat: 2.02
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 2.02
-      vel: 69
-    - bar: 4
-      beat: 0.22
-      note:
-      - C#3
-      - G#3
-      - B3
-      - D#4
-      - E4
-      dur: 4.95
-      vel: 71
-    - bar: 5
-      beat: 1.74
-      note:
-      - G2
-      - D3
-      - F#3
-      - B3
-      dur: 3.35
-      vel: 70
-    - bar: 6
-      beat: 1.02
-      note:
-      - A2
-      - E3
-      - B3
-      - C#4
-      - E4
-      dur: 4.4
-      vel: 69
-    - bar: 7
-      beat: 2.06
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 1.86
-      vel: 71
-    instrument: velvet_keys
-  jam_a_piano:
-    kind: notes
-    articulation: normal
-    humanize_ms: 5
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 2.84
-      note:
-      - E4
-      - B4
-      dur: 0.34
-      vel: 55
-    - bar: 1
-      beat: 0.44
-      note:
-      - G#4
-      - D#5
-      dur: 0.28
-      vel: 54
-    - bar: 2
-      beat: 2.18
-      note:
-      - C#4
-      - E4
-      dur: 0.32
-      vel: 55
-    - bar: 3
-      beat: 3.18
-      note:
-      - D#4
-      - F#4
-      dur: 0.3
-      vel: 53
-    - bar: 4
-      beat: 1.62
-      note:
-      - B3
-      - E4
-      dur: 0.34
-      vel: 54
-    - bar: 5
-      beat: 0.68
-      note:
-      - B3
-      - F#4
-      dur: 0.3
-      vel: 55
-    - bar: 6
-      beat: 2.62
-      note:
-      - C#4
-      - B4
-      dur: 0.34
-      vel: 54
-    - bar: 7
-      beat: 0.86
-      note:
-      - D#4
-      - G#4
-      dur: 0.3
-      vel: 55
-    instrument: grand_attack
-  jam_a_motion:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 3
-    notes:
-    - bar: 0
-      beat: 0.88
-      note: E4
-      dur: 0.14
-      vel: 60
-    - bar: 0
-      beat: 2.14
-      note: B3
-      dur: 0.12
-      vel: 57
-    - bar: 1
-      beat: 1.38
-      note: G#4
-      dur: 0.12
-      vel: 60
-    - bar: 1
-      beat: 3.62
-      note: D#4
-      dur: 0.14
-      vel: 58
-    - bar: 2
-      beat: 0.18
-      note: E4
-      dur: 0.12
-      vel: 59
-    - bar: 2
-      beat: 2.46
-      note: C#4
-      dur: 0.14
-      vel: 58
-    - bar: 3
-      beat: 1.12
-      note: F#4
-      dur: 0.12
-      vel: 60
-    - bar: 3
-      beat: 3.34
-      note: B3
-      dur: 0.13
-      vel: 57
-    - bar: 4
-      beat: 0.42
-      note: G#4
-      dur: 0.13
-      vel: 60
-    - bar: 4
-      beat: 2.72
-      note: E4
-      dur: 0.12
-      vel: 58
-    - bar: 5
-      beat: 1.18
-      note: D4
-      dur: 0.13
-      vel: 59
-    - bar: 5
-      beat: 3.46
-      note: F#4
-      dur: 0.12
-      vel: 58
-    - bar: 6
-      beat: 0.34
-      note: E4
-      dur: 0.12
-      vel: 59
-    - bar: 6
-      beat: 2.3
-      note: B4
-      dur: 0.13
-      vel: 61
-    - bar: 7
-      beat: 1.26
-      note: D#4
-      dur: 0.12
-      vel: 58
-    - bar: 7
-      beat: 3.18
-      note: G#4
-      dur: 0.14
-      vel: 60
-    instrument: nervous_chiff
-  jam_a_saw:
-    kind: notes
-    articulation: pad
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.1
-      note:
-      - C#3
-      - G#3
-      dur: 7.25
-      vel: 42
-    - bar: 2
-      beat: 0.22
-      note:
-      - A2
-      - E3
-      dur: 6.7
-      vel: 41
-    - bar: 4
-      beat: 0.12
-      note:
-      - C#3
-      - G#3
-      dur: 6.85
-      vel: 42
-    - bar: 6
-      beat: 0.28
-      note:
-      - G#2
-      - D#3
-      dur: 5.55
-      vel: 42
-    instrument: rising_saw
-  jam_a_lead_core:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 1.7
-      note: G#4
-      dur: 0.42
-      vel: 80
-    - bar: 0
-      beat: 2.46
-      note: E4
-      dur: 0.25
-      vel: 77
-    - bar: 0
-      beat: 3.18
-      note: B4
-      dur: 0.58
-      vel: 83
-    - bar: 1
-      beat: 1.12
-      note: G#4
-      dur: 0.34
-      vel: 79
-    - bar: 1
-      beat: 2.42
-      note: F#4
-      dur: 0.55
-      vel: 82
-    - bar: 3
-      beat: 0.78
-      note: F#4
-      dur: 0.24
-      vel: 77
-    - bar: 3
-      beat: 1.22
-      note: G#4
-      dur: 0.42
-      vel: 80
-    - bar: 3
-      beat: 2.54
-      note: D#4
-      dur: 0.68
-      vel: 78
-    - bar: 4
-      beat: 1.18
-      note: E4
-      dur: 0.28
-      vel: 78
-    - bar: 4
-      beat: 1.72
-      note: G#4
-      dur: 0.24
-      vel: 80
-    - bar: 4
-      beat: 2.18
-      note: B4
-      dur: 0.64
-      vel: 83
-    - bar: 5
-      beat: 0.92
-      note: D4
-      dur: 0.42
-      vel: 76
-    - bar: 5
-      beat: 1.66
-      note: B3
-      dur: 0.28
-      vel: 74
-    - bar: 5
-      beat: 2.76
-      note: F#4
-      dur: 0.58
-      vel: 79
-    - bar: 7
-      beat: 1.14
-      note: F#4
-      dur: 0.24
-      vel: 77
-    - bar: 7
-      beat: 1.56
-      note: D#4
-      dur: 0.36
-      vel: 76
-    - bar: 7
-      beat: 2.36
-      note: C#4
-      dur: 0.72
-      vel: 78
-    instrument: jamline
+    - [0, 1.50, E4, 0.30, 80]
+    - [0, 2.05, G#4, 0.24, 82]
+    - [0, 2.48, B4, 1.02, 86]
+    - [1, 1.02, G#4, 0.30, 81]
+    - [1, 1.52, F#4, 0.24, 79]
+    - [1, 1.92, E4, 0.78, 81]
+    - [2, 2.18, C#5, 0.28, 86]
+    - [2, 2.62, B4, 0.28, 83]
+    - [2, 3.04, G#4, 0.74, 81]
+    - [3, 1.18, F#4, 0.24, 79]
+    - [3, 1.58, G#4, 0.24, 81]
+    - [3, 2.02, B4, 0.95, 85]
+    - [4, 1.50, E4, 0.30, 80]
+    - [4, 2.05, G#4, 0.24, 82]
+    - [4, 2.48, E5, 1.12, 89]
+    - [5, 1.02, D#5, 0.30, 85]
+    - [5, 1.52, B4, 0.24, 82]
+    - [5, 1.92, G#4, 0.78, 81]
+    - [6, 2.18, F#4, 0.28, 80]
+    - [6, 2.62, E4, 0.28, 79]
+    - [6, 3.04, C#4, 0.74, 80]
+    - [7, 1.18, G#4, 0.24, 81]
+    - [7, 1.58, B4, 0.24, 84]
+    - [7, 2.02, G#4, 0.95, 82]
+
   jam_a_drums:
     kind: drums
     instrument: kit
-    humanize_ms: 3
-    humanize_velocity_pct: 4
+    humanize_ms: 1
+    humanize_velocity_pct: 2
     events:
-    - drum: kick
-      bars:
-      - 0
-      beats:
-      - 0.2
-      - 1.66
-      - 3.42
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 0
-      beats:
-      - 1.08
-      - 3.02
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 0
-      beats:
-      - 0.48
-      - 1.28
-      - 2.38
-      - 3.74
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 1
-      beats:
-      - 0.74
-      - 2.18
-      - 3.62
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 1
-      beats:
-      - 1.82
-      - 3.38
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 1
-      beats:
-      - 0.18
-      - 1.44
-      - 2.72
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 0.34
-      - 1.88
-      - 3.3
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 2
-      beats:
-      - 0.92
-      - 2.72
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 2
-      beats:
-      - 0.62
-      - 1.56
-      - 2.18
-      - 3.48
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 3
-      beats:
-      - 0.1
-      - 2.46
-      - 3.54
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 3
-      beats:
-      - 1.46
-      - 3.18
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 3
-      beats:
-      - 0.28
-      - 1.12
-      - 2.84
-      - 3.72
-      velocity: 25
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 3
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
-    - drum: kick
-      bars:
-      - 4
-      beats:
-      - 0.58
-      - 1.34
-      - 2.86
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 4
-      beats:
-      - 1.12
-      - 3.42
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 4
-      beats:
-      - 0.4
-      - 1.86
-      - 2.48
-      - 3.24
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 5
-      beats:
-      - 0.22
-      - 1.72
-      - 3.18
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 5
-      beats:
-      - 0.86
-      - 2.64
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 5
-      beats:
-      - 0.64
-      - 1.36
-      - 2.58
-      - 3.78
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 6
-      beats:
-      - 0.86
-      - 2.12
-      - 3.54
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 6
-      beats:
-      - 1.72
-      - 3.08
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 6
-      beats:
-      - 0.22
-      - 1.48
-      - 2.24
-      - 3.38
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 7
-      beats:
-      - 0.16
-      - 1.54
-      - 2.78
-      - 3.66
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 7
-      beats:
-      - 1.2
-      - 2.92
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 7
-      beats:
-      - 0.52
-      - 1.34
-      - 2.46
-      - 3.18
-      velocity: 25
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 7
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
+    - {drum: kick, bars: [0, 2, 4, 6], beats: [0.0, 1.75, 3.25], velocity: 84, duration_beats: 0.08}
+    - {drum: kick, bars: [1, 3, 5, 7], beats: [0.75, 2.50, 3.50], velocity: 85, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 72, duration_beats: 0.06}
+    - {drum: hand_clap, bars: [1, 3, 5, 7], beats: [3.0], velocity: 34, duration_beats: 0.05}
+    - {drum: closed_hat, bars: [0, 2, 4, 6], beats: [0.50, 1.50, 2.25, 3.50], velocity: 29, duration_beats: 0.035}
+    - {drum: closed_hat, bars: [1, 3, 5, 7], beats: [0.25, 1.50, 2.00, 2.75, 3.50], velocity: 28, duration_beats: 0.035}
+    - {drum: open_hat, bars: [1, 3, 5, 7], beats: [3.50], velocity: 34, duration_beats: 0.07}
+    - {drum: side_stick, bars: [7], beats: [3.75], velocity: 36, duration_beats: 0.05}
+
+  # ---------------------------------------------------------------------------
+  # Jam B: half-time feel. The bass leaves larger spaces, while keys and chiff
+  # keep the floor alive. The melody spends its big gesture on one octave leap.
+  # ---------------------------------------------------------------------------
   jam_b_bass:
     kind: notes
-    articulation: normal
+    instrument: pocket_bass
+    articulation: tenuto
+    notes:
+    - [0, 0.40, A1, 1.22, 91]
+    - [0, 2.45, E2, 0.34, 79]
+    - [0, 3.30, G#2, 0.48, 84]
+    - [1, 0.75, E2, 1.02, 88]
+    - [1, 2.85, B1, 0.45, 82]
+    - [2, 0.40, C#2, 1.22, 91]
+    - [2, 2.45, G#2, 0.34, 79]
+    - [2, 3.30, B2, 0.48, 84]
+    - [3, 0.75, G#1, 1.02, 89]
+    - [3, 2.85, D#2, 0.45, 82]
+    - [4, 0.40, A1, 1.22, 91]
+    - [4, 2.45, E2, 0.34, 79]
+    - [4, 3.30, B2, 0.48, 84]
+    - [5, 0.75, G1, 1.02, 90]
+    - [5, 2.85, D2, 0.45, 82]
+    - [6, 0.40, E2, 1.22, 90]
+    - [6, 2.45, B1, 0.34, 79]
+    - [6, 3.30, F#2, 0.48, 84]
+    - [7, 0.75, G#1, 1.02, 92]
+    - [7, 2.85, D#2, 0.45, 83]
+
+  jam_b_keys:
+    kind: chord_hits
+    instrument: velvet_keys
+    hits:
+    - [0, 0.00]
+    - [0, 3.00]
+    - [1, 1.50]
+    - [2, 0.50]
+    - [2, 3.25]
+    - [3, 1.75]
+    - [4, 0.00]
+    - [4, 3.00]
+    - [5, 1.50]
+    - [6, 0.50]
+    - [6, 3.25]
+    - [7, 1.75]
+    duration_beats: 0.82
+    velocity: 70
+    octave: 3
+    voicing: open
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  jam_b_motion:
+    kind: notes
+    instrument: nervous_chiff
+    articulation: staccato
+    notes:
+    - [0, 0.55, E4, 0.11, 58]
+    - [0, 0.95, A4, 0.11, 60]
+    - [0, 2.42, C#4, 0.13, 57]
+    - [1, 0.30, G#4, 0.11, 60]
+    - [1, 1.10, B3, 0.11, 57]
+    - [1, 3.10, E4, 0.13, 59]
+    - [2, 0.55, E4, 0.11, 58]
+    - [2, 0.95, G#4, 0.11, 60]
+    - [2, 2.42, B3, 0.13, 57]
+    - [3, 0.30, D#4, 0.11, 58]
+    - [3, 1.10, F#4, 0.11, 59]
+    - [3, 3.10, B3, 0.13, 57]
+    - [4, 0.55, E4, 0.11, 58]
+    - [4, 0.95, A4, 0.11, 60]
+    - [4, 2.42, C#4, 0.13, 57]
+    - [5, 0.30, D4, 0.11, 58]
+    - [5, 1.10, G4, 0.11, 60]
+    - [5, 3.10, B3, 0.13, 57]
+    - [6, 0.55, F#4, 0.11, 59]
+    - [6, 0.95, B4, 0.11, 61]
+    - [6, 2.42, E4, 0.13, 58]
+    - [7, 0.30, D#4, 0.11, 58]
+    - [7, 1.10, F#4, 0.11, 59]
+    - [7, 3.10, B3, 0.13, 57]
+
+  jam_b_saw:
+    kind: chord_hits
+    instrument: rising_saw
+    hits: [[0, 1.60], [2, 0.20], [4, 1.60], [6, 0.20]]
+    duration_beats: 3.10
+    velocity: 48
+    octave: 3
+    voicing: open
+    articulation: pad
+    humanize_ms: 5
+    humanize_velocity_pct: 2
+
+  jam_b_lead:
+    kind: notes
+    instrument: jamline
+    articulation: tenuto
     humanize_ms: 2
     humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 0.62
-      note: C#2
-      dur: 1.65
-      vel: 88
-    - bar: 0
-      beat: 3.16
-      note: G#1
-      dur: 1.18
-      vel: 82
-    - bar: 1
-      beat: 2.22
-      note: B1
-      dur: 1.42
-      vel: 83
-    - bar: 2
-      beat: 0.88
-      note: G1
-      dur: 1.55
-      vel: 88
-    - bar: 2
-      beat: 3.32
-      note: D2
-      dur: 0.92
-      vel: 80
-    - bar: 3
-      beat: 2.12
-      note: F#2
-      dur: 1.2
-      vel: 82
-    - bar: 4
-      beat: 0.36
-      note: A1
-      dur: 1.72
-      vel: 88
-    - bar: 4
-      beat: 3.08
-      note: E2
-      dur: 1.2
-      vel: 82
-    - bar: 5
-      beat: 2.34
-      note: B1
-      dur: 1.36
-      vel: 83
-    - bar: 6
-      beat: 0.92
-      note: G#1
-      dur: 1.62
-      vel: 89
-    - bar: 6
-      beat: 3.28
-      note: D#2
-      dur: 0.9
-      vel: 80
-    - bar: 7
-      beat: 2.1
-      note: F#2
-      dur: 1.18
-      vel: 82
-    instrument: pocket_bass
-  jam_b_rhodes:
-    kind: notes
-    articulation: tenuto
-    humanize_ms: 4
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.4
-      note:
-      - C#3
-      - G#3
-      - B3
-      - D#4
-      - E4
-      dur: 6.55
-      vel: 70
-    - bar: 2
-      beat: 1.18
-      note:
-      - G2
-      - D3
-      - F#3
-      - B3
-      dur: 6.2
-      vel: 69
-    - bar: 4
-      beat: 0.62
-      note:
-      - A2
-      - E3
-      - B3
-      - C#4
-      - E4
-      dur: 6.2
-      vel: 70
-    - bar: 6
-      beat: 1.24
-      note:
-      - E3
-      - B3
-      - F#4
-      - G#4
-      dur: 5.45
-      vel: 69
-    instrument: velvet_keys
-  jam_b_piano:
-    kind: notes
-    articulation: normal
-    humanize_ms: 5
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 1
-      beat: 2.76
-      note: B4
-      dur: 0.38
-      vel: 52
-    - bar: 3
-      beat: 0.48
-      note: F#4
-      dur: 0.32
-      vel: 53
-    - bar: 4
-      beat: 2.34
-      note:
-      - C#4
-      - E4
-      dur: 0.36
-      vel: 54
-    - bar: 6
-      beat: 0.28
-      note: G#4
-      dur: 0.34
-      vel: 53
-    - bar: 7
-      beat: 3.12
-      note: D#5
-      dur: 0.28
-      vel: 52
-    instrument: grand_attack
-  jam_b_motion:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 3
-    notes:
-    - bar: 0
-      beat: 1.82
-      note: E4
-      dur: 0.16
-      vel: 56
-    - bar: 1
-      beat: 3.42
-      note: B3
-      dur: 0.14
-      vel: 55
-    - bar: 2
-      beat: 2.62
-      note: F#4
-      dur: 0.16
-      vel: 57
-    - bar: 3
-      beat: 1.16
-      note: D4
-      dur: 0.15
-      vel: 55
-    - bar: 4
-      beat: 2.86
-      note: C#4
-      dur: 0.16
-      vel: 56
-    - bar: 5
-      beat: 0.72
-      note: B4
-      dur: 0.14
-      vel: 57
-    - bar: 6
-      beat: 2.42
-      note: G#4
-      dur: 0.16
-      vel: 56
-    - bar: 7
-      beat: 1.38
-      note: F#4
-      dur: 0.15
-      vel: 55
-    instrument: nervous_chiff
-  jam_b_saw:
-    kind: notes
-    articulation: pad
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.28
-      note:
-      - C#3
-      - G#3
-      dur: 7.45
-      vel: 44
-    - bar: 2
-      beat: 0.36
-      note:
-      - G2
-      - D3
-      dur: 7.1
-      vel: 43
-    - bar: 4
-      beat: 0.3
-      note:
-      - A2
-      - E3
-      dur: 7.15
-      vel: 44
-    - bar: 6
-      beat: 0.4
-      note:
-      - E3
-      - B3
-      dur: 6.7
-      vel: 43
-    instrument: rising_saw
-  jam_b_lead_core:
-    kind: notes
-    articulation: tenuto
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 1.46
-      note: G#4
-      dur: 0.62
-      vel: 78
-    - bar: 1
-      beat: 2.18
-      note: E4
-      dur: 0.92
-      vel: 76
-    - bar: 2
-      beat: 1.08
-      note: G4
-      dur: 0.44
-      vel: 77
-    - bar: 2
-      beat: 2.02
-      note: B4
-      dur: 0.68
-      vel: 80
-    - bar: 4
-      beat: 1.34
-      note: E4
-      dur: 0.66
-      vel: 77
-    - bar: 4
-      beat: 2.44
-      note: B4
-      dur: 0.48
-      vel: 81
-    - bar: 6
-      beat: 1.74
-      note: B4
-      dur: 0.42
-      vel: 80
-    - bar: 6
-      beat: 2.58
-      note: G#4
-      dur: 0.86
-      vel: 78
-    instrument: jamline
+    - [0, 1.00, C#4, 0.40, 79]
+    - [0, 1.75, E4, 0.34, 81]
+    - [0, 2.50, G#4, 1.10, 85]
+    - [2, 0.75, B4, 0.40, 84]
+    - [2, 1.40, G#4, 0.30, 81]
+    - [2, 2.00, E4, 1.20, 80]
+    - [4, 1.00, E4, 0.30, 80]
+    - [4, 1.45, G#4, 0.30, 82]
+    - [4, 1.90, E5, 1.65, 90]
+    - [5, 3.05, D#5, 0.38, 85]
+    - [6, 0.10, B4, 0.52, 83]
+    - [6, 1.50, G#4, 0.82, 81]
+    - [7, 1.25, F#4, 0.28, 79]
+    - [7, 1.80, G#4, 0.28, 81]
+    - [7, 2.40, B4, 1.12, 85]
+
   jam_b_drums:
     kind: drums
     instrument: kit
-    humanize_ms: 3
-    humanize_velocity_pct: 4
+    humanize_ms: 1
+    humanize_velocity_pct: 2
     events:
-    - drum: kick
-      bars:
-      - 0
-      beats:
-      - 0.52
-      - 2.86
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 0
-      beats:
-      - 2.42
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 0
-      beats:
-      - 0.26
-      - 1.7
-      - 3.18
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 1
-      beats:
-      - 1.14
-      - 3.42
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 1
-      beats:
-      - 1.88
-      - 3.72
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 1
-      beats:
-      - 0.82
-      - 2.24
-      - 3.66
-      velocity: 25
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 1
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 0.28
-      - 2.32
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 2
-      beats:
-      - 2.66
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 2
-      beats:
-      - 0.44
-      - 1.94
-      - 3.42
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 3
-      beats:
-      - 1.62
-      - 3.56
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 3
-      beats:
-      - 1.42
-      - 3.38
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 3
-      beats:
-      - 1.12
-      - 2.72
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 4
-      beats:
-      - 0.74
-      - 2.92
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 4
-      beats:
-      - 2.28
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 4
-      beats:
-      - 0.34
-      - 1.58
-      - 3.12
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 5
-      beats:
-      - 0.18
-      - 3.26
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 5
-      beats:
-      - 1.74
-      - 3.54
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 5
-      beats:
-      - 0.92
-      - 2.46
-      - 3.78
-      velocity: 25
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 5
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
-    - drum: kick
-      bars:
-      - 6
-      beats:
-      - 1.02
-      - 2.48
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 6
-      beats:
-      - 2.52
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 6
-      beats:
-      - 0.54
-      - 2.04
-      - 3.34
-      velocity: 25
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 7
-      beats:
-      - 0.36
-      - 3.18
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 7
-      beats:
-      - 1.3
-      - 3.22
-      velocity: 66
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 7
-      beats:
-      - 1.18
-      - 2.64
-      velocity: 25
-      duration_beats: 0.035
+    - {drum: kick, bars: [0, 2, 4, 6], beats: [0.0, 2.75], velocity: 84, duration_beats: 0.08}
+    - {drum: kick, bars: [1, 3, 5, 7], beats: [0.75, 3.25], velocity: 85, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [2.0], velocity: 76, duration_beats: 0.065}
+    - {drum: hand_clap, bars: [3, 7], beats: [2.0], velocity: 38, duration_beats: 0.05}
+    - {drum: closed_hat, beats: [0.50, 1.25, 2.50, 3.25], velocity: 28, duration_beats: 0.035}
+    - {drum: closed_hat, bars: [1, 3, 5, 7], beats: [3.75], velocity: 26, duration_beats: 0.035}
+    - {drum: open_hat, bars: [3, 7], beats: [3.25], velocity: 34, duration_beats: 0.07}
+
+  # ---------------------------------------------------------------------------
+  # Jam C: the groove snaps back into motion. It reuses Jam A's bass timing so
+  # the song has one body, but changes the harmonic route and gives the lead a
+  # brighter short-short-long hook before the loop returns to transition speech.
+  # ---------------------------------------------------------------------------
   jam_c_bass:
     kind: notes
-    articulation: normal
-    humanize_ms: 2
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.18
-      note: F#1
-      dur: 0.52
-      vel: 87
-    - bar: 0
-      beat: 0.94
-      note: C#2
-      dur: 0.22
-      vel: 75
-    - bar: 0
-      beat: 1.7
-      note: E2
-      dur: 0.36
-      vel: 81
-    - bar: 0
-      beat: 2.58
-      note: G#2
-      dur: 0.24
-      vel: 77
-    - bar: 0
-      beat: 3.42
-      note: A2
-      dur: 0.42
-      vel: 84
-    - bar: 1
-      beat: 0.48
-      note: C2
-      dur: 0.48
-      vel: 86
-    - bar: 1
-      beat: 1.26
-      note: G2
-      dur: 0.22
-      vel: 76
-    - bar: 1
-      beat: 2.18
-      note: B2
-      dur: 0.3
-      vel: 81
-    - bar: 1
-      beat: 3.36
-      note: E2
-      dur: 0.52
-      vel: 84
-    - bar: 2
-      beat: 0.12
-      note: E2
-      dur: 0.46
-      vel: 86
-    - bar: 2
-      beat: 0.88
-      note: B1
-      dur: 0.22
-      vel: 75
-    - bar: 2
-      beat: 1.66
-      note: F#2
-      dur: 0.34
-      vel: 81
-    - bar: 2
-      beat: 2.72
-      note: G#2
-      dur: 0.28
-      vel: 78
-    - bar: 2
-      beat: 3.52
-      note: B2
-      dur: 0.38
-      vel: 83
-    - bar: 3
-      beat: 0.36
-      note: G#1
-      dur: 0.62
-      vel: 89
-    - bar: 3
-      beat: 1.52
-      note: D#2
-      dur: 0.25
-      vel: 77
-    - bar: 3
-      beat: 2.36
-      note: F#2
-      dur: 0.28
-      vel: 78
-    - bar: 3
-      beat: 3.28
-      note: G#2
-      dur: 0.42
-      vel: 84
-    - bar: 4
-      beat: 0.24
-      note: F#1
-      dur: 0.52
-      vel: 87
-    - bar: 4
-      beat: 1.06
-      note: C#2
-      dur: 0.24
-      vel: 75
-    - bar: 4
-      beat: 2.04
-      note: E2
-      dur: 0.34
-      vel: 81
-    - bar: 4
-      beat: 3.18
-      note: A2
-      dur: 0.4
-      vel: 84
-    - bar: 5
-      beat: 0.52
-      note: C2
-      dur: 0.5
-      vel: 86
-    - bar: 5
-      beat: 1.38
-      note: G2
-      dur: 0.22
-      vel: 76
-    - bar: 5
-      beat: 2.42
-      note: B2
-      dur: 0.3
-      vel: 81
-    - bar: 5
-      beat: 3.5
-      note: E2
-      dur: 0.46
-      vel: 84
-    - bar: 6
-      beat: 0.1
-      note: E2
-      dur: 0.44
-      vel: 86
-    - bar: 6
-      beat: 0.82
-      note: B1
-      dur: 0.22
-      vel: 75
-    - bar: 6
-      beat: 1.72
-      note: F#2
-      dur: 0.32
-      vel: 81
-    - bar: 6
-      beat: 2.64
-      note: G#2
-      dur: 0.26
-      vel: 78
-    - bar: 6
-      beat: 3.44
-      note: B2
-      dur: 0.36
-      vel: 83
-    - bar: 7
-      beat: 0.32
-      note: G#1
-      dur: 0.72
-      vel: 89
-    - bar: 7
-      beat: 1.72
-      note: D#2
-      dur: 0.28
-      vel: 78
-    - bar: 7
-      beat: 2.76
-      note: F#2
-      dur: 0.3
-      vel: 79
     instrument: pocket_bass
-  jam_c_rhodes:
-    kind: notes
     articulation: tenuto
-    humanize_ms: 4
-    humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 0.0
-      note:
-      - F#2
-      - C#3
-      - E3
-      - G#3
-      - A3
-      dur: 3.25
-      vel: 70
-    - bar: 0
-      beat: 3.38
-      note:
-      - C#4
-      - E4
-      dur: 0.7
-      vel: 61
-    - bar: 1
-      beat: 0.68
-      note:
-      - C3
-      - G3
-      - B3
-      - E4
-      dur: 3.55
-      vel: 69
-    - bar: 2
-      beat: 1.42
-      note:
-      - E3
-      - B3
-      - F#4
-      - G#4
-      dur: 3.25
-      vel: 70
-    - bar: 3
-      beat: 0.28
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 4.25
-      vel: 70
-    - bar: 4
-      beat: 0.9
-      note:
-      - F#2
-      - C#3
-      - E3
-      - A3
-      dur: 3.05
-      vel: 69
-    - bar: 5
-      beat: 0.44
-      note:
-      - C3
-      - G3
-      - B3
-      - E4
-      dur: 3.35
-      vel: 70
-    - bar: 6
-      beat: 1.18
-      note:
-      - E3
-      - B3
-      - F#4
-      - G#4
-      dur: 3.28
-      vel: 70
-    - bar: 7
-      beat: 0.2
-      note:
-      - G#2
-      - D#3
-      - F#3
-      - C#4
-      dur: 3.2
-      vel: 71
+    - [0, 0.25, F#1, 0.72, 91]
+    - [0, 1.55, C#2, 0.25, 78]
+    - [0, 2.62, E2, 0.40, 83]
+    - [0, 3.48, F#2, 0.27, 87]
+    - [1, 0.72, A1, 0.78, 88]
+    - [1, 2.08, E2, 0.48, 84]
+    - [1, 3.34, C#2, 0.54, 82]
+    - [2, 0.38, E2, 0.80, 90]
+    - [2, 1.62, B1, 0.25, 77]
+    - [2, 2.78, F#2, 0.42, 82]
+    - [2, 3.64, G#2, 0.24, 85]
+    - [3, 0.12, G#1, 1.00, 92]
+    - [3, 1.90, D#2, 0.34, 79]
+    - [3, 2.56, F#2, 0.28, 78]
+    - [3, 3.52, G#2, 0.35, 84]
+    - [4, 0.25, F#1, 0.72, 91]
+    - [4, 1.55, C#2, 0.25, 78]
+    - [4, 2.62, A2, 0.40, 84]
+    - [4, 3.48, C#3, 0.27, 87]
+    - [5, 0.72, C2, 0.78, 89]
+    - [5, 2.08, G2, 0.48, 84]
+    - [5, 3.34, E2, 0.54, 82]
+    - [6, 0.38, E2, 0.80, 90]
+    - [6, 1.62, B1, 0.25, 77]
+    - [6, 2.78, F#2, 0.42, 82]
+    - [6, 3.64, B2, 0.24, 85]
+    - [7, 0.12, G#1, 1.00, 92]
+    - [7, 1.90, D#2, 0.34, 79]
+    - [7, 2.56, F#2, 0.28, 78]
+    - [7, 3.52, G#2, 0.35, 84]
+
+  jam_c_keys:
+    kind: chord_hits
     instrument: velvet_keys
-  jam_c_piano:
-    kind: notes
-    articulation: normal
-    humanize_ms: 5
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 1.88
-      note: A4
-      dur: 0.26
-      vel: 55
-    - bar: 1
-      beat: 3.1
-      note: E5
-      dur: 0.24
-      vel: 54
-    - bar: 2
-      beat: 0.36
-      note:
-      - G#4
-      - B4
-      dur: 0.28
-      vel: 55
-    - bar: 3
-      beat: 2.18
-      note: C#5
-      dur: 0.24
-      vel: 54
-    - bar: 4
-      beat: 3.36
-      note: E4
-      dur: 0.26
-      vel: 55
-    - bar: 5
-      beat: 1.02
-      note: B4
-      dur: 0.24
-      vel: 54
-    - bar: 6
-      beat: 2.54
-      note: G#4
-      dur: 0.27
-      vel: 55
-    - bar: 7
-      beat: 1.34
-      note: D#5
-      dur: 0.24
-      vel: 54
-    instrument: grand_attack
-  jam_c_motion:
-    kind: notes
-    articulation: normal
+    hits:
+    - [0, 0.50]
+    - [0, 2.50]
+    - [1, 1.25]
+    - [1, 3.50]
+    - [2, 0.25]
+    - [2, 2.75]
+    - [3, 1.50]
+    - [3, 3.25]
+    - [4, 0.50]
+    - [4, 2.50]
+    - [5, 1.25]
+    - [5, 3.50]
+    - [6, 0.25]
+    - [6, 2.75]
+    - [7, 1.50]
+    - [7, 3.25]
+    duration_beats: 0.58
+    velocity: 70
+    octave: 3
+    voicing: open
+    articulation: marcato
     humanize_ms: 3
     humanize_velocity_pct: 3
-    notes:
-    - bar: 0
-      beat: 0.52
-      note: A4
-      dur: 0.1
-      vel: 61
-    - bar: 0
-      beat: 1.34
-      note: C#4
-      dur: 0.1
-      vel: 61
-    - bar: 0
-      beat: 2.22
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 0
-      beat: 3.72
-      note: G#4
-      dur: 0.1
-      vel: 61
-    - bar: 1
-      beat: 0.2
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 1
-      beat: 1.62
-      note: B4
-      dur: 0.1
-      vel: 61
-    - bar: 1
-      beat: 2.72
-      note: G4
-      dur: 0.1
-      vel: 61
-    - bar: 2
-      beat: 0.58
-      note: G#4
-      dur: 0.1
-      vel: 61
-    - bar: 2
-      beat: 1.18
-      note: B3
-      dur: 0.1
-      vel: 61
-    - bar: 2
-      beat: 2.38
-      note: F#4
-      dur: 0.1
-      vel: 61
-    - bar: 2
-      beat: 3.78
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 3
-      beat: 0.76
-      note: C#4
-      dur: 0.1
-      vel: 61
-    - bar: 3
-      beat: 1.86
-      note: D#4
-      dur: 0.1
-      vel: 61
-    - bar: 3
-      beat: 3.46
-      note: G#4
-      dur: 0.1
-      vel: 61
-    - bar: 4
-      beat: 0.44
-      note: A4
-      dur: 0.1
-      vel: 61
-    - bar: 4
-      beat: 1.42
-      note: C#4
-      dur: 0.1
-      vel: 61
-    - bar: 4
-      beat: 2.86
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 5
-      beat: 0.26
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 5
-      beat: 1.76
-      note: B4
-      dur: 0.1
-      vel: 61
-    - bar: 5
-      beat: 3.12
-      note: G4
-      dur: 0.1
-      vel: 61
-    - bar: 6
-      beat: 0.62
-      note: G#4
-      dur: 0.1
-      vel: 61
-    - bar: 6
-      beat: 1.36
-      note: B3
-      dur: 0.1
-      vel: 61
-    - bar: 6
-      beat: 2.46
-      note: F#4
-      dur: 0.1
-      vel: 61
-    - bar: 6
-      beat: 3.68
-      note: E4
-      dur: 0.1
-      vel: 61
-    - bar: 7
-      beat: 0.84
-      note: C#4
-      dur: 0.1
-      vel: 61
-    - bar: 7
-      beat: 2.14
-      note: D#4
-      dur: 0.1
-      vel: 61
+
+  jam_c_motion:
+    kind: notes
     instrument: nervous_chiff
-  jam_c_saw:
-    kind: notes
-    articulation: pad
-    humanize_ms: 3
-    humanize_velocity_pct: 2
+    articulation: staccato
     notes:
-    - bar: 0
-      beat: 0.06
-      note:
-      - F#2
-      - C#3
-      dur: 7.2
-      vel: 43
-    - bar: 2
-      beat: 0.18
-      note:
-      - E3
-      - B3
-      dur: 6.8
-      vel: 43
-    - bar: 4
-      beat: 0.14
-      note:
-      - C3
-      - G3
-      dur: 6.9
-      vel: 43
-    - bar: 6
-      beat: 0.18
-      note:
-      - G#2
-      - D#3
-      dur: 6.0
-      vel: 44
+    - [0, 0.50, A4, 0.10, 60]
+    - [0, 1.25, C#4, 0.10, 58]
+    - [0, 2.75, E4, 0.10, 59]
+    - [0, 3.50, G#4, 0.10, 61]
+    - [1, 0.25, E4, 0.10, 59]
+    - [1, 1.75, C#4, 0.10, 58]
+    - [1, 2.50, A4, 0.10, 60]
+    - [2, 0.50, G#4, 0.10, 60]
+    - [2, 1.25, B3, 0.10, 57]
+    - [2, 2.75, F#4, 0.10, 59]
+    - [2, 3.50, E4, 0.10, 58]
+    - [3, 0.25, C#4, 0.10, 57]
+    - [3, 1.75, D#4, 0.10, 58]
+    - [3, 2.50, G#4, 0.10, 60]
+    - [4, 0.50, A4, 0.10, 60]
+    - [4, 1.25, C#4, 0.10, 58]
+    - [4, 2.75, E4, 0.10, 59]
+    - [4, 3.50, A4, 0.10, 61]
+    - [5, 0.25, E4, 0.10, 59]
+    - [5, 1.75, B4, 0.10, 61]
+    - [5, 2.50, G4, 0.10, 60]
+    - [6, 0.50, G#4, 0.10, 60]
+    - [6, 1.25, B3, 0.10, 57]
+    - [6, 2.75, F#4, 0.10, 59]
+    - [6, 3.50, E4, 0.10, 58]
+    - [7, 0.25, C#4, 0.10, 57]
+    - [7, 1.75, D#4, 0.10, 58]
+    - [7, 2.50, G#4, 0.10, 60]
+
+  jam_c_saw:
+    kind: chord_hits
     instrument: rising_saw
-  jam_c_lead_core:
+    hits: [[0, 1.25], [2, 0.75], [4, 1.25], [6, 0.75]]
+    duration_beats: 2.60
+    velocity: 48
+    octave: 3
+    voicing: open
+    articulation: pad
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+
+  jam_c_lead:
     kind: notes
+    instrument: jamline
     articulation: tenuto
     humanize_ms: 2
     humanize_velocity_pct: 2
     notes:
-    - bar: 0
-      beat: 0.82
-      note: C#4
-      dur: 0.2
-      vel: 78
-    - bar: 0
-      beat: 1.18
-      note: E4
-      dur: 0.18
-      vel: 80
-    - bar: 0
-      beat: 1.62
-      note: A4
-      dur: 0.44
-      vel: 83
-    - bar: 1
-      beat: 1.06
-      note: G4
-      dur: 0.24
-      vel: 79
-    - bar: 1
-      beat: 1.58
-      note: E4
-      dur: 0.42
-      vel: 77
-    - bar: 2
-      beat: 0.74
-      note: B4
-      dur: 0.28
-      vel: 82
-    - bar: 2
-      beat: 1.18
-      note: G#4
-      dur: 0.2
-      vel: 80
-    - bar: 2
-      beat: 1.64
-      note: F#4
-      dur: 0.54
-      vel: 78
-    - bar: 3
-      beat: 1.12
-      note: D#4
-      dur: 0.24
-      vel: 77
-    - bar: 3
-      beat: 1.54
-      note: F#4
-      dur: 0.3
-      vel: 80
-    - bar: 3
-      beat: 2.08
-      note: G#4
-      dur: 0.48
-      vel: 82
-    - bar: 4
-      beat: 0.66
-      note: A4
-      dur: 0.3
-      vel: 82
-    - bar: 4
-      beat: 1.06
-      note: B4
-      dur: 0.22
-      vel: 84
-    - bar: 4
-      beat: 1.54
-      note: E4
-      dur: 0.62
-      vel: 78
-    - bar: 5
-      beat: 0.96
-      note: B3
-      dur: 0.28
-      vel: 76
-    - bar: 5
-      beat: 1.42
-      note: D4
-      dur: 0.42
-      vel: 78
-    - bar: 5
-      beat: 2.16
-      note: G4
-      dur: 0.26
-      vel: 80
-    - bar: 6
-      beat: 0.84
-      note: G#4
-      dur: 0.28
-      vel: 80
-    - bar: 6
-      beat: 1.32
-      note: B4
-      dur: 0.28
-      vel: 82
-    - bar: 6
-      beat: 1.78
-      note: B4
-      dur: 0.38
-      vel: 84
-    - bar: 7
-      beat: 1.02
-      note: F#4
-      dur: 0.22
-      vel: 78
-    - bar: 7
-      beat: 1.42
-      note: D#4
-      dur: 0.24
-      vel: 77
-    - bar: 7
-      beat: 1.86
-      note: C#4
-      dur: 0.72
-      vel: 79
-    instrument: jamline
+    - [0, 0.85, A4, 0.22, 82]
+    - [0, 1.20, C#5, 0.22, 85]
+    - [0, 1.55, E5, 0.72, 88]
+    - [1, 2.05, C#5, 0.35, 84]
+    - [1, 2.72, B4, 0.62, 82]
+    - [2, 0.72, B4, 0.22, 83]
+    - [2, 1.08, G#4, 0.22, 80]
+    - [2, 1.44, F#4, 0.82, 80]
+    - [3, 2.10, G#4, 0.28, 81]
+    - [3, 2.55, B4, 0.28, 84]
+    - [3, 2.98, C#5, 0.88, 86]
+    - [4, 0.85, A4, 0.22, 82]
+    - [4, 1.20, C#5, 0.22, 85]
+    - [4, 1.55, F#5, 1.15, 90]
+    - [5, 1.00, E5, 0.35, 86]
+    - [5, 1.55, B4, 0.26, 82]
+    - [5, 2.10, G4, 0.78, 81]
+    - [6, 1.75, G#4, 0.28, 81]
+    - [6, 2.15, B4, 0.28, 84]
+    - [6, 2.55, E5, 0.92, 88]
+    - [7, 1.25, D#5, 0.25, 85]
+    - [7, 1.70, B4, 0.25, 82]
+    - [7, 2.15, G#4, 1.10, 82]
+
   jam_c_drums:
     kind: drums
     instrument: kit
-    humanize_ms: 3
-    humanize_velocity_pct: 4
+    humanize_ms: 1
+    humanize_velocity_pct: 2
     events:
-    - drum: kick
-      bars:
-      - 0
-      beats:
-      - 0.12
-      - 0.98
-      - 2.18
-      - 3.44
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 0
-      beats:
-      - 1.34
-      - 3.1
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 0
-      beats:
-      - 0.34
-      - 0.72
-      - 1.86
-      - 2.66
-      - 3.58
-      velocity: 26
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 1
-      beats:
-      - 0.48
-      - 1.54
-      - 2.72
-      - 3.62
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 1
-      beats:
-      - 0.92
-      - 2.58
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 1
-      beats:
-      - 0.18
-      - 1.12
-      - 1.96
-      - 3.28
-      velocity: 26
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 2
-      beats:
-      - 0.2
-      - 1.26
-      - 2.46
-      - 3.74
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 2
-      beats:
-      - 1.7
-      - 3.34
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 2
-      beats:
-      - 0.46
-      - 1.38
-      - 2.18
-      - 3.66
-      velocity: 26
-      duration_beats: 0.035
-    - drum: side_stick
-      bars:
-      - 2
-      beats:
-      - 0.72
-      - 3.32
-      velocity: 29
-      duration_beats: 0.04
-    - drum: kick
-      bars:
-      - 3
-      beats:
-      - 0.64
-      - 1.82
-      - 2.9
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 3
-      beats:
-      - 1.16
-      - 2.74
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 3
-      beats:
-      - 0.22
-      - 0.94
-      - 2.42
-      - 3.42
-      velocity: 26
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 3
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
-    - drum: kick
-      bars:
-      - 4
-      beats:
-      - 0.18
-      - 1.1
-      - 2.34
-      - 3.52
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 4
-      beats:
-      - 1.48
-      - 3.22
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 4
-      beats:
-      - 0.38
-      - 1.18
-      - 2.06
-      - 3.74
-      velocity: 26
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 5
-      beats:
-      - 0.42
-      - 1.62
-      - 2.78
-      - 3.7
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 5
-      beats:
-      - 0.84
-      - 2.46
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 5
-      beats:
-      - 0.16
-      - 1.04
-      - 2.34
-      - 3.18
-      velocity: 26
-      duration_beats: 0.035
-    - drum: kick
-      bars:
-      - 6
-      beats:
-      - 0.26
-      - 1.38
-      - 2.54
-      - 3.82
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 6
-      beats:
-      - 1.62
-      - 3.06
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 6
-      beats:
-      - 0.52
-      - 1.26
-      - 2.12
-      - 3.62
-      velocity: 26
-      duration_beats: 0.035
-    - drum: side_stick
-      bars:
-      - 6
-      beats:
-      - 0.72
-      - 3.32
-      velocity: 29
-      duration_beats: 0.04
-    - drum: kick
-      bars:
-      - 7
-      beats:
-      - 0.58
-      - 1.74
-      - 2.86
-      - 3.44
-      velocity: 76
-      duration_beats: 0.07
-    - drum: electric_snare
-      bars:
-      - 7
-      beats:
-      - 1.12
-      - 2.68
-      velocity: 67
-      duration_beats: 0.055
-    - drum: closed_hat
-      bars:
-      - 7
-      beats:
-      - 0.28
-      - 1.46
-      - 2.28
-      - 3.76
-      velocity: 26
-      duration_beats: 0.035
-    - drum: open_hat
-      bars:
-      - 7
-      beats:
-      - 3.72
-      velocity: 31
-      duration_beats: 0.08
-  saw_motion:
-    kind: automation
-    instrument: rising_saw
-    automation:
-    - cc: brightness
-      from: 14
-      to: 122
-      curve: saw_up
-      cycles: 3.5
-      points: 113
-    - cc: resonance
-      from: 92
-      to: 28
-      curve: saw_down
-      cycles: 2.5
-      points: 81
-    - cc: modulation
-      from: 5
-      to: 52
-      curve: lfo
-      cycles: 7.0
-      points: 129
-    - cc: chorus
-      from: 2
-      to: 30
-      curve: lfo
-      cycles: 3.25
-      points: 81
-  pulse_motion:
-    kind: automation
-    instrument: nervous_chiff
-    automation:
-    - cc: brightness
-      from: 24
-      to: 102
-      curve: saw_up
-      cycles: 4.5
-      points: 97
-    - cc: resonance
-      from: 72
-      to: 38
-      curve: saw_down
-      cycles: 3.25
-      points: 73
-    - cc: modulation
-      from: 4
-      to: 38
-      curve: lfo
-      cycles: 8.5
-      points: 129
-    - cc: chorus
-      from: 2
-      to: 20
-      curve: lfo
-      cycles: 4.25
-      points: 97
-  air_motion:
-    kind: automation
-    instrument: warm_air
-    automation:
-    - cc: brightness
-      from: 18
-      to: 92
-      curve: saw_up
-      cycles: 1.75
-      points: 57
-    - cc: resonance
-      from: 76
-      to: 42
-      curve: saw_down
-      cycles: 1.25
-      points: 41
-    - cc: modulation
-      from: 8
-      to: 46
-      curve: lfo
-      cycles: 2.75
-      points: 81
-    - cc: chorus
-      from: 4
-      to: 24
-      curve: lfo
-      cycles: 2.0
-      points: 65
-  warm_air:
-    kind: pad_chords
-    instruments:
-    - warm_air
-    octave: 3
-    duration_beats: 3.85
-    velocity: 34
-    articulation: pad
-    voicing: shell
-    humanize_ms: 5
-    humanize_velocity_pct: 2
-  transition_full_piano:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.0
-      note:
-      - B3
-      - E4
-      dur: 0.13
-      vel: 54
-    - bar: 0
-      beat: 0.32
-      note:
-      - C#4
-      - G#4
-      dur: 0.13
-      vel: 55
-    - bar: 0
-      beat: 0.64
-      note:
-      - E4
-      - B4
-      dur: 0.16
-      vel: 57
-    - bar: 2
-      beat: 0.05
-      note:
-      - C#4
-      - E4
-      dur: 0.13
-      vel: 54
-    - bar: 2
-      beat: 0.37
-      note:
-      - E4
-      - G#4
-      dur: 0.13
-      vel: 56
-    - bar: 2
-      beat: 0.69
-      note:
-      - F#4
-      - A4
-      dur: 0.16
-      vel: 58
-    - bar: 3
-      beat: 2.55
-      note:
-      - E4
-      - G#4
-      dur: 0.13
-      vel: 54
-    - bar: 3
-      beat: 2.87
-      note:
-      - F#4
-      - A4
-      dur: 0.13
-      vel: 56
-    - bar: 3
-      beat: 3.19
-      note:
-      - A4
-      - C#5
-      dur: 0.16
-      vel: 58
-    - bar: 4
-      beat: 0.35
-      note:
-      - E4
-      - G#4
-      dur: 0.16
-      vel: 55
-    - bar: 4
-      beat: 0.85
-      note:
-      - D#4
-      - F#4
-      dur: 0.15
-      vel: 54
-    - bar: 4
-      beat: 1.29
-      note:
-      - C#4
-      - E4
-      dur: 0.16
-      vel: 53
-    - bar: 4
-      beat: 1.71
-      note:
-      - B3
-      - C#4
-      dur: 0.18
-      vel: 55
-    - bar: 4
-      beat: 2.15
-      note:
-      - D#4
-      - F#4
-      dur: 0.16
-      vel: 55
-    - bar: 4
-      beat: 2.65
-      note:
-      - C#4
-      - E4
-      dur: 0.15
-      vel: 54
-    - bar: 4
-      beat: 3.09
-      note:
-      - B3
-      - C#4
-      dur: 0.16
-      vel: 53
-    - bar: 4
-      beat: 3.51
-      note:
-      - G#3
-      - B3
-      dur: 0.22
-      vel: 56
-    instrument: grand_attack
-  transition_short_piano:
-    kind: notes
-    articulation: normal
-    humanize_ms: 3
-    humanize_velocity_pct: 2
-    notes:
-    - bar: 0
-      beat: 0.0
-      note:
-      - C#4
-      - G#4
-      dur: 0.11
-      vel: 54
-    - bar: 0
-      beat: 0.27
-      note:
-      - E4
-      - A4
-      dur: 0.11
-      vel: 55
-    - bar: 0
-      beat: 0.54
-      note:
-      - F#4
-      - B4
-      dur: 0.14
-      vel: 57
-    - bar: 2
-      beat: 0.0
-      note:
-      - E4
-      - G#4
-      dur: 0.1
-      vel: 54
-    - bar: 2
-      beat: 0.19
-      note:
-      - F#4
-      - A4
-      dur: 0.1
-      vel: 55
-    - bar: 2
-      beat: 0.38
-      note:
-      - G#4
-      - B4
-      dur: 0.13
-      vel: 58
-    - bar: 2
-      beat: 1.62
-      note:
-      - G#4
-      - B4
-      dur: 0.14
-      vel: 55
-    - bar: 2
-      beat: 1.94
-      note:
-      - E4
-      - G#4
-      dur: 0.14
-      vel: 54
-    - bar: 2
-      beat: 2.24
-      note:
-      - D#4
-      - F#4
-      dur: 0.14
-      vel: 53
-    - bar: 2
-      beat: 2.56
-      note:
-      - C#4
-      - E4
-      dur: 0.17
-      vel: 55
-    - bar: 3
-      beat: 1.9
-      note:
-      - E4
-      - G#4
-      dur: 0.14
-      vel: 55
-    - bar: 3
-      beat: 2.22
-      note:
-      - D#4
-      - F#4
-      dur: 0.14
-      vel: 54
-    - bar: 3
-      beat: 2.52
-      note:
-      - C#4
-      - E4
-      dur: 0.14
-      vel: 53
-    - bar: 3
-      beat: 2.84
-      note:
-      - B3
-      - C#4
-      dur: 0.2
-      vel: 56
-    instrument: grand_attack
+    - {drum: kick, bars: [0, 2, 4, 6], beats: [0.0, 1.50, 2.75, 3.50], velocity: 86, duration_beats: 0.08}
+    - {drum: kick, bars: [1, 3, 5, 7], beats: [0.50, 2.00, 3.25], velocity: 85, duration_beats: 0.08}
+    - {drum: electric_snare, beats: [1.0, 3.0], velocity: 74, duration_beats: 0.06}
+    - {drum: hand_clap, bars: [1, 5], beats: [3.0], velocity: 34, duration_beats: 0.05}
+    - {drum: closed_hat, beats: [0.50, 1.50, 2.50, 3.50], velocity: 29, duration_beats: 0.035}
+    - {drum: open_hat, bars: [1, 3, 5, 7], beats: [0.25, 2.25], velocity: 31, duration_beats: 0.07}
+    - {drum: crash, bars: [0, 4], beats: [0.0], velocity: 48, duration_beats: 0.08}
+
 sections:
 - id: transition_open
-  bars: 5
-  intensity: 0.98
-  density: 0.94
+  bars: 3
+  intensity: 1.0
+  density: 1.0
   loopable: false
-  harmony:
-  - C#m9
-  - C#m9
-  - Amaj7
-  - Amaj7
-  - Eadd9
+  harmony: [C#m9, Amaj7, G#7sus4]
   layers:
-  - transition_full_bass
-  - transition_full_pulse
-  - transition_full_rhodes
-  - transition_full_piano
-  - transition_full_saw
-  - transition_full_core
-  - transition_full_bam_core
-  - transition_full_drums
-  - saw_motion
-  - pulse_motion
-  mix_gain_db: -1.9
+  - transition_open_bass
+  - transition_open_motion
+  - transition_open_keys
+  - transition_open_saw
+  - transition_open_lead
+  - transition_drums
+  mix_gain_db: -1.10
+
 - id: jam_medium
   bars: 8
   intensity: 1.0
   density: 1.0
   loopable: false
-  harmony:
-  - C#m9
-  - Emaj7
-  - Aadd9
-  - G#7sus4
-  - C#m9
-  - Gmaj7
-  - Aadd9
-  - G#7sus4
+  harmony: [C#m9, Emaj7, Aadd9, G#7sus4, C#m9, Emaj7, F#m9, G#7sus4]
   layers:
   - jam_a_bass
   - jam_a_motion
-  - jam_a_rhodes
-  - jam_a_piano
+  - jam_a_keys
   - jam_a_saw
-  - jam_a_lead_core
+  - jam_a_lead
   - jam_a_drums
-  - saw_motion
-  - pulse_motion
-  mix_gain_db: -0.4
+  mix_gain_db: 0.0
+
 - id: transition_first
-  bars: 4
-  intensity: 0.99
-  density: 0.96
+  bars: 3
+  intensity: 1.0
+  density: 1.0
   loopable: false
-  harmony:
-  - F#m9
-  - F#m9
-  - G#7sus4
-  - Eadd9
+  harmony: [F#m9, Eadd9, G#7sus4]
   layers:
-  - transition_short_bass
-  - transition_short_pulse
-  - transition_short_rhodes
-  - transition_short_piano
-  - transition_short_saw
-  - transition_short_core
-  - transition_short_bam_core
-  - transition_short_drums
-  - saw_motion
-  - pulse_motion
-  mix_gain_db: -0.2
+  - transition_bridge_bass
+  - transition_bridge_motion
+  - transition_bridge_keys
+  - transition_bridge_saw
+  - transition_bridge_lead
+  - transition_drums
+  mix_gain_db: -1.10
+
 - id: jam_half_time
   bars: 8
-  intensity: 0.98
-  density: 0.94
+  intensity: 1.0
+  density: 1.0
   loopable: false
-  harmony:
-  - C#m9
-  - C#m9
-  - Gmaj7
-  - Gmaj7
-  - Aadd9
-  - Aadd9
-  - Eadd9
-  - G#7sus4
+  harmony: [Amaj7, Eadd9, C#m9, G#7sus4, Amaj7, Gmaj7, Eadd9, G#7sus4]
   layers:
   - jam_b_bass
   - jam_b_motion
-  - jam_b_rhodes
-  - jam_b_piano
+  - jam_b_keys
   - jam_b_saw
-  - jam_b_lead_core
+  - jam_b_lead
   - jam_b_drums
-  - warm_air
-  - saw_motion
-  - pulse_motion
-  - air_motion
-  mix_gain_db: 0.35
+  mix_gain_db: 0.45
+
 - id: transition_second
-  bars: 4
+  bars: 3
   intensity: 1.0
-  density: 0.97
+  density: 1.0
   loopable: false
-  harmony:
-  - F#m9
-  - F#m9
-  - G#7sus4
-  - Eadd9
+  harmony: [F#m9, Eadd9, G#7sus4]
   layers:
-  - transition_short_bass
-  - transition_short_pulse
-  - transition_short_rhodes
-  - transition_short_piano
-  - transition_short_saw
-  - transition_short_core
-  - transition_short_bam_core
-  - transition_short_drums
-  - saw_motion
-  - pulse_motion
-  mix_gain_db: -0.25
-- id: jam_fractured
+  - transition_bridge_bass
+  - transition_bridge_motion
+  - transition_bridge_keys
+  - transition_bridge_saw
+  - transition_bridge_lead
+  - transition_drums
+  mix_gain_db: -1.10
+
+- id: jam_return
   bars: 8
-  intensity: 1.02
+  intensity: 1.0
   density: 1.0
   loopable: true
-  harmony:
-  - F#m9
-  - Cmaj7
-  - Eadd9
-  - G#7sus4
-  - F#m9
-  - Cmaj7
-  - Eadd9
-  - G#7sus4
+  harmony: [F#m9, Amaj7, Eadd9, G#7sus4, F#m9, Cmaj7, Eadd9, G#7sus4]
   layers:
   - jam_c_bass
   - jam_c_motion
-  - jam_c_rhodes
-  - jam_c_piano
+  - jam_c_keys
   - jam_c_saw
-  - jam_c_lead_core
+  - jam_c_lead
   - jam_c_drums
-  - saw_motion
-  - pulse_motion
-  mix_gain_db: 0.45
+  mix_gain_db: 0.05
+
 playback:
   mode: linear

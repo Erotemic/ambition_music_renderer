@@ -233,22 +233,22 @@ group_postprocess:
         dry_level: 0.96
         width: 0.98
   choir:
-    gain_db: 1.35
+    gain_db: -2.6
     highpass_hz: 72
-    lowpass_hz: 9800
-    high_shelf_hz: 6000
-    high_shelf_db: 0.8
-    compressor_threshold_db: -25.0
-    compressor_ratio: 1.1
+    lowpass_hz: 9000
+    high_shelf_hz: 5600
+    high_shelf_db: -0.8
+    compressor_threshold_db: -27.0
+    compressor_ratio: 1.08
     compressor_attack_ms: 70.0
     compressor_release_ms: 340.0
     effect_chain:
     - kind: pedalboard
       effects:
       - effect: reverb
-        room_size: 0.94
-        damping: 0.55
-        wet_level: 0.23
+        room_size: 0.91
+        damping: 0.62
+        wet_level: 0.16
         dry_level: 0.98
         width: 1.0
   harp:
@@ -504,9 +504,9 @@ instruments:
 - name: choir_high
   group: choir
   program: choir_aahs
-  volume: 112
+  volume: 98
   pan: 72
-  expression: 112
+  expression: 102
   modulation: 2
   instrument_backend:
     kind: sfz
@@ -746,9 +746,9 @@ instruments:
 - name: choir_low
   group: choir
   program: voice_oohs
-  volume: 110
+  volume: 101
   pan: 48
-  expression: 110
+  expression: 104
   modulation: 2
   instrument_backend:
     kind: sfz
@@ -764,9 +764,9 @@ instruments:
 - name: choir_mid
   group: choir
   program: voice_oohs
-  volume: 108
+  volume: 95
   pan: 60
-  expression: 110
+  expression: 100
   modulation: 2
   instrument_backend:
     kind: sfz
