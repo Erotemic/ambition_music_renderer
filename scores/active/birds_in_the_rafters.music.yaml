@@ -2,23 +2,20 @@ schema: ambition.musicir.v1
 id: birds_in_the_rafters
 title: Birds in the Rafters
 seed: 202608082129
-notes: Standalone song grown from the strongest Birds in the Rafters room of Cedar Light. Choir-free acoustic folk ensemble
-  centered on Drop-D ringing guitar, harmony-locked cross-picking, two complementary banjo voices, upright bass, restrained
-  folk drums, harp, sparse violin, and occasional woodwind breath. The form develops continuously inside one harmonic world
-  rather than moving between medley rooms.
+notes: Standalone song grown from the strongest Birds in the Rafters room of Cedar Light. Choir-free acoustic folk ensemble centered on Drop-D ringing guitar, harmony-locked cross-picking, two complementary banjo voices, upright bass, restrained folk drums, harp, sparse violin, and occasional woodwind breath. The form develops continuously inside one harmonic world rather than moving between medley rooms.
 tempo:
   bpm: 90
   map:
-  - bar: 25
+  - bar: 21
     bpm: 94
     ramp_bars: 4
-  - bar: 41
+  - bar: 37
     bpm: 86
     ramp_bars: 2
-  - bar: 49
+  - bar: 45
     bpm: 96
     ramp_bars: 4
-  - bar: 73
+  - bar: 69
     bpm: 88
     ramp_bars: 3
 meter:
@@ -33,31 +30,31 @@ render:
     bar: 1
   - id: first_flight
     label: II. First Flight - the full acoustic groove settles in
-    bar: 9
+    bar: 5
   - id: open_eaves
     label: III. Open Eaves - denser counterpicking and bass movement
-    bar: 17
+    bar: 13
   - id: wide_sky
     label: IV. Wide Sky - first broad lift
-    bar: 25
+    bar: 21
   - id: dust_light
     label: V. Dust in Sunlight - suspended acoustic middle
-    bar: 33
+    bar: 29
   - id: loft_instrumental
     label: VI. Loft Instrumental - banjo, harp, and violin take the foreground
-    bar: 41
+    bar: 37
   - id: second_flight
     label: VII. Second Flight - main progression returns with urgency
-    bar: 49
+    bar: 45
   - id: storm_of_wings
     label: VIII. Storm of Wings - full acoustic climax
-    bar: 57
+    bar: 53
   - id: home_rafters
     label: IX. Home Rafters - familiar material returns warmer
-    bar: 65
+    bar: 61
   - id: afterimage
     label: X. Afterimage - the room empties around the final Dadd9
-    bar: 73
+    bar: 69
   sfizz:
     library_roots:
     - /data/audio-tools/sfz
@@ -94,7 +91,7 @@ stem_postprocess:
   target_peak_db: -3.5
 group_postprocess:
   guitar_body:
-    gain_db: 2.4
+    gain_db: 1.4
     highpass_hz: 54
     lowpass_hz: 11600
     presence_low_hz: 2600
@@ -118,7 +115,7 @@ group_postprocess:
     transient_tame: 0.22
     transient_lowpass_hz: 4800
   banjo:
-    gain_db: 7.6
+    gain_db: 7.9
     highpass_hz: 120
     lowpass_hz: 12500
     high_shelf_hz: 7200
@@ -758,6 +755,8 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 2.8
     humanize_velocity_pct: 3.0
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   rhythm_crosspick_sparse:
     kind: arpeggio
     instrument: acoustic_rhythm
@@ -779,6 +778,8 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 3.2
     humanize_velocity_pct: 3.0
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   upper_fingerpick_fast:
     kind: arpeggio
     instrument: lead_banjo
@@ -809,6 +810,8 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 3.0
     humanize_velocity_pct: 3.0
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   upper_fingerpick_sparse:
     kind: arpeggio
     instrument: lead_banjo
@@ -831,10 +834,14 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 4.0
     humanize_velocity_pct: 3.5
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   birds_banjo_roll:
     kind: arpeggio
     instrument: birds_banjo
     octave: 4
+    min_pitch: 38
+    max_pitch: 72
     pattern:
     - 0
     - 2
@@ -861,10 +868,14 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 3.5
     humanize_velocity_pct: 4.0
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   banjo_thread:
     kind: arpeggio
     instrument: birds_banjo
     octave: 3
+    min_pitch: 48
+    max_pitch: 72
     pattern:
     - 0
     - 2
@@ -883,9 +894,8 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 3.2
     humanize_velocity_pct: 3.0
-    constraints:
-      min_pitch: 48
-      max_pitch: 72
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   upright_breathe:
     kind: bassline
     instrument: upright_bass
@@ -980,6 +990,8 @@ layer_templates:
     articulation: normal
     humanize_ms: 5
     humanize_velocity_pct: 4
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   harp_triplet:
     kind: arpeggio
     instrument: harp
@@ -1006,6 +1018,8 @@ layer_templates:
     articulation: normal
     humanize_ms: 4
     humanize_velocity_pct: 4
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   harp_shower:
     kind: arpeggio
     instrument: harp
@@ -1028,6 +1042,8 @@ layer_templates:
     articulation: normal
     humanize_ms: 4
     humanize_velocity_pct: 4
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   harp_glass:
     kind: arpeggio
     instrument: harp
@@ -1050,6 +1066,8 @@ layer_templates:
     articulation: normal
     humanize_ms: 5
     humanize_velocity_pct: 4
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   drums_birds:
     kind: drums
     instrument: folk_kit
@@ -1091,6 +1109,8 @@ layer_templates:
     kind: arpeggio
     instrument: birds_banjo
     octave: 4
+    min_pitch: 38
+    max_pitch: 72
     pattern:
     - 0
     - 2
@@ -1117,6 +1137,8 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 4.0
     humanize_velocity_pct: 4.0
+    clip_to_bar: true
+    bar_end_margin_beats: 0.045
   drums_birds_soft:
     kind: drums
     instrument: folk_kit
@@ -1234,8 +1256,57 @@ layer_templates:
 sections:
 - id: rafters_open
   label: I. Rafters Open
-  bars: 8
+  bars: 2
   intensity: 0.72
+  harmony:
+  - Gmaj7
+  - D/F#
+  layers:
+  - template: strum_breathe
+    velocity: 72
+  - template: rhythm_crosspick_sparse
+    velocity: 44
+    density: 0.24
+  - template: birds_banjo_roll
+    velocity: 76
+    density: 0.96
+  - template: upper_fingerpick_sparse
+    velocity: 66
+    density: 0.72
+  - template: upright_breathe
+    velocity: 62
+  - template: harp_light
+    velocity: 35
+    density: 0.22
+- id: wings_catch
+  label: I-b. Wings Catch
+  bars: 2
+  intensity: 0.9
+  harmony:
+  - Em7
+  - Bm7
+  layers:
+  - template: strum_breathe
+    velocity: 79
+  - template: rhythm_crosspick_sparse
+    velocity: 49
+    density: 0.38
+  - template: birds_banjo_roll
+    velocity: 75
+    density: 0.93
+  - template: upper_fingerpick_sparse
+    velocity: 65
+    density: 0.68
+  - template: upright_floor
+    velocity: 72
+  - template: harp_light
+    velocity: 38
+    density: 0.3
+  - template: drums_birds_lift
+- id: first_flight
+  label: II. First Flight
+  bars: 8
+  intensity: 0.96
   harmony: &id001
   - Gmaj7
   - D/F#
@@ -1245,43 +1316,6 @@ sections:
   - G6/B
   - A7sus4
   - Dadd9
-  layers:
-  - template: strum_breathe
-    velocity: 76
-  - template: rhythm_crosspick_sparse
-    velocity: 47
-    density: 0.3
-  - template: birds_banjo_roll
-    velocity: 73
-    density: 0.9
-  - template: upper_fingerpick_sparse
-    velocity: 65
-    density: 0.7
-  - template: upright_breathe
-    velocity: 64
-  - template: harp_light
-    velocity: 38
-    density: 0.32
-  - kind: notes
-    instrument: solo_violin
-    notes:
-    - - 4
-      - 0.0
-      - G5
-      - 2.4
-      - 56
-    - - 7
-      - 2.0
-      - F#5
-      - 1.7
-      - 56
-    humanize_ms: 4
-    humanize_velocity_pct: 2.5
-- id: first_flight
-  label: II. First Flight
-  bars: 8
-  intensity: 0.9
-  harmony: *id001
   layers:
   - template: strum_breathe
     velocity: 84
@@ -1299,7 +1333,7 @@ sections:
   - template: harp_triplet
     velocity: 50
     density: 0.72
-  - template: drums_birds
+  - template: drums_birds_lift
   - kind: notes
     instrument: solo_violin
     notes:
@@ -1448,7 +1482,7 @@ sections:
     notes:
     - - 3
       - 2.0
-      - A5
+      - B5
       - 1.4
       - 55
     - - 7
@@ -1697,7 +1731,7 @@ sections:
       - 58
     - - 3
       - 2.0
-      - A5
+      - B5
       - 1.5
       - 60
     - - 5
@@ -1717,17 +1751,17 @@ sections:
     notes:
     - - 1
       - 2.0
-      - D5
+      - E5
       - 1.4
       - 52
     - - 3
       - 2.0
-      - E5
+      - D5
       - 1.5
       - 52
     - - 5
       - 2.0
-      - F#5
+      - G5
       - 1.4
       - 53
     - - 7

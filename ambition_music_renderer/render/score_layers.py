@@ -11,7 +11,7 @@ import numpy as np
 import pretty_midi
 
 from ..profiler import profile
-from .score_core import RenderContext, TempoMap
+from .score_core import ARTICULATION_GATE, RenderContext, TempoMap
 from .score_events import add_chord, add_drum, add_instrument, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
 from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
 from .synth import sanitize_same_pitch_overlaps
@@ -24,6 +24,34 @@ def _positive_float(layer: dict[str, Any], key: str, default: float) -> float:
         kind = layer.get("kind", "layer")
         raise ValueError(f"{kind} {key} must be finite and > 0; got {value!r}")
     return value
+
+def _fit_arpeggio_pitch_to_bounds(
+    pitch: int, min_pitch: int | None, max_pitch: int | None
+) -> int:
+    """Octave-place one arpeggio note inside optional authored pitch bounds."""
+    if min_pitch is None and max_pitch is None:
+        return int(pitch)
+    min_p = 0 if min_pitch is None else int(min_pitch)
+    max_p = 127 if max_pitch is None else int(max_pitch)
+    if not 0 <= min_p <= 127 or not 0 <= max_p <= 127:
+        raise ValueError(
+            f"arpeggio pitch bounds must be within MIDI range 0..127; "
+            f"got min_pitch={min_pitch!r}, max_pitch={max_pitch!r}"
+        )
+    if min_p > max_p:
+        raise ValueError(f"arpeggio min_pitch {min_p} exceeds max_pitch {max_p}")
+    original = int(pitch)
+    candidates = [
+        original + 12 * octave_shift
+        for octave_shift in range(-11, 12)
+        if min_p <= original + 12 * octave_shift <= max_p
+    ]
+    if not candidates:
+        raise ValueError(
+            f"cannot place arpeggio pitch {original} (pitch class {original % 12}) "
+            f"inside bounds [{min_p}, {max_p}]"
+        )
+    return min(candidates, key=lambda p: (abs(p - original), p))
 
 @profile
 def render_layer_pad_chords(
@@ -75,8 +103,20 @@ def render_layer_arpeggio(
     velocity = float(layer.get("velocity", 64))
     density = float(layer.get("density", section.get("density", 1.0)))
     articulation = layer.get("articulation", "staccato")
+    gate_value = layer.get("gate")
+    gate_scale = (
+        float(gate_value)
+        if gate_value is not None
+        else float(ARTICULATION_GATE.get(articulation, 0.86))
+    )
+    clip_to_bar = bool(layer.get("clip_to_bar", False))
+    bar_end_margin = max(0.0, float(layer.get("bar_end_margin_beats", 0.04)))
     inst_velocity_offsets = layer.get("instrument_velocity_offsets", {}) or {}
     inst_octave_offsets = layer.get("instrument_octave_offsets", {}) or {}
+    min_pitch = layer.get("min_pitch")
+    max_pitch = layer.get("max_pitch")
+    min_pitch_i = int(min_pitch) if min_pitch is not None else None
+    max_pitch_i = int(max_pitch) if max_pitch is not None else None
     hk = _layer_human(layer, 4.0)
     for local in range(int(section["bars"])):
         if "every" in layer and local % int(layer["every"]) != int(
@@ -96,16 +136,24 @@ def render_layer_arpeggio(
             base_pitch = tones[pattern[i % len(pattern)] % len(tones)]
             for inst in insts:
                 p = base_pitch + 12 * int(inst_octave_offsets.get(inst, 0))
+                p = _fit_arpeggio_pitch_to_bounds(p, min_pitch_i, max_pitch_i)
                 v = velocity + float(inst_velocity_offsets.get(inst, 0.0))
+                note_dur = dur
+                if clip_to_bar:
+                    remaining = ctx.beats_per_bar - i * step - bar_end_margin
+                    if remaining <= 0.0:
+                        continue
+                    note_dur = min(note_dur, remaining / max(gate_scale, 1e-9))
                 add_note(
                     ctx,
                     inst,
                     p,
                     section["start_bar"] + local,
                     i * step,
-                    dur,
+                    note_dur,
                     v * float(section.get("intensity", 1.0)),
                     articulation=articulation,
+                    gate=float(gate_value) if gate_value is not None else None,
                     **hk,
                 )
 
