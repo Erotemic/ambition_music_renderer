@@ -323,7 +323,12 @@ full-length audition OGG per rendered stem group.
 
 Spectrogram generation is **off by default**. Enable `--spectrograms` for a
 specific visual investigation. The heavier diagnostic set is also opt-in with
-`--all_audits`.
+`--all_audits`. Full audits are render-product aware: with `simple-mix`,
+score/static audits plus scratch-stem and mastered-preview spectral audits still
+run, while adaptive-section balance/transition audits are recorded as
+intentionally skipped because that mode does not export per-section OGGs. Use
+`full-mix-only` when section-full transition/mastering audits are required, or
+`full` when audits need per-section stem audio.
 
 ## Generated layout and bundles
 

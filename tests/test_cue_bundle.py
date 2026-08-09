@@ -947,3 +947,97 @@ def test_bundle_many_positive_audit_flags_parse():
     args = BundleCommand.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
     assert args.spectrograms is True
     assert args.all_audits is True
+
+
+def test_analysis_audio_capabilities_simple_mix_preview_only(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    preview = tmp_path / "preview" / "cue.full_soundtrack_preview.ogg"
+    preview.parent.mkdir(parents=True)
+    preview.write_bytes(b"ogg")
+    manifest = {
+        "files": {
+            "preview": {"full_soundtrack_preview": "preview/cue.full_soundtrack_preview.ogg"},
+            "adaptive": {},
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps == {
+        "adaptive_audio": False,
+        "adaptive_full_audio": False,
+        "adaptive_stem_audio": False,
+        "scratch_stems": False,
+    }
+
+
+def test_analysis_audio_capabilities_full_mix_only(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    full = tmp_path / "adaptive" / "verse" / "cue.verse.full.ogg"
+    full.parent.mkdir(parents=True)
+    full.write_bytes(b"ogg")
+    manifest = {
+        "files": {
+            "preview": {},
+            "adaptive": {"verse": {"full": "adaptive/verse/cue.verse.full.ogg"}},
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps["adaptive_audio"] is True
+    assert caps["adaptive_full_audio"] is True
+    assert caps["adaptive_stem_audio"] is False
+
+
+def test_analysis_audio_capabilities_full_adaptive_with_scratch(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    full = tmp_path / "adaptive" / "verse" / "cue.verse.full.ogg"
+    stem = tmp_path / "adaptive" / "verse" / "cue.verse.guitar.ogg"
+    full.parent.mkdir(parents=True)
+    full.write_bytes(b"ogg")
+    stem.write_bytes(b"ogg")
+    (tmp_path / "scratch_stems").mkdir()
+    manifest = {
+        "files": {
+            "preview": {},
+            "adaptive": {
+                "verse": {
+                    "full": "adaptive/verse/cue.verse.full.ogg",
+                    "guitar": "adaptive/verse/cue.verse.guitar.ogg",
+                }
+            },
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps == {
+        "adaptive_audio": True,
+        "adaptive_full_audio": True,
+        "adaptive_stem_audio": True,
+        "scratch_stems": True,
+    }
+
+
+def test_audit_coverage_report_records_intentional_skips(tmp_path):
+    import json
+
+    from ambition_music_renderer.render.bundle import _write_audit_coverage_report
+
+    path = _write_audit_coverage_report(
+        tmp_path,
+        render_audio_mode="simple-mix",
+        capabilities={
+            "adaptive_audio": False,
+            "adaptive_full_audio": False,
+            "adaptive_stem_audio": False,
+            "scratch_stems": True,
+        },
+        skipped=["transition_audit: no per-section full mixes were exported"],
+    )
+    payload = json.loads(path.read_text(encoding="utf8"))
+    assert payload["render_audio_mode"] == "simple-mix"
+    assert payload["capabilities"]["scratch_stems"] is True
+    assert payload["skipped"] == [
+        "transition_audit: no per-section full mixes were exported"
+    ]
+    text = (tmp_path / "audit_coverage.txt").read_text(encoding="utf8")
+    assert "transition_audit" in text

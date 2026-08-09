@@ -77,6 +77,62 @@ from .generated_layout import (
     resolve_latest_generated_dir,
 )
 
+
+def _analysis_audio_capabilities(analysis_root: Path, manifest: dict) -> dict[str, bool]:
+    """Return which manifest-scoped audio products actually exist for audits.
+
+    Render modes intentionally export different products.  Full audits should
+    consume whatever the selected mode produced instead of assuming the full
+    adaptive directory exists and emitting subprocess tracebacks for products
+    that were deliberately omitted.
+    """
+    adaptive_entries = [
+        entry
+        for entry in manifest_audio_entries(manifest)
+        if entry.get("kind") == "adaptive_audio"
+        and (analysis_root / str(entry.get("path", ""))).is_file()
+    ]
+    return {
+        "adaptive_audio": bool(adaptive_entries),
+        "adaptive_full_audio": any(
+            entry.get("group") == "full" for entry in adaptive_entries
+        ),
+        "adaptive_stem_audio": any(
+            entry.get("group") != "full" for entry in adaptive_entries
+        ),
+        "scratch_stems": (analysis_root / "scratch_stems").is_dir(),
+    }
+
+
+def _write_audit_coverage_report(
+    reports_dir: Path,
+    *,
+    render_audio_mode: str,
+    capabilities: dict[str, bool],
+    skipped: list[str],
+) -> Path:
+    """Record intentional audit skips caused by the selected render products."""
+    payload = {
+        "schema": "ambition.music_audit_coverage.v1",
+        "render_audio_mode": render_audio_mode,
+        "capabilities": capabilities,
+        "skipped": skipped,
+    }
+    path = reports_dir / "audit_coverage.json"
+    path.write_text(json.dumps(payload, indent=2), encoding="utf8")
+    lines = [
+        f"render_audio_mode: {render_audio_mode}",
+        "capabilities:",
+        *(f"  {name}: {enabled}" for name, enabled in sorted(capabilities.items())),
+        "skipped audits:",
+        *(f"  - {item}" for item in skipped),
+    ]
+    if not skipped:
+        lines.append("  none")
+    (reports_dir / "audit_coverage.txt").write_text("\n".join(lines) + "\n", encoding="utf8")
+    return path
+
+
 @profile
 def create_bundle(
     cue: str,
@@ -256,16 +312,23 @@ def create_bundle(
     audio_shrillness_warnings: list[str] = []
     with tempfile.TemporaryDirectory(prefix=f"{cue_id}_{render_hash}_analysis_") as td:
         analysis_root = prepare_manifest_analysis_root(manifest_root, manifest, Path(td))
+        audit_capabilities = _analysis_audio_capabilities(analysis_root, manifest)
+        audit_skips: list[str] = []
         if all_audits:
-            commands.append(
-                run_logged(
-                    "audit_cue_balance",
-                    renderer_audit_command("cue_balance", analysis_root),
-                    reports_dir,
-                    cwd=tools_dir,
+            if audit_capabilities["adaptive_audio"]:
+                commands.append(
+                    run_logged(
+                        "audit_cue_balance",
+                        renderer_audit_command("cue_balance", analysis_root),
+                        reports_dir,
+                        cwd=tools_dir,
+                    )
                 )
-            )
-            if (analysis_root / "scratch_stems").is_dir():
+            else:
+                audit_skips.append(
+                    "cue_balance: no adaptive section audio was exported by this render mode"
+                )
+            if audit_capabilities["scratch_stems"]:
                 hi = f"{duration:.3f}" if duration > 0 else "-1"
                 commands.append(
                     run_logged(
@@ -298,6 +361,10 @@ def create_bundle(
                         reports_dir,
                         cwd=tools_dir,
                     )
+                )
+            else:
+                audit_skips.append(
+                    "spectral_compare/spectral_localize: no scratch stem buffers are available"
                 )
         write_stem_export_report(analysis_root, manifest, reports_dir)
         write_manifest_audio_level_report(analysis_root, manifest, reports_dir)
@@ -383,37 +450,80 @@ def create_bundle(
         dissonance_warnings = list(dissonance_payload.get("warnings") or [])
         sour_note_warnings = list(sour_note_payload.get("warnings") or [])
         if all_audits:
-            write_stem_amplitude_report(
-                analysis_root,
-                spec,
-                manifest,
-                reports_dir,
-                plots_dir=plots_dir,
-                plot_format=plot_format,
-                jpeg_quality=jpeg_quality,
-            )
-            write_adaptive_section_report(
-                analysis_root,
-                spec,
-                manifest,
-                reports_dir,
-                plots_dir=plots_dir,
-                plot_format=plot_format,
-                jpeg_quality=jpeg_quality,
-            )
-            adaptive_composition_path = write_adaptive_composition_mastering_report(
-                analysis_root,
-                spec,
-                manifest,
-                reports_dir,
-                plots_dir=plots_dir,
-                plot_format=plot_format,
-                jpeg_quality=jpeg_quality,
-            )
+            if audit_capabilities["adaptive_stem_audio"]:
+                write_stem_amplitude_report(
+                    analysis_root,
+                    spec,
+                    manifest,
+                    reports_dir,
+                    plots_dir=plots_dir,
+                    plot_format=plot_format,
+                    jpeg_quality=jpeg_quality,
+                )
+            else:
+                audit_skips.append(
+                    "stem_amplitude: no per-section adaptive stem audio was exported"
+                )
+
+            if audit_capabilities["adaptive_audio"]:
+                write_adaptive_section_report(
+                    analysis_root,
+                    spec,
+                    manifest,
+                    reports_dir,
+                    plots_dir=plots_dir,
+                    plot_format=plot_format,
+                    jpeg_quality=jpeg_quality,
+                )
+            else:
+                audit_skips.append(
+                    "adaptive_section: no adaptive section audio was exported"
+                )
+
+            adaptive_composition_path = None
+            if audit_capabilities["adaptive_full_audio"]:
+                adaptive_composition_path = write_adaptive_composition_mastering_report(
+                    analysis_root,
+                    spec,
+                    manifest,
+                    reports_dir,
+                    plots_dir=plots_dir,
+                    plot_format=plot_format,
+                    jpeg_quality=jpeg_quality,
+                )
+            else:
+                audit_skips.append(
+                    "adaptive_composition_mastering: no per-section full mixes were exported"
+                )
+
             write_spectral_fingerprint(analysis_root, manifest, reports_dir)
-            audio_shrillness_path = write_spectral_shrillness_report(analysis_root, manifest, reports_dir)
-            progress_line("running adjacent-section transition audits")
-            commands.extend(run_transition_audits(analysis_root, manifest, reports_dir, tools_dir))
+            audio_shrillness_path = write_spectral_shrillness_report(
+                analysis_root, manifest, reports_dir
+            )
+
+            if audit_capabilities["adaptive_full_audio"]:
+                progress_line("running adjacent-section transition audits")
+                commands.extend(
+                    run_transition_audits(
+                        analysis_root, manifest, reports_dir, tools_dir
+                    )
+                )
+            else:
+                audit_skips.append(
+                    "transition_audit: no per-section full mixes were exported"
+                )
+
+            _write_audit_coverage_report(
+                reports_dir,
+                render_audio_mode=render_audio_mode,
+                capabilities=audit_capabilities,
+                skipped=audit_skips,
+            )
+            if audit_skips:
+                progress_line(
+                    f"skipped {len(audit_skips)} adaptive-audio audit groups unavailable in {render_audio_mode}"
+                )
+
             # Re-run arrangement preflight after render report cleanup so it is present in the final bundle.
             arrangement_payload = audit_arrangement_file(score_path)
             write_arrangement_reports(arrangement_payload, reports_dir)
@@ -445,12 +555,22 @@ def create_bundle(
             dissonance_warnings = list(dissonance_payload.get("warnings") or [])
             sour_note_warnings = list(sour_note_payload.get("warnings") or [])
             shrill_note_warnings = list(shrill_note_payload.get("warnings") or [])
-            try:
-                adaptive_composition_warnings = list(json.loads(Path(adaptive_composition_path).read_text(encoding="utf8")).get("warnings") or [])
-            except Exception:
+            if adaptive_composition_path is not None:
+                try:
+                    adaptive_composition_warnings = list(
+                        json.loads(
+                            Path(adaptive_composition_path).read_text(encoding="utf8")
+                        ).get("warnings")
+                        or []
+                    )
+                except Exception:
+                    adaptive_composition_warnings = []
+            else:
                 adaptive_composition_warnings = []
             try:
-                audio_shrillness_warnings = list(json.loads(Path(audio_shrillness_path).read_text(encoding="utf8")).get("warnings") or [])
+                audio_shrillness_warnings = list(
+                    json.loads(Path(audio_shrillness_path).read_text(encoding="utf8")).get("warnings") or []
+                )
             except Exception:
                 audio_shrillness_warnings = []
         if write_spectrogram_plots:
