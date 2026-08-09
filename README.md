@@ -1,473 +1,525 @@
 # Ambition music renderer
 
-Author-time renderer for generated Ambition music assets. Generated outputs are local until explicitly installed or published into runtime assets.
+Author-time, data-driven music rendering for [Ambition](https://github.com/Erotemic/ambition).
+This repository is normally checked out as the `tools/ambition_music_renderer`
+submodule of the parent game repository.
 
-This package is the canonical code-only music generator for the project. Do not commit ad-hoc rendered `.ogg`, `.wav`, `.mid`, or temporary stem buffers unless a task explicitly says to publish runtime assets.
+Music is authored as compact MusicIR YAML. The renderer expands those scores
+into MIDI/audio, applies instrument and mix processing, produces diagnostics,
+and can explicitly publish generated assets into the consuming game. It is a
+build/authoring tool, not a runtime generative-music system.
 
-## RULES
+## Design contract
 
-NEVER ADD A TEST FOR A SPECIFIC SONG. TESTS ARE TOOLING TESTS ONLY. 
+The durable rules are simple:
 
-## Common commands
+- **MusicIR YAML is the source of truth for music.** New cues and musical edits
+  belong in scores, not cue-specific Python branches.
+- **Renderer features are generic.** When a musical idea needs a capability
+  MusicIR cannot express, add a reusable renderer/schema feature and test that
+  feature independently of any one song.
+- **Generated audio is disposable build output.** Commit scores, renderer code,
+  tests, and reproducible configuration; keep generated OGG/WAV/MIDI/NumPy
+  intermediates out of Git unless a task explicitly requires otherwise.
+- **Composition comes before diagnostics.** Metrics can reveal clipping,
+  buried stems, collisions, spectral imbalance, or broken transitions; they do
+  not establish that a cue is catchy, expressive, or worth keeping.
+- **Preview and runtime rendering should tell the same musical truth.** If the
+  runtime path intentionally differs from the mastered review mix, make that
+  difference explicit and auditable.
+- **Publishing is consumer-declared.** The renderer does not guess the parent
+  repository's crate or asset layout. The game supplies a destination with
+  `AMBITION_MUSIC_PUBLISH_ROOT` or `--dest_root`.
+- **Tests cover tooling, not individual songs.** A score can be a regression
+  fixture when useful, but do not encode subjective song acceptance as a
+  renderer unit test.
 
-Run from the repo root unless noted. `uv run --project ~/code/ambition/tools/ambition_music_renderer` installs/runs the package with the renderer project metadata, so `PYTHONPATH=tools/ambition_music_renderer` should not be needed.
+This README is the maintained documentation for the submodule. CLI Config
+classes and `--help` are the source of truth for command-line flags. Historical
+composition handoffs, machine-local instrument notebooks, and append-only task
+logs do not belong in the live renderer documentation.
 
-Recommended test command:
+## Quick start
 
-```bash
-cd ~/code/ambition
-uv run --project ~/code/ambition/tools/ambition_music_renderer pytest -q tools/ambition_music_renderer/tests
-```
-
-If you already activated the renderer environment, use `uv run --active`:
-
-```bash
-cd ~/code/ambition
-source tools/ambition_music_renderer/.venv/bin/activate
-uv run --active pytest -q tools/ambition_music_renderer/tests
-```
-
-Common CLI commands:
-
-```bash
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue list
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --force --zip
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --force --zip
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer cue bundle for_emmy_forever_ago --backend=pretty-midi --runtime_stem_gain_mode=shared --zip_report --force
-```
-
-`cue list` enumerates every cue id found under `scores/` (grouped by
-`active`/`examples`/`archive`/`experiments`); pass `--json` for a machine
-readable map. `cue bundle` is the render+debug+package workflow. With one cue,
-`-j/--jobs N` renders independent stem groups in parallel. With several cue ids,
-`--jobs N` controls cue-level fan-out and `--render_jobs N` optionally controls
-stem-group workers inside each cue subprocess. `cue render <cue>` renders
-without the debug/package step; add `--publish` to install `full.ogg` into the
-game asset tree.
-
-Auxiliary analysis and maintenance helpers are exposed through the package modal CLI rather than top-level scripts:
+Commands below assume the usual parent checkout at `~/code/ambition`.
 
 ```bash
 cd ~/code/ambition
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit transition --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit cue_balance --help
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer audit levels --check
+source scripts/lib/asset_roots.sh
+
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue list
 ```
 
-Use the package CLI for current music-renderer work. Older docs may mention retired paths under `tools/audio/` or direct `python *.py` tool scripts; those paths are stale and should not be copied into new instructions.
+### Lean composition render
 
-Bundle report generation also calls these helpers through the packaged modal CLI. If a bundle run reports `can't open file .../audit_cue_balance.py`, `spectral_compare.py`, `spectral_localize.py`, or `transition_audit.py`, that checkout still has stale orchestration code; update to a build where `cue bundle` invokes `python -m ambition_music_renderer audit ...` instead of root-level script paths.
-
-## Package layout
-
-- `ambition_music_renderer/cli.py` - light top-level modal CLI and repo path helpers.
-- `ambition_music_renderer/render/` - render orchestration, bundle generation, worker entrypoints, MusicIR renderer internals, and compiled kernels.
-  - `render/score_*.py` - score expansion split into core constants/context, theory helpers, event construction, and layer renderers.
-  - `render/synth.py`, `render/effects.py`, `render/export.py`, and `render/group.py` - audio synthesis, post-process effects, export/metadata, and stem-group rendering.
-  - `render/bundle_*.py` - cue bundle orchestration split into base config/path helpers, audio reports, spectral reports, adaptive reports, spectrograms, archive/zip helpers, and the main `bundle.py` workflow.
-- `ambition_music_renderer/audit/` - active diagnostics and reports exposed under `python -m ambition_music_renderer audit ...`. Each audit module owns its own kwconf `*Config` (the single source of truth for its CLI arguments) and defers heavy imports via `lazy_loader`; `cli.py` registers those Configs directly. Shared dB/RMS/peak/round helpers live in `audit/_common.py`.
-- `ambition_music_renderer/legacy/` - quarantined older one-off helpers that are still callable but need a later rename/delete decision.
-- `ambition_music_renderer/backends/` - optional plugin/SFZ/LV2/VST adapter code, imported only when requested.
-
-## Useful files
-
-- `ambition_music_renderer/render/score_layers.py` - MusicIR layer renderers and `build_score`.
-- `ambition_music_renderer/render/effects.py` - filters, compressor, reverb wrappers, stereo widening, and limiting.
-- `ambition_music_renderer/render/synth.py` - FluidSynth / pretty-midi audio rendering.
-- `ambition_music_renderer/render/bundle.py` - one-command cue regeneration, diagnostics, reports, plots, and uploadable bundles.
-- `ambition_music_renderer/render/isolated.py` and `render/group_worker.py` - adaptive stem render entrypoints.
-- `ambition_music_renderer/audit/*.py` - active analysis helpers (`levels`, `cue_balance`, `arrangement`, `dissonance`, `spectral_localize`, `spectral_compare`, `transition`, etc.).
-- `scores/active/` - cues actively used or being prepared for runtime.
-- `scores/examples/` - reference/example cues.
-- `scores/archive/` - historical cues kept for reference.
-- `goals.md` - design/planning notes for renderer direction.
-
-## Dependencies and backends
-
-The renderer can use multiple backends depending on local setup:
-
-| Backend | What it is | When to use |
-|---|---|---|
-| `pretty-midi` | pyFluidSynth + SoundFont, internal reverb/chorus disabled | Preferred for production-quality local renders when available. |
-| `fluidsynth-cli` | the `fluidsynth` binary + SoundFont | Useful when Python FluidSynth bindings misbehave. |
-| `fallback` | additive synth fallback | Diagnostic/sketch fallback only; request explicitly with `--backend fallback`. Can contain synthetic bow/breath/noise artifacts. |
-| `auto` | backend selection/fallback policy | Use only when fallback behavior is acceptable and explicitly reported. |
-| `sfizz` / `sfizz-render` | optional `sfizz_render` CLI + SFZ instrument files | Use for better open sample instruments from YAML; requires `render.sfizz.default_sfz` or per-instrument `instrument_backend.sfz`. |
-
-Optional pro-audio processing remains opt-in. `pyloudnorm` is part of the normal Python dependency set and enables `target_lufs` / `loudness.target_lufs` postprocess normalization. `numba` is also part of the normal dependency set because the built-in Schroeder/Freeverb-style reverb uses compiled DSP kernels for its long comb/allpass feedback loops; set `AMBITION_MUSIC_RENDERER_DISABLE_NUMBA=1` only when debugging the pure-Python fallback. The `pro-audio` optional extra enables Pedalboard/VST3 effects without making Pedalboard part of the default renderer path. LV2/NAM/Guitarix are external command/plugin installs and are only invoked when YAML explicitly requests those optional backends.
-
-Use the plugin diagnostics before authoring a score that depends on local plugins:
+For normal composition iteration, render the mastered full soundtrack and keep
+extra audio products disabled:
 
 ```bash
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins doctor
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins list_vst3
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins list_lv2 --limit=40
-uv run --project ~/code/ambition/tools/ambition_music_renderer python -m ambition_music_renderer plugins validate_score guitar_backend_demo
-```
+cd ~/code/ambition
+source scripts/lib/asset_roots.sh
 
-For new work, prefer the explicit `effect_chain` surface. Each step states the host family. This keeps the default render path lightweight while making DAW-like processing reproducible from YAML/Python.
-
-```yaml
-postprocess:
-  target_lufs: -16
-  true_peak_db: -1.5
-  effect_chain:
-    - kind: pedalboard
-      effects:
-        - {effect: compressor, threshold_db: -18, ratio: 2.5}
-        - {effect: reverb, room_size: 0.18, wet_level: 0.08}
-
-# VST3 effects are loaded through Pedalboard when the optional package and
-# local plugin are installed. Relative paths are resolved against the score.
-group_postprocess:
-  guitars:
-    highpass_hz: 80
-    lowpass_hz: 9000
-    effect_chain:
-      - kind: vst3
-        path: local/plugins/MyAmp.vst3
-        parameters: {}
-
-      # Simple LV2 file effects use lv2proc. Use `plugins list_lv2` and
-      # `plugins lv2_info <URI>` to discover plugin URIs/ports locally.
-      - kind: lv2proc
-        plugin_uri: http://example.invalid/my-lv2-plugin
-        params: {gain: 0.5}
-
-      # NAM/Guitarix setups vary, so command adapters are first-class. The
-      # renderer writes a WAV, substitutes placeholders, then reads the output.
-      - kind: command
-        command: [my-offline-amp, --input, "{input}", --output, "{output}", --sample-rate, "{sample_rate}"]
-```
-
-`effect_chain` is the single cross-backend effects surface; each step names its
-host family (`pedalboard`/`vst3`, `lv2`/`lv2proc`, or `command`) so ordering is
-explicit. The older flat `pedalboard_effects` / `vst3_effects` / `lv2_effects` /
-`external_effects` keys have been removed — wrap those effects in an
-`effect_chain` step instead.
-
-### Replacing built-in master stages (don't just stack)
-
-The built-in post-process applies a room reverb and a final true-peak limiter by
-default. To use a Pedalboard/VST reverb or limiter as a *replacement* rather than
-stacking it on top of the built-ins, disable the built-in stage and add the
-plugin to `effect_chain`:
-
-```yaml
-postprocess:
-  reverb_enabled: false    # skip the built-in Schroeder room (also: reverb_wet: 0)
-  limiter_enabled: false   # skip the built-in soft limiter / normalizer
-  effect_chain:
-    - kind: pedalboard
-      effects:
-        - {effect: reverb, room_size: 0.30, wet_level: 0.12}
-        - {effect: limiter, threshold_db: -1.0}
-```
-
-`effect_chain` runs before the built-in loudness/limiter stages, so when you
-disable `limiter_enabled` (and aren't using `target_lufs`) your chain's limiter
-is the final stage. `stereo_width: 0` likewise disables the built-in widener.
-
-SoundFont preference is defined in the renderer code. Prefer high-quality MuseScore/FluidR3 style General MIDI SoundFonts when available. Override per-cue with `render.soundfont` in YAML or per invocation with a backend-specific CLI flag when supported. Normal authoring defaults should prefer `pretty-midi`; fallback should never appear because a prompt or lower-level script quietly picked it.
-
-
-## One-command cue debug bundles
-
-Use `cue bundle` when regenerating a song for review or for handoff to another
-agent. It renders with retained debug stems, runs the useful reports, writes
-spectrogram images when matplotlib is available, and packages an uploadable
-bundle on request. Generated bundles remain ignored by git.
-
-```bash
-uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer cue bundle <cue_id> \
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue bundle \
+  <cue_id> \
   --backend=pretty-midi \
-  --jobs=6 \
   --force \
+  --render_audio_mode=simple-mix \
   --zip
 ```
 
-For layered runtime-stem audits, add `--runtime_stem_gain_mode=shared`. The
-default `native` mode preserves historical raw stem levels; `shared` computes one
-reference gain from the all-stem mix and applies it to every runtime stem so the
-layered export is audible without destroying the stem balance via independent
-normalization. Shared gain is capped by default (`render.runtime_stems.max_gain_db`
-or `--runtime_stem_max_gain_db`) because a cue that needs 40+ dB of rescue gain
-usually needs louder source instruments/layers, not louder exported noise.
+The primary listening artifact is:
 
-Bundles default to the gitignored `agent/` drop-zone (`agent/<cue>_<hash>_bundle/`)
-so that after a render — especially a blind fix you can't verify by ear — the
-audio, piano-roll plots, and `harmony_diagnostics.md` for a cue are all in one
-predictable place to audition and debug. Override with `--bundle_root <dir>`.
+```text
+generated/<cue_id>/latest/preview/<cue_id>_<hash>.full_soundtrack_preview.ogg
+```
 
-Use `--zip_report` for compact chat/agent handoff zips; the on-disk bundle directory remains fully featured and keeps the generated audio for local audition. Report zips exclude
-large OGG/WAV/NPY binaries but keep source YAML, manifests, logs, TSV/JSON level
-reports, `spectral_fingerprint.json`, and JPEG spectrograms. Use `--zip` only when the recipient must audition audio directly from the zip. Add `--publish` only when
-the generated `full.ogg` should be copied into the game asset tree. Add
-`--include_scratch_stems` only for local handoff bundles; raw `.npy` stems are
-useful but usually too large for chat upload.
+`simple-mix` is the preferred starting point when judging composition. Add
+more render products only when they answer a concrete debugging question.
 
-
-### Profiling renders
-
-Normal `cue bundle` launches `render_isolated` as a subprocess so long renders are robust and worker failures are contained. That isolation is good for production, but it hides useful line-profiler call stacks. For profiling, either set `LINE_PROFILE=1` or pass `--profile_render`; both run `render_isolated` in-process and render serial worker groups by direct Python calls so line-profiler can see below the old process boundaries. `--profile_render` is a convenience flag that also enables `LINE_PROFILE=1`; it uses line profiler only and does not start cProfile.
-
-Recommended short profiling command:
+A compact report archive can be requested independently:
 
 ```bash
-cd ~/code/ambition
-
-LINE_PROFILE=1 uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue bundle \
+  <cue_id> \
   --backend=pretty-midi \
-  --runtime_stem_gain_mode=shared \
-  --render_audio_mode=full-mix-only \
-  --profile_render \
+  --render_audio_mode=simple-mix \
   --force \
   --zip_report
 ```
 
-For an already-active renderer venv:
+`--zip_report` omits OGG/WAV/NumPy/MIDI binaries. `--zip` creates the full
+shareable bundle including manifest-referenced audio.
+
+### Focused stem review
+
+When the mastered mix reveals a balance problem, add full-length group audition
+files without enabling the maximal runtime/audition preview set:
 
 ```bash
-cd ~/code/ambition
-source tools/ambition_music_renderer/.venv/bin/activate
-
-LINE_PROFILE=1 uv run --active \
-python -m ambition_music_renderer cue bundle for_emmy_forever_ago \
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue bundle \
+  <cue_id> \
   --backend=pretty-midi \
-  --runtime_stem_gain_mode=shared \
-  --render_audio_mode=full-mix-only \
-  --profile_render \
+  --render_audio_mode=simple-mix \
+  --audition_stems \
   --force \
   --zip_report
 ```
 
-Use `--render_in_process` without `--profile_render` only for debugging; the default subprocess path is still the safer production path. The profile surface includes the old process-boundary functions plus audio hotspots such as `simple_reverb`, `_comb_filter`, `_allpass_filter`, `_new_fluidsynth`, `_fluidsynth_stereo_samples`, filters, compressor, limiter, and OGG writing helpers. The comb/allpass bodies normally run through lazily imported Numba kernels, so line profiler should show those wrapper calls becoming small instead of spending minutes inside Python loops. To inspect a saved line-profiler file, use:
+The group audition files are normalized for inspection. They are debugging
+artifacts, not evidence of runtime loudness.
+
+## CLI map
+
+The package exposes a modal CLI:
 
 ```bash
-python -m line_profiler -rtmz profile_output.lprof
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer --help
 ```
 
-The bundle also emits theory/debug reports that are easier for agents to reason
-about than raw audio:
+The main command families are:
 
-- `arrangement_audit_summary.txt/json/md` preflights the YAML before audio render: default-state group prominence, likely buried groups, bass/melody collision candidates, and long non-chord tones.
-- `dissonance_hotspots_summary.txt/json/tsv` identifies bars/beats where
-  overlapping note events create strong seconds, sevenths, tritones, or close
-  register clusters, attributed back to layers/groups/instruments.
-- `dissonance_hotspots.md` is the same hotspot information in a scan-friendly
-  table for humans.
-- `plots/dissonance_pianoroll.<fmt>` is the main "where" view: every note on a
-  time x pitch grid colored by its clash score, with out-of-key notes marked and
-  sized by severity, over a time-ordered clash-per-beat strip. Read it to find
-  the exact bar/pitch of a clash or a sour note. `plots/dissonance_layer_pairs.<fmt>`
-  shows which layer pairs clash most in aggregate.
-- `state_mix_report_summary.txt/json/tsv` explains why adaptive previews may
-  sound similar: `runtime_*` states are true weighted sums, while `audition_*`
-  states are normalized for review and may collapse loudness differences.
-- `spectral_fingerprint_summary.txt/json/tsv` summarizes low/mid/high/vhigh/air
-  energy by stem without requiring an audio player.
-- `stem_loudness_summary.txt/json/tsv` reports per-stem native and runtime
-  RMS/peak/headroom in dBFS and warns when one channel is wildly louder or
-  quieter than the rest. Start here when a mix sounds obviously wrong.
-- `plots/stem_loudness.<fmt>` is a single ranked stem/channel loudness plot
-  that makes buried or overpowering stems visible at a glance.
-- `stem_amplitude_summary.txt/json/tsv` and `stem_amplitude_envelope.tsv`
-  show raw and state-weighted runtime stem levels, so mix balance can be read
-  directly rather than inferred from spectrogram color.
-- `plots/stem_loudness_timeline.<fmt>` is the main over-time balance plot:
-  one fixed-dBFS line per stem across the full soundtrack timeline. It is
-  generated from scratch stems when running fast `full-mix-only` bundles, so it
-  remains available even when per-section per-stem OGGs are skipped.
-- `plots/stem_amplitude_balance.<fmt>`, `plots/stem_amplitude_timeline.<fmt>`,
-  and `plots/stem_amplitude_stack.<fmt>` visualize relative stem amplitude and
-  how the stems layer through the cue. `stem_amplitude_timeline` is retained as
-  the legacy filename for the same over-time diagnostic.
-- Spectrogram plots use a fixed dB color range by default so two plots from the
-  same bundle can be compared visually without local autoscaling hiding level
-  mistakes.
+| Command | Purpose |
+|---|---|
+| `cue list` | List score ids discovered under `scores/`. |
+| `cue render <cue>` | Render one cue without assembling a diagnostic bundle. |
+| `cue bundle <cue>...` | Render, analyze, and package one or more cues. |
+| `cue publish <cue>` | Publish the newest successful mastered preview. |
+| `audit ...` | Inspect score structure, rendered audio, balance, pitch, transitions, and related diagnostics. |
+| `plugins ...` | Inspect optional SFZ/LV2/VST3/CLAP infrastructure and validate score dependencies. |
+| `radio ...` | Bulk convenience commands for the parent game's radio cue set. |
+| `sandbox ...` | Legacy-named bulk preset for a small single-track cue set. |
+| `legacy ...` | Quarantined helpers retained only until deletion safety is established. |
 
-## Reference-audio surface analysis
+For one cue, `cue bundle -j/--jobs N` parallelizes stem-group rendering. For
+multiple cue ids, `--jobs N` controls cue-level fan-out and `--render_jobs N`
+controls per-cue stem workers.
 
-Use this when you have a reference MP3/OGG/WAV and want to mimic broad sonic
-qualities such as loudness envelope, dynamic range, brightness, and onset
-density. It does **not** do source separation or infer instrumentation. MP3
-decode depends on the local `soundfile` / `ffmpeg` setup.
+Useful discovery commands:
 
 ```bash
-uv run --project ~/code/ambition/tools/ambition_music_renderer \
-python -m ambition_music_renderer audit reference_audio path/to/reference.mp3 \
-  --outdir=/tmp/reference_audio_audit
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue bundle --help
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer audit --help
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins --help
 ```
 
-Outputs include `reference_audio_summary.txt`, `reference_audio_audit.json`,
-`reference_audio_envelope.tsv`, and optional loudness / brightness plots.
+## Scores
 
-## Output and publish model
+Score lookup searches these directories in order as declared by `_paths.py`:
 
-Rendering is a staging step. Publishing/installing is a separate decision.
+```text
+scores/
+  active/       current or candidate game cues
+  examples/     reference scores and renderer examples
+  archive/      intentionally retained historical scores
+  experiments/  exploratory scores not promoted to active
+```
 
-Typical generated output for a cue is versioned by the renderer/spec hash so old experiments do not sit beside current files:
+`cue list --json` emits the discovered ids grouped by directory.
+
+A score can be addressed by cue id or by YAML path.
+
+## MusicIR overview
+
+MusicIR is intentionally declarative. Common top-level fields include:
+
+- `id` - cue identifier.
+- `tempo` and `meter` - timing; `tempo.map` supports authored tempo changes.
+- `render` - render/backend policy and renderer-specific settings.
+- `postprocess` - final mix processing.
+- `stem_postprocess` and `group_postprocess` - targeted mix processing.
+- `constraints` - optional voicing constraints.
+- `instruments` - named instruments, groups, MIDI controls, and optional
+  per-instrument backend configuration.
+- `motifs` - reusable pitch/rhythm material.
+- `layer_templates` - reusable layer definitions.
+- `playback` - loop/crossfade metadata.
+- `state_map` - runtime states mapped to sections and stem weights.
+- `sections` - ordered musical sections containing harmony and layers.
+
+Current layer kinds are implemented in `render/score_layers.py`:
+
+- `pad_chords`
+- `arpeggio`
+- `ostinato`
+- `bassline`
+- `motif`
+- `chord_hits`
+- `drums`
+- `texture`
+- `pedal`
+- `root_hits`
+- `guitar_strum`
+- `guitar_chug`
+- `guitar_lead`
+- `notes`
+- `automation`
+
+`notes` is the literal-event escape hatch when a composed phrase is clearer as
+explicit events than as a generative layer. Note-producing layers can use
+phrase-level `dynamics`; layers can also carry CC automation. Guitar layers use
+a small performance compiler for string assignment, strum staggering, chugs,
+lead scoops, and explicit double-take authoring.
+
+Prefer the highest-level construct that expresses the musical idea cleanly.
+Use literal notes when they make the composition more legible, not as a signal
+that the renderer needs another one-off algorithm.
+
+## Rendering and instrument backends
+
+The top-level render backend choices are:
+
+| Backend | Role |
+|---|---|
+| `pretty-midi` | Preferred local render path using the configured SoundFont/FluidSynth stack. |
+| `fluidsynth-cli` | FluidSynth command-line backend. |
+| `fallback` | Built-in synthetic fallback for diagnostics and constrained environments. |
+| `auto` | Renderer-selected fallback policy; use when fallback is acceptable. |
+
+Per-instrument backends are separate from the top-level backend. An instrument
+can request an SFZ/sample path or the built-in procedural FM synth while other
+instruments in the same cue continue through the normal backend.
+
+### SFZ instruments
+
+Per-instrument SFZ configuration is resolved through `instrument_backend`.
+Useful fields include `sfz`, `library_ref`, `prefer`, optional library roots,
+and backend settings. Run plugin validation before depending on machine-local
+sample libraries:
+
+```bash
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins doctor
+
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins list_sfz_libraries
+
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins validate_score <cue_id>
+```
+
+By default, optional per-instrument backend failures warn and fall back instead
+of silently dropping a noted instrument. Set `render.strict_backends: true`
+when a requested backend must succeed or fail the render.
+
+### Procedural FM instruments
+
+The renderer includes a generic oscillator-level FM path for timbres that are
+awkward to express with General MIDI or SoundFonts. It is selected per
+instrument:
+
+```yaml
+instrument_backend:
+  kind: procedural_fm
+  carrier:
+    waveform: saw
+    harmonics: 10
+  fm:
+    waveform: sine
+    ratio: 0.25
+    index: 0.10
+  envelope:
+    attack_ms: 6
+    decay_ms: 70
+    sustain: 0.85
+    release_ms: 100
+  saturation_drive: 1.15
+  output_gain_db: -6
+```
+
+The procedural FM path is a reusable synth primitive, not a cue-specific hook.
+Improve it generically if a composition exposes a real missing capability.
+
+## Mix and effects
+
+MusicIR separates musical authoring from mix stages:
+
+- `stem_postprocess` controls named stems.
+- `group_postprocess` controls instrument groups.
+- `postprocess` controls the completed mix.
+
+The built-in processing path covers common gain/filter/dynamics/reverb/width
+operations. Optional external processing is expressed through ordered
+`effect_chain` steps rather than parallel legacy effect lists. The plugin
+commands expose locally available VST3/LV2/CLAP infrastructure.
+
+When changing balance, inspect rendered stems rather than trusting authored MIDI
+volume or score gain values as proxies for perceived loudness. Different sample
+libraries and synth paths can have very different native levels.
+
+Prefer orchestration, register, rhythm, and texture for musical contrast. Use
+gain riding when necessary to keep section playback level coherent; do not use
+mastering or extra layers to disguise weak composition.
+
+## Render audio modes
+
+`cue bundle --render_audio_mode=...` controls how much audio the underlying
+isolated renderer exports:
+
+| Mode | Audio scope |
+|---|---|
+| `simple-mix` | Mastered full soundtrack preview only. Best default for composition iteration. |
+| `full-mix-only` | Mastered full preview plus adaptive per-section full mixes; skips per-stem OGG export. |
+| `full` | Full adaptive export, including per-stem/state review products. Use when those assets are actually needed. |
+
+`--audition_stems` is orthogonal to those modes and adds one normalized
+full-length audition OGG per rendered stem group.
+
+Spectrogram generation is **off by default**. Enable `--spectrograms` for a
+specific visual investigation. The heavier diagnostic set is also opt-in with
+`--all_audits`.
+
+## Generated layout and bundles
+
+Default generated renders are content-versioned:
 
 ```text
 generated/<cue>/
   building -> .versioned/<hash-being-built>/
-  latest -> .versioned/<latest-successful-hash>/
+  latest   -> .versioned/<latest-successful-hash>/
   .versioned/<hash>/
-    adaptive/<section>/
-      <section>.full.ogg
-      <section>.<stem>.ogg
     preview/
-      full_soundtrack_preview.ogg
-      runtime_minimal.ogg
-      runtime_maximal.ogg
-      runtime_state_<name>.ogg
-      audition_minimal.ogg
-      audition_maximal.ogg
-      audition_state_<name>.ogg
+    adaptive/          # when requested by render mode
     reports/
-      stem_export_report.tsv
-      manifest_audio_levels.tsv
-      mix_diagnostics.txt
-      stem_loudness_summary.txt
-      stem_loudness.json
-      stem_loudness.tsv
-      spectral_fingerprint.json
-      spectral_fingerprint.tsv
-    plots/
-      stem_loudness.jpg
-      stem_loudness_timeline.jpg
-      stem_amplitude_balance.jpg
-      full_spectrogram.jpg
-    <cue>.adaptive_manifest.json
+    plots/             # when requested
+    <cue>_<hash>.adaptive_manifest.json
 ```
 
-Use `generated/<cue>/building/` while a render is in progress if you want to peek at intermediate stems. Use `generated/<cue>/latest/` for the most recent successful run. Explicit `--outdir` paths keep the caller-provided layout and do not get moved under `.versioned/`.
+`building` exists only while the default generated run is in progress. `latest`
+points at the newest successful run. Explicit `--outdir` paths are respected as
+given and do not use the versioned layout.
 
-`runtime_*` previews are true weighted stem sums with no upward audition
-normalization. `audition_*` previews are the same mixes normalized for easier
-composition review. Do not use audition files as evidence of in-game loudness.
+`cue bundle` also assembles a shareable bundle under the renderer's gitignored
+`agent/` drop-zone by default. The bundle contains the normalized score,
+manifest, reports, requested plots/audio, and a rerun script.
 
-Runtime assets live under:
+Useful bundle switches:
+
+- `--zip` - complete bundle archive, including copied audio.
+- `--zip_report` - compact report archive with binary audio/intermediates
+  excluded.
+- `--include_scratch_stems` - include raw NumPy scratch stems when a low-level
+  rendering problem requires them.
+- `--spectrograms` - generate spectrogram plots.
+- `--all_audits` - run the heavier diagnostic set.
+- `--skip_render` - analyze/package an existing render directory.
+
+## Audits
+
+Audits support composition and implementation review; they do not replace
+listening. Discover exact arguments with `--help`.
+
+```bash
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer audit arrangement --help
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer audit cue_balance --help
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer audit transition --help
+```
+
+Current audit families include arrangement, dissonance, lead collision, mix
+balance, pitch stability, reference-audio surface analysis, shrill-note and
+sour-note checks, cue balance, level reporting, spectral comparison/localizing,
+and transition analysis.
+
+A good debugging order is:
+
+1. listen to the mastered full soundtrack preview;
+2. decide whether the problem is composition, orchestration, timbre, or mix;
+3. inspect only the reports/stems relevant to that hypothesis;
+4. change the score or a generic renderer capability;
+5. render again and listen before escalating to heavier diagnostics.
+
+Do not declare a cue successful because it has a small RMS spread, many
+automation events, irregular onset statistics, or a clean audit. Those are
+implementation signals, not musical verdicts.
+
+## Publishing into Ambition
+
+Rendering is local staging. Publishing is explicit.
+
+The renderer deliberately contains no hard-coded consuming crate name. From the
+parent Ambition checkout, source the game's asset-root declaration before using
+a publish command:
+
+```bash
+cd ~/code/ambition
+source scripts/lib/asset_roots.sh
+
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue publish <cue_id>
+```
+
+Equivalent render-and-publish workflows can use `cue render --publish`,
+`cue bundle --publish`, or the bulk `radio` commands. Outside the parent helper
+script, set `AMBITION_MUSIC_PUBLISH_ROOT` or pass `--dest_root` explicitly.
+Publishing without a declared destination is an error by design.
+
+If `preview/published.ogg` exists for a generated cue, `cue publish` treats it
+as a manual pin; otherwise it selects the newest matching mastered full
+soundtrack preview.
+
+## Optional audio tools and plugins
+
+Python dependencies are declared in `pyproject.toml`. Additional audio tools
+and sample/plugin collections can be rooted with `AMBITION_AUDIO_TOOLS_ROOT`.
+SFZ rendering, LV2 processors, Guitarix/NAM-style command adapters, VST3 hosts,
+and similar facilities are optional and are probed only when a score requests
+them.
+
+Useful checks:
+
+```bash
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins doctor
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins list_vst3
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins list_lv2 --limit=40
+```
+
+Keep machine-specific observations out of this README. If an instrument library
+needs a durable workaround, encode the resolution/fallback behavior in the
+generic library tooling and cover it with a tooling test.
+
+## Package map
 
 ```text
-crates/ambition_actors/assets/audio/music/generated/<cue>/
+ambition_music_renderer/
+  cli.py                  modal CLI and bulk orchestration
+  _paths.py               score/generated/publish path contract
+  render/                 MusicIR expansion, rendering, mix/export, bundles
+  audit/                  score/audio diagnostics exposed by the CLI
+  backends/               optional sample/plugin adapters
+  legacy/                 quarantined helpers awaiting deletion decisions
+scores/
+  active/
+  examples/
+  archive/
+  experiments/
+tests/                     renderer/tooling tests
 ```
 
-For `first_goblin_tune_v2`, the top-level wrapper currently renders/installs the active cue path used by the sandbox. By default, prefer full-mix render/install for the cue the game actually loads. Use stem rendering when auditing or reviving stem-driven runtime playback.
+High-value implementation entry points:
 
-## Score file format
+- `render/score_layers.py` - MusicIR layer dispatch and score construction.
+- `render/score_core.py` / `render/score_events.py` / `render/score_theory.py` -
+  shared score semantics.
+- `render/group.py` - group/instrument routing and backend fallback behavior.
+- `render/synth.py` - SoundFont/fallback/procedural synthesis.
+- `render/effects.py` - built-in and external effect processing.
+- `render/isolated.py` - adaptive/full soundtrack render entry point.
+- `render/bundle_options.py` - shared `cue bundle` option contract.
+- `render/bundle.py` - render + diagnostics + shareable bundle workflow.
+- `audit/*.py` - current audit implementations and their kwconf CLI schemas.
 
-Music scores are YAML files under `scores/`. At a high level:
+## Validation
 
-- `tempo` / `meter` - BPM and beats per bar. `tempo.map` adds ritardando /
-  accelerando: ordered `{bar, bpm, ramp_bars}` entries ramp linearly from the
-  previous tempo starting at `bar` (absolute, fractional allowed) and hold
-  after. All note timing, CC automation, section metadata, and export markers
-  follow the map. Avoid ramps inside `loopable` sections (the loop seam jumps
-  tempo; the renderer warns).
-- `render` - sample rate, OGG quality, backend, SoundFont pin, and render-specific settings.
-- `postprocess`, `stem_postprocess`, `group_postprocess` - EQ, reverb, limiter/compressor, stereo width, and related mastering controls at different mix levels.
-- `constraints` - optional voicing rules such as minimizing motion or avoiding clusters.
-- `instruments` - named instruments with group, GM program/drum settings, MIDI volume/pan/expression/modulation.
-- `motifs` - reusable melodic/rhythmic patterns.
-- `layer_templates` - reusable layer definitions.
-- `playback` - runtime crossfade/loop behavior.
-- `state_map` - gameplay states mapped to sections and optional stem gains.
-- `sections` - cue sections with bar count, intensity, harmony, layers, and optional section postprocess.
+Run tooling tests from the parent repository:
 
-Common layer kinds include:
-
-- `pad_chords`
-- `chord_hits`
-- `bassline`
-- `motif`
-- `arpeggio`
-- `pedal`
-- `root_hits`
-- `drums`
-- `automation`
-- `notes` - literal note events, the full-control escape hatch. Rows are
-  `[local_bar, beat, note, dur_beats, velocity]` (note may be a list for a
-  chord) or dicts adding per-note `gate`/`articulation`/`bend`/`vibrato_cents`.
-- `guitar_strum` - chord-symbol input compiled to plausible six-string down/up strums.
-- `guitar_chug` - power-chord/palm-muted rhythm guitar with optional separate take definitions.
-- `guitar_lead` - motif input compiled to monophonic guitar-like lead notes with position-aware scoops.
-
-Most note-producing layers accept timing and velocity humanization. Motif layers can also carry pitch-bend curves for slides or bends. Guitar layers add a tiny custom performance compiler: it assigns notes to six strings, staggers strums physically, and makes double-tracking explicit as separate takes rather than generic stereo widening.
-
-Every note-producing layer also accepts `dynamics` - phrase-level crescendo /
-decrescendo curves that scale the authored velocities (backend-independent,
-unlike CC automation, which only moves instruments whose SFZ maps that CC):
-
-```yaml
-dynamics:
-  - {start_bar: 8, bars: 8, from: 0.7, to: 1.0, curve: smooth}
+```bash
+cd ~/code/ambition
+uv run --project tools/ambition_music_renderer \
+  pytest -q tools/ambition_music_renderer/tests
 ```
 
-Two related surfaces that already existed but are easy to miss: instrument
-specs accept any `CC_NUMBERS` name (`modulation: 78` emits CC1 at t=0 - some
-SFZ libraries such as VPO3 are silent without it), and any layer can carry an
-`automation` list for CC ramps/LFOs over the section (`cc: expression`,
-`from`/`to`/`curve`).
+For a focused procedural-FM change:
 
-## Constraint flags
-
-The renderer supports opt-in voicing constraints. They are off by default because there are legitimate musical reasons to break each rule.
-
-Example:
-
-```yaml
-constraints:
-  voice_leading: minimize_motion
-  no_clusters: true
+```bash
+cd ~/code/ambition
+uv run --project tools/ambition_music_renderer \
+  pytest -q tools/ambition_music_renderer/tests/test_procedural_fm.py
 ```
 
-Per-layer overrides can use the same shape. Constraints currently apply to chord construction paths; do not assume every layer kind enforces them.
+Before committing renderer changes:
 
-## Debugging transitions and balance
+```bash
+cd ~/code/ambition
+git -C tools/ambition_music_renderer diff --check
+```
 
-For adaptive cues, distinguish runtime problems from generated-audio problems before changing code:
+When a score depends on optional local infrastructure, also run:
 
-1. Render/regenerate the cue.
-2. Audit generated and installed OGGs with `python -m ambition_music_renderer audit cue_balance`.
-3. Run the game in the relevant room and capture music logs.
-4. Confirm whether the runtime starts the next state at target gain or fades from silence.
-5. Listen to adjacent generated files outside the game to decide if the seam exists before runtime touches them.
+```bash
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins validate_score <cue_id>
+```
 
-Useful future improvements:
+## Maintaining this README
 
-- level reports with LUFS / peak / RMS / duration,
-- live in-engine gain HUD,
-- equal-power crossfade experiments,
-- mastered per-stem outputs if stem-driven playback returns,
-- clearer staging vs production publish flow.
+Keep this file aligned with the code that owns each contract:
 
-## Music-theory reference
+- CLI flags: `cli.py`, `render/bundle_options.py`, and the audit/plugin Config
+  classes.
+- MusicIR layer kinds: `render/score_layers.py`.
+- instrument routing: `render/group.py` and `render/synth.py`.
+- generated layout: `render/generated_layout.py` and `render/isolated.py`.
+- bundle contents: `render/bundle.py` and `render/bundle_archive.py`.
+- publish semantics: `_paths.py` and the parent Ambition asset-root helper.
 
-When composing new YAML cues, prefer explicit, inspectable musical choices:
-
-- Preserve common tones and minimize voice motion between adjacent chords when the texture wants smoothness.
-- Avoid accidental parallel perfect fifths/octaves in classical-ish writing unless the style wants it.
-- Keep bass instruments, harmonic body, and lead instruments separated enough that the mix remains readable.
-- Use dynamic layering to intensify gameplay states: sparse intro -> loop body -> denser combat -> recap/outro.
-- Modal color tones help cues feel intentional: Phrygian b2, Lydian #4, Mixolydian b7, harmonic-minor leading tone, etc.
-- Humanization and anticipation/lay-back can make generated parts feel less mechanical; keep values small and deliberate.
-
-## Agent rules
-
-- Keep generated audio out of runtime assets unless the task explicitly installs/publishes it.
-- Preserve conservative gain ranges in tune specs; the runtime renderer can clip if stems are too hot.
-- Treat `first_goblin_tune_v2` as the current active adaptive-music lab, not as the final abstraction for all encounters.
-- Update `docs/recipes/generated-music-workflow.md` and `docs/tools/generated-audio-tools.md` when the workflow changes.
-
-
-### Lean composition review with group splits
-
-Use `--render_audio_mode=simple-mix --audition_stems --zip_report` to emit the
-mastered full soundtrack plus one normalized full-length audition file per stem
-group, without runtime/audition maximal previews or per-section stem exports.
-The report zip remains audio-free.
+When behavior changes, update the owning code and this README in the same
+change. Prefer deleting obsolete instructions to accumulating contradictory
+historical guidance.
