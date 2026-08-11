@@ -208,3 +208,64 @@ def test_upright_bass_alias_prefers_pizzicato_over_sustain(tmp_path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("<group>\n", encoding="utf8")
     assert resolve_sfz_reference(library_ref="bass.upright", roots=[root]) == pizz.resolve()
+
+
+def test_warm_acoustic_prefers_alternate_acoustic_over_shinyguitar(tmp_path: Path):
+    root = tmp_path / "sfz"
+    shiny = root / "Karoryfer" / "Shinyguitar" / "Programs" / "acoustic.sfz"
+    warm = root / "Manual" / "Blue Jeans and Moonbeams" / "12 String Acoustic Guitar Sustain.sfz"
+    for path in (shiny, warm):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    resolved = resolve_sfz_reference(library_ref="guitar.acoustic_warm", roots=[root])
+    assert resolved == warm.resolve()
+
+
+def test_warm_acoustic_can_fall_back_to_shinyguitar_when_it_is_only_sample(tmp_path: Path):
+    root = tmp_path / "sfz"
+    shiny = root / "Karoryfer" / "Shinyguitar" / "Programs" / "acoustic.sfz"
+    shiny.parent.mkdir(parents=True, exist_ok=True)
+    shiny.write_text("<group>\n", encoding="utf8")
+    resolved = resolve_sfz_reference(library_ref="guitar.acoustic_warm", roots=[root])
+    assert resolved == shiny.resolve()
+
+
+
+def test_premium_acoustic_bass_alias_prefers_meatbass_pizz_program(tmp_path: Path):
+    root = tmp_path / "sfz"
+    sonatina = root / "Sonatina" / "SymphonicOrchestra" / "Strings" / "Basses Pizzicato.sfz"
+    meatbass = root / "Karoryfer" / "Meatbass" / "Meatbass" / "Programs" / "04_pizz.sfz"
+    helper = root / "Karoryfer" / "Meatbass" / "Meatbass" / "Programs" / "pizz_basic_map.sfz"
+    for path in (sonatina, meatbass, helper):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="bass.meatbass_pizz", roots=[root]) == meatbass.resolve()
+
+
+def test_vpo_solo_performance_aliases_choose_plain_perf_programs(tmp_path: Path):
+    root = tmp_path / "sfz"
+    cases = {
+        "vpo.violin_solo_perf": (
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Strings/1st-violin-SOLO-PERF.sfz",
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Strings/1st-violin-SOLO-PERF-KS-C2.sfz",
+        ),
+        "vpo.flute_solo_perf": (
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/flute-SOLO-PERF.sfz",
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/alto-flute-SOLO-PERF.sfz",
+        ),
+        "vpo.oboe_solo_perf": (
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/oboe-SOLO-PERF.sfz",
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/oboe-SOLO-PERF-KS-C2.sfz",
+        ),
+        "vpo.clarinet_solo_perf": (
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/clarinet-SOLO-PERF.sfz",
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/clarinet-SOLO-PERF-staccato.sfz",
+        ),
+    }
+    for ref, (wanted_rel, distractor_rel) in cases.items():
+        wanted = root / wanted_rel
+        distractor = root / distractor_rel
+        for path in (wanted, distractor):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("<group>\n", encoding="utf8")
+        assert resolve_sfz_reference(library_ref=ref, roots=[root]) == wanted.resolve(), ref

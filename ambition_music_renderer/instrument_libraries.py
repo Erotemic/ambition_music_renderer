@@ -61,6 +61,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("solo", "sustain", "sus", "violin"),
         avoid=("pizz", "spicc", "stacc", "trem", "trill"),
     ),
+    "vpo.violin_solo_perf": SfzLibraryAlias(
+        ref="vpo.violin_solo_perf",
+        required_any=(("virtual", "playing", "strings", "1st", "violin", "solo", "perf"),),
+        prefer=("1st violin solo perf", "solo perf", "1st violin", "violin"),
+        avoid=("ks", "staccato", "pizzicato", "tremolo", "accent", "section", "sec", "panned"),
+    ),
     "vpo.brass": SfzLibraryAlias(
         ref="vpo.brass",
         required_any=(("virtual", "playing", "orchestra", "brass"), ("vpo", "brass"), ("brass",)),
@@ -72,6 +78,24 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("virtual", "playing", "orchestra", "woodwinds"), ("vpo", "woodwinds"), ("woodwinds",)),
         prefer=("sustain", "sus", "flute", "clarinet", "ensemble"),
         avoid=("stacc", "flutter", "trill"),
+    ),
+    "vpo.flute_solo_perf": SfzLibraryAlias(
+        ref="vpo.flute_solo_perf",
+        required_any=(("virtual", "playing", "woodwinds", "flute", "solo", "perf"),),
+        prefer=("woodwinds flute solo perf", "flute solo perf", "solo perf", "flute"),
+        avoid=("alto flute", "bass flute", "ks", "staccato", "accent", "section", "sec", "panned"),
+    ),
+    "vpo.oboe_solo_perf": SfzLibraryAlias(
+        ref="vpo.oboe_solo_perf",
+        required_any=(("virtual", "playing", "woodwinds", "oboe", "solo", "perf"),),
+        prefer=("oboe solo perf", "solo perf", "oboe"),
+        avoid=("ks", "staccato", "accent", "section", "sec", "panned"),
+    ),
+    "vpo.clarinet_solo_perf": SfzLibraryAlias(
+        ref="vpo.clarinet_solo_perf",
+        required_any=(("virtual", "playing", "woodwinds", "clarinet", "solo", "perf"),),
+        prefer=("clarinet solo perf", "solo perf", "clarinet"),
+        avoid=("bass clarinet", "contrabass", "ks", "staccato", "accent", "section", "sec", "panned"),
     ),
     "vpo.choir": SfzLibraryAlias(
         ref="vpo.choir",
@@ -134,6 +158,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         ),
         prefer=("notation", "basses pizzicato", "pizzicato", "pizz", "upright", "double bass", "acoustic bass"),
         avoid=("electric", "bowed", "arco", "sustain", "trombone", "tuba", "cello", "brass"),
+    ),
+    "bass.meatbass_pizz": SfzLibraryAlias(
+        ref="bass.meatbass_pizz",
+        required_any=(("meatbass", "pizz"),),
+        prefer=("04 pizz", "meatbass", "pizz"),
+        avoid=("arco", "map", "legato", "looped", "sustain"),
     ),
     "drums.rock": SfzLibraryAlias(
         ref="drums.rock",
@@ -281,6 +311,24 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("acoustic", "guitar"), ("blue", "jeans", "moonbeams"), ("shinyguitar",)),
         prefer=("acoustic", "mic", "sustain", "long", "chord", "guitar"),
         avoid=("pickup", "mute", "staccato", "noise", "scrape"),
+    ),
+    "guitar.acoustic_warm": SfzLibraryAlias(
+        ref="guitar.acoustic_warm",
+        required_any=(
+            ("acoustic", "guitar"),
+            ("blue", "jeans", "moonbeams"),
+            ("12", "string", "guitar"),
+            ("twelve", "string", "guitar"),
+            ("shinyguitar",),
+        ),
+        prefer=(
+            "12 string", "twelve string", "blue jeans moonbeams",
+            "jumbo", "dreadnought", "warm", "mic", "sustain", "long",
+            "acoustic", "guitar",
+        ),
+        # Shinyguitar remains an eligible last-resort sampled acoustic, but
+        # prefer another real acoustic when the local library contains one.
+        avoid=("shinyguitar", "pickup", "mute", "staccato", "noise", "scrape", "sample"),
     ),
     # Sonatina Symphonic Orchestra string sections (real sampled orchestra).
     # Prefer the simple "Notation/...Sustain" patches; avoid the keyswitch

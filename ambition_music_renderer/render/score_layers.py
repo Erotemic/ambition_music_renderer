@@ -460,6 +460,148 @@ def render_layer_root_hits(
 
 
 
+def _resolve_guitar_chord_shapes(ctx: RenderContext, layer: dict[str, Any]) -> dict[str, Any]:
+    """Resolve authored guitar shapes directly or from another layer template."""
+    shapes = layer.get("chord_shapes")
+    if isinstance(shapes, dict) and shapes:
+        return shapes
+    source = layer.get("shape_template")
+    if source:
+        template = (ctx.spec.get("layer_templates", {}) or {}).get(str(source))
+        if not isinstance(template, dict):
+            raise KeyError(f"guitar shape_template references unknown template {source!r}")
+        shapes = template.get("chord_shapes")
+        if isinstance(shapes, dict) and shapes:
+            return shapes
+        raise ValueError(f"guitar shape_template {source!r} has no chord_shapes")
+    raise ValueError("guitar physical-string layer needs chord_shapes or shape_template")
+
+
+def _paired_course_pitch(string_index: int, pitch: int, octave_strings: set[int]) -> int:
+    """Return the partner pitch for a twelve-string-style paired course."""
+    return int(pitch) + (12 if int(string_index) in octave_strings else 0)
+
+
+def _choke_guitar_string_state(
+    ctx: RenderContext,
+    *,
+    instrument: str,
+    string_index: int,
+    new_time: float,
+    choke_ms: float,
+) -> None:
+    """Stop a prior note on one physical string before that string is reused."""
+    string_state = getattr(ctx, "_guitar_string_note_state", None)
+    if string_state is None:
+        string_state = {}
+        setattr(ctx, "_guitar_string_note_state", string_state)
+    previous_entry = string_state.get((instrument, int(string_index)))
+    if previous_entry is None:
+        return
+    previous_note, previous_event = previous_entry
+    # Layers are rendered one-at-a-time rather than globally chronologically.
+    # Ignore future notes left in state by an earlier-rendered layer.
+    if previous_note.start >= float(new_time) - 1e-9:
+        return
+    cutoff = max(previous_note.start + 0.025, float(new_time) - max(0.0, choke_ms) / 1000.0)
+    if previous_note.end > cutoff:
+        previous_note.end = cutoff
+        previous_event["end_time"] = float(cutoff)
+        previous_event["end_beat"] = float(ctx.time_to_beat(cutoff))
+
+
+def _remember_guitar_string_state(
+    ctx: RenderContext, *, instrument: str, string_index: int
+) -> None:
+    string_state = getattr(ctx, "_guitar_string_note_state", None)
+    if string_state is None:
+        string_state = {}
+        setattr(ctx, "_guitar_string_note_state", string_state)
+    string_state[(instrument, int(string_index))] = (
+        ctx.instruments[instrument].notes[-1],
+        ctx.note_events[-1],
+    )
+
+
+@profile
+def render_layer_guitar_shape_pick(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Pick the actual strings of an authored guitar chord shape.
+
+    Unlike the generic arpeggiator this never rebuilds the harmony as a closed
+    MIDI voicing. ``pattern`` indexes the active strings from low to high, so a
+    muted bass string naturally shifts the same picking gesture onto the next
+    playable course. An optional paired-course instrument can add a tightly
+    locked twelve-string shimmer without introducing a second independent take.
+    """
+    from .. import guitar_performance as gp
+
+    insts = resolve_instruments(ctx, layer)
+    tuning = gp.tuning_from_spec(layer.get("tuning", "standard"))
+    chord_shapes = _resolve_guitar_chord_shapes(ctx, layer)
+    pattern = [int(x) for x in layer.get("pattern", [0, 3, 1, 4, 2, 5, 3, 4])]
+    if not pattern:
+        raise ValueError("guitar_shape_pick pattern must not be empty")
+    step = _positive_float(layer, "step", 0.5)
+    dur = float(layer.get("duration_beats", step * 1.8))
+    velocity = float(layer.get("velocity", 60))
+    density = float(layer.get("density", section.get("density", 1.0)))
+    articulation = layer.get("articulation", "tenuto")
+    gate = layer.get("gate")
+    gate_f = None if gate is None else float(gate)
+    gate_scale = gate_f if gate_f is not None else float(ARTICULATION_GATE.get(articulation, 0.86))
+    clip_to_bar = bool(layer.get("clip_to_bar", True))
+    bar_end_margin = max(0.0, float(layer.get("bar_end_margin_beats", 0.045)))
+    hk = _layer_human(layer, 2.5)
+
+    paired_inst = layer.get("paired_course_instrument")
+    if paired_inst is not None:
+        paired_inst = str(paired_inst)
+        if paired_inst not in ctx.instruments:
+            raise KeyError(f"guitar_shape_pick paired_course_instrument references unknown instrument {paired_inst!r}")
+    paired_delay_ms = max(0.0, float(layer.get("paired_course_delay_ms", 7.0)))
+    paired_velocity_scale = float(layer.get("paired_course_velocity_scale", 0.45))
+    paired_duration_scale = float(layer.get("paired_course_duration_scale", 0.9))
+    octave_strings = {int(x) for x in layer.get("paired_course_octave_strings", [0, 1, 2, 3])}
+    paired_articulation = layer.get("paired_course_articulation", articulation)
+    paired_delay_beats = paired_delay_ms / 1000.0 * float(ctx.bpm) / 60.0
+
+    for local in range(int(section["bars"])):
+        chord = chord_for_bar(section, local)
+        shape = chord_shapes.get(chord)
+        if shape is None:
+            raise KeyError(f"guitar_shape_pick has no authored shape for chord {chord!r}")
+        assignment = sorted(gp.assignment_from_frets(shape, tuning=tuning), key=lambda sf: sf.string_index)
+        if not assignment:
+            continue
+        count = int(ctx.beats_per_bar / step)
+        for i in range(count):
+            if ctx.rng.random() > density:
+                continue
+            sf = assignment[pattern[i % len(pattern)] % len(assignment)]
+            note_dur = dur
+            if clip_to_bar:
+                remaining = ctx.beats_per_bar - i * step - bar_end_margin
+                if remaining <= 0.0:
+                    continue
+                note_dur = min(note_dur, remaining / max(gate_scale, 1e-9))
+            beat = i * step
+            v = velocity * float(section.get("intensity", 1.0))
+            for inst in insts:
+                add_note(
+                    ctx, inst, int(sf.pitch), section["start_bar"] + local, beat,
+                    note_dur, v, articulation=articulation, gate=gate_f, **hk,
+                )
+            if paired_inst is not None:
+                partner_pitch = _paired_course_pitch(sf.string_index, sf.pitch, octave_strings)
+                add_note(
+                    ctx, paired_inst, partner_pitch, section["start_bar"] + local,
+                    beat + paired_delay_beats, note_dur * paired_duration_scale,
+                    v * paired_velocity_scale, articulation=paired_articulation, gate=gate_f, **hk,
+                )
+
+
 @profile
 def render_layer_guitar_strum(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
@@ -493,6 +635,19 @@ def render_layer_guitar_strum(
     prefer_open = bool(layer.get("prefer_open", True))
     velocity_slope = float(layer.get("velocity_slope", -2.0))
     hk = _layer_human(layer, 1.5)
+    paired_inst = layer.get("paired_course_instrument")
+    if paired_inst is not None:
+        paired_inst = str(paired_inst)
+        if paired_inst not in ctx.instruments:
+            raise KeyError(f"guitar_strum paired_course_instrument references unknown instrument {paired_inst!r}")
+    paired_delay_ms = max(0.0, float(layer.get("paired_course_delay_ms", 7.0)))
+    paired_velocity_scale = float(layer.get("paired_course_velocity_scale", 0.48))
+    paired_duration_scale = float(layer.get("paired_course_duration_scale", 0.9))
+    paired_octave_strings = {int(x) for x in layer.get("paired_course_octave_strings", [0, 1, 2, 3])}
+    paired_articulation = layer.get("paired_course_articulation", articulation)
+    paired_gate = layer.get("paired_course_gate", gate_f)
+    paired_gate_f = None if paired_gate is None else float(paired_gate)
+    paired_delay_beats = paired_delay_ms / 1000.0 * float(ctx.bpm) / 60.0
     hits = layer.get("hits")
     if not hits:
         every = _positive_float(layer, "every_bars", 1.0)
@@ -584,6 +739,15 @@ def render_layer_guitar_strum(
                 string_state = {}
                 setattr(ctx, "_guitar_string_note_state", string_state)
             current_strings = {int(sf.string_index) for sf in assignment}
+            if physical_string_sustain and paired_inst is not None and inst == insts[0]:
+                nominal_hit_time = ctx.bar_to_time(section["start_bar"] + local, beat)
+                for string_index in range(len(tuning)):
+                    if string_index in current_strings:
+                        continue
+                    _choke_guitar_string_state(
+                        ctx, instrument=paired_inst, string_index=string_index,
+                        new_time=nominal_hit_time, choke_ms=string_choke_ms,
+                    )
             if physical_string_sustain:
                 nominal_hit_time = ctx.bar_to_time(section["start_bar"] + local, beat)
                 for string_index in range(len(tuning)):
@@ -625,6 +789,25 @@ def render_layer_guitar_strum(
                             previous_event["end_time"] = float(cutoff)
                             previous_event["end_beat"] = float(ctx.time_to_beat(cutoff))
                     string_state[(inst, string_index)] = (new_note, new_event)
+                if paired_inst is not None and inst == insts[0] and "string" in ev:
+                    string_index = int(ev["string"])
+                    partner_pitch = _paired_course_pitch(string_index, int(ev["pitch"]), paired_octave_strings)
+                    add_note(
+                        ctx, paired_inst, partner_pitch, section["start_bar"] + local,
+                        beat + float(ev["beat_offset"]) + paired_delay_beats,
+                        hit_duration * paired_duration_scale,
+                        float(ev["velocity"]) * paired_velocity_scale,
+                        articulation=paired_articulation, gate=paired_gate_f, **hk,
+                    )
+                    if physical_string_sustain:
+                        new_course_note = ctx.instruments[paired_inst].notes[-1]
+                        _choke_guitar_string_state(
+                            ctx, instrument=paired_inst, string_index=string_index,
+                            new_time=new_course_note.start, choke_ms=string_choke_ms,
+                        )
+                        _remember_guitar_string_state(
+                            ctx, instrument=paired_inst, string_index=string_index
+                        )
 
 
 @profile
@@ -952,6 +1135,8 @@ def render_layer(
         render_layer_pedal(ctx, section, layer)
     elif kind == "root_hits":
         render_layer_root_hits(ctx, section, layer)
+    elif kind == "guitar_shape_pick":
+        render_layer_guitar_shape_pick(ctx, section, layer)
     elif kind == "guitar_strum":
         render_layer_guitar_strum(ctx, section, layer)
     elif kind == "guitar_chug":

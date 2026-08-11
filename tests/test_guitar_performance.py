@@ -331,3 +331,92 @@ def test_guitar_strum_chokes_old_fret_on_same_physical_string():
     # re-fret rather than ringing under F#7 for the original 3.96 beats.
     assert max(note.end for note in first_notes) < 1.01
     assert min(note.end for note in first_notes) > 0.97
+
+
+def test_guitar_shape_pick_uses_authored_physical_strings_and_paired_courses():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "shape_pick_courses",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [
+            {"name": "body", "group": "body", "program": "steel_guitar"},
+            {"name": "courses", "group": "courses", "program": "steel_guitar"},
+        ],
+        "sections": [
+            {
+                "id": "s",
+                "bars": 1,
+                "harmony": ["Bm7"],
+                "layers": [
+                    {
+                        "kind": "guitar_shape_pick",
+                        "instrument": "body",
+                        "tuning": "standard",
+                        "chord_shapes": {"Bm7": ["x", 2, 0, 2, 0, 2]},
+                        "pattern": [0, 1, 2, 3, 4],
+                        "step": 0.5,
+                        "duration_beats": 0.4,
+                        "velocity": 80,
+                        "density": 1.0,
+                        "humanize_ms": 0,
+                        "humanize_velocity_pct": 0,
+                        "paired_course_instrument": "courses",
+                        "paired_course_delay_ms": 0,
+                        "paired_course_velocity_scale": 0.5,
+                    }
+                ],
+            }
+        ],
+    }
+    pm, _groups, _meta = build_score(spec)
+    by_name = {inst.name: inst for inst in pm.instruments}
+    body = [note.pitch for note in by_name["body"].notes[:5]]
+    courses = [note.pitch for note in by_name["courses"].notes[:5]]
+    assert body == [47, 50, 57, 59, 66]
+    # Low four physical courses are octave-paired; B/high-E courses are unison.
+    assert courses == [59, 62, 69, 59, 66]
+
+
+def test_guitar_shape_pick_can_reuse_chord_shapes_from_strum_template():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "shape_pick_template",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "body", "group": "body", "program": "steel_guitar"}],
+        "layer_templates": {
+            "strum": {
+                "kind": "guitar_strum",
+                "instrument": "body",
+                "chord_shapes": {"Dadd9": [0, 0, 0, 2, 3, 0]},
+            }
+        },
+        "sections": [
+            {
+                "id": "s",
+                "bars": 1,
+                "harmony": ["Dadd9"],
+                "layers": [
+                    {
+                        "kind": "guitar_shape_pick",
+                        "instrument": "body",
+                        "tuning": "drop_d",
+                        "shape_template": "strum",
+                        "pattern": [0, 5],
+                        "step": 2.0,
+                        "duration_beats": 0.5,
+                        "humanize_ms": 0,
+                        "humanize_velocity_pct": 0,
+                    }
+                ],
+            }
+        ],
+    }
+    pm, _groups, _meta = build_score(spec)
+    pitches = [note.pitch for inst in pm.instruments for note in inst.notes]
+    assert pitches == [38, 64]

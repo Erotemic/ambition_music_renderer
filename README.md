@@ -254,6 +254,45 @@ uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins validate_score <cue_id>
 ```
 
+#### Installed-library truth and remote handoffs
+
+Library aliases and downloader entries describe instrument families the renderer
+knows how to use; they are **not evidence that those libraries are installed on
+the current machine**. The actual SFZ collection lives under the machine-local
+`AMBITION_AUDIO_TOOLS_ROOT` (normally `/data/audio-tools`) and is intentionally
+separate from the source tree. A source archive by itself therefore cannot tell
+a local or remote agent which optional instruments are really available.
+
+Treat these generated machine-local reports as the source of truth after running
+`download_ambition_audio_tools.sh` or otherwise updating the audio-tools tree:
+
+- `/data/audio-tools/SFZ_LIBRARY_SUMMARY.txt` - complete installed `.sfz` path list.
+- `/data/audio-tools/REFERENCE_SFZ_LIBRARY_REPORT.txt` - reference-library inventory.
+- `plugins list_sfz_libraries --json` - live resolver view, including `alias_hits`.
+- `plugins validate_score <cue_id>` - final check that a score's requested roles resolve.
+
+For a remote/online-agent handoff, attach or paste `SFZ_LIBRARY_SUMMARY.txt` (or
+the relevant filtered lines) alongside the source archive. An agent that only
+has the repository/source archive must not infer installation from
+`instrument_libraries.py`, the downloader catalog, aliases such as
+`guitar.acoustic_warm`, or documentation examples. Those describe supported or
+desired libraries, not machine state.
+
+For example, to inspect installed guitar entry points without dumping thousands
+of SFZ helper files:
+
+```bash
+grep -Ei \
+  'guitar|acoustic|12.?string|twelve.?string|dread|jumbo|moonbeams' \
+  /data/audio-tools/SFZ_LIBRARY_SUMMARY.txt
+```
+
+When selecting a patch from that output, prefer human-facing entry points such
+as `Programs/*.sfz`. Paths under `modules/`, `includes/`, `maps_*`, or similar
+implementation directories are usually building blocks for a top-level program,
+not standalone instruments. Confirm the chosen entry point in the next bundle's
+`instrument_resolution` report.
+
 By default, optional per-instrument backend failures warn and fall back instead
 of silently dropping a noted instrument. Set `render.strict_backends: true`
 when a requested backend must succeed or fail the render.
@@ -445,9 +484,11 @@ uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins list_lv2 --limit=40
 ```
 
-Keep machine-specific observations out of this README. If an instrument library
-needs a durable workaround, encode the resolution/fallback behavior in the
-generic library tooling and cover it with a tooling test.
+Keep machine-specific inventory contents out of this README; hand them to local
+or remote agents through the generated inventory reports described under
+**Installed-library truth and remote handoffs**. If an instrument library needs
+a durable workaround, encode the resolution/fallback behavior in the generic
+library tooling and cover it with a tooling test.
 
 ## Package map
 

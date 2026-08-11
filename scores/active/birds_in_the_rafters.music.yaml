@@ -9,9 +9,6 @@ tempo:
   - bar: 21
     bpm: 94
     ramp_bars: 4
-  - bar: 37
-    bpm: 86
-    ramp_bars: 2
   - bar: 45
     bpm: 96
     ramp_bars: 4
@@ -26,7 +23,7 @@ render:
   ogg_quality: 6
   metadata_markers:
   - id: rafters_open
-    label: I. Rafters Open - twin banjos state the song
+    label: I. Rafters Open - guitar alone under open rafters
     bar: 1
   - id: first_flight
     label: II. First Flight - the full acoustic groove settles in
@@ -91,14 +88,14 @@ stem_postprocess:
   target_peak_db: -3.5
 group_postprocess:
   guitar_body:
-    gain_db: 1.4
+    gain_db: 0.0
     highpass_hz: 54
-    lowpass_hz: 11600
+    lowpass_hz: 13800
     presence_low_hz: 2600
     presence_high_hz: 4700
-    presence_db: -1.05
+    presence_db: -0.25
     high_shelf_hz: 6200
-    high_shelf_db: -0.7
+    high_shelf_db: 0.0
     compressor_threshold_db: -19.0
     compressor_ratio: 1.22
     compressor_attack_ms: 42.0
@@ -107,13 +104,13 @@ group_postprocess:
     - kind: pedalboard
       effects:
       - effect: reverb
-        room_size: 0.94
-        damping: 0.4
-        wet_level: 0.38
-        dry_level: 0.99
-        width: 0.98
-    transient_tame: 0.22
-    transient_lowpass_hz: 4800
+        room_size: 0.78
+        damping: 0.55
+        wet_level: 0.12
+        dry_level: 1.0
+        width: 0.82
+    transient_tame: 0.06
+    transient_lowpass_hz: 7600
   banjo:
     gain_db: 7.9
     highpass_hz: 120
@@ -237,11 +234,13 @@ instruments:
   volume: 112
   pan: 52
   expression: 116
-  controls:
-    100: 64
   instrument_backend:
     kind: sfz
-    sfz: /data/audio-tools/sfz/Karoryfer/Shinyguitar/Shinyguitar/Programs/acoustic.sfz
+    library_ref: guitar.hollowbody
+    prefer:
+    - 03 combo keyswitch
+    - combo keyswitch
+    - blackandgreenguitars
     optional: true
     fallback_backend: pretty-midi
 - name: lead_banjo
@@ -267,14 +266,11 @@ instruments:
   expression: 112
   instrument_backend:
     kind: sfz
-    library_ref: bass.upright
+    library_ref: bass.meatbass_pizz
     prefer:
-    - notation
-    - basses pizzicato
-    - pizzicato
+    - 04 pizz
+    - meatbass
     - pizz
-    - upright
-    - acoustic
     optional: true
     fallback_backend: pretty-midi
 - name: folk_kit
@@ -315,14 +311,14 @@ instruments:
   volume: 98
   pan: 80
   expression: 102
-  modulation: 4
+  modulation: 32
   instrument_backend:
     kind: sfz
-    library_ref: orchestra.flutes_sustain
+    library_ref: vpo.flute_solo_perf
     prefer:
-    - notation
-    - flutes
-    - sustain
+    - woodwinds flute solo perf
+    - flute solo perf
+    - solo perf
     optional: true
     fallback_backend: pretty-midi
 - name: oboes
@@ -331,14 +327,13 @@ instruments:
   volume: 96
   pan: 48
   expression: 102
-  modulation: 4
+  modulation: 32
   instrument_backend:
     kind: sfz
-    library_ref: orchestra.oboes_sustain
+    library_ref: vpo.oboe_solo_perf
     prefer:
-    - notation
-    - oboes
-    - sustain
+    - oboe solo perf
+    - solo perf
     optional: true
     fallback_backend: pretty-midi
 - name: clarinets
@@ -347,14 +342,13 @@ instruments:
   volume: 98
   pan: 42
   expression: 104
-  modulation: 4
+  modulation: 32
   instrument_backend:
     kind: sfz
-    library_ref: orchestra.clarinets_sustain
+    library_ref: vpo.clarinet_solo_perf
     prefer:
-    - notation
-    - clarinets
-    - sustain
+    - clarinet solo perf
+    - solo perf
     optional: true
     fallback_backend: pretty-midi
 - name: solo_violin
@@ -363,14 +357,13 @@ instruments:
   volume: 114
   pan: 84
   expression: 112
-  modulation: 5
+  modulation: 64
   instrument_backend:
     kind: sfz
-    library_ref: strings.violin_solo
+    library_ref: vpo.violin_solo_perf
     prefer:
-    - notation
-    - violin solo 1 sustain
-    - sustain
+    - 1st violin solo perf
+    - solo perf
     optional: true
     fallback_backend: pretty-midi
 - name: birds_banjo
@@ -403,7 +396,7 @@ layer_templates:
     gate: 1.0
     chord_shapes:
       Dadd9:
-      - 0
+      - x
       - 0
       - 0
       - 2
@@ -520,7 +513,7 @@ layer_templates:
     gate: 1.0
     chord_shapes:
       Dadd9:
-      - 0
+      - x
       - 0
       - 0
       - 2
@@ -541,7 +534,7 @@ layer_templates:
       - 3
       - 2
       Dmaj7:
-      - 0
+      - x
       - 0
       - 0
       - 2
@@ -1232,17 +1225,6 @@ sections:
   - template: rhythm_crosspick_sparse
     velocity: 44
     density: 0.24
-  - template: birds_banjo_roll
-    velocity: 76
-    density: 0.96
-  - template: upper_fingerpick_sparse
-    velocity: 66
-    density: 0.72
-  - template: upright_breathe
-    velocity: 62
-  - template: harp_light
-    velocity: 35
-    density: 0.22
 - id: wings_catch
   label: I-b. Wings Catch
   bars: 2
@@ -1339,10 +1321,10 @@ sections:
   - Dadd9
   layers:
   - template: strum_breathe
-    velocity: 91
+    velocity: 89
   - template: rhythm_crosspick
-    velocity: 61
-    density: 0.84
+    velocity: 58
+    density: 0.76
   - template: upper_fingerpick_sparse
     velocity: 63
     density: 0.6
@@ -1520,8 +1502,8 @@ sections:
   intensity: 0.92
   harmony: *id001
   layers:
-  - template: strum_open_bloom
-    velocity: 86
+  - template: strum_breathe
+    velocity: 82
   - template: rhythm_crosspick_sparse
     velocity: 55
     density: 0.5
@@ -1574,10 +1556,10 @@ sections:
   harmony: *id002
   layers:
   - template: strum_breathe
-    velocity: 94
+    velocity: 86
   - template: rhythm_crosspick
-    velocity: 63
-    density: 0.88
+    velocity: 55
+    density: 0.7
   - template: banjo_thread
     velocity: 66
     density: 0.72
@@ -1819,7 +1801,7 @@ sections:
     string_choke_ms: 2.5
     chord_shapes:
       Dadd9:
-      - 0
+      - x
       - 0
       - 0
       - 2
