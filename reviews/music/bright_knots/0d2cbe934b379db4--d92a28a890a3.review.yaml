@@ -19,13 +19,13 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 1.2
+  score: 1.9
   label: Replace
-  notes: ''
+  notes: The intro has something, if it was changed a bit in shape, but the rest is not it.
   issues: []
   furthest_played_seconds: 12.576
   furthest_played_fraction: 0.1969
   created_at: '2026-08-16T15:52:44Z'
-  updated_at: '2026-08-16T15:52:44Z'
-  reviewed_at: '2026-08-16T15:52:44Z'
+  updated_at: '2026-08-16T16:07:43Z'
+  reviewed_at: '2026-08-16T16:07:43Z'
 history: []
