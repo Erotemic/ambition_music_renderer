@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: something_worth_building
+  title: Something Worth Building
+  version_id: 6a5df565e3fb914f:d3e4318ac2ed
+  render_hash: 6a5df565e3fb914f
+  preview_sha256: d3e4318ac2ed6d6c4ec4759b32f3b72837302aa0ab5d34005de09cfc4c7c9171
+  preview_path: generated/something_worth_building/.versioned/6a5df565e3fb914f/preview/something_worth_building_6a5df565e3fb914f.full_soundtrack_preview.ogg
+  manifest_path: generated/something_worth_building/.versioned/6a5df565e3fb914f/something_worth_building_6a5df565e3fb914f.adaptive_manifest.json
+  manifest_sha256: acb0366686460f2615c86a9748d68648902aa91153f1a13130bb12a3a1307bea
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/something_worth_building.music.yaml
+  score_sha256_at_review: 43ad57c04b6c81b42fbfb2a261c299bbcb104764535d7d64794283b839f01f63
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.9
+  label: Acceptable
+  notes: This is the current intro to the game's title menu. Workable but uninspiring.
+  issues: []
+  furthest_played_seconds: 35.118
+  furthest_played_fraction: 0.5853
+  created_at: '2026-08-16T15:36:31Z'
+  updated_at: '2026-08-16T15:36:31Z'
+  reviewed_at: '2026-08-16T15:36:31Z'
+history: []

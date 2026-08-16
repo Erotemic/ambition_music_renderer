@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: for_emmy_forever_ago_extended
+  title: For Emmy, Forever Ago (Extended)
+  version_id: 37f6423587033ee3:969dda094efd
+  render_hash: 37f6423587033ee3
+  preview_sha256: 969dda094efd19353709c44cf2d8e01a23c0c866a9834b00bc5edf16e5c762ff
+  preview_path: generated/for_emmy_forever_ago_extended/.versioned/37f6423587033ee3/preview/for_emmy_forever_ago_extended_37f6423587033ee3.full_soundtrack_preview.ogg
+  manifest_path: generated/for_emmy_forever_ago_extended/.versioned/37f6423587033ee3/for_emmy_forever_ago_extended_37f6423587033ee3.adaptive_manifest.json
+  manifest_sha256: b2af508e7fff96ffbf95e4651bd9e6935a0263f2f3b0cda551604317a176f0db
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/for_emmy_forever_ago_extended.music.yaml
+  score_sha256_at_review: e3c588fe60c19858951600e850cf6e4ec67ead77afc72cc5cb72b3c8a351ab4d
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.6
+  label: Acceptable
+  notes: There's nothing "wrong" with it, it just gets more boring every time I listen to it.
+  issues: []
+  furthest_played_seconds: 29.366
+  furthest_played_fraction: 0.1377
+  created_at: '2026-08-16T15:33:47Z'
+  updated_at: '2026-08-16T15:33:47Z'
+  reviewed_at: '2026-08-16T15:33:47Z'
+history: []

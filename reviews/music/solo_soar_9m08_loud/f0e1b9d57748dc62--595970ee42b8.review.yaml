@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: solo_soar_9m08_loud
+  title: Solo Soar - Long-Form Southern Flight
+  version_id: f0e1b9d57748dc62:595970ee42b8
+  render_hash: f0e1b9d57748dc62
+  preview_sha256: 595970ee42b89a4d0c7164a61637e6a8676ac4c5a65eb077828d67d9f8aa1287
+  preview_path: generated/solo_soar_9m08_loud/.versioned/f0e1b9d57748dc62/preview/solo_soar_9m08_loud_f0e1b9d57748dc62.full_soundtrack_preview.ogg
+  manifest_path: generated/solo_soar_9m08_loud/.versioned/f0e1b9d57748dc62/solo_soar_9m08_loud_f0e1b9d57748dc62.adaptive_manifest.json
+  manifest_sha256: 5c7895836721dd63daa8148c8f4ce28689b206d60b568ae5d31545eab9ff2f01
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/solo_soar_9m08_loud.music.yaml
+  score_sha256_at_review: 41cb86a7b830dcb0f390d584c872ab5dd1fe9702bf798ad6a87ac84dbfcf6fc4
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 1.1
+  label: Replace
+  notes: This was another freebird parody attempt. It has some parts that are interesting, but overall its quite
+    bad.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-08-16T15:35:53Z'
+  updated_at: '2026-08-16T15:35:53Z'
+  reviewed_at: '2026-08-16T15:35:53Z'
+history: []

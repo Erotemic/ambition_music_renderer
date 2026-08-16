@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: fighters_guild_oath_of_steel
+  title: Oath of Steel - Fighters Guild Theme
+  version_id: 6acaa5974bcb5e72:6e16b96d6f9c
+  render_hash: 6acaa5974bcb5e72
+  preview_sha256: 6e16b96d6f9c633de6cba8a693d28c42742697f90e15b3d1c0db3eea8b376a2f
+  preview_path: generated/fighters_guild_oath_of_steel/.versioned/6acaa5974bcb5e72/preview/fighters_guild_oath_of_steel_6acaa5974bcb5e72.full_soundtrack_preview.ogg
+  manifest_path: generated/fighters_guild_oath_of_steel/.versioned/6acaa5974bcb5e72/fighters_guild_oath_of_steel_6acaa5974bcb5e72.adaptive_manifest.json
+  manifest_sha256: 89733eabf5b170266f21598dbbfc5ef2f83767df0094543fcdf9607f6c7e885d
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/fighters_guild_oath_of_steel.music.yaml
+  score_sha256_at_review: c7cfdb7dc42befc004c6efab09987a564d15813a5d31ecb73b0f3c291dfc5754
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.6
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 10.017
+  furthest_played_fraction: 0.1513
+  created_at: '2026-08-16T16:02:23Z'
+  updated_at: '2026-08-16T16:02:23Z'
+  reviewed_at: '2026-08-16T16:02:23Z'
+history: []

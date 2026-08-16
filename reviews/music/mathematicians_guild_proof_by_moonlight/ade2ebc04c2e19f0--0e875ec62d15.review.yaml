@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: mathematicians_guild_proof_by_moonlight
+  title: Proof by Moonlight - Mathematicians Guild Theme
+  version_id: ade2ebc04c2e19f0:0e875ec62d15
+  render_hash: ade2ebc04c2e19f0
+  preview_sha256: 0e875ec62d15b0bf174fe03a42bd18eab0eb339aa9b4b9d3fc3d5b6cb362282a
+  preview_path: generated/mathematicians_guild_proof_by_moonlight/.versioned/ade2ebc04c2e19f0/preview/mathematicians_guild_proof_by_moonlight_ade2ebc04c2e19f0.full_soundtrack_preview.ogg
+  manifest_path: generated/mathematicians_guild_proof_by_moonlight/.versioned/ade2ebc04c2e19f0/mathematicians_guild_proof_by_moonlight_ade2ebc04c2e19f0.adaptive_manifest.json
+  manifest_sha256: 513f37295b4ebcc3cb7e085532ee675022dd49568c32522379394201b76d49de
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/mathematicians_guild_proof_by_moonlight.music.yaml
+  score_sha256_at_review: 272b0490e92463191d156af5e19fd232fd3a88e723bb04b4927ee97d4ada9059
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.4
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 32.126
+  furthest_played_fraction: 0.2677
+  created_at: '2026-08-16T16:01:36Z'
+  updated_at: '2026-08-16T16:01:36Z'
+  reviewed_at: '2026-08-16T16:01:36Z'
+history: []

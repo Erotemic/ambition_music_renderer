@@ -1,4 +1,7 @@
 schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
 subject:
   cue_id: wrong_planet_great_reception_v2
   title: Wrong Planet, Great Reception v2
@@ -16,19 +19,17 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 10.0
+  score: 9.6
   label: Standout
   notes: Absolutely love this song. It's possible that it needs some loop work, but it's just so good, I don't want
     to touch it while most other songs are way behind how good this one is.
   issues: []
   furthest_played_seconds: 75.27
   furthest_played_fraction: 0.5904
-  reviewed_at: '2026-08-16T15:03:23Z'
+  created_at: '2026-08-16T15:03:23Z'
+  updated_at: '2026-08-16T15:25:00Z'
+  reviewed_at: '2026-08-16T15:25:00Z'
 history: []
-score_scale:
-  min: 1.0
-  max: 10.0
-  legacy_v1_multiplier: 2.0
 migration:
   from_schema: ambition.music_review.v1
   score_transform: score * 2

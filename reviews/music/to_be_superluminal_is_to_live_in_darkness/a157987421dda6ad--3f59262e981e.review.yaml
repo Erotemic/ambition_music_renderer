@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: to_be_superluminal_is_to_live_in_darkness
+  title: To Be Superluminal Is to Live in Darkness
+  version_id: a157987421dda6ad:3f59262e981e
+  render_hash: a157987421dda6ad
+  preview_sha256: 3f59262e981e8a82edb5ae101bb2d962bd084d0e8c68cbce34cd7ffee9cbc7ff
+  preview_path: generated/to_be_superluminal_is_to_live_in_darkness/.versioned/a157987421dda6ad/preview/to_be_superluminal_is_to_live_in_darkness_a157987421dda6ad.full_soundtrack_preview.ogg
+  manifest_path: generated/to_be_superluminal_is_to_live_in_darkness/.versioned/a157987421dda6ad/to_be_superluminal_is_to_live_in_darkness_a157987421dda6ad.adaptive_manifest.json
+  manifest_sha256: 550b205001b5bf1d12546539efe1db73b5623356c0191bb694d17511823e3f16
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/to_be_superluminal_is_to_live_in_darkness.music.yaml
+  score_sha256_at_review: 4b6ddd9740527437a5dd902f5d05cba51d0d2bcd09b2ae74e0c3cf7c1c463c93
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.9
+  label: Major polish
+  notes: So sometimes LLMs seem to generate the samish melody, and this seems to suffer from that default LLM melody,
+    but the feel is kinda interesting.
+  issues: []
+  furthest_played_seconds: 44.708
+  furthest_played_fraction: 0.3387
+  created_at: '2026-08-16T15:45:17Z'
+  updated_at: '2026-08-16T15:45:17Z'
+  reviewed_at: '2026-08-16T15:45:17Z'
+history: []

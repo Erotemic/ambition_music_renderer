@@ -1,4 +1,7 @@
 schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
 subject:
   cue_id: super_smash_siblings_theme
   title: Raise the Banner - Super Smash Siblings Main Theme
@@ -16,18 +19,16 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 8.0
+  score: 8.5
   label: Strong
   notes: Very good for what it is doing.
   issues: []
   furthest_played_seconds: 16.241
   furthest_played_fraction: 0.1607
-  reviewed_at: '2026-08-16T15:01:46Z'
+  created_at: '2026-08-16T15:01:46Z'
+  updated_at: '2026-08-16T15:25:38Z'
+  reviewed_at: '2026-08-16T15:25:38Z'
 history: []
-score_scale:
-  min: 1.0
-  max: 10.0
-  legacy_v1_multiplier: 2.0
 migration:
   from_schema: ambition.music_review.v1
   score_transform: score * 2

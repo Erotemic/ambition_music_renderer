@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pivot_protocol
+  title: Pivot Protocol
+  version_id: 018791ea6af5f723:24768b4311da
+  render_hash: 018791ea6af5f723
+  preview_sha256: 24768b4311da6f5b0a2b6bf4b468b68d7fa02a3c63d6faff25f6d3149d991b76
+  preview_path: generated/pivot_protocol/.versioned/018791ea6af5f723/preview/pivot_protocol_018791ea6af5f723.full_soundtrack_preview.ogg
+  manifest_path: generated/pivot_protocol/.versioned/018791ea6af5f723/pivot_protocol_018791ea6af5f723.adaptive_manifest.json
+  manifest_sha256: 82142344b00e23b397a28c5d9dfa250150edef72cf24888384e267cf098555ba
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/pivot_protocol.music.yaml
+  score_sha256_at_review: 58fd4ea99fe62da5458e0f0591cdae4171a13ac9d778f4d1e671b12129527b1b
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 2.2
+  label: Replace
+  notes: Has that weird llm-y melody
+  issues: []
+  furthest_played_seconds: 95.582
+  furthest_played_fraction: 0.8307
+  created_at: '2026-08-16T15:58:07Z'
+  updated_at: '2026-08-16T15:58:07Z'
+  reviewed_at: '2026-08-16T15:58:07Z'
+history: []

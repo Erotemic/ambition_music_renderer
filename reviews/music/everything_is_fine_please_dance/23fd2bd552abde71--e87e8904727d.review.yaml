@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: everything_is_fine_please_dance
+  title: Everything Is Fine, Please Dance
+  version_id: 23fd2bd552abde71:e87e8904727d
+  render_hash: 23fd2bd552abde71
+  preview_sha256: e87e8904727de223d37797de4e6ddd8445ed39bb433ab3bb4e640c50574ec9ff
+  preview_path: generated/everything_is_fine_please_dance/.versioned/23fd2bd552abde71/preview/everything_is_fine_please_dance_23fd2bd552abde71.full_soundtrack_preview.ogg
+  manifest_path: generated/everything_is_fine_please_dance/.versioned/23fd2bd552abde71/everything_is_fine_please_dance_23fd2bd552abde71.adaptive_manifest.json
+  manifest_sha256: 40f52f6ee6e63d21c77371b35f0da742a51cb7d332c13c6afd02b65f238f330c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/everything_is_fine_please_dance.music.yaml
+  score_sha256_at_review: e92591a5cd7c15f34a1f983e035898c5d0d17d2d8be8185876df0df78fe26a8c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 2.0
+  label: Replace
+  notes: pretty bad
+  issues: []
+  furthest_played_seconds: 30.254
+  furthest_played_fraction: 0.2206
+  created_at: '2026-08-16T15:49:17Z'
+  updated_at: '2026-08-16T15:49:17Z'
+  reviewed_at: '2026-08-16T15:49:17Z'
+history: []

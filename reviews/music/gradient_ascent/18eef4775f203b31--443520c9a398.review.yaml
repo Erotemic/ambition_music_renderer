@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: gradient_ascent
+  title: Gradient Ascent
+  version_id: 18eef4775f203b31:443520c9a398
+  render_hash: 18eef4775f203b31
+  preview_sha256: 443520c9a398766a6c8fa364e32c0eb959fc7d93ccda3ab2bfc273279c3c9df2
+  preview_path: generated/gradient_ascent/.versioned/18eef4775f203b31/preview/gradient_ascent_18eef4775f203b31.full_soundtrack_preview.ogg
+  manifest_path: generated/gradient_ascent/.versioned/18eef4775f203b31/gradient_ascent_18eef4775f203b31.adaptive_manifest.json
+  manifest_sha256: 5b65b30387db3212b4334c44972b0800742ccf0a0866acf21b6fb87164641137
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/gradient_ascent.music.yaml
+  score_sha256_at_review: f1d34dca3a5657b16b5d85d70737f7b539b6f90e1175c5ea65594851fba70a50
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.1
+  label: Acceptable
+  notes: Its decent in an uninspiring way. I don't know how I would fix it. I could also see myself climbing a mountain
+    in game to something like this. Probably want to revist later.
+  issues: []
+  furthest_played_seconds: 70.254
+  furthest_played_fraction: 0.3241
+  created_at: '2026-08-16T15:43:12Z'
+  updated_at: '2026-08-16T15:43:12Z'
+  reviewed_at: '2026-08-16T15:43:12Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: room_n_plus_one
+  title: Room N+1
+  version_id: 5d164b0cf1fc3d56:ed1691c95e91
+  render_hash: 5d164b0cf1fc3d56
+  preview_sha256: ed1691c95e914ef84c63acbf694537142ed0b0600d2532b3ef6123f8d5ee18f3
+  preview_path: generated/room_n_plus_one/.versioned/5d164b0cf1fc3d56/preview/room_n_plus_one_5d164b0cf1fc3d56.full_soundtrack_preview.ogg
+  manifest_path: generated/room_n_plus_one/.versioned/5d164b0cf1fc3d56/room_n_plus_one_5d164b0cf1fc3d56.adaptive_manifest.json
+  manifest_sha256: 05c8b4fc97314e97446f8670c095fe82a622cf8ef7f0fed5f48396ccf3f9e174
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.1-procedural-fm-v1
+  score_path: scores/active/room_n_plus_one.music.yaml
+  score_sha256_at_review: 2652443bd9d5e75ee8f66a60962c8b3cfef8ccea468050e41c990bfbb1c9d7c3
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.5
+  label: Acceptable
+  notes: simple works well enough.
+  issues: []
+  furthest_played_seconds: 60.82
+  furthest_played_fraction: 0.7814
+  created_at: '2026-08-16T16:00:24Z'
+  updated_at: '2026-08-16T16:00:24Z'
+  reviewed_at: '2026-08-16T16:00:24Z'
+history: []

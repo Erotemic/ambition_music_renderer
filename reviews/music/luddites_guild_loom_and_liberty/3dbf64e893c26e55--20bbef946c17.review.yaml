@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: luddites_guild_loom_and_liberty
+  title: Loom and Liberty - Luddites Guild Theme
+  version_id: 3dbf64e893c26e55:20bbef946c17
+  render_hash: 3dbf64e893c26e55
+  preview_sha256: 20bbef946c1768fe95a021b2a613254a9c3e25333c0e99325e3e61977193a5f0
+  preview_path: generated/luddites_guild_loom_and_liberty/.versioned/3dbf64e893c26e55/preview/luddites_guild_loom_and_liberty_3dbf64e893c26e55.full_soundtrack_preview.ogg
+  manifest_path: generated/luddites_guild_loom_and_liberty/.versioned/3dbf64e893c26e55/luddites_guild_loom_and_liberty_3dbf64e893c26e55.adaptive_manifest.json
+  manifest_sha256: bda1dd504b1926f8e291ee2652a225e6f56c8d9c1750ee075c9aa00a1dfe1311
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/luddites_guild_loom_and_liberty.music.yaml
+  score_sha256_at_review: 641379c7c057e58751f02161a7b3a4a3e3f891603ea8f5900f188da0a0ffc167
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 6.662
+  furthest_played_fraction: 0.0798
+  created_at: '2026-08-16T16:02:35Z'
+  updated_at: '2026-08-16T16:02:35Z'
+  reviewed_at: '2026-08-16T16:02:35Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: argand_overdrive
+  title: Argand Overdrive — the complex plane, distorted
+  version_id: 9c9e8d81b413365c:70cc18098af0
+  render_hash: 9c9e8d81b413365c
+  preview_sha256: 70cc18098af0594ce8d955e529242c3316439a07d7652584f9acdc70c6b6ebd9
+  preview_path: generated/argand_overdrive/.versioned/9c9e8d81b413365c/preview/argand_overdrive_9c9e8d81b413365c.full_soundtrack_preview.ogg
+  manifest_path: generated/argand_overdrive/.versioned/9c9e8d81b413365c/argand_overdrive_9c9e8d81b413365c.adaptive_manifest.json
+  manifest_sha256: a2c11d65d124eb778b6f3945ad77175ce5094adf54c5702ea8251631d4a7fbee
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/argand_overdrive.music.yaml
+  score_sha256_at_review: 0d1a80f42c58b473bfff5901aadffbbc3596549e7108aa315f49b5f9316b4034
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.6
+  label: Major polish
+  notes: Insturments sound bad. This probably could be improved into something good, but its very bad as is.
+  issues: []
+  furthest_played_seconds: 44.014
+  furthest_played_fraction: 0.5094
+  created_at: '2026-08-16T15:50:58Z'
+  updated_at: '2026-08-16T15:50:58Z'
+  reviewed_at: '2026-08-16T15:50:58Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: cedar_light_guitar_study
+  title: Cedar Light - Angelic Full Ensemble
+  version_id: 6aa72932a1d1dacf:ed0e29dd1dbe
+  render_hash: 6aa72932a1d1dacf
+  preview_sha256: ed0e29dd1dbeac7d6653002c896b6f325b50cae5baf4ac3f42c993ee2a0ae3f8
+  preview_path: generated/cedar_light_guitar_study/.versioned/6aa72932a1d1dacf/preview/cedar_light_guitar_study_6aa72932a1d1dacf.full_soundtrack_preview.ogg
+  manifest_path: generated/cedar_light_guitar_study/.versioned/6aa72932a1d1dacf/cedar_light_guitar_study_6aa72932a1d1dacf.adaptive_manifest.json
+  manifest_sha256: 6fbb8f41dda8b75c95fa26a2a7eb5b0b9021147270888577af507c25b24f81b0
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/cedar_light_guitar_study.music.yaml
+  score_sha256_at_review: e9e36a2c80691ad12a20df9fed568045f1f962fcc6089fcb5d7c1e75db146ee5
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.0
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 164.001
+  furthest_played_fraction: 0.7299
+  created_at: '2026-08-16T15:53:00Z'
+  updated_at: '2026-08-16T15:53:00Z'
+  reviewed_at: '2026-08-16T15:53:00Z'
+history: []

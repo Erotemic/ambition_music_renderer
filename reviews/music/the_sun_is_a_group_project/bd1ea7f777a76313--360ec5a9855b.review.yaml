@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: the_sun_is_a_group_project
+  title: The Sun Is a Group Project
+  version_id: bd1ea7f777a76313:360ec5a9855b
+  render_hash: bd1ea7f777a76313
+  preview_sha256: 360ec5a9855bab50a131cc851d544bc95b90864be596bfd89e869c58867b1e5b
+  preview_path: generated/the_sun_is_a_group_project/.versioned/bd1ea7f777a76313/preview/the_sun_is_a_group_project_bd1ea7f777a76313.full_soundtrack_preview.ogg
+  manifest_path: generated/the_sun_is_a_group_project/.versioned/bd1ea7f777a76313/the_sun_is_a_group_project_bd1ea7f777a76313.adaptive_manifest.json
+  manifest_sha256: 05a15805ac8522f763acd64dde7baa3e54216c2edd873db51d238202a8da3f51
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/the_sun_is_a_group_project.music.yaml
+  score_sha256_at_review: c69ee7ff0c376ecdd5d786a222879a0a34f8ac048abe38355a32a00481fec08e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 1.0
+  label: Replace
+  notes: God awful.
+  issues: []
+  furthest_played_seconds: 7.556
+  furthest_played_fraction: 0.0663
+  created_at: '2026-08-16T15:45:27Z'
+  updated_at: '2026-08-16T15:45:27Z'
+  reviewed_at: '2026-08-16T15:45:27Z'
+history: []

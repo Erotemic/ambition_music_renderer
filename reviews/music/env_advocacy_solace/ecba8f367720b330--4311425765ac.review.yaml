@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: env_advocacy_solace
+  title: Solace at the Watershed - Environmental Advocacy HQ
+  version_id: ecba8f367720b330:4311425765ac
+  render_hash: ecba8f367720b330
+  preview_sha256: 4311425765ac8b817e52d3dd6f3b2f081f5497408fd04e7119203e4bb56a0158
+  preview_path: generated/env_advocacy_solace/.versioned/ecba8f367720b330/preview/env_advocacy_solace_ecba8f367720b330.full_soundtrack_preview.ogg
+  manifest_path: generated/env_advocacy_solace/.versioned/ecba8f367720b330/env_advocacy_solace_ecba8f367720b330.adaptive_manifest.json
+  manifest_sha256: fe27d33475f04749863c7da718f2b70fdd287f97ca4b3c0ac7b7afbdbc710813
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/env_advocacy_solace.music.yaml
+  score_sha256_at_review: 8ae436666df8895341875260a661acb8f4bb23bc9ef32d92f8cccfbdb40afae7
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.5
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 131.393
+  furthest_played_fraction: 0.8068
+  created_at: '2026-08-16T15:55:50Z'
+  updated_at: '2026-08-16T15:55:50Z'
+  reviewed_at: '2026-08-16T15:55:50Z'
+history: []

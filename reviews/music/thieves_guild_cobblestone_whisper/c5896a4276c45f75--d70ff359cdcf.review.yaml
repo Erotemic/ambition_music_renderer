@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: thieves_guild_cobblestone_whisper
+  title: Cobblestone Whisper - Thieves Guild Theme
+  version_id: c5896a4276c45f75:d70ff359cdcf
+  render_hash: c5896a4276c45f75
+  preview_sha256: d70ff359cdcf682e7a8eb735415b5261a63d6259d865f6ceb1b31bc13e541ad3
+  preview_path: generated/thieves_guild_cobblestone_whisper/.versioned/c5896a4276c45f75/preview/thieves_guild_cobblestone_whisper_c5896a4276c45f75.full_soundtrack_preview.ogg
+  manifest_path: generated/thieves_guild_cobblestone_whisper/.versioned/c5896a4276c45f75/thieves_guild_cobblestone_whisper_c5896a4276c45f75.adaptive_manifest.json
+  manifest_sha256: 06620a33541eaa14cd873750d9de2e36d6449324e9dc847da8e7b801be486de5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/thieves_guild_cobblestone_whisper.music.yaml
+  score_sha256_at_review: 76ee6fce48bbfe42dbed73e54bbe00b4bba3a0a43a8d6ac051981ee28a774e5c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 103.713
+  furthest_played_fraction: 0.9723
+  created_at: '2026-08-16T16:01:10Z'
+  updated_at: '2026-08-16T16:01:10Z'
+  reviewed_at: '2026-08-16T16:01:10Z'
+history: []

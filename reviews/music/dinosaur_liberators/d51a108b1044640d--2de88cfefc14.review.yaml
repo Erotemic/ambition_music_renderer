@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: dinosaur_liberators
+  title: Dinosaur Liberators - Southern Rock Anthem (Freebird homage)
+  version_id: d51a108b1044640d:2de88cfefc14
+  render_hash: d51a108b1044640d
+  preview_sha256: 2de88cfefc14685ca7c669466903e93dbc712ef662dd3b62e300991fb897b0c3
+  preview_path: generated/dinosaur_liberators/.versioned/d51a108b1044640d/preview/dinosaur_liberators_d51a108b1044640d.full_soundtrack_preview.ogg
+  manifest_path: generated/dinosaur_liberators/.versioned/d51a108b1044640d/dinosaur_liberators_d51a108b1044640d.adaptive_manifest.json
+  manifest_sha256: 7a8c2457aa7b5fa7d81a1757dc87d2c6973e95735a31d9fad7a71bab9ac6a0c5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/dinosaur_liberators.music.yaml
+  score_sha256_at_review: 1f6364dc94094c0698dc243bfdd911e3b6261f7b293ec62a8d8c34a4e259b685
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.0
+  label: Acceptable
+  notes: 'Insturments sound not great, it''s interesting for what it''s trying to do: parody free bird. Not sure
+    if we should use it or its siblings in game though.'
+  issues: []
+  furthest_played_seconds: 71.58
+  furthest_played_fraction: 0.4317
+  created_at: '2026-08-16T15:30:36Z'
+  updated_at: '2026-08-16T15:30:36Z'
+  reviewed_at: '2026-08-16T15:30:36Z'
+history: []

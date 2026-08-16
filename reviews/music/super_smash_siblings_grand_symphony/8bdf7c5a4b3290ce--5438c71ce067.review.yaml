@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: super_smash_siblings_grand_symphony
+  title: The Distance Starts Losing - Grand Symphony
+  version_id: 8bdf7c5a4b3290ce:5438c71ce067
+  render_hash: 8bdf7c5a4b3290ce
+  preview_sha256: 5438c71ce067798893067085a3e23fef80ae53ee9165f71a70fb4d73a97e2720
+  preview_path: generated/super_smash_siblings_grand_symphony/.versioned/8bdf7c5a4b3290ce/preview/super_smash_siblings_grand_symphony_8bdf7c5a4b3290ce.full_soundtrack_preview.ogg
+  manifest_path: generated/super_smash_siblings_grand_symphony/.versioned/8bdf7c5a4b3290ce/super_smash_siblings_grand_symphony_8bdf7c5a4b3290ce.adaptive_manifest.json
+  manifest_sha256: 06d835ddc2410cc0547b070888c747c685c9fec3656b6b0c481db30a91e078d9
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/super_smash_siblings_grand_symphony.music.yaml
+  score_sha256_at_review: 614f3a13134ffaef53f9c82732ff49077475182052264ee8a12bd143fca8b391
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.9
+  label: Major polish
+  notes: Noticably worse than the other smash tunes
+  issues: []
+  furthest_played_seconds: 85.83
+  furthest_played_fraction: 0.7153
+  created_at: '2026-08-16T16:00:02Z'
+  updated_at: '2026-08-16T16:00:02Z'
+  reviewed_at: '2026-08-16T16:00:02Z'
+history: []

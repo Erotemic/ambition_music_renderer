@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: mary_o_flag_victory
+  title: Mary-O Flag Victory
+  version_id: e3d7ae0173d82f79:2f0de0c88b48
+  render_hash: e3d7ae0173d82f79
+  preview_sha256: 2f0de0c88b480db5326b5c679d4cd173be421bc0ded588e62ba4556bb1265a95
+  preview_path: generated/mary_o_flag_victory/.versioned/e3d7ae0173d82f79/preview/mary_o_flag_victory_e3d7ae0173d82f79.full_soundtrack_preview.ogg
+  manifest_path: generated/mary_o_flag_victory/.versioned/e3d7ae0173d82f79/mary_o_flag_victory_e3d7ae0173d82f79.adaptive_manifest.json
+  manifest_sha256: f0e6795c84d528e5c01325ad00ed964264a8f4dcd737e1ee8260fca6bccb24fa
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/mary_o_flag_victory.music.yaml
+  score_sha256_at_review: 51606639f7e918b5d27ee1a71825ef951fe0c07a3e413d534ca38817d3e4ef51
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: It works.
+  issues: []
+  furthest_played_seconds: 3.076
+  furthest_played_fraction: 1.0
+  created_at: '2026-08-16T15:27:03Z'
+  updated_at: '2026-08-16T15:27:03Z'
+  reviewed_at: '2026-08-16T15:27:03Z'
+history: []

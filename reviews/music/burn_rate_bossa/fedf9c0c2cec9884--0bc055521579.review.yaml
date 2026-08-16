@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: burn_rate_bossa
+  title: Burn Rate Bossa
+  version_id: fedf9c0c2cec9884:0bc055521579
+  render_hash: fedf9c0c2cec9884
+  preview_sha256: 0bc055521579337aa6f78b53218cf8a416a432dbbbdff7cc992e34adfee4e401
+  preview_path: generated/burn_rate_bossa/.versioned/fedf9c0c2cec9884/preview/burn_rate_bossa_fedf9c0c2cec9884.full_soundtrack_preview.ogg
+  manifest_path: generated/burn_rate_bossa/.versioned/fedf9c0c2cec9884/burn_rate_bossa_fedf9c0c2cec9884.adaptive_manifest.json
+  manifest_sha256: 910d524737ca8382a51e4c846052e908c4ef97be7cfecebcc300f9cdf03ede62
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/burn_rate_bossa.music.yaml
+  score_sha256_at_review: 45b67ce46b2e48bf335dace510c426ccd3e8081bcfefd936fad97a24f426e338
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.1
+  label: Strong
+  notes: I don't think we actually use this anywhere, but I find myself surprised and enjoying this every time I
+    listen to it. Needs polish, but we could make this a very good tune for a shop or low stakes area.
+  issues: []
+  furthest_played_seconds: 88.225
+  furthest_played_fraction: 0.9558
+  created_at: '2026-08-16T15:41:56Z'
+  updated_at: '2026-08-16T15:41:56Z'
+  reviewed_at: '2026-08-16T15:41:56Z'
+history: []

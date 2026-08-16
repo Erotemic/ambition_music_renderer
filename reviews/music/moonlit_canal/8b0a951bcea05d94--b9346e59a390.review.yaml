@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: moonlit_canal
+  title: Moonlit Canal Nocturne - Flexible Non-Battle Demonstration
+  version_id: 8b0a951bcea05d94:b9346e59a390
+  render_hash: 8b0a951bcea05d94
+  preview_sha256: b9346e59a390a25c51abedbf138182e226c93e42fbc645ae9ca0837eb7d96148
+  preview_path: generated/moonlit_canal/.versioned/8b0a951bcea05d94/preview/moonlit_canal_nocturne_8b0a951bcea05d94.full_soundtrack_preview.ogg
+  manifest_path: generated/moonlit_canal/.versioned/8b0a951bcea05d94/moonlit_canal_nocturne_8b0a951bcea05d94.adaptive_manifest.json
+  manifest_sha256: 7e2fb35c2c194e3b3dd0e52da19ad741b3b73e45079553f130e5aeb819926e8a
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: null
+  score_sha256_at_review: null
+  score_scope: null
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.5
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 82.849
+  furthest_played_fraction: 0.8055
+  created_at: '2026-08-16T16:01:26Z'
+  updated_at: '2026-08-16T16:01:26Z'
+  reviewed_at: '2026-08-16T16:01:26Z'
+history: []

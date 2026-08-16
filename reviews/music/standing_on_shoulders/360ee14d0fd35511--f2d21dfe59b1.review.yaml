@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: standing_on_shoulders
+  title: Standing on Shoulders
+  version_id: 360ee14d0fd35511:f2d21dfe59b1
+  render_hash: 360ee14d0fd35511
+  preview_sha256: f2d21dfe59b1e1ae30ee0c93b742bf5539c3537f6fbe0d06be6364f95b5c0855
+  preview_path: generated/standing_on_shoulders/.versioned/360ee14d0fd35511/preview/standing_on_shoulders_360ee14d0fd35511.full_soundtrack_preview.ogg
+  manifest_path: generated/standing_on_shoulders/.versioned/360ee14d0fd35511/standing_on_shoulders_360ee14d0fd35511.adaptive_manifest.json
+  manifest_sha256: 1eba9f831e25977fe45c85d3d6ab986944fc049500dac9df2ddde288fcf0d9a2
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/standing_on_shoulders.music.yaml
+  score_sha256_at_review: e23b484644884a00e1376ed7cde9db6aa082c1cd463e95c2a653d7fb4a1d2b15
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.7
+  label: Strong
+  notes: Yeah, this gets my blood pumpin. On the weaker side of the strong tunes we have, but it fits the giant
+    gnu very well. The electric guitar and horns bop. The lumbering bassline is kickin'
+  issues: []
+  furthest_played_seconds: 71.758
+  furthest_played_fraction: 0.598
+  created_at: '2026-08-16T15:40:08Z'
+  updated_at: '2026-08-16T15:40:19Z'
+  reviewed_at: '2026-08-16T15:40:19Z'
+history: []

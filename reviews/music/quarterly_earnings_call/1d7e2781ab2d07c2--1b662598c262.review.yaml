@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: quarterly_earnings_call
+  title: Quarterly Earnings Call - The Spin
+  version_id: 1d7e2781ab2d07c2:1b662598c262
+  render_hash: 1d7e2781ab2d07c2
+  preview_sha256: 1b662598c2625756ce96e266aa4436efd0a0427babef12f8b7ffa727733bb744
+  preview_path: generated/quarterly_earnings_call/.versioned/1d7e2781ab2d07c2/preview/quarterly_earnings_call_1d7e2781ab2d07c2.full_soundtrack_preview.ogg
+  manifest_path: generated/quarterly_earnings_call/.versioned/1d7e2781ab2d07c2/quarterly_earnings_call_1d7e2781ab2d07c2.adaptive_manifest.json
+  manifest_sha256: e794aee0b802058412649a506f8fa784f7f20da2dfa465e3fcbd3a2327326332
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/quarterly_earnings_call.music.yaml
+  score_sha256_at_review: bf665598bdd0480043e0e099f3f5a80d14ea76c5f564109a2e653e4c9882b688
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 2.5
+  label: Replace
+  notes: Tries to be tech bros and fails.
+  issues: []
+  furthest_played_seconds: 82.068
+  furthest_played_fraction: 0.8891
+  created_at: '2026-08-16T16:00:46Z'
+  updated_at: '2026-08-16T16:00:46Z'
+  reviewed_at: '2026-08-16T16:00:46Z'
+history: []

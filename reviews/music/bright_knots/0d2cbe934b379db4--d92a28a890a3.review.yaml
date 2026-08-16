@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: bright_knots
+  title: Bright Knots
+  version_id: 0d2cbe934b379db4:d92a28a890a3
+  render_hash: 0d2cbe934b379db4
+  preview_sha256: d92a28a890a32085d327abbff79205dd09cf10ca58fe02c9ab4167b1c9ef74ff
+  preview_path: generated/bright_knots/.versioned/0d2cbe934b379db4/preview/bright_knots_0d2cbe934b379db4.full_soundtrack_preview.ogg
+  manifest_path: generated/bright_knots/.versioned/0d2cbe934b379db4/bright_knots_0d2cbe934b379db4.adaptive_manifest.json
+  manifest_sha256: e10586916cd93115c0380cebd83f4c92dfe9ea98c38244882b6fa3711c14969c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.1-procedural-fm-v1
+  score_path: scores/active/bright_knots.music.yaml
+  score_sha256_at_review: 07405e236c5a6a150510ab1324ecf3424736dd6fd2b5c815dce71a0704d64b6c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 1.2
+  label: Replace
+  notes: ''
+  issues: []
+  furthest_played_seconds: 12.576
+  furthest_played_fraction: 0.1969
+  created_at: '2026-08-16T15:52:44Z'
+  updated_at: '2026-08-16T15:52:44Z'
+  reviewed_at: '2026-08-16T15:52:44Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: first_goblin_tune_v2
+  title: First Goblin Tune v2 - Clean Demo Mix
+  version_id: 35a020fbd9e02672:538520ff9968
+  render_hash: 35a020fbd9e02672
+  preview_sha256: 538520ff996859c31e0ae70bebc1b5461f653d73b4b9e6fe7b845fd92f2475be
+  preview_path: generated/first_goblin_tune_v2/preview/first_goblin_tune_v2_35a020fbd9e02672.full_soundtrack_preview.ogg
+  manifest_path: generated/first_goblin_tune_v2/first_goblin_tune_v2_35a020fbd9e02672.adaptive_manifest.json
+  manifest_sha256: 6daf07477c9db36c5f6b1aaf42f4342601b4fcf5b25fd2976da4805fb3583361
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/first_goblin_tune_v2.music.yaml
+  score_sha256_at_review: 99a14ad9b358c4edeb20eb4d0e223b8e16fd6d7c669061eec80e288bf69e4dc3
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: false
+current:
+  score: 5.9
+  label: Acceptable
+  notes: This has a good hook.
+  issues: []
+  furthest_played_seconds: 56.806
+  furthest_played_fraction: 0.7811
+  created_at: '2026-08-16T15:54:43Z'
+  updated_at: '2026-08-16T15:54:43Z'
+  reviewed_at: '2026-08-16T15:54:43Z'
+history: []

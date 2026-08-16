@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: scaling_laws
+  title: Scaling Laws - It Keeps Getting Better As It Gets Bigger
+  version_id: 63c100c4541be258:808ea06db0a0
+  render_hash: 63c100c4541be258
+  preview_sha256: 808ea06db0a0ed6c4191cb3489d2030a524a42d79cd6a8f46af366ba4fbc9d74
+  preview_path: generated/scaling_laws/.versioned/63c100c4541be258/preview/scaling_laws_63c100c4541be258.full_soundtrack_preview.ogg
+  manifest_path: generated/scaling_laws/.versioned/63c100c4541be258/scaling_laws_63c100c4541be258.adaptive_manifest.json
+  manifest_sha256: e3c1d35e7c3c63c01991a3c8d3e7c7f3ddaf9700dbf38095b78b62cf14e7fc57
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/scaling_laws.music.yaml
+  score_sha256_at_review: 2c7a7a748cdf6318ecd20e7d399a7b4d9386ba9a96c1696f51373e432ee5b406
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 69.654
+  furthest_played_fraction: 0.8126
+  created_at: '2026-08-16T15:55:04Z'
+  updated_at: '2026-08-16T15:55:04Z'
+  reviewed_at: '2026-08-16T15:55:04Z'
+history: []

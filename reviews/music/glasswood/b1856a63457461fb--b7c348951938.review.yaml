@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: glasswood
+  title: Glasswood Canopy - High Branches and Old Light
+  version_id: b1856a63457461fb:b7c348951938
+  render_hash: b1856a63457461fb
+  preview_sha256: b7c34895193889697372de85c52a87f7c73c7f0952e473a238a6ac4b675a0fd6
+  preview_path: generated/glasswood/.versioned/b1856a63457461fb/preview/glasswood_canopy_b1856a63457461fb.full_soundtrack_preview.ogg
+  manifest_path: generated/glasswood/.versioned/b1856a63457461fb/glasswood_canopy_b1856a63457461fb.adaptive_manifest.json
+  manifest_sha256: a24155be10f47089ca32fa4b970206296895bbd16276c1beb856bdfbf3fc7dea
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: null
+  score_sha256_at_review: null
+  score_scope: null
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 74.66
+  furthest_played_fraction: 0.9333
+  created_at: '2026-08-16T15:56:08Z'
+  updated_at: '2026-08-16T15:56:08Z'
+  reviewed_at: '2026-08-16T15:56:08Z'
+history: []

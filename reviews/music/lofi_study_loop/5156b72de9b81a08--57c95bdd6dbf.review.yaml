@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: lofi_study_loop
+  title: Lofi Beats to Study and Relax To
+  version_id: 5156b72de9b81a08:57c95bdd6dbf
+  render_hash: 5156b72de9b81a08
+  preview_sha256: 57c95bdd6dbf2e887c08748bc49b274fc784997d9b46778f158cb7a188b46a65
+  preview_path: generated/lofi_study_loop/.versioned/5156b72de9b81a08/preview/lofi_study_loop_5156b72de9b81a08.full_soundtrack_preview.ogg
+  manifest_path: generated/lofi_study_loop/.versioned/5156b72de9b81a08/lofi_study_loop_5156b72de9b81a08.adaptive_manifest.json
+  manifest_sha256: 04fa258283cfc76aaa9aa475a72edb4dc8ab47536df4c84c8923785af11aaefa
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/lofi_study_loop.music.yaml
+  score_sha256_at_review: 0ffb5e87978290c4d3914efd40ca82f0d51919e38327ea90a70f0f4dd894b854
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.7
+  label: Acceptable
+  notes: Haven't gotten tired of it yet, but I don't yearn to hear it.
+  issues: []
+  furthest_played_seconds: 29.966
+  furthest_played_fraction: 0.2926
+  created_at: '2026-08-16T15:38:38Z'
+  updated_at: '2026-08-16T15:38:38Z'
+  reviewed_at: '2026-08-16T15:38:38Z'
+history: []

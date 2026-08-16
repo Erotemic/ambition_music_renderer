@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: invincible_maryo
+  title: Invincible-Maryo
+  version_id: bf7bd42c6210426e:380e5344636f
+  render_hash: bf7bd42c6210426e
+  preview_sha256: 380e5344636fc86b9c29528c2e34d927dcfb2157e9f7690c31f92dffedd3626a
+  preview_path: generated/invincible_maryo/.versioned/bf7bd42c6210426e/preview/invincible_maryo_bf7bd42c6210426e.full_soundtrack_preview.ogg
+  manifest_path: generated/invincible_maryo/.versioned/bf7bd42c6210426e/invincible_maryo_bf7bd42c6210426e.adaptive_manifest.json
+  manifest_sha256: 740bf3fe8a913ea856136d475b103a7b31c4cbb731a2243d27bdbd3d68509051
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/invincible_maryo.music.yaml
+  score_sha256_at_review: 76d7b0e54c0f6e2d530e7ec9fe6947a608953087035c9af16cd1148ebb67e0e8
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.1
+  label: Strong
+  notes: This loop works.
+  issues: []
+  furthest_played_seconds: 9.23
+  furthest_played_fraction: 1.0
+  created_at: '2026-08-16T15:37:03Z'
+  updated_at: '2026-08-16T15:37:04Z'
+  reviewed_at: '2026-08-16T15:37:04Z'
+history: []

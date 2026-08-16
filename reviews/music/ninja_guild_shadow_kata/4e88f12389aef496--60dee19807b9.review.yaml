@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: ninja_guild_shadow_kata
+  title: Shadow Kata - Ninja Guild Theme
+  version_id: 4e88f12389aef496:60dee19807b9
+  render_hash: 4e88f12389aef496
+  preview_sha256: 60dee19807b9e55bd5ac0b4b71fd17ad689f20a82703381634fe5d6d73676102
+  preview_path: generated/ninja_guild_shadow_kata/.versioned/4e88f12389aef496/preview/ninja_guild_shadow_kata_4e88f12389aef496.full_soundtrack_preview.ogg
+  manifest_path: generated/ninja_guild_shadow_kata/.versioned/4e88f12389aef496/ninja_guild_shadow_kata_4e88f12389aef496.adaptive_manifest.json
+  manifest_sha256: 47f82c4e84f31c6ec79a0f45c8cd791b2a269ee7c2b8f06dda2b56b7549b62f5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/ninja_guild_shadow_kata.music.yaml
+  score_sha256_at_review: fce1341712fb61cfd72e9411e15ccc4ca4675221cdabe6695ff64973cc2c3842
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.5
+  label: Acceptable
+  notes: Works for the environment.
+  issues: []
+  furthest_played_seconds: 24.934
+  furthest_played_fraction: 0.2987
+  created_at: '2026-08-16T15:57:25Z'
+  updated_at: '2026-08-16T15:57:25Z'
+  reviewed_at: '2026-08-16T15:57:25Z'
+history: []
