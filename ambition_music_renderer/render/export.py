@@ -82,11 +82,22 @@ def timeline_markers_from_spec(
     such as Emmy Extended expose A/B/return form markers even though the game
     still treats them as one loop component.
     """
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    tempo = TempoMap.from_spec(spec)
+    if spec.get("schema") == "ambition.musicir.v2":
+        from .exact_score import ExactTempoMap, ScoreClock
 
-    def bar_to_seconds(bar0: float) -> float:
-        return tempo.beat_to_time(bar0 * beats_per_bar)
+        exact_score = spec.get("score") or {}
+        exact_clock = ScoreClock(exact_score)
+        exact_tempo = ExactTempoMap(exact_score, exact_clock)
+
+        def bar_to_seconds(bar0: float) -> float:
+            bar1 = max(1, int(round(float(bar0))) + 1)
+            return exact_tempo.tick_to_time(exact_clock.bar_start_tick(bar1))
+    else:
+        beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+        tempo = TempoMap.from_spec(spec)
+
+        def bar_to_seconds(bar0: float) -> float:
+            return tempo.beat_to_time(bar0 * beats_per_bar)
     markers: list[dict[str, Any]] = []
     for section in sections or []:
         sid = str(section.get("id", f"section_{len(markers)+1}"))

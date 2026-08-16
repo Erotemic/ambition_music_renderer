@@ -21,7 +21,12 @@ from .synth import render_procedural_fm, render_synth_audio
 def copy_with_instruments(
     pm: pretty_midi.PrettyMIDI, instruments: list[pretty_midi.Instrument], bpm: float
 ) -> pretty_midi.PrettyMIDI:
-    new_pm = pretty_midi.PrettyMIDI(initial_tempo=bpm)
+    # Preserve the source score resolution when making per-group/per-instrument
+    # render copies.  Falling back to PrettyMIDI's default 220 PPQ silently
+    # re-quantizes absolute note and controller times whenever a backend (such
+    # as sfizz_render) serializes the copy to MIDI.  Exact-score inputs commonly
+    # use a much finer PPQ specifically to retain expressive timing.
+    new_pm = pretty_midi.PrettyMIDI(initial_tempo=bpm, resolution=pm.resolution)
     new_pm.instruments = [copy.deepcopy(inst) for inst in instruments]
     return new_pm
 

@@ -1180,6 +1180,13 @@ def merged_layers(
 def build_score(
     spec: dict[str, Any],
 ) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
+    if spec.get("schema") == "ambition.musicir.v2":
+        # Exact-score mode is independent of the procedural section/layer DSL.
+        # Dispatch before touching v1-only fields such as ``sections``.
+        from .exact_score import build_exact_score
+
+        return build_exact_score(spec)
+
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     pm = pretty_midi.PrettyMIDI(initial_tempo=bpm)
