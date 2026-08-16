@@ -7,11 +7,14 @@ from pathlib import Path
 import yaml
 
 from ambition_music_renderer.music_reviews import (
+    PAIRWISE_SCHEMA,
     REVIEW_SCHEMA,
+    REVIEW_SCHEMA_V1,
     ReviewStore,
     cue_summary,
     discover_render_versions,
     discover_score_sources,
+    pairwise_rankings,
 )
 
 
@@ -31,7 +34,7 @@ def _write_render(root: Path, cue: str, render_hash: str, audio: bytes, *, lates
         "schema": "ambition.adaptive_music_manifest.v2",
         "renderer_version": "test-renderer-v1",
         "id": cue,
-        "title": "Test Cue",
+        "title": cue.replace("_", " ").title(),
         "hash": render_hash,
         "files": {"preview": {"full_soundtrack": f"preview/{preview.name}"}},
     }
@@ -64,26 +67,85 @@ def test_review_key_binds_render_hash_and_exact_audio_bytes(tmp_path: Path):
     expected = hashlib.sha256(b"heard-this").hexdigest()
     assert expected[:12] in path1.name
 
-    # Same renderer hash but different audible bytes becomes a different review
-    # identity rather than inheriting feedback accidentally.
     preview.write_bytes(b"different-audio")
     version2 = discover_render_versions(tmp_path, include_agent_bundles=False)[0]
     path2 = store.review_path(version2)
     assert path1 != path2
 
 
-def test_save_preserves_prior_opinion_in_history(tmp_path: Path):
+def test_save_edits_current_review_in_place_without_appending_history(tmp_path: Path):
     _write_score(tmp_path)
     _write_render(tmp_path, "test_cue", "aaaaaaaaaaaaaaaa", b"audio", latest=True)
     version = discover_render_versions(tmp_path, include_agent_bundles=False)[0]
     store = ReviewStore(tmp_path)
-    first = store.save(version, score=3, notes="Fine for now", issues=["arrangement"], furthest_played_seconds=12, furthest_played_fraction=0.4)
-    assert first.current is not None and first.current.score == 3
-    second = store.save(version, score=4, notes="Polish worked", issues=[], furthest_played_seconds=30, furthest_played_fraction=1.0)
-    assert second.current is not None and second.current.score == 4
-    assert len(second.data["history"]) == 1
-    assert second.data["history"][0]["score"] == 3
+    first = store.save(version, score=6.0, notes="Fine for now", issues=["arrangement"], furthest_played_seconds=12, furthest_played_fraction=0.4)
+    assert first.current is not None and first.current.score == 6.0
+    created_at = first.data["current"]["created_at"]
+
+    second = store.save(version, score=8.5, notes="Polish worked", issues=[], furthest_played_seconds=30, furthest_played_fraction=1.0)
+    assert second.current is not None and second.current.score == 8.5
+    assert second.data["history"] == []
+    assert second.data["current"]["created_at"] == created_at
     assert second.data["schema"] == REVIEW_SCHEMA
+    assert len(store.load_all()) == 1
+
+
+def test_legacy_v1_review_reads_as_literal_double_score(tmp_path: Path):
+    _write_score(tmp_path)
+    _write_render(tmp_path, "test_cue", "aaaaaaaaaaaaaaaa", b"audio", latest=True)
+    version = discover_render_versions(tmp_path, include_agent_bundles=False)[0]
+    store = ReviewStore(tmp_path)
+    path = store.review_path(version)
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "schema": REVIEW_SCHEMA_V1,
+                "subject": {
+                    "cue_id": version.cue_id,
+                    "render_hash": version.render_hash,
+                    "preview_sha256": version.preview_sha256,
+                },
+                "current": {"score": 3, "label": "Acceptable", "notes": "Keep me", "issues": []},
+                "history": [],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf8",
+    )
+    loaded = store.load_for_version(version)
+    assert loaded is not None and loaded.current is not None
+    assert loaded.current.score == 6.0
+    assert loaded.current.notes == "Keep me"
+
+
+def test_migrate_legacy_reviews_multiplies_all_existing_scores_without_new_history(tmp_path: Path):
+    _write_score(tmp_path)
+    _write_render(tmp_path, "test_cue", "aaaaaaaaaaaaaaaa", b"audio", latest=True)
+    version = discover_render_versions(tmp_path, include_agent_bundles=False)[0]
+    store = ReviewStore(tmp_path)
+    path = store.review_path(version)
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "schema": REVIEW_SCHEMA_V1,
+                "subject": {"cue_id": version.cue_id, "render_hash": version.render_hash, "preview_sha256": version.preview_sha256},
+                "current": {"score": 4, "label": "Strong", "notes": "Existing note", "issues": []},
+                "history": [{"score": 2, "label": "Major polish", "notes": "Old thought"}],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf8",
+    )
+    changed = store.migrate_legacy_reviews()
+    assert changed == [path]
+    raw = yaml.safe_load(path.read_text())
+    assert raw["schema"] == REVIEW_SCHEMA
+    assert raw["current"]["score"] == 8.0
+    assert raw["history"][0]["score"] == 4.0
+    assert raw["current"]["notes"] == "Existing note"
+    assert len(raw["history"]) == 1
 
 
 def test_summary_distinguishes_latest_from_best_historical_version(tmp_path: Path):
@@ -93,13 +155,49 @@ def test_summary_distinguishes_latest_from_best_historical_version(tmp_path: Pat
     versions = discover_render_versions(tmp_path, include_agent_bundles=False)
     by_hash = {version.render_hash: version for version in versions}
     store = ReviewStore(tmp_path)
-    store.save(by_hash["aaaaaaaaaaaaaaaa"], score=5, notes="Keep this arrangement")
-    store.save(by_hash["bbbbbbbbbbbbbbbb"], score=3, notes="Regressed")
+    store.save(by_hash["aaaaaaaaaaaaaaaa"], score=10.0, notes="Keep this arrangement")
+    store.save(by_hash["bbbbbbbbbbbbbbbb"], score=6.0, notes="Regressed")
     row = cue_summary(versions, store.load_all())[0]
-    assert row["latest_score"] == 3
-    assert row["best_score"] == 5
+    assert row["latest_score"] == 6.0
+    assert row["best_score"] == 10.0
     assert row["best_version_id"].startswith("aaaaaaaaaaaaaaaa:")
     assert row["reviewed_versions"] == 2
+
+
+def test_pairwise_save_is_exact_unordered_pair_and_editable_in_place(tmp_path: Path):
+    for cue in ("alpha", "beta"):
+        _write_score(tmp_path, cue, cue.title())
+    _write_render(tmp_path, "alpha", "aaaaaaaaaaaaaaaa", b"alpha", latest=True)
+    _write_render(tmp_path, "beta", "bbbbbbbbbbbbbbbb", b"beta", latest=True)
+    versions = {version.cue_id: version for version in discover_render_versions(tmp_path, include_agent_bundles=False)}
+    store = ReviewStore(tmp_path)
+
+    first = store.save_comparison(versions["alpha"], versions["beta"], outcome="first")
+    assert first.data["schema"] == PAIRWISE_SCHEMA
+    first_path = first.path
+    second = store.save_comparison(versions["beta"], versions["alpha"], outcome="first")
+    assert second.path == first_path
+    assert len(store.load_comparisons()) == 1
+    # The reverse-oriented edit now says beta won; canonical storage may call
+    # that either first or second, but the winner subject must be beta.
+    winner = second.first if second.outcome == "first" else second.second
+    assert winner["cue_id"] == "beta"
+
+
+def test_pairwise_ranking_handles_non_condorcet_data_with_simple_points(tmp_path: Path):
+    for cue, h in (("alpha", "aaaaaaaaaaaaaaaa"), ("beta", "bbbbbbbbbbbbbbbb"), ("gamma", "cccccccccccccccc")):
+        _write_score(tmp_path, cue, cue.title())
+        _write_render(tmp_path, cue, h, cue.encode(), latest=True)
+    versions = {version.cue_id: version for version in discover_render_versions(tmp_path, include_agent_bundles=False)}
+    store = ReviewStore(tmp_path)
+    store.save_comparison(versions["alpha"], versions["beta"], outcome="first")
+    store.save_comparison(versions["alpha"], versions["gamma"], outcome="first")
+    store.save_comparison(versions["beta"], versions["gamma"], outcome="first")
+    rows = pairwise_rankings(store.load_comparisons())
+    assert rows[0]["cue_id"] == "alpha"
+    assert rows[0]["wins"] == 2
+    assert rows[0]["pairwise_score"] == 1.0
+    assert rows[-1]["cue_id"] == "gamma"
 
 
 def test_active_score_source_wins_over_archived_duplicate(tmp_path: Path):
@@ -150,4 +248,10 @@ def test_summary_can_include_active_score_without_local_preview(tmp_path: Path):
         "reviewed_versions": 0,
         "playable_versions": 0,
         "score_scope": "active",
+        "latest_pairwise_rank": None,
+        "latest_pairwise_score": None,
+        "latest_pairwise_wins": 0,
+        "latest_pairwise_losses": 0,
+        "latest_pairwise_ties": 0,
+        "latest_pairwise_comparisons": 0,
     }]

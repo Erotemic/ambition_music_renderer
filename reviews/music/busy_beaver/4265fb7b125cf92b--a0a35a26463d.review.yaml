@@ -1,4 +1,4 @@
-schema: ambition.music_review.v1
+schema: ambition.music_review.v2
 subject:
   cue_id: busy_beaver
   title: Busy Beaver
@@ -16,7 +16,7 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 4
+  score: 8.0
   label: Strong
   notes: The only thing preventing this from being a 5 is that it's just a background song. If a 5 meant does its
     job perfectly this would be a 5.
@@ -25,3 +25,11 @@ current:
   furthest_played_fraction: 0.0907
   reviewed_at: '2026-08-16T14:59:38Z'
 history: []
+score_scale:
+  min: 1.0
+  max: 10.0
+  legacy_v1_multiplier: 2.0
+migration:
+  from_schema: ambition.music_review.v1
+  score_transform: score * 2
+  preserved_existing_opinion: true

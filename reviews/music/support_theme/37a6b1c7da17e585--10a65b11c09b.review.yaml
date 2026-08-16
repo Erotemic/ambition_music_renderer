@@ -1,4 +1,4 @@
-schema: ambition.music_review.v1
+schema: ambition.music_review.v2
 subject:
   cue_id: support_theme
   title: Support Theme
@@ -16,7 +16,7 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 3
+  score: 6.0
   label: Acceptable
   notes: It does its job. It's supposed to be a parody of ground theme, and in that sense it falls short, because
     ground theme is iconic and great, but there is nothing terribly wrong about it, but this is not iconic.
@@ -25,3 +25,11 @@ current:
   furthest_played_fraction: 0.9769
   reviewed_at: '2026-08-16T15:05:56Z'
 history: []
+score_scale:
+  min: 1.0
+  max: 10.0
+  legacy_v1_multiplier: 2.0
+migration:
+  from_schema: ambition.music_review.v1
+  score_transform: score * 2
+  preserved_existing_opinion: true

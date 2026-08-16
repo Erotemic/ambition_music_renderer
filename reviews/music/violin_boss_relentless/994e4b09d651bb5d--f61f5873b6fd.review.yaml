@@ -1,4 +1,4 @@
-schema: ambition.music_review.v1
+schema: ambition.music_review.v2
 subject:
   cue_id: violin_boss_relentless
   title: Relentless Violin Boss r2 (Sonatina strings, remaster)
@@ -16,7 +16,7 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 3
+  score: 6.0
   label: Acceptable
   notes: ''
   issues: []
@@ -24,3 +24,11 @@ current:
   furthest_played_fraction: 0.9772
   reviewed_at: '2026-08-16T15:03:58Z'
 history: []
+score_scale:
+  min: 1.0
+  max: 10.0
+  legacy_v1_multiplier: 2.0
+migration:
+  from_schema: ambition.music_review.v1
+  score_transform: score * 2
+  preserved_existing_opinion: true

@@ -1,4 +1,4 @@
-schema: ambition.music_review.v1
+schema: ambition.music_review.v2
 subject:
   cue_id: birds_in_the_rafters
   title: Birds in the Rafters
@@ -16,7 +16,7 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 4
+  score: 8.0
   label: Strong
   notes: Banjo is doing good work in this. Might be slightly out of tune in this render though? I can't put my finger
     on what it needs. It's not perfect yet though. Maybe we need better MIDI insturments I don't have?
@@ -25,3 +25,11 @@ current:
   furthest_played_fraction: 0.8222
   reviewed_at: '2026-08-16T15:01:24Z'
 history: []
+score_scale:
+  min: 1.0
+  max: 10.0
+  legacy_v1_multiplier: 2.0
+migration:
+  from_schema: ambition.music_review.v1
+  score_transform: score * 2
+  preserved_existing_opinion: true

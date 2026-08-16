@@ -1,4 +1,4 @@
-schema: ambition.music_review.v1
+schema: ambition.music_review.v2
 subject:
   cue_id: tech_bros_disruption_recompiled
   title: Disruption Index - Extended Cut (Register Study)
@@ -16,7 +16,7 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 5
+  score: 10.0
   label: Standout
   notes: Not sure if this is better than the original or not, still great.
   issues: []
@@ -24,3 +24,11 @@ current:
   furthest_played_fraction: 0.7057
   reviewed_at: '2026-08-16T15:04:53Z'
 history: []
+score_scale:
+  min: 1.0
+  max: 10.0
+  legacy_v1_multiplier: 2.0
+migration:
+  from_schema: ambition.music_review.v1
+  score_transform: score * 2
+  preserved_existing_opinion: true

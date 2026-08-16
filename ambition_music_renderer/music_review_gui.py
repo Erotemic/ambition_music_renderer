@@ -32,6 +32,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"project: {root}")
         print(f"playable render versions: {len(versions)}")
         print(f"review records: {len(store.load_all())}")
+        print(f"pairwise comparison records: {len(store.load_comparisons())}")
         print(f"review root: {store.review_root}")
         return 0
     try:
