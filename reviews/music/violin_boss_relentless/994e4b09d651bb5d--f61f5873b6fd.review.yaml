@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: violin_boss_relentless
+  title: Relentless Violin Boss r2 (Sonatina strings, remaster)
+  version_id: 994e4b09d651bb5d:f61f5873b6fd
+  render_hash: 994e4b09d651bb5d
+  preview_sha256: f61f5873b6fd595a9bf3a77b626c09a63baad6c2e280b24b63beb721c38892e3
+  preview_path: generated/violin_boss_relentless/.versioned/994e4b09d651bb5d/preview/violin_boss_relentless_994e4b09d651bb5d.full_soundtrack_preview.ogg
+  manifest_path: generated/violin_boss_relentless/.versioned/994e4b09d651bb5d/violin_boss_relentless_994e4b09d651bb5d.adaptive_manifest.json
+  manifest_sha256: 3f7f22d1ae2a0d2fd4de962b1538251e89751b788727d9bc3c019384b238e58f
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/violin_boss_relentless.music.yaml
+  score_sha256_at_review: 477e8799c644650d13ccb4d2c30a61c7cddee0e6ecc788ca12abf80f37c6a4bc
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 65.145
+  furthest_played_fraction: 0.9772
+  reviewed_at: '2026-08-16T15:03:58Z'
+history: []

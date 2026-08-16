@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: tech_bros_disruption
+  title: Disruption Index - Tech-Bros Basement Dungeon
+  version_id: 50bddad8c39c2ed4:cf01c629accd
+  render_hash: 50bddad8c39c2ed4
+  preview_sha256: cf01c629accde8847fbf0bb36aa9941b1f1b66362969794020a20bdb68b3750c
+  preview_path: generated/tech_bros_disruption/.versioned/50bddad8c39c2ed4/preview/tech_bros_disruption_50bddad8c39c2ed4.full_soundtrack_preview.ogg
+  manifest_path: generated/tech_bros_disruption/.versioned/50bddad8c39c2ed4/tech_bros_disruption_50bddad8c39c2ed4.adaptive_manifest.json
+  manifest_sha256: 63bb125859c0ed56036115371b1a4f5e7db919adbbaa0d7302a01d26f1dab37e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/tech_bros_disruption.music.yaml
+  score_sha256_at_review: 676b02d48b94e9185529a9573e0e6b4ff091b30c8d12728e068002ef30151449
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5
+  label: Standout
+  notes: The first actually good song we composed.
+  issues: []
+  furthest_played_seconds: 81.692
+  furthest_played_fraction: 0.6207
+  reviewed_at: '2026-08-16T15:04:33Z'
+history: []

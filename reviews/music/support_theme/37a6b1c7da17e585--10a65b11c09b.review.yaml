@@ -1,0 +1,27 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: support_theme
+  title: Support Theme
+  version_id: 37a6b1c7da17e585:10a65b11c09b
+  render_hash: 37a6b1c7da17e585
+  preview_sha256: 10a65b11c09b09d186f098a3a3e6ee6f4260066e082cf5562162fdadb8645528
+  preview_path: generated/support_theme/.versioned/37a6b1c7da17e585/preview/support_theme_37a6b1c7da17e585.full_soundtrack_preview.ogg
+  manifest_path: generated/support_theme/.versioned/37a6b1c7da17e585/support_theme_37a6b1c7da17e585.adaptive_manifest.json
+  manifest_sha256: 6eb5b2ecf77634fe3ecee88274b54d1b35443fa865f559c5647a67183b20928f
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/support_theme.music.yaml
+  score_sha256_at_review: 74b4a316f4df8169f8cba777a547fb8617bf4bcae6fdd63961ab327a7fa19d75
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3
+  label: Acceptable
+  notes: It does its job. It's supposed to be a parody of ground theme, and in that sense it falls short, because
+    ground theme is iconic and great, but there is nothing terribly wrong about it, but this is not iconic.
+  issues: []
+  furthest_played_seconds: 60.502
+  furthest_played_fraction: 0.9769
+  reviewed_at: '2026-08-16T15:05:56Z'
+history: []

@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: tech_bros_disruption_recompiled
+  title: Disruption Index - Extended Cut (Register Study)
+  version_id: 661aa970bcdb540e:a4e4ebbbf9e6
+  render_hash: 661aa970bcdb540e
+  preview_sha256: a4e4ebbbf9e6e9fcfe4e83297153d6655afea210348ac82630d4850af364317d
+  preview_path: generated/tech_bros_disruption_recompiled/.versioned/661aa970bcdb540e/preview/tech_bros_disruption_recompiled_661aa970bcdb540e.full_soundtrack_preview.ogg
+  manifest_path: generated/tech_bros_disruption_recompiled/.versioned/661aa970bcdb540e/tech_bros_disruption_recompiled_661aa970bcdb540e.adaptive_manifest.json
+  manifest_sha256: 2c383fbbda435c9a73062a89ac18f1e95c974706e26bd8d72fb879b01fc94821
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/tech_bros_disruption_recompiled.music.yaml
+  score_sha256_at_review: dfa849340075e319d1ae958fe10c99bf71d5fcfa5bf70392b401154ad6058354
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5
+  label: Standout
+  notes: Not sure if this is better than the original or not, still great.
+  issues: []
+  furthest_played_seconds: 152.988
+  furthest_played_fraction: 0.7057
+  reviewed_at: '2026-08-16T15:04:53Z'
+history: []

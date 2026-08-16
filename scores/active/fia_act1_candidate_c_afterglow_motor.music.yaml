@@ -1,0 +1,196 @@
+schema: ambition.musicir.v1
+id: fia_act1_candidate_c_afterglow_motor
+title: "Fia I Candidate C — Afterglow Motor"
+seed: 202608161203
+notes: >-
+  Act I candidate C: spacious post-rock chamber-electronic. The cue is built from
+  long clean-guitar phrases, a low viola/cello horizon, and a warm analog motor
+  pulse rather than a conventional rhythm section. It should feel innocent as
+  openness and trust, not innocence as cuteness. There is no piano and no
+  woodwind. The melody uses wide open intervals and leaves large stretches of
+  air, giving later acts room to turn the same material into pressure. Its omen
+  is harmonic rather than melodic or rhythmic: one late bar substitutes a quiet
+  C-minor shadow under an otherwise G-major/Lydian landscape, then returns to
+  daylight without comment.
+tempo: {bpm: 112}
+meter: {beats_per_bar: 6, beat_unit: 8}
+constraints: {voice_leading: minimize_motion, no_clusters: true}
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  sfizz:
+    library_roots: [/data/audio-tools/sfz, /data/audio-tools]
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: -1.1
+  highpass_hz: 30
+  lowpass_hz: 12500
+  reverb_wet: 0.15
+  reverb_decay_seconds: 1.75
+  reverb_damping_hz: 5400
+  stereo_width: 0.18
+  compressor_threshold_db: -19
+  compressor_ratio: 1.8
+  compressor_attack_ms: 28
+  compressor_release_ms: 155
+  limiter_drive: 0.87
+  normalize: true
+  target_peak_db: -4.2
+stem_postprocess:
+  highpass_hz: 28
+  reverb_wet: 0.018
+  reverb_decay_seconds: 0.65
+  stereo_width: 0.04
+  normalize: false
+  target_peak_db: -4.2
+group_postprocess:
+  lead: {gain_db: 0.3, highpass_hz: 100, lowpass_hz: 12000, reverb_wet: 0.08}
+  strings: {gain_db: -1.3, highpass_hz: 70, lowpass_hz: 9300, reverb_wet: 0.10}
+  motor: {gain_db: -2.8, highpass_hz: 45, lowpass_hz: 6800, reverb_wet: 0.025}
+  texture: {gain_db: -3.4, highpass_hz: 180, lowpass_hz: 9600, reverb_wet: 0.06}
+  percussion: {gain_db: -5.0, highpass_hz: 40, lowpass_hz: 11000, transient_tame: 0.035}
+instruments:
+  - name: horizon_guitar
+    group: lead
+    program: clean_guitar
+    volume: 92
+    pan: 72
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: green twang
+      prefer: [green, twang]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: low_viola
+    group: strings
+    program: viola
+    volume: 56
+    pan: 38
+    expression: 78
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violas
+      prefer: [viola, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: low_cello
+    group: strings
+    program: cello
+    volume: 60
+    pan: 50
+    expression: 82
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli
+      prefer: [cello, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+  - {name: motor_sine, group: motor, program: synth_bass_1, volume: 44, pan: 60, expression: 62}
+  - {name: glass_square, group: texture, program: lead_square, volume: 28, pan: 86, expression: 44, modulation: 2}
+  - {name: kit, group: percussion, is_drum: true, volume: 58, pan: 64, expression: 68}
+motifs:
+  - id: afterglow_phrase
+    root: G4
+    intervals: [0, 7, 9, 6, 4, 7, 2, 0]
+    rhythm: [1.0, 0.5, 1.5, 1.0, 2.0, 1.0, 2.0, 3.0]
+    velocities: [0.54, 0.62, 0.68, 0.58, 0.64, 0.70, 0.56, 0.48]
+  - id: glass_answer
+    root: D5
+    intervals: [0, 5, 7, 5, 2, 0]
+    rhythm: [0.5, 0.5, 1.0, 1.0, 2.0, 7.0]
+    velocities: [0.28, 0.32, 0.36, 0.32, 0.28, 0.20]
+layer_templates:
+  guitar_phrase:
+    kind: motif
+    instrument: horizon_guitar
+    motif: afterglow_phrase
+    velocity: 58
+    articulation: legato
+    gate: 0.94
+    humanize_ms: 13
+    humanize_velocity_pct: 7
+  glass_reply:
+    kind: motif
+    instrument: glass_square
+    motif: glass_answer
+    velocity: 26
+    articulation: normal
+    gate: 0.72
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+  viola_horizon:
+    kind: pad_chords
+    instrument: low_viola
+    octave: 3
+    every_bars: 3
+    duration_beats: 8.4
+    velocity: 22
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 18
+    humanize_velocity_pct: 4
+  cello_horizon:
+    kind: bassline
+    instrument: low_cello
+    octave: 3
+    velocity: 34
+    articulation: tenuto
+    humanize_ms: 14
+    humanize_velocity_pct: 4
+    pattern:
+      - [0, 0.0, 1.9]
+      - [7, 3.5, 1.5]
+  motor_breath:
+    kind: bassline
+    instrument: motor_sine
+    octave: 2
+    velocity: 28
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    pattern:
+      - [0, 0.0, 0.28]
+      - [12, 2.0, 0.22]
+      - [7, 4.0, 0.24]
+  sparse_tools:
+    kind: drums
+    instrument: kit
+    humanize_ms: 6
+    humanize_velocity_pct: 6
+    events:
+      - {drum: low_tom, beats: [0.0], velocity: 28, duration_beats: 0.08, probability: 0.48}
+      - {drum: side_stick, beats: [3.0], velocity: 20, duration_beats: 0.04, probability: 0.60}
+playback:
+  mode: section_stem_matrix
+  loop_components: [fia_candidate_c_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [strings, motor]
+    fade_stems: [lead, texture, percussion]
+state_map:
+  default:
+    section: fia_candidate_c_loop
+    stems: {lead: 0.92, strings: 0.44, motor: 0.36, texture: 0.22, percussion: 0.20}
+sections:
+  - id: fia_candidate_c_loop
+    kind: loop_component
+    label: Fia Act I candidate C - spacious post-rock workshop
+    bars: 18
+    intensity: 0.38
+    density: 0.34
+    loopable: true
+    valid_exit_local_bars: [6, 12, 18]
+    harmony:
+      [G6, Cmaj7, D6, Em7, G6, Aadd9,
+       Cmaj7, G6, Em7, D6, Aadd9, G6,
+       Cmaj7, G6, Cm, D6, Em7, G6]
+    layers:
+      - viola_horizon
+      - cello_horizon
+      - motor_breath
+      - sparse_tools
+      - {template: guitar_phrase, starts: [[0, 0.0], [6, 0.0], [12, 0.0]]}
+      - {template: glass_reply, starts: [[2, 0.0], [8, 0.0], [14, 0.0]]}

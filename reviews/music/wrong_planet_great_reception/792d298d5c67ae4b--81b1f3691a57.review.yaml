@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: wrong_planet_great_reception
+  title: Wrong Planet, Great Reception
+  version_id: 792d298d5c67ae4b:81b1f3691a57
+  render_hash: 792d298d5c67ae4b
+  preview_sha256: 81b1f3691a57f86e9951fbdae2bf3b9d54311428de98a51aa50690003d94fc50
+  preview_path: generated/wrong_planet_great_reception/.versioned/792d298d5c67ae4b/preview/wrong_planet_great_reception_792d298d5c67ae4b.full_soundtrack_preview.ogg
+  manifest_path: generated/wrong_planet_great_reception/.versioned/792d298d5c67ae4b/wrong_planet_great_reception_792d298d5c67ae4b.adaptive_manifest.json
+  manifest_sha256: c534090706bcaaf4f68403d308dfd1480c54f08491444d27a1f9d492f7153bb6
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/wrong_planet_great_reception.music.yaml
+  score_sha256_at_review: 57ff2e16349d7f87feba3bdffac3cc308a9b799438a707e4d56b5dd490a64b3e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5
+  label: Standout
+  notes: Similar to v2, also great.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  reviewed_at: '2026-08-16T15:03:32Z'
+history: []

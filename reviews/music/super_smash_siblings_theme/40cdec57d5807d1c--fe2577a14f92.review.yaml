@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: super_smash_siblings_theme
+  title: Raise the Banner - Super Smash Siblings Main Theme
+  version_id: 40cdec57d5807d1c:fe2577a14f92
+  render_hash: 40cdec57d5807d1c
+  preview_sha256: fe2577a14f923823291e0b6a0a389289244d8fe9c3e437b1f4ae6673dcb09b4b
+  preview_path: generated/super_smash_siblings_theme/.versioned/40cdec57d5807d1c/preview/super_smash_siblings_theme_40cdec57d5807d1c.full_soundtrack_preview.ogg
+  manifest_path: generated/super_smash_siblings_theme/.versioned/40cdec57d5807d1c/super_smash_siblings_theme_40cdec57d5807d1c.adaptive_manifest.json
+  manifest_sha256: fc5ffa733b0489bc80837ff9d346b291c348357a0da194821d6d3b518f244b54
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/super_smash_siblings_theme.music.yaml
+  score_sha256_at_review: cca3ffa617de4a79874f500b49264882e463c0948b9af50c52bf8512053514d5
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4
+  label: Strong
+  notes: Very good for what it is doing.
+  issues: []
+  furthest_played_seconds: 16.241
+  furthest_played_fraction: 0.1607
+  reviewed_at: '2026-08-16T15:01:46Z'
+history: []

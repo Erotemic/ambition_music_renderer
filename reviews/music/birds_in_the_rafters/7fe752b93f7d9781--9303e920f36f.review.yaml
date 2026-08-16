@@ -1,0 +1,27 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: birds_in_the_rafters
+  title: Birds in the Rafters
+  version_id: 7fe752b93f7d9781:9303e920f36f
+  render_hash: 7fe752b93f7d9781
+  preview_sha256: 9303e920f36f9493f0cea1343730715bd8fa43d6573f6161deefeaa9c2c11720
+  preview_path: generated/birds_in_the_rafters/.versioned/7fe752b93f7d9781/preview/birds_in_the_rafters_7fe752b93f7d9781.full_soundtrack_preview.ogg
+  manifest_path: generated/birds_in_the_rafters/.versioned/7fe752b93f7d9781/birds_in_the_rafters_7fe752b93f7d9781.adaptive_manifest.json
+  manifest_sha256: c5573beebaf1c9a86a9269447401fce0db0d4c9f24fa8ec2e64960032328f0d4
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.1-procedural-fm-v1
+  score_path: scores/active/birds_in_the_rafters.music.yaml
+  score_sha256_at_review: 89be9516f03cf647258826aa88e661d5d379c9c036ee58cae86a95ded249c804
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4
+  label: Strong
+  notes: Banjo is doing good work in this. Might be slightly out of tune in this render though? I can't put my finger
+    on what it needs. It's not perfect yet though. Maybe we need better MIDI insturments I don't have?
+  issues: []
+  furthest_played_seconds: 161.433
+  furthest_played_fraction: 0.8222
+  reviewed_at: '2026-08-16T15:01:24Z'
+history: []

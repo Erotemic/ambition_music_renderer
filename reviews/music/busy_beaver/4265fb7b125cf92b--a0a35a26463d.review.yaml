@@ -1,0 +1,27 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: busy_beaver
+  title: Busy Beaver
+  version_id: 4265fb7b125cf92b:a0a35a26463d
+  render_hash: 4265fb7b125cf92b
+  preview_sha256: a0a35a26463dd82648e9ebe1091579bbafd5379ffc3aa2796fb00423dd408851
+  preview_path: generated/busy_beaver/.versioned/4265fb7b125cf92b/preview/busy_beaver_4265fb7b125cf92b.full_soundtrack_preview.ogg
+  manifest_path: generated/busy_beaver/.versioned/4265fb7b125cf92b/busy_beaver_4265fb7b125cf92b.adaptive_manifest.json
+  manifest_sha256: 5499f79100cc1c4b1b13cb4a60a1fc024eea71d9358f57937aff789ccb37e2f5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/busy_beaver.music.yaml
+  score_sha256_at_review: 251670c9bf5a9ac9f911ba8b9bfecb5e6b91d42c185f7b02858fb16ab87cd9c9
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4
+  label: Strong
+  notes: The only thing preventing this from being a 5 is that it's just a background song. If a 5 meant does its
+    job perfectly this would be a 5.
+  issues: []
+  furthest_played_seconds: 2.942
+  furthest_played_fraction: 0.0907
+  reviewed_at: '2026-08-16T14:59:38Z'
+history: []

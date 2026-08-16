@@ -1,0 +1,26 @@
+schema: ambition.music_review.v1
+subject:
+  cue_id: super_smash_siblings_character_select
+  title: Roster Ignition - Super Smash Siblings Character Select
+  version_id: 9daab28e89444bfa:944e9d6c81a5
+  render_hash: 9daab28e89444bfa
+  preview_sha256: 944e9d6c81a568777bb8b0ea04f29939f17e166e46226b48377cfe7897da58f3
+  preview_path: generated/super_smash_siblings_character_select/.versioned/9daab28e89444bfa/preview/super_smash_siblings_character_select_9daab28e89444bfa.full_soundtrack_preview.ogg
+  manifest_path: generated/super_smash_siblings_character_select/.versioned/9daab28e89444bfa/super_smash_siblings_character_select_9daab28e89444bfa.adaptive_manifest.json
+  manifest_sha256: a6c18d0b8a2977e604a0847db0f44b9bb13a5c3c4183bd3e7e3c5b69cdf63d58
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/super_smash_siblings_character_select.music.yaml
+  score_sha256_at_review: ad53960b3340a69d257cec5ac5fe55fe8ead9e0598f8154f8618ff9f9892541c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4
+  label: Strong
+  notes: ''
+  issues: []
+  furthest_played_seconds: 3.633
+  furthest_played_fraction: 0.0549
+  reviewed_at: '2026-08-16T15:04:11Z'
+history: []

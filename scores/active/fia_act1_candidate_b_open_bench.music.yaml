@@ -1,0 +1,213 @@
+schema: ambition.musicir.v1
+id: fia_act1_candidate_b_open_bench
+title: "Fia I Candidate B — Open Bench"
+seed: 202608161202
+notes: >-
+  Act I candidate B: chamber-groove rather than chamber-orchestra. Rhodes carries
+  a compact hook in a seven-bar C-Lydian cycle, with cello answering in the low
+  middle register, muted hollow-body guitar giving syncopated chord punctuation,
+  and finger bass plus side-stick/shaker keeping a relaxed pocket. There are no
+  arpeggiated piano beds and no lyrical woodwind narrator. The robot-mechanic
+  identity is just a tiny relay pulse under the groove. Foreshadowing here is
+  rhythmic rather than harmonic: every relay event is metrically square except
+  one late click in the final cycle, displaced by a third of a beat. It should
+  feel like the machine hesitated, not like the composer announced danger.
+tempo: {bpm: 104}
+meter: {beats_per_bar: 4, beat_unit: 4}
+constraints: {voice_leading: minimize_motion, no_clusters: true}
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  sfizz:
+    library_roots: [/data/audio-tools/sfz, /data/audio-tools]
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: -1.0
+  highpass_hz: 30
+  lowpass_hz: 12800
+  reverb_wet: 0.085
+  reverb_decay_seconds: 1.15
+  reverb_damping_hz: 5900
+  stereo_width: 0.14
+  compressor_threshold_db: -18.5
+  compressor_ratio: 2.0
+  compressor_attack_ms: 18
+  compressor_release_ms: 118
+  limiter_drive: 0.89
+  normalize: true
+  target_peak_db: -3.6
+stem_postprocess:
+  highpass_hz: 28
+  reverb_wet: 0.010
+  reverb_decay_seconds: 0.48
+  stereo_width: 0.03
+  normalize: false
+  target_peak_db: -4.0
+group_postprocess:
+  keys: {gain_db: 0.2, highpass_hz: 95, lowpass_hz: 11800, reverb_wet: 0.025}
+  cello: {gain_db: -0.8, highpass_hz: 75, lowpass_hz: 9000, reverb_wet: 0.06}
+  guitar: {gain_db: -1.4, highpass_hz: 120, lowpass_hz: 10500, reverb_wet: 0.035}
+  bass: {gain_db: -1.5, highpass_hz: 31, lowpass_hz: 4800}
+  relay: {gain_db: -4.0, highpass_hz: 260, lowpass_hz: 9800}
+  percussion: {gain_db: -4.2, highpass_hz: 40, lowpass_hz: 11500, transient_tame: 0.025}
+instruments:
+  - name: fia_rhodes
+    group: keys
+    program: electric_piano_1
+    volume: 88
+    pan: 56
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: epiano.rhodes
+      prefer: [rhodes, looped]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: answer_cello
+    group: cello
+    program: cello
+    volume: 68
+    pan: 72
+    expression: 86
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli
+      prefer: [cello, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: muted_guitar
+    group: guitar
+    program: muted_guitar
+    volume: 62
+    pan: 38
+    expression: 78
+    instrument_backend:
+      kind: sfz
+      library_ref: guitar.hollowbody
+      prefer: [03 combo keyswitch, combo keyswitch, blackandgreenguitars]
+      optional: true
+      fallback_backend: pretty-midi
+  - name: finger_bass
+    group: bass
+    program: fingered_bass
+    volume: 78
+    pan: 62
+    expression: 90
+  - {name: relay_square, group: relay, program: lead_square, volume: 27, pan: 84, expression: 42, modulation: 1}
+  - {name: kit, group: percussion, is_drum: true, volume: 68, pan: 64, expression: 78}
+motifs:
+  - id: open_bench_hook
+    root: G4
+    intervals: [0, 2, 5, 7, 9, 5, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 1.0, 0.5, 0.5, 1.0, 3.0]
+    velocities: [0.68, 0.72, 0.82, 0.66, 0.86, 0.70, 0.64, 0.68, 0.60]
+  - id: cello_answer
+    root: C3
+    intervals: [0, 7, 9, 7, 4, 2, 0]
+    rhythm: [1.0, 0.5, 0.5, 1.5, 0.5, 1.0, 3.0]
+    velocities: [0.36, 0.40, 0.46, 0.50, 0.44, 0.40, 0.34]
+layer_templates:
+  rhodes_hook:
+    kind: motif
+    instrument: fia_rhodes
+    motif: open_bench_hook
+    velocity: 66
+    articulation: tenuto
+    gate: 0.84
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+  cello_reply:
+    kind: motif
+    instrument: answer_cello
+    motif: cello_answer
+    velocity: 43
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 13
+    humanize_velocity_pct: 5
+  guitar_pocket:
+    kind: chord_hits
+    instrument: muted_guitar
+    octave: 4
+    hits: [[0, 0.66], [0, 1.66], [1, 2.66], [0, 3.66]]
+    every_bars: 2
+    velocity: 38
+    duration_beats: 0.16
+    articulation: staccato
+    voicing: triad
+    humanize_ms: 6
+    humanize_velocity_pct: 8
+  bass_pocket:
+    kind: bassline
+    instrument: finger_bass
+    octave: 2
+    velocity: 54
+    articulation: tenuto
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+    pattern:
+      - [0, 0.0, 0.42]
+      - [7, 0.66, 0.24]
+      - [12, 1.5, 0.34]
+      - [7, 2.66, 0.22]
+      - [0, 3.25, 0.34]
+  relay_grid:
+    kind: chord_hits
+    instrument: relay_square
+    octave: 5
+    hits: [[0, 0.0], [0, 2.0]]
+    every_bars: 2
+    velocity: 20
+    duration_beats: 0.08
+    articulation: staccato
+    voicing: root
+    humanize_ms: 1
+    humanize_velocity_pct: 1
+  soft_kit:
+    kind: drums
+    instrument: kit
+    humanize_ms: 7
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0, 2.5], velocity: 42, duration_beats: 0.06}
+      - {drum: side_stick, beats: [1.0, 3.0], velocity: 34, duration_beats: 0.04}
+      - {drum: shaker, beats: [0.66, 1.66, 2.66, 3.66], velocity: 18, duration_beats: 0.03}
+playback:
+  mode: section_stem_matrix
+  loop_components: [fia_candidate_b_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [keys, cello, bass]
+    fade_stems: [guitar, relay, percussion]
+state_map:
+  default:
+    section: fia_candidate_b_loop
+    stems: {keys: 0.86, cello: 0.52, guitar: 0.48, bass: 0.60, relay: 0.18, percussion: 0.40}
+sections:
+  - id: fia_candidate_b_loop
+    kind: loop_component
+    label: Fia Act I candidate B - open bench chamber groove
+    bars: 28
+    intensity: 0.44
+    density: 0.48
+    loopable: true
+    valid_exit_local_bars: [7, 14, 21, 28]
+    harmony:
+      [Cmaj7, D6, Em7, G6, Cmaj7, Am7, D6,
+       Cmaj7, D6, Em7, G6, Cmaj7, Am7, D6,
+       Cmaj7, D6, Em7, G6, Cmaj7, Am7, D6,
+       Cmaj7, D6, Em7, G6, Cmaj7, D6, Cmaj7]
+    layers:
+      - guitar_pocket
+      - bass_pocket
+      - relay_grid
+      - soft_kit
+      - {template: rhodes_hook, starts: [[0, 0.0], [7, 0.0], [14, 0.0], [21, 0.0]]}
+      - {template: cello_reply, starts: [[2, 0.0], [9, 0.0], [16, 0.0], [23, 0.0]]}
+      - kind: notes
+        instrument: relay_square
+        articulation: staccato
+        notes:
+          - [25, 3.33, C6, 0.08, 24]

@@ -1,0 +1,630 @@
+schema: ambition.musicir.v1
+id: fia_act3_what_must_be_done
+title: "Fia III \u2014 What Must Be Done"
+seed: 2026081603
+notes: 'Act III Fia climax. This is not a loud remix of Benchlight. The old trust melody has been metabolized into
+  a driving inverted interval skeleton: the rhythm and contour ancestry remain, but the tune is mostly gone. Low
+  strings and brass turn the relationship''s once-gentle call-and-answer into a machine of necessity, while percussion
+  makes every cadence feel like a decision that cannot be recalled. Only once, late in the loop, a celesta and solo
+  violin whisper the first three notes of the Act I major phrase. The orchestra does not stop for the memory. The
+  emotional target is tragic climax rather than cartoon villainy: Fia still believes the urgency is real, which
+  is precisely why the accumulated intimacy has become dangerous.'
+tempo:
+  bpm: 126
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: -0.3
+  highpass_hz: 30
+  lowpass_hz: 11200
+  presence_low_hz: 1300
+  presence_high_hz: 3900
+  presence_db: 0.25
+  reverb_wet: 0.18
+  reverb_decay_seconds: 1.9
+  reverb_damping_hz: 4300
+  stereo_width: 0.18
+  compressor_threshold_db: -16.0
+  compressor_ratio: 2.4
+  compressor_attack_ms: 14
+  compressor_release_ms: 135
+  compressor_makeup_db: 0.6
+  compressor_knee_db: 6
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -6.5
+stem_postprocess:
+  highpass_hz: 28
+  lowpass_hz: 11000
+  transient_tame: 0.04
+  reverb_wet: 0.028
+  reverb_decay_seconds: 0.9
+  reverb_damping_hz: 4700
+  stereo_width: 0.045
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: violins_i
+  group: high_strings
+  program: string_ensemble_1
+  volume: 94
+  pan: 84
+  expression: 106
+  modulation: 7
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1
+    prefer:
+    - violins
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: violins_i_stacc
+  group: pulse_strings
+  program: string_ensemble_1
+  volume: 98
+  pan: 82
+  expression: 108
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1_staccato
+    prefer:
+    - violins
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: violas
+  group: mid_strings
+  program: viola
+  volume: 88
+  pan: 60
+  expression: 102
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - viola
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celli
+  group: low_strings
+  program: cello
+  volume: 100
+  pan: 40
+  expression: 110
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - cello
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celli_stacc
+  group: pulse_strings
+  program: cello
+  volume: 106
+  pan: 38
+  expression: 114
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli_staccato
+    prefer:
+    - cello
+    - staccato
+    optional: true
+    fallback_backend: pretty-midi
+- name: horns
+  group: brass
+  program: french_horn
+  volume: 98
+  pan: 66
+  expression: 108
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer:
+    - horns
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: trombones
+  group: brass
+  program: trombone
+  volume: 102
+  pan: 42
+  expression: 112
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trombones_sustain
+    prefer:
+    - trombones
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: piano
+  group: keys
+  program: acoustic_grand_piano
+  volume: 86
+  pan: 48
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - piano
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: solo_memory_violin
+  group: memory
+  program: violin
+  volume: 58
+  pan: 78
+  expression: 82
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: memory_celesta
+  group: memory
+  program: celesta
+  volume: 44
+  pan: 88
+  expression: 72
+  instrument_backend:
+    kind: sfz
+    library_ref: celeste
+    prefer:
+    - celesta
+    - bell
+    optional: true
+    fallback_backend: pretty-midi
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 92
+  pan: 48
+  expression: 104
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.timpani
+    prefer:
+    - timpani
+    - hit
+    - normal
+    optional: true
+    fallback_backend: pretty-midi
+- name: bass_drum
+  group: percussion
+  is_drum: true
+  volume: 92
+  pan: 50
+  expression: 106
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.bass_drum
+    prefer:
+    - bass_drum
+    - hit
+    optional: true
+    fallback_backend: pretty-midi
+- name: cymbal
+  group: percussion
+  is_drum: true
+  volume: 78
+  pan: 68
+  expression: 94
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.cymbal
+    prefer:
+    - cymbal
+    - crash
+    optional: true
+    fallback_backend: pretty-midi
+motifs:
+- id: necessity_engine
+  root: D3
+  intervals:
+  - 0
+  - -2
+  - -4
+  - -7
+  - -5
+  - -2
+  - -4
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.75
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.5
+  velocities:
+  - 0.7
+  - 0.72
+  - 0.78
+  - 0.9
+  - 0.82
+  - 0.76
+  - 0.8
+  - 0.66
+- id: decision_blade
+  root: D4
+  intervals:
+  - 0
+  - 2
+  - 5
+  - 3
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 3.0
+  velocities:
+  - 0.72
+  - 0.76
+  - 0.92
+  - 0.86
+  - 0.78
+  - 0.72
+  - 0.62
+- id: benchlight_memory
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 4
+  rhythm:
+  - 0.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.28
+  - 0.3
+  - 0.18
+layer_templates:
+  cello_engine:
+    kind: motif
+    instrument: celli_stacc
+    motif: necessity_engine
+    root: D3
+    every_bars: 2
+    repeats: 20
+    starts:
+    - - 0
+      - 0.0
+    velocity: 62
+    articulation: staccato
+    gate: 0.72
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  violin_engine_shadow:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: necessity_engine
+    root: D4
+    every_bars: 4
+    repeats: 10
+    starts:
+    - - 2
+      - 0.0
+    velocity: 46
+    articulation: staccato
+    gate: 0.66
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  piano_hammer:
+    kind: arpeggio
+    instrument: piano
+    octave: 2
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.34
+    velocity: 48
+    density: 0.9
+    articulation: marcato
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  viola_pressure:
+    kind: pad_chords
+    instrument: violas
+    octave: 3
+    every_bars: 1
+    duration_beats: 2.82
+    velocity: 40
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  high_string_pressure:
+    kind: pad_chords
+    instrument: violins_i
+    octave: 4
+    every_bars: 1
+    duration_beats: 2.82
+    velocity: 34
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+  brass_decision:
+    kind: motif
+    instruments:
+    - horns
+    - trombones
+    motif: decision_blade
+    root: D3
+    every_bars: 8
+    repeats: 5
+    starts:
+    - - 4
+      - 0.0
+    velocity: 68
+    articulation: marcato
+    instrument_velocity_offsets:
+      horns: -8
+      trombones: 0
+    instrument_octave_offsets:
+      horns: 1
+      trombones: 0
+    gate: 0.88
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  memory_only_once:
+    kind: motif
+    instruments:
+    - memory_celesta
+    - solo_memory_violin
+    motif: benchlight_memory
+    root: D5
+    repeats: 1
+    starts:
+    - - 31
+      - 0.0
+    velocity: 30
+    articulation: legato
+    instrument_velocity_offsets:
+      memory_celesta: -4
+      solo_memory_violin: 0
+    instrument_octave_offsets:
+      memory_celesta: 1
+      solo_memory_violin: 0
+    gate: 0.86
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+  timpani_decisions:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+    hits:
+    - - 0
+      - 0.0
+      - 0
+      - 0.55
+    - - 4
+      - 0.0
+      - 0
+      - 0.55
+    - - 8
+      - 0.0
+      - 0
+      - 0.55
+    - - 12
+      - 0.0
+      - 0
+      - 0.55
+    - - 16
+      - 0.0
+      - 0
+      - 0.55
+    - - 20
+      - 0.0
+      - 0
+      - 0.55
+    - - 24
+      - 0.0
+      - 0
+      - 0.55
+    - - 28
+      - 0.0
+      - 0
+      - 0.55
+    - - 32
+      - 0.0
+      - 0
+      - 0.7
+    - - 36
+      - 0.0
+      - 0
+      - 0.7
+    - - 39
+      - 2.0
+      - 0
+      - 0.9
+  impact_drum:
+    kind: drums
+    instrument: bass_drum
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    events:
+    - drum: concert_bass_drum
+      beat: 0.0
+      bars:
+      - 8
+      - 16
+      - 24
+      - 32
+      velocity: 72
+      duration_beats: 0.18
+    - drum: concert_bass_drum
+      beat: 2.0
+      bars:
+      - 39
+      velocity: 90
+      duration_beats: 0.32
+  cymbal_thresholds:
+    kind: drums
+    instrument: cymbal
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    events:
+    - drum: crash
+      beat: 0.0
+      bars:
+      - 16
+      - 32
+      velocity: 62
+      duration_beats: 0.25
+    - drum: crash
+      beat: 2.0
+      bars:
+      - 39
+      velocity: 82
+      duration_beats: 0.4
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - fia_act3_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems:
+    - low_strings
+    - mid_strings
+    - keys
+    fade_stems:
+    - high_strings
+    - pulse_strings
+    - brass
+    - percussion
+    - memory
+state_map:
+  default:
+    section: fia_act3_loop
+    stems:
+      high_strings: 0.7
+      pulse_strings: 0.86
+      mid_strings: 0.72
+      low_strings: 0.88
+      brass: 0.8
+      keys: 0.62
+      memory: 0.16
+      percussion: 0.76
+  climax:
+    section: fia_act3_loop
+    stems:
+      high_strings: 0.9
+      pulse_strings: 1.0
+      mid_strings: 0.88
+      low_strings: 1.0
+      brass: 1.0
+      keys: 0.76
+      memory: 0.2
+      percussion: 0.94
+sections:
+- id: fia_act3_loop
+  kind: loop_component
+  label: Fia Act III - what must be done
+  bars: 40
+  intensity: 0.94
+  density: 0.86
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  - 24
+  - 32
+  - 40
+  harmony:
+  - Dm
+  - Dm
+  - Bb
+  - Bb
+  - Gm
+  - Gm
+  - C
+  - C
+  - Dm
+  - Dm
+  - Bb
+  - Bb
+  - Gm
+  - Gm
+  - Am
+  - Am
+  - Dm
+  - Dm
+  - Bb
+  - Bb
+  - Gm
+  - Gm
+  - C
+  - C
+  - Dm
+  - Dm
+  - Bb
+  - Bb
+  - Gm
+  - Gm
+  - Am
+  - A
+  - Dm
+  - Dm
+  - Gm
+  - Gm
+  - Bb
+  - Bb
+  - A
+  - A
+  layers:
+  - cello_engine
+  - violin_engine_shadow
+  - piano_hammer
+  - viola_pressure
+  - high_string_pressure
+  - brass_decision
+  - memory_only_once
+  - timpani_decisions
+  - impact_drum
+  - cymbal_thresholds
