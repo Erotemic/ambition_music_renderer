@@ -1,0 +1,1 @@
+IMPORTANT: Never add tests for a specific song. Test the renderer, not the content. If a feature does not have a natural test, then don't add the test. Don't add a bullshit test for the sake of adding a test.
