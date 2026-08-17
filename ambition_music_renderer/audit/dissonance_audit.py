@@ -142,6 +142,20 @@ def _dedup_active_by_pitch(active: list[dict[str, Any]]) -> list[dict[str, Any]]
     return list(best.values())
 
 
+def _dense_hotspot_spans_multiple_parts(hotspot: dict[str, Any]) -> bool:
+    """Whether a dense hotspot is an arrangement-layering concern.
+
+    A virtuosic keyboard chord can legitimately contain eight or more distinct
+    pitches.  The old warning treated that as if eight foreground orchestral
+    layers were colliding.  Reserve the arrangement warning for density that
+    actually spans multiple instruments or stem groups.
+    """
+    notes = hotspot.get("active_notes", []) or []
+    instruments = {str(row.get("instrument")) for row in notes if row.get("instrument") is not None}
+    groups = {str(row.get("group")) for row in notes if row.get("group") is not None}
+    return len(instruments) >= 2 or len(groups) >= 2
+
+
 @profile
 def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
     """Return JSON-serializable dissonance hotspot diagnostics."""
@@ -227,8 +241,16 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
     if hotspots and float(hotspots[0]["score"]) > 10.0:
         warnings.append("very strong dissonance hotspot found; inspect top bars for unintended clashes")
     dense_count = sum(1 for h in hotspots[:20] if int(h["active_note_count"]) >= 8)
-    if dense_count >= 5:
-        warnings.append("many top hotspots have 8+ simultaneous notes; reduce overlapping foreground layers or widen voicings")
+    dense_cross_part_count = sum(
+        1
+        for h in hotspots[:20]
+        if int(h["active_note_count"]) >= 8 and _dense_hotspot_spans_multiple_parts(h)
+    )
+    if dense_cross_part_count >= 5:
+        warnings.append(
+            "many top cross-instrument hotspots have 8+ simultaneous notes; "
+            "reduce overlapping foreground layers or widen voicings"
+        )
 
     def _counter_rows(counter: Counter[tuple[str, str]] | Counter[str], limit: int = 16) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
@@ -250,6 +272,8 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
         "ignored_unpitched_note_count": ignored_unpitched,
         "section_count": len(section_meta),
         "hotspot_count": len(hotspots),
+        "dense_top_hotspot_count": dense_count,
+        "dense_cross_part_top_hotspot_count": dense_cross_part_count,
         "hotspots": hotspots[:max_hotspots],
         "top_layer_pairs": _counter_rows(layer_pair_scores),
         "top_group_pairs": _counter_rows(group_pair_scores),

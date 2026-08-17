@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 import math
 import sys
+import time
+from contextlib import contextmanager
 import tempfile
 from pathlib import Path
 import kwconf
@@ -21,6 +23,22 @@ from .score_core import choose_soundfont
 from .score_layers import build_score
 from .synth import spec_hash
 from ..profiler import PhaseTimer, profile
+
+
+@contextmanager
+def _visible_phase(group: str, phase: str, **fields: object):
+    """Emit coarse worker phase progress that survives subprocess isolation."""
+    suffix = " ".join(f"{key}={value}" for key, value in fields.items() if value is not None)
+    prefix = f"[music render] group={group} phase={phase}"
+    if suffix:
+        prefix += f" {suffix}"
+    started = time.perf_counter()
+    print(f"{prefix} start", file=sys.stderr, flush=True)
+    try:
+        yield
+    finally:
+        elapsed = time.perf_counter() - started
+        print(f"{prefix} done elapsed={elapsed:.1f}s", file=sys.stderr, flush=True)
 
 
 class RenderGroupWorkerConfig(kwconf.Config):
@@ -67,7 +85,7 @@ class RenderGroupWorkerConfig(kwconf.Config):
 def _worker_main(ns) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
-    with timings.phase("load_spec_and_build_score"):
+    with _visible_phase(ns.group, "load_spec_and_build_score"), timings.phase("load_spec_and_build_score"):
         spec = yaml.safe_load(spec_path.read_text())
         render_cfg = spec.get("render", {})
         sr = int(render_cfg.get("sample_rate", 48000))
@@ -85,7 +103,7 @@ def _worker_main(ns) -> int:
     target = int(math.ceil(total * sr))
     outdir = Path(ns.outdir)
     with tempfile.TemporaryDirectory() as td:
-        with timings.phase("render_group_audio", group=ns.group, backend=ns.backend):
+        with _visible_phase(ns.group, "render_group_audio", backend=ns.backend), timings.phase("render_group_audio", group=ns.group, backend=ns.backend):
             # base_dir/render_cfg matter: they carry render.sfizz.* resolution,
             # render.strict_backends, and score-relative paths. The worker used
             # to omit them, so those config keys were silently inert on the
@@ -95,20 +113,20 @@ def _worker_main(ns) -> int:
                 base_dir=spec_path.parent,
                 render_cfg=render_cfg,
             )
-        with timings.phase("postprocess_group", group=ns.group):
+        with _visible_phase(ns.group, "postprocess_group"), timings.phase("postprocess_group", group=ns.group):
             raw = ensure_audio_length(raw, target)
             settings = dict(spec.get("stem_postprocess", {}) or {})
             settings.update((spec.get("group_postprocess", {}) or {}).get(ns.group, {}))
             settings.setdefault("normalize", False)
             settings.setdefault("target_peak_db", -2.5)
             audio = post_process(raw, sr, settings, base_dir=spec_path.parent)
-    with timings.phase("write_scratch_npy", group=ns.group):
+    with _visible_phase(ns.group, "write_scratch_npy"), timings.phase("write_scratch_npy", group=ns.group):
         npy = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{ns.group}.npy"
         npy.parent.mkdir(parents=True, exist_ok=True)
         np.save(npy, audio.astype("float32"))
     files = {}
     if not ns.skip_section_ogg:
-        with timings.phase("write_section_oggs", group=ns.group, sections=len(meta)):
+        with _visible_phase(ns.group, "write_section_oggs", sections=len(meta)), timings.phase("write_section_oggs", group=ns.group, sections=len(meta)):
             for sec in meta:
                 piece = slice_audio(audio, sr, sec["start_seconds"], sec["end_seconds"])
                 path = (

@@ -24,6 +24,7 @@ from .generated_layout import latest_manifest_in_roots
 from .bundle_options import BundleOptions
 from ..profiler import profile
 from ..kwconf_runner import KwconfCommand
+from ..subprocess_progress import tail_status, wait_with_heartbeat
 from .._paths import agent_root as _agent_root
 from .._paths import find_score as _find_score
 from .._paths import generated_root as _generated_root
@@ -252,11 +253,17 @@ def run_logged(name: str, command: list[str], reports_dir: Path, *, cwd: Path) -
     stderr = reports_dir / f"{name}.stderr.txt"
     start = _time.perf_counter()
     with stdout.open("w", encoding="utf8") as out_f, stderr.open("w", encoding="utf8") as err_f:
-        proc = subprocess.run(command, cwd=cwd, stdout=out_f, stderr=err_f)
+        proc = subprocess.Popen(command, cwd=cwd, stdout=out_f, stderr=err_f)
+        rc = wait_with_heartbeat(
+            proc,
+            label=f"bundle command {name}",
+            status_fn=lambda: tail_status(("stdout", stdout), ("stderr", stderr)),
+            emit=progress_line,
+        )
     elapsed = _time.perf_counter() - start
-    result = CommandResult(name, command, proc.returncode, stdout, stderr, elapsed)
-    if proc.returncode != 0:
-        progress_line(f"command failed: {name} rc={proc.returncode} elapsed_s={elapsed:.3f}")
+    result = CommandResult(name, command, rc, stdout, stderr, elapsed)
+    if rc != 0:
+        progress_line(f"command failed: {name} rc={rc} elapsed_s={elapsed:.3f}")
         progress_line(f"stdout: {terminal_link(stdout)}")
         progress_line(f"stderr: {terminal_link(stderr)}")
         tail = result.stderr_tail
@@ -294,8 +301,13 @@ def run_kwconf_logged(
     elif mode == "subprocess":
         shown_command = command.python_command(data)
         with stdout.open("w", encoding="utf8") as out_f, stderr.open("w", encoding="utf8") as err_f:
-            proc = command.run_subprocess(data=data, stdout=out_f, stderr=err_f, cwd=package_dir())
-        rc = int(proc.returncode)
+            proc = command.popen(data=data, stdout=out_f, stderr=err_f, cwd=package_dir())
+            rc = wait_with_heartbeat(
+                proc,
+                label=f"bundle command {name}",
+                status_fn=lambda: tail_status(("stdout", stdout), ("stderr", stderr)),
+                emit=progress_line,
+            )
     else:
         raise KeyError(f"unknown kwconf command mode: {mode!r}")
     elapsed = _time.perf_counter() - start

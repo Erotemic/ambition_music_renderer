@@ -7,6 +7,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,7 @@ from typing import Any
 import mido
 import numpy as np
 from ..audio_utils import coerce_stereo
+from ..subprocess_progress import communicate_with_heartbeat, wav_growth_status
 import pretty_midi
 import soundfile as sf
 from scipy import signal
@@ -305,21 +307,54 @@ def _render_sfizz_cli(
     failures: list[str] = []
     for template_item in templates:
         cmd = _format_command(template_item, mapping)
+        # A failed CLI spelling must not leave a previous attempt's WAV behind
+        # and accidentally make the next attempt appear successful.
+        wav_path.unlink(missing_ok=True)
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         try:
-            proc = subprocess.run(
-                cmd,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                timeout=timeout_s,
+            stdout, stderr = communicate_with_heartbeat(
+                proc,
+                label=f"sfizz {output_name}",
+                timeout_s=timeout_s,
+                status_fn=lambda: wav_growth_status(wav_path, sample_rate=sample_rate),
+                emit=lambda message: print(f"[music render] {message}", file=sys.stderr, flush=True),
             )
-        except subprocess.TimeoutExpired:
-            failures.append(f"timed out after {timeout_s:.0f}s: {shlex.join(cmd)}")
+        except subprocess.TimeoutExpired as ex:
+            failures.append(
+                f"timed out after {timeout_s:.0f}s: {shlex.join(cmd)}"
+                + (f"; stderr: {_short_process_text(ex.stderr)}" if ex.stderr else "")
+            )
             continue
-        if proc.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
+        completed = subprocess.CompletedProcess(
+            cmd,
+            int(proc.returncode),
+            stdout=stdout,
+            stderr=stderr,
+        )
+        if completed.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
+            # Do not turn a truncated sampled render into a deceptively valid
+            # full-length stem by padding minutes of zeroes. A tiny shortfall of
+            # one callback block is harmless and is still normalized below.
+            try:
+                info = sf.info(wav_path)
+                wav_duration = float(info.frames) / float(info.samplerate) if info.samplerate else 0.0
+            except Exception as ex:
+                failures.append(f"could not inspect rendered WAV {wav_path}: {type(ex).__name__}: {ex}")
+                continue
+            shortfall_tolerance_s = max(0.05, float(block_size) / float(sample_rate))
+            if minimum_duration > 0 and wav_duration + shortfall_tolerance_s < float(minimum_duration):
+                failures.append(
+                    f"sfizz_render produced a truncated WAV: duration={wav_duration:.3f}s "
+                    f"required={float(minimum_duration):.3f}s command={shlex.join(cmd)}"
+                )
+                continue
             break
-        failures.append(_format_process_failure(cmd, proc))
+        failures.append(_format_process_failure(cmd, completed))
     else:
         raise RuntimeError("sfizz_render failed. " + " | ".join(failures[-3:]))
     audio, sr = sf.read(wav_path, dtype="float32", always_2d=True)
