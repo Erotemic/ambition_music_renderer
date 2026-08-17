@@ -6,7 +6,9 @@ An instrument's loudness in the *final adaptive mix* is the product of three
 things authored in three different places:
 
     instrument ``volume``/``expression``   (the ``instruments:`` block)
+  x instrument ``mix_gain_db``              (post-synthesis sample trim)
   x group ``gain_db``                        (``group_postprocess:``)
+  x per-section family trim                  (form/section ``stem_mix_db``)
   x per-section stem weight                  (``state_map`` ``stems:``)
 
 It is easy to "make the piano the lead" by cranking its ``volume:`` and never
@@ -40,11 +42,17 @@ def _lead_for_layer(layer_kind: str, layer_name: str) -> bool:
     return "lead" in name or "answer" in name or "_run_" in name
 
 
+def _instrument_is_lead(inst_cfg: dict[str, Any]) -> bool:
+    role = str(inst_cfg.get("mix_role", inst_cfg.get("role", ""))).lower().strip()
+    return role in {"lead", "foreground", "solo"}
+
+
 def _channel_gain(inst_cfg: dict[str, Any]) -> float:
     """Linear channel gain from the instrument's volume + expression CCs."""
     vol = float(inst_cfg.get("volume", 100)) / 127.0
     expr = float(inst_cfg.get("expression", 127)) / 127.0
-    return max(1e-6, vol * expr)
+    mix_gain = 10.0 ** (float(inst_cfg.get("mix_gain_db", 0.0)) / 20.0)
+    return max(1e-6, vol * expr * mix_gain)
 
 
 def _section_state_weights(spec: dict[str, Any]) -> dict[str, dict[str, float]]:
@@ -73,7 +81,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
     """
     from ..render.score_layers import build_score
 
-    pm, _groups, _section_meta = build_score(spec)
+    pm, _groups, section_meta = build_score(spec)
     events = list(getattr(pm, "_ambition_note_events", []) or [])
     if not events:
         return {
@@ -90,6 +98,10 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
         return 10.0 ** (float((gpp.get(group) or {}).get("gain_db", 0.0)) / 20.0)
 
     sec_weights = _section_state_weights(spec)
+    sec_stem_mix_db = {
+        str(row.get("id")): {str(group): float(gain) for group, gain in (row.get("stem_mix_db") or {}).items()}
+        for row in section_meta
+    }
 
     # section order as it appears in the score
     section_order: list[str] = []
@@ -110,8 +122,10 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
         dur_s = max(0.0, float(ev["end_time"]) - float(ev["start_time"]))
         chan = _channel_gain(inst_cfg.get(str(ev.get("instrument")), {}))
         energy[sec][grp] += (float(ev["velocity"]) / 127.0) * chan * dur_s
-        if _lead_for_layer(str(ev.get("layer_kind")), str(ev.get("layer"))):
-            leads[(sec, grp)].add(str(ev.get("layer")))
+        ev_inst_cfg = inst_cfg.get(str(ev.get("instrument")), {})
+        if _lead_for_layer(str(ev.get("layer_kind")), str(ev.get("layer"))) or _instrument_is_lead(ev_inst_cfg):
+            label = str(ev.get("layer") or ev.get("instrument") or "lead")
+            leads[(sec, grp)].add(label)
             lead_vel[(sec, grp)] = max(lead_vel[(sec, grp)], float(ev["velocity"]))
 
     sections_out: list[dict[str, Any]] = []
@@ -124,9 +138,11 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
         # chug bed, so energy-share would falsely flag it; the budget reflects
         # whether the mix is even *trying* to let the group be heard.
         budget: dict[str, float] = {}
+        section_trims = sec_stem_mix_db.get(sec, {})
         for grp in energy[sec]:  # only groups that actually sound in this section
             w = weights.get(grp, 1.0)  # sections without explicit weights play native
-            budget[grp] = max(1e-9, w * group_gain_lin(grp))
+            stem_mix_lin = 10.0 ** (float(section_trims.get(grp, 0.0)) / 20.0)
+            budget[grp] = max(1e-9, w * group_gain_lin(grp) * stem_mix_lin)
         peak_budget = max(budget.values(), default=1e-9)
         total_energy = sum(energy[sec].values()) or 1.0
         rows = []
@@ -149,6 +165,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
                     "note_share_db": round(share_db, 1),
                     "state_weight": round(weights.get(grp, 1.0), 3),
                     "group_gain_db": round(float((gpp.get(grp) or {}).get("gain_db", 0.0)), 1),
+                    "section_stem_gain_db": round(float(section_trims.get(grp, 0.0)), 1),
                     "is_lead": is_lead,
                     "lead_layers": sorted(leads.get((sec, grp), set())),
                     "buried_lead": buried,
@@ -160,8 +177,9 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
                     f"{', '.join(sorted(leads[(sec, grp)]))} but its mix budget is "
                     f"{rel_db:.1f} dB below the loudest group "
                     f"(state_weight={weights.get(grp, 1.0):g}, "
-                    f"group_gain={float((gpp.get(grp) or {}).get('gain_db', 0.0)):+g}dB). "
-                    f"Raise its state_map stem weight or move the lead to a foreground group."
+                    f"group_gain={float((gpp.get(grp) or {}).get('gain_db', 0.0)):+g}dB, "
+                    f"section_stem_gain={float(section_trims.get(grp, 0.0)):+g}dB). "
+                    f"Raise its authored section stem trim/state weight or move the lead to a foreground group."
                 )
         sections_out.append({"section": sec, "groups": rows})
 
@@ -185,7 +203,7 @@ def audit_file(path: Path, *, buried_db: float = 12.0) -> dict[str, Any]:
 def _format_summary(payload: dict[str, Any]) -> str:
     lines = [
         f"cue: {payload.get('id')}",
-        "per-section MIX BUDGET per group (state_weight x group_gain), dB below the",
+        "per-section MIX BUDGET per group (state_weight x group_gain x section stem trim), dB below the",
         "best-budgeted group in that section. note_share = that group's share of note",
         "activity (informational). leads marked [LEAD]; a starved lead <<BURIED LEAD>>.",
         "",
@@ -200,7 +218,8 @@ def _format_summary(payload: dict[str, Any]) -> str:
                 tag = "  [LEAD]"
             lines.append(
                 f"    budget {row['budget_db']:>6.1f} dB  (notes {row['note_share_db']:>6.1f} dB)  "
-                f"{row['group']:<16}(w={row['state_weight']:<5g} gain={row['group_gain_db']:+.1f}dB){tag}"
+                f"{row['group']:<16}(w={row['state_weight']:<5g} gain={row['group_gain_db']:+.1f}dB "
+                f"section={row.get('section_stem_gain_db', 0.0):+.1f}dB){tag}"
             )
         lines.append("")
     warnings = payload.get("warnings", [])
@@ -266,7 +285,7 @@ def write_reports(payload: dict[str, Any], reports_dir: Path, *, plots_dir: Path
 
     md = [f"# Mix Balance — {payload.get('id')}", "",
           "Per-section group level in dB relative to the loudest group in that section.",
-          "Combines instrument volume/expression x group gain x state_map stem weight.", ""]
+          "Combines instrument volume/expression x group gain x section stem trim x state_map stem weight.", ""]
     warnings = payload.get("warnings", [])
     if warnings:
         md += ["## ⚠ Buried-lead warnings", ""] + [f"- {w}" for w in warnings] + [""]

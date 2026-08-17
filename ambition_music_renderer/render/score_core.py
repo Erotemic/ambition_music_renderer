@@ -21,7 +21,7 @@ import numpy as np
 import pretty_midi
 import yaml
 
-RENDERER_VERSION = "ambition-musicir-renderer-v0.10.5-orchestra-sustain-v1"
+RENDERER_VERSION = "ambition-musicir-renderer-v0.10.7-section-stem-mix-v1"
 DEFAULT_SOUNDFONTS = [
     "/usr/share/sounds/sf3/MuseScore_General_Full.sf3",
     "/usr/share/sounds/sf3/MuseScore_General.sf3",

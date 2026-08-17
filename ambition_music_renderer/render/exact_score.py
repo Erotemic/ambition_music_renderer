@@ -484,7 +484,7 @@ def _form_metadata(spec: dict[str, Any], clock: ScoreClock, tempo: ExactTempoMap
             stop = clock.bar_start_tick(b1 + 1)
         else:
             stop = end_tick
-        out.append({
+        row = {
             "id": str(item["id"]),
             "label": item.get("label", item["id"]),
             "kind": item.get("kind", "section"),
@@ -499,7 +499,19 @@ def _form_metadata(spec: dict[str, Any], clock: ScoreClock, tempo: ExactTempoMap
             "duration_seconds": tempo.tick_to_time(stop) - tempo.tick_to_time(start),
             "loopable": bool(item.get("loopable", False)),
             "valid_exit_local_bars": item.get("valid_exit_local_bars", []),
-        })
+        }
+        # Audio-domain mix intent belongs to the score form, not MIDI velocity.
+        # Preserve it in compiled section metadata so every rendering path and
+        # audit can apply the same authored hierarchy.
+        for key in (
+            "mix_gain_db",
+            "mix_gain_transition_beats",
+            "stem_mix_db",
+            "stem_mix_transition_beats",
+        ):
+            if key in item:
+                row[key] = copy.deepcopy(item[key])
+        out.append(row)
     return out
 
 

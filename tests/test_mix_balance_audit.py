@@ -66,3 +66,25 @@ def test_group_gain_compensates_state_weight():
     spec["group_postprocess"] = {"keys": {"gain_db": 20.0}}  # +20 dB ~ x10 -> budget ~1.0
     payload = mb.audit_spec(spec)
     assert payload["warnings"] == [], f"gain should rescue budget: {payload['warnings']}"
+
+
+def test_channel_gain_includes_post_synthesis_mix_trim():
+    base = mb._channel_gain({"volume": 100, "expression": 100})
+    boosted = mb._channel_gain({"volume": 100, "expression": 100, "mix_gain_db": 6.0})
+    assert 1.99 < boosted / base < 2.01
+
+
+def test_explicit_instrument_mix_role_can_mark_exact_score_foreground():
+    assert mb._instrument_is_lead({"mix_role": "foreground"}) is True
+    assert mb._instrument_is_lead({"mix_role": "support"}) is False
+
+
+def test_section_stem_mix_gain_participates_in_budget():
+    spec = _base_spec()
+    spec["sections"][0]["stem_mix_db"] = {"keys": -18.0, "guitars": 0.0, "perc": 0.0}
+    payload = mb.audit_spec(spec)
+    assert any("buried lead" in w and "keys" in w for w in payload["warnings"]), payload["warnings"]
+    verse = payload["sections"][0]
+    keys = next(r for r in verse["groups"] if r["group"] == "keys")
+    assert keys["section_stem_gain_db"] == -18.0
+    assert keys["buried_lead"] is True

@@ -308,6 +308,102 @@ def apply_section_mix_gains(
     return gains_db
 
 
+def section_stem_mix_gain_envelopes(
+    spec: dict,
+    meta: list[dict],
+    sample_rate: int,
+    frame_count: int,
+    group_names: list[str],
+) -> tuple[dict[str, np.ndarray], dict[str, dict[str, float]]]:
+    """Build smooth per-section gain riders for individual stem families.
+
+    Exact scores may author ``stem_mix_db`` on form regions, while v1 scores
+    may put the same mapping on top-level ``sections``.  The control lives in
+    the audio domain: it changes orchestral hierarchy without rewriting note
+    velocity, CC expression, or the rendered sample attack.
+    """
+    groups = [str(group) for group in group_names]
+    if frame_count <= 0:
+        return {group: np.ones(0, dtype=np.float32) for group in groups}, {}
+
+    authored_sections = {str(row.get("id")): row for row in spec.get("sections", [])}
+    gains_db: dict[str, dict[str, float]] = {}
+    ordered: list[tuple[int, int, str, dict[str, float], dict]] = []
+    for sec in meta:
+        sec_id = str(sec.get("id"))
+        authored = authored_sections.get(sec_id, {})
+        raw = sec.get("stem_mix_db", authored.get("stem_mix_db", {})) or {}
+        sec_gains = {group: float(raw.get(group, 0.0)) for group in groups}
+        gains_db[sec_id] = sec_gains
+        start = max(0, min(frame_count, int(round(float(sec.get("start_seconds", 0.0)) * sample_rate))))
+        end = max(start, min(frame_count, int(round(float(sec.get("end_seconds", 0.0)) * sample_rate))))
+        ordered.append((start, end, sec_id, sec_gains, sec))
+
+    envelopes_db = {group: np.zeros(frame_count, dtype=np.float32) for group in groups}
+    for start, end, _sec_id, sec_gains, _sec in ordered:
+        for group in groups:
+            envelopes_db[group][start:end] = sec_gains[group]
+
+    bpm = float((spec.get("tempo") or {}).get("bpm", 120.0))
+    render_cfg = spec.get("render") or {}
+    default_transition_beats = float(
+        render_cfg.get(
+            "section_stem_mix_transition_beats",
+            render_cfg.get("section_mix_transition_beats", 1.0),
+        )
+    )
+    for idx in range(1, len(ordered)):
+        prev_start, _prev_end, _prev_id, prev_gains, _prev_sec = ordered[idx - 1]
+        next_start, next_end, next_id, next_gains, next_sec = ordered[idx]
+        authored = authored_sections.get(next_id, {})
+        beats = float(
+            next_sec.get(
+                "stem_mix_transition_beats",
+                authored.get("stem_mix_transition_beats", default_transition_beats),
+            )
+        )
+        if beats <= 0.0 or bpm <= 0.0:
+            continue
+        transition_frames = max(2, int(round((beats * 60.0 / bpm) * sample_rate)))
+        boundary = next_start
+        left = max(prev_start, boundary - transition_frames // 2)
+        right = min(next_end, boundary + transition_frames - transition_frames // 2)
+        if right <= left:
+            continue
+        for group in groups:
+            prev_gain = prev_gains[group]
+            next_gain = next_gains[group]
+            if abs(next_gain - prev_gain) < 1e-9:
+                continue
+            envelopes_db[group][left:right] = np.linspace(
+                prev_gain, next_gain, right - left, endpoint=False, dtype=np.float32
+            )
+
+    envelopes = {
+        group: np.power(10.0, envelope_db / 20.0).astype(np.float32)
+        for group, envelope_db in envelopes_db.items()
+    }
+    return envelopes, gains_db
+
+
+def apply_section_stem_mix_gains(
+    stem_audio: dict[str, np.ndarray],
+    spec: dict,
+    meta: list[dict],
+    sample_rate: int,
+    frame_count: int,
+) -> dict[str, dict[str, float]]:
+    envelopes, gains_db = section_stem_mix_gain_envelopes(
+        spec, meta, sample_rate, frame_count, list(stem_audio)
+    )
+    for group, audio in list(stem_audio.items()):
+        envelope = envelopes.get(group)
+        if envelope is None or envelope.size == 0:
+            continue
+        stem_audio[group] = (audio * envelope[:, None]).astype(np.float32, copy=False)
+    return gains_db
+
+
 def in_game_preview_mixes(
     spec: dict, group_names: list[str]
 ) -> dict[str, dict[str, float]]:
@@ -583,6 +679,9 @@ def _render_main(ns) -> int:
                         path.relative_to(outdir)
                     )
 
+    section_stem_mix_gains_db = apply_section_stem_mix_gains(
+        stem_audio, spec, meta, sr, target
+    )
     section_mix_gains_db = apply_section_mix_gains(
         stem_audio, spec, meta, sr, target
     )
@@ -851,6 +950,7 @@ def _render_main(ns) -> int:
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db
+    manifest["section_stem_mix_gains_db"] = section_stem_mix_gains_db
     manifest["diagnostics"] = {
         "raw_full": raw_full_stats,
         "mastered_full": master_stats,

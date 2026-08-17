@@ -1256,21 +1256,28 @@ def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
         end_beat = (cursor + bars) * beats_per_bar
         start_seconds = tempo.beat_to_time(start_beat)
         end_seconds = tempo.beat_to_time(end_beat)
-        out.append(
-            {
-                "id": section["id"],
-                "label": section.get("label", section["id"]),
-                "kind": section.get("kind", "section"),
-                "start_bar": cursor,
-                "bars": bars,
-                "start_beat": start_beat,
-                "end_beat": end_beat,
-                "start_seconds": start_seconds,
-                "end_seconds": end_seconds,
-                "duration_seconds": end_seconds - start_seconds,
-                "loopable": bool(section.get("loopable", False)),
-                "valid_exit_local_bars": section.get("valid_exit_local_bars", []),
-            }
-        )
+        row = {
+            "id": section["id"],
+            "label": section.get("label", section["id"]),
+            "kind": section.get("kind", "section"),
+            "start_bar": cursor,
+            "bars": bars,
+            "start_beat": start_beat,
+            "end_beat": end_beat,
+            "start_seconds": start_seconds,
+            "end_seconds": end_seconds,
+            "duration_seconds": end_seconds - start_seconds,
+            "loopable": bool(section.get("loopable", False)),
+            "valid_exit_local_bars": section.get("valid_exit_local_bars", []),
+        }
+        for key in (
+            "mix_gain_db",
+            "mix_gain_transition_beats",
+            "stem_mix_db",
+            "stem_mix_transition_beats",
+        ):
+            if key in section:
+                row[key] = section[key]
+        out.append(row)
         cursor += bars
     return out

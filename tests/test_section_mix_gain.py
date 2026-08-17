@@ -43,3 +43,61 @@ def test_section_mix_gain_scales_every_stem_without_changing_shape():
     assert stems["pads"].shape == (200, 2)
     assert np.isclose(stems["lead"][10, 0], 10 ** (6.0 / 20.0), rtol=1e-5)
     assert np.isclose(stems["pads"][190, 0], 0.25 * 10 ** (-2.0 / 20.0), rtol=1e-5)
+
+
+def test_section_stem_mix_gain_scales_groups_independently():
+    from ambition_music_renderer.render.isolated import apply_section_stem_mix_gains
+
+    stems = {
+        "strings": np.ones((200, 2), dtype=np.float32),
+        "woodwinds": np.ones((200, 2), dtype=np.float32),
+    }
+    meta = [
+        {
+            "id": "a",
+            "start_seconds": 0.0,
+            "end_seconds": 1.0,
+            "stem_mix_db": {"strings": -6.0, "woodwinds": 3.0},
+        },
+        {
+            "id": "b",
+            "start_seconds": 1.0,
+            "end_seconds": 2.0,
+            "stem_mix_db": {"strings": 0.0, "woodwinds": -3.0},
+        },
+    ]
+    gains = apply_section_stem_mix_gains(
+        stems, _spec(), meta, sample_rate=100, frame_count=200
+    )
+
+    assert gains["a"] == {"strings": -6.0, "woodwinds": 3.0}
+    assert gains["b"] == {"strings": 0.0, "woodwinds": -3.0}
+    assert np.isclose(stems["strings"][10, 0], 10 ** (-6.0 / 20.0), rtol=1e-5)
+    assert np.isclose(stems["woodwinds"][10, 0], 10 ** (3.0 / 20.0), rtol=1e-5)
+    assert np.isclose(stems["strings"][190, 0], 1.0, rtol=1e-5)
+    assert np.isclose(stems["woodwinds"][190, 0], 10 ** (-3.0 / 20.0), rtol=1e-5)
+
+
+def test_exact_form_metadata_preserves_audio_domain_mix_intent():
+    from ambition_music_renderer.render.exact_score import ExactTempoMap, ScoreClock, _form_metadata
+
+    score = {
+        "timebase": {"ppq": 960},
+        "meter": [{"bar": 1, "signature": "4/4"}],
+        "tempo": [{"tick": 0, "bpm": 120}],
+        "form": [
+            {
+                "id": "solo",
+                "from": {"tick": 0},
+                "to": {"tick": 3840},
+                "stem_mix_db": {"woodwinds": 3.0, "strings": -2.0},
+                "stem_mix_transition_beats": 0.5,
+            }
+        ],
+    }
+    clock = ScoreClock(score)
+    tempo = ExactTempoMap(score, clock).bind_ppq(clock.ppq)
+    meta = _form_metadata({"score": score}, clock, tempo, 3840)
+
+    assert meta[0]["stem_mix_db"] == {"woodwinds": 3.0, "strings": -2.0}
+    assert meta[0]["stem_mix_transition_beats"] == 0.5
