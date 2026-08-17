@@ -140,6 +140,51 @@ def _format_process_failure(cmd: list[str], proc: subprocess.CompletedProcess[st
     return "; ".join(parts)
 
 
+def _bound_midi_end_of_track(
+    midi_path: Path,
+    pm: pretty_midi.PrettyMIDI,
+    *,
+    end_time_s: float,
+) -> None:
+    """Move every SMF End-of-Track marker to a bounded final time.
+
+    ``sfizz_render`` only has a deterministic stopping point when invoked with
+    ``--use-eot``.  Without it, the CLI keeps rendering until the output power
+    falls below its internal silence threshold.  Sample libraries with a noise
+    floor, long release, or looping release region can therefore render forever
+    and grow an unbounded WAV.
+
+    PrettyMIDI writes an End-of-Track marker per track.  Put all of them at the
+    same requested absolute tick so sfizz sees one unambiguous final boundary
+    after tracks are joined.  Never move an EOT before real MIDI data.
+    """
+    mid = mido.MidiFile(str(midi_path))
+    target_tick = int(pm.time_to_tick(max(0.0, float(end_time_s))))
+    for track in mid.tracks:
+        absolute_tick = 0
+        events: list[tuple[int, mido.Message | mido.MetaMessage]] = []
+        for msg in track:
+            absolute_tick += int(msg.time)
+            if msg.type != "end_of_track":
+                events.append((absolute_tick, msg))
+
+        last_event_tick = max((tick for tick, _msg in events), default=0)
+        eot_tick = max(target_tick, last_event_tick)
+        rebuilt = []
+        previous_tick = 0
+        for tick, msg in events:
+            rebuilt.append(msg.copy(time=max(0, tick - previous_tick)))
+            previous_tick = tick
+        rebuilt.append(
+            mido.MetaMessage(
+                "end_of_track",
+                time=max(0, eot_tick - previous_tick),
+            )
+        )
+        track[:] = rebuilt
+    mid.save(str(midi_path))
+
+
 def _render_sfizz_cli(
     pm: pretty_midi.PrettyMIDI,
     *,
@@ -177,6 +222,19 @@ def _render_sfizz_cli(
     block_size = int(settings.get("block_size", settings.get("blocksize", 1024)))
     if block_size <= 0:
         raise ValueError("sfizz block_size must be positive")
+    use_eot = bool(settings.get("use_eot", True))
+    if use_eot:
+        # sfizz_render's default tail policy is unbounded: after the final MIDI
+        # event it renders until signal power reaches an extremely low silence
+        # threshold.  Real sampled instruments can have a persistent noise floor
+        # or looping release and never cross it.  Give the CLI a deterministic
+        # EOT just beyond the audio duration the caller actually needs.
+        eot_padding_s = max(0.0, float(settings.get("eot_padding_seconds", 1.0)))
+        _bound_midi_end_of_track(
+            midi_path,
+            pm,
+            end_time_s=max(float(minimum_duration), float(pm.get_end_time())) + eot_padding_s,
+        )
     mapping = {
         "binary": binary,
         "sfz": str(sfz),
@@ -198,8 +256,8 @@ def _render_sfizz_cli(
             # --blocksize.  In particular, keep the callback block at 1024 by
             # default: some packaged sfizz_render builds otherwise request
             # 2048-frame temporary buffers from an engine configured for a
-            # 1024-frame maximum, spam "only 1024 available", and can hang
-            # until the renderer timeout.
+            # 1024-frame maximum.  Also opt into --use-eot: without it sfizz
+            # renders an open-ended tail until its own silence detector fires.
             [
                 binary,
                 "--sfz",
@@ -212,7 +270,7 @@ def _render_sfizz_cli(
                 "{sample_rate}",
                 "--blocksize",
                 "{block_size}",
-            ],
+            ] + (["--use-eot"] if use_eot else []),
             [
                 binary,
                 "--sfz",
@@ -223,7 +281,7 @@ def _render_sfizz_cli(
                 "{wav}",
                 "--blocksize",
                 "{block_size}",
-            ],
+            ] + (["--use-eot"] if use_eot else []),
             [
                 binary,
                 "--sfz",
@@ -236,7 +294,7 @@ def _render_sfizz_cli(
                 "{sample_rate}",
                 "-b",
                 "{block_size}",
-            ],
+            ] + (["--use-eot"] if use_eot else []),
         ])
     # A hung sfizz_render (e.g. a broken/pathological SFZ) must not run forever:
     # an orphaned one once wrote a ~100 GB WAV and filled the disk. Cap it; the

@@ -34,7 +34,6 @@ render:
     - /data/audio-tools/sfz
     - /data/audio-tools
     fallback_backend: pretty-midi
-    block_size: 2048
     render_timeout_s: 360
 postprocess:
   gain_db: -1.2
