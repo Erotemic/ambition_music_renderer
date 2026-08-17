@@ -174,12 +174,16 @@ def _render_sfizz_cli(
                     pretty_midi.note_number_to_name(span[1]),
                 )
     pm.write(str(midi_path))
+    block_size = int(settings.get("block_size", settings.get("blocksize", 1024)))
+    if block_size <= 0:
+        raise ValueError("sfizz block_size must be positive")
     mapping = {
         "binary": binary,
         "sfz": str(sfz),
         "midi": str(midi_path),
         "wav": str(wav_path),
         "sample_rate": str(int(sample_rate)),
+        "block_size": str(block_size),
     }
     templates = []
     template = settings.get("command")
@@ -190,10 +194,12 @@ def _render_sfizz_cli(
         # Distro builds of sfizz_render have differed enough that a fallback
         # probe here is more reliable than asking score YAML to know the host.
         templates.extend([
-            # Prefer the form that pins the requested sample rate: when the
-            # build supports it, rendering at the target rate avoids a silent
-            # resample from the binary's default rate. Builds that reject the
-            # option fail this probe and fall through to the rate-less form.
+            # sfizz-render's documented option names are --samplerate and
+            # --blocksize.  In particular, keep the callback block at 1024 by
+            # default: some packaged sfizz_render builds otherwise request
+            # 2048-frame temporary buffers from an engine configured for a
+            # 1024-frame maximum, spam "only 1024 available", and can hang
+            # until the renderer timeout.
             [
                 binary,
                 "--sfz",
@@ -202,12 +208,35 @@ def _render_sfizz_cli(
                 "{midi}",
                 "--wav",
                 "{wav}",
-                "--sample-rate",
+                "--samplerate",
                 "{sample_rate}",
+                "--blocksize",
+                "{block_size}",
             ],
-            [binary, "--sfz", "{sfz}", "--midi", "{midi}", "--wav", "{wav}"],
-            [binary, "{sfz}", "{midi}", "{wav}"],
-            [binary, "{sfz}", "{midi}", "{wav}", "{sample_rate}"],
+            [
+                binary,
+                "--sfz",
+                "{sfz}",
+                "--midi",
+                "{midi}",
+                "--wav",
+                "{wav}",
+                "--blocksize",
+                "{block_size}",
+            ],
+            [
+                binary,
+                "--sfz",
+                "{sfz}",
+                "--midi",
+                "{midi}",
+                "--wav",
+                "{wav}",
+                "-s",
+                "{sample_rate}",
+                "-b",
+                "{block_size}",
+            ],
         ])
     # A hung sfizz_render (e.g. a broken/pathological SFZ) must not run forever:
     # an orphaned one once wrote a ~100 GB WAV and filled the disk. Cap it; the
