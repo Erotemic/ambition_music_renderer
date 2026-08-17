@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+import re
 import shlex
 import shutil
 import subprocess
@@ -142,6 +143,23 @@ def _format_process_failure(cmd: list[str], proc: subprocess.CompletedProcess[st
     return "; ".join(parts)
 
 
+def _requested_sfizz_buffer_size(stderr: bytes | str | None) -> int | None:
+    """Return a larger callback buffer requested by sfizz, if reported."""
+    if stderr is None:
+        return None
+    text = stderr.decode("utf8", errors="replace") if isinstance(stderr, bytes) else str(stderr)
+    requested = [
+        int(match.group(1))
+        for match in re.finditer(
+            r"(?:stereo\s+)?buffer of size\s+(\d+);\s+only\s+(\d+)\s+available",
+            text,
+            flags=re.IGNORECASE,
+        )
+        if int(match.group(1)) > int(match.group(2))
+    ]
+    return max(requested) if requested else None
+
+
 def _bound_midi_end_of_track(
     midi_path: Path,
     pm: pretty_midi.PrettyMIDI,
@@ -235,7 +253,10 @@ def _render_sfizz_cli(
         _bound_midi_end_of_track(
             midi_path,
             pm,
-            end_time_s=max(float(minimum_duration), float(pm.get_end_time())) + eot_padding_s,
+            # ``minimum_duration`` is the destination stem length, not the
+            # amount of musical material in this one instrument. Sparse
+            # orchestral instruments legitimately end before the cue.
+            end_time_s=float(pm.get_end_time()) + eot_padding_s,
         )
     mapping = {
         "binary": binary,
@@ -305,57 +326,90 @@ def _render_sfizz_cli(
     timeout_s = float(settings.get("render_timeout_s",
                                    os.environ.get("AMBITION_SFIZZ_TIMEOUT_S", 120)))
     failures: list[str] = []
+    negotiated_block_size = block_size
+    auto_block_size = bool(settings.get("auto_block_size", True))
+    max_auto_block_size = int(settings.get("max_auto_block_size", 8192))
+    content_duration = max(0.0, float(pm.get_end_time()))
+    succeeded = False
     for template_item in templates:
-        cmd = _format_command(template_item, mapping)
-        # A failed CLI spelling must not leave a previous attempt's WAV behind
-        # and accidentally make the next attempt appear successful.
-        wav_path.unlink(missing_ok=True)
-        proc = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        try:
-            stdout, stderr = communicate_with_heartbeat(
-                proc,
-                label=f"sfizz {output_name}",
-                timeout_s=timeout_s,
-                status_fn=lambda: wav_growth_status(wav_path, sample_rate=sample_rate),
-                emit=lambda message: print(f"[music render] {message}", file=sys.stderr, flush=True),
+        attempt_block_size = negotiated_block_size
+        block_retry_count = 0
+        while True:
+            mapping["block_size"] = str(attempt_block_size)
+            cmd = _format_command(template_item, mapping)
+            wav_path.unlink(missing_ok=True)
+            proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
             )
-        except subprocess.TimeoutExpired as ex:
-            failures.append(
-                f"timed out after {timeout_s:.0f}s: {shlex.join(cmd)}"
-                + (f"; stderr: {_short_process_text(ex.stderr)}" if ex.stderr else "")
-            )
-            continue
-        completed = subprocess.CompletedProcess(
-            cmd,
-            int(proc.returncode),
-            stdout=stdout,
-            stderr=stderr,
-        )
-        if completed.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
-            # Do not turn a truncated sampled render into a deceptively valid
-            # full-length stem by padding minutes of zeroes. A tiny shortfall of
-            # one callback block is harmless and is still normalized below.
             try:
-                info = sf.info(wav_path)
-                wav_duration = float(info.frames) / float(info.samplerate) if info.samplerate else 0.0
-            except Exception as ex:
-                failures.append(f"could not inspect rendered WAV {wav_path}: {type(ex).__name__}: {ex}")
-                continue
-            shortfall_tolerance_s = max(0.05, float(block_size) / float(sample_rate))
-            if minimum_duration > 0 and wav_duration + shortfall_tolerance_s < float(minimum_duration):
-                failures.append(
-                    f"sfizz_render produced a truncated WAV: duration={wav_duration:.3f}s "
-                    f"required={float(minimum_duration):.3f}s command={shlex.join(cmd)}"
+                stdout, stderr = communicate_with_heartbeat(
+                    proc,
+                    label=f"sfizz {output_name}",
+                    timeout_s=timeout_s,
+                    status_fn=lambda: wav_growth_status(wav_path, sample_rate=sample_rate),
+                    emit=lambda message: print(f"[music render] {message}", file=sys.stderr, flush=True),
                 )
+            except subprocess.TimeoutExpired as ex:
+                failures.append(
+                    f"timed out after {timeout_s:.0f}s: {shlex.join(cmd)}"
+                    + (f"; stderr: {_short_process_text(ex.stderr)}" if ex.stderr else "")
+                )
+                break
+            completed = subprocess.CompletedProcess(
+                cmd,
+                int(proc.returncode),
+                stdout=stdout,
+                stderr=stderr,
+            )
+
+            # A callback-buffer exhaustion can leave holes in a WAV even when
+            # sfizz_render exits zero. Negotiate the larger size it explicitly
+            # requested before accepting the render.
+            requested_block = _requested_sfizz_buffer_size(completed.stderr)
+            if (
+                auto_block_size
+                and requested_block is not None
+                and requested_block > attempt_block_size
+                and requested_block <= max_auto_block_size
+                and block_retry_count < 2
+            ):
+                failures.append(
+                    f"sfizz requested callback buffer {requested_block} while configured for "
+                    f"{attempt_block_size}; retrying with the requested block size"
+                )
+                attempt_block_size = requested_block
+                negotiated_block_size = requested_block
+                block_retry_count += 1
                 continue
+
+            if completed.returncode == 0 and wav_path.exists() and wav_path.stat().st_size > 0:
+                # Validate against this instrument's own MIDI content, not the
+                # final padded stem duration. A sparse orchestral part can end
+                # early and still be complete; a piano WAV ending before later
+                # piano notes is genuinely truncated.
+                try:
+                    info = sf.info(wav_path)
+                    wav_duration = float(info.frames) / float(info.samplerate) if info.samplerate else 0.0
+                except Exception as ex:
+                    failures.append(f"could not inspect rendered WAV {wav_path}: {type(ex).__name__}: {ex}")
+                    break
+                shortfall_tolerance_s = max(0.05, float(attempt_block_size) / float(sample_rate))
+                if content_duration > 0 and wav_duration + shortfall_tolerance_s < content_duration:
+                    failures.append(
+                        f"sfizz_render produced a truncated WAV: duration={wav_duration:.3f}s "
+                        f"content_end={content_duration:.3f}s command={shlex.join(cmd)}"
+                    )
+                    break
+                succeeded = True
+                break
+            failures.append(_format_process_failure(cmd, completed))
             break
-        failures.append(_format_process_failure(cmd, completed))
-    else:
+        if succeeded:
+            break
+    if not succeeded:
         raise RuntimeError("sfizz_render failed. " + " | ".join(failures[-3:]))
     audio, sr = sf.read(wav_path, dtype="float32", always_2d=True)
     if sr != int(sample_rate):
