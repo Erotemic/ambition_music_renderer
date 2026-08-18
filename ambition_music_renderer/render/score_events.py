@@ -9,7 +9,7 @@ from typing import Any
 
 import pretty_midi
 
-from .score_core import ARTICULATION_GATE, CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext
+from .score_core import ARTICULATION_GATE, CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext, velocity_to_cc_value
 from .score_theory import chord_pitches, clamp, fit_midi_pitch, midi_to_note, note_to_midi
 
 def add_cc(inst: pretty_midi.Instrument, number: int, value: int, time: float) -> None:
@@ -140,6 +140,10 @@ def add_note(
     if humanize_velocity_pct:
         vel = vel * (1.0 + float(ctx.rng.normal(0.0, humanize_velocity_pct / 100.0)))
     velocity = int(clamp(round(vel), 1, 127))
+    velocity_cc = velocity_to_cc_value(ctx.instrument_specs.get(inst_name, {}), velocity)
+    if velocity_cc is not None:
+        cc_number, cc_value = velocity_cc
+        add_cc(inst, cc_number, cc_value, start)
     inst.notes.append(
         pretty_midi.Note(velocity=velocity, pitch=pitch_num, start=start, end=end)
     )

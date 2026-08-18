@@ -31,6 +31,8 @@ from ..audio_utils import coerce_stereo
 from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio
+from .foreground_protection import apply_foreground_protection, foreground_protection_mode
+from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
 from .score_layers import build_score
 from .synth import spec_hash
@@ -42,6 +44,24 @@ from .._paths import project_root
 from .bundle_options import BACKEND_CHOICES, RUNTIME_STEM_GAIN_MODES
 
 SECTION_FULL_MASTERING_MODES = ("section_postprocess", "global_master_slices")
+
+
+def _spectral_masking_manifest_summary(masking_payload: dict) -> dict[str, int | None]:
+    """Return manifest-safe masking counts for either protection mode.
+
+    Register-aware desk protection is applied before group stems are summed, so
+    there is intentionally no unprotected group-stem prepass in that mode.
+    Preserve that distinction as ``None`` instead of reaching into branch-local
+    variables that do not exist on the register-aware path.
+    """
+    pre_count = masking_payload.get("pre_protection_warning_count")
+    post_count = masking_payload.get("post_protection_warning_count")
+    return {
+        "pre_protection_warning_count": (
+            None if pre_count is None else int(pre_count)
+        ),
+        "post_protection_warning_count": int(post_count or 0),
+    }
 
 
 
@@ -686,6 +706,56 @@ def _render_main(ns) -> int:
         stem_audio, spec, meta, sr, target
     )
 
+    # Audio-domain masking diagnostics run while the native group stems are
+    # still in memory. This keeps diagnostic bundles lean: they can report
+    # time-local spectral collisions without retaining large debug stem audio.
+    reports_dir = outdir / "reports"
+    protection_mode = foreground_protection_mode(spec)
+    instrument_register_mode = protection_mode in {
+        "instrument_register",
+        "register",
+        "desk_register",
+    }
+
+    if instrument_register_mode:
+        # Register-aware protection was already applied to each rendered desk
+        # before the group stems were summed. Re-applying a family-bus rider
+        # here would double-duck the score, and a nominal "pre" analysis would
+        # actually be looking at already-protected audio.
+        with timings.phase("foreground_protection_report"):
+            foreground_protection = apply_foreground_protection(
+                stem_audio, pm, groups, spec, sr
+            )
+        with timings.phase("spectral_masking_post_protection"):
+            masking_post = analyze_spectral_masking(stem_audio, pm, groups, spec, sr)
+            masking_payload = dict(masking_post)
+            masking_payload["pre_protection_warning_count"] = None
+            masking_payload["post_protection_warning_count"] = int(
+                masking_post.get("warning_count", 0)
+            )
+    else:
+        with timings.phase("spectral_masking_pre_protection"):
+            masking_pre = analyze_spectral_masking(stem_audio, pm, groups, spec, sr)
+        with timings.phase("foreground_protection"):
+            foreground_protection = apply_foreground_protection(
+                stem_audio, pm, groups, spec, sr
+            )
+        with timings.phase("spectral_masking_post_protection"):
+            masking_post = analyze_spectral_masking(stem_audio, pm, groups, spec, sr)
+            masking_payload = dict(masking_post)
+            masking_payload["pre_protection_warning_count"] = int(
+                masking_pre.get("warning_count", 0)
+            )
+            masking_payload["post_protection_warning_count"] = int(
+                masking_post.get("warning_count", 0)
+            )
+
+    masking_payload["foreground_protection"] = foreground_protection
+    write_spectral_masking_reports(masking_payload, reports_dir)
+    (reports_dir / "foreground_protection.json").write_text(
+        json.dumps(foreground_protection, indent=2), encoding="utf8"
+    )
+
     # ---- Full mastered preview (matches the YAML postprocess intent) ----
     with timings.phase("mix_master_preview"):
         raw_full = np.zeros((target, 2), dtype="float32")
@@ -951,6 +1021,10 @@ def _render_main(ns) -> int:
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db
     manifest["section_stem_mix_gains_db"] = section_stem_mix_gains_db
+    manifest["foreground_protection"] = foreground_protection
+    manifest["spectral_masking"] = _spectral_masking_manifest_summary(
+        masking_payload
+    )
     manifest["diagnostics"] = {
         "raw_full": raw_full_stats,
         "mastered_full": master_stats,

@@ -249,6 +249,10 @@ def test_vpo_solo_performance_aliases_choose_plain_perf_programs(tmp_path: Path)
             "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Strings/1st-violin-SOLO-PERF.sfz",
             "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Strings/1st-violin-SOLO-PERF-KS-C2.sfz",
         ),
+        "vpo.piccolo_solo_perf": (
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/piccolo-SOLO-PERF.sfz",
+            "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/piccolo-SOLO-PERF-KS-C2.sfz",
+        ),
         "vpo.flute_solo_perf": (
             "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/flute-SOLO-PERF.sfz",
             "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Woodwinds/alto-flute-SOLO-PERF.sfz",
@@ -269,3 +273,13 @@ def test_vpo_solo_performance_aliases_choose_plain_perf_programs(tmp_path: Path)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("<group>\n", encoding="utf8")
         assert resolve_sfz_reference(library_ref=ref, roots=[root]) == wanted.resolve(), ref
+
+
+def test_vpo_timpani_hit_alias_prefers_hit_over_roll(tmp_path: Path):
+    root = tmp_path / "sfz"
+    wanted = root / "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Percussion/timpani-hit.sfz"
+    distractor = root / "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Percussion/timpani-roll.sfz"
+    for path in (wanted, distractor):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    assert resolve_sfz_reference(library_ref="vpo.timpani_hit", roots=[root]) == wanted.resolve()

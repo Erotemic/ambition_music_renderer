@@ -126,6 +126,7 @@ def write_quality_brief(
     spectral = _read_json(reports_dir / "spectral_fingerprint.json")
     adaptive = _read_json(reports_dir / "adaptive_composition_mastering.json")
     shrill = _read_json(reports_dir / "audio_shrillness_candidates.json")
+    masking = _read_json(reports_dir / "spectral_masking.json")
 
     stem_rows = _stem_rows(mix)
     action_items: list[str] = []
@@ -174,6 +175,39 @@ def write_quality_brief(
         spectral_text = json.dumps(spectral).lower()
         if "lead_guitars" in spectral_text and "high" in spectral_text:
             action_items.append("review high-band ownership; lead guitars can mask other instruments around 4-6 kHz")
+
+    underdriven_rows = masking.get("underdriven_foreground") or []
+    if isinstance(underdriven_rows, list) and underdriven_rows:
+        worst_under = underdriven_rows[0] if isinstance(underdriven_rows[0], dict) else {}
+        try:
+            under_peak = float(worst_under.get("lead_relevant_peak_db", -180.0))
+            under_time = float(worst_under.get("time_s", 0.0))
+        except Exception:
+            under_peak = -180.0
+            under_time = 0.0
+        msg = (
+            f"foreground under-drive: {len(underdriven_rows)} representative windows; "
+            f"weakest active foreground peak {under_peak:+.1f} dBFS near {under_time:.1f}s"
+        )
+        action_items.append(msg)
+        warnings.append(msg)
+
+    masking_rows = masking.get("warnings") or []
+    if isinstance(masking_rows, list) and masking_rows:
+        worst = masking_rows[0] if isinstance(masking_rows[0], dict) else {}
+        try:
+            margin = float(worst.get("lead_margin_db", 99.0))
+            time_s = float(worst.get("time_s", 0.0))
+        except Exception:
+            margin = 99.0
+            time_s = 0.0
+        msg = (
+            f"spectral masking: {len(masking_rows)} representative foreground/support collisions; "
+            f"worst lead margin {margin:+.1f} dB near {time_s:.1f}s"
+        )
+        action_items.append(msg)
+        if margin < -3.0:
+            warnings.append(msg)
 
     shrill_sources: list[dict[str, Any]] = []
     candidate_count = shrill.get("candidate_count")

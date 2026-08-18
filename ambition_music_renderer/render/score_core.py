@@ -21,7 +21,7 @@ import numpy as np
 import pretty_midi
 import yaml
 
-RENDERER_VERSION = "ambition-musicir-renderer-v0.10.7-section-stem-mix-v1"
+RENDERER_VERSION = "ambition-musicir-renderer-v0.10.11-sample-dynamics-v1"
 DEFAULT_SOUNDFONTS = [
     "/usr/share/sounds/sf3/MuseScore_General_Full.sf3",
     "/usr/share/sounds/sf3/MuseScore_General.sf3",
@@ -239,6 +239,67 @@ CC_NUMBERS = {
     "reverb": 91,
     "chorus": 93,
 }
+
+
+def controller_number(value: Any) -> int:
+    """Resolve a MIDI controller number from an integer or MusicIR CC name."""
+    if isinstance(value, int) or str(value).isdigit():
+        number = int(value)
+    else:
+        key = str(value).strip().lower()
+        if key not in CC_NUMBERS:
+            raise ValueError(f"unknown MIDI controller {value!r}; use 0..127 or one of {sorted(CC_NUMBERS)}")
+        number = int(CC_NUMBERS[key])
+    if not 0 <= number <= 127:
+        raise ValueError(f"MIDI controller out of range: {number}")
+    return number
+
+
+def velocity_to_cc_value(spec: dict[str, Any], velocity: int) -> tuple[int, int] | None:
+    """Map note velocity onto a library-specific dynamic controller.
+
+    Some sample libraries intentionally decouple MIDI note velocity from
+    loudness.  For example, a performance patch may use velocity for attack /
+    articulation while CC1 carries the dynamic level.  MusicIR can describe
+    that contract declaratively with::
+
+        velocity_to_cc:
+          cc: modulation
+          input_min: 20
+          input_max: 110
+          output_min: 70
+          output_max: 120
+
+    The renderer emits the controller immediately before each note-on.  This is
+    generic sample-controller adaptation; no library or composition name is
+    special-cased here.
+    """
+    raw = spec.get("velocity_to_cc")
+    if not raw:
+        return None
+    if not isinstance(raw, dict):
+        raise TypeError("instrument velocity_to_cc must be a mapping")
+    cc = controller_number(raw.get("cc", raw.get("controller", "expression")))
+    in_lo = float(raw.get("input_min", 1.0))
+    in_hi = float(raw.get("input_max", 127.0))
+    out_lo = float(raw.get("output_min", 1.0))
+    out_hi = float(raw.get("output_max", 127.0))
+    if in_hi <= in_lo:
+        raise ValueError("velocity_to_cc input_max must be greater than input_min")
+    x = (float(velocity) - in_lo) / (in_hi - in_lo)
+    x = max(0.0, min(1.0, x))
+    curve = str(raw.get("curve", "linear")).strip().lower()
+    if curve == "linear":
+        pass
+    elif curve == "sqrt":
+        x = math.sqrt(x)
+    elif curve == "square":
+        x = x * x
+    else:
+        raise ValueError("velocity_to_cc curve must be one of: linear, sqrt, square")
+    value = int(round(out_lo + (out_hi - out_lo) * x))
+    value = max(0, min(127, value))
+    return cc, value
 
 
 @dc.dataclass(frozen=True)

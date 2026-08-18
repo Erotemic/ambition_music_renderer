@@ -16,6 +16,10 @@ from ..audio_utils import coerce_stereo
 from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
 from .synth import render_procedural_fm, render_synth_audio
+from .foreground_protection import (
+    apply_instrument_foreground_protection,
+    foreground_protection_mode,
+)
 
 @profile
 def copy_with_instruments(
@@ -110,6 +114,45 @@ def _instrument_prefers_procedural_fm(inst_backend: dict[str, Any]) -> bool:
     return kind in {"procedural_fm", "fm", "fm_synth", "subtractive_fm"}
 
 
+def _instrument_mix_gain_db(instrument_specs: dict[str, Any], inst_name: str) -> float:
+    """Return post-synthesis mix trim for one instrument.
+
+    MIDI velocity/CC7/CC11 are performance controls and may affect a sampled
+    instrument's timbre as well as its amplitude.  ``mix_gain_db`` is a separate
+    audio-domain calibration control used after synthesis so sample-library
+    balance does not have to be encoded by distorting performance dynamics.
+    """
+    spec = instrument_specs.get(inst_name, {}) or {}
+    return float(spec.get("mix_gain_db", 0.0))
+
+
+def _apply_instrument_mix_gain(audio: np.ndarray, gain_db: float) -> np.ndarray:
+    if abs(gain_db) < 1e-9:
+        return audio.astype(np.float32, copy=False)
+    return (audio * (10.0 ** (gain_db / 20.0))).astype(np.float32, copy=False)
+
+
+def _finalize_instrument_mix_audio(
+    audio: np.ndarray,
+    *,
+    mix_gain_db: float,
+    pm: pretty_midi.PrettyMIDI,
+    groups: dict[str, str],
+    protection_spec: dict[str, Any],
+    instrument_name: str,
+    sample_rate: int,
+) -> np.ndarray:
+    audio = _apply_instrument_mix_gain(audio, mix_gain_db)
+    return apply_instrument_foreground_protection(
+        audio,
+        pm,
+        groups,
+        protection_spec,
+        instrument_name,
+        sample_rate,
+    )
+
+
 def _resolve_instrument_sfz(
     inst_backend: dict[str, Any],
     *,
@@ -157,6 +200,10 @@ def render_group_audio(
     render_cfg = render_cfg or {}
     instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
     sfizz_cfg = dict(render_cfg.get("sfizz") or {})
+    protection_spec = {
+        "render": render_cfg,
+        "instruments": list(instrument_specs.values()),
+    }
 
     wants_sfizz = backend in {"sfizz", "sfizz-render"}
     has_instrument_sfizz = any(
@@ -167,7 +214,27 @@ def render_group_audio(
         _instrument_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
-    if wants_sfizz or has_instrument_sfizz or has_instrument_procedural_fm:
+    has_instrument_mix_gain = any(
+        abs(_instrument_mix_gain_db(instrument_specs, inst.name)) > 1e-9
+        for inst in insts
+    )
+    protection_cfg = dict(render_cfg.get("foreground_protection") or {})
+    configured_protection_groups = protection_cfg.get("groups")
+    protected_group = (
+        not configured_protection_groups or group in {str(item) for item in configured_protection_groups}
+    )
+    has_instrument_register_protection = (
+        bool(protection_cfg.get("enabled", False))
+        and foreground_protection_mode(protection_spec) in {"instrument_register", "register", "desk_register"}
+        and protected_group
+    )
+    if (
+        wants_sfizz
+        or has_instrument_sfizz
+        or has_instrument_procedural_fm
+        or has_instrument_mix_gain
+        or has_instrument_register_protection
+    ):
         from ..backends.sfizz_backend import render_sfizz
 
         default_fallback_backend = str(
@@ -188,16 +255,25 @@ def render_group_audio(
         rendered: list[np.ndarray] = []
         for idx, inst in enumerate(insts):
             inst_backend = instrument_backend_spec(instrument_specs, inst.name)
+            mix_gain_db = _instrument_mix_gain_db(instrument_specs, inst.name)
             allow_fallback = _is_optional_instrument_backend(inst_backend) and not strict_backends
             fallback_backend_name = str(inst_backend.get("fallback_backend", default_fallback_backend))
             inst_pm = copy_with_instruments(pm, [inst], bpm)
             if _instrument_prefers_procedural_fm(inst_backend):
                 rendered.append(
-                    render_procedural_fm(
-                        inst_pm,
-                        inst_backend,
-                        sample_rate,
-                        minimum_duration,
+                    _finalize_instrument_mix_audio(
+                        render_procedural_fm(
+                            inst_pm,
+                            inst_backend,
+                            sample_rate,
+                            minimum_duration,
+                        ),
+                        mix_gain_db=mix_gain_db,
+                        pm=pm,
+                        groups=groups,
+                        protection_spec=protection_spec,
+                        instrument_name=inst.name,
+                        sample_rate=sample_rate,
                     )
                 )
                 continue
@@ -248,7 +324,17 @@ def render_group_audio(
                             f"{fallback_backend_name!r} this instrument's backend.",
                         )
                     else:
-                        rendered.append(sfizz_audio)
+                        rendered.append(
+                            _finalize_instrument_mix_audio(
+                                sfizz_audio,
+                                mix_gain_db=mix_gain_db,
+                                pm=pm,
+                                groups=groups,
+                                protection_spec=protection_spec,
+                                instrument_name=inst.name,
+                                sample_rate=sample_rate,
+                            )
+                        )
                         continue
             elif wants_sfizz or _instrument_prefers_sfizz(inst_backend):
                 requested = inst_backend.get("library_ref") or inst_backend.get("library") or inst_backend.get("sfz") or sfizz_cfg.get("default_sfz")
@@ -287,7 +373,17 @@ def render_group_audio(
                 if strict_backends:
                     raise RuntimeError(msg)
                 _warn_instrument_backend_once(f"instrument-silent:{inst.name}", msg)
-            rendered.append(inst_audio)
+            rendered.append(
+                _finalize_instrument_mix_audio(
+                    inst_audio,
+                    mix_gain_db=mix_gain_db,
+                    pm=pm,
+                    groups=groups,
+                    protection_spec=protection_spec,
+                    instrument_name=inst.name,
+                    sample_rate=sample_rate,
+                )
+            )
         if not rendered:
             return np.zeros((max(1, int(sample_rate * minimum_duration)), 2), dtype=np.float32)
         # Normalize layout BEFORE any length math. `coerce_stereo` accepts

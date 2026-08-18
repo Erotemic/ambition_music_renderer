@@ -79,6 +79,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         prefer=("sustain", "sus", "flute", "clarinet", "ensemble"),
         avoid=("stacc", "flutter", "trill"),
     ),
+    "vpo.piccolo_solo_perf": SfzLibraryAlias(
+        ref="vpo.piccolo_solo_perf",
+        required_any=(("virtual", "playing", "woodwinds", "piccolo", "solo", "perf"),),
+        prefer=("piccolo solo perf", "solo perf", "piccolo"),
+        avoid=("ks", "staccato", "accent", "section", "sec", "panned"),
+    ),
     "vpo.flute_solo_perf": SfzLibraryAlias(
         ref="vpo.flute_solo_perf",
         required_any=(("virtual", "playing", "woodwinds", "flute", "solo", "perf"),),
@@ -96,6 +102,12 @@ ALIASES: dict[str, SfzLibraryAlias] = {
         required_any=(("virtual", "playing", "woodwinds", "clarinet", "solo", "perf"),),
         prefer=("clarinet solo perf", "solo perf", "clarinet"),
         avoid=("bass clarinet", "contrabass", "ks", "staccato", "accent", "section", "sec", "panned"),
+    ),
+    "vpo.timpani_hit": SfzLibraryAlias(
+        ref="vpo.timpani_hit",
+        required_any=(("virtual", "playing", "percussion", "timpani", "hit"),),
+        prefer=("timpani hit", "timpani"),
+        avoid=("roll", "ks"),
     ),
     "vpo.choir": SfzLibraryAlias(
         ref="vpo.choir",

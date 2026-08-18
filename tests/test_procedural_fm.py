@@ -56,3 +56,40 @@ def test_group_routes_procedural_fm_without_soundfont(tmp_path: Path):
     )
     assert audio.ndim == 2 and audio.shape[1] == 2
     assert float(np.max(np.abs(audio))) > 1e-3
+
+
+def test_instrument_mix_gain_is_applied_after_synthesis(tmp_path: Path):
+    base_pm = _one_note_pm()
+    base_pm._ambition_instrument_specs = {  # type: ignore[attr-defined]
+        "lead": {"instrument_backend": _spec(0.14), "mix_gain_db": 0.0}
+    }
+    trimmed_pm = _one_note_pm()
+    trimmed_pm._ambition_instrument_specs = {  # type: ignore[attr-defined]
+        "lead": {"instrument_backend": _spec(0.14), "mix_gain_db": -6.0}
+    }
+    base = render_group_audio(
+        base_pm,
+        {"lead": "melody"},
+        "melody",
+        "pretty-midi",
+        "",
+        24_000,
+        tmp_path / "base",
+        0.6,
+        120.0,
+        render_cfg={},
+    )
+    trimmed = render_group_audio(
+        trimmed_pm,
+        {"lead": "melody"},
+        "melody",
+        "pretty-midi",
+        "",
+        24_000,
+        tmp_path / "trimmed",
+        0.6,
+        120.0,
+        render_cfg={},
+    )
+    ratio = float(np.max(np.abs(trimmed))) / float(np.max(np.abs(base)))
+    assert np.isclose(ratio, 10.0 ** (-6.0 / 20.0), rtol=1e-4)

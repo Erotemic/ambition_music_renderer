@@ -106,3 +106,39 @@ def test_sampled_drum_note_remap_is_reflected_in_range_audit(monkeypatch, tmp_pa
     assert row["remapped_note_count"] == 2
     assert row["notes_out_of_range"] == 0
     assert "remapped for SFZ" in row["status"]
+
+
+def test_perf_patch_without_cc1_drive_warns(monkeypatch, tmp_path):
+    import ambition_music_renderer.backends.sfizz_backend as sfizz_backend
+    import ambition_music_renderer.instrument_libraries as instrument_libraries
+
+    sfz_path = tmp_path / "flute-SOLO-PERF.sfz"
+    sfz_path.write_text("<region> key=60 sample=flute.wav\n")
+    monkeypatch.setattr(instrument_libraries, "resolve_sfz_reference", lambda *a, **kw: sfz_path)
+    monkeypatch.setattr(sfizz_backend, "sfz_key_span", lambda path: (48, 96))
+
+    inst = {
+        "name": "flute", "group": "woodwinds", "program": "flute",
+        "instrument_backend": {"kind": "sfz", "library_ref": "vpo.flute_solo_perf"},
+    }
+    p = ir.audit_spec(_spec([inst], ["bassline"]))
+    assert any("does not drive CC1" in w for w in p["warnings"])
+
+
+def test_perf_patch_velocity_to_cc_satisfies_cc1_drive(monkeypatch, tmp_path):
+    import ambition_music_renderer.backends.sfizz_backend as sfizz_backend
+    import ambition_music_renderer.instrument_libraries as instrument_libraries
+
+    sfz_path = tmp_path / "flute-SOLO-PERF.sfz"
+    sfz_path.write_text("<region> key=60 sample=flute.wav\n")
+    monkeypatch.setattr(instrument_libraries, "resolve_sfz_reference", lambda *a, **kw: sfz_path)
+    monkeypatch.setattr(sfizz_backend, "sfz_key_span", lambda path: (48, 96))
+
+    inst = {
+        "name": "flute", "group": "woodwinds", "program": "flute",
+        "velocity_to_cc": {"cc": "modulation", "output_min": 70, "output_max": 120},
+        "instrument_backend": {"kind": "sfz", "library_ref": "vpo.flute_solo_perf"},
+    }
+    p = ir.audit_spec(_spec([inst], ["bassline"]))
+    assert not any("does not drive CC1" in w for w in p["warnings"])
+    assert p["instruments"][0]["performance_patch_cc1_driven"] is True

@@ -17,6 +17,19 @@ from pathlib import Path
 from typing import Any
 
 
+def _instrument_drives_cc1(inst: dict[str, Any]) -> bool:
+    if "modulation" in inst:
+        return True
+    controls = dict(inst.get("controls") or {})
+    if 1 in controls or "1" in controls or "modulation" in controls:
+        return True
+    velocity_map = inst.get("velocity_to_cc")
+    if isinstance(velocity_map, dict):
+        raw = velocity_map.get("cc", velocity_map.get("controller", "expression"))
+        return raw == 1 or str(raw).strip().lower() in {"1", "modulation"}
+    return False
+
+
 def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
     from ..instrument_libraries import resolve_sfz_reference
     from ..backends.sfizz_backend import sfz_key_span
@@ -98,6 +111,14 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                 "render_part_low": min(rendered_pitches) if rendered_pitches else None,
                 "render_part_high": max(rendered_pitches) if rendered_pitches else None,
             })
+            if resolved is not None and "-perf" in Path(str(resolved)).name.lower():
+                row["performance_patch_cc1_driven"] = _instrument_drives_cc1(inst)
+                if not row["performance_patch_cc1_driven"]:
+                    warnings.append(
+                        f"{name!r}: resolved performance patch {Path(str(resolved)).name} but the "
+                        "instrument does not drive CC1/modulation; performance patches that use "
+                        "CC1 for dynamics can render foreground notes extremely quietly."
+                    )
             if resolved is None:
                 row["status"] = "UNRESOLVED → will fall back to GM"
                 warnings.append(f"{name!r}: SFZ {requested!r} did not resolve to any file; "
@@ -123,6 +144,8 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                 row["status"] = f"resolved; {remapped_count}/{note_n.get(name,0)} {noun} remapped for SFZ"
             else:
                 row["status"] = "resolved"
+            if row.get("performance_patch_cc1_driven"):
+                row["status"] += "; CC1 dynamics driven"
         else:
             row.update({
                 "backend": "soundfont",

@@ -22,7 +22,7 @@ from typing import Any, Iterable
 
 import pretty_midi
 
-from .score_core import CC_NUMBERS, GM_PROGRAMS
+from .score_core import CC_NUMBERS, GM_PROGRAMS, velocity_to_cc_value
 from .score_theory import clamp, fit_midi_pitch, midi_to_note, note_to_midi
 
 
@@ -580,6 +580,12 @@ def build_exact_score(spec: dict[str, Any]) -> tuple[pretty_midi.PrettyMIDI, dic
                 end = tempo.tick_to_time(tick + effective)
                 if end <= start:
                     end = start + 0.001
+                velocity_cc = velocity_to_cc_value(instrument_specs[target], velocity)
+                if velocity_cc is not None:
+                    cc_number, cc_value = velocity_cc
+                    instruments[target].control_changes.append(
+                        pretty_midi.ControlChange(number=cc_number, value=cc_value, time=start)
+                    )
                 for pitch in _pitch_list(row):
                     instruments[target].notes.append(pretty_midi.Note(velocity=velocity, pitch=pitch, start=start, end=end))
                     position = clock.tick_to_position(tick)
