@@ -25,7 +25,6 @@ render:
   sample_rate: 48000
   ogg_quality: 6
   backend: pretty-midi
-  soundfont: /data/audio-tools/soundfonts/GeneralUser-GS.sf2
   section_mix_transition_beats: 1.0
 postprocess:
   gain_db: -0.5

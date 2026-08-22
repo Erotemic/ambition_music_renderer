@@ -70,3 +70,36 @@ def test_arpeggio_pitch_bounds_reject_impossible_pitch_class_window():
                 }
             )
         )
+
+
+def test_arpeggio_pitch_bounds_accept_note_names():
+    from ambition_music_renderer.render.score_layers import build_score
+    from ambition_music_renderer.render.score_theory import note_to_midi
+
+    def rendered_pitches(min_pitch, max_pitch):
+        pm, _groups, _sections = build_score(
+            _spec(
+                {
+                    "kind": "arpeggio",
+                    "instrument": "banjo",
+                    "octave": 4,
+                    "pattern": [0, 1, 2, 3],
+                    "step": 0.5,
+                    "duration_beats": 0.25,
+                    "min_pitch": min_pitch,
+                    "max_pitch": max_pitch,
+                }
+            )
+        )
+        return [
+            int(event["pitch"])
+            for event in pm._ambition_note_events  # type: ignore[attr-defined]
+            if event["instrument"] == "banjo"
+        ]
+
+    named = rendered_pitches("B2", "B5")
+    numeric = rendered_pitches(note_to_midi("B2"), note_to_midi("B5"))
+    assert named == numeric
+    assert named
+    assert min(named) >= note_to_midi("B2")
+    assert max(named) <= note_to_midi("B5")

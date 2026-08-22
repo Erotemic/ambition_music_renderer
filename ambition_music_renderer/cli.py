@@ -541,6 +541,46 @@ def _process_simple_mix_cue(
     return None
 
 
+def _preflight_bulk_render(
+    cues: tuple[str, ...], *, backend: str, force_render: bool
+) -> bool:
+    """Resolve every render that this bulk invocation will actually need.
+
+    Hash/layout resolution is cheap and is also where score-level render inputs
+    such as an explicit soundfont are resolved. Do it for the whole batch before
+    starting cue 1 so a bad path on cue 40 cannot waste minutes of successful
+    renders before aborting the command. Cues whose current render will be reused
+    are deliberately skipped: publish-only reuse does not need local synthesis
+    dependencies.
+    """
+    from .render.score_core import load_yaml
+    from .render.score_layers import build_score
+
+    failures: list[str] = []
+    for cue in cues:
+        yaml_path = find_score(cue)
+        if yaml_path is None:
+            failures.append(f"{cue}: missing YAML")
+            continue
+        outdir = generated_root() / cue
+        if not force_render and not needs_render(cue, yaml_path, outdir):
+            continue
+        try:
+            spec = load_yaml(yaml_path)
+            generated_run_layout(outdir, yaml_path, backend, spec=spec)
+            build_score(spec)
+        except Exception as ex:
+            failures.append(f"{cue}: {ex}")
+
+    if not failures:
+        return True
+
+    print("music render preflight failed before rendering any cue:", file=sys.stderr)
+    for failure in failures:
+        print(f"  - {failure}", file=sys.stderr)
+    return False
+
+
 def _run_bulk(args, cues: tuple[str, ...], action: str) -> int:
     failed: list[str] = []
     desc = f"music {action}"
@@ -572,6 +612,10 @@ def run_bulk_cues(config, *, cues_factory, action: str) -> int:
     cues = tuple(config.cue) if config.cue else tuple(cues_factory())
     if action == "render-publish" and config.skip_render:
         action = "publish"
+    if action in ("render", "render-publish") and not _preflight_bulk_render(
+        cues, backend=config.backend, force_render=config.force_render
+    ):
+        return 1
     return _run_bulk(config, cues, action)
 
 

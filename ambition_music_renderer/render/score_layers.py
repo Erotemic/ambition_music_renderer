@@ -25,6 +25,41 @@ def _positive_float(layer: dict[str, Any], key: str, default: float) -> float:
         raise ValueError(f"{kind} {key} must be finite and > 0; got {value!r}")
     return value
 
+
+def _coerce_midi_pitch_bound(value: Any, *, field: str) -> int | None:
+    """Resolve a MusicIR pitch bound from MIDI number or note name.
+
+    Pitch-valued score fields should speak one vocabulary. Motifs and chord
+    helpers already accept names such as ``B2``; requiring arpeggio bounds to
+    spell the same pitch as ``47`` made otherwise valid authored scores fail
+    only when the renderer reached that layer. Numeric values remain supported
+    for existing scores.
+    """
+    if value is None:
+        return None
+    if isinstance(value, str):
+        raw = value.strip()
+        try:
+            pitch = note_to_midi(raw)
+        except ValueError:
+            try:
+                pitch = int(raw)
+            except ValueError as ex:
+                raise ValueError(
+                    f"{field} must be a MIDI pitch number or note name such as B2; "
+                    f"got {value!r}"
+                ) from ex
+    else:
+        try:
+            pitch = int(value)
+        except (TypeError, ValueError) as ex:
+            raise ValueError(
+                f"{field} must be a MIDI pitch number or note name; got {value!r}"
+            ) from ex
+    if not 0 <= pitch <= 127:
+        raise ValueError(f"{field} must be within MIDI range 0..127; got {value!r}")
+    return pitch
+
 def _fit_arpeggio_pitch_to_bounds(
     pitch: int, min_pitch: int | None, max_pitch: int | None
 ) -> int:
@@ -115,8 +150,8 @@ def render_layer_arpeggio(
     inst_octave_offsets = layer.get("instrument_octave_offsets", {}) or {}
     min_pitch = layer.get("min_pitch")
     max_pitch = layer.get("max_pitch")
-    min_pitch_i = int(min_pitch) if min_pitch is not None else None
-    max_pitch_i = int(max_pitch) if max_pitch is not None else None
+    min_pitch_i = _coerce_midi_pitch_bound(min_pitch, field="arpeggio min_pitch")
+    max_pitch_i = _coerce_midi_pitch_bound(max_pitch, field="arpeggio max_pitch")
     hk = _layer_human(layer, 4.0)
     for local in range(int(section["bars"])):
         if "every" in layer and local % int(layer["every"]) != int(
