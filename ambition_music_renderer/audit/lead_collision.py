@@ -8,11 +8,11 @@ mistake a listener hears immediately ("the second note is sour").
 
 This audit looks ONLY at melody-carrying layers and reports:
 
-* **lead-vs-lead collisions** - concurrent notes from different foreground
+* lead-vs-lead collisions - concurrent notes from different foreground
   layers at a dissonant interval within ~an octave, with wall-clock
   timestamps (tempo-map aware) so a listener note like "1:27" maps straight
   to a row.
-* **exposed tensions** - a foreground note held >= ``exposed_min_beats``
+* exposed tensions - a foreground note held >= ``exposed_min_beats``
   whose pitch class is a maj7/9/#11 against the bar's chord. Passing
   eighths are fine; a phrase ENDING on the 9th for a full second is the
   thing an ear flags as "off".

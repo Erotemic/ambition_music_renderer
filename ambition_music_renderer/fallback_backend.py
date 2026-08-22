@@ -1,7 +1,7 @@
 """Fast in-Python additive synth backend.
 
 This module is the iteration-time renderer used by `--backend fallback`. It is
-**not** a faithful instrument simulator — it composes bandlimited harmonic
+not a faithful instrument simulator — it composes bandlimited harmonic
 stacks plus filtered noise bands to give the YAML something audible without
 needing FluidSynth or a SoundFont.
 
