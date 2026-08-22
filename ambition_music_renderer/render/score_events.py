@@ -447,7 +447,7 @@ def apply_automation(
         elif cc in CC_NUMBERS:
             cc_num = CC_NUMBERS[cc]
         else:
-            # A typo used to silently become CC 11 (expression) — dead config.
+            # Unknown controller names are configuration errors, not expression defaults.
             raise KeyError(
                 f"unknown automation cc {cc!r}; use a MIDI CC number or one of "
                 f"{sorted(CC_NUMBERS)}"

@@ -117,9 +117,8 @@ def _worker(job: BundleJob, events: "queue.Queue[tuple[str, str, object]]") -> B
     start = time.monotonic()
     latest_stage = "starting"
     result: BundleResult | None = None
-    # The coordinator loops until it has seen one "done" event per job, so
-    # this worker must post "done" on EVERY exit path — a raised exception
-    # that skipped the event used to deadlock the whole batch run.
+    # The coordinator requires exactly one terminal "done" event per job,
+    # including exception paths.
     try:
         job.log_path.parent.mkdir(parents=True, exist_ok=True)
         events.put(("stage", job.cue, latest_stage))
@@ -232,8 +231,7 @@ def _run_rich(jobs: list[BundleJob], *, workers: int) -> list[BundleResult]:
             TextColumn("{task.fields[cue]}", justify="right"),
             BarColumn(),
             TaskProgressColumn(),
-            # Keep TextColumn arguments compatible with older Rich versions.
-            # Some distro/venv Rich releases do not accept overflow= here.
+            # Keep this TextColumn compatible with Rich versions lacking ``overflow``.
             TextColumn("{task.fields[stage]}"),
             TimeElapsedColumn(),
             TimeRemainingColumn(),

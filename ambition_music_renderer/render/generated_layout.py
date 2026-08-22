@@ -135,9 +135,8 @@ def mark_generated_run_latest(layout: GeneratedRunLayout) -> Path:
 
     layout.run_dir.mkdir(parents=True, exist_ok=True)
     replace_directory_symlink(layout.latest_link, layout.run_dir)
-    # ``building`` means "render in progress"; once the run is latest the link
-    # is stale and used to linger forever, making completed and in-progress
-    # renders indistinguishable.
+    # ``building`` denotes an in-progress render and must be cleared once the
+    # completed run becomes ``latest``.
     clear_generated_building(layout)
     return layout.latest_link
 

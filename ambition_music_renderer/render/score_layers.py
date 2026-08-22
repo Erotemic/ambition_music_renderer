@@ -863,9 +863,7 @@ def render_layer_guitar_chug(
         default_insts = []
     takes = gp.take_specs(layer, default_insts)
     if not takes:
-        # Every other layer kind errors on an unresolvable instrument; a chug
-        # layer with neither takes nor instrument(s)/group used to silently
-        # render nothing.
+        # Chug layers require either explicit takes or a resolvable instrument.
         raise KeyError(
             "guitar_chug layer needs `takes` or `instrument`/`instruments`/`group`"
         )
@@ -1271,9 +1269,8 @@ def build_score(
             render_layer(ctx, section, layer)
     pm._ambition_note_events = list(ctx.note_events)  # type: ignore[attr-defined]
     pm._ambition_instrument_specs = copy.deepcopy(ctx.instrument_specs)  # type: ignore[attr-defined]
-    # Sanitize here so every consumer (isolated worker, legacy path, audits
-    # rendering audio) gets the same-pitch overlap fix; callers used to have to
-    # remember to call it and the production worker path forgot.
+    # Sanitize at the score boundary so all consumers receive the same-pitch
+    # overlap invariant.
     sanitize_same_pitch_overlaps(pm)
     return pm, ctx.groups, section_meta
 

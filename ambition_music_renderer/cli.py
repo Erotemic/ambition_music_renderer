@@ -139,14 +139,7 @@ def output_root() -> Path:
 
 
 def find_score(cue: str) -> Path | None:
-    """Locate a cue YAML by name, searching every ``_paths.SCORE_DIRS`` subdir.
-
-    Accepts a bare cue id (e.g. ``lofi_study_loop``) or a relative/absolute
-    path to a YAML. Delegates to ``_paths.find_score`` with its default
-    subdirs so ``cue list``, ``cue render``, ``cue bundle`` and
-    ``plugins validate_score`` all agree on which cues exist (a local
-    3-dir copy used to exclude ``experiments/`` from half the commands).
-    """
+    """Locate a cue YAML by id or path using the shared score-directory policy."""
     return _find_score(cue)
 
 
@@ -274,14 +267,10 @@ def render_cue(
 
 
 def render_mode_for_cue(cue: str, args=None) -> tuple[bool, bool]:
-    """Return (simple_mix, full_mix_only) for top-level render commands.
+    """Return ``(simple_mix, full_mix_only)`` for top-level rendering.
 
-    Goblin-style adaptive encounter cues ship as per-section full mixes. The
-    historical top-level CLI defaulted every cue to --simple-mix, which renders
-    only preview/full.ogg and leaves stale adaptive section files in the game
-    asset tree. Treat known adaptive cues as full-mix-only unless the caller
-    explicitly disables simple mixing with --no-simple-mix, in which case they
-    get the full per-stem adaptive export.
+    Adaptive encounter cues default to per-section full mixes. Explicit
+    ``--no-simple-mix`` requests the full per-stem adaptive export.
     """
     simple_mix = bool(getattr(args, "simple_mix", True))
     full_mix_only = bool(getattr(args, "full_mix_only", False))
@@ -296,17 +285,10 @@ def render_mode_for_cue(cue: str, args=None) -> tuple[bool, bool]:
 
 
 def default_publish_dest_root() -> Path:
-    """Where cues install, as DECLARED by the consuming game.
+    """Return the consumer-declared publish root, raising if none is configured.
 
-    ⛔ this used to build a path into `crates/ambition_actors`, in this file and
-    in one other — two hard-coded copies of a crate name the renderer has no way
-    to know. See `_paths.publish_root`: the consumer says, the renderer does not
-    guess, and an undeclared destination raises instead of inventing one.
-
-    ⚠ **raises, so it is the USE-time answer and not an argument default.** A
-    `default_factory` runs while ARGUMENTS are parsed, which demanded a publish
-    destination for runs that never publish; use
-    [`declared_publish_dest_root`] there instead.
+    Use ``declared_publish_dest_root`` for parse-time defaults that must permit
+    commands which never publish.
     """
     return _publish_root()
 
@@ -514,9 +496,7 @@ def _process_simple_mix_cue(
     outdir = generated_root() / cue
     if action in ("render", "render-publish"):
         if force_render or needs_render(cue, yaml_path, outdir):
-            # Route through the same adaptive-cue detection as single-cue
-            # renders: a hardcoded simple_mix=True used to fully render an
-            # adaptive cue only for publish_cue to refuse it afterwards.
+            # Batch and single-cue rendering share adaptive-cue mode selection.
             simple_mix, full_mix_only = render_mode_for_cue(cue)
             if not render_cue_to_versioned_generated(
                 cue,
@@ -530,8 +510,7 @@ def _process_simple_mix_cue(
             print(f"skip render {cue}: YAML unchanged since last render")
     if action in ("publish", "render-publish"):
         if not publish_cue(cue, outdir, dest_root):
-            # Fall back to the legacy output/ tree (older renders or
-            # adaptive cues whose mastered preview lives there).
+            # Compatibility output may still hold publishable mastered previews.
             legacy = output_root() / cue
             if (legacy / "preview").exists():
                 if not publish_cue(cue, legacy, dest_root):

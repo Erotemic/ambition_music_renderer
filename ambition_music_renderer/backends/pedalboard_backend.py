@@ -51,9 +51,7 @@ def _resolve(path: str | Path, *, base_dir: Path | None = None) -> Path:
 
 def _set_parameters(plugin: Any, parameters: dict[str, Any]) -> None:
     params = dict(parameters or {})
-    # `strict` is our control key, not a plugin parameter; it used to be
-    # iterated and set on the plugin itself, which could raise on the very
-    # option meant to control error handling.
+    # `strict` controls parameter-assignment errors; it is not a plugin parameter.
     strict = bool(params.pop("strict", False))
     for key, value in params.items():
         try:
@@ -121,10 +119,8 @@ def build_plugin(spec: dict[str, Any], *, base_dir: Path | None = None) -> Any:
     if effect in {"lowpass", "lowpass_filter", "lp"}:
         return pb.LowpassFilter(cutoff_frequency_hz=float(spec.get("cutoff_hz", spec.get("hz", 9000.0))))
     if effect in {"vst3", "vst", "plugin"}:
-        # Accept the same spec shapes `plugins validate_score` accepts: a
-        # `path` (score-relative or absolute) or a `plugin` name resolved
-        # against the discovered VST3 search dirs. The validator used to
-        # green-light `plugin:` specs this function then crashed on.
+        # Match validation semantics: accept a path or a plugin name resolved
+        # through the discovered VST3 search directories.
         raw = spec.get("path") or spec.get("plugin")
         if not raw:
             raise ValueError("vst3 effect step needs a `path` or `plugin` key")

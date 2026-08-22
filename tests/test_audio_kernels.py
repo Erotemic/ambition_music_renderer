@@ -110,8 +110,7 @@ def test_to_mono_handles_every_layout():
     # 1-D mono passes through unchanged.
     np.testing.assert_allclose(to_mono(left), left, rtol=1e-6, atol=1e-7)
 
-    # (N, 1) used to fall through to mean(axis=0) — averaging over TIME —
-    # which collapsed the whole signal to a single sample row.
+    # Column-vector mono must preserve the time axis and sample count.
     column = left[:, None]
     out = to_mono(column)
     assert out.shape == (len(left),)
