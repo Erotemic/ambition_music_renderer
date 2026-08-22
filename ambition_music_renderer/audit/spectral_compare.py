@@ -68,9 +68,7 @@ def run(args: SpectralCompareConfig) -> int:
     for p in stems:
         name = p.stem.split(".")[-1]
         mono = to_mono(np.load(p))
-        # A negative hi is the bundle's "to end of track" sentinel (matching
-        # spectral_localize); it used to become a negative slice index and
-        # silently drop the last second, or empty the segment entirely.
+        # A negative high bound means "to end of track" across spectral audits.
         hi = float(len(mono)) / args.sr if t_hi < 0 else t_hi
         if int(t_lo * args.sr) >= len(mono):
             print(

@@ -202,10 +202,8 @@ def create_bundle(
 
     reports_dir = outdir / "reports"
     plots_dir = outdir / "plots"
-    # Reports and plots are derived products for the current bundle. Clear them
-    # up front so stale diagnostics from older hashes cannot contaminate a new
-    # upload bundle. Audio output dirs are left alone; bundle copying is
-    # manifest-scoped below.
+    # Reports and plots are current-bundle derivatives; clear them before
+    # regeneration. Audio copying remains manifest-scoped below.
     for derived_dir in (reports_dir, plots_dir):
         if derived_dir.exists():
             shutil.rmtree(derived_dir)

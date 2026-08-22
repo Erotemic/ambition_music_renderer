@@ -201,8 +201,7 @@ def transition_components(
         raise ValueError(f"sample-rate mismatch: {sr1} vs {sr2}")
     sr = sr1
     context_frames = max(1, int(round(context_seconds * sr)))
-    # The crossfade region lives inside the context window; a longer crossfade
-    # used to broadcast a full-length gain against a shorter tail slice.
+    # The crossfade must fit inside the sampled context window.
     crossfade_frames = min(max(1, int(round(crossfade_seconds * sr))), context_frames)
     first_tail = first[-context_frames:]
     second_head = ensure_length(second, context_frames)

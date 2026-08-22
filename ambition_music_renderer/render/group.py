@@ -55,11 +55,7 @@ def slice_audio(
 
 @profile
 def instrument_backend_spec(instrument_specs: dict[str, Any], inst_name: str) -> dict[str, Any]:
-    """Return normalized backend metadata for one instrument.
-
-    Module-level for profiling and reuse by render backends; this used to be a
-    nested closure inside ``render_group_audio``.
-    """
+    """Return normalized, reusable backend metadata for one instrument."""
     spec = dict(instrument_specs.get(inst_name, {}) or {})
     raw = spec.get("instrument_backend", spec.get("backend", {}))
     if isinstance(raw, str):

@@ -310,9 +310,8 @@ def _synth_note_fallback(
         )
         env[: len(ramp)] *= ramp
     elif family == "pluck":
-        # Guitars / plucked strings: brighter harmonic stack than the harp
-        # with a faster decay, so strums and picked lines read as plucks
-        # instead of the featureless generic sustain they used to get.
+        # Plucked strings use a brighter stack and faster decay than harp so
+        # strums and picked lines retain a clear attack.
         raw = _harm_stack([0.62, 0.34, 0.22, 0.13, 0.08, 0.05, 0.03])
         sig = _lowpass_mono(raw, 0.62)
         decay_tau = max(0.28, duration * 0.60)

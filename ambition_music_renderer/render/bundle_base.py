@@ -129,17 +129,10 @@ def default_bundle_root() -> Path:
 
 
 def default_publish_dest_root() -> Path:
-    """Where cues install, as DECLARED by the consuming game.
+    """Return the consumer-declared publish root, raising if none is configured.
 
-    ⛔ this used to build a path into `crates/ambition_actors`, in this file and
-    in one other — two hard-coded copies of a crate name the renderer has no way
-    to know. See `_paths.publish_root`: the consumer says, the renderer does not
-    guess, and an undeclared destination raises instead of inventing one.
-
-    ⚠ **raises, so it is the USE-time answer and not an argument default.** A
-    `default_factory` runs while ARGUMENTS are parsed, which demanded a publish
-    destination for runs that never publish; use
-    [`declared_publish_dest_root`] there instead.
+    Use ``declared_publish_dest_root`` for parse-time defaults that must permit
+    commands which never publish.
     """
     return _publish_root()
 
@@ -215,13 +208,7 @@ def progress_line(message: str, *, stream=None) -> None:
 
 @profile
 def renderer_audit_command(command_name: str, *args: object) -> list[str]:
-    """Build a subprocess command for a packaged audit helper.
-
-    Root-level helper scripts were moved under ``ambition_music_renderer.audit``
-    and exposed through the package modal CLI. Bundle/report generation should
-    call that public CLI surface instead of stale ``tools_dir / "script.py"``
-    paths, which disappear after the cleanup.
-    """
+    """Build a subprocess command through the packaged audit CLI surface."""
     return [
         sys.executable,
         "-m",
@@ -486,13 +473,10 @@ def copy_manifest_referenced_files(outdir: Path, manifest: dict, bundle_dir: Pat
 
 
 def prepare_manifest_analysis_root(outdir: Path, manifest: dict, analysis_root: Path) -> Path:
-    """Create a clean manifest-scoped tree for external diagnostic scripts.
+    """Create a clean manifest-scoped tree for diagnostic scripts.
 
-    Several legacy analysis helpers scan entire ``preview/``, ``adaptive/`` or
-    ``scratch_stems/`` directories. Running them directly on a long-lived output
-    directory lets stale render hashes pollute reports. This helper builds the
-    small tree those tools expect, but containing only files referenced by the
-    current manifest plus scratch stems matching the current render hash.
+    Include only manifest-referenced files and scratch stems for the current
+    render hash so directory-scanning audits cannot consume stale products.
     """
     if analysis_root.exists():
         shutil.rmtree(analysis_root)
