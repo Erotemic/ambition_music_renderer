@@ -77,6 +77,17 @@ The primary listening artifact is:
 generated/<cue_id>/latest/preview/<cue_id>_<hash>.full_soundtrack_preview.ogg
 ```
 
+For fast score/form review in a MIDI player, export a MIDI preview separately:
+
+```bash
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue midi <cue_id> --output /tmp/<cue_id>.mid
+```
+
+`render.metadata_markers` and section starts are written as Standard MIDI File
+marker events, so players that expose MIDI markers can show the authored form.
+The same markers are used as chapter metadata in rendered OGG previews.
+
 `simple-mix` is the preferred starting point when judging composition. Add
 more render products only when they answer a concrete debugging question.
 

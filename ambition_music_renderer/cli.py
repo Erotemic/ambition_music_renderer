@@ -6,6 +6,7 @@ Subcommands:
     cue render <cue>        Render a single cue YAML to local generated/<cue>/.
                             Add --publish to also install full.ogg into the
                             game asset tree.
+    cue midi <cue>          Export a marked MIDI preview for score/form review.
     cue publish <cue>       Publish newest preview into the sandbox asset tree.
     cue bundle <cue>...     Render+debug+package one or more cues. For one cue,
                             -j/--jobs N parallelizes stem groups. For several,
@@ -774,6 +775,38 @@ class RenderCommand(kwconf.Config):
         return cmd_render(config)
 
 
+class MidiCommand(kwconf.Config):
+    """Export a MIDI preview with authored MusicIR form markers."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or YAML path")
+    output: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="output .mid path; defaults to <cue>.mid in the current directory",
+    )
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        score = find_score(config.cue)
+        if score is None:
+            print(f"cue not found: {config.cue}", file=sys.stderr)
+            return 2
+
+        from .render.score_core import load_yaml
+        from .render.score_layers import build_score
+        from .render.export import timeline_markers_from_spec, write_marked_midi
+
+        spec = load_yaml(score)
+        pm, _groups, sections = build_score(spec)
+        markers = timeline_markers_from_spec(spec, sections)
+        cue_id = str(spec.get("id", cue_id_from_path(score)))
+        output = Path(config.output) if config.output is not None else Path.cwd() / f"{cue_id}.mid"
+        write_marked_midi(pm, output, markers)
+        print(output)
+        return 0
+
+
 class PublishCommand(kwconf.Config):
     """Publish newest preview to sandbox assets."""
 
@@ -904,6 +937,7 @@ class CueModal(kwconf.ModalCLI):
 
     list = ListCommand
     render = RenderCommand
+    midi = MidiCommand
     publish = PublishCommand
     bundle = BundleCommand
 

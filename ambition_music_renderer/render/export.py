@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import mido
 import numpy as np
 import soundfile as sf
 
@@ -144,6 +145,69 @@ def timeline_markers_from_spec(
         seen.add(key)
         deduped.append(marker)
     return deduped
+
+
+def write_marked_midi(
+    pm: Any,
+    midi_path: Path,
+    markers: list[dict[str, Any]] | None = None,
+) -> Path:
+    """Write a Standard MIDI File with MusicIR form markers.
+
+    PrettyMIDI preserves notes, tempo, CCs, and instrument names but does not
+    expose SMF marker meta-events. Write the musical data first, then add the
+    same timeline markers used for OGG chapter comments to track zero with
+    mido. Players such as VLC can then expose the authored form while auditioning
+    the MIDI preview.
+    """
+    midi_path = Path(midi_path)
+    midi_path.parent.mkdir(parents=True, exist_ok=True)
+    pm.write(str(midi_path))
+    marker_rows = list(markers or [])
+    if not marker_rows:
+        return midi_path
+
+    mid = mido.MidiFile(str(midi_path))
+    if not mid.tracks:
+        mid.tracks.append(mido.MidiTrack())
+    track = mid.tracks[0]
+
+    absolute_events: list[tuple[int, int, mido.Message | mido.MetaMessage]] = []
+    tick = 0
+    for order, msg in enumerate(track):
+        tick += int(msg.time)
+        if msg.type == "end_of_track":
+            continue
+        absolute_events.append((tick, order, msg.copy(time=0)))
+
+    original_end_tick = tick
+    marker_order_base = len(absolute_events) + 1
+    for idx, marker in enumerate(marker_rows):
+        start_seconds = float(marker.get("start_seconds", 0.0) or 0.0)
+        marker_tick = max(0, int(round(pm.time_to_tick(start_seconds))))
+        label = str(marker.get("label", marker.get("id", f"marker_{idx + 1}")))
+        absolute_events.append(
+            (
+                marker_tick,
+                marker_order_base + idx,
+                mido.MetaMessage("marker", text=label, time=0),
+            )
+        )
+
+    absolute_events.sort(key=lambda row: (row[0], row[1]))
+    new_track = mido.MidiTrack()
+    previous_tick = 0
+    for absolute_tick, _order, msg in absolute_events:
+        new_track.append(msg.copy(time=max(0, absolute_tick - previous_tick)))
+        previous_tick = absolute_tick
+    score_end_tick = max(0, int(round(pm.time_to_tick(float(pm.get_end_time())))))
+    end_tick = max(original_end_tick, previous_tick, score_end_tick)
+    new_track.append(
+        mido.MetaMessage("end_of_track", time=max(0, end_tick - previous_tick))
+    )
+    mid.tracks[0] = new_track
+    mid.save(str(midi_path))
+    return midi_path
 
 
 def section_chapter_metadata(

@@ -2,7 +2,7 @@ schema: ambition.musicir.v1
 id: super_smash_siblings_character_select
 title: Roster Ignition - Super Smash Siblings Character Select
 seed: 2026080602
-notes: 'High-energy symphonic character-selection loop for Super Smash Siblings. A four-bar E-minor roster hook alternates between brass, strings, and woodwinds over continuous sixteenth-note string motion, punchy low-orchestra responses, and driving orchestral percussion. The arrangement stays urgent and loop-ready rather than resolving like a title anthem: every eight bars creates a fresh selection pulse, the middle relay clears space for character browsing, and the final surge hands directly back to the opening E-minor hit. All orchestral roles prefer the existing Sonatina/VCSL SFZ libraries and retain General MIDI fallbacks.'
+notes: 'High-energy symphonic character-selection loop for Super Smash Siblings. The opening roster hook and answer remain the identity anchor, while later sections use close chord-tone variations of those phrases, two related woodwind relays, changing orchestral colors, and a delayed literal return. The 104-bar form gives character browsing more time before the loop becomes apparent without leaving the original E-minor harmonic and rhythmic language. The final surge hands directly back to the opening E-minor hit. All orchestral roles prefer the existing Sonatina/VCSL SFZ libraries and retain General MIDI fallbacks.'
 tempo:
   bpm: 174
 meter:
@@ -17,6 +17,37 @@ render:
   backend: pretty-midi
   runtime_stems:
     max_gain_db: 22.0
+  metadata_markers:
+  - bar: 25
+    id: wind_relay
+    label: Wind relay
+  - bar: 33
+    id: first_return
+    label: First return
+  - bar: 41
+    id: variation_one
+    label: Roster variation I
+  - bar: 49
+    id: relay_variation
+    label: Relay variation
+  - bar: 57
+    id: variation_two
+    label: Roster variation II
+  - bar: 65
+    id: string_relay
+    label: String relay
+  - bar: 73
+    id: variation_three
+    label: Roster variation III
+  - bar: 81
+    id: relay_reprise
+    label: Relay variation reprise
+  - bar: 89
+    id: pre_return_build
+    label: Pre-return build
+  - bar: 97
+    id: final_return
+    label: Final return
   sfizz:
     library_roots:
     - /data/audio-tools/sfz
@@ -776,6 +807,420 @@ motifs:
   - 0.9
   - 0.84
   - 0.92
+- id: roster_hook_variation_a
+  root: E4
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 12
+  - 7
+  - 3
+  - 3
+  - 8
+  - 12
+  - 15
+  - 12
+  - 7
+  - 7
+  - 10
+  - 15
+  - 19
+  - 15
+  - 10
+  - 5
+  - 10
+  - 14
+  - 17
+  - 14
+  - 10
+  rhythm: *id001
+  velocities:
+  - 0.9
+  - 0.84
+  - 0.94
+  - 1.0
+  - 0.9
+  - 0.84
+  - 0.86
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.92
+  - 0.86
+  - 0.88
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.88
+  - 0.86
+  - 0.92
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.9
+- id: roster_answer_variation_a
+  root: B3
+  intervals:
+  - 12
+  - 8
+  - 5
+  - 8
+  - 12
+  - 17
+  - 1
+  - 5
+  - 8
+  - 13
+  - 17
+  - 13
+  - -2
+  - 5
+  - 10
+  - 13
+  - 17
+  - 13
+  - 0
+  - 7
+  - 10
+  - 12
+  - 16
+  - 12
+  rhythm: *id001
+  velocities:
+  - 0.88
+  - 0.84
+  - 0.9
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.84
+  - 0.88
+  - 0.92
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.84
+  - 0.88
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.86
+  - 0.9
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.94
+- id: roster_hook_variation_b
+  root: E4
+  intervals:
+  - 7
+  - 12
+  - 15
+  - 12
+  - 7
+  - 3
+  - 8
+  - 12
+  - 15
+  - 12
+  - 8
+  - 7
+  - 10
+  - 15
+  - 19
+  - 15
+  - 10
+  - 7
+  - 14
+  - 17
+  - 22
+  - 17
+  - 14
+  - 10
+  rhythm: *id001
+  velocities:
+  - 0.86
+  - 0.92
+  - 0.98
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.88
+  - 0.94
+  - 1.0
+  - 0.94
+  - 0.88
+  - 0.84
+  - 0.9
+  - 0.96
+  - 1.0
+  - 0.94
+  - 0.9
+  - 0.86
+  - 0.92
+  - 0.98
+  - 1.0
+  - 0.96
+  - 0.92
+  - 0.88
+- id: roster_answer_variation_b
+  root: B3
+  intervals:
+  - 5
+  - 8
+  - 12
+  - 8
+  - 5
+  - 0
+  - 8
+  - 13
+  - 17
+  - 13
+  - 8
+  - 5
+  - 5
+  - 10
+  - 13
+  - 10
+  - 5
+  - 1
+  - 7
+  - 10
+  - 12
+  - 16
+  - 12
+  - 7
+  rhythm: *id001
+  velocities:
+  - 0.84
+  - 0.9
+  - 0.96
+  - 0.92
+  - 0.88
+  - 0.84
+  - 0.86
+  - 0.92
+  - 0.98
+  - 0.94
+  - 0.88
+  - 0.84
+  - 0.86
+  - 0.92
+  - 0.98
+  - 0.94
+  - 0.88
+  - 0.84
+  - 0.88
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.94
+  - 0.88
+- id: wind_relay_c
+  root: C5
+  intervals:
+  - 4
+  - 7
+  - 12
+  - 7
+  - 4
+  - 0
+  - 7
+  - 4
+  - 6
+  - 9
+  - 14
+  - 9
+  - 6
+  - 2
+  - 9
+  - 6
+  - 7
+  - 11
+  - 16
+  - 11
+  - 7
+  - 4
+  - 11
+  - 7
+  - 2
+  - 6
+  - 11
+  - 6
+  - 2
+  - -1
+  - 6
+  - 2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.74
+  - 0.8
+  - 0.86
+  - 0.8
+  - 0.76
+  - 0.72
+  - 0.82
+  - 0.78
+  - 0.74
+  - 0.8
+  - 0.86
+  - 0.8
+  - 0.76
+  - 0.72
+  - 0.82
+  - 0.78
+  - 0.76
+  - 0.82
+  - 0.88
+  - 0.82
+  - 0.78
+  - 0.74
+  - 0.84
+  - 0.8
+  - 0.76
+  - 0.82
+  - 0.9
+  - 0.84
+  - 0.8
+  - 0.76
+  - 0.86
+  - 0.82
+- id: wind_relay_d
+  root: C5
+  intervals:
+  - 7
+  - 4
+  - 0
+  - 4
+  - 7
+  - 12
+  - 4
+  - 7
+  - -3
+  - 0
+  - 4
+  - 0
+  - -3
+  - 4
+  - 0
+  - 4
+  - -1
+  - 3
+  - 6
+  - 9
+  - 11
+  - 9
+  - 6
+  - 3
+  - -1
+  - 3
+  - 6
+  - 9
+  - 11
+  - 15
+  - 18
+  - 21
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.74
+  - 0.8
+  - 0.86
+  - 0.8
+  - 0.76
+  - 0.84
+  - 0.78
+  - 0.82
+  - 0.74
+  - 0.8
+  - 0.86
+  - 0.8
+  - 0.76
+  - 0.84
+  - 0.78
+  - 0.82
+  - 0.76
+  - 0.82
+  - 0.88
+  - 0.84
+  - 0.9
+  - 0.84
+  - 0.8
+  - 0.76
+  - 0.78
+  - 0.84
+  - 0.9
+  - 0.94
+  - 0.98
+  - 1.0
+  - 0.96
+  - 0.92
 - id: final_rise
   root: B3
   intervals:
@@ -847,7 +1292,7 @@ layer_templates:
       bars: 8
       from: 0.58
       to: 0.58
-    - start_bar: 40
+    - start_bar: 96
       bars: 8
       from: 1.0
       to: 1.18
@@ -869,7 +1314,7 @@ layer_templates:
       bars: 8
       from: 0.55
       to: 0.55
-    - start_bar: 40
+    - start_bar: 96
       bars: 8
       from: 1.0
       to: 1.16
@@ -930,7 +1375,7 @@ layer_templates:
       bars: 8
       from: 0.68
       to: 0.68
-    - start_bar: 40
+    - start_bar: 96
       bars: 8
       from: 1.0
       to: 1.12
@@ -1051,11 +1496,9 @@ layer_templates:
       - 0.0
     - - 8
       - 0.0
-    - - 16
-      - 0.0
     - - 32
       - 0.0
-    - - 40
+    - - 96
       - 0.0
     velocity: 92
     articulation: marcato
@@ -1080,8 +1523,6 @@ layer_templates:
       - 0.0
     - - 12
       - 0.0
-    - - 20
-      - 0.0
     - - 36
       - 0.0
     velocity: 84
@@ -1093,6 +1534,214 @@ layer_templates:
     instrument_velocity_offsets:
       trombones_stacc: 0
       celli: -8
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  string_roster_hook_variation_a:
+    kind: motif
+    instruments:
+    - violins_i_stacc
+    - violins_ii_stacc
+    - clarinets
+    motif: roster_hook_variation_a
+    root: E4
+    starts:
+    - - 16
+      - 0.0
+    - - 56
+      - 0.0
+    - - 88
+      - 0.0
+    velocity: 82
+    articulation: marcato
+    gate: 0.8
+    instrument_octave_offsets:
+      violins_i_stacc: 0
+      violins_ii_stacc: -1
+      clarinets: -1
+    instrument_velocity_offsets:
+      violins_i_stacc: 0
+      violins_ii_stacc: -5
+      clarinets: -10
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  low_roster_answer_variation_a:
+    kind: motif
+    instruments:
+    - trombones_stacc
+    - celli
+    - clarinets
+    motif: roster_answer_variation_a
+    root: B3
+    starts:
+    - - 20
+      - 0.0
+    - - 60
+      - 0.0
+    - - 92
+      - 0.0
+    velocity: 80
+    articulation: marcato
+    gate: 0.8
+    instrument_octave_offsets:
+      trombones_stacc: -1
+      celli: 0
+      clarinets: 0
+    instrument_velocity_offsets:
+      trombones_stacc: -2
+      celli: -7
+      clarinets: -10
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  horn_roster_hook_variation_b:
+    kind: motif
+    instruments:
+    - horns_stacc
+    - violas
+    - oboes
+    motif: roster_hook_variation_b
+    root: E4
+    starts:
+    - - 40
+      - 0.0
+    - - 72
+      - 0.0
+    velocity: 84
+    articulation: marcato
+    gate: 0.8
+    instrument_octave_offsets:
+      horns_stacc: -1
+      violas: 0
+      oboes: 0
+    instrument_velocity_offsets:
+      horns_stacc: 0
+      violas: -7
+      oboes: -9
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  woodwind_roster_answer_variation_b:
+    kind: motif
+    instruments:
+    - oboes
+    - clarinets
+    - celli
+    motif: roster_answer_variation_b
+    root: B3
+    starts:
+    - - 44
+      - 0.0
+    - - 76
+      - 0.0
+    velocity: 78
+    articulation: marcato
+    gate: 0.82
+    instrument_octave_offsets:
+      oboes: 0
+      clarinets: 0
+      celli: 0
+    instrument_velocity_offsets:
+      oboes: -2
+      clarinets: -6
+      celli: -7
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  woodwind_relay_c:
+    kind: motif
+    instruments:
+    - flutes
+    - oboes
+    - clarinets
+    motif: wind_relay_c
+    root: C5
+    starts:
+    - - 48
+      - 0.0
+    - - 80
+      - 0.0
+    velocity: 77
+    articulation: tenuto
+    gate: 0.86
+    instrument_octave_offsets:
+      flutes: 0
+      oboes: 0
+      clarinets: -1
+    instrument_velocity_offsets:
+      flutes: 2
+      oboes: -2
+      clarinets: -7
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  woodwind_relay_d:
+    kind: motif
+    instruments:
+    - flutes
+    - oboes
+    - clarinets
+    motif: wind_relay_d
+    root: C5
+    starts:
+    - - 52
+      - 0.0
+    - - 84
+      - 0.0
+    velocity: 79
+    articulation: tenuto
+    gate: 0.86
+    instrument_octave_offsets:
+      flutes: 0
+      oboes: 0
+      clarinets: -1
+    instrument_velocity_offsets:
+      flutes: 2
+      oboes: -2
+      clarinets: -7
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  string_wind_relay_a_development:
+    kind: motif
+    instruments:
+    - violins_i_stacc
+    - violins_ii_stacc
+    - flutes
+    motif: wind_relay_a
+    root: C5
+    starts:
+    - - 64
+      - 0.0
+    velocity: 74
+    articulation: tenuto
+    gate: 0.86
+    instrument_octave_offsets:
+      violins_i_stacc: 0
+      violins_ii_stacc: -1
+      flutes: 0
+    instrument_velocity_offsets:
+      violins_i_stacc: 0
+      violins_ii_stacc: -6
+      flutes: -5
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  horn_wind_relay_b_development:
+    kind: motif
+    instruments:
+    - horns_sus
+    - oboes
+    - clarinets
+    motif: wind_relay_b
+    root: C5
+    starts:
+    - - 68
+      - 0.0
+    velocity: 76
+    articulation: tenuto
+    gate: 0.88
+    instrument_octave_offsets:
+      horns_sus: -1
+      oboes: 0
+      clarinets: -1
+    instrument_velocity_offsets:
+      horns_sus: -5
+      oboes: 0
+      clarinets: -6
     humanize_ms: 3
     humanize_velocity_pct: 3
   woodwind_relay_a:
@@ -1164,7 +1813,7 @@ layer_templates:
     motif: final_rise
     root: B3
     starts:
-    - - 46
+    - - 102
       - 0.0
     velocity: 78
     articulation: tenuto
@@ -1378,6 +2027,230 @@ layer_templates:
       - 1.5
     - - 47
       - 3.5
+    - - 48
+      - 0.0
+    - - 48
+      - 2.5
+    - - 49
+      - 1.5
+    - - 49
+      - 3.5
+    - - 50
+      - 0.0
+    - - 50
+      - 2.5
+    - - 51
+      - 1.5
+    - - 51
+      - 3.5
+    - - 52
+      - 0.0
+    - - 52
+      - 2.5
+    - - 53
+      - 1.5
+    - - 53
+      - 3.5
+    - - 54
+      - 0.0
+    - - 54
+      - 2.5
+    - - 55
+      - 1.5
+    - - 55
+      - 3.5
+    - - 56
+      - 0.0
+    - - 56
+      - 2.5
+    - - 57
+      - 1.5
+    - - 57
+      - 3.5
+    - - 58
+      - 0.0
+    - - 58
+      - 2.5
+    - - 59
+      - 1.5
+    - - 59
+      - 3.5
+    - - 60
+      - 0.0
+    - - 60
+      - 2.5
+    - - 61
+      - 1.5
+    - - 61
+      - 3.5
+    - - 62
+      - 0.0
+    - - 62
+      - 2.5
+    - - 63
+      - 1.5
+    - - 63
+      - 3.5
+    - - 64
+      - 0.0
+    - - 64
+      - 2.5
+    - - 65
+      - 1.5
+    - - 65
+      - 3.5
+    - - 66
+      - 0.0
+    - - 66
+      - 2.5
+    - - 67
+      - 1.5
+    - - 67
+      - 3.5
+    - - 68
+      - 0.0
+    - - 68
+      - 2.5
+    - - 69
+      - 1.5
+    - - 69
+      - 3.5
+    - - 70
+      - 0.0
+    - - 70
+      - 2.5
+    - - 71
+      - 1.5
+    - - 71
+      - 3.5
+    - - 72
+      - 0.0
+    - - 72
+      - 2.5
+    - - 73
+      - 1.5
+    - - 73
+      - 3.5
+    - - 74
+      - 0.0
+    - - 74
+      - 2.5
+    - - 75
+      - 1.5
+    - - 75
+      - 3.5
+    - - 76
+      - 0.0
+    - - 76
+      - 2.5
+    - - 77
+      - 1.5
+    - - 77
+      - 3.5
+    - - 78
+      - 0.0
+    - - 78
+      - 2.5
+    - - 79
+      - 1.5
+    - - 79
+      - 3.5
+    - - 80
+      - 0.0
+    - - 80
+      - 2.5
+    - - 81
+      - 1.5
+    - - 81
+      - 3.5
+    - - 82
+      - 0.0
+    - - 82
+      - 2.5
+    - - 83
+      - 1.5
+    - - 83
+      - 3.5
+    - - 84
+      - 0.0
+    - - 84
+      - 2.5
+    - - 85
+      - 1.5
+    - - 85
+      - 3.5
+    - - 86
+      - 0.0
+    - - 86
+      - 2.5
+    - - 87
+      - 1.5
+    - - 87
+      - 3.5
+    - - 88
+      - 0.0
+    - - 88
+      - 2.5
+    - - 89
+      - 1.5
+    - - 89
+      - 3.5
+    - - 90
+      - 0.0
+    - - 90
+      - 2.5
+    - - 91
+      - 1.5
+    - - 91
+      - 3.5
+    - - 92
+      - 0.0
+    - - 92
+      - 2.5
+    - - 93
+      - 1.5
+    - - 93
+      - 3.5
+    - - 94
+      - 0.0
+    - - 94
+      - 2.5
+    - - 95
+      - 1.5
+    - - 95
+      - 3.5
+    - - 96
+      - 0.0
+    - - 96
+      - 2.5
+    - - 97
+      - 1.5
+    - - 97
+      - 3.5
+    - - 98
+      - 0.0
+    - - 98
+      - 2.5
+    - - 99
+      - 1.5
+    - - 99
+      - 3.5
+    - - 100
+      - 0.0
+    - - 100
+      - 2.5
+    - - 101
+      - 1.5
+    - - 101
+      - 3.5
+    - - 102
+      - 0.0
+    - - 102
+      - 2.5
+    - - 103
+      - 1.5
+    - - 103
+      - 3.5
     - - 7
       - 3.0
     - - 15
@@ -1390,6 +2263,41 @@ layer_templates:
       - 3.0
     - - 47
       - 3.0
+    - - 55
+      - 3.0
+    - - 63
+      - 3.0
+    - - 71
+      - 3.0
+    - - 79
+      - 3.0
+    - - 87
+      - 3.0
+    - - 95
+      - 3.0
+    - - 103
+      - 3.0
+    dynamics:
+    - start_bar: 40
+      bars: 16
+      from: 0.9
+      to: 0.84
+      curve: smooth
+    - start_bar: 56
+      bars: 16
+      from: 0.72
+      to: 0.8
+      curve: smooth
+    - start_bar: 72
+      bars: 16
+      from: 0.82
+      to: 0.9
+      curve: smooth
+    - start_bar: 88
+      bars: 16
+      from: 0.94
+      to: 1.08
+      curve: smooth
     octave: 3
     velocity: 72
     duration_beats: 0.34
@@ -1419,191 +2327,415 @@ layer_templates:
       - 0.0
       - 0
       - 0.42
-    - - 2
-      - 0.0
-      - 0
-      - 0.42
-    - - 4
-      - 0.0
-      - 0
-      - 0.42
-    - - 6
-      - 0.0
-      - 0
-      - 0.42
-    - - 8
-      - 0.0
-      - 0
-      - 0.42
-    - - 10
-      - 0.0
-      - 0
-      - 0.42
-    - - 12
-      - 0.0
-      - 0
-      - 0.42
-    - - 14
-      - 0.0
-      - 0
-      - 0.42
-    - - 16
-      - 0.0
-      - 0
-      - 0.42
-    - - 18
-      - 0.0
-      - 0
-      - 0.42
-    - - 20
-      - 0.0
-      - 0
-      - 0.42
-    - - 22
-      - 0.0
-      - 0
-      - 0.42
-    - - 24
-      - 0.0
-      - 0
-      - 0.42
-    - - 26
-      - 0.0
-      - 0
-      - 0.42
-    - - 28
-      - 0.0
-      - 0
-      - 0.42
-    - - 30
-      - 0.0
-      - 0
-      - 0.42
-    - - 32
-      - 0.0
-      - 0
-      - 0.42
-    - - 34
-      - 0.0
-      - 0
-      - 0.42
-    - - 36
-      - 0.0
-      - 0
-      - 0.42
-    - - 38
-      - 0.0
-      - 0
-      - 0.42
-    - - 40
-      - 0.0
-      - 0
-      - 0.42
-    - - 42
-      - 0.0
-      - 0
-      - 0.42
-    - - 44
-      - 0.0
-      - 0
-      - 0.42
-    - - 46
-      - 0.0
-      - 0
-      - 0.42
     - - 0
       - 2.0
       - 12
       - 0.34
     - - 2
+      - 0.0
+      - 0
+      - 0.42
+    - - 2
       - 2.0
       - 12
       - 0.34
+    - - 4
+      - 0.0
+      - 0
+      - 0.42
     - - 4
       - 2.0
       - 12
       - 0.34
     - - 6
+      - 0.0
+      - 0
+      - 0.42
+    - - 6
       - 2.0
       - 12
       - 0.34
+    - - 8
+      - 0.0
+      - 0
+      - 0.42
     - - 8
       - 2.0
       - 12
       - 0.34
     - - 10
+      - 0.0
+      - 0
+      - 0.42
+    - - 10
       - 2.0
       - 12
       - 0.34
+    - - 12
+      - 0.0
+      - 0
+      - 0.42
     - - 12
       - 2.0
       - 12
       - 0.34
     - - 14
+      - 0.0
+      - 0
+      - 0.42
+    - - 14
       - 2.0
       - 12
       - 0.34
+    - - 16
+      - 0.0
+      - 0
+      - 0.42
     - - 16
       - 2.0
       - 12
       - 0.34
     - - 18
+      - 0.0
+      - 0
+      - 0.42
+    - - 18
       - 2.0
       - 12
       - 0.34
+    - - 20
+      - 0.0
+      - 0
+      - 0.42
     - - 20
       - 2.0
       - 12
       - 0.34
     - - 22
+      - 0.0
+      - 0
+      - 0.42
+    - - 22
       - 2.0
       - 12
       - 0.34
+    - - 24
+      - 0.0
+      - 0
+      - 0.42
     - - 24
       - 2.0
       - 12
       - 0.34
     - - 26
+      - 0.0
+      - 0
+      - 0.42
+    - - 26
       - 2.0
       - 12
       - 0.34
+    - - 28
+      - 0.0
+      - 0
+      - 0.42
     - - 28
       - 2.0
       - 12
       - 0.34
     - - 30
+      - 0.0
+      - 0
+      - 0.42
+    - - 30
       - 2.0
       - 12
       - 0.34
+    - - 32
+      - 0.0
+      - 0
+      - 0.42
     - - 32
       - 2.0
       - 12
       - 0.34
     - - 34
+      - 0.0
+      - 0
+      - 0.42
+    - - 34
       - 2.0
       - 12
       - 0.34
+    - - 36
+      - 0.0
+      - 0
+      - 0.42
     - - 36
       - 2.0
       - 12
       - 0.34
     - - 38
+      - 0.0
+      - 0
+      - 0.42
+    - - 38
       - 2.0
       - 12
       - 0.34
+    - - 40
+      - 0.0
+      - 0
+      - 0.42
     - - 40
       - 2.0
       - 12
       - 0.34
     - - 42
+      - 0.0
+      - 0
+      - 0.42
+    - - 42
       - 2.0
       - 12
       - 0.34
+    - - 44
+      - 0.0
+      - 0
+      - 0.42
     - - 44
       - 2.0
       - 12
       - 0.34
     - - 46
+      - 0.0
+      - 0
+      - 0.42
+    - - 46
+      - 2.0
+      - 12
+      - 0.34
+    - - 48
+      - 0.0
+      - 0
+      - 0.42
+    - - 48
+      - 2.0
+      - 12
+      - 0.34
+    - - 50
+      - 0.0
+      - 0
+      - 0.42
+    - - 50
+      - 2.0
+      - 12
+      - 0.34
+    - - 52
+      - 0.0
+      - 0
+      - 0.42
+    - - 52
+      - 2.0
+      - 12
+      - 0.34
+    - - 54
+      - 0.0
+      - 0
+      - 0.42
+    - - 54
+      - 2.0
+      - 12
+      - 0.34
+    - - 56
+      - 0.0
+      - 0
+      - 0.42
+    - - 56
+      - 2.0
+      - 12
+      - 0.34
+    - - 58
+      - 0.0
+      - 0
+      - 0.42
+    - - 58
+      - 2.0
+      - 12
+      - 0.34
+    - - 60
+      - 0.0
+      - 0
+      - 0.42
+    - - 60
+      - 2.0
+      - 12
+      - 0.34
+    - - 62
+      - 0.0
+      - 0
+      - 0.42
+    - - 62
+      - 2.0
+      - 12
+      - 0.34
+    - - 64
+      - 0.0
+      - 0
+      - 0.42
+    - - 64
+      - 2.0
+      - 12
+      - 0.34
+    - - 66
+      - 0.0
+      - 0
+      - 0.42
+    - - 66
+      - 2.0
+      - 12
+      - 0.34
+    - - 68
+      - 0.0
+      - 0
+      - 0.42
+    - - 68
+      - 2.0
+      - 12
+      - 0.34
+    - - 70
+      - 0.0
+      - 0
+      - 0.42
+    - - 70
+      - 2.0
+      - 12
+      - 0.34
+    - - 72
+      - 0.0
+      - 0
+      - 0.42
+    - - 72
+      - 2.0
+      - 12
+      - 0.34
+    - - 74
+      - 0.0
+      - 0
+      - 0.42
+    - - 74
+      - 2.0
+      - 12
+      - 0.34
+    - - 76
+      - 0.0
+      - 0
+      - 0.42
+    - - 76
+      - 2.0
+      - 12
+      - 0.34
+    - - 78
+      - 0.0
+      - 0
+      - 0.42
+    - - 78
+      - 2.0
+      - 12
+      - 0.34
+    - - 80
+      - 0.0
+      - 0
+      - 0.42
+    - - 80
+      - 2.0
+      - 12
+      - 0.34
+    - - 82
+      - 0.0
+      - 0
+      - 0.42
+    - - 82
+      - 2.0
+      - 12
+      - 0.34
+    - - 84
+      - 0.0
+      - 0
+      - 0.42
+    - - 84
+      - 2.0
+      - 12
+      - 0.34
+    - - 86
+      - 0.0
+      - 0
+      - 0.42
+    - - 86
+      - 2.0
+      - 12
+      - 0.34
+    - - 88
+      - 0.0
+      - 0
+      - 0.42
+    - - 88
+      - 2.0
+      - 12
+      - 0.34
+    - - 90
+      - 0.0
+      - 0
+      - 0.42
+    - - 90
+      - 2.0
+      - 12
+      - 0.34
+    - - 92
+      - 0.0
+      - 0
+      - 0.42
+    - - 92
+      - 2.0
+      - 12
+      - 0.34
+    - - 94
+      - 0.0
+      - 0
+      - 0.42
+    - - 94
+      - 2.0
+      - 12
+      - 0.34
+    - - 96
+      - 0.0
+      - 0
+      - 0.42
+    - - 96
+      - 2.0
+      - 12
+      - 0.34
+    - - 98
+      - 0.0
+      - 0
+      - 0.42
+    - - 98
+      - 2.0
+      - 12
+      - 0.34
+    - - 100
+      - 0.0
+      - 0
+      - 0.42
+    - - 100
+      - 2.0
+      - 12
+      - 0.34
+    - - 102
+      - 0.0
+      - 0
+      - 0.42
+    - - 102
       - 2.0
       - 12
       - 0.34
@@ -1700,6 +2832,118 @@ layer_templates:
       - 12
       - 0.2
     - - 47
+      - 3.75
+      - 12
+      - 0.2
+    - - 55
+      - 2.5
+      - 0
+      - 0.2
+    - - 55
+      - 3.0
+      - 7
+      - 0.2
+    - - 55
+      - 3.5
+      - 12
+      - 0.2
+    - - 55
+      - 3.75
+      - 12
+      - 0.2
+    - - 63
+      - 2.5
+      - 0
+      - 0.2
+    - - 63
+      - 3.0
+      - 7
+      - 0.2
+    - - 63
+      - 3.5
+      - 12
+      - 0.2
+    - - 63
+      - 3.75
+      - 12
+      - 0.2
+    - - 71
+      - 2.5
+      - 0
+      - 0.2
+    - - 71
+      - 3.0
+      - 7
+      - 0.2
+    - - 71
+      - 3.5
+      - 12
+      - 0.2
+    - - 71
+      - 3.75
+      - 12
+      - 0.2
+    - - 79
+      - 2.5
+      - 0
+      - 0.2
+    - - 79
+      - 3.0
+      - 7
+      - 0.2
+    - - 79
+      - 3.5
+      - 12
+      - 0.2
+    - - 79
+      - 3.75
+      - 12
+      - 0.2
+    - - 87
+      - 2.5
+      - 0
+      - 0.2
+    - - 87
+      - 3.0
+      - 7
+      - 0.2
+    - - 87
+      - 3.5
+      - 12
+      - 0.2
+    - - 87
+      - 3.75
+      - 12
+      - 0.2
+    - - 95
+      - 2.5
+      - 0
+      - 0.2
+    - - 95
+      - 3.0
+      - 7
+      - 0.2
+    - - 95
+      - 3.5
+      - 12
+      - 0.2
+    - - 95
+      - 3.75
+      - 12
+      - 0.2
+    - - 103
+      - 2.5
+      - 0
+      - 0.2
+    - - 103
+      - 3.0
+      - 7
+      - 0.2
+    - - 103
+      - 3.5
+      - 12
+      - 0.2
+    - - 103
       - 3.75
       - 12
       - 0.2
@@ -1753,6 +2997,13 @@ layer_templates:
       - 31
       - 39
       - 47
+      - 55
+      - 63
+      - 71
+      - 79
+      - 87
+      - 95
+      - 103
       velocity: 82
       duration_beats: 0.05
   cymbal_selection_marks:
@@ -1770,12 +3021,16 @@ layer_templates:
       bars:
       - 24
       - 40
+      - 48
+      - 64
+      - 80
+      - 96
       velocity: 88
       duration_beats: 0.48
     - drum: crash
       beat: 3.0
       bars:
-      - 47
+      - 103
       velocity: 96
       duration_beats: 0.62
 playback:
@@ -1802,8 +3057,8 @@ state_map:
 sections:
 - id: character_select_loop
   kind: loop_component
-  label: high-energy orchestral roster selection
-  bars: 48
+  label: Opening hook
+  bars: 104
   intensity: 0.94
   density: 0.96
   loopable: true
@@ -1814,6 +3069,13 @@ sections:
   - 32
   - 40
   - 48
+  - 56
+  - 64
+  - 72
+  - 80
+  - 88
+  - 96
+  - 104
   harmony:
   - Em
   - Cmaj7
@@ -1861,6 +3123,62 @@ sections:
   - D
   - Em
   - C
+  - Am
+  - B7
+  - Cmaj7
+  - D
+  - Em
+  - Bm
+  - Cmaj7
+  - Am
+  - B7
+  - B7
+  - Em
+  - Cmaj7
+  - G/B
+  - D
+  - Em
+  - C
+  - Am
+  - B7
+  - Cmaj7
+  - D
+  - Em
+  - Bm
+  - Cmaj7
+  - Am
+  - B7
+  - B7
+  - Em
+  - Cmaj7
+  - G/B
+  - D
+  - Em
+  - C
+  - Am
+  - B7
+  - Cmaj7
+  - D
+  - Em
+  - Bm
+  - Cmaj7
+  - Am
+  - B7
+  - B7
+  - Em
+  - Cmaj7
+  - G/B
+  - D
+  - Em
+  - C
+  - Am
+  - B7
+  - Em
+  - Cmaj7
+  - G/B
+  - D
+  - Em
+  - C
   - B7
   - B7
   layers:
@@ -1875,6 +3193,14 @@ sections:
   - trombone_motion_bed
   - brass_roster_hook
   - low_roster_answer
+  - string_roster_hook_variation_a
+  - low_roster_answer_variation_a
+  - horn_roster_hook_variation_b
+  - woodwind_roster_answer_variation_b
+  - woodwind_relay_c
+  - woodwind_relay_d
+  - string_wind_relay_a_development
+  - horn_wind_relay_b_development
   - woodwind_relay_a
   - woodwind_relay_b
   - final_full_orchestra_rise
