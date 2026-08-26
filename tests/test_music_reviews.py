@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -47,9 +48,21 @@ def _write_render(root: Path, cue: str, render_hash: str, audio: bytes, *, lates
 
 
 def test_discovery_keeps_all_versioned_renders_and_marks_latest(tmp_path: Path):
+    """Newest first, and every older render kept.
+
+    ⛔⛔ THE TWO RENDERS NEED DISTINCT MTIMES OR THIS TEST IS A COIN FLIP.
+    `discover_render_versions` sorts by `(cue_id, -generated_at, render_hash)`
+    and `generated_at` is the preview file's OWN mtime, so two files written
+    microseconds apart can tie at the filesystem's resolution — and the tie-break
+    is the hash, which puts `aaaa` first and reads as "the ordering broke". It
+    had been failing exactly that way. Real renders are minutes apart; the
+    fixture says so now instead of hoping.
+    """
     _write_score(tmp_path)
-    _write_render(tmp_path, "test_cue", "aaaaaaaaaaaaaaaa", b"old")
-    _write_render(tmp_path, "test_cue", "bbbbbbbbbbbbbbbb", b"new", latest=True)
+    old_preview = _write_render(tmp_path, "test_cue", "aaaaaaaaaaaaaaaa", b"old")
+    new_preview = _write_render(tmp_path, "test_cue", "bbbbbbbbbbbbbbbb", b"new", latest=True)
+    os.utime(old_preview, (1_700_000_000, 1_700_000_000))
+    os.utime(new_preview, (1_700_003_600, 1_700_003_600))
     versions = discover_render_versions(tmp_path, include_agent_bundles=False)
     assert [version.render_hash for version in versions] == ["bbbbbbbbbbbbbbbb", "aaaaaaaaaaaaaaaa"]
     assert versions[0].is_latest is True
