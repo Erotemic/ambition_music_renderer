@@ -161,7 +161,7 @@ instruments:
     expression: 104
     instrument_backend:
       kind: sfz
-      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Woodwinds - Performance/Flute Solo 1 Sustain (looped, decay).sfz"
+      sfz: "/data/audio-tools/sfz/Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Woodwinds - Performance/Flute Solo 1 Sustain (looped, decay).sfz"
       optional: true
       fallback_backend: pretty-midi
   # The answering voice: bowed vibraphone, slow-speaking and ethereal.
@@ -184,7 +184,7 @@ instruments:
     expression: 88
     instrument_backend:
       kind: sfz
-      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Percussion/Celeste.sfz"
+      sfz: "/data/audio-tools/sfz/Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Percussion/Celeste.sfz"
       optional: true
       fallback_backend: pretty-midi
   - name: dream_harp

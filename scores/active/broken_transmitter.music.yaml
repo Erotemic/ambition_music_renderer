@@ -128,7 +128,7 @@ instruments:
     expression: 104
     instrument_backend:
       kind: sfz
-      sfz: "/data/audio-tools/sfz/Sonatina/sso-4.0/Sonatina Symphonic Orchestra/Strings - Performance/Violin Solo 1 Sustain (looped).sfz"
+      sfz: "/data/audio-tools/sfz/Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Strings - Performance/Violin Solo 1 Sustain (looped).sfz"
       optional: true
       fallback_backend: pretty-midi
   - name: voice_guitar
