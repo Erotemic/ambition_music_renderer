@@ -428,6 +428,21 @@ def render_cue_to_versioned_generated(
     )
     if ok:
         mark_generated_run_latest(layout)
+        # Record WHICH instrument files this render actually resolved to. The
+        # run hash covers the score and backend but deliberately not the
+        # installed sample libraries (hashing a 24GB tree is not viable), so
+        # this note is the only way to later ask whether a cue would render
+        # differently now that more instruments exist. See audit/instrument_drift.py.
+        #
+        # Bookkeeping must never fail a good render: a cue that rendered
+        # correctly is still correct if this file could not be written.
+        try:
+            from .audit.instrument_drift import write_fingerprint
+            from .render.score_core import load_yaml as _load_yaml
+
+            write_fingerprint(outdir, _load_yaml(yaml_path))
+        except Exception as ex:  # noqa: BLE001 - never escalate bookkeeping
+            print(f"warning: could not record instrument fingerprint for {cue}: {ex}", file=sys.stderr)
     return ok
 
 
@@ -499,12 +514,26 @@ def _process_simple_mix_cue(
         if force_render or needs_render(cue, yaml_path, outdir):
             # Batch and single-cue rendering share adaptive-cue mode selection.
             simple_mix, full_mix_only = render_mode_for_cue(cue)
+            # ⛔ `--force_render` must reach the ISOLATED renderer, not just
+            # this branch. The versioned run directory is keyed by (YAML,
+            # backend), so a forced run resolves to the SAME directory as the
+            # previous render and `render.isolated` then no-ops on the finished
+            # output already sitting there. Without this the flag only decides
+            # whether to invoke a renderer that declines to do anything, and
+            # `--force` is silently a no-op for any cue already rendered once.
+            #
+            # That is not hypothetical: the run key does not include which
+            # instrument libraries are installed, so every cue rendered BEFORE
+            # the SFZ libraries existed kept its General-MIDI audio through a
+            # full forced re-render, and only cues whose YAML had changed since
+            # picked up the sampled instruments.
             if not render_cue_to_versioned_generated(
                 cue,
                 yaml_path,
                 backend=backend,
                 simple_mix=simple_mix,
                 full_mix_only=full_mix_only,
+                extra_args=["--force"] if force_render else None,
             ):
                 return "render"
         else:
@@ -589,7 +618,20 @@ def run_bulk_cues(config, *, cues_factory, action: str) -> int:
     (``SANDBOX_CUES`` for sandbox, ``radio_cues()`` for radio). For the
     ``render-publish`` action, ``--skip_render`` degrades it to publish-only.
     """
-    cues = tuple(config.cue) if config.cue else tuple(cues_factory())
+    # ⛔ `tuple()` OF A STRING IS ITS CHARACTERS. `cue` is annotated
+    # `list[str] | None`, but the CLI hands back a bare `str` for
+    # `--cue=some_id` (kwconf warns about the annotation mismatch and keeps the
+    # string), so this produced one "cue" per LETTER and the run died in
+    # preflight with `- b: missing YAML`, `- r: missing YAML`, ... — a failure
+    # that names every character of the argument and never the argument.
+    #
+    # The help has always promised "may be comma/list parsed"; nothing parsed
+    # it. Honour that here, for both the string and already-list forms.
+    if config.cue:
+        selected = config.cue.split(",") if isinstance(config.cue, str) else list(config.cue)
+        cues = tuple(part.strip() for part in selected if part.strip())
+    else:
+        cues = tuple(cues_factory())
     if action == "render-publish" and config.skip_render:
         action = "publish"
     if action in ("render", "render-publish") and not _preflight_bulk_render(
@@ -1097,6 +1139,7 @@ from .audit.audit_cue_balance import AuditCueBalanceConfig
 from .audit.dissonance_audit import DissonanceAuditConfig
 from .audit.lead_collision import LeadCollisionConfig
 from .audit.level_report import LevelReportConfig
+from .audit.instrument_drift import InstrumentDriftConfig
 from .audit.mix_balance_audit import MixBalanceAuditConfig
 from .audit.pitch_stability import PitchStabilityConfig
 from .audit.reference_audio_audit import ReferenceAudioAuditConfig
@@ -1124,6 +1167,7 @@ class AuditModal(kwconf.ModalCLI):
     spectral_compare = SpectralCompareConfig
     spectral_localize = SpectralLocalizeConfig
     transition = TransitionAuditConfig
+    instrument_drift = InstrumentDriftConfig
 
 
 class LegacyModal(kwconf.ModalCLI):

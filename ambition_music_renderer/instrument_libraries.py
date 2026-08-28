@@ -8,6 +8,7 @@ SoundFont path with a warning.
 
 from __future__ import annotations
 
+import functools
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -545,18 +546,34 @@ def configured_sfz_roots(extra_roots: Iterable[str | Path] | None = None) -> lis
     return _dedupe_roots(roots)
 
 
-def discover_sfz_files(roots: Iterable[str | Path] | None = None) -> list[Path]:
-    """Discover SFZ files under configured local sample-library roots."""
+@functools.lru_cache(maxsize=8)
+def _discover_sfz_files_cached(root_keys: tuple[str, ...]) -> tuple[Path, ...]:
+    """Scan the roots once per process.
 
+    A full install is ~1800 .sfz files under a 24GB tree, and `rglob` over it
+    costs seconds. Every instrument of every cue resolves through here, so an
+    uncached scan turned a whole-catalogue question into minutes of repeated
+    directory walking. Libraries do not appear mid-process, so caching for the
+    life of the process is safe; a run that installs them must start again to
+    see them, which is already true of the roots themselves.
+    """
     out: list[Path] = []
-    for root in configured_sfz_roots(roots):
+    for key in root_keys:
+        root = Path(key)
         if not root.exists():
             continue
         try:
             out.extend(path.resolve() for path in root.rglob("*.sfz") if path.is_file())
         except OSError:
             continue
-    return sorted(set(out), key=lambda p: str(p).lower())
+    return tuple(sorted(set(out), key=lambda p: str(p).lower()))
+
+
+def discover_sfz_files(roots: Iterable[str | Path] | None = None) -> list[Path]:
+    """Discover SFZ files under configured local sample-library roots."""
+
+    root_keys = tuple(str(root) for root in configured_sfz_roots(roots))
+    return list(_discover_sfz_files_cached(root_keys))
 
 
 
