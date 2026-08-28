@@ -58,6 +58,57 @@ preseed_jack_no_realtime(){
     echo "jackd2 jackd/tweak_rt_limits boolean false" | ${_SUDO:+$_SUDO} debconf-set-selections || true
 }
 
+# The renderer invokes the SFZ player BY NAME: `audio_plugins.py` and
+# `backends/sfizz_backend.py` both default to `sfizz_render`, and the backend
+# raises "not found. Install sfizz_render or choose another backend" when that
+# exact name is not on PATH.
+#
+# Which binary a machine actually ends up with depends on where sfizz came from.
+# The sfztools OBS packages ship `sfizz_render`; other builds and distro
+# packagings have shipped the hyphenated `sfizz-render`; and either may land
+# outside PATH. That is enough variation that a fresh machine can finish this
+# script with a perfectly working sfizz the renderer still cannot find, and then
+# silently render every sampled instrument through the General-MIDI fallback.
+#
+# So: normalize to the name the renderer asks for. Only ever ADD a link for a
+# missing name — never replace a real `sfizz_render` that is already present.
+ensure_sfizz_render_compat_shim(){
+    _SUDO="$(_sudo_prefix)"
+    SHIM_DIR="${SFIZZ_SHIM_DIR:-/usr/local/bin}"
+    SFIZZ_TARGET=""
+
+    if command -v sfizz_render >/dev/null 2>&1; then
+        echo "[setup] Have sfizz_render: $(command -v sfizz_render)"
+        return 0
+    fi
+
+    # PATH first, then the package manifests: a package can install into a
+    # directory that is not on this shell's PATH.
+    if command -v sfizz-render >/dev/null 2>&1; then
+        SFIZZ_TARGET="$(command -v sfizz-render)"
+    else
+        for PKG in sfizz sfizz-tools; do
+            [ -n "$SFIZZ_TARGET" ] && break
+            while IFS= read -r CANDIDATE; do
+                if [ -x "$CANDIDATE" ]; then
+                    SFIZZ_TARGET="$CANDIDATE"
+                    break
+                fi
+            done < <(dpkg -L "$PKG" 2>/dev/null | grep -E '/sfizz[-_]render$' || true)
+        done
+    fi
+
+    if [ -z "$SFIZZ_TARGET" ]; then
+        # Nothing to link. The caller reports this; do not fail the whole setup
+        # over an optional backend.
+        return 0
+    fi
+
+    echo "[setup] Linking sfizz_render -> $SFIZZ_TARGET in $SHIM_DIR"
+    ${_SUDO:+$_SUDO} mkdir -p "$SHIM_DIR"
+    ${_SUDO:+$_SUDO} ln -sfn "$SFIZZ_TARGET" "$SHIM_DIR/sfizz_render"
+}
+
 install_sfizz_obs_repo(){
     _SUDO="$(_sudo_prefix)"
     UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-}")"
@@ -151,6 +202,16 @@ else
     echo "[setup] Skipping sfizz OBS repo. Set INSTALL_SFIZZ_OBS=1 to enable it."
     echo "[setup] Trying distro sfizz package if already available."
     apt_ensure_if_available sfizz sfizz-tools
+    # The name mismatch is not specific to the OBS packages, so this path needs
+    # the same normalization. Ubuntu does not ship sfizz in the main archive at
+    # all, so reaching here usually means no SFZ player: say so plainly, because
+    # the consequence downstream is a quiet quality drop, not an error.
+    ensure_sfizz_render_compat_shim
+    if ! command -v sfizz_render >/dev/null 2>&1; then
+        echo "[setup] NOTE: no sfizz_render on this machine." >&2
+        echo "[setup] Sampled SFZ instruments will fall back to General MIDI." >&2
+        echo "[setup] Re-run with INSTALL_SFIZZ_OBS=1 to install it from the sfztools repo." >&2
+    fi
 fi
 
 # Local developer setup. Assumes uv is installed.
