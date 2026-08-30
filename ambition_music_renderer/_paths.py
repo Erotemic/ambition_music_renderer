@@ -74,7 +74,7 @@ def publish_root() -> Path:
 
     ⭐ **The consumer declares this; the renderer never guesses.** It is passed
     as ``--dest-root`` or through ``AMBITION_MUSIC_PUBLISH_ROOT``, both of which
-    the game repo's own ``regen_music.sh`` sets from the one place that knows its
+    the game repo's own ``scripts/regen/music.sh`` sets from the one place that knows its
     asset layout.
 
     Raising is the point. The previous default was a hard-coded path into a crate
