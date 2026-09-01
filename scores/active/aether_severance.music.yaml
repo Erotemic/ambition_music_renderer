@@ -1,0 +1,9829 @@
+schema: ambition.musicir.v1
+id: aether_severance
+title: Aether Severance
+seed: 2026090111
+notes: V4 performance-and-mix pass. Preserve the V3 Salamander-led composition and proven Emily/Big Rusty instrument
+  choices, but fix the rock-band performance. Rhythm-guitar notes no longer use the global staccato 0.40 gate; each attack
+  now rings to roughly 82-90% of the next onset, with explicit gate 1.0 and longer phrase chords. Drum parts are rewritten
+  as multi-bar performances with alternating kick patterns, phrase crashes, open-hat/ride changes, ghost notes, and tom
+  fills instead of one repeated bar per section. Carve guitar low-mid energy away from the piano and let the drum transients
+  breathe. Correct only the highest-confidence sour piano notes while retaining intentional harmonic-minor leading tones.
+tempo:
+  bpm: 204
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 7
+  backend: pretty-midi
+  strict_backends: true
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    render_timeout_s: 240
+  foreground_protection:
+    enabled: false
+  adaptive_section_mastering:
+    mode: global_master_slices
+    notes: Master once and slice; arrangement creates section contrast.
+  section_mix_transition_beats: 0.5
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 28
+  lowpass_hz: 15800
+  reverb_wet: 0.015
+  reverb_decay_seconds: 0.62
+  reverb_damping_hz: 7000
+  stereo_width: 0.07
+  compressor_threshold_db: -18.0
+  compressor_ratio: 1.5
+  compressor_attack_ms: 18
+  compressor_release_ms: 120
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 4.0
+  limiter_drive: 1.0
+  normalize: true
+  target_peak_db: -2.7
+  eq_bands:
+  - type: low_shelf
+    hz: 90
+    q: 0.8
+    db: -0.3
+  - type: peak
+    hz: 310
+    q: 0.9
+    db: -0.35
+  - type: peak
+    hz: 2200
+    q: 0.8
+    db: 0.35
+  - type: high_shelf
+    hz: 9500
+    q: 0.7
+    db: -0.2
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 24
+  reverb_wet: 0.001
+  stereo_width: 0.004
+  limiter_enabled: false
+  normalize: false
+group_postprocess:
+  piano_lead:
+    gain_db: -0.2
+    highpass_hz: 38
+    lowpass_hz: 15400
+    reverb_wet: 0.018
+    reverb_decay_seconds: 0.72
+    reverb_damping_hz: 7600
+    stereo_width: 0.055
+    compressor_threshold_db: -22.0
+    compressor_ratio: 1.35
+    compressor_attack_ms: 15.0
+    compressor_release_ms: 115.0
+    compressor_makeup_db: 0.0
+  rhythm_guitars:
+    gain_db: -3.7
+    highpass_hz: 68
+    lowpass_hz: 10300
+    reverb_wet: 0.003
+    compressor_threshold_db: -20.0
+    compressor_ratio: 1.3
+    compressor_attack_ms: 18.0
+    compressor_release_ms: 112.0
+    effect_chain:
+    - kind: pedalboard
+      label: emily-rhythm-amp
+      report_levels: true
+      effects:
+      - effect: gain
+        gain_db: 17.0
+      - effect: distortion
+        drive_db: 6.2
+      - effect: gain
+        gain_db: -16.0
+      - effect: lowpass
+        cutoff_hz: 10300.0
+    eq_bands:
+    - type: low_shelf
+      hz: 105
+      q: 0.8
+      db: -0.4
+    - type: peak
+      hz: 360
+      q: 0.9
+      db: -1.7
+    - type: peak
+      hz: 720
+      q: 1.0
+      db: -0.8
+    - type: peak
+      hz: 2650
+      q: 0.9
+      db: 0.4
+  low_strings:
+    gain_db: -3.8
+    highpass_hz: 45
+    lowpass_hz: 7200
+    reverb_wet: 0.006
+    compressor_threshold_db: -24.0
+    compressor_ratio: 1.5
+    compressor_attack_ms: 10.0
+    compressor_release_ms: 105.0
+  high_strings:
+    gain_db: -5.0
+    highpass_hz: 105
+    lowpass_hz: 11500
+    reverb_wet: 0.018
+    reverb_decay_seconds: 0.7
+    compressor_threshold_db: -24.0
+    compressor_ratio: 1.35
+    compressor_attack_ms: 13.0
+    compressor_release_ms: 120.0
+  brass:
+    gain_db: -6.0
+    highpass_hz: 85
+    lowpass_hz: 10000
+    reverb_wet: 0.014
+    reverb_decay_seconds: 0.68
+    compressor_threshold_db: -24.0
+    compressor_ratio: 1.35
+    compressor_attack_ms: 16.0
+    compressor_release_ms: 130.0
+  drums:
+    gain_db: -1.3
+    highpass_hz: 28
+    lowpass_hz: 16500
+    reverb_wet: 0.0015
+    reverb_decay_seconds: 0.34
+    reverb_damping_hz: 8500
+    stereo_width: 0.06
+    compressor_threshold_db: -16.5
+    compressor_ratio: 1.28
+    compressor_attack_ms: 24.0
+    compressor_release_ms: 112.0
+    compressor_makeup_db: 0.0
+    eq_bands:
+    - type: low_shelf
+      hz: 78
+      q: 0.75
+      db: 1.0
+    - type: peak
+      hz: 310
+      q: 0.9
+      db: -0.9
+    - type: peak
+      hz: 2900
+      q: 0.85
+      db: 0.4
+    - type: high_shelf
+      hz: 8200
+      q: 0.7
+      db: -0.5
+instruments:
+- name: rhythm_left
+  group: rhythm_guitars
+  program: distortion_guitar
+  volume: 103
+  pan: 26
+  expression: 110
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Emilyguitar/**/emily_chords.sfz'
+    prefer:
+    - emily_chords
+    - emilyguitar
+    - power-chord
+- name: rhythm_right
+  group: rhythm_guitars
+  program: distortion_guitar
+  volume: 101
+  pan: 102
+  expression: 108
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Emilyguitar/**/emily_chords_wide.sfz'
+    prefer:
+    - emily_chords_wide
+    - emilyguitar
+    - wide-power-chord
+- name: salamander_lead
+  group: piano_lead
+  program: acoustic_grand_piano
+  volume: 108
+  pan: 64
+  expression: 116
+  mix_role: lead
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - piano
+    - sustain
+    - salamander
+- name: celli_stacc
+  group: low_strings
+  program: cello
+  volume: 96
+  pan: 42
+  expression: 106
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli_staccato
+    prefer:
+    - notation
+    - celli staccato
+    - staccato
+- name: violas_sus
+  group: high_strings
+  program: viola
+  volume: 82
+  pan: 52
+  expression: 94
+  modulation: 5
+  mix_role: background
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+- name: violins_stacc
+  group: high_strings
+  program: string_ensemble_1
+  volume: 91
+  pan: 82
+  expression: 102
+  mix_role: background
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1_staccato
+    prefer:
+    - notation
+    - 1st violins staccato
+    - staccato
+- name: horns_sus
+  group: brass
+  program: french_horn
+  volume: 88
+  pan: 70
+  expression: 101
+  modulation: 5
+  mix_role: background
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer:
+    - notation
+    - horns
+    - sustain
+- name: big_rusty_kit
+  group: drums
+  is_drum: true
+  volume: 112
+  pan: 64
+  expression: 112
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/BigRustyDrums/Programs/01-full.sfz'
+    prefer:
+    - bigrustydrums
+    - 01-full
+    - full-kit
+motifs: []
+layer_templates:
+  severance_drums:
+    kind: drums
+    instrument: big_rusty_kit
+    humanize_ms: 1.8
+    events:
+    - drum: kick
+      bars:
+      - 0
+      - 2
+      - 4
+      - 6
+      - 8
+      beats:
+      - 0
+      - 0.375
+      - 0.75
+      - 1.5
+      - 1.875
+      - 2.25
+      - 3
+      - 3.5
+      velocity: 111
+      duration_beats: 0.16
+    - drum: kick
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      beats:
+      - 0
+      - 0.5
+      - 0.875
+      - 1.5
+      - 2
+      - 2.375
+      - 3.25
+      - 3.75
+      velocity: 107
+      duration_beats: 0.16
+    - drum: snare
+      beats:
+      - 1
+      - 3
+      velocity: 117
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      beats:
+      - 2.75
+      velocity: 66
+      duration_beats: 0.16
+    - drum: closed_hat
+      bars: &id001
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 72
+      duration_beats: 0.14
+    - drum: closed_hat
+      bars: *id001
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      velocity: 47
+      duration_beats: 0.12
+    - drum: open_hat
+      bars:
+      - 2
+      - 6
+      beats:
+      - 3.5
+      velocity: 84
+      duration_beats: 0.42
+    - drum: crash
+      bars:
+      - 0
+      - 4
+      - 8
+      beats:
+      - 0
+      velocity: 116
+      duration_beats: 1.0
+    - drum: high_tom
+      bars:
+      - 3
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 3
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 3
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 3
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 7
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 7
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 7
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 7
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 8
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 8
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 8
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 8
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+  sky_rend_drums:
+    kind: drums
+    instrument: big_rusty_kit
+    humanize_ms: 1.8
+    events:
+    - drum: kick
+      bars:
+      - 0
+      - 2
+      - 4
+      - 6
+      - 8
+      - 10
+      - 12
+      - 14
+      - 16
+      - 18
+      beats:
+      - 0
+      - 0.5
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2
+      - 2.75
+      - 3.25
+      - 3.75
+      velocity: 111
+      duration_beats: 0.16
+    - drum: kick
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      - 17
+      - 19
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 1.875
+      - 2.5
+      - 2.75
+      - 3.5
+      velocity: 107
+      duration_beats: 0.16
+    - drum: snare
+      beats:
+      - 1
+      - 3
+      velocity: 117
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      - 17
+      - 19
+      beats:
+      - 2.75
+      velocity: 66
+      duration_beats: 0.16
+    - drum: closed_hat
+      bars: &id002
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 18
+      - 19
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 72
+      duration_beats: 0.14
+    - drum: closed_hat
+      bars: *id002
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      velocity: 47
+      duration_beats: 0.12
+    - drum: open_hat
+      bars:
+      - 2
+      - 6
+      - 10
+      - 14
+      - 18
+      beats:
+      - 3.5
+      velocity: 84
+      duration_beats: 0.42
+    - drum: crash
+      bars:
+      - 0
+      - 4
+      - 8
+      - 12
+      - 16
+      beats:
+      - 0
+      velocity: 116
+      duration_beats: 1.0
+    - drum: high_tom
+      bars:
+      - 3
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 3
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 3
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 3
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 7
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 7
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 7
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 7
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 11
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 11
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 11
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 11
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 15
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 15
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 15
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 15
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 19
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 19
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 19
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 19
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+  limit_flash_drums:
+    kind: drums
+    instrument: big_rusty_kit
+    humanize_ms: 1.8
+    events:
+    - drum: kick
+      bars:
+      - 0
+      - 2
+      - 4
+      - 6
+      - 8
+      - 10
+      beats:
+      - 0
+      - 0.25
+      - 0.5
+      - 0.75
+      - 1
+      - 1.25
+      - 1.5
+      - 1.75
+      - 2
+      - 2.25
+      - 2.5
+      - 2.75
+      - 3
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 113
+      duration_beats: 0.16
+    - drum: kick
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      beats:
+      - 0
+      - 0.25
+      - 0.5
+      - 1
+      - 1.5
+      - 1.75
+      - 2.25
+      - 2.5
+      - 3
+      - 3.5
+      - 3.75
+      velocity: 108
+      duration_beats: 0.16
+    - drum: snare
+      beats:
+      - 1
+      - 3
+      velocity: 117
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      beats:
+      - 2.75
+      velocity: 66
+      duration_beats: 0.16
+    - drum: closed_hat
+      bars: &id003
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 72
+      duration_beats: 0.14
+    - drum: closed_hat
+      bars: *id003
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      velocity: 47
+      duration_beats: 0.12
+    - drum: open_hat
+      bars:
+      - 2
+      - 6
+      beats:
+      - 3.5
+      velocity: 84
+      duration_beats: 0.42
+    - drum: crash
+      bars:
+      - 0
+      - 4
+      - 8
+      beats:
+      - 0
+      velocity: 116
+      duration_beats: 1.0
+    - drum: high_tom
+      bars:
+      - 3
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 3
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 3
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 3
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 7
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 7
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 7
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 7
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 10
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 10
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 10
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 10
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+  phase_change_drums:
+    kind: drums
+    instrument: big_rusty_kit
+    humanize_ms: 1.8
+    events:
+    - drum: kick
+      bars:
+      - 0
+      - 2
+      - 4
+      - 6
+      - 8
+      - 10
+      - 12
+      - 14
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 111
+      duration_beats: 0.16
+    - drum: kick
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      beats:
+      - 0
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.5
+      - 3
+      - 3.75
+      velocity: 107
+      duration_beats: 0.16
+    - drum: snare
+      beats:
+      - 1
+      - 3
+      velocity: 117
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      beats:
+      - 2.75
+      velocity: 66
+      duration_beats: 0.16
+    - drum: closed_hat
+      bars: &id004
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 72
+      duration_beats: 0.14
+    - drum: closed_hat
+      bars: *id004
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      velocity: 47
+      duration_beats: 0.12
+    - drum: ride
+      bars:
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 79
+      duration_beats: 0.22
+    - drum: open_hat
+      bars:
+      - 2
+      - 6
+      beats:
+      - 3.5
+      velocity: 84
+      duration_beats: 0.42
+    - drum: crash
+      bars:
+      - 0
+      - 4
+      - 8
+      - 12
+      beats:
+      - 0
+      velocity: 116
+      duration_beats: 1.0
+    - drum: high_tom
+      bars:
+      - 3
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 3
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 3
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 3
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 7
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 7
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 7
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 7
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 11
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 11
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 11
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 11
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 15
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 15
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 15
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 15
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+  terminal_heaven_drums:
+    kind: drums
+    instrument: big_rusty_kit
+    humanize_ms: 1.8
+    events:
+    - drum: kick
+      bars:
+      - 0
+      - 2
+      - 4
+      - 6
+      - 8
+      - 10
+      - 12
+      - 14
+      - 16
+      beats:
+      - 0
+      - 0.25
+      - 0.5
+      - 1
+      - 1.25
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 111
+      duration_beats: 0.16
+    - drum: kick
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      - 17
+      beats:
+      - 0
+      - 0.5
+      - 0.75
+      - 1.5
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.5
+      velocity: 107
+      duration_beats: 0.16
+    - drum: snare
+      beats:
+      - 1
+      - 3
+      velocity: 117
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      - 17
+      beats:
+      - 2.75
+      velocity: 66
+      duration_beats: 0.16
+    - drum: closed_hat
+      bars: &id005
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 72
+      duration_beats: 0.14
+    - drum: closed_hat
+      bars: *id005
+      beats:
+      - 0.25
+      - 0.75
+      - 1.25
+      - 1.75
+      - 2.25
+      - 2.75
+      - 3.25
+      velocity: 47
+      duration_beats: 0.12
+    - drum: ride
+      bars:
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      beats:
+      - 0
+      - 0.5
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+      - 3.5
+      velocity: 79
+      duration_beats: 0.22
+    - drum: open_hat
+      bars:
+      - 2
+      - 6
+      beats:
+      - 3.5
+      velocity: 84
+      duration_beats: 0.42
+    - drum: crash
+      bars:
+      - 0
+      - 4
+      - 8
+      - 12
+      - 16
+      beats:
+      - 0
+      velocity: 116
+      duration_beats: 1.0
+    - drum: high_tom
+      bars:
+      - 3
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 3
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 3
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 3
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 7
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 7
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 7
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 7
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 11
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 11
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 11
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 11
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 15
+      beats:
+      - 3.0
+      velocity: 94
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 15
+      beats:
+      - 3.25
+      velocity: 101
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 15
+      beats:
+      - 3.5
+      velocity: 108
+      duration_beats: 0.24
+    - drum: snare
+      bars:
+      - 15
+      beats:
+      - 3.75
+      velocity: 116
+      duration_beats: 0.24
+    - drum: high_tom
+      bars:
+      - 17
+      beats:
+      - 3.0
+      velocity: 92
+      duration_beats: 0.24
+    - drum: mid_tom
+      bars:
+      - 17
+      beats:
+      - 3.25
+      velocity: 98
+      duration_beats: 0.24
+    - drum: low_tom
+      bars:
+      - 17
+      beats:
+      - 3.5
+      velocity: 105
+      duration_beats: 0.24
+    - drum: floor_tom
+      bars:
+      - 17
+      beats:
+      - 3.75
+      velocity: 112
+      duration_beats: 0.24
+  severance_piano:
+    kind: notes
+    instrument: salamander_lead
+    articulation: normal
+    humanize_ms: 0.35
+    humanize_velocity_pct: 1.0
+    notes:
+    - - 0
+      - 0.0
+      - D5
+      - 0.14
+      - 110
+    - - 0
+      - 0.25
+      - Eb5
+      - 0.14
+      - 99
+    - - 0
+      - 0.5
+      - F#5
+      - 0.14
+      - 99
+    - - 0
+      - 0.75
+      - G5
+      - 0.14
+      - 99
+    - - 0
+      - 1.0
+      - A5
+      - 0.14
+      - 110
+    - - 0
+      - 1.25
+      - Bb5
+      - 0.14
+      - 99
+    - - 0
+      - 1.5
+      - C6
+      - 0.14
+      - 99
+    - - 0
+      - 1.75
+      - D6
+      - 0.14
+      - 99
+    - - 0
+      - 2.25
+      - - G5
+        - D6
+      - 1.35
+      - 117
+    - - 1
+      - 0.0
+      - - G4
+        - G5
+      - 0.58
+      - 110
+    - - 1
+      - 0.85
+      - D6
+      - 0.42
+      - 99
+    - - 1
+      - 1.55
+      - Bb5
+      - 0.72
+      - 106
+    - - 1
+      - 2.6
+      - D6
+      - 1.05
+      - 114
+    - - 2
+      - 0.0
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 115
+    - - 2
+      - 0.75
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 104
+    - - 2
+      - 1.6
+      - - C5
+        - C6
+      - 0.34
+      - 104
+    - - 2
+      - 2.45
+      - - D5
+        - D6
+      - 0.34
+      - 115
+    - - 2
+      - 3.25
+      - - D5
+        - D6
+      - 0.34
+      - 104
+    - - 3
+      - 0.0
+      - D4
+      - 0.18
+      - 107
+    - - 3
+      - 0.333
+      - F#4
+      - 0.18
+      - 97
+    - - 3
+      - 0.667
+      - A4
+      - 0.18
+      - 97
+    - - 3
+      - 1.0
+      - D5
+      - 0.18
+      - 107
+    - - 3
+      - 1.333
+      - F#5
+      - 0.18
+      - 97
+    - - 3
+      - 1.667
+      - A5
+      - 0.18
+      - 97
+    - - 3
+      - 2.0
+      - F#6
+      - 0.18
+      - 107
+    - - 3
+      - 2.333
+      - A6
+      - 0.18
+      - 97
+    - - 3
+      - 2.667
+      - A6
+      - 0.18
+      - 97
+    - - 3
+      - 3.0
+      - F#6
+      - 0.18
+      - 107
+    - - 3
+      - 3.333
+      - A5
+      - 0.18
+      - 97
+    - - 3
+      - 3.667
+      - F#5
+      - 0.18
+      - 97
+    - - 4
+      - 0.5
+      - D6
+      - 0.38
+      - 105
+    - - 4
+      - 1.15
+      - G5
+      - 0.72
+      - 113
+    - - 4
+      - 2.35
+      - Bb5
+      - 0.3
+      - 98
+    - - 4
+      - 3.0
+      - - G5
+        - G6
+      - 0.76
+      - 119
+    - - 6
+      - 0.0
+      - - Bb4
+        - D5
+        - F5
+        - Bb5
+        - D6
+      - 0.48
+      - 120
+    - - 6
+      - 1.4
+      - - Bb5
+        - F6
+      - 0.28
+      - 103
+    - - 6
+      - 2.65
+      - - Bb4
+        - D5
+        - F5
+        - Bb5
+      - 0.62
+      - 117
+    - - 7
+      - 1.75
+      - C6
+      - 0.14
+      - 112
+    - - 7
+      - 2.0
+      - Bb5
+      - 0.14
+      - 103
+    - - 7
+      - 2.25
+      - A5
+      - 0.14
+      - 103
+    - - 7
+      - 2.5
+      - G5
+      - 0.14
+      - 103
+    - - 7
+      - 2.75
+      - F#5
+      - 0.14
+      - 112
+    - - 7
+      - 3.0
+      - Eb5
+      - 0.14
+      - 103
+    - - 7
+      - 3.25
+      - D5
+      - 0.14
+      - 103
+    - - 7
+      - 3.5
+      - C5
+      - 0.14
+      - 103
+    - - 7
+      - 0.0
+      - - D5
+        - A5
+      - 1.25
+      - 116
+    - - 8
+      - 0.0
+      - - G4
+        - G5
+      - 0.58
+      - 110
+    - - 8
+      - 0.85
+      - D6
+      - 0.42
+      - 99
+    - - 8
+      - 1.55
+      - Bb5
+      - 0.72
+      - 106
+    - - 8
+      - 2.6
+      - D6
+      - 1.05
+      - 114
+  severance_rhythm_left:
+    kind: notes
+    instrument: rhythm_left
+    articulation: normal
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.8
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.315
+      - 112
+    - - 0
+      - 0.375
+      - G2
+      - 0.315
+      - 94
+    - - 0
+      - 0.75
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 1.5
+      - G2
+      - 0.315
+      - 112
+    - - 0
+      - 1.875
+      - G2
+      - 0.315
+      - 94
+    - - 0
+      - 2.25
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 3.0
+      - G2
+      - 0.42
+      - 112
+    - - 0
+      - 3.5
+      - G2
+      - 0.42
+      - 94
+    - - 1
+      - 0.0
+      - G2
+      - 0.42
+      - 110
+    - - 1
+      - 0.5
+      - G2
+      - 0.66
+      - 98
+    - - 1
+      - 1.25
+      - G2
+      - 0.66
+      - 98
+    - - 1
+      - 2.0
+      - G2
+      - 0.66
+      - 110
+    - - 1
+      - 2.75
+      - G2
+      - 0.66
+      - 98
+    - - 1
+      - 3.5
+      - G2
+      - 0.42
+      - 98
+    - - 2
+      - 0.0
+      - G2
+      - 1.8
+      - 114
+    - - 2
+      - 2.35
+      - G2
+      - 1.485
+      - 108
+    - - 3
+      - 0.0
+      - D3
+      - 0.66
+      - 113
+    - - 3
+      - 0.75
+      - D3
+      - 0.42
+      - 100
+    - - 3
+      - 1.25
+      - D3
+      - 0.88
+      - 100
+    - - 3
+      - 2.25
+      - D3
+      - 0.66
+      - 113
+    - - 3
+      - 3.0
+      - D3
+      - 0.88
+      - 100
+    - - 4
+      - 0.0
+      - G2
+      - 0.42
+      - 110
+    - - 4
+      - 0.5
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 1.25
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 2.0
+      - G2
+      - 0.66
+      - 110
+    - - 4
+      - 2.75
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 3.5
+      - G2
+      - 0.42
+      - 98
+    - - 5
+      - 0.0
+      - C3
+      - 1.8
+      - 110
+    - - 5
+      - 3.25
+      - C3
+      - 0.66
+      - 104
+    - - 6
+      - 0.0
+      - Bb2
+      - 1.35
+      - 116
+    - - 6
+      - 1.5
+      - Bb2
+      - 1.35
+      - 102
+    - - 6
+      - 3.0
+      - Bb2
+      - 0.88
+      - 114
+    - - 7
+      - 0.0
+      - D3
+      - 0.315
+      - 112
+    - - 7
+      - 0.375
+      - D3
+      - 0.315
+      - 94
+    - - 7
+      - 0.75
+      - D3
+      - 0.66
+      - 94
+    - - 7
+      - 1.5
+      - D3
+      - 0.315
+      - 112
+    - - 7
+      - 1.875
+      - D3
+      - 0.315
+      - 94
+    - - 7
+      - 2.25
+      - D3
+      - 0.66
+      - 94
+    - - 7
+      - 3.0
+      - D3
+      - 0.42
+      - 112
+    - - 7
+      - 3.5
+      - D3
+      - 0.42
+      - 94
+    - - 8
+      - 0.0
+      - G2
+      - 1.8
+      - 114
+    - - 8
+      - 2.35
+      - G2
+      - 1.25
+      - 108
+    gate: 1.0
+  severance_rhythm_right:
+    kind: notes
+    instrument: rhythm_right
+    articulation: normal
+    humanize_ms: 0.75
+    humanize_velocity_pct: 2.0
+    notes:
+    - - 0
+      - 0.018
+      - G2
+      - 0.315
+      - 108
+    - - 0
+      - 0.393
+      - G2
+      - 0.315
+      - 90
+    - - 0
+      - 0.768
+      - G2
+      - 0.66
+      - 90
+    - - 0
+      - 1.518
+      - G2
+      - 0.315
+      - 108
+    - - 0
+      - 1.893
+      - G2
+      - 0.315
+      - 90
+    - - 0
+      - 2.268
+      - G2
+      - 0.66
+      - 90
+    - - 0
+      - 3.018
+      - G2
+      - 0.42
+      - 108
+    - - 0
+      - 3.518
+      - G2
+      - 0.42
+      - 90
+    - - 1
+      - 0.018
+      - G2
+      - 0.42
+      - 106
+    - - 1
+      - 0.518
+      - G2
+      - 0.66
+      - 94
+    - - 1
+      - 1.268
+      - G2
+      - 0.66
+      - 94
+    - - 1
+      - 2.018
+      - G2
+      - 0.66
+      - 106
+    - - 1
+      - 2.768
+      - G2
+      - 0.66
+      - 94
+    - - 1
+      - 3.518
+      - G2
+      - 0.42
+      - 94
+    - - 2
+      - 0.018
+      - G2
+      - 1.8
+      - 110
+    - - 2
+      - 2.368
+      - G2
+      - 1.485
+      - 104
+    - - 3
+      - 0.018
+      - D3
+      - 0.66
+      - 109
+    - - 3
+      - 0.768
+      - D3
+      - 0.42
+      - 96
+    - - 3
+      - 1.268
+      - D3
+      - 0.88
+      - 96
+    - - 3
+      - 2.268
+      - D3
+      - 0.66
+      - 109
+    - - 3
+      - 3.018
+      - D3
+      - 0.88
+      - 96
+    - - 4
+      - 0.018
+      - G2
+      - 0.42
+      - 106
+    - - 4
+      - 0.518
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 1.268
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 2.018
+      - G2
+      - 0.66
+      - 106
+    - - 4
+      - 2.768
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 3.518
+      - G2
+      - 0.42
+      - 94
+    - - 5
+      - 0.018
+      - C3
+      - 1.8
+      - 106
+    - - 5
+      - 3.268
+      - C3
+      - 0.66
+      - 100
+    - - 6
+      - 0.018
+      - Bb2
+      - 1.35
+      - 112
+    - - 6
+      - 1.518
+      - Bb2
+      - 1.35
+      - 98
+    - - 6
+      - 3.018
+      - Bb2
+      - 0.88
+      - 110
+    - - 7
+      - 0.018
+      - D3
+      - 0.315
+      - 108
+    - - 7
+      - 0.393
+      - D3
+      - 0.315
+      - 90
+    - - 7
+      - 0.768
+      - D3
+      - 0.66
+      - 90
+    - - 7
+      - 1.518
+      - D3
+      - 0.315
+      - 108
+    - - 7
+      - 1.893
+      - D3
+      - 0.315
+      - 90
+    - - 7
+      - 2.268
+      - D3
+      - 0.66
+      - 90
+    - - 7
+      - 3.018
+      - D3
+      - 0.42
+      - 108
+    - - 7
+      - 3.518
+      - D3
+      - 0.42
+      - 90
+    - - 8
+      - 0.018
+      - G2
+      - 1.8
+      - 110
+    - - 8
+      - 2.368
+      - G2
+      - 1.25
+      - 104
+    gate: 1.0
+  severance_celli:
+    kind: notes
+    instrument: celli_stacc
+    articulation: staccato
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.6
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.24
+      - 90
+    - - 0
+      - 0.75
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 1.5
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 2.25
+      - G2
+      - 0.24
+      - 90
+    - - 0
+      - 3.0
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 3.5
+      - G2
+      - 0.24
+      - 80
+    - - 1
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 1
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 1
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 1
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 2
+      - 0.0
+      - G2
+      - 1.2
+      - 88
+    - - 2
+      - 2.5
+      - D3
+      - 0.75
+      - 82
+    - - 3
+      - 0.0
+      - D2
+      - 0.3
+      - 92
+    - - 3
+      - 1.5
+      - A2
+      - 0.3
+      - 82
+    - - 3
+      - 2.5
+      - D2
+      - 0.3
+      - 82
+    - - 3
+      - 3.25
+      - A2
+      - 0.3
+      - 82
+    - - 4
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 4
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 4
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 4
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 5
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 5
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 6
+      - 0.0
+      - Bb2
+      - 0.3
+      - 92
+    - - 6
+      - 1.5
+      - F3
+      - 0.3
+      - 82
+    - - 6
+      - 2.5
+      - Bb2
+      - 0.3
+      - 82
+    - - 6
+      - 3.25
+      - F3
+      - 0.3
+      - 82
+    - - 7
+      - 0.0
+      - D2
+      - 0.24
+      - 90
+    - - 7
+      - 0.75
+      - A2
+      - 0.24
+      - 80
+    - - 7
+      - 1.5
+      - A2
+      - 0.24
+      - 80
+    - - 7
+      - 2.25
+      - D2
+      - 0.24
+      - 90
+    - - 7
+      - 3.0
+      - A2
+      - 0.24
+      - 80
+    - - 7
+      - 3.5
+      - D2
+      - 0.24
+      - 80
+    - - 8
+      - 0.0
+      - G2
+      - 1.2
+      - 88
+    - - 8
+      - 2.5
+      - D3
+      - 0.75
+      - 82
+  severance_violas:
+    kind: notes
+    instrument: violas_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.2
+    notes:
+    - - 3
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+    - - 7
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+    - - 8
+      - 0.0
+      - - G3
+        - Bb3
+      - 3.75
+      - 84
+  severance_violins:
+    kind: notes
+    instrument: violins_stacc
+    articulation: staccato
+    humanize_ms: 0.7
+    humanize_velocity_pct: 1.4
+    notes:
+    - - 2
+      - 0.0
+      - G4
+      - 0.36
+      - 86
+    - - 2
+      - 1.5
+      - D5
+      - 0.36
+      - 86
+    - - 2
+      - 3.0
+      - Bb4
+      - 0.36
+      - 86
+    - - 3
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 3
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 3
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+    - - 7
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 7
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 7
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+    - - 8
+      - 0.0
+      - G4
+      - 0.36
+      - 96
+    - - 8
+      - 1.5
+      - D5
+      - 0.36
+      - 96
+    - - 8
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+  severance_horns:
+    kind: notes
+    instrument: horns_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.1
+    notes:
+    - - 3
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 3
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+    - - 7
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 7
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+    - - 8
+      - 0.0
+      - - G3
+        - D4
+      - 1.6
+      - 86
+    - - 8
+      - 2.4
+      - - Bb3
+        - D4
+      - 1.25
+      - 82
+  sky_rend_piano:
+    kind: notes
+    instrument: salamander_lead
+    articulation: normal
+    humanize_ms: 0.35
+    humanize_velocity_pct: 1.0
+    notes:
+    - - 0
+      - 0.0
+      - - G4
+        - G5
+      - 0.58
+      - 105
+    - - 0
+      - 0.85
+      - D6
+      - 0.42
+      - 96
+    - - 0
+      - 1.55
+      - Bb5
+      - 0.72
+      - 101
+    - - 0
+      - 2.6
+      - D6
+      - 1.05
+      - 109
+    - - 1
+      - 0.5
+      - G6
+      - 0.38
+      - 100
+    - - 1
+      - 1.15
+      - C6
+      - 0.72
+      - 108
+    - - 1
+      - 2.35
+      - Eb6
+      - 0.3
+      - 95
+    - - 1
+      - 3.0
+      - - C6
+        - C7
+      - 0.76
+      - 114
+    - - 2
+      - 0.0
+      - D5
+      - 0.14
+      - 105
+    - - 2
+      - 0.25
+      - Eb5
+      - 0.14
+      - 96
+    - - 2
+      - 0.5
+      - F#5
+      - 0.14
+      - 96
+    - - 2
+      - 0.75
+      - G5
+      - 0.14
+      - 96
+    - - 2
+      - 1.0
+      - A5
+      - 0.14
+      - 105
+    - - 2
+      - 1.25
+      - Bb5
+      - 0.14
+      - 96
+    - - 2
+      - 1.5
+      - C6
+      - 0.14
+      - 96
+    - - 2
+      - 1.75
+      - D6
+      - 0.14
+      - 96
+    - - 2
+      - 2.25
+      - - G5
+        - D6
+      - 1.35
+      - 112
+    - - 4
+      - 0.0
+      - - D4
+        - D5
+      - 0.34
+      - 110
+    - - 4
+      - 0.75
+      - - F#4
+        - F#5
+      - 0.34
+      - 99
+    - - 4
+      - 1.6
+      - - G4
+        - G5
+      - 0.34
+      - 99
+    - - 4
+      - 2.45
+      - - A4
+        - A5
+      - 0.34
+      - 110
+    - - 4
+      - 3.25
+      - - A4
+        - A5
+      - 0.34
+      - 99
+    - - 5
+      - 0.0
+      - G4
+      - 0.18
+      - 102
+    - - 5
+      - 0.333
+      - Bb4
+      - 0.18
+      - 94
+    - - 5
+      - 0.667
+      - D5
+      - 0.18
+      - 94
+    - - 5
+      - 1.0
+      - G5
+      - 0.18
+      - 102
+    - - 5
+      - 1.333
+      - Bb5
+      - 0.18
+      - 94
+    - - 5
+      - 1.667
+      - D6
+      - 0.18
+      - 94
+    - - 5
+      - 2.0
+      - Bb6
+      - 0.18
+      - 102
+    - - 5
+      - 2.333
+      - D7
+      - 0.18
+      - 94
+    - - 5
+      - 2.667
+      - D7
+      - 0.18
+      - 94
+    - - 5
+      - 3.0
+      - Bb6
+      - 0.18
+      - 102
+    - - 5
+      - 3.333
+      - D6
+      - 0.18
+      - 94
+    - - 5
+      - 3.667
+      - Bb5
+      - 0.18
+      - 94
+    - - 6
+      - 0.0
+      - - Eb4
+        - Eb5
+      - 0.58
+      - 105
+    - - 6
+      - 0.85
+      - Bb5
+      - 0.42
+      - 96
+    - - 6
+      - 1.55
+      - G5
+      - 0.72
+      - 101
+    - - 6
+      - 2.6
+      - Bb5
+      - 1.05
+      - 109
+    - - 7
+      - 0.0
+      - - C5
+        - Eb5
+        - G5
+        - C6
+        - Eb6
+      - 0.48
+      - 115
+    - - 7
+      - 1.4
+      - - C6
+        - G6
+      - 0.28
+      - 98
+    - - 7
+      - 2.65
+      - - C5
+        - Eb5
+        - G5
+        - C6
+      - 0.62
+      - 112
+    - - 8
+      - 1.75
+      - C6
+      - 0.14
+      - 107
+    - - 8
+      - 2.0
+      - Bb5
+      - 0.14
+      - 98
+    - - 8
+      - 2.25
+      - A5
+      - 0.14
+      - 98
+    - - 8
+      - 2.5
+      - G5
+      - 0.14
+      - 98
+    - - 8
+      - 2.75
+      - F#5
+      - 0.14
+      - 107
+    - - 8
+      - 3.0
+      - Eb5
+      - 0.14
+      - 98
+    - - 8
+      - 3.25
+      - D5
+      - 0.14
+      - 98
+    - - 8
+      - 3.5
+      - C5
+      - 0.14
+      - 98
+    - - 8
+      - 0.0
+      - - D5
+        - A5
+      - 1.25
+      - 111
+    - - 9
+      - 0.5
+      - D6
+      - 0.38
+      - 100
+    - - 9
+      - 1.15
+      - G5
+      - 0.72
+      - 108
+    - - 9
+      - 2.35
+      - Bb5
+      - 0.3
+      - 95
+    - - 9
+      - 3.0
+      - - G5
+        - G6
+      - 0.76
+      - 114
+    - - 10
+      - 0.0
+      - Bb4
+      - 0.16
+      - 103
+    - - 10
+      - 0.333
+      - D5
+      - 0.16
+      - 95
+    - - 10
+      - 0.667
+      - Eb5
+      - 0.16
+      - 95
+    - - 10
+      - 1.0
+      - F#5
+      - 0.16
+      - 103
+    - - 10
+      - 1.333
+      - G5
+      - 0.16
+      - 95
+    - - 10
+      - 1.667
+      - A5
+      - 0.16
+      - 95
+    - - 10
+      - 2.0
+      - Bb5
+      - 0.16
+      - 103
+    - - 10
+      - 2.333
+      - C6
+      - 0.16
+      - 95
+    - - 10
+      - 2.667
+      - D6
+      - 0.16
+      - 95
+    - - 10
+      - 3.0
+      - Eb6
+      - 0.16
+      - 103
+    - - 10
+      - 3.333
+      - F#6
+      - 0.16
+      - 95
+    - - 10
+      - 3.667
+      - Bb4
+      - 0.16
+      - 95
+    - - 12
+      - 0.0
+      - - C5
+        - C6
+      - 0.32
+      - 113
+    - - 12
+      - 0.5
+      - C6
+      - 0.18
+      - 96
+    - - 12
+      - 1.0
+      - C6
+      - 0.18
+      - 96
+    - - 12
+      - 1.5
+      - C6
+      - 0.18
+      - 96
+    - - 12
+      - 2.75
+      - - C5
+        - C6
+      - 0.32
+      - 113
+    - - 12
+      - 3.0
+      - C6
+      - 0.18
+      - 96
+    - - 12
+      - 3.25
+      - C6
+      - 0.18
+      - 96
+    - - 12
+      - 3.5
+      - C6
+      - 0.18
+      - 96
+    - - 13
+      - 0.0
+      - - D4
+        - D5
+      - 0.58
+      - 105
+    - - 13
+      - 0.85
+      - A5
+      - 0.42
+      - 96
+    - - 13
+      - 1.55
+      - F#5
+      - 0.72
+      - 101
+    - - 13
+      - 2.6
+      - A5
+      - 1.05
+      - 109
+    - - 14
+      - 0.0
+      - G4
+      - 0.18
+      - 102
+    - - 14
+      - 0.333
+      - Bb4
+      - 0.18
+      - 94
+    - - 14
+      - 0.667
+      - D5
+      - 0.18
+      - 94
+    - - 14
+      - 1.0
+      - G5
+      - 0.18
+      - 102
+    - - 14
+      - 1.333
+      - Bb5
+      - 0.18
+      - 94
+    - - 14
+      - 1.667
+      - D6
+      - 0.18
+      - 94
+    - - 14
+      - 2.0
+      - Bb6
+      - 0.18
+      - 102
+    - - 14
+      - 2.333
+      - D7
+      - 0.18
+      - 94
+    - - 14
+      - 2.667
+      - D7
+      - 0.18
+      - 94
+    - - 14
+      - 3.0
+      - Bb6
+      - 0.18
+      - 102
+    - - 14
+      - 3.333
+      - D6
+      - 0.18
+      - 94
+    - - 14
+      - 3.667
+      - Bb5
+      - 0.18
+      - 94
+    - - 15
+      - 0.0
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 110
+    - - 15
+      - 0.75
+      - - D5
+        - D6
+      - 0.34
+      - 99
+    - - 15
+      - 1.6
+      - - Eb5
+        - Eb6
+      - 0.34
+      - 99
+    - - 15
+      - 2.45
+      - - G5
+        - G6
+      - 0.34
+      - 110
+    - - 15
+      - 3.25
+      - - F5
+        - F6
+      - 0.34
+      - 99
+    - - 16
+      - 0.5
+      - D6
+      - 0.38
+      - 100
+    - - 16
+      - 1.15
+      - G5
+      - 0.72
+      - 108
+    - - 16
+      - 2.35
+      - Bb5
+      - 0.3
+      - 95
+    - - 16
+      - 3.0
+      - - G5
+        - G6
+      - 0.76
+      - 114
+    - - 17
+      - 0.0
+      - Eb5
+      - 0.13
+      - 104
+    - - 17
+      - 0.25
+      - F5
+      - 0.13
+      - 96
+    - - 17
+      - 0.5
+      - G5
+      - 0.13
+      - 96
+    - - 17
+      - 0.75
+      - A5
+      - 0.13
+      - 96
+    - - 17
+      - 1.0
+      - Bb5
+      - 0.13
+      - 104
+    - - 17
+      - 1.25
+      - C6
+      - 0.13
+      - 96
+    - - 17
+      - 1.5
+      - D6
+      - 0.13
+      - 96
+    - - 17
+      - 1.75
+      - Eb6
+      - 0.13
+      - 96
+    - - 17
+      - 2.0
+      - F6
+      - 0.13
+      - 104
+    - - 17
+      - 2.25
+      - G6
+      - 0.13
+      - 96
+    - - 17
+      - 2.6
+      - - C6
+        - G6
+      - 0.5
+      - 113
+    - - 18
+      - 0.0
+      - - D4
+        - F#4
+        - A4
+        - D5
+        - F#5
+      - 0.48
+      - 115
+    - - 18
+      - 1.4
+      - - D5
+        - A5
+      - 0.28
+      - 98
+    - - 18
+      - 2.65
+      - - D4
+        - F#4
+        - A4
+        - D5
+      - 0.62
+      - 112
+    - - 19
+      - 0.0
+      - - G4
+        - G5
+      - 0.58
+      - 105
+    - - 19
+      - 0.85
+      - D6
+      - 0.42
+      - 96
+    - - 19
+      - 1.55
+      - Bb5
+      - 0.72
+      - 101
+    - - 19
+      - 2.6
+      - D6
+      - 1.05
+      - 109
+  sky_rend_rhythm_left:
+    kind: notes
+    instrument: rhythm_left
+    articulation: normal
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.8
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.42
+      - 110
+    - - 0
+      - 0.5
+      - G2
+      - 0.66
+      - 98
+    - - 0
+      - 1.25
+      - G2
+      - 0.66
+      - 98
+    - - 0
+      - 2.0
+      - G2
+      - 0.66
+      - 110
+    - - 0
+      - 2.75
+      - G2
+      - 0.66
+      - 98
+    - - 0
+      - 3.5
+      - G2
+      - 0.42
+      - 98
+    - - 1
+      - 0.0
+      - C3
+      - 1.8
+      - 114
+    - - 1
+      - 2.35
+      - C3
+      - 1.485
+      - 108
+    - - 2
+      - 0.0
+      - G2
+      - 0.66
+      - 113
+    - - 2
+      - 0.75
+      - G2
+      - 0.42
+      - 100
+    - - 2
+      - 1.25
+      - G2
+      - 0.88
+      - 100
+    - - 2
+      - 2.25
+      - G2
+      - 0.66
+      - 113
+    - - 2
+      - 3.0
+      - G2
+      - 0.88
+      - 100
+    - - 3
+      - 0.0
+      - Bb2
+      - 0.315
+      - 112
+    - - 3
+      - 0.375
+      - Bb2
+      - 0.315
+      - 94
+    - - 3
+      - 0.75
+      - Bb2
+      - 0.66
+      - 94
+    - - 3
+      - 1.5
+      - Bb2
+      - 0.315
+      - 112
+    - - 3
+      - 1.875
+      - Bb2
+      - 0.315
+      - 94
+    - - 3
+      - 2.25
+      - Bb2
+      - 0.66
+      - 94
+    - - 3
+      - 3.0
+      - Bb2
+      - 0.42
+      - 112
+    - - 3
+      - 3.5
+      - Bb2
+      - 0.42
+      - 94
+    - - 4
+      - 0.0
+      - D3
+      - 1.8
+      - 110
+    - - 4
+      - 3.25
+      - D3
+      - 0.66
+      - 104
+    - - 5
+      - 0.0
+      - G2
+      - 1.35
+      - 116
+    - - 5
+      - 1.5
+      - G2
+      - 1.35
+      - 102
+    - - 5
+      - 3.0
+      - G2
+      - 0.88
+      - 114
+    - - 6
+      - 0.0
+      - Eb3
+      - 0.42
+      - 110
+    - - 6
+      - 0.5
+      - Eb3
+      - 0.66
+      - 98
+    - - 6
+      - 1.25
+      - Eb3
+      - 0.66
+      - 98
+    - - 6
+      - 2.0
+      - Eb3
+      - 0.66
+      - 110
+    - - 6
+      - 2.75
+      - Eb3
+      - 0.66
+      - 98
+    - - 6
+      - 3.5
+      - Eb3
+      - 0.42
+      - 98
+    - - 7
+      - 0.0
+      - C3
+      - 1.8
+      - 114
+    - - 7
+      - 2.35
+      - C3
+      - 1.485
+      - 108
+    - - 8
+      - 0.0
+      - D3
+      - 0.315
+      - 112
+    - - 8
+      - 0.375
+      - D3
+      - 0.315
+      - 94
+    - - 8
+      - 0.75
+      - D3
+      - 0.66
+      - 94
+    - - 8
+      - 1.5
+      - D3
+      - 0.315
+      - 112
+    - - 8
+      - 1.875
+      - D3
+      - 0.315
+      - 94
+    - - 8
+      - 2.25
+      - D3
+      - 0.66
+      - 94
+    - - 8
+      - 3.0
+      - D3
+      - 0.42
+      - 112
+    - - 8
+      - 3.5
+      - D3
+      - 0.42
+      - 94
+    - - 9
+      - 0.0
+      - G2
+      - 0.66
+      - 113
+    - - 9
+      - 0.75
+      - G2
+      - 0.42
+      - 100
+    - - 9
+      - 1.25
+      - G2
+      - 0.88
+      - 100
+    - - 9
+      - 2.25
+      - G2
+      - 0.66
+      - 113
+    - - 9
+      - 3.0
+      - G2
+      - 0.88
+      - 100
+    - - 10
+      - 0.0
+      - G2
+      - 1.8
+      - 110
+    - - 10
+      - 3.25
+      - G2
+      - 0.66
+      - 104
+    - - 11
+      - 0.0
+      - F2
+      - 1.8
+      - 114
+    - - 11
+      - 2.35
+      - F2
+      - 1.485
+      - 108
+    - - 12
+      - 0.0
+      - C3
+      - 0.42
+      - 110
+    - - 12
+      - 0.5
+      - C3
+      - 0.66
+      - 98
+    - - 12
+      - 1.25
+      - C3
+      - 0.66
+      - 98
+    - - 12
+      - 2.0
+      - C3
+      - 0.66
+      - 110
+    - - 12
+      - 2.75
+      - C3
+      - 0.66
+      - 98
+    - - 12
+      - 3.5
+      - C3
+      - 0.42
+      - 98
+    - - 13
+      - 0.0
+      - D3
+      - 1.35
+      - 116
+    - - 13
+      - 1.5
+      - D3
+      - 1.35
+      - 102
+    - - 13
+      - 3.0
+      - D3
+      - 0.88
+      - 114
+    - - 14
+      - 0.0
+      - G2
+      - 0.315
+      - 112
+    - - 14
+      - 0.375
+      - G2
+      - 0.315
+      - 94
+    - - 14
+      - 0.75
+      - G2
+      - 0.66
+      - 94
+    - - 14
+      - 1.5
+      - G2
+      - 0.315
+      - 112
+    - - 14
+      - 1.875
+      - G2
+      - 0.315
+      - 94
+    - - 14
+      - 2.25
+      - G2
+      - 0.66
+      - 94
+    - - 14
+      - 3.0
+      - G2
+      - 0.42
+      - 112
+    - - 14
+      - 3.5
+      - G2
+      - 0.42
+      - 94
+    - - 15
+      - 0.0
+      - Bb2
+      - 1.8
+      - 114
+    - - 15
+      - 2.35
+      - Bb2
+      - 1.485
+      - 108
+    - - 16
+      - 0.0
+      - G2
+      - 0.66
+      - 113
+    - - 16
+      - 0.75
+      - G2
+      - 0.42
+      - 100
+    - - 16
+      - 1.25
+      - G2
+      - 0.88
+      - 100
+    - - 16
+      - 2.25
+      - G2
+      - 0.66
+      - 113
+    - - 16
+      - 3.0
+      - G2
+      - 0.88
+      - 100
+    - - 17
+      - 0.0
+      - C3
+      - 1.8
+      - 110
+    - - 17
+      - 3.25
+      - C3
+      - 0.66
+      - 104
+    - - 18
+      - 0.0
+      - D3
+      - 0.315
+      - 112
+    - - 18
+      - 0.375
+      - D3
+      - 0.315
+      - 94
+    - - 18
+      - 0.75
+      - D3
+      - 0.66
+      - 94
+    - - 18
+      - 1.5
+      - D3
+      - 0.315
+      - 112
+    - - 18
+      - 1.875
+      - D3
+      - 0.315
+      - 94
+    - - 18
+      - 2.25
+      - D3
+      - 0.66
+      - 94
+    - - 18
+      - 3.0
+      - D3
+      - 0.42
+      - 112
+    - - 18
+      - 3.5
+      - D3
+      - 0.42
+      - 94
+    - - 19
+      - 0.0
+      - G2
+      - 1.8
+      - 114
+    - - 19
+      - 2.35
+      - G2
+      - 1.25
+      - 108
+    gate: 1.0
+  sky_rend_rhythm_right:
+    kind: notes
+    instrument: rhythm_right
+    articulation: normal
+    humanize_ms: 0.75
+    humanize_velocity_pct: 2.0
+    notes:
+    - - 0
+      - 0.018
+      - G2
+      - 0.42
+      - 106
+    - - 0
+      - 0.518
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 1.268
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 2.018
+      - G2
+      - 0.66
+      - 106
+    - - 0
+      - 2.768
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 3.518
+      - G2
+      - 0.42
+      - 94
+    - - 1
+      - 0.018
+      - C3
+      - 1.8
+      - 110
+    - - 1
+      - 2.368
+      - C3
+      - 1.485
+      - 104
+    - - 2
+      - 0.018
+      - G2
+      - 0.66
+      - 109
+    - - 2
+      - 0.768
+      - G2
+      - 0.42
+      - 96
+    - - 2
+      - 1.268
+      - G2
+      - 0.88
+      - 96
+    - - 2
+      - 2.268
+      - G2
+      - 0.66
+      - 109
+    - - 2
+      - 3.018
+      - G2
+      - 0.88
+      - 96
+    - - 3
+      - 0.018
+      - Bb2
+      - 0.315
+      - 108
+    - - 3
+      - 0.393
+      - Bb2
+      - 0.315
+      - 90
+    - - 3
+      - 0.768
+      - Bb2
+      - 0.66
+      - 90
+    - - 3
+      - 1.518
+      - Bb2
+      - 0.315
+      - 108
+    - - 3
+      - 1.893
+      - Bb2
+      - 0.315
+      - 90
+    - - 3
+      - 2.268
+      - Bb2
+      - 0.66
+      - 90
+    - - 3
+      - 3.018
+      - Bb2
+      - 0.42
+      - 108
+    - - 3
+      - 3.518
+      - Bb2
+      - 0.42
+      - 90
+    - - 4
+      - 0.018
+      - D3
+      - 1.8
+      - 106
+    - - 4
+      - 3.268
+      - D3
+      - 0.66
+      - 100
+    - - 5
+      - 0.018
+      - G2
+      - 1.35
+      - 112
+    - - 5
+      - 1.518
+      - G2
+      - 1.35
+      - 98
+    - - 5
+      - 3.018
+      - G2
+      - 0.88
+      - 110
+    - - 6
+      - 0.018
+      - Eb3
+      - 0.42
+      - 106
+    - - 6
+      - 0.518
+      - Eb3
+      - 0.66
+      - 94
+    - - 6
+      - 1.268
+      - Eb3
+      - 0.66
+      - 94
+    - - 6
+      - 2.018
+      - Eb3
+      - 0.66
+      - 106
+    - - 6
+      - 2.768
+      - Eb3
+      - 0.66
+      - 94
+    - - 6
+      - 3.518
+      - Eb3
+      - 0.42
+      - 94
+    - - 7
+      - 0.018
+      - C3
+      - 1.8
+      - 110
+    - - 7
+      - 2.368
+      - C3
+      - 1.485
+      - 104
+    - - 8
+      - 0.018
+      - D3
+      - 0.315
+      - 108
+    - - 8
+      - 0.393
+      - D3
+      - 0.315
+      - 90
+    - - 8
+      - 0.768
+      - D3
+      - 0.66
+      - 90
+    - - 8
+      - 1.518
+      - D3
+      - 0.315
+      - 108
+    - - 8
+      - 1.893
+      - D3
+      - 0.315
+      - 90
+    - - 8
+      - 2.268
+      - D3
+      - 0.66
+      - 90
+    - - 8
+      - 3.018
+      - D3
+      - 0.42
+      - 108
+    - - 8
+      - 3.518
+      - D3
+      - 0.42
+      - 90
+    - - 9
+      - 0.018
+      - G2
+      - 0.66
+      - 109
+    - - 9
+      - 0.768
+      - G2
+      - 0.42
+      - 96
+    - - 9
+      - 1.268
+      - G2
+      - 0.88
+      - 96
+    - - 9
+      - 2.268
+      - G2
+      - 0.66
+      - 109
+    - - 9
+      - 3.018
+      - G2
+      - 0.88
+      - 96
+    - - 10
+      - 0.018
+      - G2
+      - 1.8
+      - 106
+    - - 10
+      - 3.268
+      - G2
+      - 0.66
+      - 100
+    - - 11
+      - 0.018
+      - F2
+      - 1.8
+      - 110
+    - - 11
+      - 2.368
+      - F2
+      - 1.485
+      - 104
+    - - 12
+      - 0.018
+      - C3
+      - 0.42
+      - 106
+    - - 12
+      - 0.518
+      - C3
+      - 0.66
+      - 94
+    - - 12
+      - 1.268
+      - C3
+      - 0.66
+      - 94
+    - - 12
+      - 2.018
+      - C3
+      - 0.66
+      - 106
+    - - 12
+      - 2.768
+      - C3
+      - 0.66
+      - 94
+    - - 12
+      - 3.518
+      - C3
+      - 0.42
+      - 94
+    - - 13
+      - 0.018
+      - D3
+      - 1.35
+      - 112
+    - - 13
+      - 1.518
+      - D3
+      - 1.35
+      - 98
+    - - 13
+      - 3.018
+      - D3
+      - 0.88
+      - 110
+    - - 14
+      - 0.018
+      - G2
+      - 0.315
+      - 108
+    - - 14
+      - 0.393
+      - G2
+      - 0.315
+      - 90
+    - - 14
+      - 0.768
+      - G2
+      - 0.66
+      - 90
+    - - 14
+      - 1.518
+      - G2
+      - 0.315
+      - 108
+    - - 14
+      - 1.893
+      - G2
+      - 0.315
+      - 90
+    - - 14
+      - 2.268
+      - G2
+      - 0.66
+      - 90
+    - - 14
+      - 3.018
+      - G2
+      - 0.42
+      - 108
+    - - 14
+      - 3.518
+      - G2
+      - 0.42
+      - 90
+    - - 15
+      - 0.018
+      - Bb2
+      - 1.8
+      - 110
+    - - 15
+      - 2.368
+      - Bb2
+      - 1.485
+      - 104
+    - - 16
+      - 0.018
+      - G2
+      - 0.66
+      - 109
+    - - 16
+      - 0.768
+      - G2
+      - 0.42
+      - 96
+    - - 16
+      - 1.268
+      - G2
+      - 0.88
+      - 96
+    - - 16
+      - 2.268
+      - G2
+      - 0.66
+      - 109
+    - - 16
+      - 3.018
+      - G2
+      - 0.88
+      - 96
+    - - 17
+      - 0.018
+      - C3
+      - 1.8
+      - 106
+    - - 17
+      - 3.268
+      - C3
+      - 0.66
+      - 100
+    - - 18
+      - 0.018
+      - D3
+      - 0.315
+      - 108
+    - - 18
+      - 0.393
+      - D3
+      - 0.315
+      - 90
+    - - 18
+      - 0.768
+      - D3
+      - 0.66
+      - 90
+    - - 18
+      - 1.518
+      - D3
+      - 0.315
+      - 108
+    - - 18
+      - 1.893
+      - D3
+      - 0.315
+      - 90
+    - - 18
+      - 2.268
+      - D3
+      - 0.66
+      - 90
+    - - 18
+      - 3.018
+      - D3
+      - 0.42
+      - 108
+    - - 18
+      - 3.518
+      - D3
+      - 0.42
+      - 90
+    - - 19
+      - 0.018
+      - G2
+      - 1.8
+      - 110
+    - - 19
+      - 2.368
+      - G2
+      - 1.25
+      - 104
+    gate: 1.0
+  sky_rend_celli:
+    kind: notes
+    instrument: celli_stacc
+    articulation: staccato
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.6
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 0
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 0
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 0
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 1
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 1
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 2
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 2
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 2
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 2
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 3
+      - 0.0
+      - Bb2
+      - 0.24
+      - 90
+    - - 3
+      - 0.75
+      - F3
+      - 0.24
+      - 80
+    - - 3
+      - 1.5
+      - F3
+      - 0.24
+      - 80
+    - - 3
+      - 2.25
+      - Bb2
+      - 0.24
+      - 90
+    - - 3
+      - 3.0
+      - F3
+      - 0.24
+      - 80
+    - - 3
+      - 3.5
+      - Bb2
+      - 0.24
+      - 80
+    - - 4
+      - 0.0
+      - D2
+      - 1.2
+      - 88
+    - - 4
+      - 2.5
+      - A2
+      - 0.75
+      - 82
+    - - 5
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 5
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 5
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 5
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 6
+      - 0.0
+      - Eb2
+      - 0.3
+      - 92
+    - - 6
+      - 1.5
+      - Bb2
+      - 0.3
+      - 82
+    - - 6
+      - 2.5
+      - Eb2
+      - 0.3
+      - 82
+    - - 6
+      - 3.25
+      - Bb2
+      - 0.3
+      - 82
+    - - 7
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 7
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 8
+      - 0.0
+      - D2
+      - 0.24
+      - 90
+    - - 8
+      - 0.75
+      - A2
+      - 0.24
+      - 80
+    - - 8
+      - 1.5
+      - A2
+      - 0.24
+      - 80
+    - - 8
+      - 2.25
+      - D2
+      - 0.24
+      - 90
+    - - 8
+      - 3.0
+      - A2
+      - 0.24
+      - 80
+    - - 8
+      - 3.5
+      - D2
+      - 0.24
+      - 80
+    - - 9
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 9
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 9
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 9
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 10
+      - 0.0
+      - G2
+      - 1.2
+      - 88
+    - - 10
+      - 2.5
+      - D3
+      - 0.75
+      - 82
+    - - 11
+      - 0.0
+      - F2
+      - 1.2
+      - 88
+    - - 11
+      - 2.5
+      - C3
+      - 0.75
+      - 82
+    - - 12
+      - 0.0
+      - C3
+      - 0.3
+      - 92
+    - - 12
+      - 1.5
+      - G3
+      - 0.3
+      - 82
+    - - 12
+      - 2.5
+      - C3
+      - 0.3
+      - 82
+    - - 12
+      - 3.25
+      - G3
+      - 0.3
+      - 82
+    - - 13
+      - 0.0
+      - D2
+      - 0.3
+      - 92
+    - - 13
+      - 1.5
+      - A2
+      - 0.3
+      - 82
+    - - 13
+      - 2.5
+      - D2
+      - 0.3
+      - 82
+    - - 13
+      - 3.25
+      - A2
+      - 0.3
+      - 82
+    - - 14
+      - 0.0
+      - G2
+      - 0.24
+      - 90
+    - - 14
+      - 0.75
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 1.5
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 2.25
+      - G2
+      - 0.24
+      - 90
+    - - 14
+      - 3.0
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 3.5
+      - G2
+      - 0.24
+      - 80
+    - - 15
+      - 0.0
+      - Bb2
+      - 1.2
+      - 88
+    - - 15
+      - 2.5
+      - F3
+      - 0.75
+      - 82
+    - - 16
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 16
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 16
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 16
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 17
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 17
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 18
+      - 0.0
+      - D2
+      - 0.24
+      - 90
+    - - 18
+      - 0.75
+      - A2
+      - 0.24
+      - 80
+    - - 18
+      - 1.5
+      - A2
+      - 0.24
+      - 80
+    - - 18
+      - 2.25
+      - D2
+      - 0.24
+      - 90
+    - - 18
+      - 3.0
+      - A2
+      - 0.24
+      - 80
+    - - 18
+      - 3.5
+      - D2
+      - 0.24
+      - 80
+    - - 19
+      - 0.0
+      - G2
+      - 1.2
+      - 88
+    - - 19
+      - 2.5
+      - D3
+      - 0.75
+      - 82
+  sky_rend_violas:
+    kind: notes
+    instrument: violas_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.2
+    notes:
+    - - 13
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+    - - 19
+      - 0.0
+      - - G3
+        - Bb3
+      - 3.75
+      - 84
+  sky_rend_violins:
+    kind: notes
+    instrument: violins_stacc
+    articulation: staccato
+    humanize_ms: 0.7
+    humanize_velocity_pct: 1.4
+    notes:
+    - - 2
+      - 0.0
+      - G4
+      - 0.36
+      - 86
+    - - 2
+      - 1.5
+      - D5
+      - 0.36
+      - 86
+    - - 2
+      - 3.0
+      - Bb4
+      - 0.36
+      - 86
+    - - 7
+      - 0.0
+      - C5
+      - 0.36
+      - 86
+    - - 7
+      - 1.5
+      - G5
+      - 0.36
+      - 86
+    - - 7
+      - 3.0
+      - Eb5
+      - 0.36
+      - 86
+    - - 12
+      - 0.0
+      - C5
+      - 0.36
+      - 86
+    - - 12
+      - 1.5
+      - G5
+      - 0.36
+      - 86
+    - - 12
+      - 3.0
+      - Eb5
+      - 0.36
+      - 86
+    - - 13
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 13
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 13
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+    - - 17
+      - 0.0
+      - C5
+      - 0.36
+      - 86
+    - - 17
+      - 1.5
+      - G5
+      - 0.36
+      - 86
+    - - 17
+      - 3.0
+      - Eb5
+      - 0.36
+      - 86
+    - - 19
+      - 0.0
+      - G4
+      - 0.36
+      - 96
+    - - 19
+      - 1.5
+      - D5
+      - 0.36
+      - 96
+    - - 19
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+  sky_rend_horns:
+    kind: notes
+    instrument: horns_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.1
+    notes:
+    - - 13
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 13
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+    - - 19
+      - 0.0
+      - - G3
+        - D4
+      - 1.6
+      - 86
+    - - 19
+      - 2.4
+      - - Bb3
+        - D4
+      - 1.25
+      - 82
+  limit_flash_piano:
+    kind: notes
+    instrument: salamander_lead
+    articulation: normal
+    humanize_ms: 0.35
+    humanize_velocity_pct: 1.0
+    notes:
+    - - 0
+      - 0.0
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 115
+    - - 0
+      - 0.75
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 104
+    - - 0
+      - 1.6
+      - - C5
+        - C6
+      - 0.34
+      - 104
+    - - 0
+      - 2.45
+      - - D5
+        - D6
+      - 0.34
+      - 115
+    - - 0
+      - 3.25
+      - - D5
+        - D6
+      - 0.34
+      - 104
+    - - 1
+      - 0.0
+      - D5
+      - 0.14
+      - 110
+    - - 1
+      - 0.25
+      - Eb5
+      - 0.14
+      - 99
+    - - 1
+      - 0.5
+      - F#5
+      - 0.14
+      - 99
+    - - 1
+      - 0.75
+      - G5
+      - 0.14
+      - 99
+    - - 1
+      - 1.0
+      - A5
+      - 0.14
+      - 110
+    - - 1
+      - 1.25
+      - Bb5
+      - 0.14
+      - 99
+    - - 1
+      - 1.5
+      - C6
+      - 0.14
+      - 99
+    - - 1
+      - 1.75
+      - D6
+      - 0.14
+      - 99
+    - - 1
+      - 2.25
+      - - G5
+        - D6
+      - 1.35
+      - 117
+    - - 2
+      - 0.0
+      - - Eb4
+        - G4
+        - Bb4
+        - Eb5
+        - G5
+      - 0.48
+      - 120
+    - - 2
+      - 1.4
+      - - Eb5
+        - Bb5
+      - 0.28
+      - 103
+    - - 2
+      - 2.65
+      - - Eb4
+        - G4
+        - Bb4
+        - Eb5
+      - 0.62
+      - 117
+    - - 4
+      - 0.0
+      - Bb4
+      - 0.16
+      - 108
+    - - 4
+      - 0.333
+      - D5
+      - 0.16
+      - 98
+    - - 4
+      - 0.667
+      - Eb5
+      - 0.16
+      - 98
+    - - 4
+      - 1.0
+      - F#5
+      - 0.16
+      - 108
+    - - 4
+      - 1.333
+      - G5
+      - 0.16
+      - 98
+    - - 4
+      - 1.667
+      - A5
+      - 0.16
+      - 98
+    - - 4
+      - 2.0
+      - Bb5
+      - 0.16
+      - 108
+    - - 4
+      - 2.333
+      - C6
+      - 0.16
+      - 98
+    - - 4
+      - 2.667
+      - D6
+      - 0.16
+      - 98
+    - - 4
+      - 3.0
+      - Eb6
+      - 0.16
+      - 108
+    - - 4
+      - 3.333
+      - F#6
+      - 0.16
+      - 98
+    - - 4
+      - 3.667
+      - Bb4
+      - 0.16
+      - 98
+    - - 5
+      - 0.0
+      - - Bb4
+        - Bb5
+      - 0.32
+      - 118
+    - - 5
+      - 0.5
+      - Bb5
+      - 0.18
+      - 99
+    - - 5
+      - 1.0
+      - Bb5
+      - 0.18
+      - 99
+    - - 5
+      - 1.5
+      - Bb5
+      - 0.18
+      - 99
+    - - 5
+      - 2.75
+      - - Bb4
+        - Bb5
+      - 0.32
+      - 118
+    - - 5
+      - 3.0
+      - Bb5
+      - 0.18
+      - 99
+    - - 5
+      - 3.25
+      - Bb5
+      - 0.18
+      - 99
+    - - 5
+      - 3.5
+      - Bb5
+      - 0.18
+      - 99
+    - - 6
+      - 0.0
+      - - C5
+        - C6
+      - 0.58
+      - 110
+    - - 6
+      - 0.85
+      - G6
+      - 0.42
+      - 99
+    - - 6
+      - 1.55
+      - Eb6
+      - 0.72
+      - 106
+    - - 6
+      - 2.6
+      - G6
+      - 1.05
+      - 114
+    - - 7
+      - 0.0
+      - D4
+      - 0.18
+      - 107
+    - - 7
+      - 0.333
+      - F#4
+      - 0.18
+      - 97
+    - - 7
+      - 0.667
+      - A4
+      - 0.18
+      - 97
+    - - 7
+      - 1.0
+      - D5
+      - 0.18
+      - 107
+    - - 7
+      - 1.333
+      - F#5
+      - 0.18
+      - 97
+    - - 7
+      - 1.667
+      - A5
+      - 0.18
+      - 97
+    - - 7
+      - 2.0
+      - F#6
+      - 0.18
+      - 107
+    - - 7
+      - 2.333
+      - A6
+      - 0.18
+      - 97
+    - - 7
+      - 2.667
+      - A6
+      - 0.18
+      - 97
+    - - 7
+      - 3.0
+      - F#6
+      - 0.18
+      - 107
+    - - 7
+      - 3.333
+      - A5
+      - 0.18
+      - 97
+    - - 7
+      - 3.667
+      - F#5
+      - 0.18
+      - 97
+    - - 8
+      - 1.75
+      - G6
+      - 0.14
+      - 112
+    - - 8
+      - 2.0
+      - Eb6
+      - 0.14
+      - 103
+    - - 8
+      - 2.25
+      - D6
+      - 0.14
+      - 103
+    - - 8
+      - 2.5
+      - C6
+      - 0.14
+      - 103
+    - - 8
+      - 2.75
+      - Bb5
+      - 0.14
+      - 112
+    - - 8
+      - 3.0
+      - A5
+      - 0.14
+      - 103
+    - - 8
+      - 3.25
+      - G5
+      - 0.14
+      - 103
+    - - 8
+      - 3.5
+      - G5
+      - 0.14
+      - 103
+    - - 8
+      - 0.0
+      - - G5
+        - D6
+      - 1.25
+      - 116
+    - - 9
+      - 0.5
+      - C6
+      - 0.38
+      - 105
+    - - 9
+      - 1.15
+      - F5
+      - 0.72
+      - 113
+    - - 9
+      - 2.35
+      - A5
+      - 0.3
+      - 98
+    - - 9
+      - 3.0
+      - - F5
+        - F6
+      - 0.76
+      - 119
+    - - 10
+      - 0.0
+      - - D4
+        - F#4
+        - A4
+        - D5
+        - F#5
+      - 0.48
+      - 120
+    - - 10
+      - 1.4
+      - - D5
+        - A5
+      - 0.28
+      - 103
+    - - 10
+      - 2.65
+      - - D4
+        - F#4
+        - A4
+        - D5
+      - 0.62
+      - 117
+  limit_flash_rhythm_left:
+    kind: notes
+    instrument: rhythm_left
+    articulation: normal
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.8
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.315
+      - 112
+    - - 0
+      - 0.375
+      - G2
+      - 0.315
+      - 94
+    - - 0
+      - 0.75
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 1.5
+      - G2
+      - 0.315
+      - 112
+    - - 0
+      - 1.875
+      - G2
+      - 0.315
+      - 94
+    - - 0
+      - 2.25
+      - G2
+      - 0.66
+      - 94
+    - - 0
+      - 3.0
+      - G2
+      - 0.42
+      - 112
+    - - 0
+      - 3.5
+      - G2
+      - 0.42
+      - 94
+    - - 1
+      - 0.0
+      - G2
+      - 0.66
+      - 113
+    - - 1
+      - 0.75
+      - G2
+      - 0.42
+      - 100
+    - - 1
+      - 1.25
+      - G2
+      - 0.88
+      - 100
+    - - 1
+      - 2.25
+      - G2
+      - 0.66
+      - 113
+    - - 1
+      - 3.0
+      - G2
+      - 0.88
+      - 100
+    - - 2
+      - 0.0
+      - Eb3
+      - 1.35
+      - 116
+    - - 2
+      - 1.5
+      - Eb3
+      - 1.35
+      - 102
+    - - 2
+      - 3.0
+      - Eb3
+      - 0.88
+      - 114
+    - - 3
+      - 0.0
+      - D3
+      - 1.8
+      - 110
+    - - 3
+      - 3.25
+      - D3
+      - 0.66
+      - 104
+    - - 4
+      - 0.0
+      - G2
+      - 0.42
+      - 110
+    - - 4
+      - 0.5
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 1.25
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 2.0
+      - G2
+      - 0.66
+      - 110
+    - - 4
+      - 2.75
+      - G2
+      - 0.66
+      - 98
+    - - 4
+      - 3.5
+      - G2
+      - 0.42
+      - 98
+    - - 5
+      - 0.0
+      - Bb2
+      - 0.315
+      - 112
+    - - 5
+      - 0.375
+      - Bb2
+      - 0.315
+      - 94
+    - - 5
+      - 0.75
+      - Bb2
+      - 0.66
+      - 94
+    - - 5
+      - 1.5
+      - Bb2
+      - 0.315
+      - 112
+    - - 5
+      - 1.875
+      - Bb2
+      - 0.315
+      - 94
+    - - 5
+      - 2.25
+      - Bb2
+      - 0.66
+      - 94
+    - - 5
+      - 3.0
+      - Bb2
+      - 0.42
+      - 112
+    - - 5
+      - 3.5
+      - Bb2
+      - 0.42
+      - 94
+    - - 6
+      - 0.0
+      - C3
+      - 1.8
+      - 114
+    - - 6
+      - 2.35
+      - C3
+      - 1.485
+      - 108
+    - - 7
+      - 0.0
+      - D3
+      - 0.66
+      - 113
+    - - 7
+      - 0.75
+      - D3
+      - 0.42
+      - 100
+    - - 7
+      - 1.25
+      - D3
+      - 0.88
+      - 100
+    - - 7
+      - 2.25
+      - D3
+      - 0.66
+      - 113
+    - - 7
+      - 3.0
+      - D3
+      - 0.88
+      - 100
+    - - 8
+      - 0.0
+      - G2
+      - 0.315
+      - 112
+    - - 8
+      - 0.375
+      - G2
+      - 0.315
+      - 94
+    - - 8
+      - 0.75
+      - G2
+      - 0.66
+      - 94
+    - - 8
+      - 1.5
+      - G2
+      - 0.315
+      - 112
+    - - 8
+      - 1.875
+      - G2
+      - 0.315
+      - 94
+    - - 8
+      - 2.25
+      - G2
+      - 0.66
+      - 94
+    - - 8
+      - 3.0
+      - G2
+      - 0.42
+      - 112
+    - - 8
+      - 3.5
+      - G2
+      - 0.42
+      - 94
+    - - 9
+      - 0.0
+      - F2
+      - 1.35
+      - 116
+    - - 9
+      - 1.5
+      - F2
+      - 1.35
+      - 102
+    - - 9
+      - 3.0
+      - F2
+      - 0.88
+      - 114
+    - - 10
+      - 0.0
+      - D3
+      - 1.8
+      - 114
+    - - 10
+      - 2.35
+      - D3
+      - 1.25
+      - 108
+    gate: 1.0
+  limit_flash_rhythm_right:
+    kind: notes
+    instrument: rhythm_right
+    articulation: normal
+    humanize_ms: 0.75
+    humanize_velocity_pct: 2.0
+    notes:
+    - - 0
+      - 0.018
+      - G2
+      - 0.315
+      - 108
+    - - 0
+      - 0.393
+      - G2
+      - 0.315
+      - 90
+    - - 0
+      - 0.768
+      - G2
+      - 0.66
+      - 90
+    - - 0
+      - 1.518
+      - G2
+      - 0.315
+      - 108
+    - - 0
+      - 1.893
+      - G2
+      - 0.315
+      - 90
+    - - 0
+      - 2.268
+      - G2
+      - 0.66
+      - 90
+    - - 0
+      - 3.018
+      - G2
+      - 0.42
+      - 108
+    - - 0
+      - 3.518
+      - G2
+      - 0.42
+      - 90
+    - - 1
+      - 0.018
+      - G2
+      - 0.66
+      - 109
+    - - 1
+      - 0.768
+      - G2
+      - 0.42
+      - 96
+    - - 1
+      - 1.268
+      - G2
+      - 0.88
+      - 96
+    - - 1
+      - 2.268
+      - G2
+      - 0.66
+      - 109
+    - - 1
+      - 3.018
+      - G2
+      - 0.9
+      - 96
+    - - 2
+      - 0.018
+      - Eb3
+      - 1.35
+      - 112
+    - - 2
+      - 1.518
+      - Eb3
+      - 1.35
+      - 98
+    - - 2
+      - 3.018
+      - Eb3
+      - 0.88
+      - 110
+    - - 3
+      - 0.018
+      - D3
+      - 1.8
+      - 106
+    - - 3
+      - 3.268
+      - D3
+      - 0.66
+      - 100
+    - - 4
+      - 0.018
+      - G2
+      - 0.42
+      - 106
+    - - 4
+      - 0.518
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 1.268
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 2.018
+      - G2
+      - 0.66
+      - 106
+    - - 4
+      - 2.768
+      - G2
+      - 0.66
+      - 94
+    - - 4
+      - 3.518
+      - G2
+      - 0.42
+      - 94
+    - - 5
+      - 0.018
+      - Bb2
+      - 0.315
+      - 108
+    - - 5
+      - 0.393
+      - Bb2
+      - 0.315
+      - 90
+    - - 5
+      - 0.768
+      - Bb2
+      - 0.66
+      - 90
+    - - 5
+      - 1.518
+      - Bb2
+      - 0.315
+      - 108
+    - - 5
+      - 1.893
+      - Bb2
+      - 0.315
+      - 90
+    - - 5
+      - 2.268
+      - Bb2
+      - 0.66
+      - 90
+    - - 5
+      - 3.018
+      - Bb2
+      - 0.42
+      - 108
+    - - 5
+      - 3.518
+      - Bb2
+      - 0.42
+      - 90
+    - - 6
+      - 0.018
+      - C3
+      - 1.8
+      - 110
+    - - 6
+      - 2.368
+      - C3
+      - 1.485
+      - 104
+    - - 7
+      - 0.018
+      - D3
+      - 0.66
+      - 109
+    - - 7
+      - 0.768
+      - D3
+      - 0.42
+      - 96
+    - - 7
+      - 1.268
+      - D3
+      - 0.88
+      - 96
+    - - 7
+      - 2.268
+      - D3
+      - 0.66
+      - 109
+    - - 7
+      - 3.018
+      - D3
+      - 0.88
+      - 96
+    - - 8
+      - 0.018
+      - G2
+      - 0.315
+      - 108
+    - - 8
+      - 0.393
+      - G2
+      - 0.315
+      - 90
+    - - 8
+      - 0.768
+      - G2
+      - 0.66
+      - 90
+    - - 8
+      - 1.518
+      - G2
+      - 0.315
+      - 108
+    - - 8
+      - 1.893
+      - G2
+      - 0.315
+      - 90
+    - - 8
+      - 2.268
+      - G2
+      - 0.66
+      - 90
+    - - 8
+      - 3.018
+      - G2
+      - 0.42
+      - 108
+    - - 8
+      - 3.518
+      - G2
+      - 0.42
+      - 90
+    - - 9
+      - 0.018
+      - F2
+      - 1.35
+      - 112
+    - - 9
+      - 1.518
+      - F2
+      - 1.35
+      - 98
+    - - 9
+      - 3.018
+      - F2
+      - 0.88
+      - 110
+    - - 10
+      - 0.018
+      - D3
+      - 1.8
+      - 110
+    - - 10
+      - 2.368
+      - D3
+      - 1.25
+      - 104
+    gate: 1.0
+  limit_flash_celli:
+    kind: notes
+    instrument: celli_stacc
+    articulation: staccato
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.6
+    notes:
+    - - 0
+      - 0.0
+      - G2
+      - 0.24
+      - 90
+    - - 0
+      - 0.75
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 1.5
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 2.25
+      - G2
+      - 0.24
+      - 90
+    - - 0
+      - 3.0
+      - D3
+      - 0.24
+      - 80
+    - - 0
+      - 3.5
+      - G2
+      - 0.24
+      - 80
+    - - 1
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 1
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 1
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 1
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 2
+      - 0.0
+      - Eb2
+      - 0.3
+      - 92
+    - - 2
+      - 1.5
+      - Bb2
+      - 0.3
+      - 82
+    - - 2
+      - 2.5
+      - Eb2
+      - 0.3
+      - 82
+    - - 2
+      - 3.25
+      - Bb2
+      - 0.3
+      - 82
+    - - 3
+      - 0.0
+      - D2
+      - 1.2
+      - 88
+    - - 3
+      - 2.5
+      - A2
+      - 0.75
+      - 82
+    - - 4
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 4
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 4
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 4
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 5
+      - 0.0
+      - Bb2
+      - 0.24
+      - 90
+    - - 5
+      - 0.75
+      - F3
+      - 0.24
+      - 80
+    - - 5
+      - 1.5
+      - F3
+      - 0.24
+      - 80
+    - - 5
+      - 2.25
+      - Bb2
+      - 0.24
+      - 90
+    - - 5
+      - 3.0
+      - F3
+      - 0.24
+      - 80
+    - - 5
+      - 3.5
+      - Bb2
+      - 0.24
+      - 80
+    - - 6
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 6
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 7
+      - 0.0
+      - D2
+      - 0.3
+      - 92
+    - - 7
+      - 1.5
+      - A2
+      - 0.3
+      - 82
+    - - 7
+      - 2.5
+      - D2
+      - 0.3
+      - 82
+    - - 7
+      - 3.25
+      - A2
+      - 0.3
+      - 82
+    - - 8
+      - 0.0
+      - G2
+      - 0.24
+      - 90
+    - - 8
+      - 0.75
+      - D3
+      - 0.24
+      - 80
+    - - 8
+      - 1.5
+      - D3
+      - 0.24
+      - 80
+    - - 8
+      - 2.25
+      - G2
+      - 0.24
+      - 90
+    - - 8
+      - 3.0
+      - D3
+      - 0.24
+      - 80
+    - - 8
+      - 3.5
+      - G2
+      - 0.24
+      - 80
+    - - 9
+      - 0.0
+      - F2
+      - 0.3
+      - 92
+    - - 9
+      - 1.5
+      - C3
+      - 0.3
+      - 82
+    - - 9
+      - 2.5
+      - F2
+      - 0.3
+      - 82
+    - - 9
+      - 3.25
+      - C3
+      - 0.3
+      - 82
+    - - 10
+      - 0.0
+      - D2
+      - 1.2
+      - 88
+    - - 10
+      - 2.5
+      - A2
+      - 0.75
+      - 82
+  limit_flash_violas:
+    kind: notes
+    instrument: violas_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.2
+    notes:
+    - - 3
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+    - - 7
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+    - - 10
+      - 0.0
+      - - D4
+        - F#4
+      - 3.75
+      - 84
+  limit_flash_violins:
+    kind: notes
+    instrument: violins_stacc
+    articulation: staccato
+    humanize_ms: 0.7
+    humanize_velocity_pct: 1.4
+    notes:
+    - - 2
+      - 0.0
+      - Eb5
+      - 0.36
+      - 86
+    - - 2
+      - 1.5
+      - Bb5
+      - 0.36
+      - 86
+    - - 2
+      - 3.0
+      - G5
+      - 0.36
+      - 86
+    - - 3
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 3
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 3
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+    - - 7
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 7
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 7
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+    - - 10
+      - 0.0
+      - D5
+      - 0.36
+      - 96
+    - - 10
+      - 1.5
+      - A5
+      - 0.36
+      - 96
+    - - 10
+      - 3.0
+      - F#5
+      - 0.36
+      - 96
+  limit_flash_horns:
+    kind: notes
+    instrument: horns_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.1
+    notes:
+    - - 3
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 3
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+    - - 7
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 7
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+    - - 10
+      - 0.0
+      - - D4
+        - A4
+      - 1.6
+      - 86
+    - - 10
+      - 2.4
+      - - F#4
+        - A4
+      - 1.25
+      - 82
+  phase_change_piano:
+    kind: notes
+    instrument: salamander_lead
+    articulation: normal
+    humanize_ms: 0.35
+    humanize_velocity_pct: 1.0
+    notes:
+    - - 0
+      - 0.0
+      - - B4
+        - B5
+      - 0.58
+      - 105
+    - - 0
+      - 0.85
+      - F#6
+      - 0.42
+      - 96
+    - - 0
+      - 1.55
+      - D6
+      - 0.72
+      - 101
+    - - 0
+      - 2.6
+      - F#6
+      - 1.05
+      - 109
+    - - 2
+      - 0.5
+      - G6
+      - 0.38
+      - 100
+    - - 2
+      - 1.15
+      - C6
+      - 0.72
+      - 108
+    - - 2
+      - 2.35
+      - E6
+      - 0.3
+      - 95
+    - - 2
+      - 3.0
+      - - C6
+        - C7
+      - 0.76
+      - 114
+    - - 3
+      - 0.0
+      - - F#4
+        - F#5
+      - 0.34
+      - 110
+    - - 3
+      - 0.75
+      - - Bb4
+        - Bb5
+      - 0.34
+      - 99
+    - - 3
+      - 1.6
+      - - B4
+        - B5
+      - 0.34
+      - 99
+    - - 3
+      - 2.45
+      - - C#5
+        - C#6
+      - 0.34
+      - 110
+    - - 3
+      - 3.25
+      - - C#5
+        - C#6
+      - 0.34
+      - 99
+    - - 4
+      - 0.0
+      - B4
+      - 0.18
+      - 102
+    - - 4
+      - 0.333
+      - D5
+      - 0.18
+      - 94
+    - - 4
+      - 0.667
+      - F#5
+      - 0.18
+      - 94
+    - - 4
+      - 1.0
+      - B5
+      - 0.18
+      - 102
+    - - 4
+      - 1.333
+      - D6
+      - 0.18
+      - 94
+    - - 4
+      - 1.667
+      - F#6
+      - 0.18
+      - 94
+    - - 4
+      - 2.0
+      - D7
+      - 0.18
+      - 102
+    - - 4
+      - 2.333
+      - F#7
+      - 0.18
+      - 94
+    - - 4
+      - 2.667
+      - F#7
+      - 0.18
+      - 94
+    - - 4
+      - 3.0
+      - D7
+      - 0.18
+      - 102
+    - - 4
+      - 3.333
+      - F#6
+      - 0.18
+      - 94
+    - - 4
+      - 3.667
+      - D6
+      - 0.18
+      - 94
+    - - 5
+      - 0.0
+      - - A4
+        - A5
+      - 0.58
+      - 105
+    - - 5
+      - 0.85
+      - E6
+      - 0.42
+      - 96
+    - - 5
+      - 1.55
+      - C#6
+      - 0.72
+      - 101
+    - - 5
+      - 2.6
+      - E6
+      - 1.05
+      - 109
+    - - 6
+      - 0.0
+      - - G4
+        - B4
+        - D5
+        - G5
+        - B5
+      - 0.48
+      - 115
+    - - 6
+      - 1.4
+      - - G5
+        - D6
+      - 0.28
+      - 98
+    - - 6
+      - 2.65
+      - - G4
+        - B4
+        - D5
+        - G5
+      - 0.62
+      - 112
+    - - 7
+      - 0.0
+      - C#5
+      - 0.14
+      - 105
+    - - 7
+      - 0.25
+      - D5
+      - 0.14
+      - 96
+    - - 7
+      - 0.5
+      - E5
+      - 0.14
+      - 96
+    - - 7
+      - 0.75
+      - F#5
+      - 0.14
+      - 96
+    - - 7
+      - 1.0
+      - G5
+      - 0.14
+      - 105
+    - - 7
+      - 1.25
+      - Bb5
+      - 0.14
+      - 96
+    - - 7
+      - 1.5
+      - B5
+      - 0.14
+      - 96
+    - - 7
+      - 1.75
+      - C#6
+      - 0.14
+      - 96
+    - - 7
+      - 2.25
+      - - F#5
+        - C#6
+      - 1.35
+      - 112
+    - - 9
+      - 0.0
+      - C#5
+      - 0.16
+      - 103
+    - - 9
+      - 0.333
+      - E5
+      - 0.16
+      - 95
+    - - 9
+      - 0.667
+      - F#5
+      - 0.16
+      - 95
+    - - 9
+      - 1.0
+      - G5
+      - 0.16
+      - 103
+    - - 9
+      - 1.333
+      - A5
+      - 0.16
+      - 95
+    - - 9
+      - 1.667
+      - B5
+      - 0.16
+      - 95
+    - - 9
+      - 2.0
+      - C#6
+      - 0.16
+      - 103
+    - - 9
+      - 2.333
+      - D6
+      - 0.16
+      - 95
+    - - 9
+      - 2.667
+      - E6
+      - 0.16
+      - 95
+    - - 9
+      - 3.0
+      - F#6
+      - 0.16
+      - 103
+    - - 9
+      - 3.333
+      - G6
+      - 0.16
+      - 95
+    - - 9
+      - 3.667
+      - E5
+      - 0.16
+      - 95
+    - - 10
+      - 0.5
+      - B6
+      - 0.38
+      - 100
+    - - 10
+      - 1.15
+      - E6
+      - 0.72
+      - 108
+    - - 10
+      - 2.35
+      - G6
+      - 0.3
+      - 95
+    - - 10
+      - 3.0
+      - - E6
+        - E7
+      - 0.76
+      - 114
+    - - 11
+      - 1.75
+      - C7
+      - 0.14
+      - 107
+    - - 11
+      - 2.0
+      - G6
+      - 0.14
+      - 98
+    - - 11
+      - 2.25
+      - F#6
+      - 0.14
+      - 98
+    - - 11
+      - 2.5
+      - E6
+      - 0.14
+      - 98
+    - - 11
+      - 2.75
+      - D6
+      - 0.14
+      - 107
+    - - 11
+      - 3.0
+      - C#6
+      - 0.14
+      - 98
+    - - 11
+      - 3.25
+      - B5
+      - 0.14
+      - 98
+    - - 11
+      - 3.5
+      - C6
+      - 0.14
+      - 98
+    - - 11
+      - 0.0
+      - - C6
+        - G6
+      - 1.25
+      - 111
+    - - 12
+      - 0.0
+      - - F#4
+        - F#5
+      - 0.58
+      - 105
+    - - 12
+      - 0.85
+      - C#6
+      - 0.42
+      - 96
+    - - 12
+      - 1.55
+      - Bb5
+      - 0.72
+      - 101
+    - - 12
+      - 2.6
+      - C#6
+      - 1.05
+      - 109
+    - - 13
+      - 0.0
+      - - B4
+        - B5
+      - 0.32
+      - 113
+    - - 13
+      - 0.5
+      - B5
+      - 0.18
+      - 96
+    - - 13
+      - 1.0
+      - B5
+      - 0.18
+      - 96
+    - - 13
+      - 1.5
+      - B5
+      - 0.18
+      - 96
+    - - 13
+      - 2.75
+      - - B4
+        - B5
+      - 0.32
+      - 113
+    - - 13
+      - 3.0
+      - B5
+      - 0.18
+      - 96
+    - - 13
+      - 3.25
+      - B5
+      - 0.18
+      - 96
+    - - 13
+      - 3.5
+      - B5
+      - 0.18
+      - 96
+    - - 14
+      - 0.0
+      - G4
+      - 0.18
+      - 102
+    - - 14
+      - 0.333
+      - B4
+      - 0.18
+      - 94
+    - - 14
+      - 0.667
+      - D5
+      - 0.18
+      - 94
+    - - 14
+      - 1.0
+      - G5
+      - 0.18
+      - 102
+    - - 14
+      - 1.333
+      - B5
+      - 0.18
+      - 94
+    - - 14
+      - 1.667
+      - D6
+      - 0.18
+      - 94
+    - - 14
+      - 2.0
+      - B6
+      - 0.18
+      - 102
+    - - 14
+      - 2.333
+      - D7
+      - 0.18
+      - 94
+    - - 14
+      - 2.667
+      - D7
+      - 0.18
+      - 94
+    - - 14
+      - 3.0
+      - B6
+      - 0.18
+      - 102
+    - - 14
+      - 3.333
+      - D6
+      - 0.18
+      - 94
+    - - 14
+      - 3.667
+      - B5
+      - 0.18
+      - 94
+    - - 15
+      - 0.0
+      - - F#4
+        - Bb4
+        - C#5
+        - F#5
+        - Bb5
+      - 0.48
+      - 115
+    - - 15
+      - 1.4
+      - - F#5
+        - C#6
+      - 0.28
+      - 98
+    - - 15
+      - 2.65
+      - - F#4
+        - Bb4
+        - C#5
+        - F#5
+      - 0.62
+      - 112
+  phase_change_rhythm_left:
+    kind: notes
+    instrument: rhythm_left
+    articulation: normal
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.8
+    notes:
+    - - 0
+      - 0.0
+      - B2
+      - 1.8
+      - 114
+    - - 0
+      - 2.35
+      - B2
+      - 1.485
+      - 108
+    - - 1
+      - 0.0
+      - B2
+      - 1.8
+      - 110
+    - - 1
+      - 3.25
+      - B2
+      - 0.66
+      - 104
+    - - 2
+      - 0.0
+      - C3
+      - 0.66
+      - 113
+    - - 2
+      - 0.75
+      - C3
+      - 0.42
+      - 100
+    - - 2
+      - 1.25
+      - C3
+      - 0.88
+      - 100
+    - - 2
+      - 2.25
+      - C3
+      - 0.66
+      - 113
+    - - 2
+      - 3.0
+      - C3
+      - 0.88
+      - 100
+    - - 3
+      - 0.0
+      - F#2
+      - 0.42
+      - 110
+    - - 3
+      - 0.5
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 1.25
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 2.0
+      - F#2
+      - 0.66
+      - 110
+    - - 3
+      - 2.75
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 3.5
+      - F#2
+      - 0.42
+      - 98
+    - - 4
+      - 0.0
+      - B2
+      - 0.315
+      - 112
+    - - 4
+      - 0.375
+      - B2
+      - 0.315
+      - 94
+    - - 4
+      - 0.75
+      - B2
+      - 0.66
+      - 94
+    - - 4
+      - 1.5
+      - B2
+      - 0.315
+      - 112
+    - - 4
+      - 1.875
+      - B2
+      - 0.315
+      - 94
+    - - 4
+      - 2.25
+      - B2
+      - 0.66
+      - 94
+    - - 4
+      - 3.0
+      - B2
+      - 0.42
+      - 112
+    - - 4
+      - 3.5
+      - B2
+      - 0.42
+      - 94
+    - - 5
+      - 0.0
+      - A2
+      - 1.8
+      - 114
+    - - 5
+      - 2.35
+      - A2
+      - 1.485
+      - 108
+    - - 6
+      - 0.0
+      - G2
+      - 1.35
+      - 116
+    - - 6
+      - 1.5
+      - G2
+      - 1.35
+      - 102
+    - - 6
+      - 3.0
+      - G2
+      - 0.88
+      - 114
+    - - 7
+      - 0.0
+      - F#2
+      - 0.66
+      - 113
+    - - 7
+      - 0.75
+      - F#2
+      - 0.42
+      - 100
+    - - 7
+      - 1.25
+      - F#2
+      - 0.88
+      - 100
+    - - 7
+      - 2.25
+      - F#2
+      - 0.66
+      - 113
+    - - 7
+      - 3.0
+      - F#2
+      - 0.88
+      - 100
+    - - 8
+      - 0.0
+      - B2
+      - 1.8
+      - 110
+    - - 8
+      - 3.25
+      - B2
+      - 0.66
+      - 104
+    - - 9
+      - 0.0
+      - A2
+      - 0.315
+      - 112
+    - - 9
+      - 0.375
+      - A2
+      - 0.315
+      - 94
+    - - 9
+      - 0.75
+      - A2
+      - 0.66
+      - 94
+    - - 9
+      - 1.5
+      - A2
+      - 0.315
+      - 112
+    - - 9
+      - 1.875
+      - A2
+      - 0.315
+      - 94
+    - - 9
+      - 2.25
+      - A2
+      - 0.66
+      - 94
+    - - 9
+      - 3.0
+      - A2
+      - 0.42
+      - 112
+    - - 9
+      - 3.5
+      - A2
+      - 0.42
+      - 94
+    - - 10
+      - 0.0
+      - E2
+      - 0.42
+      - 110
+    - - 10
+      - 0.5
+      - E2
+      - 0.66
+      - 98
+    - - 10
+      - 1.25
+      - E2
+      - 0.66
+      - 98
+    - - 10
+      - 2.0
+      - E2
+      - 0.66
+      - 110
+    - - 10
+      - 2.75
+      - E2
+      - 0.66
+      - 98
+    - - 10
+      - 3.5
+      - E2
+      - 0.42
+      - 98
+    - - 11
+      - 0.0
+      - C3
+      - 1.8
+      - 114
+    - - 11
+      - 2.35
+      - C3
+      - 1.485
+      - 108
+    - - 12
+      - 0.0
+      - F#2
+      - 0.66
+      - 113
+    - - 12
+      - 0.75
+      - F#2
+      - 0.42
+      - 100
+    - - 12
+      - 1.25
+      - F#2
+      - 0.88
+      - 100
+    - - 12
+      - 2.25
+      - F#2
+      - 0.66
+      - 113
+    - - 12
+      - 3.0
+      - F#2
+      - 0.88
+      - 100
+    - - 13
+      - 0.0
+      - B2
+      - 0.315
+      - 112
+    - - 13
+      - 0.375
+      - B2
+      - 0.315
+      - 94
+    - - 13
+      - 0.75
+      - B2
+      - 0.66
+      - 94
+    - - 13
+      - 1.5
+      - B2
+      - 0.315
+      - 112
+    - - 13
+      - 1.875
+      - B2
+      - 0.315
+      - 94
+    - - 13
+      - 2.25
+      - B2
+      - 0.66
+      - 94
+    - - 13
+      - 3.0
+      - B2
+      - 0.42
+      - 112
+    - - 13
+      - 3.5
+      - B2
+      - 0.42
+      - 94
+    - - 14
+      - 0.0
+      - G2
+      - 1.35
+      - 116
+    - - 14
+      - 1.5
+      - G2
+      - 1.35
+      - 102
+    - - 14
+      - 3.0
+      - G2
+      - 0.88
+      - 114
+    - - 15
+      - 0.0
+      - F#2
+      - 1.8
+      - 114
+    - - 15
+      - 2.35
+      - F#2
+      - 1.25
+      - 108
+    gate: 1.0
+  phase_change_rhythm_right:
+    kind: notes
+    instrument: rhythm_right
+    articulation: normal
+    humanize_ms: 0.75
+    humanize_velocity_pct: 2.0
+    notes:
+    - - 0
+      - 0.018
+      - B2
+      - 1.8
+      - 110
+    - - 0
+      - 2.368
+      - B2
+      - 1.485
+      - 104
+    - - 1
+      - 0.018
+      - B2
+      - 1.8
+      - 106
+    - - 1
+      - 3.268
+      - B2
+      - 0.66
+      - 100
+    - - 2
+      - 0.018
+      - C3
+      - 0.66
+      - 109
+    - - 2
+      - 0.768
+      - C3
+      - 0.42
+      - 96
+    - - 2
+      - 1.268
+      - C3
+      - 0.88
+      - 96
+    - - 2
+      - 2.268
+      - C3
+      - 0.66
+      - 109
+    - - 2
+      - 3.018
+      - C3
+      - 0.88
+      - 96
+    - - 3
+      - 0.018
+      - F#2
+      - 0.42
+      - 106
+    - - 3
+      - 0.518
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 1.268
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 2.018
+      - F#2
+      - 0.66
+      - 106
+    - - 3
+      - 2.768
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 3.518
+      - F#2
+      - 0.42
+      - 94
+    - - 4
+      - 0.018
+      - B2
+      - 0.315
+      - 108
+    - - 4
+      - 0.393
+      - B2
+      - 0.315
+      - 90
+    - - 4
+      - 0.768
+      - B2
+      - 0.66
+      - 90
+    - - 4
+      - 1.518
+      - B2
+      - 0.315
+      - 108
+    - - 4
+      - 1.893
+      - B2
+      - 0.315
+      - 90
+    - - 4
+      - 2.268
+      - B2
+      - 0.66
+      - 90
+    - - 4
+      - 3.018
+      - B2
+      - 0.42
+      - 108
+    - - 4
+      - 3.518
+      - B2
+      - 0.42
+      - 90
+    - - 5
+      - 0.018
+      - A2
+      - 1.8
+      - 110
+    - - 5
+      - 2.368
+      - A2
+      - 1.485
+      - 104
+    - - 6
+      - 0.018
+      - G2
+      - 1.35
+      - 112
+    - - 6
+      - 1.518
+      - G2
+      - 1.35
+      - 98
+    - - 6
+      - 3.018
+      - G2
+      - 0.88
+      - 110
+    - - 7
+      - 0.018
+      - F#2
+      - 0.66
+      - 109
+    - - 7
+      - 0.768
+      - F#2
+      - 0.42
+      - 96
+    - - 7
+      - 1.268
+      - F#2
+      - 0.88
+      - 96
+    - - 7
+      - 2.268
+      - F#2
+      - 0.66
+      - 109
+    - - 7
+      - 3.018
+      - F#2
+      - 0.88
+      - 96
+    - - 8
+      - 0.018
+      - B2
+      - 1.8
+      - 106
+    - - 8
+      - 3.268
+      - B2
+      - 0.66
+      - 100
+    - - 9
+      - 0.018
+      - A2
+      - 0.315
+      - 108
+    - - 9
+      - 0.393
+      - A2
+      - 0.315
+      - 90
+    - - 9
+      - 0.768
+      - A2
+      - 0.66
+      - 90
+    - - 9
+      - 1.518
+      - A2
+      - 0.315
+      - 108
+    - - 9
+      - 1.893
+      - A2
+      - 0.315
+      - 90
+    - - 9
+      - 2.268
+      - A2
+      - 0.66
+      - 90
+    - - 9
+      - 3.018
+      - A2
+      - 0.42
+      - 108
+    - - 9
+      - 3.518
+      - A2
+      - 0.42
+      - 90
+    - - 10
+      - 0.018
+      - E2
+      - 0.42
+      - 106
+    - - 10
+      - 0.518
+      - E2
+      - 0.66
+      - 94
+    - - 10
+      - 1.268
+      - E2
+      - 0.66
+      - 94
+    - - 10
+      - 2.018
+      - E2
+      - 0.66
+      - 106
+    - - 10
+      - 2.768
+      - E2
+      - 0.66
+      - 94
+    - - 10
+      - 3.518
+      - E2
+      - 0.42
+      - 94
+    - - 11
+      - 0.018
+      - C3
+      - 1.8
+      - 110
+    - - 11
+      - 2.368
+      - C3
+      - 1.485
+      - 104
+    - - 12
+      - 0.018
+      - F#2
+      - 0.66
+      - 109
+    - - 12
+      - 0.768
+      - F#2
+      - 0.42
+      - 96
+    - - 12
+      - 1.268
+      - F#2
+      - 0.88
+      - 96
+    - - 12
+      - 2.268
+      - F#2
+      - 0.66
+      - 109
+    - - 12
+      - 3.018
+      - F#2
+      - 0.88
+      - 96
+    - - 13
+      - 0.018
+      - B2
+      - 0.315
+      - 108
+    - - 13
+      - 0.393
+      - B2
+      - 0.315
+      - 90
+    - - 13
+      - 0.768
+      - B2
+      - 0.66
+      - 90
+    - - 13
+      - 1.518
+      - B2
+      - 0.315
+      - 108
+    - - 13
+      - 1.893
+      - B2
+      - 0.315
+      - 90
+    - - 13
+      - 2.268
+      - B2
+      - 0.66
+      - 90
+    - - 13
+      - 3.018
+      - B2
+      - 0.42
+      - 108
+    - - 13
+      - 3.518
+      - B2
+      - 0.42
+      - 90
+    - - 14
+      - 0.018
+      - G2
+      - 1.35
+      - 112
+    - - 14
+      - 1.518
+      - G2
+      - 1.35
+      - 98
+    - - 14
+      - 3.018
+      - G2
+      - 0.88
+      - 110
+    - - 15
+      - 0.018
+      - F#2
+      - 1.8
+      - 110
+    - - 15
+      - 2.368
+      - F#2
+      - 1.25
+      - 104
+    gate: 1.0
+  phase_change_celli:
+    kind: notes
+    instrument: celli_stacc
+    articulation: staccato
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.6
+    notes:
+    - - 0
+      - 0.0
+      - B2
+      - 1.2
+      - 88
+    - - 0
+      - 2.5
+      - F#3
+      - 0.75
+      - 82
+    - - 1
+      - 0.0
+      - B2
+      - 1.2
+      - 88
+    - - 1
+      - 2.5
+      - F#3
+      - 0.75
+      - 82
+    - - 2
+      - 0.0
+      - C3
+      - 0.3
+      - 92
+    - - 2
+      - 1.5
+      - G3
+      - 0.3
+      - 82
+    - - 2
+      - 2.5
+      - C3
+      - 0.3
+      - 82
+    - - 2
+      - 3.25
+      - G3
+      - 0.3
+      - 82
+    - - 3
+      - 0.0
+      - F#2
+      - 0.3
+      - 92
+    - - 3
+      - 1.5
+      - C#3
+      - 0.3
+      - 82
+    - - 3
+      - 2.5
+      - F#2
+      - 0.3
+      - 82
+    - - 3
+      - 3.25
+      - C#3
+      - 0.3
+      - 82
+    - - 4
+      - 0.0
+      - B2
+      - 0.24
+      - 90
+    - - 4
+      - 0.75
+      - F#3
+      - 0.24
+      - 80
+    - - 4
+      - 1.5
+      - F#3
+      - 0.24
+      - 80
+    - - 4
+      - 2.25
+      - B2
+      - 0.24
+      - 90
+    - - 4
+      - 3.0
+      - F#3
+      - 0.24
+      - 80
+    - - 4
+      - 3.5
+      - B2
+      - 0.24
+      - 80
+    - - 5
+      - 0.0
+      - A2
+      - 1.2
+      - 88
+    - - 5
+      - 2.5
+      - E3
+      - 0.75
+      - 82
+    - - 6
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 6
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 6
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 6
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 7
+      - 0.0
+      - F#2
+      - 0.3
+      - 92
+    - - 7
+      - 1.5
+      - C#3
+      - 0.3
+      - 82
+    - - 7
+      - 2.5
+      - F#2
+      - 0.3
+      - 82
+    - - 7
+      - 3.25
+      - C#3
+      - 0.3
+      - 82
+    - - 8
+      - 0.0
+      - B2
+      - 1.2
+      - 88
+    - - 8
+      - 2.5
+      - F#3
+      - 0.75
+      - 82
+    - - 9
+      - 0.0
+      - A2
+      - 0.24
+      - 90
+    - - 9
+      - 0.75
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 1.5
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 2.25
+      - A2
+      - 0.24
+      - 90
+    - - 9
+      - 3.0
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 3.5
+      - A2
+      - 0.24
+      - 80
+    - - 10
+      - 0.0
+      - E2
+      - 0.3
+      - 92
+    - - 10
+      - 1.5
+      - B2
+      - 0.3
+      - 82
+    - - 10
+      - 2.5
+      - E2
+      - 0.3
+      - 82
+    - - 10
+      - 3.25
+      - B2
+      - 0.3
+      - 82
+    - - 11
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 11
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 12
+      - 0.0
+      - F#2
+      - 0.3
+      - 92
+    - - 12
+      - 1.5
+      - C#3
+      - 0.3
+      - 82
+    - - 12
+      - 2.5
+      - F#2
+      - 0.3
+      - 82
+    - - 12
+      - 3.25
+      - C#3
+      - 0.3
+      - 82
+    - - 13
+      - 0.0
+      - B2
+      - 0.24
+      - 90
+    - - 13
+      - 0.75
+      - F#3
+      - 0.24
+      - 80
+    - - 13
+      - 1.5
+      - F#3
+      - 0.24
+      - 80
+    - - 13
+      - 2.25
+      - B2
+      - 0.24
+      - 90
+    - - 13
+      - 3.0
+      - F#3
+      - 0.24
+      - 80
+    - - 13
+      - 3.5
+      - B2
+      - 0.24
+      - 80
+    - - 14
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 14
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 14
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 14
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 15
+      - 0.0
+      - F#2
+      - 1.2
+      - 88
+    - - 15
+      - 2.5
+      - C#3
+      - 0.75
+      - 82
+  phase_change_violas:
+    kind: notes
+    instrument: violas_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.2
+    notes:
+    - - 0
+      - 0.0
+      - - B3
+        - D4
+      - 3.75
+      - 84
+    - - 3
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+    - - 5
+      - 0.0
+      - - A3
+        - C#4
+      - 3.75
+      - 72
+    - - 7
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+    - - 10
+      - 0.0
+      - - E4
+        - G4
+      - 3.75
+      - 72
+    - - 12
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+    - - 15
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+  phase_change_violins:
+    kind: notes
+    instrument: violins_stacc
+    articulation: staccato
+    humanize_ms: 0.7
+    humanize_velocity_pct: 1.4
+    notes:
+    - - 0
+      - 0.0
+      - B4
+      - 0.36
+      - 96
+    - - 0
+      - 1.5
+      - F#5
+      - 0.36
+      - 96
+    - - 0
+      - 3.0
+      - D5
+      - 0.36
+      - 96
+    - - 3
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 3
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 3
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+    - - 7
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 7
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 7
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+    - - 12
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 12
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 12
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+    - - 15
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 15
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 15
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+  phase_change_horns:
+    kind: notes
+    instrument: horns_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.1
+    notes:
+    - - 0
+      - 0.0
+      - - B3
+        - F#4
+      - 1.6
+      - 86
+    - - 0
+      - 2.4
+      - - D4
+        - F#4
+      - 1.25
+      - 82
+    - - 3
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 3
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+    - - 7
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 7
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+    - - 12
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 12
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+    - - 15
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 15
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+  terminal_heaven_piano:
+    kind: notes
+    instrument: salamander_lead
+    articulation: normal
+    humanize_ms: 0.35
+    humanize_velocity_pct: 1.0
+    notes:
+    - - 0
+      - 0.0
+      - - D5
+        - D6
+      - 0.34
+      - 115
+    - - 0
+      - 0.75
+      - - D5
+        - D6
+      - 0.34
+      - 104
+    - - 0
+      - 1.6
+      - - E5
+        - E6
+      - 0.34
+      - 104
+    - - 0
+      - 2.45
+      - - F#5
+        - F#6
+      - 0.34
+      - 115
+    - - 0
+      - 3.25
+      - - F#5
+        - F#6
+      - 0.34
+      - 104
+    - - 1
+      - 0.0
+      - - B4
+        - B5
+      - 0.58
+      - 110
+    - - 1
+      - 0.85
+      - F#6
+      - 0.42
+      - 99
+    - - 1
+      - 1.55
+      - D6
+      - 0.72
+      - 106
+    - - 1
+      - 2.6
+      - F#6
+      - 1.05
+      - 114
+    - - 2
+      - 0.0
+      - D5
+      - 0.14
+      - 110
+    - - 2
+      - 0.25
+      - E5
+      - 0.14
+      - 99
+    - - 2
+      - 0.5
+      - F#5
+      - 0.14
+      - 99
+    - - 2
+      - 0.75
+      - G5
+      - 0.14
+      - 99
+    - - 2
+      - 1.0
+      - A5
+      - 0.14
+      - 110
+    - - 2
+      - 1.25
+      - B5
+      - 0.14
+      - 99
+    - - 2
+      - 1.5
+      - C6
+      - 0.14
+      - 99
+    - - 2
+      - 1.75
+      - D6
+      - 0.14
+      - 99
+    - - 2
+      - 2.25
+      - - G5
+        - D6
+      - 1.35
+      - 117
+    - - 3
+      - 0.5
+      - C#6
+      - 0.38
+      - 105
+    - - 3
+      - 1.15
+      - F#5
+      - 0.72
+      - 113
+    - - 3
+      - 2.35
+      - Bb5
+      - 0.3
+      - 98
+    - - 3
+      - 3.0
+      - - F#5
+        - F#6
+      - 0.76
+      - 119
+    - - 5
+      - 0.0
+      - C5
+      - 0.18
+      - 107
+    - - 5
+      - 0.333
+      - E5
+      - 0.18
+      - 97
+    - - 5
+      - 0.667
+      - G5
+      - 0.18
+      - 97
+    - - 5
+      - 1.0
+      - C6
+      - 0.18
+      - 107
+    - - 5
+      - 1.333
+      - E6
+      - 0.18
+      - 97
+    - - 5
+      - 1.667
+      - G6
+      - 0.18
+      - 97
+    - - 5
+      - 2.0
+      - E7
+      - 0.18
+      - 107
+    - - 5
+      - 2.333
+      - G7
+      - 0.18
+      - 97
+    - - 5
+      - 2.667
+      - G7
+      - 0.18
+      - 97
+    - - 5
+      - 3.0
+      - E7
+      - 0.18
+      - 107
+    - - 5
+      - 3.333
+      - G6
+      - 0.18
+      - 97
+    - - 5
+      - 3.667
+      - E6
+      - 0.18
+      - 97
+    - - 6
+      - 0.0
+      - - E5
+        - G5
+        - B5
+        - E6
+        - G6
+      - 0.48
+      - 120
+    - - 6
+      - 1.4
+      - - E6
+        - B6
+      - 0.28
+      - 103
+    - - 6
+      - 2.65
+      - - E5
+        - G5
+        - B5
+        - E6
+      - 0.62
+      - 117
+    - - 7
+      - 0.0
+      - Bb4
+      - 0.16
+      - 108
+    - - 7
+      - 0.333
+      - C#5
+      - 0.16
+      - 98
+    - - 7
+      - 0.667
+      - D#5
+      - 0.16
+      - 98
+    - - 7
+      - 1.0
+      - E5
+      - 0.16
+      - 108
+    - - 7
+      - 1.333
+      - F#5
+      - 0.16
+      - 98
+    - - 7
+      - 1.667
+      - G#5
+      - 0.16
+      - 98
+    - - 7
+      - 2.0
+      - Bb5
+      - 0.16
+      - 108
+    - - 7
+      - 2.333
+      - B5
+      - 0.16
+      - 98
+    - - 7
+      - 2.667
+      - C#6
+      - 0.16
+      - 98
+    - - 7
+      - 3.0
+      - D#6
+      - 0.16
+      - 108
+    - - 7
+      - 3.333
+      - E6
+      - 0.16
+      - 98
+    - - 7
+      - 3.667
+      - C#5
+      - 0.16
+      - 98
+    - - 8
+      - 0.0
+      - - B4
+        - B5
+      - 0.58
+      - 110
+    - - 8
+      - 0.85
+      - F#6
+      - 0.42
+      - 99
+    - - 8
+      - 1.55
+      - D6
+      - 0.72
+      - 106
+    - - 8
+      - 2.6
+      - F#6
+      - 1.05
+      - 114
+    - - 9
+      - 0.0
+      - - A4
+        - A5
+      - 0.32
+      - 118
+    - - 9
+      - 0.5
+      - A5
+      - 0.18
+      - 99
+    - - 9
+      - 1.0
+      - A5
+      - 0.18
+      - 99
+    - - 9
+      - 1.5
+      - A5
+      - 0.18
+      - 99
+    - - 9
+      - 2.75
+      - - A4
+        - A5
+      - 0.32
+      - 118
+    - - 9
+      - 3.0
+      - A5
+      - 0.18
+      - 99
+    - - 9
+      - 3.25
+      - A5
+      - 0.18
+      - 99
+    - - 9
+      - 3.5
+      - A5
+      - 0.18
+      - 99
+    - - 10
+      - 1.75
+      - C7
+      - 0.14
+      - 112
+    - - 10
+      - 2.0
+      - G6
+      - 0.14
+      - 103
+    - - 10
+      - 2.25
+      - F6
+      - 0.14
+      - 103
+    - - 10
+      - 2.5
+      - E6
+      - 0.14
+      - 103
+    - - 10
+      - 2.75
+      - D6
+      - 0.14
+      - 112
+    - - 10
+      - 3.0
+      - C6
+      - 0.14
+      - 103
+    - - 10
+      - 3.25
+      - B5
+      - 0.14
+      - 103
+    - - 10
+      - 3.5
+      - C6
+      - 0.14
+      - 103
+    - - 10
+      - 0.0
+      - - C6
+        - G6
+      - 1.25
+      - 116
+    - - 11
+      - 0.5
+      - C#6
+      - 0.38
+      - 105
+    - - 11
+      - 1.15
+      - F#5
+      - 0.72
+      - 113
+    - - 11
+      - 2.35
+      - Bb5
+      - 0.3
+      - 98
+    - - 11
+      - 3.0
+      - - F#5
+        - F#6
+      - 0.76
+      - 119
+    - - 12
+      - 0.0
+      - - D5
+        - D6
+      - 0.34
+      - 115
+    - - 12
+      - 0.75
+      - - D5
+        - D6
+      - 0.34
+      - 104
+    - - 12
+      - 1.6
+      - - E5
+        - E6
+      - 0.34
+      - 104
+    - - 12
+      - 2.45
+      - - F#5
+        - F#6
+      - 0.34
+      - 115
+    - - 12
+      - 3.25
+      - - F#5
+        - F#6
+      - 0.34
+      - 104
+    - - 14
+      - 0.0
+      - B4
+      - 0.13
+      - 109
+    - - 14
+      - 0.25
+      - C5
+      - 0.13
+      - 99
+    - - 14
+      - 0.5
+      - D5
+      - 0.13
+      - 99
+    - - 14
+      - 0.75
+      - E5
+      - 0.13
+      - 99
+    - - 14
+      - 1.0
+      - F#5
+      - 0.13
+      - 109
+    - - 14
+      - 1.25
+      - G5
+      - 0.13
+      - 99
+    - - 14
+      - 1.5
+      - A5
+      - 0.13
+      - 99
+    - - 14
+      - 1.75
+      - B5
+      - 0.13
+      - 99
+    - - 14
+      - 2.0
+      - C6
+      - 0.13
+      - 109
+    - - 14
+      - 2.25
+      - D6
+      - 0.13
+      - 99
+    - - 14
+      - 2.6
+      - - G5
+        - D6
+      - 0.5
+      - 118
+    - - 15
+      - 0.0
+      - A4
+      - 0.18
+      - 107
+    - - 15
+      - 0.333
+      - C#5
+      - 0.18
+      - 97
+    - - 15
+      - 0.667
+      - E5
+      - 0.18
+      - 97
+    - - 15
+      - 1.0
+      - A5
+      - 0.18
+      - 107
+    - - 15
+      - 1.333
+      - C#6
+      - 0.18
+      - 97
+    - - 15
+      - 1.667
+      - E6
+      - 0.18
+      - 97
+    - - 15
+      - 2.0
+      - C#7
+      - 0.18
+      - 107
+    - - 15
+      - 2.333
+      - E7
+      - 0.18
+      - 97
+    - - 15
+      - 2.667
+      - E7
+      - 0.18
+      - 97
+    - - 15
+      - 3.0
+      - C#7
+      - 0.18
+      - 107
+    - - 15
+      - 3.333
+      - E6
+      - 0.18
+      - 97
+    - - 15
+      - 3.667
+      - C#6
+      - 0.18
+      - 97
+    - - 16
+      - 0.0
+      - - C5
+        - E5
+        - G5
+        - C6
+        - E6
+      - 0.48
+      - 120
+    - - 16
+      - 1.4
+      - - C6
+        - G6
+      - 0.28
+      - 103
+    - - 16
+      - 2.65
+      - - C5
+        - E5
+        - G5
+        - C6
+      - 0.62
+      - 117
+    - - 17
+      - 0.0
+      - - F#4
+        - F#5
+      - 0.58
+      - 110
+    - - 17
+      - 0.85
+      - C#6
+      - 0.42
+      - 99
+    - - 17
+      - 1.55
+      - Bb5
+      - 0.72
+      - 106
+    - - 17
+      - 2.6
+      - C#6
+      - 1.05
+      - 114
+  terminal_heaven_rhythm_left:
+    kind: notes
+    instrument: rhythm_left
+    articulation: normal
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.8
+    notes:
+    - - 0
+      - 0.0
+      - B2
+      - 0.315
+      - 112
+    - - 0
+      - 0.375
+      - B2
+      - 0.315
+      - 94
+    - - 0
+      - 0.75
+      - B2
+      - 0.66
+      - 94
+    - - 0
+      - 1.5
+      - B2
+      - 0.315
+      - 112
+    - - 0
+      - 1.875
+      - B2
+      - 0.315
+      - 94
+    - - 0
+      - 2.25
+      - B2
+      - 0.66
+      - 94
+    - - 0
+      - 3.0
+      - B2
+      - 0.42
+      - 112
+    - - 0
+      - 3.5
+      - B2
+      - 0.42
+      - 94
+    - - 1
+      - 0.0
+      - B2
+      - 1.8
+      - 114
+    - - 1
+      - 2.35
+      - B2
+      - 1.485
+      - 108
+    - - 2
+      - 0.0
+      - G2
+      - 0.66
+      - 113
+    - - 2
+      - 0.75
+      - G2
+      - 0.42
+      - 100
+    - - 2
+      - 1.25
+      - G2
+      - 0.88
+      - 100
+    - - 2
+      - 2.25
+      - G2
+      - 0.66
+      - 113
+    - - 2
+      - 3.0
+      - G2
+      - 0.88
+      - 100
+    - - 3
+      - 0.0
+      - F#2
+      - 0.42
+      - 110
+    - - 3
+      - 0.5
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 1.25
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 2.0
+      - F#2
+      - 0.66
+      - 110
+    - - 3
+      - 2.75
+      - F#2
+      - 0.66
+      - 98
+    - - 3
+      - 3.5
+      - F#2
+      - 0.42
+      - 98
+    - - 4
+      - 0.0
+      - B2
+      - 1.8
+      - 110
+    - - 4
+      - 3.25
+      - B2
+      - 0.66
+      - 104
+    - - 5
+      - 0.0
+      - C3
+      - 1.35
+      - 116
+    - - 5
+      - 1.5
+      - C3
+      - 1.35
+      - 102
+    - - 5
+      - 3.0
+      - C3
+      - 0.88
+      - 114
+    - - 6
+      - 0.0
+      - E2
+      - 0.315
+      - 112
+    - - 6
+      - 0.375
+      - E2
+      - 0.315
+      - 94
+    - - 6
+      - 0.75
+      - E2
+      - 0.66
+      - 94
+    - - 6
+      - 1.5
+      - E2
+      - 0.315
+      - 112
+    - - 6
+      - 1.875
+      - E2
+      - 0.315
+      - 94
+    - - 6
+      - 2.25
+      - E2
+      - 0.66
+      - 94
+    - - 6
+      - 3.0
+      - E2
+      - 0.42
+      - 112
+    - - 6
+      - 3.5
+      - E2
+      - 0.42
+      - 94
+    - - 7
+      - 0.0
+      - F#2
+      - 1.8
+      - 114
+    - - 7
+      - 2.35
+      - F#2
+      - 1.485
+      - 108
+    - - 8
+      - 0.0
+      - B2
+      - 0.66
+      - 113
+    - - 8
+      - 0.75
+      - B2
+      - 0.42
+      - 100
+    - - 8
+      - 1.25
+      - B2
+      - 0.88
+      - 100
+    - - 8
+      - 2.25
+      - B2
+      - 0.66
+      - 113
+    - - 8
+      - 3.0
+      - B2
+      - 0.88
+      - 100
+    - - 9
+      - 0.0
+      - A2
+      - 0.315
+      - 112
+    - - 9
+      - 0.375
+      - A2
+      - 0.315
+      - 94
+    - - 9
+      - 0.75
+      - A2
+      - 0.66
+      - 94
+    - - 9
+      - 1.5
+      - A2
+      - 0.315
+      - 112
+    - - 9
+      - 1.875
+      - A2
+      - 0.315
+      - 94
+    - - 9
+      - 2.25
+      - A2
+      - 0.66
+      - 94
+    - - 9
+      - 3.0
+      - A2
+      - 0.42
+      - 112
+    - - 9
+      - 3.5
+      - A2
+      - 0.42
+      - 94
+    - - 10
+      - 0.0
+      - C3
+      - 1.8
+      - 110
+    - - 10
+      - 3.25
+      - C3
+      - 0.66
+      - 104
+    - - 11
+      - 0.0
+      - F#2
+      - 0.42
+      - 110
+    - - 11
+      - 0.5
+      - F#2
+      - 0.66
+      - 98
+    - - 11
+      - 1.25
+      - F#2
+      - 0.66
+      - 98
+    - - 11
+      - 2.0
+      - F#2
+      - 0.66
+      - 110
+    - - 11
+      - 2.75
+      - F#2
+      - 0.66
+      - 98
+    - - 11
+      - 3.5
+      - F#2
+      - 0.42
+      - 98
+    - - 12
+      - 0.0
+      - B2
+      - 1.35
+      - 116
+    - - 12
+      - 1.5
+      - B2
+      - 1.35
+      - 102
+    - - 12
+      - 3.0
+      - B2
+      - 0.88
+      - 114
+    - - 13
+      - 0.0
+      - E2
+      - 1.8
+      - 114
+    - - 13
+      - 2.35
+      - E2
+      - 1.485
+      - 108
+    - - 14
+      - 0.0
+      - G2
+      - 0.315
+      - 112
+    - - 14
+      - 0.375
+      - G2
+      - 0.315
+      - 94
+    - - 14
+      - 0.75
+      - G2
+      - 0.66
+      - 94
+    - - 14
+      - 1.5
+      - G2
+      - 0.315
+      - 112
+    - - 14
+      - 1.875
+      - G2
+      - 0.315
+      - 94
+    - - 14
+      - 2.25
+      - G2
+      - 0.66
+      - 94
+    - - 14
+      - 3.0
+      - G2
+      - 0.42
+      - 112
+    - - 14
+      - 3.5
+      - G2
+      - 0.42
+      - 94
+    - - 15
+      - 0.0
+      - A2
+      - 0.66
+      - 113
+    - - 15
+      - 0.75
+      - A2
+      - 0.42
+      - 100
+    - - 15
+      - 1.25
+      - A2
+      - 0.88
+      - 100
+    - - 15
+      - 2.25
+      - A2
+      - 0.66
+      - 113
+    - - 15
+      - 3.0
+      - A2
+      - 0.88
+      - 100
+    - - 16
+      - 0.0
+      - C3
+      - 1.35
+      - 116
+    - - 16
+      - 1.5
+      - C3
+      - 1.35
+      - 102
+    - - 16
+      - 3.0
+      - C3
+      - 0.88
+      - 114
+    - - 17
+      - 0.0
+      - F#2
+      - 1.8
+      - 114
+    - - 17
+      - 2.35
+      - F#2
+      - 1.25
+      - 108
+    gate: 1.0
+  terminal_heaven_rhythm_right:
+    kind: notes
+    instrument: rhythm_right
+    articulation: normal
+    humanize_ms: 0.75
+    humanize_velocity_pct: 2.0
+    notes:
+    - - 0
+      - 0.018
+      - B2
+      - 0.315
+      - 108
+    - - 0
+      - 0.393
+      - B2
+      - 0.315
+      - 90
+    - - 0
+      - 0.768
+      - B2
+      - 0.66
+      - 90
+    - - 0
+      - 1.518
+      - B2
+      - 0.315
+      - 108
+    - - 0
+      - 1.893
+      - B2
+      - 0.315
+      - 90
+    - - 0
+      - 2.268
+      - B2
+      - 0.66
+      - 90
+    - - 0
+      - 3.018
+      - B2
+      - 0.42
+      - 108
+    - - 0
+      - 3.518
+      - B2
+      - 0.42
+      - 90
+    - - 1
+      - 0.018
+      - B2
+      - 1.8
+      - 110
+    - - 1
+      - 2.368
+      - B2
+      - 1.485
+      - 104
+    - - 2
+      - 0.018
+      - G2
+      - 0.66
+      - 109
+    - - 2
+      - 0.768
+      - G2
+      - 0.42
+      - 96
+    - - 2
+      - 1.268
+      - G2
+      - 0.88
+      - 96
+    - - 2
+      - 2.268
+      - G2
+      - 0.66
+      - 109
+    - - 2
+      - 3.018
+      - G2
+      - 0.88
+      - 96
+    - - 3
+      - 0.018
+      - F#2
+      - 0.42
+      - 106
+    - - 3
+      - 0.518
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 1.268
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 2.018
+      - F#2
+      - 0.66
+      - 106
+    - - 3
+      - 2.768
+      - F#2
+      - 0.66
+      - 94
+    - - 3
+      - 3.518
+      - F#2
+      - 0.42
+      - 94
+    - - 4
+      - 0.018
+      - B2
+      - 1.8
+      - 106
+    - - 4
+      - 3.268
+      - B2
+      - 0.66
+      - 100
+    - - 5
+      - 0.018
+      - C3
+      - 1.35
+      - 112
+    - - 5
+      - 1.518
+      - C3
+      - 1.35
+      - 98
+    - - 5
+      - 3.018
+      - C3
+      - 0.88
+      - 110
+    - - 6
+      - 0.018
+      - E2
+      - 0.315
+      - 108
+    - - 6
+      - 0.393
+      - E2
+      - 0.315
+      - 90
+    - - 6
+      - 0.768
+      - E2
+      - 0.66
+      - 90
+    - - 6
+      - 1.518
+      - E2
+      - 0.315
+      - 108
+    - - 6
+      - 1.893
+      - E2
+      - 0.315
+      - 90
+    - - 6
+      - 2.268
+      - E2
+      - 0.66
+      - 90
+    - - 6
+      - 3.018
+      - E2
+      - 0.42
+      - 108
+    - - 6
+      - 3.518
+      - E2
+      - 0.42
+      - 90
+    - - 7
+      - 0.018
+      - F#2
+      - 1.8
+      - 110
+    - - 7
+      - 2.368
+      - F#2
+      - 1.485
+      - 104
+    - - 8
+      - 0.018
+      - B2
+      - 0.66
+      - 109
+    - - 8
+      - 0.768
+      - B2
+      - 0.42
+      - 96
+    - - 8
+      - 1.268
+      - B2
+      - 0.88
+      - 96
+    - - 8
+      - 2.268
+      - B2
+      - 0.66
+      - 109
+    - - 8
+      - 3.018
+      - B2
+      - 0.88
+      - 96
+    - - 9
+      - 0.018
+      - A2
+      - 0.315
+      - 108
+    - - 9
+      - 0.393
+      - A2
+      - 0.315
+      - 90
+    - - 9
+      - 0.768
+      - A2
+      - 0.66
+      - 90
+    - - 9
+      - 1.518
+      - A2
+      - 0.315
+      - 108
+    - - 9
+      - 1.893
+      - A2
+      - 0.315
+      - 90
+    - - 9
+      - 2.268
+      - A2
+      - 0.66
+      - 90
+    - - 9
+      - 3.018
+      - A2
+      - 0.42
+      - 108
+    - - 9
+      - 3.518
+      - A2
+      - 0.42
+      - 90
+    - - 10
+      - 0.018
+      - C3
+      - 1.8
+      - 106
+    - - 10
+      - 3.268
+      - C3
+      - 0.66
+      - 100
+    - - 11
+      - 0.018
+      - F#2
+      - 0.42
+      - 106
+    - - 11
+      - 0.518
+      - F#2
+      - 0.66
+      - 94
+    - - 11
+      - 1.268
+      - F#2
+      - 0.66
+      - 94
+    - - 11
+      - 2.018
+      - F#2
+      - 0.66
+      - 106
+    - - 11
+      - 2.768
+      - F#2
+      - 0.66
+      - 94
+    - - 11
+      - 3.518
+      - F#2
+      - 0.42
+      - 94
+    - - 12
+      - 0.018
+      - B2
+      - 1.35
+      - 112
+    - - 12
+      - 1.518
+      - B2
+      - 1.35
+      - 98
+    - - 12
+      - 3.018
+      - B2
+      - 0.88
+      - 110
+    - - 13
+      - 0.018
+      - E2
+      - 1.8
+      - 110
+    - - 13
+      - 2.368
+      - E2
+      - 1.485
+      - 104
+    - - 14
+      - 0.018
+      - G2
+      - 0.315
+      - 108
+    - - 14
+      - 0.393
+      - G2
+      - 0.315
+      - 90
+    - - 14
+      - 0.768
+      - G2
+      - 0.66
+      - 90
+    - - 14
+      - 1.518
+      - G2
+      - 0.315
+      - 108
+    - - 14
+      - 1.893
+      - G2
+      - 0.315
+      - 90
+    - - 14
+      - 2.268
+      - G2
+      - 0.66
+      - 90
+    - - 14
+      - 3.018
+      - G2
+      - 0.42
+      - 108
+    - - 14
+      - 3.518
+      - G2
+      - 0.42
+      - 90
+    - - 15
+      - 0.018
+      - A2
+      - 0.66
+      - 109
+    - - 15
+      - 0.768
+      - A2
+      - 0.42
+      - 96
+    - - 15
+      - 1.268
+      - A2
+      - 0.88
+      - 96
+    - - 15
+      - 2.268
+      - A2
+      - 0.66
+      - 109
+    - - 15
+      - 3.018
+      - A2
+      - 0.88
+      - 96
+    - - 16
+      - 0.018
+      - C3
+      - 1.35
+      - 112
+    - - 16
+      - 1.518
+      - C3
+      - 1.35
+      - 98
+    - - 16
+      - 3.018
+      - C3
+      - 0.88
+      - 110
+    - - 17
+      - 0.018
+      - F#2
+      - 1.8
+      - 110
+    - - 17
+      - 2.368
+      - F#2
+      - 1.25
+      - 104
+    gate: 1.0
+  terminal_heaven_celli:
+    kind: notes
+    instrument: celli_stacc
+    articulation: staccato
+    humanize_ms: 0.5
+    humanize_velocity_pct: 1.6
+    notes:
+    - - 0
+      - 0.0
+      - B2
+      - 0.24
+      - 90
+    - - 0
+      - 0.75
+      - F#3
+      - 0.24
+      - 80
+    - - 0
+      - 1.5
+      - F#3
+      - 0.24
+      - 80
+    - - 0
+      - 2.25
+      - B2
+      - 0.24
+      - 90
+    - - 0
+      - 3.0
+      - F#3
+      - 0.24
+      - 80
+    - - 0
+      - 3.5
+      - B2
+      - 0.24
+      - 80
+    - - 1
+      - 0.0
+      - B2
+      - 1.2
+      - 88
+    - - 1
+      - 2.5
+      - F#3
+      - 0.75
+      - 82
+    - - 2
+      - 0.0
+      - G2
+      - 0.3
+      - 92
+    - - 2
+      - 1.5
+      - D3
+      - 0.3
+      - 82
+    - - 2
+      - 2.5
+      - G2
+      - 0.3
+      - 82
+    - - 2
+      - 3.25
+      - D3
+      - 0.3
+      - 82
+    - - 3
+      - 0.0
+      - F#2
+      - 0.3
+      - 92
+    - - 3
+      - 1.5
+      - C#3
+      - 0.3
+      - 82
+    - - 3
+      - 2.5
+      - F#2
+      - 0.3
+      - 82
+    - - 3
+      - 3.25
+      - C#3
+      - 0.3
+      - 82
+    - - 4
+      - 0.0
+      - B2
+      - 1.2
+      - 88
+    - - 4
+      - 2.5
+      - F#3
+      - 0.75
+      - 82
+    - - 5
+      - 0.0
+      - C3
+      - 0.3
+      - 92
+    - - 5
+      - 1.5
+      - G3
+      - 0.3
+      - 82
+    - - 5
+      - 2.5
+      - C3
+      - 0.3
+      - 82
+    - - 5
+      - 3.25
+      - G3
+      - 0.3
+      - 82
+    - - 6
+      - 0.0
+      - E2
+      - 0.24
+      - 90
+    - - 6
+      - 0.75
+      - B2
+      - 0.24
+      - 80
+    - - 6
+      - 1.5
+      - B2
+      - 0.24
+      - 80
+    - - 6
+      - 2.25
+      - E2
+      - 0.24
+      - 90
+    - - 6
+      - 3.0
+      - B2
+      - 0.24
+      - 80
+    - - 6
+      - 3.5
+      - E2
+      - 0.24
+      - 80
+    - - 7
+      - 0.0
+      - F#2
+      - 1.2
+      - 88
+    - - 7
+      - 2.5
+      - C#3
+      - 0.75
+      - 82
+    - - 8
+      - 0.0
+      - B2
+      - 0.3
+      - 92
+    - - 8
+      - 1.5
+      - F#3
+      - 0.3
+      - 82
+    - - 8
+      - 2.5
+      - B2
+      - 0.3
+      - 82
+    - - 8
+      - 3.25
+      - F#3
+      - 0.3
+      - 82
+    - - 9
+      - 0.0
+      - A2
+      - 0.24
+      - 90
+    - - 9
+      - 0.75
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 1.5
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 2.25
+      - A2
+      - 0.24
+      - 90
+    - - 9
+      - 3.0
+      - E3
+      - 0.24
+      - 80
+    - - 9
+      - 3.5
+      - A2
+      - 0.24
+      - 80
+    - - 10
+      - 0.0
+      - C3
+      - 1.2
+      - 88
+    - - 10
+      - 2.5
+      - G3
+      - 0.75
+      - 82
+    - - 11
+      - 0.0
+      - F#2
+      - 0.3
+      - 92
+    - - 11
+      - 1.5
+      - C#3
+      - 0.3
+      - 82
+    - - 11
+      - 2.5
+      - F#2
+      - 0.3
+      - 82
+    - - 11
+      - 3.25
+      - C#3
+      - 0.3
+      - 82
+    - - 12
+      - 0.0
+      - B2
+      - 0.3
+      - 92
+    - - 12
+      - 1.5
+      - F#3
+      - 0.3
+      - 82
+    - - 12
+      - 2.5
+      - B2
+      - 0.3
+      - 82
+    - - 12
+      - 3.25
+      - F#3
+      - 0.3
+      - 82
+    - - 13
+      - 0.0
+      - E2
+      - 1.2
+      - 88
+    - - 13
+      - 2.5
+      - B2
+      - 0.75
+      - 82
+    - - 14
+      - 0.0
+      - G2
+      - 0.24
+      - 90
+    - - 14
+      - 0.75
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 1.5
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 2.25
+      - G2
+      - 0.24
+      - 90
+    - - 14
+      - 3.0
+      - D3
+      - 0.24
+      - 80
+    - - 14
+      - 3.5
+      - G2
+      - 0.24
+      - 80
+    - - 15
+      - 0.0
+      - A2
+      - 0.3
+      - 92
+    - - 15
+      - 1.5
+      - E3
+      - 0.3
+      - 82
+    - - 15
+      - 2.5
+      - A2
+      - 0.3
+      - 82
+    - - 15
+      - 3.25
+      - E3
+      - 0.3
+      - 82
+    - - 16
+      - 0.0
+      - C3
+      - 0.3
+      - 92
+    - - 16
+      - 1.5
+      - G3
+      - 0.3
+      - 82
+    - - 16
+      - 2.5
+      - C3
+      - 0.3
+      - 82
+    - - 16
+      - 3.25
+      - G3
+      - 0.3
+      - 82
+    - - 17
+      - 0.0
+      - F#2
+      - 1.2
+      - 88
+    - - 17
+      - 2.5
+      - C#3
+      - 0.75
+      - 82
+  terminal_heaven_violas:
+    kind: notes
+    instrument: violas_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.2
+    notes:
+    - - 0
+      - 0.0
+      - - B3
+        - D4
+      - 3.75
+      - 84
+    - - 2
+      - 0.0
+      - - G3
+        - B3
+      - 3.75
+      - 72
+    - - 3
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+    - - 6
+      - 0.0
+      - - E4
+        - G4
+      - 3.75
+      - 72
+    - - 7
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+    - - 10
+      - 0.0
+      - - C4
+        - E4
+      - 3.75
+      - 84
+    - - 14
+      - 0.0
+      - - G3
+        - B3
+      - 3.75
+      - 84
+    - - 16
+      - 0.0
+      - - C4
+        - E4
+      - 3.75
+      - 84
+    - - 17
+      - 0.0
+      - - F#3
+        - Bb3
+      - 3.75
+      - 84
+  terminal_heaven_violins:
+    kind: notes
+    instrument: violins_stacc
+    articulation: staccato
+    humanize_ms: 0.7
+    humanize_velocity_pct: 1.4
+    notes:
+    - - 0
+      - 0.0
+      - B4
+      - 0.36
+      - 96
+    - - 0
+      - 1.5
+      - F#5
+      - 0.36
+      - 96
+    - - 0
+      - 3.0
+      - D5
+      - 0.36
+      - 96
+    - - 1
+      - 0.0
+      - B4
+      - 0.36
+      - 86
+    - - 1
+      - 1.5
+      - F#5
+      - 0.36
+      - 86
+    - - 1
+      - 3.0
+      - D5
+      - 0.36
+      - 86
+    - - 3
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 3
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 3
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+    - - 4
+      - 0.0
+      - B4
+      - 0.36
+      - 86
+    - - 4
+      - 1.5
+      - F#5
+      - 0.36
+      - 86
+    - - 4
+      - 3.0
+      - D5
+      - 0.36
+      - 86
+    - - 7
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 7
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 7
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+    - - 10
+      - 0.0
+      - C5
+      - 0.36
+      - 96
+    - - 10
+      - 1.5
+      - G5
+      - 0.36
+      - 96
+    - - 10
+      - 3.0
+      - E5
+      - 0.36
+      - 96
+    - - 13
+      - 0.0
+      - E5
+      - 0.36
+      - 86
+    - - 13
+      - 1.5
+      - B5
+      - 0.36
+      - 86
+    - - 13
+      - 3.0
+      - G5
+      - 0.36
+      - 86
+    - - 14
+      - 0.0
+      - G4
+      - 0.36
+      - 96
+    - - 14
+      - 1.5
+      - D5
+      - 0.36
+      - 96
+    - - 14
+      - 3.0
+      - B4
+      - 0.36
+      - 96
+    - - 16
+      - 0.0
+      - C5
+      - 0.36
+      - 96
+    - - 16
+      - 1.5
+      - G5
+      - 0.36
+      - 96
+    - - 16
+      - 3.0
+      - E5
+      - 0.36
+      - 96
+    - - 17
+      - 0.0
+      - F#4
+      - 0.36
+      - 96
+    - - 17
+      - 1.5
+      - C#5
+      - 0.36
+      - 96
+    - - 17
+      - 3.0
+      - Bb4
+      - 0.36
+      - 96
+  terminal_heaven_horns:
+    kind: notes
+    instrument: horns_sus
+    articulation: normal
+    humanize_ms: 1.0
+    humanize_velocity_pct: 1.1
+    notes:
+    - - 0
+      - 0.0
+      - - B3
+        - F#4
+      - 1.6
+      - 86
+    - - 0
+      - 2.4
+      - - D4
+        - F#4
+      - 1.25
+      - 82
+    - - 3
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 3
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+    - - 7
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 7
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+    - - 10
+      - 0.0
+      - - C4
+        - G4
+      - 1.6
+      - 86
+    - - 10
+      - 2.4
+      - - E4
+        - G4
+      - 1.25
+      - 82
+    - - 14
+      - 0.0
+      - - G3
+        - D4
+      - 1.6
+      - 86
+    - - 14
+      - 2.4
+      - - B3
+        - D4
+      - 1.25
+      - 82
+    - - 16
+      - 0.0
+      - - C4
+        - G4
+      - 1.6
+      - 86
+    - - 16
+      - 2.4
+      - - E4
+        - G4
+      - 1.25
+      - 82
+    - - 17
+      - 0.0
+      - - F#3
+        - C#4
+      - 1.6
+      - 86
+    - - 17
+      - 2.4
+      - - Bb3
+        - C#4
+      - 1.25
+      - 82
+sections:
+- id: severance
+  kind: loop_component
+  label: severance
+  bars: 9
+  intensity: 1.07
+  density: 1.0
+  loopable: true
+  valid_exit_local_bars:
+  - 9
+  harmony:
+  - Gm
+  - Gm
+  - Gm
+  - D7
+  - Gm
+  - Cm
+  - Bb
+  - D7
+  - Gm
+  layers:
+  - severance_rhythm_left
+  - severance_rhythm_right
+  - severance_celli
+  - severance_drums
+  - severance_piano
+  - severance_violas
+  - severance_violins
+  - severance_horns
+- id: sky_rend
+  kind: loop_component
+  label: sky rend
+  bars: 20
+  intensity: 1.03
+  density: 1.0
+  loopable: true
+  valid_exit_local_bars:
+  - 20
+  harmony:
+  - Gm
+  - Cm
+  - Gm
+  - Bb
+  - D7
+  - Gm
+  - Eb
+  - Cm
+  - D7
+  - Gm
+  - Gm
+  - F
+  - Cm
+  - D7
+  - Gm
+  - Bb
+  - Gm
+  - Cm
+  - D7
+  - Gm
+  layers:
+  - sky_rend_rhythm_left
+  - sky_rend_rhythm_right
+  - sky_rend_celli
+  - sky_rend_drums
+  - sky_rend_piano
+  - sky_rend_violas
+  - sky_rend_violins
+  - sky_rend_horns
+- id: limit_flash
+  kind: loop_component
+  label: limit flash
+  bars: 11
+  intensity: 1.07
+  density: 1.0
+  loopable: true
+  valid_exit_local_bars:
+  - 11
+  harmony:
+  - Gm
+  - Gm
+  - Eb
+  - D7
+  - Gm
+  - Bb
+  - Cm
+  - D7
+  - Gm
+  - F
+  - D7
+  layers:
+  - limit_flash_rhythm_left
+  - limit_flash_rhythm_right
+  - limit_flash_celli
+  - limit_flash_drums
+  - limit_flash_piano
+  - limit_flash_violas
+  - limit_flash_violins
+  - limit_flash_horns
+- id: phase_change
+  kind: loop_component
+  label: phase change
+  bars: 16
+  intensity: 1.03
+  density: 1.0
+  loopable: true
+  valid_exit_local_bars:
+  - 16
+  harmony:
+  - Bm
+  - Bm
+  - C
+  - F#7
+  - Bm
+  - A
+  - G
+  - F#7
+  - Bm
+  - A
+  - Em
+  - C
+  - F#7
+  - Bm
+  - G
+  - F#7
+  layers:
+  - phase_change_rhythm_left
+  - phase_change_rhythm_right
+  - phase_change_celli
+  - phase_change_drums
+  - phase_change_piano
+  - phase_change_violas
+  - phase_change_violins
+  - phase_change_horns
+- id: terminal_heaven
+  kind: loop_component
+  label: terminal heaven
+  bars: 18
+  intensity: 1.07
+  density: 1.0
+  loopable: true
+  valid_exit_local_bars:
+  - 18
+  harmony:
+  - Bm
+  - Bm
+  - G
+  - F#7
+  - Bm
+  - C
+  - Em
+  - F#7
+  - Bm
+  - A
+  - C
+  - F#7
+  - Bm
+  - Em
+  - G
+  - A
+  - C
+  - F#7
+  layers:
+  - terminal_heaven_rhythm_left
+  - terminal_heaven_rhythm_right
+  - terminal_heaven_celli
+  - terminal_heaven_drums
+  - terminal_heaven_piano
+  - terminal_heaven_violas
+  - terminal_heaven_violins
+  - terminal_heaven_horns
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - severance
+  - sky_rend
+  - limit_flash
+  - phase_change
+  - terminal_heaven
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+  bridge_stems:
+  - rhythm_guitars
+  - piano_lead
+  - low_strings
+  - high_strings
+  - brass
+  - drums
+state_map:
+  default:
+    preferred_section: severance
+    stems:
+      rhythm_guitars: 0.92
+      piano_lead: 1.0
+      low_strings: 0.82
+      high_strings: 0.42
+      brass: 0.26
+      drums: 1.0
+  pressure:
+    preferred_section: limit_flash
+    stems:
+      rhythm_guitars: 0.98
+      piano_lead: 1.0
+      low_strings: 0.9
+      high_strings: 0.52
+      brass: 0.38
+      drums: 1.0
+  climax:
+    preferred_section: terminal_heaven
+    stems:
+      rhythm_guitars: 1.0
+      piano_lead: 1.0
+      low_strings: 0.96
+      high_strings: 0.72
+      brass: 0.62
+      drums: 1.0
