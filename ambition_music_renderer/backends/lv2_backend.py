@@ -17,11 +17,17 @@ from typing import Any
 
 import numpy as np
 from ..audio_utils import coerce_stereo
-from .external_fx import run_file_effect
+from .external_fx import run_file_effect, run_file_effect_raw
 
 
 def build_lv2proc_command(input_path: Path, output_path: Path, spec: dict[str, Any]) -> list[str]:
-    """Build a conservative lv2proc invocation for one plugin spec."""
+    """Build an offline LV2-host invocation for one plugin spec.
+
+    ``lv2proc`` and Lilv's newer ``lv2apply`` expose nearly the same job but
+    use different control-assignment syntax.  Supporting both keeps authored
+    LV2 chains portable across Ubuntu releases and lets scores prefer
+    ``lv2apply`` for plugins with richer LV2 feature requirements.
+    """
 
     binary = str(spec.get("binary", "lv2proc"))
     if not shutil.which(binary):
@@ -30,8 +36,17 @@ def build_lv2proc_command(input_path: Path, output_path: Path, spec: dict[str, A
     if not plugin_uri:
         raise ValueError("LV2 effect requires plugin_uri or uri")
     cmd = [binary, "-i", str(input_path), "-o", str(output_path)]
-    for key, value in dict(spec.get("params") or spec.get("parameters") or {}).items():
-        cmd.extend(["-c", f"{key}={value}"])
+    params = dict(spec.get("params") or spec.get("parameters") or {})
+    binary_name = Path(binary).name
+    if binary_name == "lv2apply":
+        # Lilv lv2apply: ``-c symbol value``.
+        for key, value in params.items():
+            cmd.extend(["-c", str(key), str(value)])
+    else:
+        # lv2proc: ``-c port:value``.  ``port=value`` looks plausible but is
+        # not its control-assignment syntax.
+        for key, value in params.items():
+            cmd.extend(["-c", f"{key}:{value}"])
     cmd.append(plugin_uri)
     return cmd
 
@@ -41,6 +56,28 @@ def apply_lv2_effect(audio: np.ndarray, sample_rate: int, spec: dict[str, Any]) 
 
     if not spec.get("command") and not spec.get("kind"):
         spec = {**spec, "kind": "lv2proc"}
+    channel_mode = str(spec.get("channel_mode", "stereo")).lower().strip()
+    if channel_mode in {"dual_mono", "split_mono"}:
+        stereo = coerce_stereo(audio)
+        rendered_channels: list[np.ndarray] = []
+        for channel_idx in range(2):
+            rendered = run_file_effect_raw(stereo[:, channel_idx], sample_rate, spec)
+            if rendered.ndim != 2 or rendered.shape[1] < 1:
+                raise RuntimeError(
+                    f"dual-mono LV2 effect returned invalid shape {rendered.shape!r}"
+                )
+            channel = rendered[:, 0]
+            if channel.shape[0] != stereo.shape[0]:
+                raise RuntimeError(
+                    "dual-mono LV2 effect changed sample count: "
+                    f"{stereo.shape[0]} -> {channel.shape[0]}"
+                )
+            rendered_channels.append(channel.astype(np.float32, copy=False))
+        return np.column_stack(rendered_channels).astype(np.float32, copy=False)
+    if channel_mode not in {"stereo", "auto", ""}:
+        raise ValueError(
+            f"unsupported LV2 channel_mode {channel_mode!r}; use stereo or dual_mono"
+        )
     return run_file_effect(audio, sample_rate, spec)
 
 

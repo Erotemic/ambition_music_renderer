@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import re
-import re
 import shlex
 import shutil
 import subprocess
@@ -25,6 +24,8 @@ log = logging.getLogger("ambition_music_renderer.sfizz")
 
 _NOTE_RE = re.compile(r"^([a-gA-G])([#b]?)(-?\d+)$")
 _KEY_OPCODE_RE = re.compile(r"\b(lokey|hikey|key|pitch_keycenter)\s*=\s*([A-Ga-g#b\-0-9]+)")
+_SFZ_INCLUDE_RE = re.compile(r'#include\s+["<]([^">]+)[">]', re.IGNORECASE)
+_SFZ_DEFINE_RE = re.compile(r"#define\s+(\$[A-Za-z0-9_]+)\s+([^\s]+)", re.IGNORECASE)
 
 
 def _note_to_midi(tok: str) -> int | None:
@@ -55,12 +56,49 @@ def sfz_key_span(sfz_path: str) -> tuple[int, int] | None:
         text = Path(sfz_path).read_text(errors="ignore")
     except OSError:
         return None
-    base = Path(sfz_path).parent
-    for inc in re.findall(r'#include\s+"([^"]+)"', text):
+    root = Path(sfz_path).resolve()
+    chunks: list[str] = []
+    seen: set[Path] = set()
+
+    include_base = root.parent
+
+    def read_recursive(path: Path) -> None:
+        path = path.resolve()
+        if path in seen:
+            return
         try:
-            text += "\n" + (base / inc.replace("\\", "/")).read_text(errors="ignore")
+            body = path.read_text(errors="ignore")
         except OSError:
-            pass
+            return
+        seen.add(path)
+        chunks.append(body)
+        for include in _SFZ_INCLUDE_RE.findall(body):
+            # The distributed ARIA/SFZ Level 2 kits resolve all includes from
+            # the top-level program directory, even when an include fragment
+            # lives below ``Data/stereo`` or ``Programs/modules``.
+            read_recursive(include_base / include.replace("\\", "/"))
+
+    read_recursive(root)
+    text = "\n".join(chunks)
+    macros = dict(_SFZ_DEFINE_RE.findall(text))
+
+    def expand_macro(value: str) -> str:
+        for _ in range(8):
+            expanded = re.sub(r"\$[A-Za-z0-9_]+", lambda m: macros.get(m.group(0), m.group(0)), value)
+            if expanded == value:
+                break
+            value = expanded
+        return value
+
+    # The distributed drum kits frequently hide their GM key map in a .txt
+    # include and refer to it through #define macros. Resolve those aliases so
+    # the range audit reflects the actual map instead of returning ``None``.
+    text = re.sub(
+        r"\b(lokey|hikey|key|pitch_keycenter)\s*=\s*([^\s]+)",
+        lambda m: f"{m.group(1)}={expand_macro(m.group(2))}",
+        text,
+        flags=re.IGNORECASE,
+    )
     los: list[int] = []
     his: list[int] = []
     for op, val in _KEY_OPCODE_RE.findall(text):

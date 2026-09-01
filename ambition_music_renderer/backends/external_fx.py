@@ -35,17 +35,22 @@ def _format_command(template: str | list[str], mapping: dict[str, str]) -> list[
     return [part.format(**mapping) for part in parts]
 
 
-def run_file_effect(audio: np.ndarray, sample_rate: int, spec: dict[str, Any]) -> np.ndarray:
-    """Run one file-in/file-out external effect (command, lv2proc, ...).
+def run_file_effect_raw(audio: np.ndarray, sample_rate: int, spec: dict[str, Any]) -> np.ndarray:
+    """Run one file effect while preserving the requested channel count.
 
-    This is the single shared runner for every external effect family;
-    ``lv2_backend`` delegates here rather than keeping a drifted copy.
+    Most renderer callers want stereo and should use :func:`run_file_effect`.
+    LV2 also contains useful mono stompboxes, however.  A dual-mono adapter
+    needs to send one channel at a time to those plugins without this helper
+    silently duplicating it to stereo first.
     """
     with tempfile.TemporaryDirectory() as d:
         tempdir = Path(d)
         input_path = tempdir / "input.wav"
         output_path = tempdir / "output.wav"
-        sf.write(input_path, coerce_stereo(audio), int(sample_rate), subtype="PCM_24")
+        source = np.asarray(audio, dtype=np.float32)
+        if source.ndim not in {1, 2}:
+            raise ValueError(f"external effect audio must be 1D/2D, got {source.shape!r}")
+        sf.write(input_path, source, int(sample_rate), subtype="PCM_24")
         mapping = {
             "input": str(input_path),
             "output": str(output_path),
@@ -94,7 +99,16 @@ def run_file_effect(audio: np.ndarray, sample_rate: int, spec: dict[str, Any]) -
         out, sr = sf.read(output_path, dtype="float32", always_2d=True)
         if sr != int(sample_rate):
             out = signal.resample_poly(out, int(sample_rate), int(sr), axis=0).astype(np.float32)
-        return coerce_stereo(out)
+        return np.asarray(out, dtype=np.float32)
+
+
+def run_file_effect(audio: np.ndarray, sample_rate: int, spec: dict[str, Any]) -> np.ndarray:
+    """Run one file-in/file-out external effect and return stereo audio.
+
+    This is the shared runner for every ordinary external effect family;
+    ``lv2_backend`` delegates here rather than keeping a drifted copy.
+    """
+    return coerce_stereo(run_file_effect_raw(audio, sample_rate, spec))
 
 
 def apply_external_effects(audio: np.ndarray, sample_rate: int, effects: list[dict[str, Any]]) -> np.ndarray:

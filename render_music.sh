@@ -13,6 +13,9 @@ if [[ -f /data/audio-tools/env.sh ]]; then
     source /data/audio-tools/env.sh
 fi
 
+# The optional audio-tools environment prepends its private LV2 directory but
+# must not hide the system Guitarix packages used by the amp-chain scores.
+export LV2_PATH="${LV2_PATH:+${LV2_PATH}:}/usr/lib/lv2"
+
 uv run --project "$SCRIPT_DIR" \
     python -m ambition_music_renderer "$@"
-

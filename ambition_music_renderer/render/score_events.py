@@ -20,6 +20,50 @@ def add_cc(inst: pretty_midi.Instrument, number: int, value: int, time: float) -
     )
 
 
+def add_keyswitch(
+    ctx: RenderContext,
+    inst_name: str,
+    pitch: int | str,
+    bar: float,
+    beat: float,
+    *,
+    humanize_ms: float = 0.0,
+) -> None:
+    """Emit a short, explicitly classified MIDI keyswitch event.
+
+    Keyswitches control the next sampled articulation; they are not chord
+    pitches and must never be expanded by a chord or guitar voicing helper.
+    """
+    if inst_name not in ctx.instruments:
+        raise KeyError(f"unknown instrument {inst_name!r}")
+    pitch_num = note_to_midi(pitch) if isinstance(pitch, str) else int(pitch)
+    start = ctx.beat_to_time(ctx.bar_to_beat(bar, beat))
+    if humanize_ms:
+        start += float(ctx.rng.normal(0.0, humanize_ms / 1000.0))
+    start = max(0.0, start)
+    ctx.instruments[inst_name].notes.append(
+        pretty_midi.Note(velocity=1, pitch=fit_midi_pitch(pitch_num), start=start, end=start + 0.025)
+    )
+    ctx.note_events.append({
+        "event_type": "keyswitch",
+        "instrument": inst_name,
+        "group": ctx.groups.get(inst_name, inst_name),
+        "section": ctx.active_section_id,
+        "layer": ctx.active_layer_id,
+        "layer_kind": ctx.active_layer_kind,
+        "pitch": int(fit_midi_pitch(pitch_num)),
+        "keyswitch": int(fit_midi_pitch(pitch_num)),
+        "velocity": 1,
+        "nominal_bar": float(bar),
+        "nominal_beat": float(beat),
+        "nominal_duration_beats": 0.025 * float(ctx.bpm) / 60.0,
+        "start_time": float(start),
+        "end_time": float(start + 0.025),
+        "start_beat": float(ctx.time_to_beat(start)),
+        "end_beat": float(ctx.time_to_beat(start + 0.025)),
+    })
+
+
 def add_instrument(ctx: RenderContext, spec: dict[str, Any]) -> None:
     name = spec["name"]
     if spec.get("is_drum", False):
@@ -149,6 +193,7 @@ def add_note(
     )
     ctx.note_events.append(
         {
+            "event_type": "note",
             "instrument": inst_name,
             "group": ctx.groups.get(inst_name, inst_name),
             "section": ctx.active_section_id,
@@ -516,5 +561,3 @@ def _layer_constraints(
     merged = dict(spec_c)
     merged.update(layer_c)
     return merged or None
-
-

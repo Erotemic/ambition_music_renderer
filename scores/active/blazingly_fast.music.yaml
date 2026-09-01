@@ -1,0 +1,2838 @@
+schema: ambition.musicir.v1
+id: blazingly_fast
+title: Blazingly Fast
+seed: 2026083111
+notes: 'V22 keeps the accepted melody and harmony but makes the rock bed semantically sampled: Emilyguitar chord
+  patches receive one root plus an explicit 33/34/35 keyswitch, Black-and-Blue supplies the locked bass, and Big Rusty
+  supplies the GM drum kit. Source stems stay clean; only the guitar group receives the conservative audition amp chain.'
+tempo:
+  bpm: 180
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 7
+  backend: pretty-midi
+  strict_backends: true
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    render_timeout_s: 240
+  foreground_protection:
+    enabled: false
+  adaptive_section_mastering:
+    mode: global_master_slices
+    notes: Master once and slice; section changes must come from arrangement, not independent mastering.
+  section_mix_transition_beats: 1.0
+postprocess:
+  gain_db: -1.0
+  highpass_hz: 30
+  lowpass_hz: 19000
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.42
+  reverb_damping_hz: 9000
+  stereo_width: 0.06
+  compressor_threshold_db: -20.0
+  compressor_ratio: 2.25
+  compressor_attack_ms: 10
+  compressor_release_ms: 92
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 3.0
+  limiter_drive: 1.0
+  normalize: true
+  target_peak_db: -3.5
+  eq_bands:
+  - type: low_shelf
+    hz: 95
+    q: 0.8
+    db: 0.15
+  - type: peak
+    hz: 520
+    q: 0.9
+    db: -0.45
+  - type: peak
+    hz: 2450
+    q: 0.85
+    db: 1.35
+  - type: peak
+    hz: 4300
+    q: 0.9
+    db: 0.85
+  - type: high_shelf
+    hz: 7600
+    q: 0.7
+    db: 1.1
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 25
+  lowpass_hz: 20000
+  reverb_wet: 0.001
+  reverb_decay_seconds: 0.2
+  reverb_damping_hz: 9000
+  stereo_width: 0.006
+  normalize: false
+  target_peak_db: -4.0
+  limiter_enabled: false
+group_postprocess:
+  keys:
+    gain_db: -1.2
+    highpass_hz: 35
+    lowpass_hz: 18500
+    reverb_wet: 0.0035
+    reverb_decay_seconds: 0.38
+    reverb_damping_hz: 8500
+    stereo_width: 0.035
+    transient_tame: 0.02
+    transient_lowpass_hz: 17000
+    high_shelf_db: 1.15
+    high_shelf_hz: 6900
+    compressor_threshold_db: -23.0
+    compressor_ratio: 2.0
+    compressor_attack_ms: 8.0
+    compressor_release_ms: 90.0
+    compressor_makeup_db: 0.0
+  strings:
+    gain_db: -1.6
+    highpass_hz: 48
+    lowpass_hz: 17000
+    reverb_wet: 0.0038
+    reverb_decay_seconds: 0.36
+    reverb_damping_hz: 8000
+    stereo_width: 0.045
+    transient_tame: 0.035
+    transient_lowpass_hz: 15500
+    high_shelf_db: 1.45
+    high_shelf_hz: 6500
+    compressor_threshold_db: -23.5
+    compressor_ratio: 2.1
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 86.0
+    compressor_makeup_db: 0.0
+  brass:
+    gain_db: -4.0
+    highpass_hz: 70
+    lowpass_hz: 16500
+    reverb_wet: 0.003
+    reverb_decay_seconds: 0.34
+    reverb_damping_hz: 7600
+    stereo_width: 0.025
+    transient_tame: 0.03
+    transient_lowpass_hz: 15000
+    high_shelf_db: 1.35
+    high_shelf_hz: 6300
+    compressor_threshold_db: -24.0
+    compressor_ratio: 2.15
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 92.0
+    compressor_makeup_db: 0.0
+  percussion:
+    gain_db: -7.2
+    highpass_hz: 38
+    lowpass_hz: 18000
+    reverb_wet: 0.0008
+    reverb_decay_seconds: 0.23
+    reverb_damping_hz: 8200
+    stereo_width: 0.015
+    transient_tame: 0.05
+    transient_lowpass_hz: 16000
+    high_shelf_db: 1.75
+    high_shelf_hz: 6800
+    compressor_threshold_db: -24.0
+    compressor_ratio: 2.5
+    compressor_attack_ms: 3.5
+    compressor_release_ms: 68.0
+    compressor_makeup_db: 0.0
+  guitars:
+    gain_db: -0.5
+    highpass_hz: 82
+    lowpass_hz: 19500
+    reverb_wet: 0.001
+    reverb_decay_seconds: 0.2
+    reverb_damping_hz: 11000
+    stereo_width: 0.12
+    transient_tame: 0.0
+    transient_lowpass_hz: 19500
+    high_shelf_db: 2.4
+    high_shelf_hz: 5200
+    compressor_threshold_db: -18.0
+    compressor_ratio: 2.2
+    compressor_attack_ms: 12.0
+    compressor_release_ms: 88.0
+    compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      label: guitar-pre
+      report_levels: true
+      effects:
+      - effect: gain
+        gain_db: 16.0
+    - kind: lv2proc
+      label: guitarix-ts9
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.58
+      report_levels: true
+      params:
+        fslider0_: -4.0
+        fslider1_: 720.0
+        fslider2_: 0.62
+        BYPASS: 1.0
+      binary: lv2apply
+    - kind: lv2proc
+      label: guitarix-metal-amp-crunch
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gxmetal_amp#metal_amp
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.42
+      report_levels: true
+      params:
+        TONE: 0.8
+        DRIVE: 7.5
+        PREGAIN: 2.0
+        GAIN1: -1.5
+        HIGHGAIN: 0.0
+      binary: lv2apply
+    - kind: pedalboard
+      label: guitar-post
+      report_levels: true
+      effects:
+      - effect: gain
+        gain_db: -13.0
+  patina:
+    gain_db: -120.0
+    highpass_hz: 300
+    lowpass_hz: 5700
+    reverb_wet: 0.0
+    stereo_width: 0.0
+    limiter_drive: 0.0
+    normalize: false
+    limiter_enabled: false
+instruments:
+- name: grand_piano
+  group: keys
+  program: acoustic_grand_piano
+  volume: 95
+  pan: 64
+  expression: 101
+  mix_role: lead
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    - flac
+- name: oxidized_striker
+  group: patina
+  program: tubular_bells
+  volume: 84
+  pan: 69
+  expression: 90
+  mix_role: support
+  instrument_backend:
+    kind: procedural_fm
+    carrier:
+      waveform: sine
+      harmonics: 1
+    fm:
+      waveform: sine
+      ratio: 3.17
+      index: 1.65
+    envelope:
+      attack_ms: 1.5
+      decay_ms: 145.0
+      sustain: 0.13
+      release_ms: 210.0
+    saturation_drive: 1.08
+    output_gain_db: -9.0
+- name: violins_i_stacc
+  group: strings
+  program: string_ensemble_1
+  volume: 82
+  pan: 78
+  expression: 94
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_1_staccato
+    prefer:
+    - notation
+    - staccato
+- name: violins_ii_stacc
+  group: strings
+  program: string_ensemble_2
+  volume: 78
+  pan: 48
+  expression: 90
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violins_2_staccato
+    prefer:
+    - notation
+    - staccato
+- name: celli_stacc
+  group: strings
+  program: cello
+  volume: 84
+  pan: 42
+  expression: 94
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli_staccato
+    prefer:
+    - notation
+    - staccato
+- name: violas_sus
+  group: strings
+  program: viola
+  volume: 80
+  pan: 50
+  expression: 92
+  modulation: 6
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+- name: horns_sus
+  group: brass
+  program: french_horn
+  volume: 76
+  pan: 58
+  expression: 88
+  modulation: 5
+  mix_role: background
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer:
+    - notation
+    - horns
+    - sustain
+- name: concert_bass_drum
+  group: percussion
+  is_drum: true
+  volume: 82
+  pan: 58
+  expression: 92
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.bass_drum
+    prefer:
+    - bass drum 1
+    - concert bass drum
+    note_remap:
+      concert_bass_drum: C4
+- name: orchestral_snare
+  group: percussion
+  is_drum: true
+  volume: 80
+  pan: 68
+  expression: 90
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.snare
+    prefer:
+    - snare drum rope tension
+    - snare drum
+    note_remap:
+      snare: C4
+- name: rust_gtr_l
+  group: guitars
+  program: clean_guitar
+  volume: 78
+  pan: 24
+  expression: 102
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.emily
+    prefer:
+    - chords
+    - emily
+    settings:
+      fold_to_range: false
+- name: rust_gtr_r
+  group: guitars
+  program: clean_guitar
+  volume: 77
+  pan: 104
+  expression: 100
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.emily
+    prefer:
+    - chords
+    - emily
+    settings:
+      fold_to_range: false
+- name: locked_bass
+  group: bass
+  program: fingered_bass
+  volume: 92
+  pan: 64
+  expression: 102
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.black_and_blue
+    prefer:
+    - babyblue all
+    - black and blue
+    settings:
+      fold_to_range: false
+- name: rock_drums
+  group: percussion
+  is_drum: true
+  volume: 92
+  pan: 64
+  expression: 105
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.big_rusty
+    prefer:
+    - 01 full
+    - big rusty
+    settings:
+      fold_to_range: false
+motifs:
+- id: main_line
+  notes:
+  - E5
+  - G5
+  - B5
+  - E6
+  - B5
+  - G5
+  - E5
+  - G5
+  - C6
+  - B5
+  - G5
+  - E5
+  - D5
+  - G5
+  - B5
+  - D6
+  - B5
+  - G5
+  - F#5
+  - A5
+  - D6
+  - A5
+  - F#5
+  - D5
+  rhythm: &id001
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  durations: &id002
+  - 0.28
+  - 0.28
+  - 0.58
+  - 0.28
+  - 0.28
+  - 0.62
+  - 0.28
+  - 0.28
+  - 0.58
+  - 0.28
+  - 0.28
+  - 0.62
+  - 0.28
+  - 0.28
+  - 0.58
+  - 0.28
+  - 0.28
+  - 0.62
+  - 0.28
+  - 0.28
+  - 0.58
+  - 0.28
+  - 0.28
+  - 0.62
+  velocities:
+  - 0.8
+  - 0.86
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.78
+  - 0.8
+  - 0.86
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.78
+  - 0.8
+  - 0.86
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.78
+  - 0.8
+  - 0.86
+  - 0.94
+  - 0.9
+  - 0.84
+  - 0.78
+- id: return_line
+  notes:
+  - B4
+  - E5
+  - G5
+  - B5
+  - G5
+  - E5
+  - B4
+  - D5
+  - G5
+  - B5
+  - G5
+  - D5
+  - G4
+  - C5
+  - E5
+  - G5
+  - E5
+  - C5
+  - A4
+  - D5
+  - F#5
+  - A5
+  - F#5
+  - D5
+  rhythm: *id001
+  durations: *id002
+  velocities:
+  - 0.82
+  - 0.88
+  - 0.96
+  - 0.92
+  - 0.86
+  - 0.8
+  - 0.82
+  - 0.88
+  - 0.96
+  - 0.92
+  - 0.86
+  - 0.8
+  - 0.82
+  - 0.88
+  - 0.96
+  - 0.92
+  - 0.86
+  - 0.8
+  - 0.82
+  - 0.88
+  - 0.96
+  - 0.92
+  - 0.86
+  - 0.8
+layer_templates:
+  piano_comp_a:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.5
+    - - 0
+      - 3.0
+    - - 1
+      - 0.0
+    - - 1
+      - 1.5
+    - - 1
+      - 3.0
+    - - 2
+      - 0.0
+    - - 2
+      - 1.5
+    - - 2
+      - 3.0
+    - - 3
+      - 0.0
+    - - 3
+      - 1.5
+    - - 3
+      - 3.0
+    - - 4
+      - 0.0
+    - - 4
+      - 1.5
+    - - 4
+      - 3.0
+    - - 5
+      - 0.0
+    - - 5
+      - 1.5
+    - - 5
+      - 3.0
+    - - 6
+      - 0.0
+    - - 6
+      - 1.5
+    - - 6
+      - 3.0
+    - - 7
+      - 0.0
+    - - 7
+      - 1.5
+    - - 7
+      - 3.0
+    - - 8
+      - 0.0
+    - - 8
+      - 1.5
+    - - 8
+      - 3.0
+    - - 9
+      - 0.0
+    - - 9
+      - 1.5
+    - - 9
+      - 3.0
+    - - 10
+      - 0.0
+    - - 10
+      - 1.5
+    - - 10
+      - 3.0
+    - - 11
+      - 0.0
+    - - 11
+      - 1.5
+    - - 11
+      - 3.0
+    - - 12
+      - 0.0
+    - - 12
+      - 1.5
+    - - 12
+      - 3.0
+    - - 13
+      - 0.0
+    - - 13
+      - 1.5
+    - - 13
+      - 3.0
+    - - 14
+      - 0.0
+    - - 14
+      - 1.5
+    - - 14
+      - 3.0
+    - - 15
+      - 0.0
+    - - 15
+      - 1.5
+    - - 15
+      - 3.0
+    duration_beats: 0.34
+    velocity: 49
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4
+  piano_comp_b:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.0
+    - - 0
+      - 2.5
+    - - 1
+      - 0.0
+    - - 1
+      - 1.0
+    - - 1
+      - 2.5
+    - - 2
+      - 0.0
+    - - 2
+      - 1.0
+    - - 2
+      - 2.5
+    - - 3
+      - 0.0
+    - - 3
+      - 1.0
+    - - 3
+      - 2.5
+    - - 4
+      - 0.0
+    - - 4
+      - 1.0
+    - - 4
+      - 2.5
+    - - 5
+      - 0.0
+    - - 5
+      - 1.0
+    - - 5
+      - 2.5
+    - - 6
+      - 0.0
+    - - 6
+      - 1.0
+    - - 6
+      - 2.5
+    - - 7
+      - 0.0
+    - - 7
+      - 1.0
+    - - 7
+      - 2.5
+    - - 8
+      - 0.0
+    - - 8
+      - 1.0
+    - - 8
+      - 2.5
+    - - 9
+      - 0.0
+    - - 9
+      - 1.0
+    - - 9
+      - 2.5
+    - - 10
+      - 0.0
+    - - 10
+      - 1.0
+    - - 10
+      - 2.5
+    - - 11
+      - 0.0
+    - - 11
+      - 1.0
+    - - 11
+      - 2.5
+    - - 12
+      - 0.0
+    - - 12
+      - 1.0
+    - - 12
+      - 2.5
+    - - 13
+      - 0.0
+    - - 13
+      - 1.0
+    - - 13
+      - 2.5
+    - - 14
+      - 0.0
+    - - 14
+      - 1.0
+    - - 14
+      - 2.5
+    - - 15
+      - 0.0
+    - - 15
+      - 1.0
+    - - 15
+      - 2.5
+    duration_beats: 0.32
+    velocity: 50
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4
+  viola_bed:
+    kind: pad_chords
+    instrument: violas_sus
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.72
+    velocity: 35
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 5.0
+    humanize_velocity_pct: 2
+  horn_bed:
+    kind: pad_chords
+    instrument: horns_sus
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.68
+    velocity: 29
+    articulation: tenuto
+    voicing: root_fifth
+    include_slash_bass: false
+    humanize_ms: 4.0
+    humanize_velocity_pct: 2
+  cello_motor_a:
+    kind: bassline
+    instrument: locked_bass
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.42
+    - - 7
+      - 0.5
+      - 0.22
+    - - 12
+      - 1.0
+      - 0.34
+    - - 7
+      - 1.5
+      - 0.22
+    - - 0
+      - 2.0
+      - 0.42
+    - - 7
+      - 2.5
+      - 0.22
+    - - 12
+      - 3.0
+      - 0.34
+    - - 7
+      - 3.5
+      - 0.22
+  cello_motor_b:
+    kind: bassline
+    instrument: locked_bass
+    octave: 2
+    velocity: 50
+    articulation: staccato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.44
+    - - 12
+      - 0.75
+      - 0.24
+    - - 7
+      - 1.25
+      - 0.28
+    - - 0
+      - 2.0
+      - 0.4
+    - - 7
+      - 2.75
+      - 0.24
+    - - 12
+      - 3.25
+      - 0.28
+    - - 7
+      - 3.75
+      - 0.18
+  inner_strings_a:
+    kind: arpeggio
+    instrument: violins_ii_stacc
+    octave: 4
+    voicing: triad
+    pattern:
+    - 0
+    - 1
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 0.2
+    velocity: 34
+    density: 0.7
+    articulation: staccato
+    min_pitch: G4
+    max_pitch: C6
+    clip_to_bar: true
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    every: 2
+    offset: 1
+  inner_strings_b:
+    kind: arpeggio
+    instrument: violins_ii_stacc
+    octave: 4
+    voicing: triad
+    pattern:
+    - 2
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    step: 0.5
+    duration_beats: 0.2
+    velocity: 35
+    density: 0.72
+    articulation: staccato
+    min_pitch: G4
+    max_pitch: C6
+    clip_to_bar: true
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    every: 2
+    offset: 0
+  main_line_layer:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: main_line
+    velocity: 72
+    articulation: staccato
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+  return_line_layer:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: return_line
+    velocity: 73
+    articulation: staccato
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+  bass_drum_steady:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.0
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 58
+      duration_beats: 0.16
+    - drum: concert_bass_drum
+      beat: 3.5
+      velocity: 44
+      duration_beats: 0.12
+      every: 4
+      offset: 3
+  snare_steady_a:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.6
+    events:
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 55
+      duration_beats: 0.07
+    - drum: snare
+      beat: 3.5
+      velocity: 34
+      duration_beats: 0.05
+      every: 2
+      offset: 1
+  snare_steady_b:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.6
+    events:
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 56
+      duration_beats: 0.07
+    - drum: snare
+      beats:
+      - 1.75
+      - 3.5
+      velocity: 33
+      duration_beats: 0.045
+      every: 2
+      offset: 0
+  hat_steady:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.2
+    events:
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 38
+      duration_beats: 0.08
+  piano_comp_c:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.5
+    - - 0
+      - 2.5
+    - - 0
+      - 3.5
+    - - 1
+      - 0.0
+    - - 1
+      - 1.5
+    - - 1
+      - 2.5
+    - - 1
+      - 3.5
+    - - 2
+      - 0.0
+    - - 2
+      - 1.5
+    - - 2
+      - 2.5
+    - - 2
+      - 3.5
+    - - 3
+      - 0.0
+    - - 3
+      - 1.5
+    - - 3
+      - 2.5
+    - - 3
+      - 3.5
+    - - 4
+      - 0.0
+    - - 4
+      - 1.5
+    - - 4
+      - 2.5
+    - - 4
+      - 3.5
+    - - 5
+      - 0.0
+    - - 5
+      - 1.5
+    - - 5
+      - 2.5
+    - - 5
+      - 3.5
+    - - 6
+      - 0.0
+    - - 6
+      - 1.5
+    - - 6
+      - 2.5
+    - - 6
+      - 3.5
+    - - 7
+      - 0.0
+    - - 7
+      - 1.5
+    - - 7
+      - 2.5
+    - - 7
+      - 3.5
+    - - 8
+      - 0.0
+    - - 8
+      - 1.5
+    - - 8
+      - 2.5
+    - - 8
+      - 3.5
+    - - 9
+      - 0.0
+    - - 9
+      - 1.5
+    - - 9
+      - 2.5
+    - - 9
+      - 3.5
+    - - 10
+      - 0.0
+    - - 10
+      - 1.5
+    - - 10
+      - 2.5
+    - - 10
+      - 3.5
+    - - 11
+      - 0.0
+    - - 11
+      - 1.5
+    - - 11
+      - 2.5
+    - - 11
+      - 3.5
+    - - 12
+      - 0.0
+    - - 12
+      - 1.5
+    - - 12
+      - 2.5
+    - - 12
+      - 3.5
+    - - 13
+      - 0.0
+    - - 13
+      - 1.5
+    - - 13
+      - 2.5
+    - - 13
+      - 3.5
+    - - 14
+      - 0.0
+    - - 14
+      - 1.5
+    - - 14
+      - 2.5
+    - - 14
+      - 3.5
+    - - 15
+      - 0.0
+    - - 15
+      - 1.5
+    - - 15
+      - 2.5
+    - - 15
+      - 3.5
+    duration_beats: 0.27
+    velocity: 45
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4
+  piano_comp_d:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.0
+    - - 0
+      - 2.0
+    - - 0
+      - 3.25
+    - - 1
+      - 0.0
+    - - 1
+      - 1.0
+    - - 1
+      - 2.0
+    - - 1
+      - 3.25
+    - - 2
+      - 0.0
+    - - 2
+      - 1.0
+    - - 2
+      - 2.0
+    - - 2
+      - 3.25
+    - - 3
+      - 0.0
+    - - 3
+      - 1.0
+    - - 3
+      - 2.0
+    - - 3
+      - 3.25
+    - - 4
+      - 0.0
+    - - 4
+      - 1.0
+    - - 4
+      - 2.0
+    - - 4
+      - 3.25
+    - - 5
+      - 0.0
+    - - 5
+      - 1.0
+    - - 5
+      - 2.0
+    - - 5
+      - 3.25
+    - - 6
+      - 0.0
+    - - 6
+      - 1.0
+    - - 6
+      - 2.0
+    - - 6
+      - 3.25
+    - - 7
+      - 0.0
+    - - 7
+      - 1.0
+    - - 7
+      - 2.0
+    - - 7
+      - 3.25
+    - - 8
+      - 0.0
+    - - 8
+      - 1.0
+    - - 8
+      - 2.0
+    - - 8
+      - 3.25
+    - - 9
+      - 0.0
+    - - 9
+      - 1.0
+    - - 9
+      - 2.0
+    - - 9
+      - 3.25
+    - - 10
+      - 0.0
+    - - 10
+      - 1.0
+    - - 10
+      - 2.0
+    - - 10
+      - 3.25
+    - - 11
+      - 0.0
+    - - 11
+      - 1.0
+    - - 11
+      - 2.0
+    - - 11
+      - 3.25
+    - - 12
+      - 0.0
+    - - 12
+      - 1.0
+    - - 12
+      - 2.0
+    - - 12
+      - 3.25
+    - - 13
+      - 0.0
+    - - 13
+      - 1.0
+    - - 13
+      - 2.0
+    - - 13
+      - 3.25
+    - - 14
+      - 0.0
+    - - 14
+      - 1.0
+    - - 14
+      - 2.0
+    - - 14
+      - 3.25
+    - - 15
+      - 0.0
+    - - 15
+      - 1.0
+    - - 15
+      - 2.0
+    - - 15
+      - 3.25
+    duration_beats: 0.29
+    velocity: 44
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4
+  inner_strings_c:
+    kind: arpeggio
+    instrument: violins_ii_stacc
+    octave: 4
+    voicing: triad
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 0
+    - 1
+    - 2
+    - 0
+    - 2
+    step: 0.5
+    duration_beats: 0.19
+    velocity: 31
+    density: 0.62
+    articulation: staccato
+    min_pitch: G4
+    max_pitch: C6
+    clip_to_bar: true
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    every: 2
+    offset: 1
+  main_line_gap_layer:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: main_line
+    velocity: 72
+    articulation: staccato
+    starts:
+    - - 4
+      - 0.0
+    - - 12
+      - 0.0
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+  main_line_once_8:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: main_line
+    velocity: 72
+    articulation: staccato
+    starts:
+    - - 8
+      - 0.0
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+  return_line_once_0:
+    kind: motif
+    instrument: violins_i_stacc
+    motif: return_line
+    velocity: 73
+    articulation: staccato
+    starts:
+    - - 0
+      - 0.0
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3
+  cello_motor_c:
+    kind: bassline
+    instrument: locked_bass
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.4
+    - - 7
+      - 0.5
+      - 0.2
+    - - 12
+      - 1.0
+      - 0.28
+    - - 7
+      - 1.5
+      - 0.2
+    - - 0
+      - 2.0
+      - 0.34
+    - - 12
+      - 2.75
+      - 0.2
+    - - 7
+      - 3.25
+      - 0.22
+    - - 12
+      - 3.75
+      - 0.16
+  cello_motor_d:
+    kind: bassline
+    instrument: locked_bass
+    octave: 2
+    velocity: 50
+    articulation: staccato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.42
+    - - 12
+      - 0.75
+      - 0.2
+    - - 7
+      - 1.25
+      - 0.22
+    - - 12
+      - 1.75
+      - 0.18
+    - - 0
+      - 2.0
+      - 0.38
+    - - 7
+      - 2.5
+      - 0.2
+    - - 12
+      - 3.0
+      - 0.24
+    - - 7
+      - 3.5
+      - 0.2
+  piano_comp_counterpoint:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 4
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 2.5
+    - - 1
+      - 0.0
+    - - 1
+      - 2.5
+    - - 2
+      - 0.0
+    - - 2
+      - 2.5
+    - - 3
+      - 0.0
+    - - 3
+      - 2.5
+    - - 4
+      - 0.0
+    - - 4
+      - 2.5
+    - - 5
+      - 0.0
+    - - 5
+      - 2.5
+    - - 6
+      - 0.0
+    - - 6
+      - 2.5
+    - - 7
+      - 0.0
+    - - 7
+      - 2.5
+    - - 8
+      - 0.0
+    - - 8
+      - 2.5
+    - - 9
+      - 0.0
+    - - 9
+      - 2.5
+    - - 10
+      - 0.0
+    - - 10
+      - 2.5
+    - - 11
+      - 0.0
+    - - 11
+      - 2.5
+    - - 12
+      - 0.0
+    - - 12
+      - 2.5
+    - - 13
+      - 0.0
+    - - 13
+      - 2.5
+    - - 14
+      - 0.0
+    - - 14
+      - 2.5
+    - - 15
+      - 0.0
+    - - 15
+      - 2.5
+    duration_beats: 0.52
+    velocity: 40
+    articulation: tenuto
+    voicing: wide
+    include_slash_bass: false
+    humanize_ms: 3.2
+    humanize_velocity_pct: 4
+  piano_reply_counterpoint:
+    kind: notes
+    instrument: grand_piano
+    notes:
+    - - 0
+      - 0.0
+      - E4
+      - 0.52
+      - 57
+    - - 0
+      - 0.75
+      - A4
+      - 0.28
+      - 52
+    - - 0
+      - 1.5
+      - C5
+      - 0.56
+      - 64
+    - - 0
+      - 2.5
+      - E5
+      - 0.3
+      - 59
+    - - 0
+      - 3.0
+      - C5
+      - 0.68
+      - 54
+    - - 1
+      - 0.0
+      - G4
+      - 0.48
+      - 55
+    - - 1
+      - 0.75
+      - C5
+      - 0.27
+      - 51
+    - - 1
+      - 1.5
+      - E5
+      - 0.6
+      - 65
+    - - 1
+      - 2.5
+      - G5
+      - 0.28
+      - 60
+    - - 1
+      - 3.0
+      - E5
+      - 0.7
+      - 55
+    - - 2
+      - 0.0
+      - D4
+      - 0.5
+      - 56
+    - - 2
+      - 0.75
+      - G4
+      - 0.26
+      - 51
+    - - 2
+      - 1.5
+      - B4
+      - 0.56
+      - 63
+    - - 2
+      - 2.5
+      - D5
+      - 0.3
+      - 59
+    - - 2
+      - 3.0
+      - B4
+      - 0.68
+      - 54
+    - - 3
+      - 0.0
+      - A4
+      - 0.45
+      - 57
+    - - 3
+      - 0.75
+      - D5
+      - 0.26
+      - 53
+    - - 3
+      - 1.5
+      - F#5
+      - 0.52
+      - 65
+    - - 3
+      - 2.5
+      - A5
+      - 0.28
+      - 60
+    - - 3
+      - 3.0
+      - F#5
+      - 0.72
+      - 55
+    - - 8
+      - 0.0
+      - A3
+      - 0.48
+      - 55
+    - - 8
+      - 0.0
+      - E4
+      - 0.48
+      - 50
+    - - 8
+      - 1.0
+      - C5
+      - 0.36
+      - 58
+    - - 8
+      - 1.75
+      - E5
+      - 0.52
+      - 65
+    - - 8
+      - 2.75
+      - A5
+      - 0.31
+      - 61
+    - - 8
+      - 3.25
+      - E5
+      - 0.54
+      - 55
+    - - 9
+      - 0.0
+      - C4
+      - 0.48
+      - 54
+    - - 9
+      - 0.0
+      - G4
+      - 0.48
+      - 49
+    - - 9
+      - 1.0
+      - E5
+      - 0.34
+      - 59
+    - - 9
+      - 1.75
+      - G5
+      - 0.5
+      - 64
+    - - 9
+      - 2.75
+      - C6
+      - 0.29
+      - 60
+    - - 9
+      - 3.25
+      - G5
+      - 0.55
+      - 55
+    - - 10
+      - 0.0
+      - G3
+      - 0.48
+      - 55
+    - - 10
+      - 0.0
+      - D4
+      - 0.48
+      - 50
+    - - 10
+      - 1.0
+      - B4
+      - 0.34
+      - 58
+    - - 10
+      - 1.75
+      - D5
+      - 0.52
+      - 64
+    - - 10
+      - 2.75
+      - G5
+      - 0.29
+      - 60
+    - - 10
+      - 3.25
+      - D5
+      - 0.55
+      - 55
+    - - 11
+      - 0.0
+      - D4
+      - 0.48
+      - 55
+    - - 11
+      - 0.0
+      - A4
+      - 0.48
+      - 50
+    - - 11
+      - 1.0
+      - F#5
+      - 0.34
+      - 60
+    - - 11
+      - 1.75
+      - A5
+      - 0.5
+      - 65
+    - - 11
+      - 2.75
+      - D6
+      - 0.28
+      - 61
+    - - 11
+      - 3.25
+      - A5
+      - 0.57
+      - 55
+    articulation: tenuto
+    humanize_ms: 3.8
+    humanize_velocity_pct: 4
+  piano_reply_final:
+    kind: notes
+    instrument: grand_piano
+    notes:
+    - - 4
+      - 0.0
+      - A3
+      - 0.42
+      - 55
+    - - 4
+      - 0.0
+      - E4
+      - 0.42
+      - 49
+    - - 4
+      - 1.25
+      - C5
+      - 0.4
+      - 60
+    - - 4
+      - 2.0
+      - E5
+      - 0.28
+      - 64
+    - - 4
+      - 2.75
+      - G5
+      - 0.35
+      - 59
+    - - 4
+      - 3.35
+      - E5
+      - 0.45
+      - 54
+    - - 5
+      - 0.0
+      - C4
+      - 0.42
+      - 54
+    - - 5
+      - 0.0
+      - G4
+      - 0.42
+      - 49
+    - - 5
+      - 1.25
+      - E5
+      - 0.4
+      - 61
+    - - 5
+      - 2.0
+      - G5
+      - 0.28
+      - 65
+    - - 5
+      - 2.75
+      - C6
+      - 0.34
+      - 60
+    - - 5
+      - 3.35
+      - G5
+      - 0.45
+      - 54
+    - - 6
+      - 0.0
+      - G3
+      - 0.42
+      - 55
+    - - 6
+      - 0.0
+      - D4
+      - 0.42
+      - 49
+    - - 6
+      - 1.25
+      - B4
+      - 0.4
+      - 60
+    - - 6
+      - 2.0
+      - D5
+      - 0.28
+      - 64
+    - - 6
+      - 2.75
+      - G5
+      - 0.34
+      - 59
+    - - 6
+      - 3.35
+      - D5
+      - 0.45
+      - 54
+    - - 7
+      - 0.0
+      - D4
+      - 0.42
+      - 55
+    - - 7
+      - 0.0
+      - A4
+      - 0.42
+      - 49
+    - - 7
+      - 1.25
+      - F#5
+      - 0.38
+      - 61
+    - - 7
+      - 2.0
+      - A5
+      - 0.28
+      - 65
+    - - 7
+      - 2.75
+      - D6
+      - 0.34
+      - 60
+    - - 7
+      - 3.35
+      - A5
+      - 0.45
+      - 54
+    - - 12
+      - 0.0
+      - C4
+      - 0.46
+      - 55
+    - - 12
+      - 0.0
+      - G4
+      - 0.46
+      - 49
+    - - 12
+      - 1.0
+      - E5
+      - 0.33
+      - 59
+    - - 12
+      - 1.75
+      - G5
+      - 0.38
+      - 64
+    - - 12
+      - 2.5
+      - E5
+      - 0.3
+      - 57
+    - - 12
+      - 3.2
+      - C5
+      - 0.54
+      - 53
+    - - 13
+      - 0.0
+      - A3
+      - 0.46
+      - 55
+    - - 13
+      - 0.0
+      - E4
+      - 0.46
+      - 49
+    - - 13
+      - 1.0
+      - C5
+      - 0.33
+      - 59
+    - - 13
+      - 1.75
+      - E5
+      - 0.38
+      - 64
+    - - 13
+      - 2.5
+      - C5
+      - 0.3
+      - 57
+    - - 13
+      - 3.2
+      - A4
+      - 0.54
+      - 53
+    - - 14
+      - 0.0
+      - B3
+      - 0.44
+      - 55
+    - - 14
+      - 0.0
+      - F#4
+      - 0.44
+      - 49
+    - - 14
+      - 1.0
+      - D5
+      - 0.34
+      - 60
+    - - 14
+      - 1.75
+      - F#5
+      - 0.38
+      - 64
+    - - 14
+      - 2.5
+      - D5
+      - 0.3
+      - 57
+    - - 14
+      - 3.2
+      - B4
+      - 0.5
+      - 53
+    - - 15
+      - 0.0
+      - B3
+      - 0.4
+      - 56
+    - - 15
+      - 0.0
+      - F#4
+      - 0.4
+      - 50
+    - - 15
+      - 1.0
+      - D#5
+      - 0.31
+      - 61
+    - - 15
+      - 1.75
+      - F#5
+      - 0.34
+      - 65
+    - - 15
+      - 2.5
+      - B5
+      - 0.28
+      - 61
+    - - 15
+      - 3.0
+      - F#5
+      - 0.24
+      - 57
+    - - 15
+      - 3.5
+      - D#5
+      - 0.38
+      - 60
+    articulation: tenuto
+    humanize_ms: 3.5
+    humanize_velocity_pct: 4
+  guitar_spine_a:
+    kind: sampled_chord
+    takes:
+    - instrument: rust_gtr_l
+      timing_offset_ms: -8
+      velocity_offset: 0
+    - instrument: rust_gtr_r
+      timing_offset_ms: 11
+      velocity_offset: -4
+    octave: 2
+    quality: power
+    keyswitches:
+      power: 33
+      minor: 34
+      major: 35
+    pattern:
+    - - 0
+      - 0.0
+      - 0.82
+      - 1.0
+    - - 0
+      - 1.5
+      - 0.38
+      - 0.72
+    - - 0
+      - 2.5
+      - 0.58
+      - 0.9
+    - - 12
+      - 3.5
+      - 0.34
+      - 0.7
+    velocity: 72
+    spread_ms: 6
+    gate: 0.84
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    root_policy: chord_root
+    min_pitch: 40
+  guitar_spine_b:
+    kind: sampled_chord
+    takes:
+    - instrument: rust_gtr_l
+      timing_offset_ms: -8
+      velocity_offset: 0
+    - instrument: rust_gtr_r
+      timing_offset_ms: 11
+      velocity_offset: -4
+    octave: 2
+    quality: power
+    keyswitches:
+      power: 33
+      minor: 34
+      major: 35
+    pattern:
+    - - 0
+      - 0.0
+      - 0.68
+      - 1.0
+    - - 0
+      - 0.75
+      - 0.3
+      - 0.66
+    - - 0
+      - 2.0
+      - 0.78
+      - 0.92
+    - - 12
+      - 3.25
+      - 0.48
+      - 0.74
+    velocity: 73
+    spread_ms: 6
+    gate: 0.82
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    root_policy: chord_root
+    min_pitch: 40
+  guitar_spine_c:
+    kind: sampled_chord
+    takes:
+    - instrument: rust_gtr_l
+      timing_offset_ms: -8
+      velocity_offset: 0
+    - instrument: rust_gtr_r
+      timing_offset_ms: 11
+      velocity_offset: -4
+    octave: 2
+    quality: power
+    keyswitches:
+      power: 33
+      minor: 34
+      major: 35
+    pattern:
+    - - 0
+      - 0.0
+      - 1.18
+      - 0.88
+    - - 0
+      - 2.5
+      - 0.54
+      - 0.72
+    - - 12
+      - 3.5
+      - 0.3
+      - 0.62
+    velocity: 69
+    spread_ms: 6
+    gate: 0.88
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    root_policy: chord_root
+    min_pitch: 40
+  guitar_spine_d:
+    kind: sampled_chord
+    takes:
+    - instrument: rust_gtr_l
+      timing_offset_ms: -8
+      velocity_offset: 0
+    - instrument: rust_gtr_r
+      timing_offset_ms: 11
+      velocity_offset: -4
+    octave: 2
+    quality: power
+    keyswitches:
+      power: 33
+      minor: 34
+      major: 35
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+      - 1.0
+    - - 0
+      - 1.0
+      - 0.42
+      - 0.72
+    - - 12
+      - 2.0
+      - 0.82
+      - 0.94
+    - - 0
+      - 3.25
+      - 0.48
+      - 0.78
+    velocity: 74
+    spread_ms: 6
+    gate: 0.84
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    root_policy: chord_root
+    min_pitch: 40
+  patina_hot_path:
+    kind: notes
+    instrument: oxidized_striker
+    articulation: staccato
+    humanize_ms: 1.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 0
+      - 2.72
+      - B4
+      - 0.16
+      - 55
+    - - 1
+      - 1.72
+      - E5
+      - 0.16
+      - 55
+    - - 2
+      - 2.72
+      - D5
+      - 0.16
+      - 55
+    - - 3
+      - 2.45
+      - A4
+      - 0.11
+      - 58
+    - - 3
+      - 3.0
+      - D5
+      - 0.13
+      - 64
+    - - 3
+      - 3.48
+      - F#5
+      - 0.19
+      - 69
+    - - 4
+      - 2.72
+      - E5
+      - 0.16
+      - 55
+    - - 5
+      - 1.72
+      - E5
+      - 0.16
+      - 55
+    - - 6
+      - 2.72
+      - D5
+      - 0.16
+      - 55
+    - - 7
+      - 2.45
+      - A4
+      - 0.11
+      - 58
+    - - 7
+      - 3.0
+      - D5
+      - 0.13
+      - 64
+    - - 7
+      - 3.48
+      - F#5
+      - 0.19
+      - 69
+    - - 8
+      - 2.72
+      - B4
+      - 0.16
+      - 55
+    - - 9
+      - 1.72
+      - E5
+      - 0.16
+      - 55
+    - - 10
+      - 2.72
+      - D5
+      - 0.16
+      - 55
+    - - 11
+      - 2.45
+      - A4
+      - 0.11
+      - 58
+    - - 11
+      - 3.0
+      - D5
+      - 0.13
+      - 64
+    - - 11
+      - 3.48
+      - F#5
+      - 0.19
+      - 69
+    - - 12
+      - 2.72
+      - G4
+      - 0.16
+      - 55
+    - - 13
+      - 1.72
+      - C6
+      - 0.16
+      - 55
+    - - 14
+      - 2.72
+      - F#5
+      - 0.16
+      - 55
+    - - 15
+      - 2.45
+      - F#5
+      - 0.11
+      - 58
+    - - 15
+      - 3.0
+      - B5
+      - 0.13
+      - 64
+    - - 15
+      - 3.48
+      - D#6
+      - 0.19
+      - 69
+  patina_borrowed_motion:
+    kind: notes
+    instrument: oxidized_striker
+    articulation: staccato
+    humanize_ms: 1.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 0
+      - 1.22
+      - G5
+      - 0.16
+      - 55
+    - - 1
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 2
+      - 1.22
+      - E5
+      - 0.16
+      - 55
+    - - 3
+      - 2.25
+      - A4
+      - 0.11
+      - 58
+    - - 3
+      - 2.85
+      - D5
+      - 0.13
+      - 64
+    - - 3
+      - 3.42
+      - F#5
+      - 0.19
+      - 69
+    - - 4
+      - 1.22
+      - E5
+      - 0.16
+      - 55
+    - - 5
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 6
+      - 1.22
+      - C6
+      - 0.16
+      - 55
+    - - 7
+      - 2.25
+      - A4
+      - 0.11
+      - 58
+    - - 7
+      - 2.85
+      - D5
+      - 0.13
+      - 64
+    - - 7
+      - 3.42
+      - F#5
+      - 0.19
+      - 69
+    - - 8
+      - 1.22
+      - G5
+      - 0.16
+      - 55
+    - - 9
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 10
+      - 1.22
+      - E5
+      - 0.16
+      - 55
+    - - 11
+      - 2.25
+      - A4
+      - 0.11
+      - 58
+    - - 11
+      - 2.85
+      - D5
+      - 0.13
+      - 64
+    - - 11
+      - 3.42
+      - F#5
+      - 0.19
+      - 69
+    - - 12
+      - 1.22
+      - C6
+      - 0.16
+      - 55
+    - - 13
+      - 3.18
+      - G4
+      - 0.16
+      - 55
+    - - 14
+      - 1.22
+      - D6
+      - 0.16
+      - 55
+    - - 15
+      - 2.25
+      - F#5
+      - 0.11
+      - 58
+    - - 15
+      - 2.85
+      - B5
+      - 0.13
+      - 64
+    - - 15
+      - 3.42
+      - D#6
+      - 0.19
+      - 69
+  patina_counterpoint:
+    kind: notes
+    instrument: oxidized_striker
+    articulation: staccato
+    humanize_ms: 1.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 0
+      - 3.18
+      - E5
+      - 0.16
+      - 55
+    - - 2
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 3
+      - 2.55
+      - A4
+      - 0.11
+      - 58
+    - - 3
+      - 3.1
+      - D5
+      - 0.13
+      - 64
+    - - 3
+      - 3.55
+      - F#5
+      - 0.19
+      - 69
+    - - 4
+      - 3.18
+      - B4
+      - 0.16
+      - 55
+    - - 6
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 7
+      - 2.55
+      - A4
+      - 0.11
+      - 58
+    - - 7
+      - 3.1
+      - D5
+      - 0.13
+      - 64
+    - - 7
+      - 3.55
+      - F#5
+      - 0.19
+      - 69
+    - - 8
+      - 3.18
+      - E5
+      - 0.16
+      - 55
+    - - 10
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 11
+      - 2.55
+      - A4
+      - 0.11
+      - 58
+    - - 11
+      - 3.1
+      - D5
+      - 0.13
+      - 64
+    - - 11
+      - 3.55
+      - F#5
+      - 0.19
+      - 69
+    - - 12
+      - 3.18
+      - B4
+      - 0.16
+      - 55
+    - - 14
+      - 3.18
+      - D5
+      - 0.16
+      - 55
+    - - 15
+      - 2.55
+      - A4
+      - 0.11
+      - 58
+    - - 15
+      - 3.1
+      - D5
+      - 0.13
+      - 64
+    - - 15
+      - 3.55
+      - F#5
+      - 0.19
+      - 69
+  patina_zero_cost:
+    kind: notes
+    instrument: oxidized_striker
+    articulation: staccato
+    humanize_ms: 1.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 0
+      - 1.68
+      - E5
+      - 0.16
+      - 57
+    - - 1
+      - 2.68
+      - D5
+      - 0.16
+      - 57
+    - - 2
+      - 1.68
+      - C5
+      - 0.16
+      - 57
+    - - 3
+      - 2.35
+      - A4
+      - 0.11
+      - 58
+    - - 3
+      - 2.95
+      - D5
+      - 0.13
+      - 64
+    - - 3
+      - 3.5
+      - F#5
+      - 0.19
+      - 69
+    - - 4
+      - 1.68
+      - A5
+      - 0.16
+      - 57
+    - - 5
+      - 2.68
+      - G4
+      - 0.16
+      - 57
+    - - 6
+      - 1.68
+      - G5
+      - 0.16
+      - 57
+    - - 7
+      - 2.35
+      - A4
+      - 0.11
+      - 58
+    - - 7
+      - 2.95
+      - D5
+      - 0.13
+      - 64
+    - - 7
+      - 3.5
+      - F#5
+      - 0.19
+      - 69
+    - - 8
+      - 1.68
+      - E5
+      - 0.16
+      - 57
+    - - 9
+      - 2.68
+      - G4
+      - 0.16
+      - 57
+    - - 10
+      - 1.68
+      - G5
+      - 0.16
+      - 57
+    - - 11
+      - 2.35
+      - A4
+      - 0.11
+      - 58
+    - - 11
+      - 2.95
+      - D5
+      - 0.13
+      - 64
+    - - 11
+      - 3.5
+      - F#5
+      - 0.19
+      - 69
+    - - 12
+      - 1.68
+      - C5
+      - 0.16
+      - 57
+    - - 13
+      - 2.68
+      - E5
+      - 0.16
+      - 57
+    - - 14
+      - 1.68
+      - B5
+      - 0.16
+      - 57
+    - - 15
+      - 2.35
+      - F#5
+      - 0.11
+      - 58
+    - - 15
+      - 2.95
+      - B5
+      - 0.13
+      - 64
+    - - 15
+      - 3.5
+      - D#6
+      - 0.19
+      - 69
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - hot_path
+  - borrowed_motion
+  - counterpoint
+  - zero_cost
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+  bridge_stems:
+  - keys
+  - strings
+  - brass
+  - percussion
+  - guitars
+  fade_stems: []
+state_map:
+  default:
+    preferred_section: hot_path
+    stems:
+      keys: 1.0
+      strings: 0.94
+      brass: 0.54
+      percussion: 0.68
+      guitars: 0.74
+  flow:
+    preferred_section: borrowed_motion
+    stems:
+      keys: 1.0
+      strings: 0.95
+      brass: 0.52
+      percussion: 0.69
+      guitars: 0.78
+  focus:
+    preferred_section: counterpoint
+    stems:
+      keys: 1.0
+      strings: 0.92
+      brass: 0.5
+      percussion: 0.68
+      guitars: 0.68
+  pressure:
+    preferred_section: zero_cost
+    stems:
+      keys: 1.0
+      strings: 0.96
+      brass: 0.56
+      percussion: 0.72
+      guitars: 0.82
+sections:
+- id: hot_path
+  kind: loop_component
+  label: hot path
+  bars: 16
+  intensity: 0.94
+  density: 0.9
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Em
+  - Cmaj7
+  - G
+  - D
+  - Am7
+  - C
+  - G
+  - D
+  - Em
+  - Cmaj7
+  - G
+  - D
+  - C
+  - Am7
+  - Bm7
+  - B7
+  layers:
+  - piano_comp_a
+  - viola_bed
+  - horn_bed
+  - patina_hot_path
+  - cello_motor_a
+  - template: inner_strings_a
+    velocity: 32
+  - main_line_layer
+  - bass_drum_steady
+  - snare_steady_a
+  - hat_steady
+  - guitar_spine_a
+- id: borrowed_motion
+  kind: loop_component
+  label: borrowed motion
+  bars: 16
+  intensity: 0.94
+  density: 0.9
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Em
+  - G
+  - C
+  - D
+  - C
+  - G
+  - Am7
+  - D
+  - Em
+  - G
+  - C
+  - D
+  - Am7
+  - C
+  - Bm7
+  - B7
+  layers:
+  - piano_comp_b
+  - viola_bed
+  - horn_bed
+  - patina_borrowed_motion
+  - cello_motor_b
+  - template: inner_strings_b
+    velocity: 33
+  - return_line_layer
+  - bass_drum_steady
+  - snare_steady_b
+  - hat_steady
+  - guitar_spine_b
+- id: counterpoint
+  kind: loop_component
+  label: counterpoint
+  bars: 16
+  intensity: 0.94
+  density: 0.9
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Am7
+  - C
+  - G
+  - D
+  - Em
+  - Cmaj7
+  - G
+  - D
+  - Am7
+  - C
+  - G
+  - D
+  - Em
+  - Cmaj7
+  - G
+  - D
+  layers:
+  - piano_comp_counterpoint
+  - piano_reply_counterpoint
+  - viola_bed
+  - patina_counterpoint
+  - horn_bed
+  - cello_motor_c
+  - template: inner_strings_c
+    velocity: 30
+  - main_line_gap_layer
+  - bass_drum_steady
+  - snare_steady_a
+  - hat_steady
+  - guitar_spine_c
+- id: zero_cost
+  kind: loop_component
+  label: zero cost
+  bars: 16
+  intensity: 0.95
+  density: 0.91
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Em
+  - G
+  - C
+  - D
+  - Am7
+  - C
+  - G
+  - D
+  - Em
+  - Cmaj7
+  - G
+  - D
+  - C
+  - Am7
+  - Bm7
+  - B7
+  layers:
+  - piano_comp_d
+  - piano_reply_final
+  - viola_bed
+  - patina_zero_cost
+  - horn_bed
+  - cello_motor_d
+  - template: inner_strings_b
+    velocity: 33
+  - return_line_once_0
+  - main_line_once_8
+  - bass_drum_steady
+  - snare_steady_b
+  - hat_steady
+  - guitar_spine_d

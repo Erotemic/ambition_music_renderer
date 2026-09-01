@@ -12,7 +12,7 @@ import pretty_midi
 
 from ..profiler import profile
 from .score_core import ARTICULATION_GATE, RenderContext, TempoMap
-from .score_events import add_chord, add_drum, add_instrument, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
+from .score_events import add_chord, add_drum, add_instrument, add_keyswitch, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
 from .score_theory import chord_for_bar, chord_intervals, chord_pitches, motif_notes, note_to_midi, root_for_chord, section_starts
 from .synth import sanitize_same_pitch_overlaps
 
@@ -920,6 +920,72 @@ def render_layer_guitar_chug(
 
 
 @profile
+def render_layer_sampled_chord(
+    ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
+) -> None:
+    """Trigger a sampled chord patch with one root note and a keyswitch.
+
+    Some SFZ libraries, notably Emilyguitar, record the whole guitar voicing
+    behind one playable root. Sending root/fifth/octave MIDI to those patches
+    produces three separate chords and is therefore a semantic error. This
+    layer makes the control-key event explicit and keeps the sampled chord
+    capability separate from ordinary chord expansion.
+    """
+    from .. import guitar_performance as gp
+
+    if any(k in layer for k in ("instrument", "instruments", "group")):
+        default_insts = resolve_instruments(ctx, layer)
+    else:
+        default_insts = []
+    takes = gp.take_specs(layer, default_insts)
+    if not takes:
+        raise KeyError("sampled_chord needs `takes` or `instrument`/`instruments`/`group`")
+    switch_map = {str(key).lower(): int(value) for key, value in dict(layer.get("keyswitches") or {}).items()}
+    if not switch_map:
+        raise ValueError("sampled_chord needs a non-empty keyswitches mapping")
+    quality = str(layer.get("quality", "power")).lower()
+    if quality not in switch_map:
+        raise KeyError(f"sampled_chord quality {quality!r} is absent from keyswitches {sorted(switch_map)}")
+    pattern = layer.get("pattern", [[0, 0.0, 0.75], [0, 2.0, 0.55]])
+    octave = int(layer.get("octave", 3))
+    velocity = float(layer.get("velocity", 82))
+    articulation = str(layer.get("articulation", "marcato"))
+    gate = layer.get("gate")
+    gate_f = None if gate is None else float(gate)
+    min_pitch = layer.get("min_pitch")
+    min_pitch_i = int(min_pitch) if min_pitch is not None else None
+    hk = _layer_human(layer, 1.0)
+    last_switch: dict[str, int] = {}
+    for local in range(int(section["bars"])):
+        for item in pattern:
+            interval = int(item[0])
+            beat = float(item[1])
+            dur = float(item[2])
+            accent = float(item[3]) if len(item) > 3 else 1.0
+            chord = chord_for_bar(section, local)
+            root, _intervals, _slash = chord_intervals(chord)
+            root_pitch = note_to_midi(f"{root}{octave}") + interval
+            if min_pitch_i is not None:
+                while root_pitch < min_pitch_i:
+                    root_pitch += 12
+            switch = switch_map[quality]
+            for take_index, take in enumerate(takes):
+                inst = str(take.get("instrument"))
+                timing_offset_ms = float(take.get("timing_offset_ms", take.get("offset_ms", 0.0)))
+                take_beat = beat + timing_offset_ms / 1000.0 * ctx.bpm / 60.0
+                velocity_offset = float(take.get("velocity_offset", -2.0 * take_index))
+                if last_switch.get(inst) != switch:
+                    add_keyswitch(ctx, inst, switch, section["start_bar"] + local, take_beat)
+                    last_switch[inst] = switch
+                add_note(
+                    ctx, inst, root_pitch,
+                    section["start_bar"] + local, take_beat, dur,
+                    (velocity + velocity_offset) * accent * float(section.get("intensity", 1.0)),
+                    articulation=articulation, gate=gate_f, **hk,
+                )
+
+
+@profile
 def render_layer_guitar_lead(
     ctx: RenderContext, section: dict[str, Any], layer: dict[str, Any]
 ) -> None:
@@ -1174,6 +1240,8 @@ def render_layer(
         render_layer_guitar_strum(ctx, section, layer)
     elif kind == "guitar_chug":
         render_layer_guitar_chug(ctx, section, layer)
+    elif kind == "sampled_chord":
+        render_layer_sampled_chord(ctx, section, layer)
     elif kind == "guitar_lead":
         render_layer_guitar_lead(ctx, section, layer)
     elif kind == "notes":

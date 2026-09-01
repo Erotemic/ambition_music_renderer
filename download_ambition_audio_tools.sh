@@ -121,10 +121,17 @@ already_extracted() {
     local archive_name="$1"
     local dest="$2"
     if [[ -e "$(extraction_marker "$archive_name" "$dest")" ]]; then
-        return 0
+        # A marker without a payload is stale (for example, an archive that
+        # ran out of disk while downloading/extracting). Let the next run
+        # repair it instead of treating an empty library as installed.
+        if find "$dest" -type f -name '*.sfz' -print -quit 2>/dev/null | grep -q .; then
+            return 0
+        fi
     fi
     if [[ -e "$dest/.ambition_audio_tools_extracted" && "$dest" != *Virtual-Playing-Orchestra* ]]; then
-        return 0
+        if find "$dest" -type f -name '*.sfz' -print -quit 2>/dev/null | grep -q .; then
+            return 0
+        fi
     fi
     return 1
 }
@@ -187,7 +194,13 @@ download_and_extract() {
         log "already extracted (skipping download): $label -> $dest_dir"
         return 0
     fi
-    download "$url" "$archive" "$label"
+    # Do not attempt extraction after a failed optional download. With
+    # ``set -e`` suppressed inside ``download_and_extract_optional``'s
+    # conditional, the old form continued and could leave a misleading
+    # per-archive extraction marker beside an empty destination.
+    if ! download "$url" "$archive" "$label"; then
+        return 1
+    fi
     if [[ "$DRY_RUN" == "1" ]]; then
         return 0
     fi
@@ -709,10 +722,18 @@ folder listed above. Then rerun this script with the same root path.
 ## SFZ instrument libraries
 
 Starter/pro modes download or attempt: FreePats Upright Piano KW, Salamander
-Grand Piano, Virtual Playing Orchestra, Shinyguitar, jRhodes3c Rhodes, Black And
-Green Guitars, Growlybass, Swagbass, Gogodze Phu Vol II drums, Ganjo,
-Etherealwinds Harp II CE, War Tuba, Bigcat Cello, String Cyborgs, Horse Pulse,
-VCSL, and Sonatina Symphonic Orchestra.
+Grand Piano, Virtual Playing Orchestra, Shinyguitar, Emilyguitar, jRhodes3c
+Rhodes, Black And Green Guitars, Growlybass, Swagbass, Black And Blue Basses,
+Fashionbass, Pastabass, Gogodze Phu Vol II drums, Big Rusty Drums, Naked Drums,
+Muldjord Kit, Ganjo, Etherealwinds Harp II CE, War Tuba, Bigcat Cello, String
+Cyborgs, Horse Pulse, VSCO 2 CE, VCSL, and Sonatina Symphonic Orchestra.
+
+The added libraries are classified here with their upstream license metadata. Emilyguitar,
+Big Rusty Drums, Black And Blue Basses, Fashionbass, Pastabass, and VSCO 2 CE are
+CC0. Naked Drums and Muldjord Kit are CC-BY-4.0 and require attribution when
+redistributed. Metal GTX and Standard Guitar are intentionally not automatic:
+their catalog license is Custom, so download them manually into `inbox/` only
+after reviewing the archive's license terms.
 
 Important VPO note: the scripts alone are not enough. VPO must have both the
 Wave Files archive and the Standard and/or Performance SFZ scripts extracted into
@@ -861,6 +882,7 @@ normalize_vpo_tree "$VPO_DEST"
 validate_vpo_install "$VPO_DEST" || true
 
 download_and_extract_optional "Karoryfer Shinyguitar" "https://github.com/sfzinstruments/karoryfer.shinyguitar/releases/download/v1.002/Karoryfer.Shinyguitar.v1.002.zip" "Karoryfer.Shinyguitar.v1.002.zip" "$SFZ_ROOT/Karoryfer/Shinyguitar" || true
+download_and_extract_optional "Karoryfer Emilyguitar (CC0)" "https://github.com/sfzinstruments/karoryfer.emilyguitar/releases/download/v1.001/Karoryfer.Emilyguitar.v1.001.zip" "Karoryfer.Emilyguitar.v1.001.zip" "$SFZ_ROOT/Karoryfer/Emilyguitar" || true
 # Shinyguitar's per-articulation programs reference samples as `acoustic\...`
 # relative to Programs/, but the zip puts them in ../Samples/; only main.sfz
 # (which needs an ARIA $sample_dir define we cannot pass to sfizz_render)
@@ -870,7 +892,11 @@ if [[ "$DRY_RUN" != "1" && -d "$SFZ_ROOT/Karoryfer/Shinyguitar/Shinyguitar/Sampl
     ln -sfn ../Samples/electric "$SFZ_ROOT/Karoryfer/Shinyguitar/Shinyguitar/Programs/electric"
 fi
 download_and_extract_optional "Karoryfer Growlybass" "https://github.com/sfzinstruments/karoryfer.growlybass/releases/download/v1.002/Karoryfer.Growlybass.v1.002.zip" "Karoryfer.Growlybass.v1.002.zip" "$SFZ_ROOT/Karoryfer/Growlybass" || true
+download_and_extract_optional "Karoryfer Black And Blue Basses (CC0)" "https://github.com/sfzinstruments/karoryfer.black-and-blue-basses/releases/download/v1.002/Black_And_Blue_Basses_1002.zip" "Black_And_Blue_Basses_1002.zip" "$SFZ_ROOT/Karoryfer/BlackAndBlueBasses" || true
+download_and_extract_optional "Karoryfer Fashionbass (CC0)" "https://github.com/sfzinstruments/karoryfer.fashionbass/releases/download/v1.001/Karoryfer.Fashionbass.v1.001.zip" "Karoryfer.Fashionbass.v1.001.zip" "$SFZ_ROOT/Karoryfer/Fashionbass" || true
+download_and_extract_optional "Karoryfer Pastabass (CC0)" "https://github.com/sfzinstruments/karoryfer.pastabass/releases/download/v1.101/Karoryfer.Pastabass.v1.101.zip" "Karoryfer.Pastabass.v1.101.zip" "$SFZ_ROOT/Karoryfer/Pastabass" || true
 download_and_extract_optional "Karoryfer Gogodze Phu Vol II drums" "https://github.com/sfzinstruments/karoryfer.gogodze-phu-vol-ii/releases/download/v1.001/Karoryfer_Gogodze_Phu_vol_II.v1.001.zip" "Karoryfer_Gogodze_Phu_vol_II.v1.001.zip" "$SFZ_ROOT/Karoryfer/GogodzePhuVolII" || true
+download_and_extract_optional "Karoryfer Big Rusty Drums (CC0)" "https://github.com/sfzinstruments/karoryfer.big-rusty-drums/releases/download/v1.100/Big_Rusty_Drums_1100.zip" "Big_Rusty_Drums_1100.zip" "$SFZ_ROOT/Karoryfer/BigRustyDrums" || true
 download_and_extract_optional "Ganjo guitar-banjo" "https://github.com/sfzinstruments/ganjo/archive/refs/heads/master.zip" "sfzinstruments.ganjo.master.zip" "$SFZ_ROOT/SFZInstruments/Ganjo" || download_and_extract_optional "Ganjo guitar-banjo" "https://github.com/sfzinstruments/ganjo/archive/refs/heads/main.zip" "sfzinstruments.ganjo.main.zip" "$SFZ_ROOT/SFZInstruments/Ganjo" || true
 download_and_extract_optional "jRhodes3c Rhodes Mark I SFZ/FLAC" "https://github.com/sfzinstruments/jlearman.jRhodes3c/archive/refs/heads/master.zip" "sfzinstruments.jRhodes3c.master.zip" "$SFZ_ROOT/SFZInstruments/jRhodes3c" || download_and_extract_optional "jRhodes3c Rhodes Mark I SFZ/FLAC" "https://github.com/sfzinstruments/jlearman.jRhodes3c/archive/refs/heads/main.zip" "sfzinstruments.jRhodes3c.main.zip" "$SFZ_ROOT/SFZInstruments/jRhodes3c" || true
 
@@ -901,6 +927,15 @@ if want_pro; then
           || download_and_extract_optional "Sonatina Symphonic Orchestra" \
             "https://codeload.github.com/peastman/sso/zip/refs/heads/master" \
             "Sonatina-SSO-master.zip" "$SFZ_ROOT/Sonatina/SymphonicOrchestra" || true
+        download_and_extract_optional "VSCO 2 Community Edition (CC0)" \
+            "https://codeload.github.com/sgossner/VSCO-2-CE/zip/refs/heads/SFZ" \
+            "VSCO-2-CE-SFZ.zip" "$SFZ_ROOT/VSCO2CE" || true
+        download_and_extract_optional "Naked Drums (CC-BY-4.0)" \
+            "https://codeload.github.com/sfzinstruments/WilkinsonAudio.NakedDrums/zip/refs/heads/master" \
+            "WilkinsonAudio.NakedDrums-master.zip" "$SFZ_ROOT/WilkinsonAudio/NakedDrums" || true
+        download_and_extract_optional "Muldjord Kit (CC-BY-4.0)" \
+            "https://codeload.github.com/sfzinstruments/DrumGizmo.MuldjordKit/zip/refs/heads/master" \
+            "DrumGizmo.MuldjordKit-master.zip" "$SFZ_ROOT/DrumGizmo/MuldjordKit" || true
     else
         log "orchestra extras disabled by ORCHESTRA_EXTRAS=0"
     fi

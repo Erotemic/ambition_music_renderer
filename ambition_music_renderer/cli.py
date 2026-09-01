@@ -754,6 +754,27 @@ def cmd_plugins_list_sfz_libraries(args) -> int:
     return 0
 
 
+def cmd_plugins_smoke_sfz(args) -> int:
+    from .audit.sfz_smoke import run_sfz_smoke, write_sfz_smoke_report
+
+    roots = [Path(args.root)] if args.root else None
+    report = run_sfz_smoke(
+        roots=roots,
+        sample_rate=int(args.sample_rate),
+        render_timeout_s=float(args.timeout),
+    )
+    if args.output:
+        path = write_sfz_smoke_report(report, Path(args.output))
+        report["output"] = str(path)
+    if args.json or args.output:
+        print(json.dumps(report, indent=2))
+    else:
+        print(f"SFZ smoke probes: {report['ok_count']}/{report['candidate_count']} passed")
+        for row in report["rows"]:
+            print(f"  {row['name']:<22} {row['status']:<18} {row.get('resolved') or 'UNRESOLVED'}")
+    return 0 if report["ok_count"] == report["candidate_count"] else 1
+
+
 def cmd_plugins_lv2_info(args) -> int:
     from .audio_plugins import lv2_info
 
@@ -1101,6 +1122,18 @@ class PluginListSFZLibraries(kwconf.Config):
         return cmd_plugins_list_sfz_libraries(cls.cli(argv=argv, data=kwargs))
 
 
+class PluginSmokeSFZ(kwconf.Config):
+    root: str | None = kwconf.Value(None, help="SFZ root override")
+    sample_rate: int = kwconf.Value(24000)
+    timeout: float = kwconf.Value(30.0, help="per-patch sfizz timeout in seconds")
+    output: Path | None = kwconf.Value(None, parser=Path, help="write JSON report to this path")
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_plugins_smoke_sfz(cls.cli(argv=argv, data=kwargs))
+
+
 class PluginLV2Info(kwconf.Config):
     uri: str = kwconf.Value(None, position=1)
     raw: bool = kwconf.Flag(False, help="print raw lv2info text")
@@ -1127,6 +1160,7 @@ class PluginsModal(kwconf.ModalCLI):
     list_lv2 = PluginListLV2
     list_clap = PluginListCLAP
     list_sfz_libraries = PluginListSFZLibraries
+    smoke_sfz = PluginSmokeSFZ
     lv2_info = PluginLV2Info
     validate_score = PluginValidateScore
 

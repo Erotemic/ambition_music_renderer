@@ -104,8 +104,18 @@ def build_plugin(spec: dict[str, Any], *, base_dir: Path | None = None) -> Any:
             if key in spec:
                 setattr(plugin, key, float(spec[key]))
         return plugin
+    if effect in {"gain", "volume", "level"}:
+        return pb.Gain(gain_db=float(spec.get("gain_db", spec.get("db", 0.0))))
     if effect in {"distortion", "distort", "drive"}:
         return pb.Distortion(drive_db=float(spec.get("drive_db", 12.0)))
+    if effect in {"clipping", "clip", "hard_clip"}:
+        return pb.Clipping(threshold_db=float(spec.get("threshold_db", -6.0)))
+    if effect in {"bitcrush", "bit_crush", "crusher"}:
+        return pb.Bitcrush(bit_depth=float(spec.get("bit_depth", 8.0)))
+    if effect in {"resample", "downsample", "sample_rate_reduce"}:
+        return pb.Resample(
+            target_sample_rate=float(spec.get("target_sample_rate", spec.get("sample_rate", 12000.0)))
+        )
     if effect == "delay":
         return pb.Delay(
             delay_seconds=float(spec.get("delay_seconds", float(spec.get("delay_ms", 90.0)) / 1000.0)),
@@ -139,9 +149,56 @@ def build_plugin(spec: dict[str, Any], *, base_dir: Path | None = None) -> Any:
         _set_parameters(plugin, dict(spec.get("parameters") or {}))
         return plugin
     raise ValueError(
-        f"unknown Pedalboard effect {effect!r}; use compressor, limiter, reverb, chorus, "
-        "phaser, distortion, delay, pitch_shift, highpass, lowpass, or vst3."
+        f"unknown Pedalboard effect {effect!r}; use gain, compressor, limiter, "
+        "reverb, chorus, phaser, distortion, clipping, bitcrush, resample, "
+        "delay, pitch_shift, highpass, lowpass, or vst3."
     )
+
+
+def _dbfs_levels(audio: np.ndarray) -> tuple[float, float]:
+    """Return (rms_dbfs, peak_dbfs) without letting silence become -inf."""
+    x = np.asarray(audio, dtype=np.float64)
+    if x.size == 0:
+        return -240.0, -240.0
+    rms = float(np.sqrt(np.mean(np.square(x))))
+    peak = float(np.max(np.abs(x)))
+    rms_db = 20.0 * np.log10(max(rms, 1e-12))
+    peak_db = 20.0 * np.log10(max(peak, 1e-12))
+    return float(rms_db), float(peak_db)
+
+
+def _effect_name(spec: dict[str, Any]) -> str:
+    return str(spec.get("effect") or spec.get("type") or spec.get("kind") or "unknown")
+
+
+def _shape_change_db(before: np.ndarray, after: np.ndarray) -> float:
+    """Residual level after removing the best scalar gain match, relative to output."""
+    x = np.asarray(before, dtype=np.float64).reshape(-1)
+    y = np.asarray(after, dtype=np.float64).reshape(-1)
+    if not x.size or not y.size:
+        return -240.0
+    denom = float(np.dot(x, x))
+    scale = float(np.dot(y, x) / max(denom, 1e-30))
+    residual = y - scale * x
+    resid_rms = float(np.sqrt(np.mean(np.square(residual))))
+    out_rms = float(np.sqrt(np.mean(np.square(y))))
+    return float(20.0 * np.log10(max(resid_rms / max(out_rms, 1e-30), 1e-12)))
+
+
+def _apply_one_plugin(
+    audio: np.ndarray,
+    sample_rate: int,
+    plugin: Any,
+    spec: dict[str, Any],
+) -> np.ndarray:
+    """Apply one plugin with optional explicit parallel wet/dry blending."""
+    dry = _samples_first(audio)
+    board = _import_pedalboard().Pedalboard([plugin])
+    rendered = _samples_first(board(_chans_first(dry), int(sample_rate)))
+    if "wet_mix" not in spec:
+        return rendered
+    wet_mix = float(np.clip(float(spec.get("wet_mix", 1.0)), 0.0, 1.0))
+    return ((1.0 - wet_mix) * dry + wet_mix * rendered).astype(np.float32, copy=False)
 
 
 def apply_pedalboard_effects(
@@ -150,11 +207,42 @@ def apply_pedalboard_effects(
     effects: list[dict[str, Any]],
     *,
     base_dir: Path | None = None,
+    report_levels: bool = False,
+    label: str | None = None,
 ) -> np.ndarray:
     pb = _import_pedalboard()
-    plugins = [build_plugin(spec, base_dir=base_dir) for spec in effects or []]
+    specs = [dict(spec or {}) for spec in effects or []]
+    plugins = [build_plugin(spec, base_dir=base_dir) for spec in specs]
     if not plugins:
         return _samples_first(audio)
-    board = pb.Pedalboard(plugins)
-    rendered = board(_chans_first(audio), int(sample_rate))
-    return _samples_first(rendered)
+    if not report_levels and not any("wet_mix" in spec for spec in specs):
+        board = pb.Pedalboard(plugins)
+        rendered = board(_chans_first(audio), int(sample_rate))
+        return _samples_first(rendered)
+
+    # Process one plugin at a time when diagnostics or explicit wet/dry mixing
+    # are requested. This exposes the actual level hitting nonlinear stages and
+    # makes parallel degradation deterministic without requiring a plugin-specific
+    # mix control.
+    out = _samples_first(audio)
+    chain_label = str(label or "pedalboard")
+    in_rms, in_peak = _dbfs_levels(out)
+    print(
+        f"[music fx] chain={chain_label} input rms_dbfs={in_rms:.2f} peak_dbfs={in_peak:.2f}",
+        file=sys.stderr,
+    )
+    for idx, (spec, plugin) in enumerate(zip(specs, plugins)):
+        before = out
+        before_rms, before_peak = _dbfs_levels(before)
+        out = _apply_one_plugin(before, sample_rate, plugin, spec)
+        after_rms, after_peak = _dbfs_levels(out)
+        shape_db = _shape_change_db(before, out)
+        wet_text = f" wet_mix={float(spec['wet_mix']):.3f}" if "wet_mix" in spec else ""
+        print(
+            f"[music fx] chain={chain_label} effect={idx}:{_effect_name(spec)} "
+            f"in_rms_dbfs={before_rms:.2f} in_peak_dbfs={before_peak:.2f} "
+            f"out_rms_dbfs={after_rms:.2f} out_peak_dbfs={after_peak:.2f} "
+            f"shape_change_db={shape_db:.2f}{wet_text}",
+            file=sys.stderr,
+        )
+    return out

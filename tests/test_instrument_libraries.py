@@ -65,6 +65,21 @@ def test_rock_drums_do_not_select_orchestral_percussion(tmp_path: Path):
     assert resolve_sfz_reference(library_ref="vpo.percussion", roots=[tmp_path / "sfz"]) == perc.resolve()
 
 
+def test_new_real_library_aliases_are_registered():
+    from ambition_music_renderer.instrument_libraries import ALIASES
+
+    assert {
+        "guitar.emily",
+        "bass.black_and_blue",
+        "bass.fashion",
+        "bass.pastabass",
+        "drums.big_rusty",
+        "drums.naked",
+        "drums.muldjord",
+        "orchestra.vsco2",
+    } <= set(ALIASES)
+
+
 def test_downloaded_role_aliases_resolve_from_stable_names(tmp_path: Path):
     cases = {
         "guitar.clean": "Karoryfer/Shinyguitar/Shinyguitar Sustain.sfz",
@@ -78,6 +93,14 @@ def test_downloaded_role_aliases_resolve_from_stable_names(tmp_path: Path):
         "strings.cello": "Karoryfer/BigcatCello/Bigcat Cello Sustain.sfz",
         "strings.cyborg": "Karoryfer/StringCyborgs/String Cyborgs Sustain.sfz",
         "folk.bass_tagelharpa": "Karoryfer/HorsePulse/Horse Pulse Bass Tagelharpa.sfz",
+        "guitar.emily": "Karoryfer/Emilyguitar/Emilyguitar Barre Chords.sfz",
+        "bass.black_and_blue": "Karoryfer/BlackAndBlueBasses/Black And Blue Bass Sustain.sfz",
+        "bass.fashion": "Karoryfer/Fashionbass/Fashionbass Sustain.sfz",
+        "bass.pastabass": "Karoryfer/Pastabass/Pastabass Linguine.sfz",
+        "drums.big_rusty": "Karoryfer/BigRustyDrums/Big Rusty Drums Kit.sfz",
+        "drums.naked": "WilkinsonAudio/NakedDrums/Naked Drums GM.sfz",
+        "drums.muldjord": "DrumGizmo/MuldjordKit/MuldjordKit.sfz",
+        "orchestra.vsco2": "VSCO2CE/VSCO 2 CE Flute Sustain.sfz",
     }
     for ref, rel in cases.items():
         root = tmp_path / ref.replace(".", "_") / "sfz"
@@ -243,7 +266,6 @@ def test_premium_acoustic_bass_alias_prefers_meatbass_pizz_program(tmp_path: Pat
 
 
 def test_vpo_solo_performance_aliases_choose_plain_perf_programs(tmp_path: Path):
-    root = tmp_path / "sfz"
     cases = {
         "vpo.violin_solo_perf": (
             "Virtual-Playing-Orchestra3/Virtual-Playing-Orchestra3/Strings/1st-violin-SOLO-PERF.sfz",
@@ -267,6 +289,10 @@ def test_vpo_solo_performance_aliases_choose_plain_perf_programs(tmp_path: Path)
         ),
     }
     for ref, (wanted_rel, distractor_rel) in cases.items():
+        # Discovery is intentionally cached for the life of a process because
+        # installed libraries do not appear mid-render. Keep each synthetic
+        # library in its own root so this test models separate installations.
+        root = tmp_path / ref.replace(".", "_") / "sfz"
         wanted = root / wanted_rel
         distractor = root / distractor_rel
         for path in (wanted, distractor):

@@ -215,6 +215,7 @@ Current layer kinds are implemented in `render/score_layers.py`:
 - `root_hits`
 - `guitar_strum`
 - `guitar_chug`
+- `sampled_chord`
 - `guitar_lead`
 - `notes`
 - `automation`
@@ -224,6 +225,9 @@ explicit events than as a generative layer. Note-producing layers can use
 phrase-level `dynamics`; layers can also carry CC automation. Guitar layers use
 a small performance compiler for string assignment, strum staggering, chugs,
 lead scoops, and explicit double-take authoring.
+`sampled_chord` is for libraries that record a complete chord behind one root
+key: it emits a classified keyswitch followed by exactly one root note, so it
+must not be fed through ordinary chord voicing expansion.
 
 Prefer the highest-level construct that expresses the musical idea cleanly.
 Use literal notes when they make the composition more legible, not as a signal
@@ -263,7 +267,23 @@ uv run --project tools/ambition_music_renderer \
 AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins validate_score <cue_id>
+
+# Render the real-library probes used before assigning a sampled instrument to
+# a cue. This writes a machine-local JSON report; it does not modify a score.
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer plugins smoke_sfz \
+  --output /tmp/ambition-sfz-smoke.json
 ```
+
+`plugins smoke_sfz` exercises the Emily, Black & Green, Shinyguitar, Growly,
+Swag, Black & Blue, Fashionbass, Pastabass, Gogodze, Big Rusty, Naked Drums,
+and Muldjord entry points. Its report includes recursive include/sample checks,
+actual playable ranges and keyswitch ranges, startup CC state, per-probe
+duration/RMS/peak/silence, low/mid/high velocity, repeated-strike, and explicit
+keyswitch behavior, plus pitch error/confidence for pitched instruments. The probe
+explicitly disables octave folding so a passing row means the authored test
+key really rendered in the library's range.
 
 #### Installed-library truth and remote handoffs
 
@@ -346,8 +366,31 @@ MusicIR separates musical authoring from mix stages:
 
 The built-in processing path covers common gain/filter/dynamics/reverb/width
 operations. Optional external processing is expressed through ordered
-`effect_chain` steps rather than parallel legacy effect lists. The plugin
-commands expose locally available VST3/LV2/CLAP infrastructure.
+`effect_chain` steps rather than parallel legacy effect lists. The Pedalboard
+adapter exposes `gain`, `distortion`, `clipping`, `bitcrush`, `resample`, filters,
+dynamics, modulation, delay/reverb, and VST3 hosting. Nonlinear chains should
+use explicit gain staging when the rendered source is too quiet to drive the
+nonlinearity directly. Individual Pedalboard effects may set `wet_mix: 0..1`
+for deterministic parallel wet/dry blending even when the underlying plugin
+does not provide its own mix control.
+
+Any top-level `effect_chain` step may also set `wet_mix: 0..1`. This is useful
+for LV2/VST/external processors whose native control surface has no dry/wet
+parameter: the renderer processes the full step, then blends it against the
+step input. LV2 steps may set `channel_mode: dual_mono` to run a mono pedal
+independently over the left and right channels before returning stereo. The
+LV2 adapter understands both `lv2proc`'s `-c port:value` controls and Lilv
+`lv2apply`'s `-c port value` controls; set `binary: lv2apply` when a score wants
+the Lilv host explicitly.
+
+Set `report_levels: true` (and optionally `label`) on a Pedalboard chain to emit
+per-effect RMS/peak levels and `shape_change_db` into the render stderr report.
+`shape_change_db` measures the residual after removing the best scalar-gain
+match between the effect input and output: very negative values mean the step
+mostly changed level, while values closer to 0 dB mean the waveform/timbre was
+materially reshaped. This makes both gain-staging mistakes and ineffectual
+"distortion" settings visible before final normalization. The plugin commands
+expose locally available VST3/LV2/CLAP infrastructure.
 
 When changing balance, inspect rendered stems rather than trusting authored MIDI
 volume or score gain values as proxies for perceived loudness. Different sample

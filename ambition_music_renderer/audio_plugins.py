@@ -32,6 +32,7 @@ EXTERNAL_BINARIES = (
     "lv2ls",
     "lv2info",
     "lv2proc",
+    "lv2apply",
     "jalv",
     "guitarix",
     "carla-single",
