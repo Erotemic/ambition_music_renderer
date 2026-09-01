@@ -2,9 +2,9 @@ schema: ambition.musicir.v1
 id: blazingly_fast
 title: Blazingly Fast
 seed: 2026083111
-notes: 'V22 keeps the accepted melody and harmony but makes the rock bed semantically sampled: Emilyguitar chord
-  patches receive one root plus an explicit 33/34/35 keyswitch, Black-and-Blue supplies the locked bass, and Big Rusty
-  supplies the GM drum kit. Source stems stay clean; only the guitar group receives the conservative audition amp chain.'
+notes: 'V25 preserves the measured Emily / Swagbass / Big Rusty palette and accepted melody/harmony while making
+  the production physically grungy: longer, less repetitive recorded-chord anchors feed a driven JCM-style preamp and
+  short amp-room tail; violin, ensemble, piano, bass, and drums share restrained rehearsal-room preamp coloration.'
 tempo:
   bpm: 180
 meter:
@@ -24,7 +24,29 @@ render:
     - /data/audio-tools
     render_timeout_s: 240
   foreground_protection:
-    enabled: false
+    enabled: true
+    mode: group_density
+    groups:
+    - guitars
+    - strings
+    - brass
+    exclude_groups:
+    - percussion
+    - bass
+    - keys
+    - melody
+    role_priorities:
+      background: 0
+      support: 1
+      lead: 2
+      foreground: 3
+    min_density_ratio: 0.5
+    min_target_notes: 1
+    duck_db_per_priority: -1.5
+    max_duck_db: -4.5
+    control_hop_ms: 15
+    attack_ms: 15
+    release_ms: 85
   adaptive_section_mastering:
     mode: global_master_slices
     notes: Master once and slice; section changes must come from arrangement, not independent mastering.
@@ -80,10 +102,10 @@ stem_postprocess:
   limiter_enabled: false
 group_postprocess:
   keys:
-    gain_db: -1.2
+    gain_db: 0.6
     highpass_hz: 35
     lowpass_hz: 18500
-    reverb_wet: 0.0035
+    reverb_wet: 0.006
     reverb_decay_seconds: 0.38
     reverb_damping_hz: 8500
     stereo_width: 0.035
@@ -96,11 +118,84 @@ group_postprocess:
     compressor_attack_ms: 8.0
     compressor_release_ms: 90.0
     compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: 4.0
+    - kind: lv2proc
+      label: keys-worn-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
+      required: true
+      wet_mix: 0.1
+      params: &worn_preamp_light
+        bright_l: 0
+        volume_l: 0.62
+        bass_l: 0.48
+        middle_l: 0.62
+        treble_l: 0.56
+        master_l: 0.52
+        bright_r: 0
+        volume_r: 0.62
+        bass_r: 0.48
+        middle_r: 0.62
+        treble_r: 0.56
+        master_r: 0.52
+      binary: lv2apply
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: -4.0
+  melody:
+    gain_db: 2.8
+    highpass_hz: 90
+    lowpass_hz: 19500
+    reverb_wet: 0.009
+    reverb_decay_seconds: 0.32
+    reverb_damping_hz: 9000
+    stereo_width: 0.02
+    transient_tame: 0.0
+    transient_lowpass_hz: 19500
+    high_shelf_db: 1.2
+    high_shelf_hz: 5200
+    compressor_threshold_db: -25.0
+    compressor_ratio: 1.55
+    compressor_attack_ms: 13.0
+    compressor_release_ms: 82.0
+    compressor_makeup_db: 0.8
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: 8.0
+    - kind: lv2proc
+      label: violin-questionable-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
+      required: true
+      wet_mix: 0.28
+      params:
+        bright_l: 1
+        volume_l: 0.7
+        bass_l: 0.44
+        middle_l: 0.69
+        treble_l: 0.64
+        master_l: 0.54
+        bright_r: 1
+        volume_r: 0.7
+        bass_r: 0.44
+        middle_r: 0.69
+        treble_r: 0.64
+        master_r: 0.54
+      binary: lv2apply
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: -8.0
   strings:
-    gain_db: -1.6
+    gain_db: -2.5
     highpass_hz: 48
     lowpass_hz: 17000
-    reverb_wet: 0.0038
+    reverb_wet: 0.008
     reverb_decay_seconds: 0.36
     reverb_damping_hz: 8000
     stereo_width: 0.045
@@ -113,11 +208,27 @@ group_postprocess:
     compressor_attack_ms: 7.0
     compressor_release_ms: 86.0
     compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: 5.0
+    - kind: lv2proc
+      label: strings-worn-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
+      required: true
+      wet_mix: 0.15
+      params: *worn_preamp_light
+      binary: lv2apply
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: -5.0
   brass:
     gain_db: -4.0
     highpass_hz: 70
     lowpass_hz: 16500
-    reverb_wet: 0.003
+    reverb_wet: 0.006
     reverb_decay_seconds: 0.34
     reverb_damping_hz: 7600
     stereo_width: 0.025
@@ -130,8 +241,24 @@ group_postprocess:
     compressor_attack_ms: 7.0
     compressor_release_ms: 92.0
     compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: 5.0
+    - kind: lv2proc
+      label: brass-worn-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
+      required: true
+      wet_mix: 0.13
+      params: *worn_preamp_light
+      binary: lv2apply
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: -5.0
   percussion:
-    gain_db: -7.2
+    gain_db: -4.4
     highpass_hz: 38
     lowpass_hz: 18000
     reverb_wet: 0.0008
@@ -147,17 +274,79 @@ group_postprocess:
     compressor_attack_ms: 3.5
     compressor_release_ms: 68.0
     compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      label: overloaded-drum-room
+      effects:
+      - effect: gain
+        gain_db: 8.0
+      - effect: clipping
+        threshold_db: -24.0
+        wet_mix: 0.18
+      - effect: compressor
+        threshold_db: -30.0
+        ratio: 3.2
+        attack_ms: 4.0
+        release_ms: 72.0
+        wet_mix: 0.2
+      - effect: gain
+        gain_db: -8.0
+  bass:
+    gain_db: 1.6
+    highpass_hz: 30
+    lowpass_hz: 14500
+    reverb_wet: 0.0005
+    reverb_decay_seconds: 0.18
+    reverb_damping_hz: 8500
+    stereo_width: 0.0
+    transient_tame: 0.01
+    transient_lowpass_hz: 13500
+    high_shelf_db: 0.45
+    high_shelf_hz: 4800
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.15
+    compressor_attack_ms: 9.0
+    compressor_release_ms: 78.0
+    compressor_makeup_db: 0.6
+    effect_chain:
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: 7.0
+    - kind: lv2proc
+      label: bass-worn-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
+      required: true
+      wet_mix: 0.2
+      params:
+        bright_l: 0
+        volume_l: 0.68
+        bass_l: 0.58
+        middle_l: 0.68
+        treble_l: 0.48
+        master_l: 0.54
+        bright_r: 0
+        volume_r: 0.68
+        bass_r: 0.58
+        middle_r: 0.68
+        treble_r: 0.48
+        master_r: 0.54
+      binary: lv2apply
+    - kind: pedalboard
+      effects:
+      - effect: gain
+        gain_db: -7.0
   guitars:
-    gain_db: -0.5
+    gain_db: -0.8
     highpass_hz: 82
     lowpass_hz: 19500
-    reverb_wet: 0.001
-    reverb_decay_seconds: 0.2
+    reverb_wet: 0.018
+    reverb_decay_seconds: 0.32
     reverb_damping_hz: 11000
-    stereo_width: 0.12
+    stereo_width: 0.05
     transient_tame: 0.0
     transient_lowpass_hz: 19500
-    high_shelf_db: 2.4
+    high_shelf_db: 1.35
     high_shelf_hz: 5200
     compressor_threshold_db: -18.0
     compressor_ratio: 2.2
@@ -170,40 +359,45 @@ group_postprocess:
       report_levels: true
       effects:
       - effect: gain
-        gain_db: 6.0
+        gain_db: 12.0
+      - effect: compressor
+        threshold_db: -24.0
+        ratio: 2.4
+        attack_ms: 8.0
+        release_ms: 110.0
     - kind: lv2proc
       label: guitarix-ts9
       plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
       channel_mode: dual_mono
       required: true
-      wet_mix: 0.35
+      wet_mix: 0.52
       report_levels: true
       params:
-        fslider0_: -6.0
-        fslider1_: 720.0
-        fslider2_: 0.58
+        fslider0_: -4.0
+        fslider1_: 680.0
+        fslider2_: 0.68
         BYPASS: 1.0
       binary: lv2apply
     - kind: lv2proc
-      label: guitarix-metal-amp-crunch
-      plugin_uri: http://guitarix.sourceforge.net/plugins/gxmetal_amp#metal_amp
-      channel_mode: dual_mono
+      label: guitarix-jcm800-corroded-crunch
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
       required: true
-      wet_mix: 0.24
+      wet_mix: 0.58
       report_levels: true
       params:
-        TONE: 0.74
-        DRIVE: 3.5
-        PREGAIN: 1.0
-        GAIN1: -2.0
-        HIGHGAIN: 0.0
+        P6v: 0.74
+        Middle: 0.68
+        Bass: 0.48
+        Treble: 0.6
+        WET_DRY: 60.0
+        GAIN: -2.0
       binary: lv2apply
     - kind: pedalboard
       label: guitar-post
       report_levels: true
       effects:
       - effect: gain
-        gain_db: -6.0
+        gain_db: -16.0
   patina:
     gain_db: -120.0
     highpass_hz: 300
@@ -253,12 +447,12 @@ instruments:
     saturation_drive: 1.08
     output_gain_db: -9.0
 - name: violins_i_stacc
-  group: strings
+  group: melody
   program: string_ensemble_1
-  volume: 82
-  pan: 78
-  expression: 94
-  mix_role: support
+  volume: 90
+  pan: 72
+  expression: 101
+  mix_role: foreground
   instrument_backend:
     kind: sfz
     library_ref: strings.violins_1_staccato
@@ -354,7 +548,7 @@ instruments:
   group: guitars
   program: clean_guitar
   volume: 78
-  pan: 24
+  pan: 32
   expression: 102
   mix_role: support
   instrument_backend:
@@ -369,7 +563,7 @@ instruments:
   group: guitars
   program: clean_guitar
   volume: 77
-  pan: 104
+  pan: 96
   expression: 100
   mix_role: support
   instrument_backend:
@@ -2037,10 +2231,10 @@ layer_templates:
     kind: sampled_chord
     takes:
     - instrument: rust_gtr_l
-      timing_offset_ms: -8
+      timing_offset_ms: -5
       velocity_offset: 0
     - instrument: rust_gtr_r
-      timing_offset_ms: 11
+      timing_offset_ms: 7
       velocity_offset: -4
     octave: 2
     quality: power
@@ -2051,23 +2245,19 @@ layer_templates:
     pattern:
     - - 0
       - 0.0
-      - 0.82
+      - 1.42
       - 1.0
     - - 0
       - 1.5
-      - 0.38
-      - 0.72
-    - - 0
-      - 2.5
-      - 0.58
+      - 1.92
       - 0.9
     - - 12
       - 3.5
-      - 0.34
+      - 0.46
       - 0.7
     velocity: 72
     spread_ms: 6
-    gate: 0.84
+    gate: 0.96
     articulation: marcato
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
@@ -2077,10 +2267,10 @@ layer_templates:
     kind: sampled_chord
     takes:
     - instrument: rust_gtr_l
-      timing_offset_ms: -8
+      timing_offset_ms: -5
       velocity_offset: 0
     - instrument: rust_gtr_r
-      timing_offset_ms: 11
+      timing_offset_ms: 7
       velocity_offset: -4
     octave: 2
     quality: power
@@ -2091,23 +2281,19 @@ layer_templates:
     pattern:
     - - 0
       - 0.0
-      - 0.68
+      - 1.85
       - 1.0
     - - 0
-      - 0.75
-      - 0.3
-      - 0.66
-    - - 0
       - 2.0
-      - 0.78
+      - 1.15
       - 0.92
     - - 12
       - 3.25
-      - 0.48
+      - 0.65
       - 0.74
     velocity: 73
     spread_ms: 6
-    gate: 0.82
+    gate: 0.96
     articulation: marcato
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
@@ -2117,10 +2303,10 @@ layer_templates:
     kind: sampled_chord
     takes:
     - instrument: rust_gtr_l
-      timing_offset_ms: -8
+      timing_offset_ms: -5
       velocity_offset: 0
     - instrument: rust_gtr_r
-      timing_offset_ms: 11
+      timing_offset_ms: 7
       velocity_offset: -4
     octave: 2
     quality: power
@@ -2131,19 +2317,19 @@ layer_templates:
     pattern:
     - - 0
       - 0.0
-      - 1.18
+      - 2.38
       - 0.88
     - - 0
       - 2.5
-      - 0.54
+      - 0.9
       - 0.72
     - - 12
       - 3.5
-      - 0.3
+      - 0.45
       - 0.62
     velocity: 69
     spread_ms: 6
-    gate: 0.88
+    gate: 0.96
     articulation: marcato
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
@@ -2153,10 +2339,10 @@ layer_templates:
     kind: sampled_chord
     takes:
     - instrument: rust_gtr_l
-      timing_offset_ms: -8
+      timing_offset_ms: -5
       velocity_offset: 0
     - instrument: rust_gtr_r
-      timing_offset_ms: 11
+      timing_offset_ms: 7
       velocity_offset: -4
     octave: 2
     quality: power
@@ -2167,23 +2353,23 @@ layer_templates:
     pattern:
     - - 0
       - 0.0
-      - 0.62
+      - 0.9
       - 1.0
     - - 0
       - 1.0
-      - 0.42
+      - 0.9
       - 0.72
     - - 12
       - 2.0
-      - 0.82
+      - 1.15
       - 0.94
     - - 0
       - 3.25
-      - 0.48
+      - 0.65
       - 0.78
     velocity: 74
     spread_ms: 6
-    gate: 0.84
+    gate: 0.96
     articulation: marcato
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
@@ -2688,9 +2874,11 @@ playback:
     request_outro: stop_at_next_valid_exit_bar
   bridge_stems:
   - keys
+  - melody
   - strings
   - brass
   - percussion
+  - bass
   - guitars
   fade_stems: []
 state_map:
@@ -2698,34 +2886,42 @@ state_map:
     preferred_section: hot_path
     stems:
       keys: 1.0
-      strings: 0.94
-      brass: 0.54
-      percussion: 0.68
-      guitars: 0.74
+      melody: 1.0
+      strings: 0.88
+      brass: 0.52
+      percussion: 0.78
+      bass: 0.9
+      guitars: 0.62
   flow:
     preferred_section: borrowed_motion
     stems:
       keys: 1.0
-      strings: 0.95
-      brass: 0.52
-      percussion: 0.69
-      guitars: 0.78
+      melody: 1.0
+      strings: 0.9
+      brass: 0.5
+      percussion: 0.8
+      bass: 0.92
+      guitars: 0.65
   focus:
     preferred_section: counterpoint
     stems:
       keys: 1.0
-      strings: 0.92
-      brass: 0.5
-      percussion: 0.68
-      guitars: 0.68
+      melody: 1.0
+      strings: 0.84
+      brass: 0.48
+      percussion: 0.76
+      bass: 0.88
+      guitars: 0.55
   pressure:
     preferred_section: zero_cost
     stems:
       keys: 1.0
-      strings: 0.96
-      brass: 0.56
-      percussion: 0.72
-      guitars: 0.82
+      melody: 1.0
+      strings: 0.91
+      brass: 0.54
+      percussion: 0.82
+      bass: 0.95
+      guitars: 0.68
 sections:
 - id: hot_path
   kind: loop_component
