@@ -20,6 +20,7 @@ import pretty_midi
 import librosa
 from ..backends.sfizz_backend import render_sfizz, sfz_key_span
 from ..instrument_libraries import configured_sfz_roots, resolve_sfz_reference
+from .sfz_measurement import repeat_variation, select_regions
 
 
 _OPCODE_RE = re.compile(r"(?P<key>[A-Za-z][A-Za-z0-9_]*)=(?P<value>[^\s]+)")
@@ -42,7 +43,7 @@ class SmokeCandidate:
     pitch_probe: bool = True
     keyswitch_probes: tuple[int, ...] = ()
     velocity_probes: tuple[int, ...] = (32, 80, 120)
-    repeat_count: int = 3
+    repeat_count: int = 8
 
 
 # These are the patches SOL identified as useful for the fast rock cue.  Paths
@@ -50,22 +51,22 @@ class SmokeCandidate:
 # aliases are used for families whose chosen program name is installation data.
 CANDIDATES: tuple[SmokeCandidate, ...] = (
     SmokeCandidate("emily_basic", "Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz", family="guitar", articulation="basic", probes=(48, 55, 60), pitch_probe=False),
-    SmokeCandidate("emily_chords", "Karoryfer/Emilyguitar/Emilyguitar/emily_chords.sfz", family="guitar", articulation="power-chord", probes=(40, 48, 55), pitch_probe=False, keyswitch_probes=(33, 34, 35)),
+    SmokeCandidate("emily_chords", library_ref="guitar.emily", prefer=("chords", "emily"), family="guitar", articulation="power-chord", probes=(40, 48, 55), pitch_probe=False, keyswitch_probes=(33, 34, 35)),
     SmokeCandidate("emily_chords_wide", "Karoryfer/Emilyguitar/Emilyguitar/emily_chords_wide.sfz", family="guitar", articulation="wide-power-chord", probes=(40, 48, 55), pitch_probe=False, keyswitch_probes=(33, 34, 35)),
     SmokeCandidate("blackgreen_green", "Karoryfer/BlackAndGreenGuitars/Programs/01-green_keyswitch.sfz", family="guitar", articulation="green", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
     SmokeCandidate("blackgreen_black", "Karoryfer/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz", family="guitar", articulation="black", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
-    SmokeCandidate("blackgreen_twang", "Karoryfer/BlackAndGreenGuitars/Programs/04-green_twang.sfz", family="guitar", articulation="twang", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
-    SmokeCandidate("blackgreen_staccato", "Karoryfer/BlackAndGreenGuitars/Programs/05-green_staccato.sfz", family="guitar", articulation="staccato", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
-    SmokeCandidate("shiny_electric", "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz", family="guitar", articulation="electric-sustain", startup_cc=((100, 64), (107, 127)), probes=(37,)),
+    SmokeCandidate("blackgreen_twang", "Karoryfer/BlackAndGreenGuitars/Programs/04-green_twang.sfz", family="guitar", articulation="twang", probes=(52, 60, 67)),
+    SmokeCandidate("blackgreen_staccato", "Karoryfer/BlackAndGreenGuitars/Programs/05-green_staccato.sfz", family="guitar", articulation="staccato", probes=(52, 60, 67)),
+    SmokeCandidate("shiny_electric", "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz", family="guitar", articulation="electric-sustain", startup_cc=((100, 64), (107, 127)), probes=(37, 52, 64, 76)),
     SmokeCandidate("growlybass", library_ref="bass.growly", family="bass", articulation="clean-finger", probes=(36, 43, 52)),
     SmokeCandidate("swagbass", library_ref="bass.swag", family="bass", articulation="clean-finger", probes=(36, 43, 52)),
-    SmokeCandidate("black_and_blue_bass", "Karoryfer/BlackAndBlueBasses/Programs/03-babyblue_all.sfz", family="bass", articulation="baby-blue", probes=(36, 43, 52)),
+    SmokeCandidate("black_and_blue_bass", library_ref="bass.black_and_blue", prefer=("babyblue all", "black and blue"), family="bass", articulation="baby-blue", probes=(36, 43, 52)),
     SmokeCandidate("fashionbass", "Karoryfer/Fashionbass/Fashionbass/fashionbass_clean.sfz", family="bass", articulation="clean", probes=(36, 48, 60)),
     SmokeCandidate("pastabass", "Karoryfer/Pastabass/Pastabass/linguine.sfz", family="bass", articulation="linguine", probes=(36, 40, 48)),
-    SmokeCandidate("gogodze", "Karoryfer/GogodzePhuVolII/Gogodze_Phu_vol_II/Programs/Kit.sfz", family="drums", articulation="kit", probes=(36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("big_rusty", "Karoryfer/BigRustyDrums/Programs/01-full.sfz", family="drums", articulation="full-kit", probes=(36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("naked_drums", "WilkinsonAudio/NakedDrums/WilkinsonAudio.NakedDrums-master/Wilkinson Audio/Naked Drums/User/Naked Drums GM.sfz", family="drums", articulation="gm-kit", probes=(36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("muldjord", "DrumGizmo/MuldjordKit/DrumGizmo.MuldjordKit-master/DrumGizmo/MuldjordKit/Stereo/DrumGizmo MuldjordKit.sfz", family="drums", articulation="stereo-kit", probes=(36, 38, 42, 46, 49), drum=True, pitch_probe=False),
+    SmokeCandidate("gogodze", "Karoryfer/GogodzePhuVolII/Gogodze_Phu_vol_II/Programs/Kit.sfz", family="drums", articulation="kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
+    SmokeCandidate("big_rusty", library_ref="drums.big_rusty", prefer=("01 full", "big rusty"), family="drums", articulation="full-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
+    SmokeCandidate("naked_drums", "WilkinsonAudio/NakedDrums/WilkinsonAudio.NakedDrums-master/Wilkinson Audio/Naked Drums/User/Naked Drums GM.sfz", family="drums", articulation="gm-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
+    SmokeCandidate("muldjord", "DrumGizmo/MuldjordKit/DrumGizmo.MuldjordKit-master/DrumGizmo/MuldjordKit/Stereo/DrumGizmo MuldjordKit.sfz", family="drums", articulation="stereo-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
 )
 
 
@@ -312,7 +313,9 @@ def _resolve_candidate(candidate: SmokeCandidate, roots: list[Path]) -> Path | N
             if direct.is_file():
                 return direct
     if candidate.library_ref:
-        return resolve_sfz_reference(library_ref=candidate.library_ref, roots=roots)
+        return resolve_sfz_reference(
+            library_ref=candidate.library_ref, prefer=candidate.prefer, roots=roots
+        )
     return None
 
 
@@ -336,6 +339,7 @@ def run_sfz_smoke(
                 "family": candidate.family,
                 "articulation": candidate.articulation,
                 "requested": candidate.path or candidate.library_ref,
+                "prefer_requested": list(candidate.prefer),
                 "resolved": str(resolved) if resolved else None,
                 "startup_cc_requested": {str(key): value for key, value in candidate.startup_cc},
                 "probes": [],
@@ -350,6 +354,12 @@ def run_sfz_smoke(
             failed_count = 0
             for index, note in enumerate(candidate.probes):
                 probe: dict[str, Any] = {"note": note, "note_name": pretty_midi.note_number_to_name(note)}
+                probe["selected_regions"] = select_regions(
+                    resolved,
+                    note,
+                    velocity=80,
+                    controls=dict(candidate.startup_cc) if candidate.startup_cc else None,
+                )
                 if key_span and not (int(key_span[0]) <= note <= int(key_span[1])):
                     probe.update({"status": "OUT_OF_RANGE", "skipped": True, "rendered": False})
                     row["probes"].append(probe)
@@ -440,7 +450,13 @@ def run_sfz_smoke(
                         b = min(len(array), int((0.50 + 0.55 * repeat_index) * sample_rate))
                         peaks.append(float(np.max(np.abs(array[a:b]))) if b > a else 0.0)
                     peak_db = [_db(value) for value in peaks]
-                    repeat.update({"rendered": True, "peaks_dbfs": peak_db, "peak_spread_db": round(max(peak_db, default=-120.0) - min(peak_db, default=-120.0), 2), "silent": any(value < 1e-3 for value in peaks)})
+                    repeat.update({
+                        "rendered": True,
+                        "peaks_dbfs": peak_db,
+                        "peak_spread_db": round(max(peak_db, default=-120.0) - min(peak_db, default=-120.0), 2),
+                        "silent": any(value < 1e-3 for value in peaks),
+                        **repeat_variation(array, sample_rate, count=repeats),
+                    })
                 except Exception as ex:
                     failed_count += 1
                     repeat["error"] = f"{type(ex).__name__}: {ex}"
@@ -471,14 +487,25 @@ def run_sfz_smoke(
             row["articulation_probes"] = articulation_report
             rendered = [probe for probe in row["probes"] if probe.get("rendered")]
             row["pitch_unreliable_count"] = sum(bool(probe.get("pitch_unreliable")) for probe in rendered)
-            row["status"] = "ok" if rendered and not any(probe.get("silent") for probe in rendered) and failed_count == 0 else "SILENT_OR_FAILED"
+            row["pitch_reliable_count"] = sum(probe.get("pitch_status") == "reliable" for probe in rendered)
+            render_ok = bool(rendered) and not any(probe.get("silent") for probe in rendered) and failed_count == 0
+            row["render_status"] = "ok" if render_ok else "SILENT_OR_FAILED"
+            if not render_ok:
+                row["validation_status"] = row["render_status"]
+            elif candidate.pitch_probe and row["pitch_unreliable_count"]:
+                row["validation_status"] = "PITCH_UNRELIABLE"
+            else:
+                row["validation_status"] = "ok"
+            # Keep the original field as the renderability status for v1 readers.
+            row["status"] = row["render_status"]
             rows.append(row)
     return {
         "schema": "ambition.music_sfz_smoke.v1",
         "sample_rate": sample_rate,
         "sfz_roots": [str(root) for root in search_roots],
         "candidate_count": len(rows),
-        "ok_count": sum(row.get("status") == "ok" for row in rows),
+        "ok_count": sum(row.get("render_status", row.get("status")) == "ok" for row in rows),
+        "validated_count": sum(row.get("validation_status") == "ok" for row in rows),
         "rows": rows,
     }
 

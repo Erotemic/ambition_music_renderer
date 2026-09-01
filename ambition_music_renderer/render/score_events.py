@@ -28,6 +28,8 @@ def add_keyswitch(
     beat: float,
     *,
     humanize_ms: float = 0.0,
+    duration_ms: float = 5.0,
+    start_time_override_s: float | None = None,
 ) -> None:
     """Emit a short, explicitly classified MIDI keyswitch event.
 
@@ -37,12 +39,18 @@ def add_keyswitch(
     if inst_name not in ctx.instruments:
         raise KeyError(f"unknown instrument {inst_name!r}")
     pitch_num = note_to_midi(pitch) if isinstance(pitch, str) else int(pitch)
-    start = ctx.beat_to_time(ctx.bar_to_beat(bar, beat))
+    start = (
+        ctx.beat_to_time(ctx.bar_to_beat(bar, beat))
+        if start_time_override_s is None
+        else float(start_time_override_s)
+    )
     if humanize_ms:
         start += float(ctx.rng.normal(0.0, humanize_ms / 1000.0))
     start = max(0.0, start)
+    duration_s = max(0.001, float(duration_ms) / 1000.0)
+    end = start + duration_s
     ctx.instruments[inst_name].notes.append(
-        pretty_midi.Note(velocity=1, pitch=fit_midi_pitch(pitch_num), start=start, end=start + 0.025)
+        pretty_midi.Note(velocity=1, pitch=fit_midi_pitch(pitch_num), start=start, end=end)
     )
     ctx.note_events.append({
         "event_type": "keyswitch",
@@ -56,11 +64,11 @@ def add_keyswitch(
         "velocity": 1,
         "nominal_bar": float(bar),
         "nominal_beat": float(beat),
-        "nominal_duration_beats": 0.025 * float(ctx.bpm) / 60.0,
+        "nominal_duration_beats": duration_s * float(ctx.bpm) / 60.0,
         "start_time": float(start),
-        "end_time": float(start + 0.025),
+        "end_time": float(end),
         "start_beat": float(ctx.time_to_beat(start)),
-        "end_beat": float(ctx.time_to_beat(start + 0.025)),
+        "end_beat": float(ctx.time_to_beat(end)),
     })
 
 
@@ -154,6 +162,7 @@ def add_note(
     pitch_vibrato_cents: float = 0.0,
     pitch_vibrato_rate_hz: float = 5.4,
     pitch_vibrato_delay_beats: float = 0.45,
+    start_time_override_s: float | None = None,
 ) -> None:
     """Schedule a single note.
 
@@ -171,7 +180,11 @@ def add_note(
     pitch_num = note_to_midi(pitch) if isinstance(pitch, str) else int(pitch)
     pitch_num = fit_midi_pitch(pitch_num)
     start_beat = ctx.bar_to_beat(bar, beat)
-    start = ctx.beat_to_time(start_beat)
+    start = (
+        ctx.beat_to_time(start_beat)
+        if start_time_override_s is None
+        else float(start_time_override_s)
+    )
     if humanize_ms:
         start += float(ctx.rng.normal(0.0, humanize_ms / 1000.0))
     # Clamp before computing the end so negative jitter near t=0 shifts the

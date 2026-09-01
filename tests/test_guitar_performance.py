@@ -446,3 +446,59 @@ def test_guitar_shape_pick_can_reuse_chord_shapes_from_strum_template():
     pm, _groups, _meta = build_score(spec)
     pitches = [note.pitch for inst in pm.instruments for note in inst.notes]
     assert pitches == [38, 64]
+
+
+def test_sampled_chord_keyswitch_is_released_before_humanized_attack():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "sampled_chord_keyswitch_timing",
+        "seed": 7,
+        "tempo": {"bpm": 180},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "gtr", "group": "strings", "program": "clean_guitar"}],
+        "sections": [{
+            "id": "loop", "bars": 1, "harmony": ["Em"],
+            "layers": [{
+                "kind": "sampled_chord", "instrument": "gtr",
+                "quality": "power", "keyswitches": {"power": 33},
+                "pattern": [[0, 0.0, 0.5]], "octave": 3,
+                "humanize_ms": 25.0,
+                "keyswitch_lead_ms": 10.0,
+                "keyswitch_duration_ms": 5.0,
+            }],
+        }],
+    }
+    pm, _groups, _meta = build_score(spec)
+    events = [event for event in pm._ambition_note_events if event["instrument"] == "gtr"]
+    switch, note = events
+    assert switch["event_type"] == "keyswitch"
+    assert note["event_type"] == "note"
+    assert switch["end_time"] <= note["start_time"]
+    assert note["start_time"] - switch["start_time"] >= 0.0099
+
+
+def test_sampled_chord_rejects_keyswitch_duration_without_release_gap():
+    import pytest
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "sampled_chord_bad_keyswitch_timing",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "gtr", "group": "strings", "program": "clean_guitar"}],
+        "sections": [{
+            "id": "loop", "bars": 1, "harmony": ["Em"],
+            "layers": [{
+                "kind": "sampled_chord", "instrument": "gtr",
+                "quality": "power", "keyswitches": {"power": 33},
+                "pattern": [[0, 0.0, 0.5]], "octave": 3,
+                "keyswitch_lead_ms": 5.0,
+                "keyswitch_duration_ms": 5.0,
+            }],
+        }],
+    }
+    with pytest.raises(ValueError, match="keyswitch_duration_ms must be smaller"):
+        build_score(spec)

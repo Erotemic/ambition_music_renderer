@@ -31,8 +31,28 @@ def events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, 
     pm, _groups, _section_meta = build_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    events = musical_note_events(getattr(pm, "_ambition_note_events", []) or [])
     return events, bpm, beats_per_bar
+
+
+@profile
+def is_musical_note_event(event: dict[str, Any]) -> bool:
+    """Whether an expanded score event is a sounding musical note.
+
+    Older event producers did not attach ``event_type``; treat those as notes
+    for backward compatibility.  Explicit control events such as keyswitches
+    remain in score provenance but must not participate in pitch, harmony,
+    density, lead, or playable-range judgments.
+    """
+
+    return str(event.get("event_type", "note")) == "note"
+
+
+@profile
+def musical_note_events(events: Any) -> list[dict[str, Any]]:
+    """Return only musical note events from expanded score provenance."""
+
+    return [event for event in (events or []) if is_musical_note_event(event)]
 
 
 @profile
@@ -230,8 +250,9 @@ def harmonic_events(
 ) -> tuple[list[dict[str, Any]], int]:
     """Remove unpitched trigger-key events from pitch/harmony diagnostics."""
 
+    musical = musical_note_events(events)
     unpitched = unpitched_instrument_names(spec)
     if not unpitched:
-        return list(events), 0
-    kept = [ev for ev in events if str(ev.get("instrument")) not in unpitched]
-    return kept, len(events) - len(kept)
+        return musical, 0
+    kept = [ev for ev in musical if str(ev.get("instrument")) not in unpitched]
+    return kept, len(musical) - len(kept)

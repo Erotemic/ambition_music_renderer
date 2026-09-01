@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import Any
 
 from ._common import round3 as _round3
-from ._score_common import chord_pitch_classes
+from ._score_common import chord_pitch_classes, musical_note_events
 
 FOREGROUND_KINDS = {"motif", "guitar_lead", "notes"}
 
@@ -66,6 +66,7 @@ def audit_events(
     exposed_min_beats: float = 1.0,
     max_rows: int = 40,
 ) -> dict[str, Any]:
+    events = musical_note_events(events)
     leads = [
         e for e in events
         if str(e.get("layer_kind")) in FOREGROUND_KINDS
@@ -191,7 +192,7 @@ def audit_spec(spec: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
 
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
     pm, _groups, _meta = build_score(spec)
-    events = list(getattr(pm, "_ambition_note_events", []))
+    events = musical_note_events(getattr(pm, "_ambition_note_events", []))
     return audit_events(events, spec, beats_per_bar=beats_per_bar, **kwargs)
 
 

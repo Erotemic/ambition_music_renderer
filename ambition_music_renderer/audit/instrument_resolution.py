@@ -16,6 +16,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from ._score_common import musical_note_events
+
 
 def _instrument_drives_cc1(inst: dict[str, Any]) -> bool:
     if "modulation" in inst:
@@ -46,7 +48,7 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
     build_warnings: list[str] = []
     try:
         pm, _groups, _meta = build_score(spec)
-        for ev in getattr(pm, "_ambition_note_events", []) or []:
+        for ev in musical_note_events(getattr(pm, "_ambition_note_events", []) or []):
             pitches.setdefault(str(ev.get("instrument")), []).append(int(ev["pitch"]))
     except Exception as ex:
         # This audit exists to make "asked for X, got Y" visible; a swallowed

@@ -955,6 +955,19 @@ def render_layer_sampled_chord(
     min_pitch = layer.get("min_pitch")
     min_pitch_i = int(min_pitch) if min_pitch is not None else None
     hk = _layer_human(layer, 1.0)
+    timing_humanize_ms = float(hk.pop("humanize_ms", 0.0))
+    keyswitch_lead_ms = float(layer.get("keyswitch_lead_ms", 10.0))
+    keyswitch_duration_ms = float(layer.get("keyswitch_duration_ms", 5.0))
+    if not math.isfinite(keyswitch_lead_ms) or keyswitch_lead_ms <= 0.0:
+        raise ValueError("sampled_chord keyswitch_lead_ms must be finite and > 0")
+    if not math.isfinite(keyswitch_duration_ms) or keyswitch_duration_ms <= 0.0:
+        raise ValueError("sampled_chord keyswitch_duration_ms must be finite and > 0")
+    if keyswitch_duration_ms >= keyswitch_lead_ms:
+        raise ValueError(
+            "sampled_chord keyswitch_duration_ms must be smaller than keyswitch_lead_ms "
+            "so the control note is released before the sampled chord attack"
+        )
+    keyswitch_lead_s = keyswitch_lead_ms / 1000.0
     last_switch: dict[str, int] = {}
     for local in range(int(section["bars"])):
         for item in pattern:
@@ -974,14 +987,33 @@ def render_layer_sampled_chord(
                 timing_offset_ms = float(take.get("timing_offset_ms", take.get("offset_ms", 0.0)))
                 take_beat = beat + timing_offset_ms / 1000.0 * ctx.bpm / 60.0
                 velocity_offset = float(take.get("velocity_offset", -2.0 * take_index))
+
+                # Sample timing humanization once, then schedule the keyswitch
+                # relative to the *actual* note attack.  Letting add_note jitter
+                # independently could move a chord before its articulation
+                # control event, especially at section/cue boundaries.
+                authored_bar = section["start_bar"] + local
+                note_start = ctx.bar_to_time(authored_bar, take_beat)
+                if timing_humanize_ms:
+                    note_start += float(ctx.rng.normal(0.0, timing_humanize_ms / 1000.0))
+                note_start = max(0.0, note_start)
                 if last_switch.get(inst) != switch:
-                    add_keyswitch(ctx, inst, switch, section["start_bar"] + local, take_beat)
+                    # At t=0 there is no negative-time pre-roll available. Move
+                    # only that first attack forward enough to preserve the
+                    # configured lead and a release gap.
+                    note_start = max(note_start, keyswitch_lead_s)
+                    add_keyswitch(
+                        ctx, inst, switch, authored_bar, take_beat,
+                        duration_ms=keyswitch_duration_ms,
+                        start_time_override_s=note_start - keyswitch_lead_s,
+                    )
                     last_switch[inst] = switch
                 add_note(
                     ctx, inst, root_pitch,
-                    section["start_bar"] + local, take_beat, dur,
+                    authored_bar, take_beat, dur,
                     (velocity + velocity_offset) * accent * float(section.get("intensity", 1.0)),
-                    articulation=articulation, gate=gate_f, **hk,
+                    articulation=articulation, gate=gate_f,
+                    humanize_ms=0.0, start_time_override_s=note_start, **hk,
                 )
 
 

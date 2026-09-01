@@ -170,18 +170,18 @@ group_postprocess:
       report_levels: true
       effects:
       - effect: gain
-        gain_db: 16.0
+        gain_db: 6.0
     - kind: lv2proc
       label: guitarix-ts9
       plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
       channel_mode: dual_mono
       required: true
-      wet_mix: 0.58
+      wet_mix: 0.35
       report_levels: true
       params:
-        fslider0_: -4.0
+        fslider0_: -6.0
         fslider1_: 720.0
-        fslider2_: 0.62
+        fslider2_: 0.58
         BYPASS: 1.0
       binary: lv2apply
     - kind: lv2proc
@@ -189,13 +189,13 @@ group_postprocess:
       plugin_uri: http://guitarix.sourceforge.net/plugins/gxmetal_amp#metal_amp
       channel_mode: dual_mono
       required: true
-      wet_mix: 0.42
+      wet_mix: 0.24
       report_levels: true
       params:
-        TONE: 0.8
-        DRIVE: 7.5
-        PREGAIN: 2.0
-        GAIN1: -1.5
+        TONE: 0.74
+        DRIVE: 3.5
+        PREGAIN: 1.0
+        GAIN1: -2.0
         HIGHGAIN: 0.0
       binary: lv2apply
     - kind: pedalboard
@@ -203,7 +203,7 @@ group_postprocess:
       report_levels: true
       effects:
       - effect: gain
-        gain_db: -13.0
+        gain_db: -6.0
   patina:
     gain_db: -120.0
     highpass_hz: 300
@@ -383,16 +383,16 @@ instruments:
 - name: locked_bass
   group: bass
   program: fingered_bass
-  volume: 92
+  volume: 108
   pan: 64
   expression: 102
   mix_role: support
   instrument_backend:
     kind: sfz
-    library_ref: bass.black_and_blue
+    library_ref: bass.swag
     prefer:
-    - babyblue all
-    - black and blue
+    - swagbass
+    - clean
     settings:
       fold_to_range: false
 - name: rock_drums
@@ -1017,6 +1017,60 @@ layer_templates:
       - 3.5
       velocity: 38
       duration_beats: 0.08
+  rock_transitions:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.0
+    events:
+    - drum: crash
+      beat: 0.0
+      bars:
+      - 0
+      - 4
+      - 8
+      - 12
+      velocity: 88
+      duration_beats: 0.18
+    - drum: open_hat
+      beat: 3.5
+      bars:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 9
+      - 11
+      - 13
+      - 15
+      velocity: 55
+      duration_beats: 0.1
+    - drum: low_tom
+      beat: 3.25
+      bars:
+      - 3
+      - 7
+      - 11
+      - 15
+      velocity: 72
+      duration_beats: 0.12
+    - drum: mid_tom
+      beat: 3.5
+      bars:
+      - 3
+      - 7
+      - 11
+      - 15
+      velocity: 78
+      duration_beats: 0.12
+    - drum: high_tom
+      beat: 3.75
+      bars:
+      - 3
+      - 7
+      - 11
+      - 15
+      velocity: 84
+      duration_beats: 0.12
   piano_comp_c:
     kind: chord_hits
     instrument: grand_piano
@@ -2712,6 +2766,7 @@ sections:
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
+  - rock_transitions
   - guitar_spine_a
 - id: borrowed_motion
   kind: loop_component
@@ -2752,6 +2807,7 @@ sections:
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
+  - rock_transitions
   - guitar_spine_b
 - id: counterpoint
   kind: loop_component
@@ -2793,6 +2849,7 @@ sections:
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
+  - rock_transitions
   - guitar_spine_c
 - id: zero_cost
   kind: loop_component
@@ -2835,4 +2892,5 @@ sections:
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
+  - rock_transitions
   - guitar_spine_d

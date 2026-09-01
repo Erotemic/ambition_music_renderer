@@ -227,7 +227,10 @@ a small performance compiler for string assignment, strum staggering, chugs,
 lead scoops, and explicit double-take authoring.
 `sampled_chord` is for libraries that record a complete chord behind one root
 key: it emits a classified keyswitch followed by exactly one root note, so it
-must not be fed through ordinary chord voicing expansion.
+must not be fed through ordinary chord voicing expansion. The switch is scheduled
+before the humanized attack and released first; `keyswitch_lead_ms` (default 10)
+and `keyswitch_duration_ms` (default 5) can tune that control pre-roll for a
+library that needs a longer setup interval.
 
 Prefer the highest-level construct that expresses the musical idea cleanly.
 Use literal notes when they make the composition more legible, not as a signal
@@ -282,8 +285,17 @@ and Muldjord entry points. Its report includes recursive include/sample checks,
 actual playable ranges and keyswitch ranges, startup CC state, per-probe
 duration/RMS/peak/silence, low/mid/high velocity, repeated-strike, and explicit
 keyswitch behavior, plus pitch error/confidence for pitched instruments. The probe
-explicitly disables octave folding so a passing row means the authored test
-key really rendered in the library's range.
+explicitly disables octave folding. `render_status`/the backward-compatible
+`status` field answer whether the probes produced audio; `validation_status` is
+stricter and reports `PITCH_UNRELIABLE` when a pitched library rendered but the
+pitch measurement is not yet trustworthy. Top-level `ok_count` counts renderable
+rows and `validated_count` counts rows that also passed the requested validation.
+
+For deeper source audits, `ambition_music_renderer.audit.sfz_measurement` is a
+reusable Python API. `sfz_regions` and `select_regions` expose effective
+included-region/sample provenance, `raw_pitch_diagnostic` compares expected F0
+with half- and double-frequency competitors, and `repeat_variation` measures
+normalized attack-shape differences across repeated strikes.
 
 #### Installed-library truth and remote handoffs
 

@@ -142,3 +142,35 @@ def test_perf_patch_velocity_to_cc_satisfies_cc1_drive(monkeypatch, tmp_path):
     p = ir.audit_spec(_spec([inst], ["bassline"]))
     assert not any("does not drive CC1" in w for w in p["warnings"])
     assert p["instruments"][0]["performance_patch_cc1_driven"] is True
+
+
+def test_instrument_resolution_excludes_keyswitch_from_playable_part_range(monkeypatch, tmp_path):
+    import ambition_music_renderer.backends.sfizz_backend as sfizz_backend
+    import ambition_music_renderer.instrument_libraries as instrument_libraries
+
+    sfz_path = tmp_path / "recorded-chords.sfz"
+    sfz_path.write_text("<region> lokey=40 hikey=66 sample=chord.wav\n")
+    monkeypatch.setattr(instrument_libraries, "resolve_sfz_reference", lambda *a, **kw: sfz_path)
+    monkeypatch.setattr(sfizz_backend, "sfz_key_span", lambda path: (40, 66))
+
+    spec = {
+        "id": "sampled_chord_range",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{
+            "name": "gtr", "group": "guitars", "program": "clean_guitar",
+            "instrument_backend": {"kind": "sfz", "library_ref": "guitar.test", "settings": {"fold_to_range": False}},
+        }],
+        "sections": [{
+            "id": "s", "bars": 1, "harmony": ["Em"],
+            "layers": [{
+                "kind": "sampled_chord", "instrument": "gtr", "quality": "power",
+                "keyswitches": {"power": 33}, "pattern": [[0, 0.0, 0.5]], "octave": 3,
+            }],
+        }],
+    }
+    row = ir.audit_spec(spec)["instruments"][0]
+    assert row["note_count"] == 1
+    assert row["part_low"] == 52
+    assert row["part_high"] == 52
+    assert row["notes_out_of_range"] == 0

@@ -31,6 +31,8 @@ from typing import Any
 
 import kwconf
 
+from ._score_common import musical_note_events
+
 # Layer kinds whose notes are a foreground melodic line (a "lead").
 LEAD_LAYER_KINDS = {"guitar_lead", "motif"}
 
@@ -82,7 +84,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
     from ..render.score_layers import build_score
 
     pm, _groups, section_meta = build_score(spec)
-    events = list(getattr(pm, "_ambition_note_events", []) or [])
+    events = musical_note_events(getattr(pm, "_ambition_note_events", []) or [])
     if not events:
         return {
             "schema": "ambition.music_mix_balance_audit.v1",
