@@ -2,9 +2,9 @@ schema: ambition.musicir.v1
 id: blazingly_fast
 title: Blazingly Fast
 seed: 2026090101
-notes: 'V33 polishes the 112-bar garage-blues loop without changing its form: the downshifts clear around the low tenor, silent slow-section
-  bars become crooked guitar answers, and a gentle guitar presence cut separates the two voices. Guitars own the first two bars; tenor enters
-  on a long low E drone. The final fast Bb turns directly into the opening fast Em.'
+notes: 'V34 extends the garage-blues loop to 144 bars and gives its sax density a longer arc: a foreground vibrato whine pulls the first fast
+  passage into half-time, the added third cycle leaves wider horn rests, and the last three bars clear the tenor before returning to the guitar-only
+  opening. Internal form markers expose every fast, downshift, slow, and rise boundary as OGG chapters.'
 tempo:
   bpm: 180
 meter:
@@ -18,6 +18,43 @@ render:
   ogg_quality: 7
   backend: pretty-midi
   strict_backends: true
+  metadata_markers:
+  - id: downshift_one
+    label: Downshift I - tenor whine
+    bar: 17
+  - id: slow_one
+    label: Slow I - low smoke
+    bar: 21
+  - id: rise_one
+    label: Rise I - 3+3+2
+    bar: 41
+  - id: fast_two
+    label: Fast II - crowded answer
+    bar: 45
+  - id: downshift_two
+    label: Downshift II - clipped fall
+    bar: 65
+  - id: slow_two
+    label: Slow II - crooked replies
+    bar: 69
+  - id: rise_two
+    label: Rise II - higher pressure
+    bar: 89
+  - id: fast_three
+    label: Fast III - long run
+    bar: 93
+  - id: downshift_three
+    label: Downshift III - open air
+    bar: 113
+  - id: slow_three
+    label: Slow III - sparse memory
+    bar: 117
+  - id: rise_three
+    label: Rise III - last climb
+    bar: 129
+  - id: fast_return
+    label: Fast return - sax clears
+    bar: 133
   sfizz:
     library_roots:
     - /data/audio-tools/sfz
@@ -92,7 +129,7 @@ group_postprocess:
     compressor_release_ms: 100
     compressor_makeup_db: 0.0
   melody:
-    gain_db: 0.5
+    gain_db: 1.2
     highpass_hz: 65
     lowpass_hz: 16000
     reverb_wet: 0.012
@@ -777,6 +814,55 @@ layer_templates:
       from: 0.68
       to: 1.0
       curve: smooth
+  tenor_whine_one:
+    kind: notes
+    instrument: tenor_sax_vibrato
+    articulation: tenuto
+    gate: 0.97
+    humanize_ms: 5.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 15
+      - 2.82
+      - B4
+      - 1.05
+      - 82
+    - - 16
+      - 0.18
+      - B4
+      - 2.9
+      - 86
+    - - 17
+      - 0.12
+      - G4
+      - 2.75
+      - 83
+    - - 18
+      - 0.3
+      - F#4
+      - 2.35
+      - 80
+    - - 19
+      - 0.62
+      - D#4
+      - 1.95
+      - 77
+    - - 19
+      - 3.05
+      - B3
+      - 0.62
+      - 70
+    dynamics:
+    - start_bar: 15
+      bars: 2
+      from: 0.8
+      to: 1.0
+      curve: smooth
+    - start_bar: 17
+      bars: 3
+      from: 0.96
+      to: 0.72
+      curve: smooth
   tenor_main:
     kind: notes
     instrument: tenor_sax_nv
@@ -1020,31 +1106,6 @@ layer_templates:
       - B3
       - 0.72
       - 69
-    - - 16
-      - 0.4
-      - G4
-      - 0.5
-      - 75
-    - - 16
-      - 1.4
-      - E4
-      - 0.7
-      - 72
-    - - 17
-      - 0.3
-      - D4
-      - 1.2
-      - 69
-    - - 18
-      - 0.5
-      - E4
-      - 0.6
-      - 72
-    - - 19
-      - 1.0
-      - B3
-      - 1.8
-      - 65
     - - 20
       - 0.72
       - B3
@@ -2854,6 +2915,743 @@ layer_templates:
       - 111
       velocity: 52
       duration_beats: 0.1
+  guitar_extension_brake_a:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 112
+    - 113
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.35
+      - 0.94
+    - - 12
+      - 2.0
+      - 0.72
+      - 0.76
+    - - 0
+      - 3.25
+      - 0.42
+      - 0.62
+    velocity: 70
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.7
+    humanize_velocity_pct: 2.5
+    min_pitch: 31
+  guitar_extension_brake_b:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 114
+    - 115
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.82
+      - 0.84
+    - - 12
+      - 3.0
+      - 0.48
+      - 0.6
+    velocity: 68
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.9
+    humanize_velocity_pct: 2.5
+    min_pitch: 31
+  guitar_extension_down_open:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 116
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.58
+      - 0.82
+    - - 12
+      - 3.0
+      - 0.5
+      - 0.62
+    velocity: 66
+    gate: 0.95
+    articulation: marcato
+    humanize_ms: 2.4
+    humanize_velocity_pct: 3.0
+    min_pitch: 31
+  guitar_extension_down:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 117
+    - 118
+    - 119
+    - 120
+    - 122
+    - 123
+    - 124
+    - 126
+    - 127
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.72
+      - 0.82
+    - - 12
+      - 3.0
+      - 0.5
+      - 0.6
+    velocity: 66
+    gate: 0.95
+    articulation: marcato
+    humanize_ms: 2.5
+    humanize_velocity_pct: 3.5
+    min_pitch: 31
+  guitar_extension_reply:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 121
+    - 125
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.72
+      - 0.76
+    - - 12
+      - 1.5
+      - 0.25
+      - 0.58
+    - - 0
+      - 2.25
+      - 0.28
+      - 0.66
+    - - 12
+      - 3.0
+      - 0.48
+      - 0.72
+    velocity: 67
+    gate: 0.93
+    articulation: marcato
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3.5
+    min_pitch: 31
+  guitar_extension_rise:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 128
+    - 129
+    - 130
+    - 131
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.72
+      - 0.84
+    - - 12
+      - 1.5
+      - 0.42
+      - 0.72
+    - - 0
+      - 3.0
+      - 0.62
+      - 0.94
+    velocity: 71
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.7
+    humanize_velocity_pct: 2.2
+    min_pitch: 31
+  guitar_extension_fast:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 132
+    - 133
+    - 134
+    - 135
+    - 136
+    - 137
+    - 138
+    - 139
+    - 140
+    - 141
+    - 142
+    - 143
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+      - 1.0
+    - - 12
+      - 0.75
+      - 0.28
+      - 0.72
+    - - 0
+      - 1.5
+      - 0.65
+      - 0.92
+    - - 0
+      - 2.5
+      - 0.26
+      - 0.68
+    - - 12
+      - 3.0
+      - 0.72
+      - 0.84
+    velocity: 72
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+  bass_extension_brake_a:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 112
+    - 113
+    octave: 2
+    velocity: 48
+    articulation: staccato
+    humanize_ms: 2.1
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.55
+    - - 7
+      - 2.0
+      - 0.38
+    - - 12
+      - 3.25
+      - 0.3
+  bass_extension_brake_b:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 114
+    - 115
+    octave: 2
+    velocity: 46
+    articulation: tenuto
+    humanize_ms: 2.9
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 1.35
+    - - 7
+      - 2.75
+      - 0.52
+  bass_extension_down:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 116
+    - 117
+    - 118
+    - 119
+    - 120
+    - 121
+    - 122
+    - 123
+    - 124
+    - 125
+    - 126
+    - 127
+    octave: 2
+    velocity: 45
+    articulation: tenuto
+    humanize_ms: 3.7
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 1.65
+    - - 7
+      - 2.75
+      - 0.52
+  bass_extension_rise:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 128
+    - 129
+    - 130
+    - 131
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 2.1
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.54
+    - - 7
+      - 1.5
+      - 0.42
+    - - 12
+      - 3.0
+      - 0.38
+  bass_extension_fast:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 132
+    - 133
+    - 134
+    - 135
+    - 136
+    - 137
+    - 138
+    - 139
+    - 140
+    - 141
+    - 142
+    - 143
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 1.9
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.34
+    - - 7
+      - 0.75
+      - 0.24
+    - - 12
+      - 1.5
+      - 0.3
+    - - 7
+      - 2.0
+      - 0.28
+    - - 0
+      - 2.75
+      - 0.34
+    - - 7
+      - 3.5
+      - 0.24
+  tenor_extension:
+    kind: notes
+    instrument: tenor_sax_nv
+    articulation: tenuto
+    gate: 0.94
+    humanize_ms: 9.0
+    humanize_velocity_pct: 4
+    notes:
+    - - 112
+      - 0.45
+      - E4
+      - 1.45
+      - 72
+    - - 114
+      - 0.65
+      - B3
+      - 1.55
+      - 67
+    - - 116
+      - 0.7
+      - E4
+      - 1.75
+      - 69
+    - - 118
+      - 0.6
+      - G4
+      - 0.72
+      - 72
+    - - 118
+      - 1.75
+      - D4
+      - 0.58
+      - 67
+    - - 119
+      - 1.05
+      - A#3
+      - 1.15
+      - 64
+    - - 122
+      - 0.55
+      - F#4
+      - 0.68
+      - 72
+    - - 122
+      - 1.65
+      - E4
+      - 0.52
+      - 68
+    - - 123
+      - 1.0
+      - D#4
+      - 0.62
+      - 69
+    - - 123
+      - 2.05
+      - B3
+      - 0.92
+      - 64
+    - - 124
+      - 0.5
+      - E4
+      - 1.55
+      - 70
+    - - 126
+      - 0.4
+      - G4
+      - 0.58
+      - 73
+    - - 126
+      - 1.45
+      - F4
+      - 0.52
+      - 70
+    - - 127
+      - 0.85
+      - D4
+      - 0.62
+      - 67
+    - - 127
+      - 2.0
+      - A#3
+      - 0.82
+      - 63
+    - - 128
+      - 0.35
+      - B3
+      - 0.38
+      - 68
+    - - 128
+      - 1.2
+      - E4
+      - 0.44
+      - 72
+    - - 128
+      - 2.1
+      - G4
+      - 0.52
+      - 76
+    - - 129
+      - 0.25
+      - C4
+      - 0.34
+      - 70
+    - - 129
+      - 1.15
+      - F4
+      - 0.4
+      - 74
+    - - 129
+      - 2.05
+      - A4
+      - 0.42
+      - 78
+    - - 130
+      - 0.2
+      - C#4
+      - 0.34
+      - 72
+    - - 130
+      - 1.0
+      - F#4
+      - 0.4
+      - 76
+    - - 130
+      - 1.8
+      - A#4
+      - 0.46
+      - 80
+    - - 131
+      - 0.15
+      - D#4
+      - 0.34
+      - 73
+    - - 131
+      - 0.95
+      - F#4
+      - 0.4
+      - 77
+    - - 131
+      - 1.75
+      - A4
+      - 0.48
+      - 81
+    - - 132
+      - 0.3
+      - B3
+      - 0.32
+      - 72
+    - - 132
+      - 0.95
+      - D4
+      - 0.28
+      - 75
+    - - 132
+      - 1.55
+      - E4
+      - 0.78
+      - 80
+    - - 132
+      - 2.75
+      - G4
+      - 0.38
+      - 78
+    - - 134
+      - 0.2
+      - C4
+      - 0.32
+      - 72
+    - - 134
+      - 0.9
+      - E4
+      - 0.38
+      - 76
+    - - 134
+      - 1.7
+      - G4
+      - 0.46
+      - 80
+    - - 134
+      - 2.65
+      - B4
+      - 0.58
+      - 82
+    - - 135
+      - 0.55
+      - A#4
+      - 0.34
+      - 79
+    - - 135
+      - 1.3
+      - F4
+      - 0.38
+      - 75
+    - - 135
+      - 2.2
+      - D4
+      - 0.68
+      - 70
+    - - 136
+      - 0.4
+      - B3
+      - 0.34
+      - 71
+    - - 136
+      - 1.05
+      - E4
+      - 0.62
+      - 77
+    - - 136
+      - 2.15
+      - G4
+      - 0.52
+      - 80
+    - - 137
+      - 0.4
+      - D#4
+      - 0.36
+      - 73
+    - - 137
+      - 1.15
+      - F#4
+      - 0.42
+      - 77
+    - - 137
+      - 2.0
+      - B3
+      - 0.75
+      - 68
+    - - 138
+      - 0.25
+      - C4
+      - 0.32
+      - 72
+    - - 138
+      - 0.95
+      - E4
+      - 0.38
+      - 76
+    - - 138
+      - 1.75
+      - G4
+      - 0.42
+      - 79
+    - - 138
+      - 2.55
+      - A#4
+      - 0.58
+      - 81
+    - - 139
+      - 0.45
+      - A3
+      - 0.34
+      - 69
+    - - 139
+      - 1.15
+      - D#4
+      - 0.42
+      - 74
+    - - 139
+      - 2.0
+      - F#4
+      - 0.55
+      - 77
+    - - 140
+      - 0.3
+      - E4
+      - 2.2
+      - 72
+  piano_extension_down:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 116
+      - 0.0
+    - - 120
+      - 0.0
+    - - 124
+      - 0.0
+    duration_beats: 0.68
+    velocity: 38
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 5.5
+    humanize_velocity_pct: 5
+  piano_extension_rise:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 128
+      - 0.0
+    - - 129
+      - 0.0
+    - - 129
+      - 2.5
+    - - 130
+      - 0.0
+    - - 130
+      - 1.5
+    - - 130
+      - 3.0
+    - - 131
+      - 0.0
+    - - 131
+      - 1.0
+    - - 131
+      - 2.0
+    - - 131
+      - 3.0
+    duration_beats: 0.36
+    velocity: 46
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.2
+    humanize_velocity_pct: 4
+  macro_drums_extension:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.5
+    events:
+    - drum: concert_bass_drum
+      beats: [0.0, 2.0, 3.5]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 57
+      duration_beats: 0.14
+    - drum: snare
+      beats: [1.0, 3.0]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 54
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 37
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats: [0.0, 2.0, 3.5]
+      bars: [112, 113]
+      velocity: 54
+      duration_beats: 0.14
+    - drum: snare
+      beats: [1.0, 3.0]
+      bars: [112, 113]
+      velocity: 52
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [112, 113]
+      velocity: 34
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats: [0.0, 2.5]
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 50
+      duration_beats: 0.14
+    - drum: snare
+      beat: 2.0
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 50
+      duration_beats: 0.08
+    - drum: closed_hat
+      beats: [0.0, 1.0, 2.0, 3.0]
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 29
+      duration_beats: 0.09
+    - drum: concert_bass_drum
+      beats: [0.0, 1.5, 3.0]
+      bars: [128, 129, 130, 131]
+      velocity: 54
+      duration_beats: 0.14
+    - drum: snare
+      beats: [2.0, 3.5]
+      bars: [128, 129, 130, 131]
+      velocity: 52
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [128, 129, 130, 131]
+      velocity: 37
+      duration_beats: 0.08
+    - drum: crash
+      beat: 0.0
+      bars: [132]
+      velocity: 80
+      duration_beats: 0.18
+    - drum: open_hat
+      beat: 3.5
+      bars: [127, 131]
+      velocity: 50
+      duration_beats: 0.1
   tenor_drone:
     kind: notes
     instrument: tenor_sax_nv
@@ -2916,13 +3714,13 @@ state_map:
 sections:
 - id: main_loop
   kind: loop_component
-  label: crooked garage cycle - up, down, rise, up
-  bars: 112
+  label: Fast I - guitar ignition
+  bars: 144
   intensity: 0.94
   density: 0.9
   loopable: true
   valid_exit_local_bars:
-  - 112
+  - 144
   harmony:
   - Em9
   - Em9
@@ -3036,6 +3834,38 @@ sections:
   - Em9
   - Cmaj7
   - Bb
+  - Em9
+  - Em9
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Em9
+  - F
+  - F#7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - B7
+  - Em9
+  - Em9
   layers:
   - guitar_up
   - guitar_brake_a
@@ -3050,9 +3880,26 @@ sections:
   - bass_down
   - bass_rise
   - tenor_drone
+  - tenor_whine_one
   - tenor_main
   - tenor_bites
   - tenor_peak
   - piano_down
   - piano_rise
   - macro_drums
+  - guitar_extension_brake_a
+  - guitar_extension_brake_b
+  - guitar_extension_down_open
+  - guitar_extension_down
+  - guitar_extension_reply
+  - guitar_extension_rise
+  - guitar_extension_fast
+  - bass_extension_brake_a
+  - bass_extension_brake_b
+  - bass_extension_down
+  - bass_extension_rise
+  - bass_extension_fast
+  - tenor_extension
+  - piano_extension_down
+  - piano_extension_rise
+  - macro_drums_extension
