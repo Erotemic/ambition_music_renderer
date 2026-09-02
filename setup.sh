@@ -153,16 +153,57 @@ install_sfizz_obs_repo(){
         echo "[setup] Already have sfizz OBS apt source: $LIST_FILE"
     fi
 
-    UPDATE=1 apt_ensure sfizz
+    # ⚠ `|| true`: an unusable OBS repo must fall through to the source build
+    # below, not abort setup. `apt_ensure` runs under `set -e`.
+    UPDATE=1 apt_ensure sfizz || true
     ensure_sfizz_render_compat_shim
 
     if ! command -v sfizz_render >/dev/null 2>&1; then
-        echo "[setup] WARNING: sfizz installed, but sfizz_render was not found." >&2
-        echo "[setup] Available sfizz binaries:" >&2
-        command -v sfizz || true >&2
-        command -v sfizz-render || true >&2
-        dpkg -L sfizz 2>/dev/null | grep -E '/bin/|sfizz.*render' || true >&2
+        echo "[setup] sfizz did not install from OBS; building it from source" >&2
+        build_sfizz_from_source || {
+            echo "[setup] ERROR: could not obtain sfizz_render." >&2
+            echo "[setup] Every sampled instrument would fall back to General MIDI." >&2
+            return 1
+        }
     fi
+}
+
+# ⛔⛔ THE OBS REPOSITORY IS NOT A DEPENDABLE SOURCE, AND ITS FAILURE IS SILENT
+# WHERE IT HURTS. Ubuntu packages no `sfizz` at all and upstream ships no Linux
+# binary, so the OBS build was the only path — and on 2026-09-02 its signing key
+# EXPIRED (`EXPKEYSIG 1DCC29D5F18761E8`, expiry 2026-08-31). `apt` then refuses
+# the repo, sfizz never installs, and every sampled instrument in the catalogue
+# quietly renders as a General-MIDI stand-in that is indistinguishable from the
+# real cue once it is an .ogg on disk.
+#
+# ⭐ SO THE FALLBACK IS THE SOURCE RELEASE, which depends on nothing that can
+# expire. ~5 minutes on 8 cores, and only when the package path failed.
+build_sfizz_from_source() {
+    local version="${SFIZZ_SOURCE_VERSION:-1.2.3}"
+    local workdir tarball
+    apt_ensure build-essential cmake ninja-build pkg-config libsndfile1-dev curl || return 1
+
+    workdir="$(mktemp -d)"
+    tarball="$workdir/sfizz-${version}.tar.gz"
+    echo "[setup] Downloading sfizz ${version} source"
+    curl -fsSL -o "$tarball" \
+        "https://github.com/sfztools/sfizz/releases/download/${version}/sfizz-${version}.tar.gz" \
+        || { rm -rf "$workdir"; return 1; }
+    tar xzf "$tarball" -C "$workdir" || { rm -rf "$workdir"; return 1; }
+
+    # Only the offline renderer is wanted here: the GUI/plugin targets pull a
+    # far larger dependency set and nothing in this repository loads them.
+    cmake -S "$workdir/sfizz-${version}" -B "$workdir/build" -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DSFIZZ_RENDER=ON -DSFIZZ_JACK=OFF -DSFIZZ_TESTS=OFF \
+        -DSFIZZ_DEMOS=OFF -DSFIZZ_BENCHMARKS=OFF \
+        || { rm -rf "$workdir"; return 1; }
+    cmake --build "$workdir/build" -j "$(nproc)" || { rm -rf "$workdir"; return 1; }
+    ${_SUDO:+$_SUDO} cmake --install "$workdir/build" || { rm -rf "$workdir"; return 1; }
+    ${_SUDO:+$_SUDO} ldconfig || true
+    rm -rf "$workdir"
+
+    command -v sfizz_render >/dev/null 2>&1
 }
 
 echo "[setup] Installing baseline native audio tools"
