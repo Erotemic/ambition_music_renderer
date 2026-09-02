@@ -3,9 +3,10 @@ id: blazingly_fast
 title: Blazingly Fast
 seed: 2026090101
 notes: >-
-  V30 is one 24-bar crooked garage-blues loop. The seam stays in the fast feel:
-  six bars up, eight bars half-time, four bars of arrangement crescendo, then
-  six bars up. VCSL tenor states one compact call and Emily guitar answers it.
+  V31 is one 24-bar crooked garage-blues loop. The seam stays in the fast feel:
+  four bars up, a two-bar descending brake, eight bars half-time, a four-bar
+  3+3+2 step-up crescendo, then six bars up. VCSL tenor develops one syncopated
+  call through displaced answers, low-register space, and distinct transitions.
 tempo: {bpm: 180}
 meter: {beats_per_bar: 4, beat_unit: 4}
 constraints: {voice_leading: minimize_motion, no_clusters: true}
@@ -248,7 +249,7 @@ layer_templates:
     takes: &rust_takes
     - {instrument: rust_gtr_l, timing_offset_ms: -5, velocity_offset: 0}
     - {instrument: rust_gtr_r, timing_offset_ms: 7, velocity_offset: -4}
-    bars: &up_bars [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23]
+    bars: &up_bars [0, 1, 2, 3, 18, 19, 20, 21, 22, 23]
     octave: 2
     quality: power
     keyswitches: &rust_switches {power: 33, minor: 34, major: 35}
@@ -258,6 +259,34 @@ layer_templates:
     articulation: marcato
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
+    min_pitch: 31
+  guitar_brake_a:
+    kind: sampled_chord
+    takes: *rust_takes
+    bars: &brake_a_bars [4]
+    octave: 2
+    quality: power
+    keyswitches: *rust_switches
+    pattern: [[0, 0.0, 0.38, 0.96], [12, 0.75, 0.42, 0.82], [0, 1.75, 0.56, 0.88], [12, 3.0, 0.72, 0.78]]
+    velocity: 71
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.6
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+  guitar_brake_b:
+    kind: sampled_chord
+    takes: *rust_takes
+    bars: &brake_b_bars [5]
+    octave: 2
+    quality: power
+    keyswitches: *rust_switches
+    pattern: [[0, 0.0, 0.7, 0.92], [0, 1.5, 0.76, 0.82], [12, 3.25, 0.52, 0.7]]
+    velocity: 69
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 2.5
     min_pitch: 31
   guitar_down:
     kind: sampled_chord
@@ -280,7 +309,7 @@ layer_templates:
     octave: 2
     quality: power
     keyswitches: *rust_switches
-    pattern: [[0, 0.0, 1.05, 0.9], [0, 1.5, 0.38, 0.72], [12, 2.5, 0.38, 0.82], [0, 3.25, 0.5, 0.94]]
+    pattern: [[0, 0.0, 0.88, 0.9], [12, 1.5, 0.52, 0.78], [0, 3.0, 0.72, 0.96]]
     velocity: 72
     gate: 0.96
     articulation: marcato
@@ -308,6 +337,26 @@ layer_templates:
     humanize_ms: 3.5
     humanize_velocity_pct: 4
     pattern: [[0, 0.0, 1.75], [7, 2.75, 0.62]]
+  bass_brake_a:
+    kind: bassline
+    instrument: locked_bass
+    bars: *brake_a_bars
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    pattern: [[12, 0.0, 0.28], [7, 0.75, 0.3], [3, 1.75, 0.4], [0, 3.0, 0.62]]
+  bass_brake_b:
+    kind: bassline
+    instrument: locked_bass
+    bars: *brake_b_bars
+    octave: 2
+    velocity: 47
+    articulation: tenuto
+    humanize_ms: 2.8
+    humanize_velocity_pct: 3
+    pattern: [[7, 0.0, 0.52], [4, 1.5, 0.58], [0, 3.25, 0.52]]
   bass_rise:
     kind: bassline
     instrument: locked_bass
@@ -317,7 +366,7 @@ layer_templates:
     articulation: staccato
     humanize_ms: 2.0
     humanize_velocity_pct: 3
-    pattern: [[0, 0.0, 0.58], [7, 1.5, 0.38], [12, 2.5, 0.38], [7, 3.25, 0.38]]
+    pattern: [[0, 0.0, 0.58], [7, 1.5, 0.46], [12, 3.0, 0.42]]
     dynamics: [{start_bar: 14, bars: 4, from: 0.68, to: 1.0, curve: smooth}]
   tenor_main:
     kind: notes
@@ -327,65 +376,85 @@ layer_templates:
     humanize_ms: 10.0
     humanize_velocity_pct: 5
     notes:
-    - [0, 0.5, B3, 0.46, 70]
-    - [0, 1.25, D4, 0.42, 73]
-    - [0, 2.0, E4, 1.32, 79]
-    - [1, 3.0, G4, 0.54, 74]
-    - [2, 0.25, G4, 0.68, 76]
-    - [2, 1.18, E4, 0.48, 72]
-    - [2, 2.0, D4, 0.76, 70]
-    - [3, 0.25, D4, 0.55, 72]
-    - [3, 1.1, C4, 0.5, 69]
-    - [3, 2.0, Bb3, 1.18, 73]
-    - [4, 0.5, B3, 0.42, 71]
-    - [4, 1.18, D4, 0.42, 73]
-    - [4, 1.9, E4, 0.56, 76]
-    - [4, 2.72, G4, 0.72, 79]
-    - [5, 0.22, A3, 0.42, 68]
-    - [5, 0.92, D#4, 0.52, 75]
-    - [5, 1.72, F#4, 0.62, 78]
-    - [5, 2.72, B3, 0.88, 70]
-    - [6, 0.65, B3, 0.55, 65]
-    - [6, 1.5, E4, 2.05, 73]
-    - [8, 0.5, D4, 1.05, 69]
-    - [8, 2.0, Bb3, 0.62, 65]
-    - [8, 2.9, G3, 0.82, 63]
-    - [10, 0.65, G3, 0.48, 62]
-    - [10, 1.4, C4, 0.62, 67]
-    - [10, 2.35, E4, 1.2, 72]
-    - [12, 0.4, E4, 2.45, 72]
-    - [13, 0.25, D#4, 0.52, 71]
-    - [13, 1.05, F#4, 0.62, 75]
-    - [13, 2.1, B3, 1.3, 67]
-    - [14, 0.5, B3, 0.42, 66]
-    - [14, 1.3, D4, 0.44, 69]
-    - [14, 2.15, E4, 0.72, 72]
-    - [15, 0.38, C4, 0.42, 68]
-    - [15, 1.18, F4, 0.48, 73]
-    - [15, 2.12, A4, 0.68, 76]
-    - [16, 0.25, C#4, 0.38, 70]
-    - [16, 0.95, F#4, 0.46, 75]
-    - [16, 1.78, A4, 0.52, 78]
-    - [16, 2.72, C#5, 0.72, 81]
-    - [17, 0.15, D#4, 0.38, 72]
-    - [17, 0.82, F#4, 0.46, 78]
-    - [18, 0.5, B3, 0.42, 71]
-    - [18, 1.18, D4, 0.42, 74]
-    - [18, 1.9, E4, 1.18, 80]
-    - [19, 3.0, G4, 0.52, 76]
-    - [20, 0.18, G4, 0.62, 78]
-    - [20, 1.08, E4, 0.42, 73]
-    - [20, 1.78, D4, 0.58, 71]
-    - [21, 0.18, D4, 0.48, 73]
-    - [21, 0.92, C4, 0.42, 70]
-    - [21, 1.62, Bb3, 0.92, 74]
-    - [22, 0.25, C4, 0.4, 70]
-    - [22, 0.92, F4, 0.5, 76]
-    - [22, 1.75, E4, 0.72, 74]
-    - [23, 0.15, A3, 0.38, 68]
-    - [23, 0.78, D#4, 0.42, 74]
-    - [23, 1.48, F#4, 0.5, 78]
-    - [23, 2.35, B3, 0.82, 70]
+    - [0, 0.25, B3, 0.34, 70]
+    - [0, 0.9, D4, 0.28, 74]
+    - [0, 1.5, E4, 0.92, 80]
+    - [0, 2.78, G4, 0.28, 77]
+    - [0, 3.28, E4, 0.4, 73]
+    - [1, 1.0, D4, 0.38, 72]
+    - [1, 1.72, B3, 0.68, 68]
+    - [1, 3.05, A3, 0.34, 70]
+    - [2, 0.22, G4, 0.42, 78]
+    - [2, 0.95, E4, 0.3, 73]
+    - [2, 1.52, D4, 0.3, 71]
+    - [2, 2.25, E4, 0.88, 76]
+    - [3, 0.45, D4, 0.44, 74]
+    - [3, 1.18, C4, 0.4, 70]
+    - [3, 1.9, Bb3, 0.62, 72]
+    - [3, 3.05, F4, 0.38, 76]
+    - [4, 0.0, G4, 0.3, 79]
+    - [4, 0.75, F#4, 0.34, 76]
+    - [4, 1.75, E4, 0.46, 73]
+    - [4, 3.0, D4, 0.62, 70]
+    - [5, 0.0, F#4, 0.4, 76]
+    - [5, 1.5, D#4, 0.52, 73]
+    - [5, 3.25, B3, 0.48, 67]
+    - [6, 0.72, B3, 0.48, 64]
+    - [6, 1.62, E4, 1.5, 72]
+    - [7, 3.18, G3, 0.34, 61]
+    - [8, 0.48, Bb3, 0.52, 65]
+    - [8, 1.48, D4, 0.52, 69]
+    - [8, 2.4, G4, 1.02, 74]
+    - [9, 0.92, F4, 0.54, 71]
+    - [9, 1.92, D4, 0.58, 68]
+    - [9, 3.0, Bb3, 0.5, 64]
+    - [10, 0.45, E4, 1.35, 72]
+    - [10, 2.52, D4, 0.4, 67]
+    - [10, 3.22, C4, 0.38, 65]
+    - [12, 0.35, E4, 1.65, 71]
+    - [12, 2.72, D4, 0.42, 67]
+    - [13, 0.32, D#4, 0.44, 71]
+    - [13, 1.18, F#4, 0.52, 75]
+    - [13, 2.2, B3, 1.02, 66]
+    - [14, 0.5, B3, 0.42, 65]
+    - [14, 2.0, E4, 0.48, 70]
+    - [14, 3.25, G4, 0.34, 73]
+    - [15, 0.25, C4, 0.36, 68]
+    - [15, 1.5, F4, 0.42, 73]
+    - [15, 2.5, A4, 0.38, 76]
+    - [15, 3.25, C5, 0.3, 78]
+    - [16, 0.0, C#4, 0.3, 70]
+    - [16, 0.75, F#4, 0.32, 75]
+    - [16, 1.5, A#4, 0.34, 78]
+    - [16, 2.25, C#5, 0.34, 81]
+    - [16, 3.0, A#4, 0.42, 77]
+    - [17, 0.0, D#4, 0.3, 72]
+    - [17, 0.75, F#4, 0.32, 77]
+    - [17, 1.5, A4, 0.34, 80]
+    - [18, 0.0, B3, 0.32, 71]
+    - [18, 0.62, D4, 0.28, 75]
+    - [18, 1.2, E4, 0.82, 81]
+    - [18, 2.45, G4, 0.28, 79]
+    - [18, 2.95, B4, 0.58, 82]
+    - [19, 0.72, G4, 0.38, 77]
+    - [19, 1.42, E4, 0.34, 73]
+    - [19, 2.15, D4, 0.7, 71]
+    - [20, 0.18, E4, 0.3, 74]
+    - [20, 0.75, G4, 0.34, 78]
+    - [20, 1.4, Bb4, 0.4, 80]
+    - [20, 2.18, G4, 0.72, 76]
+    - [21, 0.4, D4, 0.36, 72]
+    - [21, 1.05, F4, 0.42, 77]
+    - [21, 1.8, D4, 0.34, 72]
+    - [21, 2.5, Bb3, 0.78, 69]
+    - [22, 0.18, A3, 0.32, 68]
+    - [22, 0.78, C4, 0.34, 72]
+    - [22, 1.45, F4, 0.42, 78]
+    - [22, 2.25, A4, 0.68, 80]
+    - [23, 0.0, A4, 0.3, 79]
+    - [23, 0.62, F#4, 0.3, 76]
+    - [23, 1.25, D#4, 0.34, 73]
+    - [23, 2.0, B3, 0.72, 68]
   tenor_bites:
     kind: notes
     instrument: tenor_sax_staccato
@@ -393,7 +462,7 @@ layer_templates:
     gate: 0.72
     humanize_ms: 7.0
     humanize_velocity_pct: 5
-    notes: [[1, 1.75, E4, 0.24, 68], [1, 2.25, G4, 0.2, 71], [5, 3.55, F#4, 0.22, 72], [15, 3.35, A4, 0.22, 73], [16, 3.42, C#5, 0.22, 77], [18, 3.35, G4, 0.22, 73], [19, 1.75, E4, 0.24, 69], [19, 2.25, G4, 0.2, 72], [23, 3.48, F#4, 0.2, 73]]
+    notes: [[1, 2.55, E4, 0.2, 68], [2, 3.45, G4, 0.2, 72], [9, 3.62, G4, 0.2, 68], [15, 3.72, A4, 0.2, 74], [16, 3.58, C#5, 0.2, 78], [19, 3.38, E4, 0.2, 70], [20, 3.48, G4, 0.2, 74], [22, 3.42, C5, 0.2, 76]]
   tenor_peak:
     kind: notes
     instrument: tenor_sax_vibrato
@@ -401,7 +470,7 @@ layer_templates:
     gate: 0.94
     humanize_ms: 6.0
     humanize_velocity_pct: 3
-    notes: [[17, 1.55, B4, 1.95, 82]]
+    notes: [[17, 2.0, B4, 1.52, 82]]
     dynamics: [{start_bar: 17, bars: 1, from: 0.82, to: 1.0, curve: smooth}]
   piano_down:
     kind: chord_hits
@@ -436,11 +505,17 @@ layer_templates:
     - {drum: concert_bass_drum, beats: [0.0, 2.0, 3.5], bars: *up_bars, velocity: 58, duration_beats: 0.14}
     - {drum: snare, beats: [1.0, 3.0], bars: *up_bars, velocity: 55, duration_beats: 0.07}
     - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], bars: *up_bars, velocity: 38, duration_beats: 0.08}
+    - {drum: concert_bass_drum, beats: [0.0, 1.75, 3.0], bars: *brake_a_bars, velocity: 55, duration_beats: 0.14}
+    - {drum: snare, beats: [1.0, 3.0], bars: *brake_a_bars, velocity: 53, duration_beats: 0.07}
+    - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.75, 2.5, 3.5], bars: *brake_a_bars, velocity: 35, duration_beats: 0.08}
+    - {drum: concert_bass_drum, beats: [0.0, 2.5], bars: *brake_b_bars, velocity: 53, duration_beats: 0.14}
+    - {drum: snare, beats: [1.5, 3.0], bars: *brake_b_bars, velocity: 52, duration_beats: 0.07}
+    - {drum: closed_hat, beats: [0.0, 0.75, 1.5, 2.5, 3.5], bars: *brake_b_bars, velocity: 32, duration_beats: 0.08}
     - {drum: concert_bass_drum, beats: [0.0, 2.5], bars: *down_bars, velocity: 52, duration_beats: 0.14}
     - {drum: snare, beat: 2.0, bars: *down_bars, velocity: 52, duration_beats: 0.08}
     - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], bars: *down_bars, velocity: 30, duration_beats: 0.09}
-    - {drum: concert_bass_drum, beats: [0.0, 2.0, 3.5], bars: *rise_bars, velocity: 55, duration_beats: 0.14}
-    - {drum: snare, beats: [1.0, 3.0], bars: *rise_bars, velocity: 53, duration_beats: 0.07}
+    - {drum: concert_bass_drum, beats: [0.0, 1.5, 3.0], bars: *rise_bars, velocity: 55, duration_beats: 0.14}
+    - {drum: snare, beats: [2.0, 3.5], bars: *rise_bars, velocity: 53, duration_beats: 0.07}
     - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], bars: [14], velocity: 31, duration_beats: 0.08}
     - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], bars: [15], velocity: 34, duration_beats: 0.08}
     - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], bars: [16], velocity: 37, duration_beats: 0.08}
@@ -470,5 +545,5 @@ sections:
   density: 0.9
   loopable: true
   valid_exit_local_bars: [24]
-  harmony: [Em9, Em9, Cmaj7, Bb, Em9, B7, Em9, Em9, Gm7, Gm7, Cmaj7, Cmaj7, B7sus4, B7, Em9, F, F#7, B7, Em9, Em9, Cmaj7, Bb, F, B7]
-  layers: [guitar_up, guitar_down, guitar_rise, bass_up, bass_down, bass_rise, tenor_main, tenor_bites, tenor_peak, piano_down, piano_rise, macro_drums]
+  harmony: [Em9, Em9, Cmaj7, Bb, Em9, B7, Em9, Em9, Gm7, Gm7, Cmaj7, Cmaj7, B7sus4, B7, Em9, F, F#7, B7, Em9, Em9, C7, Bb, F, B7]
+  layers: [guitar_up, guitar_brake_a, guitar_brake_b, guitar_down, guitar_rise, bass_up, bass_brake_a, bass_brake_b, bass_down, bass_rise, tenor_main, tenor_bites, tenor_peak, piano_down, piano_rise, macro_drums]
