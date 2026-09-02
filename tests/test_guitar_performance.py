@@ -153,6 +153,32 @@ def test_sampled_chord_emits_one_root_and_a_classified_keyswitch():
     assert [note.pitch for note in pm.instruments[0].notes] == [33, 52]
 
 
+def test_sampled_chord_can_target_selected_section_bars():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "sampled_chord_bar_selection",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": "gtr", "group": "strings", "program": "clean_guitar"}],
+        "sections": [{
+            "id": "loop", "bars": 4, "harmony": ["Em", "G", "C", "B7"],
+            "layers": [{
+                "kind": "sampled_chord", "instrument": "gtr", "bars": [0, 3],
+                "quality": "power", "keyswitches": {"power": 33},
+                "pattern": [[0, 0.0, 0.5]], "octave": 3,
+            }],
+        }],
+    }
+    pm, _groups, _meta = build_score(spec)
+    notes = [
+        event for event in pm._ambition_note_events
+        if event["instrument"] == "gtr" and event["event_type"] == "note"
+    ]
+    assert [event["nominal_bar"] for event in notes] == [0.0, 3.0]
+
+
 def test_guitar_lead_vibrato_adds_pitch_bend_events():
     from ambition_music_renderer.render.score_layers import build_score
 

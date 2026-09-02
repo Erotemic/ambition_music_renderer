@@ -268,6 +268,22 @@ def test_lead_collision_flags_simultaneous_seconds():
     assert top["interval_semitones"] == 2
 
 
+def test_bassline_can_target_selected_section_bars():
+    spec = _base_spec(
+        instruments=[{"name": "bass", "group": "bass", "program": "acoustic_bass"}],
+        sections=[{
+            "id": "a", "bars": 4, "harmony": ["C", "F", "G", "C"],
+            "layers": [{
+                "kind": "bassline", "instrument": "bass", "bars": [1, 2],
+                "pattern": [[0, 0.0, 0.5]],
+            }],
+        }],
+    )
+    pm, _groups, _meta = build_score(spec)
+    notes = [event for event in pm._ambition_note_events if event["event_type"] == "note"]
+    assert [event["nominal_bar"] for event in notes] == [1.0, 2.0]
+
+
 def test_lead_collision_ignores_consonant_and_background():
     from ambition_music_renderer.audit.lead_collision import audit_spec as lead_audit
 

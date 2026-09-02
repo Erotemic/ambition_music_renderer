@@ -248,7 +248,14 @@ def render_layer_bassline(
     velocity = float(layer.get("velocity", 74))
     articulation = layer.get("articulation", "marcato")
     hk = _layer_human(layer, 5.0)
+    active_bars = (
+        {int(bar) for bar in layer["bars"]}
+        if "bars" in layer
+        else None
+    )
     for local in range(int(section["bars"])):
+        if active_bars is not None and local not in active_bars:
+            continue
         root = root_for_chord(chord_for_bar(section, local), octave)
         for item in pattern:
             interval, beat, dur = int(item[0]), float(item[1]), float(item[2])
@@ -969,7 +976,14 @@ def render_layer_sampled_chord(
         )
     keyswitch_lead_s = keyswitch_lead_ms / 1000.0
     last_switch: dict[str, int] = {}
+    active_bars = (
+        {int(bar) for bar in layer["bars"]}
+        if "bars" in layer
+        else None
+    )
     for local in range(int(section["bars"])):
+        if active_bars is not None and local not in active_bars:
+            continue
         for item in pattern:
             interval = int(item[0])
             beat = float(item[1])
