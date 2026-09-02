@@ -30,6 +30,7 @@ cue's mastered preview lives under a manual filename.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -236,6 +237,37 @@ def python_exe() -> str:
     return sys.executable
 
 
+#: Thread-pool knobs every numeric library reads at import time. A cue's own
+#: parallelism is `--jobs`; these decide how many threads each of ITS libraries
+#: opens underneath that, and they default to "one per core" regardless of how
+#: many sibling cues are already running.
+_THREAD_LIMIT_VARS = (
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+)
+
+
+def _child_env_with_thread_limit(threads: int) -> dict[str, str]:
+    """The child's environment with its numeric libraries pinned to `threads`.
+
+    ⛔ FANNING OUT CUES WITHOUT THIS OVERSUBSCRIBES THE BOX BY THE BLAS POOL.
+    Measured 2026-09-02 on 14 cores: 14 concurrent cues, each nominally one
+    worker, drove load average to 36 because every cue's numpy opened its own
+    core-count-sized OpenBLAS pool. The cue budget in `_bulk_job_plan` is only
+    honest if the libraries under each cue honour it too.
+
+    ⚠ An explicit setting from the caller WINS. Someone who exported
+    `OMP_NUM_THREADS` meant it.
+    """
+    env = dict(os.environ)
+    for name in _THREAD_LIMIT_VARS:
+        env.setdefault(name, str(max(1, int(threads))))
+    return env
+
+
 def render_cue(
     cue: str,
     yaml_path: Path,
@@ -245,6 +277,7 @@ def render_cue(
     simple_mix: bool = True,
     full_mix_only: bool = False,
     extra_args: list[str] | None = None,
+    thread_limit: int | None = None,
 ) -> bool:
     cmd = [
         python_exe(),
@@ -263,7 +296,8 @@ def render_cue(
     if extra_args:
         cmd.extend(extra_args)
     print(f"render {cue}: {' '.join(cmd)}")
-    result = subprocess.run(cmd, cwd=package_dir())
+    env = _child_env_with_thread_limit(thread_limit) if thread_limit else None
+    result = subprocess.run(cmd, cwd=package_dir(), env=env)
     return result.returncode == 0
 
 
@@ -413,6 +447,7 @@ def render_cue_to_versioned_generated(
     simple_mix: bool = True,
     full_mix_only: bool = False,
     extra_args: list[str] | None = None,
+    thread_limit: int | None = None,
 ) -> bool:
     cue_dir = generated_root() / cue
     layout = generated_run_layout(cue_dir, yaml_path, backend)
@@ -425,6 +460,7 @@ def render_cue_to_versioned_generated(
         simple_mix=simple_mix,
         full_mix_only=full_mix_only,
         extra_args=extra_args,
+        thread_limit=thread_limit,
     )
     if ok:
         mark_generated_run_latest(layout)
@@ -490,6 +526,7 @@ def _process_simple_mix_cue(
     backend: str,
     force_render: bool,
     dest_root: Path,
+    render_jobs: int = 1,
 ) -> str | None:
     """Run render/publish/render-publish for one simple-mix cue.
 
@@ -527,13 +564,20 @@ def _process_simple_mix_cue(
             # the SFZ libraries existed kept its General-MIDI audio through a
             # full forced re-render, and only cues whose YAML had changed since
             # picked up the sampled instruments.
+            # ⚠ `--jobs` is the CUE'S share of the machine, decided by
+            # `_bulk_job_plan`, not this renderer's own default. Its default is
+            # `cpu_count // 2`, which is correct for one cue alone and
+            # oversubscribes the box by that factor once cues run concurrently.
+            extra_args = ["--force"] if force_render else []
+            extra_args.append(f"--jobs={max(1, int(render_jobs))}")
             if not render_cue_to_versioned_generated(
                 cue,
                 yaml_path,
                 backend=backend,
                 simple_mix=simple_mix,
                 full_mix_only=full_mix_only,
-                extra_args=["--force"] if force_render else None,
+                extra_args=extra_args,
+                thread_limit=render_jobs,
             ):
                 return "render"
         else:
@@ -548,6 +592,20 @@ def _process_simple_mix_cue(
             else:
                 return "publish"
     return None
+
+
+def _sampled_libraries_installed() -> bool:
+    """Is ANY sampled instrument library present on this machine?
+
+    Not "did this instrument resolve" — that is the renderer's job. This is the
+    coarser question: the `.sfz` tree either exists here or it does not.
+    """
+    try:
+        from .instrument_libraries import discover_sfz_files
+
+        return bool(discover_sfz_files())
+    except Exception:
+        return False
 
 
 def _preflight_bulk_render(
@@ -590,20 +648,75 @@ def _preflight_bulk_render(
     return False
 
 
+def _bulk_job_plan(n_cues: int, requested: int) -> tuple[int, int]:
+    """Split the CPU budget between cue fan-out and per-cue stem groups.
+
+    ⛔⛔ CUES WERE RENDERED STRICTLY ONE AT A TIME AND THE MACHINE SAT IDLE.
+    Every cue is already an independent subprocess writing its own versioned
+    output directory, so nothing forced the serial loop that drove them — and a
+    75-cue radio pass is the FRESH-CLONE path, where no cue is cached and all 75
+    render. Measured 2026-09-02 on 14 cores: mean 15% busy, median 0%, under two
+    cores busy for 78% of the run, with a repeating one-second burst and a
+    two-second trough.
+
+    ⭐ THE PER-CUE `--jobs` COULD NOT FIX THIS. It parallelises stem GROUPS,
+    which is the burst; the trough is the serial remainder of a cue — mix,
+    master, encode, and the interpreter start of each worker. Only overlapping
+    whole cues fills those troughs.
+
+    The budget is SPLIT, not nested: N cues each fanning out to N groups
+    oversubscribes the box by N². Cue fan-out is the outer, wider dimension
+    because cues are many and independent; groups get what is left over, which
+    matters only when few cues were selected.
+    """
+    budget = requested if requested > 0 else (os.cpu_count() or 1)
+    cue_jobs = max(1, min(n_cues, budget))
+    group_jobs = max(1, budget // cue_jobs)
+    return cue_jobs, group_jobs
+
+
 def _run_bulk(args, cues: tuple[str, ...], action: str) -> int:
     failed: list[str] = []
     desc = f"music {action}"
-    for cue in _progress(cues, total=len(cues), desc=desc):
-        stage = _process_simple_mix_cue(
+    cue_jobs, group_jobs = _bulk_job_plan(len(cues), int(getattr(args, "jobs", 0) or 0))
+
+    def run_one(cue: str) -> str | None:
+        return _process_simple_mix_cue(
             cue,
             action=action,
             backend=args.backend,
             force_render=args.force_render,
             dest_root=args.dest_root,
+            render_jobs=group_jobs,
         )
-        if stage is not None:
-            failed.append(f"{stage} {cue}")
+
+    if cue_jobs <= 1:
+        # Serial stays reachable with `--jobs 1`: interleaved child output is
+        # unreadable when profiling or chasing one cue's failure.
+        for cue in _progress(cues, total=len(cues), desc=desc):
+            stage = run_one(cue)
+            if stage is not None:
+                failed.append(f"{stage} {cue}")
+    else:
+        from concurrent.futures import as_completed
+
+        import ubelt as ub
+
+        print(f"{desc}: {len(cues)} cue(s), {cue_jobs} at a time, {group_jobs} stem worker(s) each")
+        # Threads supervising independent child PROCESSES — the same shape
+        # `render.batch_bundle` already uses, and the reason the GIL is not in
+        # the way: no cue's CPU work happens in this interpreter.
+        with ub.Executor(mode="thread", max_workers=cue_jobs) as pool:
+            futures = {pool.submit(run_one, cue): cue for cue in cues}
+            for future in _progress(as_completed(futures), total=len(futures), desc=desc):
+                cue = futures[future]
+                stage = future.result()
+                if stage is not None:
+                    failed.append(f"{stage} {cue}")
+
     if failed:
+        # Completion order is nondeterministic under fan-out; the report is not.
+        failed.sort()
         print(f"FAILED: {', '.join(failed)}", file=sys.stderr)
         return 1
     print(f"OK: {len(cues)} cue(s) ready")
@@ -634,6 +747,33 @@ def run_bulk_cues(config, *, cues_factory, action: str) -> int:
         cues = tuple(cues_factory())
     if action == "render-publish" and config.skip_render:
         action = "publish"
+    # ⛔⛔ REFUSE RATHER THAN RENDER THE FALLBACK. Without the sampled libraries
+    # every cue that names one still "succeeds" — through General MIDI, which is
+    # not the music. Nothing downstream can tell the difference: the .ogg is
+    # there, the registry lists it, the game plays it. A machine that renders
+    # the whole catalogue in the wrong instruments and reports success is worse
+    # than one that stops and says what is missing.
+    #
+    # ⭐ THE LIBRARIES ARE NOT OPTIONAL ANY MORE. `run_developer_setup.sh`
+    # installs them by default; `download_ambition_audio_tools.sh` fetches every
+    # one of them from a public URL. This is the check that a machine which
+    # skipped that step cannot silently ship the wrong audio.
+    if action in ("render", "render-publish") and not _sampled_libraries_installed():
+        print(
+            "no sampled instrument libraries found; refusing to render every cue "
+            "through the General-MIDI fallback.",
+            file=sys.stderr,
+        )
+        print(
+            "  install them with: ./run_developer_setup.sh\n"
+            "  or directly:       tools/ambition_music_renderer/download_ambition_audio_tools.sh /data/audio-tools\n"
+            "  to render the fallback anyway (previews, no sound design): "
+            "AMBITION_MUSIC_ALLOW_GM_FALLBACK=1",
+            file=sys.stderr,
+        )
+        if not os.environ.get("AMBITION_MUSIC_ALLOW_GM_FALLBACK"):
+            return 1
+        print("  AMBITION_MUSIC_ALLOW_GM_FALLBACK set; continuing with fallback audio", file=sys.stderr)
     if action in ("render", "render-publish") and not _preflight_bulk_render(
         cues, backend=config.backend, force_render=config.force_render
     ):
@@ -1013,6 +1153,14 @@ class BulkActionConfig(kwconf.Config):
     force_render: bool = kwconf.Flag(False)
     skip_render: bool = kwconf.Flag(False, help="treat render_publish as publish")
     dest_root: Path = kwconf.Value(default_factory=declared_publish_dest_root, parser=Path)
+    jobs: int = kwconf.Value(
+        0,
+        short_alias=["j"],
+        help=(
+            "cue-level fan-out; 0 (the default) uses the machine's CPU count, "
+            "1 renders cues strictly one at a time"
+        ),
+    )
 
     def __post_init__(self) -> None:
         # ⚠ `None` is legal and means UNDECLARED — see
