@@ -2,10 +2,12 @@ schema: ambition.musicir.v1
 id: blazingly_fast
 title: Blazingly Fast
 seed: 2026083111
-notes: 'V28 is a compositional reset around the successful Emily / Swagbass / Big Rusty backing band. The familiar
+notes: 'V29 is a compositional reset around the successful Emily / Swagbass / Big Rusty backing band. The familiar
   four-chord opening and arpeggiated lead are gone: four section-specific alto-sax melodies now move through a darker,
-  chromatic E-minor garage progression with tritone roots, borrowed minor colors, and dominant turnarounds. Weresax
-  supplies breath, microphone blend, instability, and delayed vibrato through a lightly overloaded rehearsal preamp.'
+  chromatic E-minor garage progression with tritone roots, borrowed minor colors, and dominant turnarounds. The alto
+  is now the clean Weresax dynamic microphone with restrained natural vibrato and only a diagnostics-driven notch at
+  its 6.5 kHz whistle; the opening Emily chords play a syncopated root/octave hook while later sections retain the
+  established guitar feel. Broad master EQ coloration is removed.'
 tempo:
   bpm: 180
 meter:
@@ -68,27 +70,6 @@ postprocess:
   limiter_drive: 1.0
   normalize: true
   target_peak_db: -3.5
-  eq_bands:
-  - type: low_shelf
-    hz: 95
-    q: 0.8
-    db: 0.15
-  - type: peak
-    hz: 520
-    q: 0.9
-    db: -0.45
-  - type: peak
-    hz: 2450
-    q: 0.85
-    db: 1.35
-  - type: peak
-    hz: 4300
-    q: 0.9
-    db: 0.85
-  - type: high_shelf
-    hz: 7600
-    q: 0.7
-    db: 1.1
 stem_postprocess:
   gain_db: 0.0
   highpass_hz: 25
@@ -147,63 +128,27 @@ group_postprocess:
       - effect: gain
         gain_db: -4.0
   melody:
-    gain_db: 0.5
-    highpass_hz: 105
-    lowpass_hz: 18000
-    reverb_wet: 0.014
-    reverb_decay_seconds: 0.42
+    gain_db: -9.0
+    highpass_hz: 70
+    lowpass_hz: 20000
+    reverb_wet: 0.01
+    reverb_decay_seconds: 0.36
     reverb_damping_hz: 8200
-    stereo_width: 0.018
+    stereo_width: 0.01
     transient_tame: 0.0
-    transient_lowpass_hz: 19500
-    high_shelf_db: 0.65
+    transient_lowpass_hz: 20000
+    high_shelf_db: 0.0
     high_shelf_hz: 6100
-    compressor_threshold_db: -24.0
-    compressor_ratio: 1.8
-    compressor_attack_ms: 16.0
-    compressor_release_ms: 110.0
-    compressor_makeup_db: 0.4
-    effect_chain:
-    - kind: pedalboard
-      label: alto-sax-pre
-      report_levels: true
-      effects:
-      - effect: gain
-        gain_db: 5.0
-      - effect: compressor
-        threshold_db: -23.0
-        ratio: 2.0
-        attack_ms: 14.0
-        release_ms: 125.0
-    - kind: lv2proc
-      label: alto-sax-worn-preamp
-      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
-      required: true
-      wet_mix: 0.28
-      report_levels: true
-      params:
-        bright_l: 0
-        volume_l: 0.72
-        bass_l: 0.46
-        middle_l: 0.74
-        treble_l: 0.6
-        master_l: 0.58
-        bright_r: 0
-        volume_r: 0.72
-        bass_r: 0.46
-        middle_r: 0.74
-        treble_r: 0.6
-        master_r: 0.58
-      binary: lv2apply
-    - kind: pedalboard
-      label: alto-sax-grit-and-post
-      report_levels: true
-      effects:
-      - effect: clipping
-        threshold_db: -15.0
-        wet_mix: 0.11
-      - effect: gain
-        gain_db: -14.0
+    compressor_threshold_db: -18.0
+    compressor_ratio: 1.25
+    compressor_attack_ms: 24.0
+    compressor_release_ms: 140.0
+    compressor_makeup_db: 0.0
+    eq_bands:
+    - type: peak
+      hz: 6530
+      q: 5.0
+      db: -9.0
   brass:
     gain_db: -4.0
     highpass_hz: 70
@@ -406,17 +351,17 @@ instruments:
     102: 10
     103: 127
     104: 36
-    110: 38
-    111: 32
-    112: 48
-    113: 10
-    116: 42
-    117: 34
-    118: 18
-    119: 14
-    120: 76
-    121: 78
-    122: 24
+    110: 0
+    111: 20
+    112: 44
+    113: 0
+    116: 48
+    117: 18
+    118: 6
+    119: 4
+    120: 127
+    121: 46
+    122: 0
   instrument_backend:
     kind: sfz
     sfz: /data/audio-tools/sfz/Karoryfer/Weresax/Weresax/Programs/Sax.sfz
@@ -2255,16 +2200,24 @@ layer_templates:
     pattern:
     - - 0
       - 0.0
-      - 1.42
+      - 0.92
       - 1.0
+    - - 12
+      - 1.0
+      - 0.38
+      - 0.76
     - - 0
       - 1.5
-      - 1.92
-      - 0.9
+      - 1.48
+      - 0.94
+    - - 0
+      - 3.1
+      - 0.32
+      - 0.66
     - - 12
       - 3.5
-      - 0.46
-      - 0.7
+      - 0.44
+      - 0.82
     velocity: 72
     spread_ms: 6
     gate: 0.96
@@ -2272,7 +2225,7 @@ layer_templates:
     humanize_ms: 1.5
     humanize_velocity_pct: 2.0
     root_policy: chord_root
-    min_pitch: 40
+    min_pitch: 31
   guitar_spine_b:
     kind: sampled_chord
     takes:
