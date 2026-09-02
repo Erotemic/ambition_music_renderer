@@ -2,9 +2,10 @@ schema: ambition.musicir.v1
 id: blazingly_fast
 title: Blazingly Fast
 seed: 2026083111
-notes: 'V26 keeps the measured Emily / Swagbass / Big Rusty rock bed and accepted melody/harmony, removes the
-  non-contributing patina and string layers, and recasts the lead as a pitch-validated Shinyguitar electric through an
-  articulate TS9/JCM chain. Piano, brass, bass, and drums retain the shared worn rehearsal-room production language.'
+notes: 'V27 keeps the measured Emily / Swagbass / Big Rusty rock bed and accepted melodic contour, but turns the lead
+  into an idiomatic garage-rock performance: Shinyguitar primary electric take, irregular sustained phrasing, scoops,
+  held-note vibrato, octave/double-stop punctuation, and a controlled TS9/DS1/JCM drive chain. Piano, brass, bass, and
+  drums retain the shared worn rehearsal-room production language.'
 tempo:
   bpm: 180
 meter:
@@ -179,26 +180,39 @@ group_postprocess:
       plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
       channel_mode: dual_mono
       required: true
-      wet_mix: 0.42
+      wet_mix: 0.3
       report_levels: true
       params:
-        fslider0_: -5.0
-        fslider1_: 760.0
-        fslider2_: 0.6
+        fslider0_: -4.0
+        fslider1_: 720.0
+        fslider2_: 0.52
+        BYPASS: 1.0
+      binary: lv2apply
+    - kind: lv2proc
+      label: lead-guitar-ds1
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_bossds1_#_bossds1_
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.52
+      report_levels: true
+      params:
+        LEVEL: -4.0
+        TONE: 0.58
+        DRIVE: 0.72
         BYPASS: 1.0
       binary: lv2apply
     - kind: lv2proc
       label: lead-guitar-jcm800
       plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
       required: true
-      wet_mix: 0.44
+      wet_mix: 0.58
       report_levels: true
       params:
-        P6v: 0.66
-        Middle: 0.72
-        Bass: 0.42
-        Treble: 0.64
-        WET_DRY: 64.0
+        P6v: 0.76
+        Middle: 0.76
+        Bass: 0.44
+        Treble: 0.67
+        WET_DRY: 72.0
         GAIN: -2.0
       binary: lv2apply
     - kind: pedalboard
@@ -206,7 +220,7 @@ group_postprocess:
       report_levels: true
       effects:
       - effect: gain
-        gain_db: -13.0
+        gain_db: -10.0
   brass:
     gain_db: -4.0
     highpass_hz: 70
@@ -405,15 +419,14 @@ instruments:
   expression: 103
   mix_role: foreground
   controls:
-    100: 64
-    107: 127
+    100: 0
+    106: 42
+    107: 0
   instrument_backend:
     kind: sfz
     library_ref: guitar.electric_lead
     prefer:
-    - shinyguitar
-    - electric
-    - sustain
+    - electric one
     settings:
       fold_to_range: false
 - name: horns_sus
@@ -549,55 +562,55 @@ motifs:
   - F#5
   - D5
   rhythm: &id001
-  - 0.5
-  - 0.5
   - 1.0
-  - 0.5
-  - 0.5
+  - 0.35
+  - 0.65
+  - 1.25
+  - 0.375
+  - 0.375
+  - 0.75
+  - 0.4
+  - 0.85
+  - 1.3
+  - 0.35
+  - 0.35
   - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
-  - 0.5
-  - 0.5
-  - 1.0
+  - 0.35
+  - 0.65
+  - 1.25
+  - 0.375
+  - 0.375
+  - 0.75
+  - 0.4
+  - 0.85
+  - 1.25
+  - 0.375
+  - 0.375
   durations: &id002
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
-  - 0.42
-  - 0.42
-  - 0.82
+  - 0.88
+  - 0.28
+  - 0.56
+  - 1.12
+  - 0.3
+  - 0.3
+  - 0.62
+  - 0.3
+  - 0.72
+  - 1.18
+  - 0.28
+  - 0.28
+  - 0.88
+  - 0.28
+  - 0.56
+  - 1.12
+  - 0.3
+  - 0.3
+  - 0.62
+  - 0.3
+  - 0.72
+  - 1.08
+  - 0.3
+  - 0.3
   velocities:
   - 0.8
   - 0.86
@@ -969,11 +982,17 @@ layer_templates:
       - 3.75
       - 0.18
   main_line_layer:
-    kind: motif
+    kind: guitar_lead
     instrument: lead_guitar
     motif: main_line
     velocity: 72
-    articulation: staccato
+    articulation: tenuto
+    gate: 0.98
+    pitch_scoop_cents: -14.0
+    position_scoop_scale: 0.3
+    pitch_vibrato_cents: 13.0
+    pitch_vibrato_rate_hz: 5.2
+    pitch_vibrato_delay_beats: 0.52
     starts:
     - - 0
       - 0.0
@@ -982,11 +1001,17 @@ layer_templates:
     humanize_ms: 2.2
     humanize_velocity_pct: 3
   return_line_layer:
-    kind: motif
+    kind: guitar_lead
     instrument: lead_guitar
     motif: return_line
     velocity: 73
-    articulation: staccato
+    articulation: tenuto
+    gate: 0.98
+    pitch_scoop_cents: -16.0
+    position_scoop_scale: 0.28
+    pitch_vibrato_cents: 14.0
+    pitch_vibrato_rate_hz: 5.0
+    pitch_vibrato_delay_beats: 0.5
     starts:
     - - 0
       - 0.0
@@ -1399,11 +1424,17 @@ layer_templates:
     humanize_ms: 3.0
     humanize_velocity_pct: 4
   main_line_gap_layer:
-    kind: motif
+    kind: guitar_lead
     instrument: lead_guitar
     motif: main_line
     velocity: 72
-    articulation: staccato
+    articulation: tenuto
+    gate: 0.98
+    pitch_scoop_cents: -14.0
+    position_scoop_scale: 0.3
+    pitch_vibrato_cents: 13.0
+    pitch_vibrato_rate_hz: 5.2
+    pitch_vibrato_delay_beats: 0.52
     starts:
     - - 4
       - 0.0
@@ -1412,27 +1443,89 @@ layer_templates:
     humanize_ms: 2.2
     humanize_velocity_pct: 3
   main_line_once_8:
-    kind: motif
+    kind: guitar_lead
     instrument: lead_guitar
     motif: main_line
     velocity: 72
-    articulation: staccato
+    articulation: tenuto
+    gate: 0.98
+    pitch_scoop_cents: -14.0
+    position_scoop_scale: 0.3
+    pitch_vibrato_cents: 13.0
+    pitch_vibrato_rate_hz: 5.2
+    pitch_vibrato_delay_beats: 0.52
     starts:
     - - 8
       - 0.0
     humanize_ms: 2.2
     humanize_velocity_pct: 3
   return_line_once_0:
-    kind: motif
+    kind: guitar_lead
     instrument: lead_guitar
     motif: return_line
     velocity: 73
-    articulation: staccato
+    articulation: tenuto
+    gate: 0.98
+    pitch_scoop_cents: -16.0
+    position_scoop_scale: 0.28
+    pitch_vibrato_cents: 14.0
+    pitch_vibrato_rate_hz: 5.0
+    pitch_vibrato_delay_beats: 0.5
     starts:
     - - 0
       - 0.0
     humanize_ms: 2.2
     humanize_velocity_pct: 3
+  lead_double_stops_even:
+    kind: notes
+    instrument: lead_guitar
+    humanize_ms: 1.2
+    humanize_velocity_pct: 2
+    notes:
+    - &lead_fifth_bend
+      bar: 3
+      beat: 2.0
+      note: D6
+      dur: 1.08
+      vel: 66
+      articulation: tenuto
+      gate: 0.98
+      bend:
+      - - 0.0
+        - 0
+      - - 0.32
+        - 38
+      - - 0.72
+        - 18
+      - - 1.0
+        - 0
+    - &lead_turnaround_stop
+      bar: 3
+      beat: 3.25
+      note: A5
+      dur: 0.56
+      vel: 70
+      articulation: tenuto
+      gate: 0.96
+      scoop_cents: -18
+    - <<: *lead_fifth_bend
+      bar: 11
+    - <<: *lead_turnaround_stop
+      bar: 11
+  lead_double_stops_odd:
+    kind: notes
+    instrument: lead_guitar
+    humanize_ms: 1.2
+    humanize_velocity_pct: 2
+    notes:
+    - <<: *lead_fifth_bend
+      bar: 7
+    - <<: *lead_turnaround_stop
+      bar: 7
+    - <<: *lead_fifth_bend
+      bar: 15
+    - <<: *lead_turnaround_stop
+      bar: 15
   cello_motor_c:
     kind: bassline
     instrument: locked_bass
@@ -2289,6 +2382,7 @@ sections:
   - horn_bed
   - cello_motor_a
   - main_line_layer
+  - lead_double_stops_even
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
@@ -2326,6 +2420,7 @@ sections:
   - horn_bed
   - cello_motor_b
   - return_line_layer
+  - lead_double_stops_even
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
@@ -2364,6 +2459,7 @@ sections:
   - horn_bed
   - cello_motor_c
   - main_line_gap_layer
+  - lead_double_stops_odd
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
@@ -2403,6 +2499,7 @@ sections:
   - cello_motor_d
   - return_line_once_0
   - main_line_once_8
+  - lead_double_stops_even
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
