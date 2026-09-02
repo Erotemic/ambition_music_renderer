@@ -249,15 +249,78 @@ github_latest_asset_url() {
     local pattern="$2"
     python3 - "$repo" "$pattern" <<'PY'
 import json
+import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
+
 repo, pattern = sys.argv[1:3]
 rx = re.compile(pattern, re.I)
 url = f"https://api.github.com/repos/{repo}/releases/latest"
+
+
+def fetch(url):
+    """GitHub's release metadata, waiting out an anonymous rate limit.
+
+    ⛔⛔ SIXTY REQUESTS AN HOUR IS THE ANONYMOUS BUDGET, AND THIS SCRIPT ASKS FOR
+    MORE THAN THAT IN A ROW. Measured 2026-09-02: six plugin bundles in one run
+    died with `HTTP Error 403: rate limit exceeded` — AnalogTapeModel, dexed,
+    BYOD, dragonfly-reverb, airwindows, wolf-shaper — and each one is a plugin a
+    cue may name. The failure is per-asset and non-fatal, so the run ends
+    "successful" with an incomplete plugin set, which is the same shape of lie
+    as a General-MIDI stand-in.
+
+    ⭐ A TOKEN MAKES IT MOOT (5000/hour): `GITHUB_TOKEN` or `GH_TOKEN` is used
+    when present. Without one, wait — the reset is minutes away and the headers
+    say exactly when, so sleeping is strictly better than dropping a plugin.
+    """
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "ambition-audio-tools"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    deadline = time.monotonic() + float(os.environ.get("AMBITION_GITHUB_MAX_WAIT_S", 900))
+    delay = 5.0
+    while True:
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.load(resp)
+        except urllib.error.HTTPError as ex:
+            # 403/429 with a zero remaining budget is the rate limit; a 403 for
+            # any other reason (a private or renamed repo) must not be retried.
+            remaining = ex.headers.get("X-RateLimit-Remaining") if ex.headers else None
+            rate_limited = ex.code == 429 or (ex.code == 403 and remaining == "0")
+            if not rate_limited:
+                raise
+            reset = ex.headers.get("X-RateLimit-Reset") if ex.headers else None
+            retry_after = ex.headers.get("Retry-After") if ex.headers else None
+            if retry_after and retry_after.isdigit():
+                wait = float(retry_after)
+            elif reset and reset.isdigit():
+                wait = max(0.0, float(reset) - time.time()) + 1.0
+            else:
+                wait = delay
+                delay = min(delay * 2, 120.0)
+            if time.monotonic() + wait > deadline:
+                raise
+            hint = "" if token else " (set GITHUB_TOKEN to avoid this)"
+            print(
+                f"NOTE {repo}: GitHub rate limit; waiting {wait:.0f}s{hint}",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+        except urllib.error.URLError:
+            if time.monotonic() + delay > deadline:
+                raise
+            time.sleep(delay)
+            delay = min(delay * 2, 120.0)
+
+
 try:
-    with urllib.request.urlopen(url, timeout=20) as resp:
-        data = json.load(resp)
+    data = fetch(url)
 except Exception as ex:
     print(f"ERROR {repo}: {ex}", file=sys.stderr)
     raise SystemExit(1)
@@ -624,6 +687,17 @@ collect_plugin_bundles() {
     done < <(find "$PLUGIN_UNPACKED" \( -type f -o -type d \) -name '*.clap' -print0 2>/dev/null)
 }
 
+# ⛔⛔ EXTEND THE SEARCH PATH; DO NOT REPLACE IT. These were
+# "$ROOT${VAR:+:$VAR}", which appends the caller's value only when the caller
+# HAD one — and an unset LV2_PATH is not "no plugins", it is the host's built-in
+# default (~/.lv2, /usr/local/lib/lv2, /usr/lib/lv2). Setting it to this root
+# alone therefore HID every apt-installed plugin.
+#
+# ⚠ Measured 2026-09-02: `guitarix` was installed and
+# `/usr/lib/lv2/gxts9.lv2` present, yet sourcing this file made
+# `blazingly_fast` die with `Plugin <...gxts9#ts9sim> not found`. The cue
+# rendered fine WITHOUT this file — so sourcing it was strictly worse than not,
+# which is the opposite of what an environment file is for.
 write_environment_file() {
     cat > "$ENV_FILE" <<ENV_EOF
 # Source this file before running the renderer to expose /data audio tools.
@@ -632,9 +706,9 @@ export AMBITION_MUSIC_SOUNDFONT_ROOT="$SOUNDFONT_ROOT"
 export AMBITION_MUSIC_DEFAULT_SOUNDFONT="$SOUNDFONT_ROOT/GeneralUser-GS.sf2"
 export AMBITION_MUSIC_CLAP_PATHS="$CLAP_ROOT\${AMBITION_MUSIC_CLAP_PATHS:+:\$AMBITION_MUSIC_CLAP_PATHS}"
 export AMBITION_MUSIC_VST3_PATHS="$VST3_ROOT\${AMBITION_MUSIC_VST3_PATHS:+:\$AMBITION_MUSIC_VST3_PATHS}"
-export CLAP_PATH="$CLAP_ROOT\${CLAP_PATH:+:\$CLAP_PATH}"
-export LV2_PATH="$LV2_ROOT\${LV2_PATH:+:\$LV2_PATH}"
-export VST3_PATH="$VST3_ROOT\${VST3_PATH:+:\$VST3_PATH}"
+export CLAP_PATH="$CLAP_ROOT:\${CLAP_PATH:-\$HOME/.clap:/usr/local/lib/clap:/usr/lib/clap}"
+export LV2_PATH="$LV2_ROOT:\${LV2_PATH:-\$HOME/.lv2:/usr/local/lib/lv2:/usr/lib/lv2}"
+export VST3_PATH="$VST3_ROOT:\${VST3_PATH:-\$HOME/.vst3:/usr/local/lib/vst3:/usr/lib/vst3}"
 ENV_EOF
 }
 
