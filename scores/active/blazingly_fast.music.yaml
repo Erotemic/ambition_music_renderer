@@ -2,10 +2,10 @@ schema: ambition.musicir.v1
 id: blazingly_fast
 title: Blazingly Fast
 seed: 2026083111
-notes: 'V27 keeps the measured Emily / Swagbass / Big Rusty rock bed and accepted melodic contour, but turns the lead
-  into an idiomatic garage-rock performance: Shinyguitar primary electric take, irregular sustained phrasing, scoops,
-  held-note vibrato, octave/double-stop punctuation, and a controlled TS9/DS1/JCM drive chain. Piano, brass, bass, and
-  drums retain the shared worn rehearsal-room production language.'
+notes: 'V28 is a compositional reset around the successful Emily / Swagbass / Big Rusty backing band. The familiar
+  four-chord opening and arpeggiated lead are gone: four section-specific alto-sax melodies now move through a darker,
+  chromatic E-minor garage progression with tritone roots, borrowed minor colors, and dominant turnarounds. Weresax
+  supplies breath, microphone blend, instability, and delayed vibrato through a lightly overloaded rehearsal preamp.'
 tempo:
   bpm: 180
 meter:
@@ -147,80 +147,63 @@ group_postprocess:
       - effect: gain
         gain_db: -4.0
   melody:
-    gain_db: 1.0
-    highpass_hz: 90
-    lowpass_hz: 19500
-    reverb_wet: 0.009
-    reverb_decay_seconds: 0.32
-    reverb_damping_hz: 9000
-    stereo_width: 0.02
+    gain_db: 0.5
+    highpass_hz: 105
+    lowpass_hz: 18000
+    reverb_wet: 0.014
+    reverb_decay_seconds: 0.42
+    reverb_damping_hz: 8200
+    stereo_width: 0.018
     transient_tame: 0.0
     transient_lowpass_hz: 19500
-    high_shelf_db: 1.2
-    high_shelf_hz: 5200
-    compressor_threshold_db: -25.0
-    compressor_ratio: 1.55
-    compressor_attack_ms: 13.0
-    compressor_release_ms: 82.0
-    compressor_makeup_db: 0.8
+    high_shelf_db: 0.65
+    high_shelf_hz: 6100
+    compressor_threshold_db: -24.0
+    compressor_ratio: 1.8
+    compressor_attack_ms: 16.0
+    compressor_release_ms: 110.0
+    compressor_makeup_db: 0.4
     effect_chain:
     - kind: pedalboard
-      label: lead-guitar-pre
+      label: alto-sax-pre
       report_levels: true
       effects:
       - effect: gain
-        gain_db: 10.0
+        gain_db: 5.0
       - effect: compressor
-        threshold_db: -24.0
-        ratio: 2.2
-        attack_ms: 10.0
-        release_ms: 105.0
+        threshold_db: -23.0
+        ratio: 2.0
+        attack_ms: 14.0
+        release_ms: 125.0
     - kind: lv2proc
-      label: lead-guitar-ts9
-      plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
-      channel_mode: dual_mono
+      label: alto-sax-worn-preamp
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_studiopre_st#studiopre_st
       required: true
-      wet_mix: 0.3
+      wet_mix: 0.28
       report_levels: true
       params:
-        fslider0_: -4.0
-        fslider1_: 720.0
-        fslider2_: 0.52
-        BYPASS: 1.0
-      binary: lv2apply
-    - kind: lv2proc
-      label: lead-guitar-ds1
-      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_bossds1_#_bossds1_
-      channel_mode: dual_mono
-      required: true
-      wet_mix: 0.52
-      report_levels: true
-      params:
-        LEVEL: -4.0
-        TONE: 0.58
-        DRIVE: 0.72
-        BYPASS: 1.0
-      binary: lv2apply
-    - kind: lv2proc
-      label: lead-guitar-jcm800
-      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
-      required: true
-      wet_mix: 0.58
-      report_levels: true
-      params:
-        P6v: 0.76
-        Middle: 0.76
-        Bass: 0.44
-        Treble: 0.67
-        WET_DRY: 72.0
-        GAIN: -2.0
+        bright_l: 0
+        volume_l: 0.72
+        bass_l: 0.46
+        middle_l: 0.74
+        treble_l: 0.6
+        master_l: 0.58
+        bright_r: 0
+        volume_r: 0.72
+        bass_r: 0.46
+        middle_r: 0.74
+        treble_r: 0.6
+        master_r: 0.58
       binary: lv2apply
     - kind: pedalboard
-      label: lead-guitar-post
+      label: alto-sax-grit-and-post
       report_levels: true
       effects:
+      - effect: clipping
+        threshold_db: -15.0
+        wet_mix: 0.11
       - effect: gain
-        gain_db: -10.0
+        gain_db: -14.0
   brass:
     gain_db: -4.0
     highpass_hz: 70
@@ -411,22 +394,32 @@ instruments:
     - grand
     - piano
     - flac
-- name: lead_guitar
+- name: lead_alto_sax
   group: melody
-  program: overdrive_guitar
-  volume: 92
-  pan: 68
-  expression: 103
+  program: alto_sax
+  volume: 100
+  pan: 66
+  expression: 104
   mix_role: foreground
   controls:
-    100: 0
-    106: 42
-    107: 0
+    100: 3
+    102: 10
+    103: 127
+    104: 36
+    110: 38
+    111: 32
+    112: 48
+    113: 10
+    116: 42
+    117: 34
+    118: 18
+    119: 14
+    120: 76
+    121: 78
+    122: 24
   instrument_backend:
     kind: sfz
-    library_ref: guitar.electric_lead
-    prefer:
-    - electric one
+    sfz: /data/audio-tools/sfz/Karoryfer/Weresax/Weresax/Programs/Sax.sfz
     settings:
       fold_to_range: false
 - name: horns_sus
@@ -981,44 +974,122 @@ layer_templates:
     - - 7
       - 3.75
       - 0.18
-  main_line_layer:
-    kind: guitar_lead
-    instrument: lead_guitar
-    motif: main_line
-    velocity: 72
+  sax_hot_path:
+    kind: notes
+    instrument: lead_alto_sax
     articulation: tenuto
-    gate: 0.98
-    pitch_scoop_cents: -14.0
-    position_scoop_scale: 0.3
-    pitch_vibrato_cents: 13.0
-    pitch_vibrato_rate_hz: 5.2
-    pitch_vibrato_delay_beats: 0.52
-    starts:
-    - - 0
-      - 0.0
-    - - 8
-      - 0.0
-    humanize_ms: 2.2
-    humanize_velocity_pct: 3
-  return_line_layer:
-    kind: guitar_lead
-    instrument: lead_guitar
-    motif: return_line
-    velocity: 73
+    gate: 0.94
+    humanize_ms: 7.0
+    humanize_velocity_pct: 4
+    notes:
+    - [0, 1.25, B4, 1.6, 76]
+    - [0, 3.1, G4, 0.65, 69]
+    - [1, 0.25, D5, 1.3, 82]
+    - [1, 2.0, A4, 0.5, 72]
+    - [1, 2.65, F4, 1.0, 75]
+    - [2, 0.25, F#4, 0.35, 69]
+    - [2, 0.68, G4, 0.8, 74]
+    - [2, 1.75, B4, 0.55, 78]
+    - [2, 2.55, D5, 1.05, 83]
+    - [3, 0.2, A4, 0.45, 74]
+    - [3, 0.82, D#5, 0.55, 82]
+    - {bar: 3, beat: 1.65, note: F#5, dur: 1.75, vel: 88, gate: 0.97,
+       bend: [[0.0, -18], [0.18, 0], [1.2, 0], [1.55, 24]]}
+    - [4, 0.0, E5, 2.2, 87]
+    - [4, 2.55, B4, 0.5, 72]
+    - [4, 3.25, G4, 0.6, 70]
+    - [5, 0.2, Bb4, 1.2, 79]
+    - [5, 1.72, D5, 0.62, 82]
+    - [5, 2.58, F5, 1.05, 86]
+    - [6, 0.25, A4, 0.62, 72]
+    - [6, 1.05, D5, 1.3, 81]
+    - [6, 2.68, F#5, 0.92, 86]
+    - [7, 0.15, E5, 1.42, 84]
+    - [7, 1.9, C5, 0.55, 76]
+    - [7, 2.75, A4, 1.0, 73]
+    - [8, 0.5, G4, 0.45, 70]
+    - [8, 1.08, B4, 0.72, 77]
+    - [8, 2.05, E5, 1.5, 86]
+    - [9, 0.18, D#5, 0.42, 78]
+    - [9, 0.78, F#5, 0.58, 85]
+    - [9, 1.65, B4, 1.65, 76]
+    - {bar: 10, beat: 0.0, note: E5, dur: 2.5, vel: 91, gate: 0.98,
+       bend: [[0.0, -24], [0.24, 0], [2.0, 0], [2.35, 18]]}
+    - [10, 2.82, D5, 0.35, 73]
+    - [10, 3.28, B4, 0.58, 76]
+    - [11, 0.15, F5, 1.2, 86]
+    - [11, 1.65, E5, 0.58, 78]
+    - [11, 2.5, D5, 1.2, 82]
+    - [12, 0.18, B4, 0.85, 75]
+    - [12, 1.25, D5, 0.58, 80]
+    - [12, 2.05, F#5, 1.45, 88]
+    - [13, 0.12, F5, 1.12, 85]
+    - [13, 1.52, D5, 0.72, 79]
+    - [13, 2.52, Bb4, 1.05, 75]
+    - [14, 0.2, E5, 1.0, 82]
+    - [14, 1.48, F#5, 1.65, 88]
+    - [15, 0.05, D#5, 0.55, 81]
+    - [15, 0.82, F#5, 0.82, 87]
+    - {bar: 15, beat: 1.9, note: B4, dur: 1.85, vel: 79, gate: 0.98,
+       bend: [[0.0, 0], [1.35, 0], [1.7, -22]]}
+  sax_borrowed_motion:
+    kind: notes
+    instrument: lead_alto_sax
     articulation: tenuto
-    gate: 0.98
-    pitch_scoop_cents: -16.0
-    position_scoop_scale: 0.28
-    pitch_vibrato_cents: 14.0
-    pitch_vibrato_rate_hz: 5.0
-    pitch_vibrato_delay_beats: 0.5
-    starts:
-    - - 0
-      - 0.0
-    - - 8
-      - 0.0
-    humanize_ms: 2.2
-    humanize_velocity_pct: 3
+    gate: 0.94
+    humanize_ms: 7.5
+    humanize_velocity_pct: 4
+    notes:
+    - [0, 0.25, G4, 0.7, 72]
+    - [0, 1.2, B4, 0.6, 77]
+    - [0, 2.05, E5, 1.45, 86]
+    - [1, 0.12, A4, 0.75, 74]
+    - [1, 1.15, C5, 0.65, 79]
+    - [1, 2.0, F5, 1.4, 87]
+    - [2, 0.25, E5, 1.0, 83]
+    - [2, 1.5, D5, 0.5, 75]
+    - [2, 2.25, B4, 1.15, 77]
+    - [3, 0.15, D#5, 0.48, 79]
+    - [3, 0.82, F#5, 0.75, 87]
+    - [3, 1.85, A4, 1.4, 75]
+    - [4, 0.0, D5, 1.2, 82]
+    - [4, 1.5, Bb4, 0.7, 76]
+    - [4, 2.55, G4, 1.0, 72]
+    - [5, 0.18, A4, 0.55, 73]
+    - [5, 0.92, D5, 1.25, 82]
+    - [5, 2.52, F#5, 1.02, 87]
+    - [6, 0.1, E5, 1.35, 84]
+    - [6, 1.72, C5, 0.65, 77]
+    - [6, 2.68, A4, 0.92, 73]
+    - [7, 0.22, G4, 0.5, 70]
+    - [7, 0.9, C5, 0.75, 79]
+    - [7, 1.95, E5, 1.45, 85]
+    - [8, 0.0, A4, 0.72, 75]
+    - [8, 0.95, C5, 0.62, 79]
+    - [8, 1.82, E5, 0.68, 84]
+    - [8, 2.75, G5, 0.9, 89]
+    - [9, 0.18, F5, 1.1, 85]
+    - [9, 1.62, D5, 0.7, 79]
+    - [9, 2.62, Bb4, 1.0, 75]
+    - [10, 0.12, A4, 0.62, 74]
+    - [10, 0.92, C5, 0.62, 78]
+    - [10, 1.82, F#5, 1.52, 88]
+    - [11, 0.0, G5, 1.35, 89]
+    - [11, 1.62, F5, 0.58, 82]
+    - [11, 2.48, D5, 1.08, 79]
+    - [12, 0.2, E5, 0.72, 81]
+    - [12, 1.18, G5, 1.25, 88]
+    - [12, 2.75, B4, 0.82, 75]
+    - [13, 0.12, C#5, 0.5, 77]
+    - [13, 0.78, E5, 0.68, 82]
+    - [13, 1.7, F#5, 0.78, 87]
+    - [13, 2.78, Bb4, 0.72, 74]
+    - [14, 0.12, E5, 1.0, 82]
+    - [14, 1.4, F#5, 1.5, 88]
+    - [15, 0.0, D#5, 0.52, 80]
+    - [15, 0.72, F#5, 0.72, 87]
+    - {bar: 15, beat: 1.72, note: B4, dur: 2.0, vel: 80, gate: 0.98,
+       bend: [[0.0, -16], [0.2, 0], [1.65, 0], [1.9, -20]]}
   bass_drum_steady:
     kind: drums
     instrument: rock_drums
@@ -1423,109 +1494,128 @@ layer_templates:
     include_slash_bass: false
     humanize_ms: 3.0
     humanize_velocity_pct: 4
-  main_line_gap_layer:
-    kind: guitar_lead
-    instrument: lead_guitar
-    motif: main_line
-    velocity: 72
-    articulation: tenuto
-    gate: 0.98
-    pitch_scoop_cents: -14.0
-    position_scoop_scale: 0.3
-    pitch_vibrato_cents: 13.0
-    pitch_vibrato_rate_hz: 5.2
-    pitch_vibrato_delay_beats: 0.52
-    starts:
-    - - 4
-      - 0.0
-    - - 12
-      - 0.0
-    humanize_ms: 2.2
-    humanize_velocity_pct: 3
-  main_line_once_8:
-    kind: guitar_lead
-    instrument: lead_guitar
-    motif: main_line
-    velocity: 72
-    articulation: tenuto
-    gate: 0.98
-    pitch_scoop_cents: -14.0
-    position_scoop_scale: 0.3
-    pitch_vibrato_cents: 13.0
-    pitch_vibrato_rate_hz: 5.2
-    pitch_vibrato_delay_beats: 0.52
-    starts:
-    - - 8
-      - 0.0
-    humanize_ms: 2.2
-    humanize_velocity_pct: 3
-  return_line_once_0:
-    kind: guitar_lead
-    instrument: lead_guitar
-    motif: return_line
-    velocity: 73
-    articulation: tenuto
-    gate: 0.98
-    pitch_scoop_cents: -16.0
-    position_scoop_scale: 0.28
-    pitch_vibrato_cents: 14.0
-    pitch_vibrato_rate_hz: 5.0
-    pitch_vibrato_delay_beats: 0.5
-    starts:
-    - - 0
-      - 0.0
-    humanize_ms: 2.2
-    humanize_velocity_pct: 3
-  lead_double_stops_even:
+  sax_counterpoint:
     kind: notes
-    instrument: lead_guitar
-    humanize_ms: 1.2
-    humanize_velocity_pct: 2
+    instrument: lead_alto_sax
+    articulation: tenuto
+    gate: 0.94
+    humanize_ms: 8.0
+    humanize_velocity_pct: 5
     notes:
-    - &lead_fifth_bend
-      bar: 3
-      beat: 2.0
-      note: D6
-      dur: 1.08
-      vel: 66
-      articulation: tenuto
-      gate: 0.98
-      bend:
-      - - 0.0
-        - 0
-      - - 0.32
-        - 38
-      - - 0.72
-        - 18
-      - - 1.0
-        - 0
-    - &lead_turnaround_stop
-      bar: 3
-      beat: 3.25
-      note: A5
-      dur: 0.56
-      vel: 70
-      articulation: tenuto
-      gate: 0.96
-      scoop_cents: -18
-    - <<: *lead_fifth_bend
-      bar: 11
-    - <<: *lead_turnaround_stop
-      bar: 11
-  lead_double_stops_odd:
+    - [0, 0.5, C5, 0.62, 76]
+    - [0, 1.35, E5, 0.72, 82]
+    - [0, 2.35, G5, 1.15, 88]
+    - [1, 0.15, G4, 0.5, 70]
+    - [1, 0.85, Bb4, 0.7, 76]
+    - [1, 1.85, Eb5, 1.55, 86]
+    - [2, 0.2, B4, 0.65, 76]
+    - [2, 1.12, D5, 0.62, 80]
+    - [2, 2.0, G5, 1.32, 88]
+    - [3, 0.08, A4, 0.58, 72]
+    - [3, 0.85, C5, 0.7, 78]
+    - [3, 1.82, F5, 0.82, 86]
+    - [3, 2.92, D5, 0.68, 79]
+    - [4, 0.0, B4, 0.72, 76]
+    - [4, 0.98, D5, 0.62, 80]
+    - [4, 1.82, E5, 0.78, 84]
+    - [4, 2.92, G5, 0.82, 88]
+    - [5, 0.15, D5, 1.0, 81]
+    - [5, 1.42, F5, 1.18, 86]
+    - [5, 2.9, Bb4, 0.65, 74]
+    - [6, 0.2, G4, 0.45, 70]
+    - [6, 0.82, B4, 0.65, 77]
+    - [6, 1.72, E5, 1.58, 85]
+    - [7, 0.12, Bb4, 0.52, 75]
+    - [7, 0.82, C#5, 0.58, 79]
+    - [7, 1.62, E5, 0.65, 83]
+    - [7, 2.52, F#5, 1.05, 88]
+    - [8, 0.0, A4, 0.65, 74]
+    - [8, 0.88, C5, 0.62, 79]
+    - [8, 1.72, E5, 0.7, 84]
+    - [8, 2.68, G5, 0.95, 89]
+    - [9, 0.2, G4, 0.48, 70]
+    - [9, 0.88, C5, 0.75, 79]
+    - [9, 1.92, E5, 1.4, 85]
+    - [10, 0.05, Bb4, 0.62, 76]
+    - [10, 0.88, D5, 0.75, 82]
+    - [10, 1.9, G5, 1.38, 89]
+    - [11, 0.15, A4, 0.55, 73]
+    - [11, 0.88, D5, 1.18, 82]
+    - [11, 2.42, F#5, 1.12, 88]
+    - [12, 0.0, E5, 1.45, 86]
+    - [12, 1.75, G5, 1.05, 90]
+    - [12, 3.05, B4, 0.62, 75]
+    - [13, 0.15, A4, 0.58, 74]
+    - [13, 0.92, C5, 0.72, 79]
+    - [13, 1.88, F5, 1.5, 87]
+    - [14, 0.18, G4, 0.5, 70]
+    - [14, 0.88, C5, 0.7, 79]
+    - [14, 1.82, E5, 1.52, 85]
+    - [15, 0.08, D#5, 0.5, 80]
+    - [15, 0.78, F#5, 0.78, 88]
+    - {bar: 15, beat: 1.85, note: B4, dur: 1.85, vel: 80, gate: 0.98,
+       bend: [[0.0, -20], [0.2, 0], [1.5, 0], [1.75, -18]]}
+  sax_zero_cost:
     kind: notes
-    instrument: lead_guitar
-    humanize_ms: 1.2
-    humanize_velocity_pct: 2
+    instrument: lead_alto_sax
+    articulation: tenuto
+    gate: 0.95
+    humanize_ms: 7.0
+    humanize_velocity_pct: 4
     notes:
-    - <<: *lead_fifth_bend
-      bar: 7
-    - <<: *lead_turnaround_stop
-      bar: 7
-    - <<: *lead_fifth_bend
-      bar: 15
-    - <<: *lead_turnaround_stop
-      bar: 15
+    - [0, 0.0, E5, 1.7, 88]
+    - [0, 2.0, G5, 0.72, 91]
+    - [0, 3.0, B4, 0.65, 77]
+    - [1, 0.12, D5, 0.65, 81]
+    - [1, 0.98, F5, 0.78, 87]
+    - [1, 2.02, Bb4, 1.42, 76]
+    - [2, 0.18, B4, 0.65, 77]
+    - [2, 1.02, D5, 0.68, 82]
+    - [2, 1.92, F#5, 1.45, 90]
+    - [3, 0.05, D#5, 0.48, 81]
+    - [3, 0.72, F#5, 0.62, 88]
+    - [3, 1.55, B4, 0.75, 78]
+    - [3, 2.58, F#5, 1.05, 92]
+    - [4, 0.0, G5, 1.2, 91]
+    - [4, 1.5, D5, 0.72, 81]
+    - [4, 2.5, Bb4, 0.9, 76]
+    - [5, 0.15, A4, 0.55, 74]
+    - [5, 0.9, D5, 0.72, 82]
+    - [5, 1.88, F#5, 1.48, 90]
+    - [6, 0.0, F5, 1.25, 88]
+    - [6, 1.5, C5, 0.62, 79]
+    - [6, 2.4, A4, 1.0, 74]
+    - [7, 0.15, G4, 0.48, 70]
+    - [7, 0.82, C5, 0.72, 79]
+    - [7, 1.82, E5, 1.55, 87]
+    - [8, 0.0, A4, 0.62, 75]
+    - [8, 0.85, C5, 0.62, 80]
+    - [8, 1.68, E5, 0.75, 86]
+    - [8, 2.72, G5, 0.92, 92]
+    - [9, 0.12, F5, 1.02, 88]
+    - [9, 1.42, D5, 0.72, 81]
+    - [9, 2.42, Bb4, 1.0, 76]
+    - [10, 0.0, E5, 1.05, 85]
+    - [10, 1.3, G5, 0.88, 92]
+    - [10, 2.5, B4, 0.82, 78]
+    - [11, 0.08, A4, 0.5, 74]
+    - [11, 0.75, C5, 0.58, 79]
+    - [11, 1.52, F#5, 1.72, 91]
+    - [12, 0.0, F5, 1.22, 88]
+    - [12, 1.5, C5, 0.62, 80]
+    - [12, 2.38, A4, 1.0, 75]
+    - [13, 0.05, Bb4, 0.55, 76]
+    - [13, 0.78, C#5, 0.62, 80]
+    - [13, 1.62, E5, 0.68, 85]
+    - [13, 2.55, F#5, 1.05, 91]
+    - [14, 0.0, E5, 1.0, 86]
+    - [14, 1.25, F#5, 0.78, 91]
+    - [14, 2.3, B4, 1.05, 78]
+    - [15, 0.0, D#5, 0.48, 82]
+    - [15, 0.68, F#5, 0.65, 90]
+    - [15, 1.58, F#5, 0.72, 93]
+    - {bar: 15, beat: 2.55, note: B4, dur: 1.2, vel: 82, gate: 0.98,
+       bend: [[0.0, -28], [0.22, 0], [0.9, 0], [1.12, -20]]}
   cello_motor_c:
     kind: bassline
     instrument: locked_bass
@@ -2361,28 +2451,27 @@ sections:
   - 8
   - 16
   harmony:
-  - Em
+  - Em9
+  - Bbmaj7
+  - Cmaj9(#11)
+  - B7
+  - Em9
+  - Gm7
+  - D/F#
+  - Fmaj7
   - Cmaj7
-  - G
-  - D
-  - Am7
-  - C
-  - G
-  - D
-  - Em
-  - Cmaj7
-  - G
-  - D
-  - C
-  - Am7
-  - Bm7
+  - B7
+  - Em9
+  - Dm6/9
+  - Cmaj9(#11)
+  - Bb
+  - B7sus4
   - B7
   layers:
   - piano_comp_a
   - horn_bed
   - cello_motor_a
-  - main_line_layer
-  - lead_double_stops_even
+  - sax_hot_path
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
@@ -2399,28 +2488,27 @@ sections:
   - 8
   - 16
   harmony:
-  - Em
-  - G
-  - C
-  - D
-  - C
-  - G
-  - Am7
-  - D
-  - Em
-  - G
-  - C
-  - D
-  - Am7
-  - C
-  - Bm7
+  - Em9
+  - F
+  - Cmaj7
+  - B7
+  - Gm7
+  - D/F#
+  - Fmaj7
+  - C/E
+  - Am9
+  - Bb
+  - D7
+  - Gm7
+  - Cmaj7
+  - F#7
+  - B7sus4
   - B7
   layers:
   - piano_comp_b
   - horn_bed
   - cello_motor_b
-  - return_line_layer
-  - lead_double_stops_even
+  - sax_borrowed_motion
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
@@ -2437,29 +2525,27 @@ sections:
   - 8
   - 16
   harmony:
-  - Am7
-  - C
-  - G
-  - D
-  - Em
+  - Am9
+  - Eb
+  - G/B
+  - Dm
+  - Em9
+  - Bb
   - Cmaj7
-  - G
+  - F#7
+  - Am9
+  - C/E
+  - Gm7
   - D
-  - Am7
+  - Em9
+  - F
   - C
-  - G
-  - D
-  - Em
-  - Cmaj7
-  - G
-  - D
+  - B7
   layers:
   - piano_comp_counterpoint
-  - piano_reply_counterpoint
   - horn_bed
   - cello_motor_c
-  - main_line_gap_layer
-  - lead_double_stops_odd
+  - sax_counterpoint
   - bass_drum_steady
   - snare_steady_a
   - hat_steady
@@ -2476,30 +2562,27 @@ sections:
   - 8
   - 16
   harmony:
-  - Em
-  - G
-  - C
-  - D
-  - Am7
-  - C
-  - G
-  - D
-  - Em
+  - Em9
+  - Bb
+  - Cmaj9(#11)
+  - B7
+  - Gm7
+  - D/F#
+  - F
+  - C/E
+  - Am9
+  - Bb
   - Cmaj7
-  - G
-  - D
-  - C
-  - Am7
-  - Bm7
+  - D7
+  - F
+  - F#7
+  - B7sus4
   - B7
   layers:
   - piano_comp_d
-  - piano_reply_final
   - horn_bed
   - cello_motor_d
-  - return_line_once_0
-  - main_line_once_8
-  - lead_double_stops_even
+  - sax_zero_cost
   - bass_drum_steady
   - snare_steady_b
   - hat_steady
