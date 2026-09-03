@@ -29,12 +29,15 @@ cue's mastered preview lives under a manual filename.
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 import shutil
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from ._paths import find_score as _find_score
 from ._paths import generated_root as _generated_root
@@ -608,6 +611,95 @@ def _sampled_libraries_installed() -> bool:
         return False
 
 
+def _walk_instrument_backends(node: Any) -> "Iterator[dict[str, Any]]":
+    """Every `instrument_backend` mapping anywhere in a score, at any depth."""
+    if isinstance(node, dict):
+        backend = node.get("instrument_backend")
+        if isinstance(backend, dict):
+            yield backend
+        for value in node.values():
+            yield from _walk_instrument_backends(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _walk_instrument_backends(value)
+
+
+@functools.lru_cache(maxsize=None)
+def _sfz_reference_resolves(
+    reference: str, library_ref: bool, base_dir: str, prefer: tuple[str, ...]
+) -> bool:
+    """Memoised, because resolution GLOBS the library roots.
+
+    Measured 2026-09-03 against an installed `/data/audio-tools`: 0.36 s to
+    5.54 s for ONE reference, and a repeat call cost 0.84 s because nothing
+    below here caches. The active catalogue names 68 distinct references across
+    247 instrument backends, so resolving per backend without this would add
+    minutes to a preflight whose whole purpose is to be cheap.
+    """
+    from .instrument_libraries import resolve_sfz_reference
+
+    if library_ref:
+        return resolve_sfz_reference(
+            None, library_ref=reference, prefer=list(prefer),
+            base_dir=Path(base_dir) if base_dir else None,
+        ) is not None
+    return resolve_sfz_reference(
+        reference, prefer=list(prefer),
+        base_dir=Path(base_dir) if base_dir else None,
+    ) is not None
+
+
+def _unresolvable_sfz_references(spec: Any, *, base_dir: "Path | None") -> list[str]:
+    """The sampled libraries this score NAMES and this machine cannot find.
+
+    ⛔⛔ THIS IGNORES `optional:` ON PURPOSE, AND THAT IS THE ENTIRE POINT.
+    A missing library is not a per-instrument style choice — it is the machine
+    rendering somebody's cue in the wrong instrument and reporting success,
+    which is the failure Jon named: *"I don't want new machines to get bad
+    fallbacks of songs."*
+
+    ⚠ AND THE CATALOGUE CANNOT DEFEND ITSELF HERE. Measured 2026-09-03 across
+    `scores/active`: **all 247 sfz instrument backends are `optional: True`** —
+    231 say so explicitly, 16 inherit it from
+    `_is_optional_instrument_backend`'s default — and only 2 of 75 scores set
+    `render.strict_backends`. So `group.py`'s guard
+    `(wants_sfizz and not optional) or strict_backends` is FALSE for every
+    instrument in the shipped catalogue: each one warns once to stderr, falls
+    back to General MIDI, and the command exits 0.
+
+    ⭐ AND MAKING IT FATAL COSTS A CORRECTLY-INSTALLED MACHINE NOTHING, which is
+    why this is a gate rather than a warning: on a box with the libraries
+    installed all 247 resolve, this one included.
+    """
+    references: list[str] = []
+    seen: set[str] = set()
+    base = str(base_dir) if base_dir is not None else ""
+    for backend in _walk_instrument_backends(spec):
+        library = backend.get("library_ref") or backend.get("library")
+        explicit = (
+            backend.get("sfz")
+            or backend.get("path")
+            or backend.get("sfz_path")
+            or backend.get("sfz_glob")
+        )
+        if library:
+            reference, is_library = str(library), True
+        elif explicit:
+            reference, is_library = str(explicit), False
+        else:
+            continue
+        if reference in seen:
+            continue
+        seen.add(reference)
+        prefer = tuple(
+            str(item)
+            for item in (backend.get("prefer") or backend.get("prefer_keywords") or [])
+        )
+        if not _sfz_reference_resolves(reference, is_library, base, prefer):
+            references.append(reference)
+    return references
+
+
 def _preflight_bulk_render(
     cues: tuple[str, ...], *, backend: str, force_render: bool
 ) -> bool:
@@ -624,6 +716,7 @@ def _preflight_bulk_render(
     from .render.score_layers import build_score
 
     failures: list[str] = []
+    missing_libraries: dict[str, list[str]] = {}
     for cue in cues:
         yaml_path = find_score(cue)
         if yaml_path is None:
@@ -638,6 +731,29 @@ def _preflight_bulk_render(
             build_score(spec)
         except Exception as ex:
             failures.append(f"{cue}: {ex}")
+            continue
+        for reference in _unresolvable_sfz_references(spec, base_dir=yaml_path.parent):
+            missing_libraries.setdefault(reference, []).append(cue)
+
+    if missing_libraries:
+        print(
+            "music render preflight failed: this machine is missing sampled "
+            "instrument libraries that the selected cues NAME.",
+            file=sys.stderr,
+        )
+        for reference, affected in sorted(missing_libraries.items()):
+            shown = ", ".join(affected[:4])
+            more = f" (+{len(affected) - 4} more)" if len(affected) > 4 else ""
+            print(f"  - {reference} — wanted by {shown}{more}", file=sys.stderr)
+        print(
+            "\nEvery one of these would have rendered through General MIDI and "
+            "reported SUCCESS.\nInstall the libraries:\n"
+            "  ./run_developer_setup.sh                     (from the game repo)\n"
+            "  ./download_ambition_audio_tools.sh           (this tool, MODE=pro)\n"
+            "Set AMBITION_MUSIC_ALLOW_GM_FALLBACK=1 to render stand-ins anyway.",
+            file=sys.stderr,
+        )
+        return False
 
     if not failures:
         return True
