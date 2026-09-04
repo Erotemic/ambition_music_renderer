@@ -27,7 +27,6 @@ will copy that exact file instead of the auto-named full mix. Used when a
 cue's mastered preview lives under a manual filename.
 """
 
-from .publish_safely import publish_copy
 from __future__ import annotations
 
 import json
@@ -36,6 +35,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from .publish_safely import publish_copy
 from ._paths import find_score as _find_score
 from ._paths import generated_root as _generated_root
 from ._paths import output_root as _output_root
