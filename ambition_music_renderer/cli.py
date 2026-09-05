@@ -39,6 +39,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
+from .publish_safely import publish_copy
 from ._paths import find_score as _find_score
 from ._paths import generated_root as _generated_root
 from ._paths import output_root as _output_root
@@ -397,14 +398,14 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
 
     for src, dest in to_copy:
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
+        publish_copy(src, dest)
         copied.append(dest)
 
     # Keep the manifest next to the runtime files as a debugging breadcrumb.
     # The game does not load it today, but it makes it obvious which render hash
     # produced the shipped adaptive sections.
     if copied:
-        shutil.copy2(manifest_path, dest_dir / f"{cue}.adaptive_manifest.json")
+        publish_copy(manifest_path, dest_dir / f"{cue}.adaptive_manifest.json")
     return copied
 
 
@@ -432,7 +433,7 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
         return False
 
     dest = dest_dir / "full.ogg"
-    shutil.copy2(src, dest)
+    publish_copy(src, dest)
     print(f"publish {cue}: {_display_path(src)} -> {_display_path(dest)}")
     for adaptive_dest in adaptive_copied:
         print(f"publish {cue}: adaptive section -> {_display_path(adaptive_dest)}")
