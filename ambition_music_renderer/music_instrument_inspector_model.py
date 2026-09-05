@@ -22,7 +22,9 @@ import soundfile as sf
 import yaml
 
 from ._paths import agent_root
-from .instrument_libraries import ALIASES, configured_sfz_roots, discover_sfz_files, resolve_sfz_reference
+from .instrument_catalog import get_instrument_catalog_entry, instrument_catalog
+from .instrument_libraries import configured_sfz_roots, discover_sfz_files
+from .instrument_resolution import backend_spec_from_instrument, resolve_instrument_backend
 from .render.effects import post_process
 from .render.group import render_group_audio
 from .render.score_core import (
@@ -100,10 +102,13 @@ def gm_library_entries() -> tuple[LibraryEntry, ...]:
 
 
 def alias_library_entries() -> tuple[LibraryEntry, ...]:
+    """Return the checked-in Ambition instrument vocabulary for browsing."""
+
     rows = []
-    for name in sorted(ALIASES):
-        parts = tuple(part.replace("_", " ").title() for part in name.split(".")[:-1])
-        rows.append(LibraryEntry("sfz_alias", name, name.split(".")[-1].replace("_", " ").title(), name, parts))
+    for name, entry in sorted(instrument_catalog().items()):
+        family = entry.family.replace("_", " ").title()
+        label = name.split(".")[-1].replace("_", " ").title()
+        rows.append(LibraryEntry("sfz_alias", name, label, name, (family,)))
     return tuple(rows)
 
 
@@ -179,9 +184,10 @@ def apply_library_entry(instrument: Mapping[str, Any], entry: LibraryEntry) -> d
     elif entry.kind == "sfz_alias":
         inst.setdefault("program", "acoustic_grand_piano")
         inst["instrument_backend"] = {"kind": "sfz", "library_ref": entry.value}
-        if entry.value.startswith("drums."):
+        catalog_entry = get_instrument_catalog_entry(entry.value)
+        if catalog_entry is not None and catalog_entry.is_drum:
             inst["is_drum"] = True
-        elif entry.value.startswith(("guitar.", "bass.", "piano.", "strings.", "brass.", "winds.", "folk.")):
+        else:
             inst.pop("is_drum", None)
     elif entry.kind == "sfz_path":
         inst.setdefault("program", "acoustic_grand_piano")
@@ -192,19 +198,11 @@ def apply_library_entry(instrument: Mapping[str, Any], entry: LibraryEntry) -> d
 
 
 def resolved_backend_path(instrument: Mapping[str, Any], *, base_dir: Path | None = None) -> Path | None:
-    backend = instrument.get("instrument_backend")
-    if not isinstance(backend, Mapping):
+    backend = backend_spec_from_instrument(instrument)
+    if not backend:
         return None
-    explicit = backend.get("sfz") or backend.get("path") or backend.get("sfz_path") or backend.get("sfz_glob")
-    library_ref = backend.get("library_ref") or backend.get("library")
-    prefer = backend.get("prefer") or backend.get("prefer_keywords") or []
-    return resolve_sfz_reference(
-        explicit,
-        library_ref=str(library_ref) if library_ref else None,
-        prefer=[str(x) for x in prefer],
-        base_dir=base_dir,
-        roots=list(backend.get("library_roots") or []),
-    )
+    plan = resolve_instrument_backend(backend, base_dir=base_dir)
+    return plan.resolved_sfz
 
 
 def load_score_instrument(score_path: Path, instrument_name: str) -> tuple[dict[str, Any], dict[str, Any]]:

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Download/install free SFZ sample libraries and open plugin bundles for the
 # Ambition music renderer.
+#
+# The checked-in supported-instrument contract lives in
+# ambition_music_renderer/data/instrument_catalog.yaml. This script owns the
+# download/extraction mechanics for those declared sources; do not maintain a
+# second prose list of expected libraries here.
 # Usage:
 #   ./download_ambition_audio_tools.sh [ROOT]
 #   MODE=starter ./download_ambition_audio_tools.sh /data/audio-tools
@@ -721,12 +726,11 @@ folder listed above. Then rerun this script with the same root path.
 
 ## SFZ instrument libraries
 
-Starter/pro modes download or attempt: FreePats Upright Piano KW, Salamander
-Grand Piano, Virtual Playing Orchestra, Shinyguitar, Emilyguitar, jRhodes3c
-Rhodes, Black And Green Guitars, Growlybass, Swagbass, Black And Blue Basses,
-Fashionbass, Pastabass, Gogodze Phu Vol II drums, Big Rusty Drums, Naked Drums,
-Muldjord Kit, Ganjo, Etherealwinds Harp II CE, War Tuba, Bigcat Cello, String
-Cyborgs, Horse Pulse, VSCO 2 CE, VCSL, and Sonatina Symphonic Orchestra.
+The source-controlled expected library set, install profiles, stable MusicIR
+`library_ref` identities, and authoring notes live in
+`ambition_music_renderer/data/instrument_catalog.yaml`. Keep that catalog and
+the download/extraction commands in this script synchronized; the catalog is
+the authoring contract.
 
 The added libraries are classified here with their upstream license metadata. Emilyguitar,
 Big Rusty Drums, Black And Blue Basses, Fashionbass, Pastabass, and VSCO 2 CE are

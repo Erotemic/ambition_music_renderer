@@ -1,0 +1,2416 @@
+schema: ambition.instrument_catalog.v1
+policy:
+  installer: download_ambition_audio_tools.sh
+  default_audio_tools_root: /data/audio-tools
+  default_install_profile: pro
+  expectation: Entries marked expected are part of the normal Ambition authoring environment. A missing local file is an environment/setup
+    problem, not a reason for an agent to avoid the instrument.
+  inventory: Generated files under AMBITION_AUDIO_TOOLS_ROOT describe what is actually installed on one machine; they do not
+    define the supported instrument vocabulary.
+sources:
+  freepats.upright_piano_kw:
+    label: FreePats Upright Piano KW
+    expected: true
+    install_profile: starter
+    relative_root: sfz/FreePats/UprightPianoKW
+  freepats.salamander_grand:
+    label: FreePats Salamander Grand Piano
+    expected: true
+    install_profile: pro
+    relative_root: sfz/FreePats/SalamanderGrandPiano
+  virtual_playing_orchestra:
+    label: Virtual Playing Orchestra
+    expected: true
+    install_profile: starter
+    relative_root: sfz/Virtual-Playing-Orchestra3
+    notes:
+    - The wave archive and SFZ script archives must be extracted into the same tree.
+    - Performance patches may use CC1/modulation for dynamics; drive CC1 when choosing a -perf patch.
+  karoryfer.shinyguitar:
+    label: Karoryfer Shinyguitar
+    expected: true
+    install_profile: starter
+    relative_root: sfz/Karoryfer/Shinyguitar
+    notes:
+    - The installer creates Programs/acoustic and Programs/electric sample-directory symlinks required by the plain sfizz
+      renderer.
+    - The electric_five program requires startup CC100=64 and CC107=127 to produce the intended sustained electric sound.
+  karoryfer.emilyguitar:
+    label: Karoryfer Emilyguitar
+    expected: true
+    install_profile: starter
+    license: CC0-1.0
+    relative_root: sfz/Karoryfer/Emilyguitar
+    notes:
+    - emily_chords is chord/voicing oriented and has keyswitch states 33..35; use a basic/single-note program when writing
+      lead lines.
+  karoryfer.growlybass:
+    label: Karoryfer Growlybass
+    expected: true
+    install_profile: starter
+    relative_root: sfz/Karoryfer/Growlybass
+    notes:
+    - The clean program is the neutral finger-bass choice; dirty/angry/vicious/excessive/strange/shifty programs are character
+      variants.
+  karoryfer.black_and_blue_basses:
+    label: Karoryfer Black And Blue Basses
+    expected: true
+    install_profile: starter
+    license: CC0-1.0
+    relative_root: sfz/Karoryfer/BlackAndBlueBasses
+  karoryfer.fashionbass:
+    label: Karoryfer Fashionbass
+    expected: true
+    install_profile: starter
+    license: CC0-1.0
+    relative_root: sfz/Karoryfer/Fashionbass
+  karoryfer.pastabass:
+    label: Karoryfer Pastabass
+    expected: true
+    install_profile: starter
+    license: CC0-1.0
+    relative_root: sfz/Karoryfer/Pastabass
+  karoryfer.gogodze:
+    label: Karoryfer Gogodze Phu Vol II
+    expected: true
+    install_profile: starter
+    relative_root: sfz/Karoryfer/GogodzePhuVolII
+  karoryfer.big_rusty_drums:
+    label: Karoryfer Big Rusty Drums
+    expected: true
+    install_profile: starter
+    license: CC0-1.0
+    relative_root: sfz/Karoryfer/BigRustyDrums
+    notes:
+    - Use the 01-full top-level program for the normal kit; mappings/ helper SFZs are implementation files, not authoring
+      targets.
+  sfzinstruments.ganjo:
+    label: Ganjo guitar-banjo
+    expected: true
+    install_profile: starter
+    relative_root: sfz/SFZInstruments/Ganjo
+  jlearman.jrhodes3c:
+    label: jRhodes3c Rhodes Mark I
+    expected: true
+    install_profile: starter
+    relative_root: sfz/SFZInstruments/jRhodes3c
+  karoryfer.black_and_green_guitars:
+    label: Karoryfer Black And Green Guitars
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/BlackAndGreenGuitars
+    notes:
+    - The keyswitch programs use keys around 36..38. Prefer dedicated sustain/staccato/twang programs when the articulation
+      is known.
+  karoryfer.swagbass:
+    label: Karoryfer Swagbass
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/Swagbass
+  versilian.etherealwinds_harp_ii_ce:
+    label: Etherealwinds Harp II CE
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Versilian/EtherealwindsHarpII_CE
+  karoryfer.war_tuba:
+    label: Karoryfer War Tuba
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/WarTuba
+    notes:
+    - Sustain programs can respond strongly to CC1/modulation; treat CC1 as an expressive timbre/dynamics control when using
+      them.
+  karoryfer.bigcat_cello:
+    label: Karoryfer Bigcat Cello
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/BigcatCello
+  karoryfer.string_cyborgs:
+    label: Karoryfer String Cyborgs
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/StringCyborgs
+  karoryfer.horse_pulse:
+    label: Karoryfer Horse Pulse
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/HorsePulse
+    notes:
+    - The main keyswitch program exposes states 31..36 and ships startup controls including CC31, CC107, and CC110.
+  karoryfer.meatbass:
+    label: Karoryfer Meatbass
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/Meatbass
+  karoryfer.weresax:
+    label: Karoryfer Weresax
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Karoryfer/Weresax
+  vsco2_ce:
+    label: VSCO 2 Community Edition
+    expected: true
+    install_profile: pro
+    license: CC0-1.0
+    relative_root: sfz/VSCO2CE
+  vcsl:
+    label: Versilian Community Sample Library
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Versilian/VCSL
+  sonatina:
+    label: Sonatina Symphonic Orchestra
+    expected: true
+    install_profile: pro
+    relative_root: sfz/Sonatina/SymphonicOrchestra
+  naked_drums:
+    label: Naked Drums
+    expected: true
+    install_profile: pro
+    license: CC-BY-4.0
+    relative_root: sfz/WilkinsonAudio/NakedDrums
+    notes:
+    - Attribution is required when redistributing the samples. Use the User/Naked Drums GM.sfz program for a conventional
+      drum map.
+  muldjord_kit:
+    label: Muldjord Kit
+    expected: true
+    install_profile: pro
+    license: CC-BY-4.0
+    relative_root: sfz/DrumGizmo/MuldjordKit
+    notes:
+    - Attribution is required when redistributing the samples. Prefer the Stereo kit program for normal rendering.
+instruments:
+  freepats.upright_piano_kw:
+    family: piano
+    role: upright_piano
+    resolver:
+      required_any:
+      - - upright
+        - pianokw
+      - - upright
+        - piano
+        - kw
+      prefer:
+      - upright
+      - piano
+      - flac
+      - sfz
+      avoid: []
+    source: freepats.upright_piano_kw
+    expected: true
+    install_profile: starter
+    usage:
+      summary: FreePats Upright Piano KW sampled upright.
+  freepats.salamander_grand:
+    family: piano
+    role: grand_piano
+    resolver:
+      required_any:
+      - - salamander
+      - - grand
+        - piano
+      prefer:
+      - salamander
+      - grand
+      - piano
+      - flac
+      - sfz
+      avoid:
+      - 16bit
+      - ogg
+    source: freepats.salamander_grand
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Salamander sampled grand piano; preferred high-quality acoustic piano when available.
+  piano.acoustic:
+    family: piano
+    role: acoustic
+    resolver:
+      required_any:
+      - - piano
+      - - salamander
+      - - upright
+      prefer:
+      - salamander
+      - upright
+      - grand
+      - piano
+      - flac
+      avoid: []
+    source: freepats.salamander_grand
+    expected: true
+    install_profile: pro
+  vpo.strings:
+    family: orchestra
+    role: strings
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - strings
+      - - vpo
+        - strings
+      - - strings
+      prefer:
+      - all strings
+      - section
+      - sec
+      - panned
+      - sustain
+      - sus
+      - ensemble
+      - strings
+      avoid:
+      - pizz
+      - spicc
+      - stacc
+      - trem
+      - trill
+      - solo
+      - violin
+      - viola
+      - cello
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.violin:
+    family: orchestra
+    role: violin
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - violin
+      - - vpo
+        - violin
+      - - violin
+      prefer:
+      - solo
+      - sustain
+      - sus
+      - violin
+      avoid:
+      - pizz
+      - spicc
+      - stacc
+      - trem
+      - trill
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.violin_solo_perf:
+    family: orchestra
+    role: solo_violin_performance
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - strings
+        - 1st
+        - violin
+        - solo
+        - perf
+      prefer:
+      - 1st violin solo perf
+      - solo perf
+      - 1st violin
+      - violin
+      avoid:
+      - ks
+      - staccato
+      - pizzicato
+      - tremolo
+      - accent
+      - section
+      - sec
+      - panned
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    usage:
+      summary: VPO performance violin patch.
+      nuances:
+      - Drive CC1/modulation for performance dynamics; a static CC1=0 can make the foreground part too quiet.
+  vpo.brass:
+    family: orchestra
+    role: brass
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - brass
+      - - vpo
+        - brass
+      - - brass
+      prefer:
+      - all brass
+      - section
+      - sec
+      - panned
+      - sustain
+      - sus
+      - brass
+      - horns
+      avoid:
+      - stacc
+      - marcato
+      - fall
+      - solo
+      - trombone
+      - tuba
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.woodwinds:
+    family: orchestra
+    role: woodwinds
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - woodwinds
+      - - vpo
+        - woodwinds
+      - - woodwinds
+      prefer:
+      - sustain
+      - sus
+      - flute
+      - clarinet
+      - ensemble
+      avoid:
+      - stacc
+      - flutter
+      - trill
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.piccolo_solo_perf:
+    family: orchestra
+    role: solo_piccolo_performance
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - woodwinds
+        - piccolo
+        - solo
+        - perf
+      prefer:
+      - piccolo solo perf
+      - solo perf
+      - piccolo
+      avoid:
+      - ks
+      - staccato
+      - accent
+      - section
+      - sec
+      - panned
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    usage:
+      summary: VPO performance piccolo patch.
+      nuances:
+      - Drive CC1/modulation for performance dynamics.
+  vpo.flute_solo_perf:
+    family: orchestra
+    role: solo_flute_performance
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - woodwinds
+        - flute
+        - solo
+        - perf
+      prefer:
+      - woodwinds flute solo perf
+      - flute solo perf
+      - solo perf
+      - flute
+      avoid:
+      - alto flute
+      - bass flute
+      - ks
+      - staccato
+      - accent
+      - section
+      - sec
+      - panned
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    usage:
+      summary: VPO performance flute patch.
+      nuances:
+      - Drive CC1/modulation for performance dynamics.
+  vpo.oboe_solo_perf:
+    family: orchestra
+    role: solo_oboe_performance
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - woodwinds
+        - oboe
+        - solo
+        - perf
+      prefer:
+      - oboe solo perf
+      - solo perf
+      - oboe
+      avoid:
+      - ks
+      - staccato
+      - accent
+      - section
+      - sec
+      - panned
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    usage:
+      summary: VPO performance oboe patch.
+      nuances:
+      - Drive CC1/modulation for performance dynamics.
+  vpo.clarinet_solo_perf:
+    family: orchestra
+    role: solo_clarinet_performance
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - woodwinds
+        - clarinet
+        - solo
+        - perf
+      prefer:
+      - clarinet solo perf
+      - solo perf
+      - clarinet
+      avoid:
+      - bass clarinet
+      - contrabass
+      - ks
+      - staccato
+      - accent
+      - section
+      - sec
+      - panned
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    usage:
+      summary: VPO performance clarinet patch.
+      nuances:
+      - Drive CC1/modulation for performance dynamics.
+  vpo.timpani_hit:
+    family: orchestra
+    role: timpani_hit
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - percussion
+        - timpani
+        - hit
+      prefer:
+      - timpani hit
+      - timpani
+      avoid:
+      - roll
+      - ks
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.choir:
+    family: orchestra
+    role: choir
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - vocals
+      - - vpo
+        - vocals
+      - - choir
+      - - voice
+      prefer:
+      - choir
+      - aah
+      - ooh
+      - sustain
+      - vocals
+      avoid: []
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  vpo.choir_male:
+    family: orchestra
+    role: choir_male
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - vocals
+        - male
+      - - vpo
+        - vocals
+        - male
+      - - choir
+        - male
+      - - male
+        - voice
+      prefer:
+      - male
+      - men
+      - baritone
+      - bass
+      - choir
+      - sustain
+      - vocals
+      avoid:
+      - female
+      - soprano
+      - alto
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+  winds.alto_sax:
+    family: woodwinds
+    role: alto_sax
+    resolver:
+      required_any:
+      - - alto
+        - sax
+      - - alto
+        - saxophone
+      - - sax
+        - alto
+      prefer:
+      - alto
+      - sax
+      - saxophone
+      - solo
+      - sustain
+      - legato
+      - normal
+      avoid:
+      - baritone
+      - tenor
+      - soprano
+      - staccato
+      - growl
+      - fx
+      - noise
+    source: karoryfer.weresax
+    expected: true
+    install_profile: pro
+  winds.tenor_sax:
+    family: woodwinds
+    role: tenor_sax
+    resolver:
+      required_any:
+      - - tenor
+        - sax
+      - - tenor
+        - saxophone
+      - - sax
+        - tenor
+      prefer:
+      - tenor
+      - sax
+      - saxophone
+      - solo
+      - sustain
+      - legato
+      - forte
+      - condenser
+      - normal
+      avoid:
+      - alto
+      - baritone
+      - soprano
+      - staccato
+      - growl
+      - fx
+      - noise
+    source: karoryfer.weresax
+    expected: true
+    install_profile: pro
+  guitar.clean:
+    family: guitar
+    role: clean
+    resolver:
+      required_any:
+      - - guitar
+      - - shinyguitar
+      - - emilyguitar
+      - - black
+        - green
+      prefer:
+      - shinyguitar
+      - black
+      - green
+      - clean
+      - sustain
+      - sus
+      - long
+      - mic
+      - hollowbody
+      - emily
+      - guitar
+      avoid:
+      - mute
+      - choke
+      - noise
+      - scrape
+      - feedback
+      - staccato
+    source: karoryfer.shinyguitar
+    expected: true
+    install_profile: starter
+  guitar.electric_lead:
+    family: guitar
+    role: electric_lead
+    resolver:
+      required_any:
+      - - guitar
+      - - shinyguitar
+      - - emilyguitar
+      - - black
+        - green
+      prefer:
+      - shinyguitar
+      - lead
+      - sustain
+      - sus
+      - long
+      - electric
+      - pickup
+      - guitar
+      - black
+      - green
+      avoid:
+      - mute
+      - choke
+      - noise
+      - scrape
+      - staccato
+    source: karoryfer.shinyguitar
+    expected: true
+    install_profile: starter
+  bass.electric:
+    family: bass
+    role: electric
+    resolver:
+      required_any:
+      - - electric
+        - bass
+      - - bass
+        - guitar
+      - - growlybass
+      - - swagbass
+      - - fashionbass
+      - - pastabass
+      prefer:
+      - clean
+      - growlybass
+      - swagbass
+      - finger
+      - pick
+      - sustain
+      - growly
+      - swag
+      - bass
+      - electric
+      avoid:
+      - slap
+      - mute
+      - noise
+      - trombone
+      - tuba
+      - brass
+      - cello
+      - orchestra
+      - strings
+      - angry
+      - dirty
+      - vicious
+      - excessive
+      - strange
+      - shifty
+      - distort
+    source: karoryfer.growlybass
+    expected: true
+    install_profile: starter
+  bass.upright:
+    family: bass
+    role: upright
+    resolver:
+      required_any:
+      - - upright
+        - bass
+      - - acoustic
+        - bass
+      - - double
+        - bass
+        - pizz
+      - - contrabass
+        - pizz
+      - - basses
+        - pizzicato
+      - - basses
+        - pizz
+      prefer:
+      - notation
+      - basses pizzicato
+      - pizzicato
+      - pizz
+      - upright
+      - double bass
+      - acoustic bass
+      avoid:
+      - electric
+      - bowed
+      - arco
+      - sustain
+      - trombone
+      - tuba
+      - cello
+      - brass
+    source: sonatina
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Upright/double-bass pizzicato role; prefers the installed orchestral pizzicato bass patches.
+  bass.meatbass_pizz:
+    family: bass
+    role: meatbass_pizz
+    resolver:
+      required_any:
+      - - meatbass
+        - pizz
+      prefer:
+      - 04 pizz
+      - meatbass
+      - pizz
+      avoid:
+      - arco
+      - map
+      - legato
+      - looped
+      - sustain
+    source: karoryfer.meatbass
+    expected: true
+    install_profile: pro
+  drums.rock:
+    family: drums
+    role: rock
+    resolver:
+      required_any:
+      - - drum
+        - kit
+      - - rock
+        - drum
+      - - gogodze
+      - - muldjord
+      - - salamander
+        - drum
+      prefer:
+      - gogodze
+      - kit
+      - drum
+      - gm
+      - salamander
+      - muldjord
+      - rock
+      avoid:
+      - brush
+      - loop
+      - timpani
+      - orchestra
+      - cymbals only
+    is_drum: true
+    source: karoryfer.gogodze
+    expected: true
+    install_profile: starter
+    usage:
+      summary: General rock-kit role; prefers the installed Gogodze kit and can resolve to other compatible installed rock
+        kits.
+  vpo.percussion:
+    family: orchestra
+    role: percussion
+    resolver:
+      required_any:
+      - - virtual
+        - playing
+        - orchestra
+        - percussion
+      - - vpo
+        - percussion
+      - - percussion
+      prefer:
+      - bassdrum snare cymbals
+      - snare
+      - bassdrum
+      - cymbals
+      avoid:
+      - timpani
+      - bells
+      - xylophone
+      - vibraphone
+    source: virtual_playing_orchestra
+    expected: true
+    install_profile: starter
+    is_drum: true
+  orchestra.horns_sustain:
+    family: orchestra
+    role: horns_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - horns
+      - - horns
+        - sustain
+      - - horns
+        - sus
+      prefer:
+      - notation
+      - horns sustain
+      - horns sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - marcato
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.horns_staccato:
+    family: orchestra
+    role: horns_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - horns
+      - - horns
+        - staccato
+      - - horns
+        - stc
+      prefer:
+      - notation
+      - horns staccato
+      - horns stc
+      - staccato
+      - stc
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.trumpets_sustain:
+    family: orchestra
+    role: trumpets_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - trumpets
+      - - trumpets
+        - sustain
+      - - trumpets
+        - sus
+      prefer:
+      - notation
+      - trumpets sustain
+      - trumpets sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - marcato
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.trumpets_staccato:
+    family: orchestra
+    role: trumpets_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - trumpets
+      - - trumpets
+        - staccato
+      - - trumpets
+        - stc
+      prefer:
+      - notation
+      - trumpets staccato
+      - trumpets stc
+      - staccato
+      - stc
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.trombones_sustain:
+    family: orchestra
+    role: trombones_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - trombones
+      - - trombones
+        - sustain
+      - - trombones
+        - sus
+      prefer:
+      - notation
+      - trombones sustain
+      - trombones sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - marcato
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.trombones_staccato:
+    family: orchestra
+    role: trombones_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - trombones
+      - - trombones
+        - staccato
+      - - trombones
+        - stc
+      prefer:
+      - notation
+      - trombones staccato
+      - trombones stc
+      - staccato
+      - stc
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.tuba_sustain:
+    family: orchestra
+    role: tuba_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - tuba
+      - - tuba
+        - sustain
+      - - tuba
+        - sus
+      prefer:
+      - notation
+      - tuba sustain
+      - tuba sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - marcato
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.flutes_sustain:
+    family: orchestra
+    role: flutes_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - flutes
+      - - flutes
+        - sustain
+      - - flutes
+        - sus
+      prefer:
+      - notation
+      - flutes sustain
+      - flutes sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - flutter
+      - trill
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.oboes_sustain:
+    family: orchestra
+    role: oboes_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - oboes
+      - - oboes
+        - sustain
+      - - oboes
+        - sus
+      prefer:
+      - notation
+      - oboes sustain
+      - oboes sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - trill
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.clarinets_sustain:
+    family: orchestra
+    role: clarinets_sustain
+    resolver:
+      required_any:
+      - - sonatina
+        - clarinets
+      - - clarinets
+        - sustain
+      - - clarinets
+        - sus
+      prefer:
+      - notation
+      - clarinets sustain
+      - clarinets sus
+      - sustain
+      - sus
+      avoid:
+      - performance
+      - includes
+      - looped
+      - stacc
+      - stc
+      - trill
+      - solo
+      - ks
+    source: sonatina
+    expected: true
+    install_profile: pro
+  orchestra.timpani:
+    family: orchestra
+    role: timpani
+    resolver:
+      required_any:
+      - - sonatina
+        - timpani
+      - - vcsl
+        - timpani
+      - - timpani
+      prefer:
+      - timpani
+      - hit
+      - normal
+      - notation
+      avoid:
+      - roll
+      - crescendo
+      - crsc
+      - tremolo
+      - mallet
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.snare:
+    family: orchestra
+    role: snare
+    resolver:
+      required_any:
+      - - vcsl
+        - snare
+      - - snare
+        - drum
+      prefer:
+      - snare drum rope tension
+      - snare drum
+      - snare
+      - low
+      avoid:
+      - brush
+      - side
+      - rim
+      - stick
+      - marching tenor
+      - sample
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.snare_march:
+    family: orchestra
+    role: snare_march
+    resolver:
+      required_any:
+      - - snare
+        - rope
+        - tension
+      - - field
+        - snare
+      - - marching
+        - snare
+      prefer:
+      - snare drum rope tension
+      - rope tension
+      - field snare
+      - marching snare
+      - snare drum
+      avoid:
+      - modern
+      - brush
+      - side
+      - rim
+      - stick
+      - marching tenor
+      - sample
+      - roll
+      - tremolo
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.snare_roll:
+    family: orchestra
+    role: snare_roll
+    resolver:
+      required_any:
+      - - snare
+        - roll
+      - - snare
+        - tremolo
+      - - rope
+        - tension
+        - roll
+      - - field
+        - snare
+        - roll
+      prefer:
+      - snare drum rope tension roll
+      - snare roll
+      - rope tension roll
+      - roll
+      - tremolo
+      - long
+      avoid:
+      - crescendo
+      - decrescendo
+      - brush
+      - side
+      - rim
+      - marching tenor
+      - sample
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.marching_tenor:
+    family: orchestra
+    role: marching_tenor
+    resolver:
+      required_any:
+      - - marching
+        - tenor
+      - - tenor
+        - drum
+      - - marching
+        - tom
+      - - quad
+        - drum
+      - - quads
+      prefer:
+      - marching tenor
+      - tenor drum
+      - quads
+      - quad
+      - marching tom
+      - toms
+      avoid:
+      - sax
+      - saxophone
+      - voice
+      - vocal
+      - snare
+      - sample
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.bass_drum:
+    family: orchestra
+    role: bass_drum
+    resolver:
+      required_any:
+      - - vcsl
+        - bass
+        - drum
+      - - bass
+        - drum
+      prefer:
+      - bass drum 1
+      - concert bass drum
+      - bass drum
+      avoid:
+      - kit
+      - kick
+      - sample
+      - legacy
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  orchestra.cymbal:
+    family: orchestra
+    role: cymbal
+    resolver:
+      required_any:
+      - - vcsl
+        - cymbal
+      - - cymbal
+      prefer:
+      - suspended cymbal
+      - crash cymbal
+      - cymbal suspended
+      - crash
+      - suspended
+      avoid:
+      - finger
+      - hi hat
+      - hihat
+      - ride
+      - china
+      - sizzle
+      - sample
+    source: vcsl
+    expected: true
+    install_profile: pro
+    is_drum: true
+  guitar.hollowbody:
+    family: guitar
+    role: hollowbody
+    resolver:
+      required_any:
+      - - black
+        - green
+        - guitar
+      - - blackandgreenguitars
+      - - hollowbody
+        - guitar
+      prefer:
+      - sustain
+      - sus
+      - long
+      - clean
+      - pickup
+      - guitar
+      - green
+      - black
+      avoid:
+      - feedback
+      - noise
+      - scrape
+      - staccato
+      - mute
+    source: karoryfer.black_and_green_guitars
+    expected: true
+    install_profile: pro
+  guitar.acoustic:
+    family: guitar
+    role: acoustic
+    resolver:
+      required_any:
+      - - acoustic
+        - guitar
+      - - blue
+        - jeans
+        - moonbeams
+      - - shinyguitar
+      prefer:
+      - acoustic
+      - mic
+      - sustain
+      - long
+      - chord
+      - guitar
+      avoid:
+      - pickup
+      - mute
+      - staccato
+      - noise
+      - scrape
+    source: karoryfer.shinyguitar
+    expected: true
+    install_profile: starter
+  guitar.acoustic_warm:
+    family: guitar
+    role: acoustic_warm
+    resolver:
+      required_any:
+      - - acoustic
+        - guitar
+      - - blue
+        - jeans
+        - moonbeams
+      - - '12'
+        - string
+        - guitar
+      - - twelve
+        - string
+        - guitar
+      - - shinyguitar
+      prefer:
+      - 12 string
+      - twelve string
+      - blue jeans moonbeams
+      - jumbo
+      - dreadnought
+      - warm
+      - mic
+      - sustain
+      - long
+      - acoustic
+      - guitar
+      avoid:
+      - shinyguitar
+      - pickup
+      - mute
+      - staccato
+      - noise
+      - scrape
+      - sample
+      prefer_source: false
+    source: karoryfer.shinyguitar
+    expected: true
+    install_profile: starter
+  strings.violin_solo:
+    family: strings
+    role: violin_solo
+    resolver:
+      required_any:
+      - - sonatina
+        - violin
+        - solo
+      - - violin
+        - solo
+        - sustain
+      prefer:
+      - notation
+      - violin solo 1 sustain
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - non-vibrato
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - '2'
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violins_1:
+    family: strings
+    role: violins_1
+    resolver:
+      required_any:
+      - - sonatina
+        - 1st
+        - violins
+      - - 1st
+        - violins
+        - sustain
+      prefer:
+      - notation
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - solo
+      - tenuto
+      - accent
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violins_2:
+    family: strings
+    role: violins_2
+    resolver:
+      required_any:
+      - - sonatina
+        - 2nd
+        - violins
+      - - 2nd
+        - violins
+        - sustain
+      prefer:
+      - notation
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - solo
+      - tenuto
+      - accent
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violins_1_staccato:
+    family: strings
+    role: violins_1_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - 1st
+        - violins
+        - staccato
+      - - 1st
+        - violins
+        - staccato
+      prefer:
+      - notation
+      - 1st violins staccato
+      - staccato
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - pizz
+      - tremolo
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violins_2_staccato:
+    family: strings
+    role: violins_2_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - 2nd
+        - violins
+        - staccato
+      - - 2nd
+        - violins
+        - staccato
+      prefer:
+      - notation
+      - 2nd violins staccato
+      - staccato
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - pizz
+      - tremolo
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violin_solo_marcato:
+    family: strings
+    role: violin_solo_marcato
+    resolver:
+      required_any:
+      - - sonatina
+        - violin
+        - solo
+        - marcato
+      prefer:
+      - notation
+      - violin solo 1 marcato
+      - marcato
+      avoid:
+      - performance
+      - includes
+      - looped
+      - non-vibrato
+      - ' 2'
+      - solo 2
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violins_1_marcato:
+    family: strings
+    role: violins_1_marcato
+    resolver:
+      required_any:
+      - - sonatina
+        - 1st
+        - violins
+        - marcato
+      prefer:
+      - notation
+      - 1st violins marcato
+      - marcato
+      avoid:
+      - performance
+      - includes
+      - looped
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.violas:
+    family: strings
+    role: violas
+    resolver:
+      required_any:
+      - - sonatina
+        - violas
+      - - violas
+        - sustain
+      prefer:
+      - notation
+      - violas sustain
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - solo
+      - tenuto
+      - accent
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.celli:
+    family: strings
+    role: celli
+    resolver:
+      required_any:
+      - - sonatina
+        - celli
+      - - celli
+        - sustain
+      prefer:
+      - notation
+      - celli sustain
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - solo
+      - tenuto
+      - accent
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.celli_staccato:
+    family: strings
+    role: celli_staccato
+    resolver:
+      required_any:
+      - - sonatina
+        - celli
+        - staccato
+      - - celli
+        - staccato
+      prefer:
+      - notation
+      - celli staccato
+      - staccato
+      avoid:
+      - performance
+      - includes
+      - looped
+      - sustain
+      - sus
+      - pizz
+      - tremolo
+    source: sonatina
+    expected: true
+    install_profile: pro
+  strings.basses:
+    family: strings
+    role: basses
+    resolver:
+      required_any:
+      - - sonatina
+        - basses
+      - - basses
+        - sustain
+      prefer:
+      - notation
+      - basses sustain
+      - sustain
+      avoid:
+      - performance
+      - includes
+      - looped
+      - pizz
+      - staccato
+      - tremolo
+      - legno
+      - harmonic
+      - marcato
+      - ks
+      - solo
+      - tenuto
+      - accent
+    source: sonatina
+    expected: true
+    install_profile: pro
+  epiano.rhodes:
+    family: keys
+    role: rhodes_electric_piano
+    resolver:
+      required_any:
+      - - jrhodes
+      - - rhodes
+      prefer:
+      - stereo
+      - looped
+      - both
+      - rhodes
+      avoid:
+      - mono
+      - release
+      - noise
+    source: jlearman.jrhodes3c
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Rhodes Mark I electric piano; resolver favors stereo/looped/both entry points.
+  bass.growly:
+    family: bass
+    role: electric_bass_clean
+    resolver:
+      required_any:
+      - - growlybass
+      - - growly
+        - bass
+      prefer:
+      - clean
+      - finger
+      - sustain
+      - sus
+      - growly
+      - bass
+      avoid:
+      - slap
+      - mute
+      - noise
+      - angry
+      - dirty
+      - vicious
+      - excessive
+      - strange
+      - shifty
+      - distort
+    source: karoryfer.growlybass
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Neutral clean finger-bass realization from Growlybass.
+      nuances:
+      - Avoid the named dirty/angry/vicious/excessive/strange/shifty variants unless that coloration is intentional.
+  bass.swag:
+    family: bass
+    role: electric_bass
+    resolver:
+      required_any:
+      - - swagbass
+      - - swag
+        - bass
+      prefer:
+      - finger
+      - sustain
+      - swag
+      - bass
+      avoid:
+      - slap
+      - noise
+    source: karoryfer.swagbass
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Electric bass with a clean/finger emphasis.
+  guitar.emily:
+    family: guitar
+    role: electric_guitar_chords
+    resolver:
+      required_any:
+      - - emilyguitar
+      - - emily
+        - guitar
+      prefer:
+      - barre
+      - chord
+      - sustain
+      - guitar
+      - emily
+      avoid:
+      - include
+      - keyswitch
+      - noise
+    source: karoryfer.emilyguitar
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Emilyguitar chord-oriented electric guitar. Good for rhythm/power-chord writing; prefer a dedicated single-note
+        program for lead melodies.
+      nuances:
+      - The catalog alias intentionally favors chord/barre programs.
+      - The resolved chord program may expose keyswitches 33..35.
+  bass.black_and_blue:
+    family: bass
+    role: electric_bass
+    resolver:
+      required_any:
+      - - black
+        - blue
+        - bass
+      - - blackandblue
+        - bass
+      prefer:
+      - babyblue all
+      - babyblue
+      - finger
+      - pick
+      - sustain
+      - black and blue
+      - bass
+      avoid:
+      - keysw
+      - pluck
+      - ghost
+      - stac
+      - btb
+      - include
+      - noise
+    source: karoryfer.black_and_blue_basses
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Black And Blue bass; the Baby Blue all program is the normal broad-coverage choice.
+  bass.fashion:
+    family: bass
+    role: electric_bass_clean
+    resolver:
+      required_any:
+      - - fashionbass
+      - - fashion
+        - bass
+      prefer:
+      - fashionbass clean
+      - clean
+      - finger
+      - sustain
+      - fashion
+      - bass
+      avoid:
+      - shifty
+      - unison
+      - include
+      - noise
+    source: karoryfer.fashionbass
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Clean Fashionbass program for general electric-bass parts.
+  bass.pastabass:
+    family: bass
+    role: electric_bass
+    resolver:
+      required_any:
+      - - pastabass
+      - - pasta
+        - bass
+      prefer:
+      - fettuccine
+      - linguine
+      - finger
+      - bass
+      avoid:
+      - include
+      - noise
+    source: karoryfer.pastabass
+    expected: true
+    install_profile: starter
+    usage:
+      summary: Pastabass finger-bass family; resolver favors Fettuccine/Linguine entry points.
+  drums.big_rusty:
+    family: drums
+    role: rock_drum_kit
+    resolver:
+      required_any:
+      - - big
+        - rusty
+        - drum
+      - - bigrusty
+        - drum
+      prefer:
+      - 01 full
+      - kit
+      - drum
+      - big rusty
+      avoid:
+      - ekit
+      - default
+      - mapping
+      - include
+      - noise
+    source: karoryfer.big_rusty_drums
+    expected: true
+    install_profile: starter
+    is_drum: true
+    usage:
+      summary: Full acoustic rock/metal drum kit. Use as a drum instrument with GM-like authored drum pitches.
+      nuances:
+      - Use the top-level 01-full program rather than mappings/helper SFZs.
+  drums.naked:
+    family: drums
+    role: drum_kit
+    resolver:
+      required_any:
+      - - naked
+        - drum
+      prefer:
+      - naked drums gm
+      - user
+      - stereo
+      - gm
+      - kit
+      - naked drums
+      avoid:
+      - cr
+      - fr
+      - ms
+      - oh
+      - multi
+      - include
+      - noise
+    source: naked_drums
+    expected: true
+    install_profile: pro
+    is_drum: true
+    usage:
+      summary: Naked Drums GM-oriented kit.
+      nuances:
+      - CC-BY-4.0 sample attribution applies to redistribution.
+  drums.muldjord:
+    family: drums
+    role: drum_kit
+    resolver:
+      required_any:
+      - - muldjord
+      prefer:
+      - stereo
+      - kit
+      - muldjord
+      avoid:
+      - include
+      - multi
+      - noise
+    source: muldjord_kit
+    expected: true
+    install_profile: pro
+    is_drum: true
+    usage:
+      summary: Muldjord stereo acoustic drum kit.
+      nuances:
+      - CC-BY-4.0 sample attribution applies to redistribution.
+  orchestra.vsco2:
+    family: orchestra
+    role: vsco2
+    resolver:
+      required_any:
+      - - vsco
+      prefer:
+      - sustain
+      - normal
+      - vsco
+      avoid:
+      - include
+      - keyswitch
+      - staccato
+      - noise
+    source: vsco2_ce
+    expected: true
+    install_profile: pro
+  drums.gogodze:
+    family: drums
+    role: drum_kit
+    resolver:
+      required_any:
+      - - gogodze
+      - - phu
+        - vol
+        - ii
+      prefer:
+      - kit
+      - drum
+      - gm
+      - hi
+      - '47'
+      - '13'
+      - gogodze
+      avoid:
+      - loop
+      - timpani
+      - orchestra
+    source: karoryfer.gogodze
+    expected: true
+    install_profile: starter
+    is_drum: true
+    usage:
+      summary: Gogodze Phu Vol II drum kit.
+  folk.banjo:
+    family: folk
+    role: banjo
+    resolver:
+      required_any:
+      - - ganjo
+      - - banjo
+      prefer:
+      - ganjo
+      - banjo
+      - instrument
+      - sfz
+      avoid:
+      - samples
+      - mapping
+      - readme
+    source: sfzinstruments.ganjo
+    expected: true
+    install_profile: starter
+  folk.harp:
+    family: folk
+    role: concert_harp
+    resolver:
+      required_any:
+      - - etherealwinds
+        - harp
+      - - ewharp
+      - - harp
+      prefer:
+      - harp
+      - normal
+      - sustain
+      - etherealwinds
+      - instrument
+      avoid:
+      - gliss
+      - fx
+      - voice
+      - phrase
+      - raw
+    source: versilian.etherealwinds_harp_ii_ce
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Etherealwinds Harp II CE normal harp program.
+  brass.tuba:
+    family: brass
+    role: solo_tuba
+    resolver:
+      required_any:
+      - - war
+        - tuba
+      - - tuba
+      prefer:
+      - sustain
+      - sus
+      - tuba
+      - war
+      avoid:
+      - stacc
+      - noise
+      - yell
+      - breath
+    source: karoryfer.war_tuba
+    expected: true
+    install_profile: pro
+    usage:
+      summary: War Tuba sustained/legato tuba.
+      nuances:
+      - CC1 can materially shape the sustained sound.
+  strings.cello:
+    family: strings
+    role: solo_cello
+    resolver:
+      required_any:
+      - - bigcat
+        - cello
+      - - cello
+      prefer:
+      - sustain
+      - sus
+      - bowed
+      - cello
+      - bigcat
+      avoid:
+      - stacc
+      - pizz
+      - noise
+      - slide
+      - harmonic
+    source: karoryfer.bigcat_cello
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Bigcat bowed cello, velocity-layer program.
+  strings.cyborg:
+    family: strings
+    role: hybrid_strings
+    resolver:
+      required_any:
+      - - string
+        - cyborg
+      - - cyborg
+        - strings
+      prefer:
+      - sustain
+      - strings
+      - ensemble
+      - cyborg
+      avoid:
+      - stacc
+      - pizz
+      - noise
+    source: karoryfer.string_cyborgs
+    expected: true
+    install_profile: pro
+    usage:
+      summary: String Cyborgs hybrid/effected string palette; choose intentionally rather than as a neutral orchestral section.
+  folk.bass_tagelharpa:
+    family: folk
+    role: bass_tagelharpa
+    resolver:
+      required_any:
+      - - horse
+        - pulse
+      - - tagelharpa
+      prefer:
+      - horse
+      - pulse
+      - pizz
+      - sustain
+      - bass
+      avoid:
+      - noise
+      - fx
+    source: karoryfer.horse_pulse
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Horse Pulse bowed/tagelharpa family.
+      nuances:
+      - The main keyswitch program uses states 31..36 and startup controller defaults.
+smoke_profiles:
+- name: emily_basic
+  path: Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz
+  source: karoryfer.emilyguitar
+  family: guitar
+  articulation: basic
+  probes:
+  - 48
+  - 55
+  - 60
+  pitch_probe: false
+- name: emily_chords
+  library_ref: guitar.emily
+  source: karoryfer.emilyguitar
+  prefer:
+  - chords
+  - emily
+  family: guitar
+  articulation: power-chord
+  probes:
+  - 40
+  - 48
+  - 55
+  pitch_probe: false
+  keyswitch_probes:
+  - 33
+  - 34
+  - 35
+- name: emily_chords_wide
+  path: Karoryfer/Emilyguitar/Emilyguitar/emily_chords_wide.sfz
+  source: karoryfer.emilyguitar
+  family: guitar
+  articulation: wide-power-chord
+  probes:
+  - 40
+  - 48
+  - 55
+  pitch_probe: false
+  keyswitch_probes:
+  - 33
+  - 34
+  - 35
+- name: blackgreen_green
+  path: Karoryfer/BlackAndGreenGuitars/Programs/01-green_keyswitch.sfz
+  source: karoryfer.black_and_green_guitars
+  family: guitar
+  articulation: green
+  probes:
+  - 52
+  - 60
+  - 67
+  keyswitch_probes:
+  - 36
+  - 37
+  - 38
+- name: blackgreen_black
+  path: Karoryfer/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz
+  source: karoryfer.black_and_green_guitars
+  family: guitar
+  articulation: black
+  probes:
+  - 52
+  - 60
+  - 67
+  keyswitch_probes:
+  - 36
+  - 37
+  - 38
+- name: blackgreen_twang
+  path: Karoryfer/BlackAndGreenGuitars/Programs/04-green_twang.sfz
+  source: karoryfer.black_and_green_guitars
+  family: guitar
+  articulation: twang
+  probes:
+  - 52
+  - 60
+  - 67
+- name: blackgreen_staccato
+  path: Karoryfer/BlackAndGreenGuitars/Programs/05-green_staccato.sfz
+  source: karoryfer.black_and_green_guitars
+  family: guitar
+  articulation: staccato
+  probes:
+  - 52
+  - 60
+  - 67
+- name: shiny_electric
+  path: Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz
+  source: karoryfer.shinyguitar
+  family: guitar
+  articulation: electric-sustain
+  startup_cc:
+    '100': 64
+    '107': 127
+  probes:
+  - 37
+  - 52
+  - 64
+  - 76
+- name: growlybass
+  library_ref: bass.growly
+  source: karoryfer.growlybass
+  family: bass
+  articulation: clean-finger
+  probes:
+  - 36
+  - 43
+  - 52
+- name: swagbass
+  library_ref: bass.swag
+  source: karoryfer.swagbass
+  family: bass
+  articulation: clean-finger
+  probes:
+  - 36
+  - 43
+  - 52
+- name: black_and_blue_bass
+  library_ref: bass.black_and_blue
+  source: karoryfer.black_and_blue_basses
+  prefer:
+  - babyblue all
+  - black and blue
+  family: bass
+  articulation: baby-blue
+  probes:
+  - 36
+  - 43
+  - 52
+- name: fashionbass
+  path: Karoryfer/Fashionbass/Fashionbass/fashionbass_clean.sfz
+  source: karoryfer.fashionbass
+  family: bass
+  articulation: clean
+  probes:
+  - 36
+  - 48
+  - 60
+- name: pastabass
+  path: Karoryfer/Pastabass/Pastabass/linguine.sfz
+  source: karoryfer.pastabass
+  family: bass
+  articulation: linguine
+  probes:
+  - 36
+  - 40
+  - 48
+- name: gogodze
+  path: Karoryfer/GogodzePhuVolII/Gogodze_Phu_vol_II/Programs/Kit.sfz
+  source: karoryfer.gogodze
+  family: drums
+  articulation: kit
+  probes:
+  - 35
+  - 36
+  - 38
+  - 42
+  - 46
+  - 49
+  drum: true
+  pitch_probe: false
+- name: big_rusty
+  library_ref: drums.big_rusty
+  source: karoryfer.big_rusty_drums
+  prefer:
+  - 01 full
+  - big rusty
+  family: drums
+  articulation: full-kit
+  probes:
+  - 35
+  - 36
+  - 38
+  - 42
+  - 46
+  - 49
+  drum: true
+  pitch_probe: false
+- name: naked_drums
+  path: WilkinsonAudio/NakedDrums/WilkinsonAudio.NakedDrums-master/Wilkinson Audio/Naked Drums/User/Naked Drums GM.sfz
+  source: naked_drums
+  family: drums
+  articulation: gm-kit
+  probes:
+  - 35
+  - 36
+  - 38
+  - 42
+  - 46
+  - 49
+  drum: true
+  pitch_probe: false
+- name: muldjord
+  path: DrumGizmo/MuldjordKit/DrumGizmo.MuldjordKit-master/DrumGizmo/MuldjordKit/Stereo/DrumGizmo MuldjordKit.sfz
+  source: muldjord_kit
+  family: drums
+  articulation: stereo-kit
+  probes:
+  - 35
+  - 36
+  - 38
+  - 42
+  - 46
+  - 49
+  drum: true
+  pitch_probe: false

@@ -195,7 +195,8 @@ The main command families are:
 | `cue bundle <cue>...` | Render, analyze, and package one or more cues. |
 | `cue publish <cue>` | Publish the newest successful mastered preview. |
 | `audit ...` | Inspect score structure, rendered audio, balance, pitch, transitions, and related diagnostics. |
-| `plugins ...` | Inspect optional SFZ/LV2/VST3/CLAP infrastructure and validate score dependencies. |
+| `instruments ...` | Discover the checked-in sampled-instrument vocabulary and check the local install. |
+| `plugins ...` | Inspect SFZ/LV2/VST3/CLAP infrastructure and validate score dependencies. |
 | `radio ...` | Bulk convenience commands for the parent game's radio cue set. |
 | `sandbox ...` | Legacy-named bulk preset for a small single-track cue set. |
 | `legacy ...` | Quarantined helpers retained only until deletion safety is established. |
@@ -212,6 +213,9 @@ uv run --project tools/ambition_music_renderer \
 
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer audit --help
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer instruments --help
 
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins --help
@@ -315,11 +319,28 @@ instruments in the same cue continue through the normal backend.
 ### SFZ instruments
 
 Per-instrument SFZ configuration is resolved through `instrument_backend`.
-Useful fields include `sfz`, `library_ref`, `prefer`, optional library roots,
-and backend settings. Run plugin validation before depending on machine-local
-sample libraries:
+Prefer a stable checked-in `library_ref`; the catalog owns the ordinary resolver
+hints and usage caveats so scores do not need to repeat machine/library folklore.
+Use explicit `sfz`, `prefer`, or library roots only for intentional overrides.
+
+Discover the expected authoring vocabulary even on a machine without the sample
+tree:
 
 ```bash
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer instruments list
+
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer instruments describe guitar.emily
+```
+
+Check a populated authoring machine and then validate a score:
+
+```bash
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer instruments doctor
+
 AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins doctor
@@ -358,23 +379,30 @@ included-region/sample provenance, `raw_pitch_diagnostic` compares expected F0
 with half- and double-frequency competitors, and `repeat_variation` measures
 normalized attack-shape differences across repeated strikes.
 
-#### Installed-library truth and remote handoffs
+#### Catalog authority, installed-library truth, and remote handoffs
 
-Library aliases and downloader entries describe instrument families the renderer
-knows how to use; they are **not evidence that those libraries are installed on
-the current machine**. The actual SFZ collection lives under the machine-local
-`AMBITION_AUDIO_TOOLS_ROOT` (normally `/data/audio-tools`) and is intentionally
-separate from the source tree. A source archive by itself therefore cannot tell
-a local or remote agent which optional instruments are really available.
+`ambition_music_renderer/data/instrument_catalog.yaml` is the checked-in
+authoring authority for the sampled-instrument vocabulary. The normal
+`download_ambition_audio_tools.sh` environment is expected to satisfy every
+catalog ref. A remote agent with only the source archive can therefore compose
+against `guitar.emily`, `bass.growly`, `strings.violas`, `drums.big_rusty`, and
+the other catalog roles without access to `/data/audio-tools`. `instruments
+describe <ref>` exposes the canonical MusicIR snippet, source/install profile,
+resolver hints, curated usage caveats, and known patch profiles such as startup
+controllers or keyswitch probes when the repository has them.
 
-Treat these generated machine-local reports as the source of truth after running
-`download_ambition_audio_tools.sh` or otherwise updating the audio-tools tree:
+The actual SFZ collection under `AMBITION_AUDIO_TOOLS_ROOT` (normally
+`/data/audio-tools`) is machine-local evidence. Generated inventory files answer
+which concrete files are installed and how those files parse today; they do not
+define which instruments Ambition supports. Treat these as the source of truth
+for current machine state:
 
 - `/data/audio-tools/SFZ_LIBRARY_SUMMARY.txt` - complete installed `.sfz` path list.
 - `/data/audio-tools/REFERENCE_SFZ_LIBRARY_REPORT.txt` - reference-library inventory.
-- `/data/audio-tools/SFZ_USAGE_CENSUS.json` - generated trigger/controller/keyswitch/sample metadata for remote agents and Instrument Inspector.
+- `/data/audio-tools/SFZ_USAGE_CENSUS.json` - generated trigger/controller/keyswitch/sample metadata.
 - `/data/audio-tools/SFZ_USAGE_CENSUS.md` - human-readable usage-census companion.
-- `plugins list_sfz_libraries --json` - live resolver view, including `alias_hits`.
+- `instruments doctor --json` - comparison of expected downloaded sources and catalog refs with live resolution.
+- `plugins list_sfz_libraries --json` - lower-level live resolver view.
 - `plugins validate_score <cue_id>` - final check that a score's requested roles resolve.
 
 Generate the usage census after installing or changing SFZ libraries:
@@ -384,28 +412,19 @@ cd tools/ambition_music_renderer
 ./instrument_usage_census.sh
 ```
 
-See `docs/instrument_usage_census.md` for the schema and handoff guidance.
+See `docs/instrument_catalog.md` for the authoring/environment split and
+`docs/instrument_usage_census.md` for the generated census schema.
 
-For a remote/online-agent handoff, attach or paste `SFZ_LIBRARY_SUMMARY.txt` (or
-the relevant filtered lines) alongside the source archive. An agent that only
-has the repository/source archive must not infer installation from
-`instrument_libraries.py`, the downloader catalog, aliases such as
-`guitar.acoustic_warm`, or documentation examples. Those describe supported or
-desired libraries, not machine state.
+For remote authoring, the repository catalog is sufficient to choose supported
+instruments. Attach `SFZ_USAGE_CENSUS.json` when the task needs exact knowledge
+of one workstation's current patch paths, playable zones, controller gates, or
+installation health. Missing local catalog refs should be reported as setup
+problems instead of teaching an agent to avoid those instruments.
 
-For example, to inspect installed guitar entry points without dumping thousands
-of SFZ helper files:
-
-```bash
-grep -Ei \
-  'guitar|acoustic|12.?string|twelve.?string|dread|jumbo|moonbeams' \
-  /data/audio-tools/SFZ_LIBRARY_SUMMARY.txt
-```
-
-When selecting a patch from that output, prefer human-facing entry points such
-as `Programs/*.sfz`. Paths under `modules/`, `includes/`, `maps_*`, or similar
-implementation directories are usually building blocks for a top-level program,
-not standalone instruments. Confirm the chosen entry point in the next bundle's
+When selecting an explicit patch from machine inventory, prefer human-facing
+entry points such as `Programs/*.sfz`. Paths under `modules/`, `includes/`,
+`maps_*`, or similar implementation directories are usually building blocks
+for a top-level program. Confirm explicit overrides in the next bundle's
 `instrument_resolution` report.
 
 By default, optional per-instrument backend failures warn and fall back instead
@@ -622,11 +641,11 @@ uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins list_lv2 --limit=40
 ```
 
-Keep machine-specific inventory contents out of this README; hand them to local
-or remote agents through the generated inventory reports described under
-**Installed-library truth and remote handoffs**. If an instrument library needs
-a durable workaround, encode the resolution/fallback behavior in the generic
-library tooling and cover it with a tooling test.
+Keep machine-specific inventory contents out of this README. Stable supported
+instrument identities, resolver hints, and durable usage caveats belong in
+`data/instrument_catalog.yaml`; generated inventory belongs under the configured
+audio-tools root. If a library needs a durable workaround, encode it in the
+catalog/resolution tooling and cover it with a tooling test.
 
 ## Package map
 
@@ -634,6 +653,9 @@ library tooling and cover it with a tooling test.
 ambition_music_renderer/
   cli.py                  modal CLI and bulk orchestration
   _paths.py               score/generated/publish path contract
+  instrument_catalog.py  checked-in sampled-instrument vocabulary API
+  instrument_resolution.py canonical backend normalization/resolution plan
+  data/instrument_catalog.yaml expected sources, refs, usage, smoke profiles
   render/                 MusicIR expansion, rendering, mix/export, bundles
   audit/                  score/audio diagnostics exposed by the CLI
   backends/               optional sample/plugin adapters
@@ -651,7 +673,9 @@ High-value implementation entry points:
 - `render/score_layers.py` - MusicIR layer dispatch and score construction.
 - `render/score_core.py` / `render/score_events.py` / `render/score_theory.py` -
   shared score semantics.
-- `render/group.py` - group/instrument routing and backend fallback behavior.
+- `instrument_catalog.py` / `data/instrument_catalog.yaml` - supported sampled-instrument authoring contract.
+- `instrument_resolution.py` - canonical per-instrument backend interpretation and local resolution.
+- `render/group.py` - group rendering and execution of resolved instrument plans.
 - `render/synth.py` - SoundFont/fallback/procedural synthesis.
 - `render/effects.py` - built-in and external effect processing.
 - `render/isolated.py` - adaptive/full soundtrack render entry point.
@@ -699,7 +723,8 @@ Keep this file aligned with the code that owns each contract:
 - CLI flags: `cli.py`, `render/bundle_options.py`, and the audit/plugin Config
   classes.
 - MusicIR layer kinds: `render/score_layers.py`.
-- instrument routing: `render/group.py` and `render/synth.py`.
+- sampled-instrument vocabulary: `data/instrument_catalog.yaml` and `instrument_catalog.py`.
+- instrument normalization/resolution: `instrument_resolution.py`; rendering consumes it from `render/group.py`.
 - generated layout: `render/generated_layout.py` and `render/isolated.py`.
 - bundle contents: `render/bundle.py` and `render/bundle_archive.py`.
 - publish semantics: `_paths.py` and the parent Ambition asset-root helper.

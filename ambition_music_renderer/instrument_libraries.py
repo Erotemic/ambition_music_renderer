@@ -1,546 +1,31 @@
-"""Local SFZ sample-library discovery for MusicIR instrument backends.
+"""Machine-local SFZ discovery for the checked-in instrument catalog.
 
-The renderer keeps high-quality sampled instruments optional.  Scores may ask
-for named local libraries with ``instrument_backend.library_ref`` and the
-renderer will use them when present, otherwise fall back to the existing MIDI /
-SoundFont path with a warning.
+Stable authoring identities and resolver hints live in ``instrument_catalog.yaml``.
+This module owns only filesystem discovery and resolution against the current
+machine.  Generated census/report files under ``AMBITION_AUDIO_TOOLS_ROOT`` are
+evidence about that machine, not authoring vocabulary.
 """
 
 from __future__ import annotations
 
 import functools
 import os
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
+
+from .instrument_catalog import (
+    InstrumentCatalogEntry,
+    ResolverHints,
+    get_instrument_catalog_entry,
+    instrument_catalog,
+    instrument_source_catalog,
+)
 
 
 DEFAULT_AUDIO_TOOLS_ROOTS = (
     Path("/data/audio-tools"),
     Path.home() / "data" / "music",
 )
-
-
-@dataclass(frozen=True)
-class SfzLibraryAlias:
-    """Search hints for a named SFZ library family."""
-
-    ref: str
-    required_any: tuple[tuple[str, ...], ...] = ()
-    prefer: tuple[str, ...] = ()
-    avoid: tuple[str, ...] = ()
-
-
-ALIASES: dict[str, SfzLibraryAlias] = {
-    # FreePats pianos downloaded by download_ambition_audio_tools.sh
-    "freepats.upright_piano_kw": SfzLibraryAlias(
-        ref="freepats.upright_piano_kw",
-        required_any=(("upright", "pianokw"), ("upright", "piano", "kw")),
-        prefer=("upright", "piano", "flac", "sfz"),
-    ),
-    "freepats.salamander_grand": SfzLibraryAlias(
-        ref="freepats.salamander_grand",
-        required_any=(("salamander",), ("grand", "piano")),
-        prefer=("salamander", "grand", "piano", "flac", "sfz"),
-        avoid=("16bit", "ogg"),
-    ),
-    "piano.acoustic": SfzLibraryAlias(
-        ref="piano.acoustic",
-        required_any=(("piano",), ("salamander",), ("upright",)),
-        prefer=("salamander", "upright", "grand", "piano", "flac"),
-    ),
-    # Virtual Playing Orchestra downloaded by download_ambition_audio_tools.sh
-    "vpo.strings": SfzLibraryAlias(
-        ref="vpo.strings",
-        required_any=(("virtual", "playing", "orchestra", "strings"), ("vpo", "strings"), ("strings",)),
-        prefer=("all strings", "section", "sec", "panned", "sustain", "sus", "ensemble", "strings"),
-        avoid=("pizz", "spicc", "stacc", "trem", "trill", "solo", "violin", "viola", "cello"),
-    ),
-    "vpo.violin": SfzLibraryAlias(
-        ref="vpo.violin",
-        required_any=(("virtual", "playing", "orchestra", "violin"), ("vpo", "violin"), ("violin",)),
-        prefer=("solo", "sustain", "sus", "violin"),
-        avoid=("pizz", "spicc", "stacc", "trem", "trill"),
-    ),
-    "vpo.violin_solo_perf": SfzLibraryAlias(
-        ref="vpo.violin_solo_perf",
-        required_any=(("virtual", "playing", "strings", "1st", "violin", "solo", "perf"),),
-        prefer=("1st violin solo perf", "solo perf", "1st violin", "violin"),
-        avoid=("ks", "staccato", "pizzicato", "tremolo", "accent", "section", "sec", "panned"),
-    ),
-    "vpo.brass": SfzLibraryAlias(
-        ref="vpo.brass",
-        required_any=(("virtual", "playing", "orchestra", "brass"), ("vpo", "brass"), ("brass",)),
-        prefer=("all brass", "section", "sec", "panned", "sustain", "sus", "brass", "horns"),
-        avoid=("stacc", "marcato", "fall", "solo", "trombone", "tuba"),
-    ),
-    "vpo.woodwinds": SfzLibraryAlias(
-        ref="vpo.woodwinds",
-        required_any=(("virtual", "playing", "orchestra", "woodwinds"), ("vpo", "woodwinds"), ("woodwinds",)),
-        prefer=("sustain", "sus", "flute", "clarinet", "ensemble"),
-        avoid=("stacc", "flutter", "trill"),
-    ),
-    "vpo.piccolo_solo_perf": SfzLibraryAlias(
-        ref="vpo.piccolo_solo_perf",
-        required_any=(("virtual", "playing", "woodwinds", "piccolo", "solo", "perf"),),
-        prefer=("piccolo solo perf", "solo perf", "piccolo"),
-        avoid=("ks", "staccato", "accent", "section", "sec", "panned"),
-    ),
-    "vpo.flute_solo_perf": SfzLibraryAlias(
-        ref="vpo.flute_solo_perf",
-        required_any=(("virtual", "playing", "woodwinds", "flute", "solo", "perf"),),
-        prefer=("woodwinds flute solo perf", "flute solo perf", "solo perf", "flute"),
-        avoid=("alto flute", "bass flute", "ks", "staccato", "accent", "section", "sec", "panned"),
-    ),
-    "vpo.oboe_solo_perf": SfzLibraryAlias(
-        ref="vpo.oboe_solo_perf",
-        required_any=(("virtual", "playing", "woodwinds", "oboe", "solo", "perf"),),
-        prefer=("oboe solo perf", "solo perf", "oboe"),
-        avoid=("ks", "staccato", "accent", "section", "sec", "panned"),
-    ),
-    "vpo.clarinet_solo_perf": SfzLibraryAlias(
-        ref="vpo.clarinet_solo_perf",
-        required_any=(("virtual", "playing", "woodwinds", "clarinet", "solo", "perf"),),
-        prefer=("clarinet solo perf", "solo perf", "clarinet"),
-        avoid=("bass clarinet", "contrabass", "ks", "staccato", "accent", "section", "sec", "panned"),
-    ),
-    "vpo.timpani_hit": SfzLibraryAlias(
-        ref="vpo.timpani_hit",
-        required_any=(("virtual", "playing", "percussion", "timpani", "hit"),),
-        prefer=("timpani hit", "timpani"),
-        avoid=("roll", "ks"),
-    ),
-    "vpo.choir": SfzLibraryAlias(
-        ref="vpo.choir",
-        required_any=(("virtual", "playing", "orchestra", "vocals"), ("vpo", "vocals"), ("choir",), ("voice",)),
-        prefer=("choir", "aah", "ooh", "sustain", "vocals"),
-    ),
-    "vpo.choir_male": SfzLibraryAlias(
-        ref="vpo.choir_male",
-        required_any=(
-            ("virtual", "playing", "orchestra", "vocals", "male"),
-            ("vpo", "vocals", "male"),
-            ("choir", "male"),
-            ("male", "voice"),
-        ),
-        prefer=("male", "men", "baritone", "bass", "choir", "sustain", "vocals"),
-        avoid=("female", "soprano", "alto"),
-    ),
-    "winds.alto_sax": SfzLibraryAlias(
-        ref="winds.alto_sax",
-        required_any=(("alto", "sax"), ("alto", "saxophone"), ("sax", "alto")),
-        prefer=("alto", "sax", "saxophone", "solo", "sustain", "legato", "normal"),
-        avoid=("baritone", "tenor", "soprano", "staccato", "growl", "fx", "noise"),
-    ),
-    "winds.tenor_sax": SfzLibraryAlias(
-        ref="winds.tenor_sax",
-        required_any=(("tenor", "sax"), ("tenor", "saxophone"), ("sax", "tenor")),
-        prefer=("tenor", "sax", "saxophone", "solo", "sustain", "legato", "forte", "condenser", "normal"),
-        avoid=("alto", "baritone", "soprano", "staccato", "growl", "fx", "noise"),
-    ),
-    # Manual-download families from the generated checklist.  These aliases are
-    # deliberately broad so browser-downloaded archives under sfz/manual work.
-    "guitar.clean": SfzLibraryAlias(
-        ref="guitar.clean",
-        required_any=(("guitar",), ("shinyguitar",), ("emilyguitar",), ("black", "green")),
-        prefer=("shinyguitar", "black", "green", "clean", "sustain", "sus", "long", "mic", "hollowbody", "emily", "guitar"),
-        avoid=("mute", "choke", "noise", "scrape", "feedback", "staccato"),
-    ),
-    "guitar.electric_lead": SfzLibraryAlias(
-        ref="guitar.electric_lead",
-        required_any=(("guitar",), ("shinyguitar",), ("emilyguitar",), ("black", "green")),
-        prefer=("shinyguitar", "lead", "sustain", "sus", "long", "electric", "pickup", "guitar", "black", "green"),
-        avoid=("mute", "choke", "noise", "scrape", "staccato"),
-    ),
-    "bass.electric": SfzLibraryAlias(
-        ref="bass.electric",
-        required_any=(("electric", "bass"), ("bass", "guitar"), ("growlybass",), ("swagbass",), ("fashionbass",), ("pastabass",)),
-        prefer=("clean", "growlybass", "swagbass", "finger", "pick", "sustain", "growly", "swag", "bass", "electric"),
-        avoid=("slap", "mute", "noise", "trombone", "tuba", "brass", "cello", "orchestra", "strings",
-               "angry", "dirty", "vicious", "excessive", "strange", "shifty", "distort"),
-    ),
-    "bass.upright": SfzLibraryAlias(
-        ref="bass.upright",
-        required_any=(
-            ("upright", "bass"),
-            ("acoustic", "bass"),
-            ("double", "bass", "pizz"),
-            ("contrabass", "pizz"),
-            ("basses", "pizzicato"),
-            ("basses", "pizz"),
-        ),
-        prefer=("notation", "basses pizzicato", "pizzicato", "pizz", "upright", "double bass", "acoustic bass"),
-        avoid=("electric", "bowed", "arco", "sustain", "trombone", "tuba", "cello", "brass"),
-    ),
-    "bass.meatbass_pizz": SfzLibraryAlias(
-        ref="bass.meatbass_pizz",
-        required_any=(("meatbass", "pizz"),),
-        prefer=("04 pizz", "meatbass", "pizz"),
-        avoid=("arco", "map", "legato", "looped", "sustain"),
-    ),
-    "drums.rock": SfzLibraryAlias(
-        ref="drums.rock",
-        required_any=(("drum", "kit"), ("rock", "drum"), ("gogodze",), ("muldjord",), ("salamander", "drum")),
-        prefer=("gogodze", "kit", "drum", "gm", "salamander", "muldjord", "rock"),
-        avoid=("brush", "loop", "timpani", "orchestra", "cymbals only"),
-    ),
-    "vpo.percussion": SfzLibraryAlias(
-        ref="vpo.percussion",
-        required_any=(("virtual", "playing", "orchestra", "percussion"), ("vpo", "percussion"), ("percussion",)),
-        prefer=("bassdrum snare cymbals", "snare", "bassdrum", "cymbals"),
-        avoid=("timpani", "bells", "xylophone", "vibraphone"),
-    ),
-    # Sonatina Symphonic Orchestra and VCSL orchestral roles.  These aliases
-    # intentionally describe musical roles rather than installation-specific paths;
-    # scores keep an audible GM fallback when a sampled patch is unavailable.
-    "orchestra.horns_sustain": SfzLibraryAlias(
-        ref="orchestra.horns_sustain",
-        required_any=(("sonatina", "horns"), ("horns", "sustain"), ("horns", "sus")),
-        prefer=("notation", "horns sustain", "horns sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
-    ),
-    "orchestra.horns_staccato": SfzLibraryAlias(
-        ref="orchestra.horns_staccato",
-        required_any=(("sonatina", "horns"), ("horns", "staccato"), ("horns", "stc")),
-        prefer=("notation", "horns staccato", "horns stc", "staccato", "stc"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
-    ),
-    "orchestra.trumpets_sustain": SfzLibraryAlias(
-        ref="orchestra.trumpets_sustain",
-        required_any=(("sonatina", "trumpets"), ("trumpets", "sustain"), ("trumpets", "sus")),
-        prefer=("notation", "trumpets sustain", "trumpets sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
-    ),
-    "orchestra.trumpets_staccato": SfzLibraryAlias(
-        ref="orchestra.trumpets_staccato",
-        required_any=(("sonatina", "trumpets"), ("trumpets", "staccato"), ("trumpets", "stc")),
-        prefer=("notation", "trumpets staccato", "trumpets stc", "staccato", "stc"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
-    ),
-    "orchestra.trombones_sustain": SfzLibraryAlias(
-        ref="orchestra.trombones_sustain",
-        required_any=(("sonatina", "trombones"), ("trombones", "sustain"), ("trombones", "sus")),
-        prefer=("notation", "trombones sustain", "trombones sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
-    ),
-    "orchestra.trombones_staccato": SfzLibraryAlias(
-        ref="orchestra.trombones_staccato",
-        required_any=(("sonatina", "trombones"), ("trombones", "staccato"), ("trombones", "stc")),
-        prefer=("notation", "trombones staccato", "trombones stc", "staccato", "stc"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "solo", "ks"),
-    ),
-    "orchestra.tuba_sustain": SfzLibraryAlias(
-        ref="orchestra.tuba_sustain",
-        required_any=(("sonatina", "tuba"), ("tuba", "sustain"), ("tuba", "sus")),
-        prefer=("notation", "tuba sustain", "tuba sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "marcato", "solo", "ks"),
-    ),
-    "orchestra.flutes_sustain": SfzLibraryAlias(
-        ref="orchestra.flutes_sustain",
-        required_any=(("sonatina", "flutes"), ("flutes", "sustain"), ("flutes", "sus")),
-        prefer=("notation", "flutes sustain", "flutes sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "flutter", "trill", "solo", "ks"),
-    ),
-    "orchestra.oboes_sustain": SfzLibraryAlias(
-        ref="orchestra.oboes_sustain",
-        required_any=(("sonatina", "oboes"), ("oboes", "sustain"), ("oboes", "sus")),
-        prefer=("notation", "oboes sustain", "oboes sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "trill", "solo", "ks"),
-    ),
-    "orchestra.clarinets_sustain": SfzLibraryAlias(
-        ref="orchestra.clarinets_sustain",
-        required_any=(("sonatina", "clarinets"), ("clarinets", "sustain"), ("clarinets", "sus")),
-        prefer=("notation", "clarinets sustain", "clarinets sus", "sustain", "sus"),
-        avoid=("performance", "includes", "looped", "stacc", "stc", "trill", "solo", "ks"),
-    ),
-    "orchestra.timpani": SfzLibraryAlias(
-        ref="orchestra.timpani",
-        required_any=(("sonatina", "timpani"), ("vcsl", "timpani"), ("timpani",)),
-        prefer=("timpani", "hit", "normal", "notation"),
-        avoid=("roll", "crescendo", "crsc", "tremolo", "mallet"),
-    ),
-    "orchestra.snare": SfzLibraryAlias(
-        ref="orchestra.snare",
-        required_any=(("vcsl", "snare"), ("snare", "drum")),
-        prefer=("snare drum rope tension", "snare drum", "snare", "low"),
-        avoid=("brush", "side", "rim", "stick", "marching tenor", "sample"),
-    ),
-    "orchestra.snare_march": SfzLibraryAlias(
-        ref="orchestra.snare_march",
-        required_any=(
-            ("snare", "rope", "tension"),
-            ("field", "snare"),
-            ("marching", "snare"),
-        ),
-        prefer=("snare drum rope tension", "rope tension", "field snare", "marching snare", "snare drum"),
-        avoid=("modern", "brush", "side", "rim", "stick", "marching tenor", "sample", "roll", "tremolo"),
-    ),
-    "orchestra.snare_roll": SfzLibraryAlias(
-        ref="orchestra.snare_roll",
-        required_any=(
-            ("snare", "roll"),
-            ("snare", "tremolo"),
-            ("rope", "tension", "roll"),
-            ("field", "snare", "roll"),
-        ),
-        prefer=("snare drum rope tension roll", "snare roll", "rope tension roll", "roll", "tremolo", "long"),
-        avoid=("crescendo", "decrescendo", "brush", "side", "rim", "marching tenor", "sample"),
-    ),
-    "orchestra.marching_tenor": SfzLibraryAlias(
-        ref="orchestra.marching_tenor",
-        required_any=(
-            ("marching", "tenor"),
-            ("tenor", "drum"),
-            ("marching", "tom"),
-            ("quad", "drum"),
-            ("quads",),
-        ),
-        prefer=("marching tenor", "tenor drum", "quads", "quad", "marching tom", "toms"),
-        avoid=("sax", "saxophone", "voice", "vocal", "snare", "sample"),
-    ),
-    "orchestra.bass_drum": SfzLibraryAlias(
-        ref="orchestra.bass_drum",
-        required_any=(("vcsl", "bass", "drum"), ("bass", "drum")),
-        prefer=("bass drum 1", "concert bass drum", "bass drum"),
-        avoid=("kit", "kick", "sample", "legacy"),
-    ),
-    "orchestra.cymbal": SfzLibraryAlias(
-        ref="orchestra.cymbal",
-        required_any=(("vcsl", "cymbal"), ("cymbal",)),
-        prefer=("suspended cymbal", "crash cymbal", "cymbal suspended", "crash", "suspended"),
-        avoid=("finger", "hi hat", "hihat", "ride", "china", "sizzle", "sample"),
-    ),
-    # Direct libraries from the pro audio-tools downloader.  These aliases let a
-    # score request a musical role while the local library catalog chooses the
-    # best available SFZ patch.
-    "guitar.hollowbody": SfzLibraryAlias(
-        ref="guitar.hollowbody",
-        required_any=(("black", "green", "guitar"), ("blackandgreenguitars",), ("hollowbody", "guitar")),
-        prefer=("sustain", "sus", "long", "clean", "pickup", "guitar", "green", "black"),
-        avoid=("feedback", "noise", "scrape", "staccato", "mute"),
-    ),
-    "guitar.acoustic": SfzLibraryAlias(
-        ref="guitar.acoustic",
-        required_any=(("acoustic", "guitar"), ("blue", "jeans", "moonbeams"), ("shinyguitar",)),
-        prefer=("acoustic", "mic", "sustain", "long", "chord", "guitar"),
-        avoid=("pickup", "mute", "staccato", "noise", "scrape"),
-    ),
-    "guitar.acoustic_warm": SfzLibraryAlias(
-        ref="guitar.acoustic_warm",
-        required_any=(
-            ("acoustic", "guitar"),
-            ("blue", "jeans", "moonbeams"),
-            ("12", "string", "guitar"),
-            ("twelve", "string", "guitar"),
-            ("shinyguitar",),
-        ),
-        prefer=(
-            "12 string", "twelve string", "blue jeans moonbeams",
-            "jumbo", "dreadnought", "warm", "mic", "sustain", "long",
-            "acoustic", "guitar",
-        ),
-        # Shinyguitar remains an eligible last-resort sampled acoustic, but
-        # prefer another real acoustic when the local library contains one.
-        avoid=("shinyguitar", "pickup", "mute", "staccato", "noise", "scrape", "sample"),
-    ),
-    # Sonatina Symphonic Orchestra string sections (real sampled orchestra).
-    # Prefer the simple "Notation/...Sustain" patches; avoid the keyswitch
-    # "Performance" builds, the include fragments, and the non-sustain articulations.
-    "strings.violin_solo": SfzLibraryAlias(
-        ref="strings.violin_solo",
-        required_any=(("sonatina", "violin", "solo"), ("violin", "solo", "sustain")),
-        prefer=("notation", "violin solo 1 sustain", "sustain"),
-        avoid=("performance", "includes", "looped", "non-vibrato", "pizz", "staccato",
-               "tremolo", "legno", "harmonic", "marcato", "ks", "2"),
-    ),
-    "strings.violins_1": SfzLibraryAlias(
-        ref="strings.violins_1",
-        required_any=(("sonatina", "1st", "violins"), ("1st", "violins", "sustain")),
-        prefer=("notation", "sustain"),
-        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
-               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
-    ),
-    "strings.violins_2": SfzLibraryAlias(
-        ref="strings.violins_2",
-        required_any=(("sonatina", "2nd", "violins"), ("2nd", "violins", "sustain")),
-        prefer=("notation", "sustain"),
-        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
-               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
-    ),
-    "strings.violins_1_staccato": SfzLibraryAlias(
-        ref="strings.violins_1_staccato",
-        required_any=(
-            ("sonatina", "1st", "violins", "staccato"),
-            ("1st", "violins", "staccato"),
-        ),
-        prefer=("notation", "1st violins staccato", "staccato"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
-    ),
-    "strings.violins_2_staccato": SfzLibraryAlias(
-        ref="strings.violins_2_staccato",
-        required_any=(
-            ("sonatina", "2nd", "violins", "staccato"),
-            ("2nd", "violins", "staccato"),
-        ),
-        prefer=("notation", "2nd violins staccato", "staccato"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
-    ),
-    # Marcato (accented) variants — louder/punchier, for cutting over a rock band.
-    "strings.violin_solo_marcato": SfzLibraryAlias(
-        ref="strings.violin_solo_marcato",
-        required_any=(("sonatina", "violin", "solo", "marcato"),),
-        prefer=("notation", "violin solo 1 marcato", "marcato"),
-        avoid=("performance", "includes", "looped", "non-vibrato", " 2", "solo 2"),
-    ),
-    "strings.violins_1_marcato": SfzLibraryAlias(
-        ref="strings.violins_1_marcato",
-        required_any=(("sonatina", "1st", "violins", "marcato"),),
-        prefer=("notation", "1st violins marcato", "marcato"),
-        avoid=("performance", "includes", "looped"),
-    ),
-    "strings.violas": SfzLibraryAlias(
-        ref="strings.violas",
-        required_any=(("sonatina", "violas"), ("violas", "sustain")),
-        prefer=("notation", "violas sustain", "sustain"),
-        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
-               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
-    ),
-    "strings.celli": SfzLibraryAlias(
-        ref="strings.celli",
-        required_any=(("sonatina", "celli"), ("celli", "sustain")),
-        prefer=("notation", "celli sustain", "sustain"),
-        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
-               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
-    ),
-    "strings.celli_staccato": SfzLibraryAlias(
-        ref="strings.celli_staccato",
-        required_any=(
-            ("sonatina", "celli", "staccato"),
-            ("celli", "staccato"),
-        ),
-        prefer=("notation", "celli staccato", "staccato"),
-        avoid=("performance", "includes", "looped", "sustain", "sus", "pizz", "tremolo"),
-    ),
-    "strings.basses": SfzLibraryAlias(
-        ref="strings.basses",
-        required_any=(("sonatina", "basses"), ("basses", "sustain")),
-        prefer=("notation", "basses sustain", "sustain"),
-        avoid=("performance", "includes", "looped", "pizz", "staccato", "tremolo",
-               "legno", "harmonic", "marcato", "ks", "solo", "tenuto", "accent"),
-    ),
-    "epiano.rhodes": SfzLibraryAlias(
-        ref="epiano.rhodes",
-        required_any=(("jrhodes",), ("rhodes",)),
-        prefer=("stereo", "looped", "both", "rhodes"),
-        avoid=("mono", "release", "noise"),
-    ),
-    "bass.growly": SfzLibraryAlias(
-        ref="bass.growly",
-        required_any=(("growlybass",), ("growly", "bass")),
-        # Growlybass ships 7 programs (clean / dirty / angry / vicious / excessive
-        # / strange / shifty). 'clean' is the usable finger-bass; the rest are
-        # distortion/character variants that read as "broken" for a normal bass.
-        prefer=("clean", "finger", "sustain", "sus", "growly", "bass"),
-        avoid=("slap", "mute", "noise", "angry", "dirty", "vicious", "excessive",
-               "strange", "shifty", "distort"),
-    ),
-    "bass.swag": SfzLibraryAlias(
-        ref="bass.swag",
-        required_any=(("swagbass",), ("swag", "bass")),
-        prefer=("finger", "sustain", "swag", "bass"),
-        avoid=("slap", "noise"),
-    ),
-    "guitar.emily": SfzLibraryAlias(
-        ref="guitar.emily",
-        required_any=(("emilyguitar",), ("emily", "guitar")),
-        prefer=("barre", "chord", "sustain", "guitar", "emily"),
-        avoid=("include", "keyswitch", "noise"),
-    ),
-    "bass.black_and_blue": SfzLibraryAlias(
-        ref="bass.black_and_blue",
-        required_any=(("black", "blue", "bass"), ("blackandblue", "bass")),
-        prefer=("babyblue all", "babyblue", "finger", "pick", "sustain", "black and blue", "bass"),
-        avoid=("keysw", "pluck", "ghost", "stac", "btb", "include", "noise"),
-    ),
-    "bass.fashion": SfzLibraryAlias(
-        ref="bass.fashion",
-        required_any=(("fashionbass",), ("fashion", "bass")),
-        prefer=("fashionbass clean", "clean", "finger", "sustain", "fashion", "bass"),
-        avoid=("shifty", "unison", "include", "noise"),
-    ),
-    "bass.pastabass": SfzLibraryAlias(
-        ref="bass.pastabass",
-        required_any=(("pastabass",), ("pasta", "bass")),
-        prefer=("fettuccine", "linguine", "finger", "bass"),
-        avoid=("include", "noise"),
-    ),
-    "drums.big_rusty": SfzLibraryAlias(
-        ref="drums.big_rusty",
-        required_any=(("big", "rusty", "drum"), ("bigrusty", "drum")),
-        prefer=("01 full", "kit", "drum", "big rusty"),
-        avoid=("ekit", "default", "mapping", "include", "noise"),
-    ),
-    "drums.naked": SfzLibraryAlias(
-        ref="drums.naked",
-        required_any=(("naked", "drum"),),
-        prefer=("naked drums gm", "user", "stereo", "gm", "kit", "naked drums"),
-        avoid=("cr", "fr", "ms", "oh", "multi", "include", "noise"),
-    ),
-    "drums.muldjord": SfzLibraryAlias(
-        ref="drums.muldjord",
-        required_any=(("muldjord",),),
-        prefer=("stereo", "kit", "muldjord"),
-        avoid=("include", "multi", "noise"),
-    ),
-    "orchestra.vsco2": SfzLibraryAlias(
-        ref="orchestra.vsco2",
-        required_any=(("vsco",),),
-        prefer=("sustain", "normal", "vsco"),
-        avoid=("include", "keyswitch", "staccato", "noise"),
-    ),
-    "drums.gogodze": SfzLibraryAlias(
-        ref="drums.gogodze",
-        required_any=(("gogodze",), ("phu", "vol", "ii")),
-        prefer=("kit", "drum", "gm", "hi", "47", "13", "gogodze"),
-        avoid=("loop", "timpani", "orchestra"),
-    ),
-    "folk.banjo": SfzLibraryAlias(
-        ref="folk.banjo",
-        required_any=(("ganjo",), ("banjo",)),
-        prefer=("ganjo", "banjo", "instrument", "sfz"),
-        avoid=("samples", "mapping", "readme"),
-    ),
-    "folk.harp": SfzLibraryAlias(
-        ref="folk.harp",
-        required_any=(("etherealwinds", "harp"), ("ewharp",), ("harp",)),
-        prefer=("harp", "normal", "sustain", "etherealwinds", "instrument"),
-        avoid=("gliss", "fx", "voice", "phrase", "raw"),
-    ),
-    "brass.tuba": SfzLibraryAlias(
-        ref="brass.tuba",
-        required_any=(("war", "tuba"), ("tuba",)),
-        prefer=("sustain", "sus", "tuba", "war"),
-        avoid=("stacc", "noise", "yell", "breath"),
-    ),
-    "strings.cello": SfzLibraryAlias(
-        ref="strings.cello",
-        required_any=(("bigcat", "cello"), ("cello",)),
-        prefer=("sustain", "sus", "bowed", "cello", "bigcat"),
-        avoid=("stacc", "pizz", "noise", "slide", "harmonic"),
-    ),
-    "strings.cyborg": SfzLibraryAlias(
-        ref="strings.cyborg",
-        required_any=(("string", "cyborg"), ("cyborg", "strings")),
-        prefer=("sustain", "strings", "ensemble", "cyborg"),
-        avoid=("stacc", "pizz", "noise"),
-    ),
-    "folk.bass_tagelharpa": SfzLibraryAlias(
-        ref="folk.bass_tagelharpa",
-        required_any=(("horse", "pulse"), ("tagelharpa",)),
-        prefer=("horse", "pulse", "pizz", "sustain", "bass"),
-        avoid=("noise", "fx"),
-    ),
-}
 
 
 def _normalize_text(value: str | Path) -> str:
@@ -638,7 +123,58 @@ def _candidate_text(path: Path, roots: Iterable[str | Path] | None = None) -> st
             return _normalize_text(rel)
     return _normalize_text(path.name)
 
-def _matches_required(path_text: str, alias: SfzLibraryAlias) -> bool:
+def _source_relative_tokens(source_info: dict[str, Any]) -> tuple[str, ...]:
+    """Return stable directory tokens for one downloaded sample source.
+
+    The installer owns concrete roots; the catalog owns only the relative
+    source location below an audio-tools tree.  Matching directory tokens
+    lets explicit/custom SFZ roots work without baking ``/data/audio-tools``
+    into authoring semantics.
+    """
+
+    relative_root = str(source_info.get("relative_root") or "").strip()
+    if not relative_root:
+        return ()
+    parts = list(Path(relative_root).parts)
+    if parts and _normalize_text(parts[0]) == "sfz":
+        parts = parts[1:]
+    return tuple(norm for part in parts if (norm := _normalize_text(part)))
+
+
+def _matches_source(path: Path, source_info: dict[str, Any]) -> bool:
+    tokens = _source_relative_tokens(source_info)
+    if not tokens:
+        return False
+    # Use the full path here on purpose. A caller may pass the package
+    # directory itself as an explicit root, in which case a root-relative
+    # candidate no longer contains the source-directory name.
+    text = _normalize_text(path)
+    return all(token in text for token in tokens)
+
+
+def _prefer_catalog_source(
+    candidates: list[Path],
+    entry: InstrumentCatalogEntry | None,
+) -> list[Path]:
+    """Prefer the catalog-declared downloaded source when it is installed.
+
+    A stable role may deliberately have broad compatibility fallbacks, but
+    when its expected source is present it is the canonical realization.
+    This prevents broad aliases such as ``vpo.violin`` or ``drums.rock``
+    from selecting an unrelated compatible patch just because its filename
+    scores well.
+    """
+
+    if entry is None or not entry.source or not entry.resolver.prefer_source:
+        return candidates
+    source_info = instrument_source_catalog().get(entry.source)
+    if not source_info:
+        return candidates
+    preferred = [path for path in candidates if _matches_source(path, source_info)]
+    return preferred or candidates
+
+
+def _matches_required(path_text: str, alias: ResolverHints) -> bool:
     if not alias.required_any:
         return True
     return any(all(token in path_text for token in tokens) for tokens in alias.required_any)
@@ -647,7 +183,7 @@ def _matches_required(path_text: str, alias: SfzLibraryAlias) -> bool:
 def _score_candidate(
     path: Path,
     *,
-    alias: SfzLibraryAlias | None,
+    alias: ResolverHints | None,
     prefer: Iterable[str] = (),
     roots: Iterable[str | Path] | None = None,
 ) -> int:
@@ -704,10 +240,21 @@ def resolve_sfz_reference(
                     glob_candidates.extend(path.resolve() for path in root.glob(explicit))
             glob_candidates = [p for p in glob_candidates if p.is_file() and p.suffix.lower() == ".sfz"]
             if glob_candidates:
-                return sorted(glob_candidates, key=lambda p: (-_score_candidate(p, alias=None, prefer=prefer, roots=search_roots), str(p)))[0]
+                return sorted(
+                    glob_candidates,
+                    key=lambda p: (
+                        -_score_candidate(p, alias=None, prefer=prefer, roots=search_roots),
+                        str(p),
+                    ),
+                )[0]
     if not library_ref:
         return None
-    alias = ALIASES.get(library_ref, SfzLibraryAlias(ref=library_ref, required_any=(tuple(_normalize_text(library_ref).split()),)))
+    entry = get_instrument_catalog_entry(library_ref)
+    alias = (
+        entry.resolver
+        if entry is not None
+        else ResolverHints(required_any=(tuple(_normalize_text(library_ref).split()),))
+    )
     candidates = []
     for path in discover_sfz_files(search_roots):
         text = _candidate_text(path, search_roots)
@@ -715,7 +262,14 @@ def resolve_sfz_reference(
             candidates.append(path)
     if not candidates:
         return None
-    return sorted(candidates, key=lambda p: (-_score_candidate(p, alias=alias, prefer=prefer, roots=search_roots), str(p)))[0]
+    candidates = _prefer_catalog_source(candidates, entry)
+    return sorted(
+        candidates,
+        key=lambda p: (
+            -_score_candidate(p, alias=alias, prefer=prefer, roots=search_roots),
+            str(p),
+        ),
+    )[0]
 
 
 def collect_sfz_library_diagnostics(*, limit: int = 200) -> dict[str, Any]:
@@ -724,12 +278,30 @@ def collect_sfz_library_diagnostics(*, limit: int = 200) -> dict[str, Any]:
     roots = configured_sfz_roots()
     files = discover_sfz_files(roots)
     alias_hits: dict[str, str | None] = {}
-    for name in sorted(ALIASES):
+    expected_missing: list[str] = []
+    catalog = instrument_catalog()
+    for name, entry in sorted(catalog.items()):
         resolved = resolve_sfz_reference(library_ref=name, roots=roots)
         alias_hits[name] = str(resolved) if resolved is not None else None
+        if entry.expected and resolved is None:
+            expected_missing.append(name)
+
+    source_hits: dict[str, str | None] = {}
+    expected_sources_missing: list[str] = []
+    for name, source_info in sorted(instrument_source_catalog().items()):
+        hit = next((path for path in files if _matches_source(path, source_info)), None)
+        source_hits[name] = str(hit) if hit is not None else None
+        if bool(source_info.get("expected", False)) and hit is None:
+            expected_sources_missing.append(name)
+
     return {
         "sfz_roots": [str(root) for root in roots],
         "sfz_count": len(files),
         "sfz_files": [str(path) for path in files[:limit]],
         "alias_hits": alias_hits,
+        "expected_missing": expected_missing,
+        "catalog_instrument_count": len(catalog),
+        "source_hits": source_hits,
+        "expected_sources_missing": expected_sources_missing,
+        "catalog_source_count": len(instrument_source_catalog()),
     }

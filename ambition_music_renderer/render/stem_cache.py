@@ -23,6 +23,7 @@ from typing import Any
 import numpy as np
 import pretty_midi
 
+from ..instrument_resolution import instrument_backend_spec, resolve_instrument_backend
 from .score_core import RENDERER_VERSION
 
 _REGISTER_PROTECTION_MODES = {"instrument_register", "register", "desk_register"}
@@ -67,22 +68,25 @@ def _resolved_sfz_identities(
     *,
     base_dir: Path,
     render_cfg: dict[str, Any],
+    backend: str,
 ) -> dict[str, dict[str, Any] | None]:
     """Record the exact SFZ file each cached instrument would resolve today."""
-    # Keep renderer resolution authoritative. A library_ref can choose a different
-    # file after an audio-library install/update even when the score text is
-    # unchanged, and that must invalidate a cached stem. Import locally to avoid
-    # making the lightweight cache module part of group.py's import surface.
-    from .group import _resolve_instrument_sfz, instrument_backend_spec
-
+    # Resolve through the same canonical plan the renderer executes. A
+    # library_ref can choose a different file after an audio-library
+    # install/update even when the score text is unchanged, and that must
+    # invalidate a cached stem.
     sfizz_cfg = dict(render_cfg.get("sfizz") or {})
+    force_sfz = backend in {"sfizz", "sfizz-render"}
     out: dict[str, dict[str, Any] | None] = {}
     for name in instrument_names:
         inst_backend = instrument_backend_spec(instrument_specs, name)
-        resolved = _resolve_instrument_sfz(
-            inst_backend, base_dir=base_dir, sfizz_cfg=sfizz_cfg
+        plan = resolve_instrument_backend(
+            inst_backend,
+            base_dir=base_dir,
+            sfizz_cfg=sfizz_cfg,
+            force_sfz=force_sfz,
         )
-        out[name] = _file_identity(resolved) if resolved is not None else None
+        out[name] = _file_identity(plan.resolved_sfz) if plan.resolved_sfz is not None else None
     return out
 
 
@@ -132,6 +136,7 @@ def stem_cache_key(
         relevant_names,
         base_dir=Path(spec_path).resolve().parent,
         render_cfg=render_cfg,
+        backend=backend,
     )
 
     payload = {

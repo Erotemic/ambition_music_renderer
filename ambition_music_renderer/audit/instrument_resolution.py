@@ -32,8 +32,8 @@ def _instrument_drives_cc1(inst: dict[str, Any]) -> bool:
     return False
 
 
-def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
-    from ..instrument_libraries import resolve_sfz_reference
+def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
+    from ..instrument_resolution import backend_spec_from_instrument, resolve_instrument_backend
     from ..backends.sfizz_backend import sfz_key_span
     from ..render.backend_notes import backend_note_remap
     from ..render.score_layers import build_score
@@ -67,8 +67,13 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
     for inst in spec.get("instruments", []):
         name = str(inst.get("name"))
         is_drum = bool(inst.get("is_drum"))
-        be = inst.get("instrument_backend") if isinstance(inst.get("instrument_backend"), dict) else {}
-        kind = str(be.get("kind", "")).lower()
+        be = backend_spec_from_instrument(inst)
+        plan = resolve_instrument_backend(
+            be,
+            base_dir=base_dir,
+            sfizz_cfg=sfizz_cfg,
+            default_fallback_backend=sfizz_cfg.get("fallback_backend"),
+        )
         row: dict[str, Any] = {
             "instrument": name,
             "group": inst.get("group", name),
@@ -77,14 +82,10 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
             "part_low": note_lo.get(name),
             "part_high": note_hi.get(name),
         }
-        if kind in ("sfz", "sfizz", "sample", "sampled"):
-            requested = be.get("library_ref") or be.get("sfz") or be.get("library")
-            prefer = [str(x) for x in (be.get("prefer") or [])]
-            resolved = resolve_sfz_reference(
-                be.get("sfz") or be.get("path"),
-                library_ref=be.get("library_ref") or be.get("library"),
-                prefer=prefer, roots=roots,
-            )
+        if plan.wants_sfz:
+            requested = plan.requested
+            prefer = list(plan.prefer)
+            resolved = plan.resolved_sfz
             span = sfz_key_span(str(resolved)) if resolved else None
             authored_pitches = list(pitches.get(name) or [])
             try:
@@ -105,7 +106,10 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                 "prefer": prefer or None,
                 "resolved": str(resolved) if resolved else None,
                 "resolved_name": Path(resolved).name if resolved else None,
-                "fallback_backend": be.get("fallback_backend", sfizz_cfg.get("fallback_backend")),
+                "fallback_backend": plan.fallback_backend,
+                "catalog_ref": plan.library_ref if plan.catalog_entry else None,
+                "expected_catalog_instrument": plan.expected_catalog_instrument,
+                "catalog_usage": list(plan.catalog_entry.usage) if plan.catalog_entry else None,
                 "key_span": list(span) if span else None,
                 "notes_out_of_range": oob,
                 "backend_note_remap": {str(src): dst for src, dst in sorted(note_remap.items())} or None,
@@ -122,9 +126,19 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
                         "CC1 for dynamics can render foreground notes extremely quietly."
                     )
             if resolved is None:
-                row["status"] = "UNRESOLVED → will fall back to GM"
-                warnings.append(f"{name!r}: SFZ {requested!r} did not resolve to any file; "
-                                f"will fall back to GM.")
+                if plan.expected_catalog_instrument:
+                    row["status"] = "MISSING EXPECTED CATALOG INSTRUMENT → fallback"
+                    warnings.append(
+                        f"{name!r}: expected catalog instrument {plan.library_ref!r} did not resolve. "
+                        "The normal Ambition authoring environment is expected to contain it; run or "
+                        "repair download_ambition_audio_tools.sh. Rendering may use the configured fallback."
+                    )
+                else:
+                    row["status"] = "UNRESOLVED → fallback"
+                    warnings.append(
+                        f"{name!r}: SFZ {requested!r} did not resolve to any file; "
+                        "rendering may use the configured fallback."
+                    )
             elif oob and is_drum:
                 # Drum maps use key→piece semantics. Backend note remaps are
                 # applied before this check, so remaining misses really are silent.
@@ -170,7 +184,7 @@ def audit_spec(spec: dict[str, Any]) -> dict[str, Any]:
 
 def audit_file(path: Path) -> dict[str, Any]:
     from ..render.score_core import load_yaml
-    return audit_spec(load_yaml(path))
+    return audit_spec(load_yaml(path), base_dir=path.resolve().parent)
 
 
 def _summary(payload: dict[str, Any]) -> str:

@@ -14,7 +14,8 @@ from typing import Any, Mapping
 
 import yaml
 
-from .instrument_libraries import ALIASES
+from .instrument_catalog import instrument_catalog
+from .instrument_resolution import backend_spec_from_instrument
 from .render.score_core import GM_PROGRAMS
 
 
@@ -29,10 +30,9 @@ class InstrumentChoice:
 
 
 def _backend_fields(row: Mapping[str, Any]) -> tuple[str, str, str]:
-    raw = row.get("instrument_backend")
-    backend = raw if isinstance(raw, Mapping) else {}
-    library_ref = str(backend.get("library_ref") or backend.get("library") or "")
-    sfz_glob = str(backend.get("sfz_glob") or backend.get("sfz") or backend.get("sfz_path") or "")
+    backend = backend_spec_from_instrument(row)
+    library_ref = str(backend.get("library_ref") or "")
+    sfz_glob = str(backend.get("sfz") or "")
     if library_ref:
         mode = "sfz_library"
     elif sfz_glob:
@@ -70,7 +70,7 @@ def gm_program_names() -> tuple[str, ...]:
 
 
 def sfz_library_refs() -> tuple[str, ...]:
-    return tuple(sorted(ALIASES))
+    return tuple(sorted(instrument_catalog()))
 
 
 def safe_variant_slug(value: str) -> str:
@@ -146,8 +146,7 @@ def write_instrument_variant(
         raise ValueError("numeric GM program must be between 0 and 127")
     target["program"] = program
 
-    current_backend = target.get("instrument_backend")
-    current_backend = dict(current_backend) if isinstance(current_backend, Mapping) else {}
+    current_backend = backend_spec_from_instrument(target)
     if backend_mode == "keep":
         pass
     elif backend_mode == "gm":
@@ -156,13 +155,12 @@ def write_instrument_variant(
         ref = library_ref.strip()
         if not ref:
             raise ValueError("SFZ library mode requires a library reference")
-        current_ref = str(current_backend.get("library_ref") or current_backend.get("library") or "")
+        current_ref = str(current_backend.get("library_ref") or "")
         if current_ref == ref:
             backend = current_backend
             backend["kind"] = "sfz"
             backend["library_ref"] = ref
-            for key in ("library", "sfz", "sfz_path", "sfz_glob"):
-                backend.pop(key, None)
+            backend.pop("sfz", None)
         else:
             backend = {"kind": "sfz", "library_ref": ref}
             if isinstance(current_backend.get("settings"), Mapping):
@@ -172,15 +170,14 @@ def write_instrument_variant(
         glob = sfz_glob.strip()
         if not glob:
             raise ValueError("SFZ path mode requires an SFZ path/glob")
-        current_path = str(current_backend.get("sfz_glob") or current_backend.get("sfz") or current_backend.get("sfz_path") or "")
+        current_path = str(current_backend.get("sfz") or "")
         if current_path == glob:
             backend = current_backend
             backend["kind"] = "sfz"
-            backend["sfz_glob"] = glob
-            for key in ("library_ref", "library", "sfz", "sfz_path"):
-                backend.pop(key, None)
+            backend["sfz"] = glob
+            backend.pop("library_ref", None)
         else:
-            backend = {"kind": "sfz", "sfz_glob": glob}
+            backend = {"kind": "sfz", "sfz": glob}
             if isinstance(current_backend.get("settings"), Mapping):
                 backend["settings"] = dict(current_backend["settings"])
         target["instrument_backend"] = backend

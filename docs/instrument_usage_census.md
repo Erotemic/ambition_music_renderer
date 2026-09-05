@@ -1,7 +1,9 @@
 # Instrument usage census
 
-`SFZ_LIBRARY_SUMMARY.txt` answers **what is installed**. The usage census answers
-**how an installed SFZ program can be triggered and controlled**.
+The checked-in `data/instrument_catalog.yaml` answers **what Ambition expects
+authors to be able to request**. `SFZ_LIBRARY_SUMMARY.txt` answers **what is
+installed on this machine**. The usage census answers **how an installed SFZ
+program can be triggered and controlled**.
 
 Generate it after installing/updating `/data/audio-tools`:
 
@@ -15,9 +17,11 @@ By default this writes:
 - `/data/audio-tools/SFZ_USAGE_CENSUS.json` — structured machine-readable handoff
 - `/data/audio-tools/SFZ_USAGE_CENSUS.md` — human/LLM-readable companion
 
-The JSON is the authoritative artifact for tooling. Attach both files to remote
-agents together with the source archive when instrument selection or score
-rendering is part of the task.
+The JSON is authoritative for observations about the current machine. It is
+not the supported-instrument registry. Remote agents can choose normal
+instruments from the checked-in catalog without this file; attach the census
+when they need exact workstation paths, controller/keyswitch details, or
+installation-health evidence.
 
 The census is intentionally static and does **not** synthesize audio. For each
 likely program/entry point it records:

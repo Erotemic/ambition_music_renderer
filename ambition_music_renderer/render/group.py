@@ -11,7 +11,12 @@ import numpy as np
 import pretty_midi
 
 from ..profiler import profile
-from ..instrument_libraries import resolve_sfz_reference
+from ..instrument_resolution import (
+    backend_prefers_procedural_fm,
+    backend_prefers_sfizz,
+    instrument_backend_spec,
+    resolve_instrument_backend,
+)
 from ..audio_utils import coerce_stereo
 from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
@@ -53,26 +58,7 @@ def slice_audio(
     return audio[a:b]
 
 
-@profile
-def instrument_backend_spec(instrument_specs: dict[str, Any], inst_name: str) -> dict[str, Any]:
-    """Return normalized, reusable backend metadata for one instrument."""
-    spec = dict(instrument_specs.get(inst_name, {}) or {})
-    raw = spec.get("instrument_backend", spec.get("backend", {}))
-    if isinstance(raw, str):
-        raw = {"kind": raw}
-    if not isinstance(raw, dict):
-        raw = {}
-    if "sfz" in spec and "sfz" not in raw:
-        raw = {**raw, "sfz": spec["sfz"]}
-    return raw
-
 _WARNED_INSTRUMENT_BACKENDS: set[str] = set()
-
-
-def _is_optional_instrument_backend(spec: dict[str, Any]) -> bool:
-    if "required" in spec:
-        return not bool(spec.get("required"))
-    return bool(spec.get("optional", True))
 
 
 def _warn_instrument_backend_once(key: str, message: str) -> None:
@@ -96,18 +82,6 @@ def _instrument_has_notes(pm: pretty_midi.PrettyMIDI) -> bool:
 
 def _is_effectively_silent(audio: np.ndarray) -> bool:
     return audio.size == 0 or float(np.max(np.abs(audio))) < _SILENT_RENDER_PEAK
-
-
-def _instrument_prefers_sfizz(inst_backend: dict[str, Any]) -> bool:
-    kind = str(inst_backend.get("kind", "")).lower().strip()
-    return kind in {"sfz", "sfizz", "sample", "sampled"} or any(
-        key in inst_backend for key in ("sfz", "library_ref", "library", "sfz_glob")
-    )
-
-
-def _instrument_prefers_procedural_fm(inst_backend: dict[str, Any]) -> bool:
-    kind = str(inst_backend.get("kind", "")).lower().strip()
-    return kind in {"procedural_fm", "fm", "fm_synth", "subtractive_fm"}
 
 
 def _instrument_mix_gain_db(instrument_specs: dict[str, Any], inst_name: str) -> float:
@@ -149,34 +123,6 @@ def _finalize_instrument_mix_audio(
     )
 
 
-def _resolve_instrument_sfz(
-    inst_backend: dict[str, Any],
-    *,
-    base_dir: Path | None,
-    sfizz_cfg: dict[str, Any],
-) -> Path | None:
-    raw_sfz = inst_backend.get("sfz") or inst_backend.get("path") or inst_backend.get("sfz_path")
-    raw_sfz = raw_sfz or inst_backend.get("sfz_glob")
-    library_ref = inst_backend.get("library_ref") or inst_backend.get("library")
-    prefer = inst_backend.get("prefer") or inst_backend.get("prefer_keywords") or []
-    roots = []
-    roots.extend(sfizz_cfg.get("library_roots") or [])
-    roots.extend(inst_backend.get("library_roots") or [])
-    resolved = resolve_sfz_reference(
-        raw_sfz,
-        library_ref=str(library_ref) if library_ref else None,
-        prefer=[str(item) for item in prefer],
-        base_dir=base_dir,
-        roots=roots,
-    )
-    if resolved is not None:
-        return resolved
-    default_sfz = sfizz_cfg.get("default_sfz")
-    if default_sfz:
-        return resolve_sfz_reference(default_sfz, base_dir=base_dir, roots=roots)
-    return None
-
-
 @profile
 def render_group_audio(
     pm: pretty_midi.PrettyMIDI,
@@ -203,11 +149,11 @@ def render_group_audio(
 
     wants_sfizz = backend in {"sfizz", "sfizz-render"}
     has_instrument_sfizz = any(
-        _instrument_prefers_sfizz(instrument_backend_spec(instrument_specs, inst.name))
+        backend_prefers_sfizz(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
     has_instrument_procedural_fm = any(
-        _instrument_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
+        backend_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
     has_instrument_mix_gain = any(
@@ -252,10 +198,17 @@ def render_group_audio(
         for idx, inst in enumerate(insts):
             inst_backend = instrument_backend_spec(instrument_specs, inst.name)
             mix_gain_db = _instrument_mix_gain_db(instrument_specs, inst.name)
-            allow_fallback = _is_optional_instrument_backend(inst_backend) and not strict_backends
-            fallback_backend_name = str(inst_backend.get("fallback_backend", default_fallback_backend))
+            plan = resolve_instrument_backend(
+                inst_backend,
+                base_dir=base_dir,
+                sfizz_cfg=sfizz_cfg,
+                default_fallback_backend=default_fallback_backend,
+                force_sfz=wants_sfizz,
+            )
+            allow_fallback = plan.optional and not strict_backends
+            fallback_backend_name = str(plan.fallback_backend or default_fallback_backend)
             inst_pm = copy_with_instruments(pm, [inst], bpm)
-            if _instrument_prefers_procedural_fm(inst_backend):
+            if plan.wants_procedural_fm:
                 rendered.append(
                     _finalize_instrument_mix_audio(
                         render_procedural_fm(
@@ -273,16 +226,11 @@ def render_group_audio(
                     )
                 )
                 continue
-            sfz_path = _resolve_instrument_sfz(inst_backend, base_dir=base_dir, sfizz_cfg=sfizz_cfg)
+            sfz_path = plan.resolved_sfz
             if sfz_path is not None:
                 sfz_pm = copy_with_instruments(pm, [inst], bpm)
                 apply_backend_note_remap(sfz_pm, inst_backend)
-                settings = dict(sfizz_cfg)
-                settings.update(dict(inst_backend.get("settings") or {}))
-                if "command" in inst_backend:
-                    settings["command"] = inst_backend["command"]
-                if "binary" in inst_backend:
-                    settings["binary"] = inst_backend["binary"]
+                settings = dict(plan.sfizz_settings)
                 try:
                     sfizz_audio = render_sfizz(
                         sfz_pm,
@@ -332,9 +280,9 @@ def render_group_audio(
                             )
                         )
                         continue
-            elif wants_sfizz or _instrument_prefers_sfizz(inst_backend):
-                requested = inst_backend.get("library_ref") or inst_backend.get("library") or inst_backend.get("sfz") or sfizz_cfg.get("default_sfz")
-                if (wants_sfizz and not _is_optional_instrument_backend(inst_backend)) or strict_backends:
+            elif plan.wants_sfz:
+                requested = plan.requested
+                if (wants_sfizz and not plan.optional) or strict_backends:
                     raise FileNotFoundError(
                         f"instrument {inst.name!r} requested SFZ library {requested!r}, but no matching .sfz was "
                         f"found (backend={backend!r}); set render.sfizz.default_sfz or "

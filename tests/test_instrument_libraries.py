@@ -66,7 +66,7 @@ def test_rock_drums_do_not_select_orchestral_percussion(tmp_path: Path):
 
 
 def test_new_real_library_aliases_are_registered():
-    from ambition_music_renderer.instrument_libraries import ALIASES
+    from ambition_music_renderer.instrument_catalog import instrument_catalog
 
     assert {
         "guitar.emily",
@@ -77,7 +77,7 @@ def test_new_real_library_aliases_are_registered():
         "drums.naked",
         "drums.muldjord",
         "orchestra.vsco2",
-    } <= set(ALIASES)
+    } <= set(instrument_catalog())
 
 
 def test_downloaded_role_aliases_resolve_from_stable_names(tmp_path: Path):
@@ -309,3 +309,40 @@ def test_vpo_timpani_hit_alias_prefers_hit_over_roll(tmp_path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("<group>\n", encoding="utf8")
     assert resolve_sfz_reference(library_ref="vpo.timpani_hit", roots=[root]) == wanted.resolve()
+
+
+def test_catalog_source_is_preferred_over_broad_compatible_patch(tmp_path: Path):
+    root = tmp_path / "sfz"
+    sonatina_violin = root / "Sonatina" / "SymphonicOrchestra" / "Strings" / "Violin Solo Sustain.sfz"
+    vpo_violin = root / "Virtual-Playing-Orchestra3" / "Strings" / "1st violin SOLO sustain.sfz"
+    muldjord_helper = root / "DrumGizmo" / "MuldjordKit" / "Multi" / "Ambience left.sfz"
+    gogodze_kit = root / "Karoryfer" / "GogodzePhuVolII" / "Kit.sfz"
+    for path in (sonatina_violin, vpo_violin, muldjord_helper, gogodze_kit):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+
+    assert resolve_sfz_reference(library_ref="vpo.violin", roots=[root]) == vpo_violin.resolve()
+    assert resolve_sfz_reference(library_ref="drums.rock", roots=[root]) == gogodze_kit.resolve()
+
+
+def test_catalog_source_preference_can_be_disabled_for_intentional_role_override(tmp_path: Path):
+    root = tmp_path / "sfz"
+    shiny = root / "Karoryfer" / "Shinyguitar" / "Programs" / "acoustic.sfz"
+    warm = root / "Manual" / "Blue Jeans and Moonbeams" / "12 String Acoustic Guitar Sustain.sfz"
+    for path in (shiny, warm):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+
+    assert resolve_sfz_reference(library_ref="guitar.acoustic_warm", roots=[root]) == warm.resolve()
+
+
+def test_diagnostics_report_missing_expected_download_sources(tmp_path: Path, monkeypatch):
+    sfz = tmp_path / "sfz" / "Virtual-Playing-Orchestra3" / "Strings" / "1st Violins Sustain.sfz"
+    sfz.parent.mkdir(parents=True)
+    sfz.write_text("<group>\n", encoding="utf8")
+    monkeypatch.setenv("AMBITION_AUDIO_TOOLS_ROOT", str(tmp_path))
+
+    report = collect_sfz_library_diagnostics(limit=10)
+    assert report["source_hits"]["virtual_playing_orchestra"] == str(sfz.resolve())
+    assert "virtual_playing_orchestra" not in report["expected_sources_missing"]
+    assert "karoryfer.emilyguitar" in report["expected_sources_missing"]

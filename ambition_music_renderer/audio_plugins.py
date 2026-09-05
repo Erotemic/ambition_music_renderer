@@ -20,9 +20,12 @@ from typing import Any, Iterable
 
 import yaml
 
-from .instrument_libraries import (
-    collect_sfz_library_diagnostics,
-    resolve_sfz_reference,
+from .instrument_libraries import collect_sfz_library_diagnostics
+from .instrument_resolution import (
+    backend_is_optional,
+    backend_spec_from_instrument,
+    normalize_backend_spec,
+    resolve_instrument_backend,
 )
 
 
@@ -317,26 +320,17 @@ def _collect_instrument_backend_specs(score: dict[str, Any]) -> list[tuple[str, 
     for idx, inst in enumerate(instruments):
         if not isinstance(inst, dict):
             continue
-        raw = inst.get("instrument_backend", inst.get("backend", None))
-        if raw is None and "sfz" in inst:
-            raw = {"sfz": inst.get("sfz")}
-        if raw is None:
+        has_backend = any(key in inst for key in ("instrument_backend", "backend", "sfz"))
+        if not has_backend:
             continue
-        if isinstance(raw, str):
-            raw = {"kind": raw}
-        if not isinstance(raw, dict):
-            raw = {}
-        if "sfz" in inst and "sfz" not in raw:
-            raw = {**raw, "sfz": inst["sfz"]}
+        backend = backend_spec_from_instrument(inst)
         name = inst.get("name", idx)
-        specs.append((f"$.instruments[{idx}]({name}).instrument_backend", raw))
+        specs.append((f"$.instruments[{idx}]({name}).instrument_backend", backend))
     return specs
 
 
 def _spec_missing_severity(spec: dict[str, Any]) -> str:
-    if "required" in spec:
-        return "error" if bool(spec.get("required")) else "warning"
-    return "warning" if bool(spec.get("optional", True)) else "error"
+    return "warning" if backend_is_optional(normalize_backend_spec(spec)) else "error"
 
 
 def validate_instrument_backend_spec(
@@ -347,16 +341,14 @@ def validate_instrument_backend_spec(
     """Return warnings/errors for one instrument backend spec."""
 
     messages: list[dict[str, Any]] = []
-    severity = _spec_missing_severity(spec)
-    kind = str(spec.get("kind") or spec.get("type") or "").lower().strip()
-    wants_sfz = kind in {"sfz", "sfizz", "sample", "sampled"} or any(
-        key in spec for key in ("sfz", "sfz_path", "sfz_glob", "library_ref", "library")
-    )
-    if not wants_sfz:
+    canonical = normalize_backend_spec(spec)
+    severity = _spec_missing_severity(canonical)
+    plan = resolve_instrument_backend(canonical, base_dir=base_dir)
+    if not plan.wants_sfz:
         return messages
-    settings = dict(spec.get("settings") or {})
-    binary = str(spec.get("binary", settings.get("binary", "sfizz_render")))
-    renderer = str(settings.get("renderer", spec.get("renderer", "auto"))).lower().strip()
+    settings = dict(plan.sfizz_settings)
+    binary = str(settings.get("binary", "sfizz_render"))
+    renderer = str(settings.get("renderer", canonical.get("renderer", "auto"))).lower().strip()
     if not shutil.which(binary):
         vst3_plugin = settings.get("vst3_plugin") or spec.get("vst3_plugin") or "sfizz"
         vst3_path = resolve_vst3_reference(str(vst3_plugin), base_dir=base_dir)
@@ -371,19 +363,19 @@ def validate_instrument_backend_spec(
                 "severity": severity,
                 "message": f"{binary!r} not found for SFZ instrument rendering",
             })
-    prefer = spec.get("prefer") or spec.get("prefer_keywords") or []
-    resolved = resolve_sfz_reference(
-        spec.get("sfz") or spec.get("path") or spec.get("sfz_path") or spec.get("sfz_glob"),
-        library_ref=spec.get("library_ref") or spec.get("library"),
-        prefer=[str(item) for item in prefer],
-        base_dir=base_dir,
-        roots=spec.get("library_roots") or [],
-    )
+    resolved = plan.resolved_sfz
     if resolved is None:
-        requested = spec.get("library_ref") or spec.get("library") or spec.get("sfz") or spec.get("sfz_path") or spec.get("sfz_glob")
+        requested = plan.requested
+        if plan.expected_catalog_instrument:
+            message = (
+                f"expected Ambition catalog instrument did not resolve: {plan.library_ref!r}; "
+                "run or repair download_ambition_audio_tools.sh"
+            )
+        else:
+            message = f"SFZ library reference did not resolve: {requested!r}"
         messages.append({
             "severity": severity,
-            "message": f"SFZ library reference did not resolve: {requested!r}",
+            "message": message,
         })
     else:
         missing = _sfz_missing_samples(Path(resolved))

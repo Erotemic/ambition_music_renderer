@@ -25,7 +25,8 @@ import sys
 from typing import Any, Iterable, Mapping, Sequence
 
 from .audit.sfz_measurement import sfz_regions, sfz_startup_cc
-from .instrument_libraries import ALIASES, configured_sfz_roots, discover_sfz_files, resolve_sfz_reference
+from .instrument_catalog import instrument_catalog
+from .instrument_libraries import configured_sfz_roots, discover_sfz_files, resolve_sfz_reference
 
 
 SCHEMA = "ambition.sfz_usage_census.v1"
@@ -334,7 +335,7 @@ def analyze_sfz_usage(
 
 def _alias_reverse_map(roots: Sequence[Path]) -> dict[Path, list[str]]:
     reverse: dict[Path, list[str]] = defaultdict(list)
-    for alias in sorted(ALIASES):
+    for alias in sorted(instrument_catalog()):
         resolved = resolve_sfz_reference(library_ref=alias, roots=roots)
         if resolved is not None:
             reverse[resolved.resolve()].append(alias)

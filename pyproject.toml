@@ -52,3 +52,6 @@ ambition-music-renderer = "ambition_music_renderer.cli:main"
 include = ["ambition_music_renderer*"]
 exclude = ["scores*", "tests*"]
 
+
+[tool.setuptools.package-data]
+ambition_music_renderer = ["data/*.yaml"]

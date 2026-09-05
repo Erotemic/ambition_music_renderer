@@ -19,6 +19,7 @@ import numpy as np
 import pretty_midi
 import librosa
 from ..backends.sfizz_backend import render_sfizz, sfz_key_span
+from ..instrument_catalog import sfz_smoke_profile_specs
 from ..instrument_libraries import configured_sfz_roots, resolve_sfz_reference
 from .sfz_measurement import repeat_variation, select_regions
 
@@ -46,27 +47,35 @@ class SmokeCandidate:
     repeat_count: int = 8
 
 
-# These are the patches SOL identified as useful for the fast rock cue.  Paths
-# are relative to an SFZ root when the archive has a stable upstream layout;
-# aliases are used for families whose chosen program name is installation data.
-CANDIDATES: tuple[SmokeCandidate, ...] = (
-    SmokeCandidate("emily_basic", "Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz", family="guitar", articulation="basic", probes=(48, 55, 60), pitch_probe=False),
-    SmokeCandidate("emily_chords", library_ref="guitar.emily", prefer=("chords", "emily"), family="guitar", articulation="power-chord", probes=(40, 48, 55), pitch_probe=False, keyswitch_probes=(33, 34, 35)),
-    SmokeCandidate("emily_chords_wide", "Karoryfer/Emilyguitar/Emilyguitar/emily_chords_wide.sfz", family="guitar", articulation="wide-power-chord", probes=(40, 48, 55), pitch_probe=False, keyswitch_probes=(33, 34, 35)),
-    SmokeCandidate("blackgreen_green", "Karoryfer/BlackAndGreenGuitars/Programs/01-green_keyswitch.sfz", family="guitar", articulation="green", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
-    SmokeCandidate("blackgreen_black", "Karoryfer/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz", family="guitar", articulation="black", probes=(52, 60, 67), keyswitch_probes=(36, 37, 38)),
-    SmokeCandidate("blackgreen_twang", "Karoryfer/BlackAndGreenGuitars/Programs/04-green_twang.sfz", family="guitar", articulation="twang", probes=(52, 60, 67)),
-    SmokeCandidate("blackgreen_staccato", "Karoryfer/BlackAndGreenGuitars/Programs/05-green_staccato.sfz", family="guitar", articulation="staccato", probes=(52, 60, 67)),
-    SmokeCandidate("shiny_electric", "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz", family="guitar", articulation="electric-sustain", startup_cc=((100, 64), (107, 127)), probes=(37, 52, 64, 76)),
-    SmokeCandidate("growlybass", library_ref="bass.growly", family="bass", articulation="clean-finger", probes=(36, 43, 52)),
-    SmokeCandidate("swagbass", library_ref="bass.swag", family="bass", articulation="clean-finger", probes=(36, 43, 52)),
-    SmokeCandidate("black_and_blue_bass", library_ref="bass.black_and_blue", prefer=("babyblue all", "black and blue"), family="bass", articulation="baby-blue", probes=(36, 43, 52)),
-    SmokeCandidate("fashionbass", "Karoryfer/Fashionbass/Fashionbass/fashionbass_clean.sfz", family="bass", articulation="clean", probes=(36, 48, 60)),
-    SmokeCandidate("pastabass", "Karoryfer/Pastabass/Pastabass/linguine.sfz", family="bass", articulation="linguine", probes=(36, 40, 48)),
-    SmokeCandidate("gogodze", "Karoryfer/GogodzePhuVolII/Gogodze_Phu_vol_II/Programs/Kit.sfz", family="drums", articulation="kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("big_rusty", library_ref="drums.big_rusty", prefer=("01 full", "big rusty"), family="drums", articulation="full-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("naked_drums", "WilkinsonAudio/NakedDrums/WilkinsonAudio.NakedDrums-master/Wilkinson Audio/Naked Drums/User/Naked Drums GM.sfz", family="drums", articulation="gm-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
-    SmokeCandidate("muldjord", "DrumGizmo/MuldjordKit/DrumGizmo.MuldjordKit-master/DrumGizmo/MuldjordKit/Stereo/DrumGizmo MuldjordKit.sfz", family="drums", articulation="stereo-kit", probes=(35, 36, 38, 42, 46, 49), drum=True, pitch_probe=False),
+def _smoke_candidate_from_catalog(raw: dict[str, Any]) -> SmokeCandidate:
+    """Build one runtime smoke probe from the checked-in instrument catalog."""
+
+    startup_cc = tuple(
+        (int(controller), int(value))
+        for controller, value in (raw.get("startup_cc") or {}).items()
+    )
+    return SmokeCandidate(
+        name=str(raw["name"]),
+        path=str(raw["path"]) if raw.get("path") else None,
+        library_ref=str(raw["library_ref"]) if raw.get("library_ref") else None,
+        prefer=tuple(str(item) for item in (raw.get("prefer") or [])),
+        family=str(raw.get("family") or "pitched"),
+        articulation=str(raw.get("articulation") or "sustain"),
+        startup_cc=startup_cc,
+        probes=tuple(int(item) for item in (raw.get("probes") or [])),
+        drum=bool(raw.get("drum", False)),
+        pitch_probe=bool(raw.get("pitch_probe", True)),
+        keyswitch_probes=tuple(int(item) for item in (raw.get("keyswitch_probes") or [])),
+        velocity_probes=tuple(int(item) for item in raw.get("velocity_probes", (32, 80, 120))),
+        repeat_count=int(raw.get("repeat_count", 8)),
+    )
+
+
+# Curated real-library probes live beside the supported instrument vocabulary.
+# The audit consumes that authority instead of maintaining a second list of
+# sample paths, aliases, startup controls, and articulation quirks.
+CANDIDATES: tuple[SmokeCandidate, ...] = tuple(
+    _smoke_candidate_from_catalog(raw) for raw in sfz_smoke_profile_specs()
 )
 
 

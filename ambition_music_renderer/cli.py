@@ -20,6 +20,9 @@ Subcommands:
                             scores/active/* plus EXTRA_RADIO_CUES.
     radio render            Render-only for radio cues.
     radio publish           Publish-only for radio cues.
+    instruments list        List the checked-in sampled-instrument vocabulary.
+    instruments describe    Show canonical MusicIR usage and library nuances.
+    instruments doctor      Check the local audio-tools install against expectations.
 
 Pinning a specific render: drop a file named ``published.ogg`` (or a symlink)
 into ``output/<cue>/preview/`` (or ``generated/<cue>/preview/``) and publish
@@ -805,6 +808,112 @@ def cmd_plugins_validate_score(args) -> int:
     return 0 if report.get("ok") or args.warn_only else 1
 
 
+def cmd_instruments_list(args) -> int:
+    """List the checked-in authoring vocabulary without consulting local samples."""
+
+    from .instrument_catalog import instrument_catalog_report
+
+    report = instrument_catalog_report(
+        family=str(args.family) if args.family else None,
+        expected_only=bool(args.expected_only),
+    )
+    if args.json:
+        print(json.dumps(report, indent=2))
+        return 0
+    for row in report["instruments"]:
+        source = row.get("source") or "-"
+        role = row.get("role") or "-"
+        profile = row.get("install_profile") or "-"
+        print(f"{row['ref']:<34} {row['family']:<12} {role:<24} {profile:<8} {source}")
+    print(f"catalog instruments: {report['instrument_count']}")
+    return 0
+
+
+def cmd_instruments_describe(args) -> int:
+    """Describe one stable MusicIR instrument identity and how to author it."""
+
+    from .instrument_catalog import describe_instrument
+
+    try:
+        report = describe_instrument(str(args.ref))
+    except KeyError:
+        print(f"error: unknown instrument catalog ref: {args.ref}", file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        import yaml
+
+        print(yaml.safe_dump(report, sort_keys=False, allow_unicode=True, width=110), end="")
+    return 0
+
+
+def cmd_instruments_doctor(args) -> int:
+    """Compare expected repo-side instruments with the current machine inventory."""
+
+    from .instrument_catalog import instrument_catalog, instrument_catalog_policy, instrument_source_catalog
+    from .instrument_libraries import collect_sfz_library_diagnostics
+
+    catalog = instrument_catalog()
+    diagnostics = collect_sfz_library_diagnostics(limit=int(args.limit))
+    rows = []
+    for ref, entry in sorted(catalog.items()):
+        if not entry.expected:
+            continue
+        resolved = diagnostics["alias_hits"].get(ref)
+        rows.append({
+            "ref": ref,
+            "family": entry.family,
+            "source": entry.source,
+            "install_profile": entry.install_profile,
+            "resolved": resolved,
+            "ok": bool(resolved),
+        })
+    missing = [row for row in rows if not row["ok"]]
+    source_hits = diagnostics.get("source_hits") or {}
+    expected_sources_missing = list(diagnostics.get("expected_sources_missing") or [])
+    expected_source_count = sum(
+        1 for info in instrument_source_catalog().values() if bool(info.get("expected", False))
+    )
+    report = {
+        "schema": "ambition.instrument_environment_report.v1",
+        "policy": instrument_catalog_policy(),
+        "sfz_roots": diagnostics["sfz_roots"],
+        "sfz_count": diagnostics["sfz_count"],
+        "expected_source_count": expected_source_count,
+        "resolved_expected_source_count": expected_source_count - len(expected_sources_missing),
+        "missing_expected_source_count": len(expected_sources_missing),
+        "missing_expected_sources": expected_sources_missing,
+        "source_hits": source_hits,
+        "expected_count": len(rows),
+        "resolved_expected_count": len(rows) - len(missing),
+        "missing_expected_count": len(missing),
+        "missing_expected": [row["ref"] for row in missing],
+        "instruments": rows,
+    }
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print("Expected Ambition instrument environment:")
+        print(f"  sample sources: {report['resolved_expected_source_count']}/{report['expected_source_count']} present")
+        print(f"  catalog refs:   {report['resolved_expected_count']}/{report['expected_count']} resolved")
+        print("  roots:")
+        for root in report["sfz_roots"]:
+            print(f"    {root}")
+        if expected_sources_missing:
+            print("Missing expected sample sources:")
+            for source in expected_sources_missing:
+                print(f"  {source}")
+        if missing:
+            print("Missing expected instrument refs:")
+            for row in missing:
+                print(f"  {row['ref']:<34} source={row.get('source') or '-'}")
+        if expected_sources_missing or missing:
+            print("Run or repair download_ambition_audio_tools.sh; these are catalog expectations, not optional discoveries.")
+    failed = bool(expected_sources_missing or missing)
+    return 0 if not failed or args.warn_only else 1
+
+
 class RenderCommand(kwconf.Config):
     """Render a single cue YAML; optionally publish it to the game assets."""
 
@@ -1079,6 +1188,49 @@ class RadioModal(kwconf.ModalCLI):
     )
 
 
+class InstrumentList(kwconf.Config):
+    """List stable sampled-instrument identities agents can author against."""
+
+    family: str | None = kwconf.Value(None, help="restrict to one catalog family")
+    expected_only: bool = kwconf.Flag(False, help="show only instruments expected in the normal environment")
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_instruments_list(cls.cli(argv=argv, data=kwargs))
+
+
+class InstrumentDescribe(kwconf.Config):
+    """Describe one catalog ref, including MusicIR usage and sample-library nuances."""
+
+    ref: str = kwconf.Value(None, position=1, help="catalog library_ref, e.g. guitar.emily")
+    json: bool = kwconf.Flag(False, help="emit JSON instead of YAML")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_instruments_describe(cls.cli(argv=argv, data=kwargs))
+
+
+class InstrumentDoctor(kwconf.Config):
+    """Check that the current machine satisfies the checked-in instrument catalog."""
+
+    limit: int = kwconf.Value(50, help="maximum discovered SFZ paths retained in diagnostics")
+    warn_only: bool = kwconf.Flag(False, help="return success even when expected catalog instruments are missing")
+    json: bool = kwconf.Flag(False, help="emit JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return cmd_instruments_doctor(cls.cli(argv=argv, data=kwargs))
+
+
+class InstrumentsModal(kwconf.ModalCLI):
+    """Discover the checked-in instrument vocabulary and verify local installation."""
+
+    list = InstrumentList
+    describe = InstrumentDescribe
+    doctor = InstrumentDoctor
+
+
 class PluginDoctor(kwconf.Config):
     fast: bool = kwconf.Flag(False, help="skip plugin-count probes")
 
@@ -1217,6 +1369,7 @@ class AmbitionMusicRendererCLI(kwconf.ModalCLI):
     cue = CueModal
     sandbox = SandboxModal
     radio = RadioModal
+    instruments = InstrumentsModal
     plugins = PluginsModal
     audit = AuditModal
     legacy = LegacyModal

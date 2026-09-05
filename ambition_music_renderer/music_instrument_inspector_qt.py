@@ -57,6 +57,7 @@ from .music_instrument_inspector_model import (
     write_export_document,
     yaml_text,
 )
+from .instrument_resolution import backend_spec_from_instrument
 from .instrument_usage_census import census_by_resolved_path, census_row_is_fresh, default_census_paths, load_usage_census
 from .music_transport_qt import MusicTransport
 from .music_qt_runtime import install_sigint_quit
@@ -359,12 +360,12 @@ class InstrumentInspectorWindow(QMainWindow):
         )
 
     def _resolved_backend_path_fast(self, instrument: dict) -> Path | None:
-        backend = instrument.get("instrument_backend")
-        if not isinstance(backend, dict) or str(backend.get("kind", "")) != "sfz":
+        backend = backend_spec_from_instrument(instrument)
+        if str(backend.get("kind", "")) not in {"sfz", "sfizz", "sample", "sampled"}:
             return None
         # Exact registered aliases from the generated machine-local census are
         # constant-time and already capture the resolver's selected entry point.
-        library_ref = backend.get("library_ref") or backend.get("library")
+        library_ref = backend.get("library_ref")
         if library_ref:
             census_path = self._usage_census_alias_hits.get(str(library_ref))
             if census_path:
@@ -382,12 +383,12 @@ class InstrumentInspectorWindow(QMainWindow):
         return self._resolved_backend_cache[key]
 
     def _instrument_availability(self, instrument: dict) -> tuple[bool, str]:
-        backend = instrument.get("instrument_backend")
-        if not isinstance(backend, dict):
+        backend = backend_spec_from_instrument(instrument)
+        if not backend:
             return True, f"GM / SoundFont · {instrument.get('program', 'default')}"
         kind = str(backend.get("kind", "custom"))
-        ref = backend.get("library_ref") or backend.get("sfz") or backend.get("sfz_glob") or backend.get("path")
-        if kind == "sfz":
+        ref = backend.get("library_ref") or backend.get("sfz")
+        if kind in {"sfz", "sfizz", "sample", "sampled"}:
             resolved = self._resolved_backend_path_fast(instrument)
             if resolved is None or not Path(resolved).is_file():
                 return False, f"SFZ unavailable · {ref or 'unresolved selection'}"
@@ -395,8 +396,8 @@ class InstrumentInspectorWindow(QMainWindow):
         return True, f"{kind} · {ref or 'configured'}"
 
     def _census_row_for_instrument(self, instrument: dict) -> tuple[Path | None, dict | None]:
-        backend = instrument.get("instrument_backend")
-        if not isinstance(backend, dict) or str(backend.get("kind", "")) != "sfz":
+        backend = backend_spec_from_instrument(instrument)
+        if str(backend.get("kind", "")) not in {"sfz", "sfizz", "sample", "sampled"}:
             return None, None
         resolved = self._resolved_backend_path_fast(instrument)
         if resolved is None:
