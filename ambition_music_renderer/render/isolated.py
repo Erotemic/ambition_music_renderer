@@ -37,7 +37,12 @@ from ..audit.spectral_masking_audit import analyze_spectral_masking, write_repor
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
 from ..musicir.model import compiled_score_fingerprint
-from .synth import spec_hash
+from .synth import legacy_spec_hash
+from .dependencies import (
+    RenderDependencyFingerprint,
+    build_render_dependency_fingerprint,
+    dependency_change_summary,
+)
 from .stem_cache import (
     restore_cached_stem,
     stem_cache_key,
@@ -83,6 +88,13 @@ class RenderIsolatedConfig(kwconf.Config):
         "pretty-midi",
         choices=list(BACKEND_CHOICES),
         help="renderer backend",
+    )
+    expected_render_hash: str | None = kwconf.Value(
+        None,
+        help=(
+            "optional parent-computed dependency hash; fail instead of writing into "
+            "the wrong versioned directory if dependencies change mid-launch"
+        ),
     )
     simple_mix: bool = kwconf.Flag(
         False,
@@ -174,6 +186,7 @@ class RenderWorkerPlan:
     spec_path: Path
     outdir: Path
     backend: str
+    render_hash: str
     simple_mix: bool
     full_mix_only: bool
     profile_workers: bool
@@ -193,6 +206,7 @@ def worker_data(plan: RenderWorkerPlan, group: str) -> dict[str, object]:
         "outdir": plan.outdir,
         "group": group,
         "backend": plan.backend,
+        "render_hash": plan.render_hash,
         "skip_section_ogg": bool(plan.simple_mix or plan.full_mix_only),
         "timings_out": worker_timings_path(plan, group),
     }
@@ -513,7 +527,7 @@ def is_render_current(
     spec_path: Path,
     outdir: Path,
     cue_id: str,
-    cue_hash: str,
+    render_dependencies: RenderDependencyFingerprint,
     *,
     simple_mix: bool,
     full_mix_only: bool,
@@ -521,12 +535,8 @@ def is_render_current(
     runtime_stem_gain_mode: str,
     runtime_stem_max_gain_db: float | None,
 ) -> tuple[bool, Path | None, str]:
-    """Return whether rendered music is current for this spec + renderer version.
-
-    The hash already includes the YAML text, renderer version, soundfont, and
-    backend. The mtime check catches manual file copies or partially restored
-    generated directories whose manifest happened to survive.
-    """
+    """Return whether outputs match the canonical render dependency identity."""
+    cue_hash = render_dependencies.short_hash
     manifest_path = _current_manifest_path(outdir, cue_id, cue_hash)
     if not manifest_path.exists():
         return False, None, "missing manifest"
@@ -535,7 +545,12 @@ def is_render_current(
     except Exception as ex:  # noqa: BLE001 - malformed manifests should regenerate.
         return False, manifest_path, f"unreadable manifest: {ex}"
     if manifest.get("hash") != cue_hash:
-        return False, manifest_path, "manifest hash/version does not match"
+        return False, manifest_path, "manifest short hash does not match"
+    dependency_reasons = dependency_change_summary(
+        manifest.get("render_dependencies"), render_dependencies
+    )
+    if dependency_reasons:
+        return False, manifest_path, dependency_reasons[0]
     if bool(manifest.get("simple_mix", False)) != simple_mix:
         return False, manifest_path, "manifest simple_mix mode does not match"
     if bool(manifest.get("full_mix_only", False)) != full_mix_only:
@@ -571,12 +586,26 @@ def is_render_current(
 def _render_main(ns) -> int:
     timings = PhaseTimer()
     spec_path = Path(ns.spec)
-    with timings.phase("load_spec_and_hash"):
+    with timings.phase("load_compile_and_fingerprint"):
         spec = yaml.safe_load(spec_path.read_text())
         render_cfg = spec.get("render", {})
         sr = int(render_cfg.get("sample_rate", 48000))
         soundfont = choose_soundfont(render_cfg.get("soundfont"))
-        cue_hash = spec_hash(spec_path, soundfont, ns.backend)
+        compiled = compile_score(spec)
+        render_dependencies = build_render_dependency_fingerprint(
+            spec_path=spec_path,
+            spec=spec,
+            compiled=compiled,
+            backend=ns.backend,
+            soundfont=soundfont,
+        )
+        cue_hash = render_dependencies.short_hash
+        if ns.expected_render_hash and str(ns.expected_render_hash) != cue_hash:
+            raise RuntimeError(
+                "render dependencies changed after the versioned output directory "
+                f"was selected: expected {ns.expected_render_hash}, now {cue_hash}; retry the render"
+            )
+        legacy_hash = legacy_spec_hash(spec_path, soundfont, ns.backend)
         quality = float(render_cfg.get("ogg_quality", 5.0))
         outdir = Path(ns.outdir)
         outdir.mkdir(parents=True, exist_ok=True)
@@ -586,7 +615,7 @@ def _render_main(ns) -> int:
             spec_path,
             outdir,
             spec["id"],
-            cue_hash,
+            render_dependencies,
             simple_mix=ns.simple_mix,
             full_mix_only=ns.full_mix_only,
             audition_stems=ns.audition_stems,
@@ -619,12 +648,12 @@ def _render_main(ns) -> int:
                 f"render_isolated: regenerating {spec['id']}: {reason}", file=sys.stderr
             )
 
-    with timings.phase("compile_score"):
-        compiled = compile_score(spec)
-        pm = compiled.pm
-        groups = compiled.groups
-        meta = compiled.sections
-        compiled_fingerprint = compiled_score_fingerprint(compiled)
+    # Compilation already happened before currentness so dependency identity and
+    # rendering consume the exact same semantic object.
+    pm = compiled.pm
+    groups = compiled.groups
+    meta = compiled.sections
+    compiled_fingerprint = compiled_score_fingerprint(compiled)
     cue_markers = timeline_markers_from_spec(compiled.normalized_spec, meta)
     cue_metadata = section_chapter_metadata(
         cue_id=str(spec.get("id", spec_path.stem)),
@@ -706,6 +735,7 @@ def _render_main(ns) -> int:
         spec_path=spec_path,
         outdir=outdir,
         backend=ns.backend,
+        render_hash=cue_hash,
         simple_mix=bool(ns.simple_mix),
         full_mix_only=bool(ns.full_mix_only),
         profile_workers=bool(ns.profile_workers),
@@ -1165,7 +1195,9 @@ def _render_main(ns) -> int:
             "canonical_schema": compiled.canonical_schema,
             "normalization_warnings": list(compiled.normalization_warnings),
         },
+        render_dependencies=render_dependencies.manifest_payload(),
     )
+    manifest["legacy_render_hash"] = legacy_hash
     manifest["source_score_sha256"] = authoring.source_score_sha256
     manifest["render_mode"] = "isolated_process_stem_warmmix"
     manifest["simple_mix"] = bool(ns.simple_mix)

@@ -263,8 +263,17 @@ python -m ambition_music_renderer cue validate <cue_id> --strict-schema
 
 Validation reports a deterministic compiled-score fingerprint so refactors can
 distinguish changes to musical semantics from later backend/sample realization
-changes. See `docs/musicir_compilation.md` for the migration contract and
-removal gates.
+changes. The complete render identity is available separately:
+
+```bash
+python -m ambition_music_renderer cue fingerprint <cue_id>
+python -m ambition_music_renderer cue fingerprint <cue_id> --json
+```
+
+That fingerprint includes the compiled music, concrete instrument/sample and
+processing dependencies, renderer implementation, and relevant runtime tools.
+See `docs/musicir_compilation.md` for the compiler migration contract and
+`docs/render_dependencies.md` for render currentness.
 
 ## MusicIR overview
 
@@ -668,6 +677,12 @@ instrument identities, resolver hints, and durable usage caveats belong in
 audio-tools root. If a library needs a durable workaround, encode it in the
 catalog/resolution tooling and cover it with a tooling test.
 
+Render currentness follows only the resources a cue actually resolves to. A
+change to a referenced SFZ/sample, SoundFont, VST3/LV2/external processor, or
+renderer implementation produces a new versioned render identity even when the
+score YAML timestamp is unchanged. Unrelated files elsewhere in the audio-tools
+tree do not invalidate the cue.
+
 ## Package map
 
 ```text
@@ -677,7 +692,7 @@ ambition_music_renderer/
   instrument_catalog.py  checked-in sampled-instrument vocabulary API
   instrument_resolution.py canonical backend normalization/resolution plan
   data/instrument_catalog.yaml expected sources, refs, usage, smoke profiles
-  render/                 MusicIR expansion, rendering, mix/export, bundles
+  render/                 MusicIR expansion, dependency identity, rendering, mix/export, bundles
   audit/                  score/audio diagnostics exposed by the CLI
   backends/               optional sample/plugin adapters
   legacy/                 quarantined helpers awaiting deletion decisions

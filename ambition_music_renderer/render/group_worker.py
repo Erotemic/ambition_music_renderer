@@ -21,7 +21,7 @@ from .export import section_chapter_metadata, timeline_markers_from_spec, write_
 from .group import ensure_audio_length, render_group_audio, slice_audio
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
-from .synth import spec_hash
+from .dependencies import build_render_dependency_fingerprint
 from ..profiler import PhaseTimer, profile
 
 
@@ -49,6 +49,10 @@ class RenderGroupWorkerConfig(kwconf.Config):
     outdir: Path = kwconf.Value(None, parser=Path, required=True, help="render output directory")
     group: str = kwconf.Value(None, required=True, help="stem/group name to render")
     backend: str = kwconf.Value("pretty-midi", help="renderer backend")
+    render_hash: str | None = kwconf.Value(
+        None,
+        help="parent-computed canonical render hash; standalone workers compute it when omitted",
+    )
     skip_section_ogg: bool = kwconf.Flag(
         False,
         help=(
@@ -91,9 +95,19 @@ def _worker_main(ns) -> int:
         sr = int(render_cfg.get("sample_rate", 48000))
         bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
         soundfont = choose_soundfont(render_cfg.get("soundfont"))
-        cue_hash = spec_hash(spec_path, soundfont, ns.backend)
         quality = float(render_cfg.get("ogg_quality", 5.0))
         compiled = compile_score(spec)
+        if ns.render_hash:
+            cue_hash = str(ns.render_hash)
+        else:
+            render_dependencies = build_render_dependency_fingerprint(
+                spec_path=spec_path,
+                spec=spec,
+                compiled=compiled,
+                backend=ns.backend,
+                soundfont=soundfont,
+            )
+            cue_hash = render_dependencies.short_hash
         pm = compiled.pm
         groups = compiled.groups
         meta = compiled.sections

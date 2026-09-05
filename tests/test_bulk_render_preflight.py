@@ -111,3 +111,57 @@ def test_bulk_render_preflight_builds_score_before_first_render(monkeypatch, tmp
     stderr = capsys.readouterr().err
     assert "music render preflight failed before rendering any cue" in stderr
     assert "synthetic MusicIR construction failure" in stderr
+
+
+def test_dependency_refresh_detects_non_yaml_mtime_render_inputs(tmp_path):
+    from ambition_music_renderer.render.generated_layout import compute_score_render_dependencies
+
+    score = tmp_path / "deps.music.yaml"
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "deps",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [
+            {"name": "piano", "group": "music", "program": "acoustic_grand_piano"}
+        ],
+        "motifs": [
+            {"id": "m", "root": "C4", "intervals": [0], "rhythm": [1.0], "velocities": [1.0]}
+        ],
+        "sections": [
+            {
+                "id": "loop",
+                "bars": 1,
+                "harmony": ["C"],
+                "layers": [
+                    {"kind": "motif", "instrument": "piano", "motif": "m", "starts": [[0, 0.0]], "velocity": 90}
+                ],
+            }
+        ],
+    }
+    score.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf8")
+    cue_dir = tmp_path / "generated" / "deps"
+    deps = compute_score_render_dependencies(score, "pretty-midi", spec=spec)
+    run_dir = cue_dir / ".versioned" / deps.short_hash
+    run_dir.mkdir(parents=True)
+    manifest = run_dir / f"deps_{deps.short_hash}.adaptive_manifest.json"
+    manifest.write_text(
+        __import__("json").dumps({"render_dependencies": deps.manifest_payload()}),
+        encoding="utf8",
+    )
+
+    refresh, reason = cli.render_dependencies_need_refresh(score, cue_dir, "pretty-midi")
+    assert not refresh
+    assert reason == "render dependencies current"
+
+    # An audio-domain setting changes the dependency identity even if callers
+    # deliberately preserve the source mtime (the old coarse gate cannot see it).
+    original_mtime = score.stat().st_mtime_ns
+    spec["postprocess"] = {"gain_db": -1.5}
+    score.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf8")
+    import os
+    os.utime(score, ns=(original_mtime, original_mtime))
+
+    refresh, reason = cli.render_dependencies_need_refresh(score, cue_dir, "pretty-midi")
+    assert refresh
+    assert "dependency fingerprint" in reason or "dependencies changed" in reason

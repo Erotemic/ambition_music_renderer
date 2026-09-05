@@ -19,18 +19,39 @@ from scipy import signal
 
 from ..profiler import profile
 from ..audio_utils import coerce_stereo
-from .score_core import RENDERER_VERSION
 
-def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
+def legacy_spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
+    """Return the pre-render-dependency hash for migration diagnostics only.
+
+    New currentness/layout code must use ``render.dependencies``.  Keeping this
+    helper makes old manifests explainable without allowing the hand-bumped
+    renderer version to remain a cache authority.
+    """
+    from .score_core import RENDERER_VERSION
+
     payload = {
         "renderer_version": RENDERER_VERSION,
-        "spec_text": spec_path.read_text(encoding="utf8"),
+        "spec_text": Path(spec_path).read_text(encoding="utf8"),
         "soundfont": str(soundfont_path),
         "backend": backend,
     }
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True).encode("utf8")
     ).hexdigest()[:16]
+
+
+def spec_hash(spec_path: Path, soundfont_path: str, backend: str) -> str:
+    """Compatibility facade for the canonical render-dependency short hash.
+
+    ``soundfont_path`` is retained in the signature for callers from the old
+    API; the canonical builder resolves the score's SoundFont itself so every
+    caller shares one dependency plan.
+    """
+    from .dependencies import render_dependency_fingerprint_for_score
+
+    return render_dependency_fingerprint_for_score(
+        Path(spec_path), backend, soundfont_override=str(soundfont_path)
+    ).short_hash
 
 
 def sanitize_same_pitch_overlaps(

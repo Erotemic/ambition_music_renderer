@@ -368,6 +368,7 @@ def build_manifest(
     sample_rate: int,
     *,
     compiled_score: dict[str, Any] | None = None,
+    render_dependencies: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -389,4 +390,6 @@ def build_manifest(
     }
     if compiled_score is not None:
         manifest["compiled_score"] = dict(compiled_score)
+    if render_dependencies is not None:
+        manifest["render_dependencies"] = dict(render_dependencies)
     return manifest

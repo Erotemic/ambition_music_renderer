@@ -225,6 +225,7 @@ def create_bundle(
             "spec": score_path,
             "outdir": outdir,
             "backend": backend,
+            "expected_render_hash": generated_layout.hash_id if generated_layout is not None else None,
             "runtime_stem_gain_mode": runtime_stem_gain_mode,
             "keep_debug_stems": True,
             "jobs": jobs,

@@ -144,3 +144,22 @@ def test_stem_cache_key_tracks_resolved_sfz_file_identity(tmp_path):
 
     assert before["left"] != after["left"]
     assert before["right"] == after["right"]
+
+
+def test_stem_cache_key_tracks_referenced_sfz_sample_identity(tmp_path):
+    sample = tmp_path / "lead.wav"
+    sample.write_bytes(b"sample-v1")
+    sfz = tmp_path / "lead.sfz"
+    sfz.write_text("<region> sample=lead.wav\n")
+    spec = _score()
+    spec["instruments"][0]["instrument_backend"] = {
+        "kind": "sfz",
+        "sfz": str(sfz),
+    }
+
+    before = _keys(spec, tmp_path)
+    sample.write_bytes(b"sample-v2-with-different-size")
+    after = _keys(spec, tmp_path)
+
+    assert before["left"] != after["left"]
+    assert before["right"] == after["right"]

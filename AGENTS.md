@@ -20,3 +20,12 @@ IMPORTANT: Never add tests for a specific song. Test the renderer, not the conte
 - Do not add snapshots for named cues. Frozen migration fixtures must describe renderer capabilities generically so score edits remain free to evolve.
 - `cue validate <cue>` compiles without synthesis and reports schema normalization plus the `CompiledScore` fingerprint. The fingerprint represents the synthesis/form contract, not a local sample-file realization; use instrument-resolution and render-cache diagnostics for machine-specific backend identity.
 - During this migration, legacy compatibility paths stay in place until tests demonstrate their consumers have moved. Remove them in a later explicit cleanup rather than opportunistically while refactoring another subsystem.
+
+## Render dependency/currentness contract
+
+- `ambition_music_renderer.render.dependencies` is the authority for the static inputs that determine rendered audio. Versioned generated paths, manifests, cue currentness, and stem caching should derive machine/resource identity from that layer instead of inventing another hash.
+- `RENDERER_VERSION` is compatibility/history metadata, not a cache-invalidation responsibility. Do not bump a magic version just to make a renderer code edit take effect; production source/data are fingerprinted automatically.
+- Fingerprint the narrow dependency actually used by a cue: resolved SFZ/include/sample files, selected SoundFont, plugin bundle, processor/model file, executable, etc. Do not hash all of `/data/audio-tools` or a whole plugin root as a shortcut.
+- When adding a synthesis/processing backend whose output depends on a new machine resource, add that dependency to `render.dependencies` and a generic invalidation/locality test in the same change.
+- `cue fingerprint <cue> --json` is the diagnostic surface for explaining current render identity. `audit instrument_drift` may describe historical changes but must not become a second currentness authority.
+- Preserve the old `needs_render()` / `build_score()` interception points while their migration tests exist. New canonical checks may complement those hooks but should not bypass them until an explicit removal change updates the contract.

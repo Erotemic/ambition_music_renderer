@@ -24,7 +24,12 @@ import numpy as np
 import pretty_midi
 
 from ..instrument_resolution import instrument_backend_spec, resolve_instrument_backend
-from .score_core import RENDERER_VERSION
+from .dependencies import (
+    file_identity,
+    renderer_implementation_identity,
+    runtime_environment_identity,
+    sfz_dependency_identity,
+)
 
 _REGISTER_PROTECTION_MODES = {"instrument_register", "register", "desk_register"}
 
@@ -48,18 +53,6 @@ def _event_payload(inst: pretty_midi.Instrument) -> dict[str, Any]:
             for pb in inst.pitch_bends
         ],
     }
-
-
-def _file_identity(path: str | Path) -> dict[str, Any]:
-    """Return path plus cheap content-change identity for one local render input."""
-    resolved = Path(path).expanduser()
-    payload: dict[str, Any] = {"path": str(resolved)}
-    try:
-        stat = resolved.stat()
-    except OSError:
-        return payload
-    payload.update({"size": int(stat.st_size), "mtime_ns": int(stat.st_mtime_ns)})
-    return payload
 
 
 def _resolved_sfz_identities(
@@ -86,7 +79,7 @@ def _resolved_sfz_identities(
             sfizz_cfg=sfizz_cfg,
             force_sfz=force_sfz,
         )
-        out[name] = _file_identity(plan.resolved_sfz) if plan.resolved_sfz is not None else None
+        out[name] = sfz_dependency_identity(plan.resolved_sfz) if plan.resolved_sfz is not None else None
     return out
 
 
@@ -143,11 +136,12 @@ def stem_cache_key(
     )
 
     payload = {
-        "schema": "ambition.stem_cache_key.v1",
-        "renderer_version": RENDERER_VERSION,
+        "schema": "ambition.stem_cache_key.v2",
+        "renderer_implementation": renderer_implementation_identity(),
+        "runtime_environment": runtime_environment_identity(include_export_tools=False),
         "group": str(group),
         "backend": str(backend),
-        "soundfont": _file_identity(str(soundfont)),
+        "soundfont": file_identity(str(soundfont)),
         "sample_rate": int(sample_rate),
         "bpm": float(bpm),
         "total_seconds": float(total_seconds),

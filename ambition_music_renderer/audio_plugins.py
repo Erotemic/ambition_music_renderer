@@ -287,7 +287,7 @@ def _walk_dicts(node: Any, path: str = "$") -> Iterable[tuple[str, dict[str, Any
             yield from _walk_dicts(value, f"{path}[{idx}]")
 
 
-def _collect_effect_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+def collect_effect_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
     specs: list[tuple[str, dict[str, Any]]] = []
     # `effect_chain` is the single cross-backend effects surface; its steps carry
     # nested `effects`/`chain`/`plugins` lists which add_spec() recurses into.
@@ -310,6 +310,11 @@ def _collect_effect_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, An
             for idx, spec in enumerate(_as_list(node.get(key))):
                 add_spec(f"{path}.{key}[{idx}]", spec)
     return specs
+
+
+# Compatibility for any out-of-tree diagnostic code that imported the former
+# private helper during the migration. New code should use collect_effect_specs.
+_collect_effect_specs = collect_effect_specs
 
 
 def _collect_instrument_backend_specs(score: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
@@ -499,7 +504,7 @@ def validate_effect_spec(
 
 
 def validate_score_plugins(score: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
-    specs = _collect_effect_specs(score)
+    specs = collect_effect_specs(score)
     instrument_specs = _collect_instrument_backend_specs(score)
     lv2_uris: set[str] | None = None
     if shutil.which("lv2ls"):

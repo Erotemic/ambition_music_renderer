@@ -1,35 +1,14 @@
-"""Ask what a rendered cue ACTUALLY used, and whether better is available now.
+"""Explain instrument-resolution changes between a recorded render and today.
 
-The render cache is keyed by ``(score YAML, backend)`` — deliberately, because
-the set of installed sample libraries is a 24GB directory tree that is neither
-cheap nor stable to hash, and making it part of the key would invalidate every
-render whenever an unrelated library appeared. See
-``render/generated_layout.py::compute_score_render_hash``.
+Canonical render currentness now lives in ``render.dependencies`` and includes
+the concrete SFZ/sample dependencies selected by a cue.  This audit remains a
+narrow human-facing explanation layer: it compares the latest completed run's
+recorded instrument choices with current resolution and names changes such as
+``solo_violin: GM fallback -> Violin Solo 1 Marcato.sfz``.
 
-The cost of that choice is that installing instruments CANNOT invalidate a
-render. A cue rendered before the SFZ libraries existed keeps its General-MIDI
-audio forever, and no amount of ``--force_render`` reveals which cues those are
-— you either re-render all 85 (49 minutes, mostly wasted) or you guess.
-
-So instead of making the libraries a key, RECORD THE OUTCOME. Every render
-writes down which file each instrument actually resolved to. This module reads
-that record back and re-resolves the same score against the libraries installed
-right now; where the two disagree, the cue would render differently today, and
-that is exactly the set worth re-rendering.
-
-Resolution is a pure function of the score and the installed roots
-(``audit/instrument_resolution.py::audit_spec``), so answering "would this
-change?" costs a YAML parse and a directory scan — not a render.
-
-Three states, and the distinction matters:
-
-* ``unrecorded`` — rendered before fingerprints existed. We genuinely do not
-  know what it used, so it cannot be proven current. Reported separately rather
-  than being quietly lumped in with real drift.
-* ``current`` — the recorded resolution matches what would happen today.
-* ``drifted`` — at least one instrument would resolve differently. The report
-  names the instrument and both sides, because "your music changed" is not
-  actionable and "solo_violin: GM fallback -> Violin Solo 1 Marcato.sfz" is.
+Older runs that predate instrument records remain ``unrecorded``.  The audit is
+therefore useful for history and diagnosis, but it is no longer a second cache
+authority.
 """
 
 from __future__ import annotations
@@ -149,7 +128,7 @@ def drift_for_cue(cue: str) -> CueDrift:
     # Imported here: cli imports this module for the render-time hook, so a
     # module-level import back into cli would be circular.
     from ..cli import find_score, generated_root
-    from ..render.generated_layout import generated_run_layout
+    from ..render.generated_layout import resolve_latest_generated_dir
     from ..render.score_core import load_yaml
 
     score = find_score(cue)
@@ -157,11 +136,11 @@ def drift_for_cue(cue: str) -> CueDrift:
         return CueDrift(cue=cue, state="missing-score", note="no YAML under scores/")
 
     spec = load_yaml(score)
-    layout = generated_run_layout(generated_root() / cue, score, "pretty-midi", spec=spec)
-    if not layout.run_dir.is_dir():
-        return CueDrift(cue=cue, state="unrecorded", note="no render for the current score hash")
+    run_dir = resolve_latest_generated_dir(generated_root() / cue)
+    if not run_dir.is_dir():
+        return CueDrift(cue=cue, state="unrecorded", note="no completed generated render")
 
-    recorded = read_fingerprint(layout.run_dir)
+    recorded = read_fingerprint(run_dir)
     if recorded is None:
         return CueDrift(cue=cue, state="unrecorded", note="render predates instrument fingerprints")
 
@@ -228,25 +207,25 @@ def backfill_fingerprint(cue: str, *, library_mtime: float) -> str:
     module exists to catch.
     """
     from ..cli import find_score, generated_root
-    from ..render.generated_layout import generated_run_layout
+    from ..render.generated_layout import resolve_latest_generated_dir
     from ..render.score_core import load_yaml
 
     score = find_score(cue)
     if score is None:
         return "no-score"
     spec = load_yaml(score)
-    layout = generated_run_layout(generated_root() / cue, score, "pretty-midi", spec=spec)
-    if not layout.run_dir.is_dir():
+    run_dir = resolve_latest_generated_dir(generated_root() / cue)
+    if not run_dir.is_dir():
         return "no-render"
-    if read_fingerprint(layout.run_dir) is not None:
+    if read_fingerprint(run_dir) is not None:
         return "already-recorded"
     try:
-        rendered = layout.run_dir.stat().st_mtime
+        rendered = run_dir.stat().st_mtime
     except OSError:
         return "unreadable"
     if rendered < library_mtime:
         return "predates-libraries"
-    write_fingerprint(layout.run_dir, spec)
+    write_fingerprint(run_dir, spec)
     return "recorded"
 
 

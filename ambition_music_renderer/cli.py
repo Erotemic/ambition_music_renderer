@@ -233,6 +233,46 @@ def needs_render(cue: str, yaml_path: Path, outdir: Path) -> bool:
     return yaml_path.stat().st_mtime > latest.stat().st_mtime
 
 
+def render_dependencies_need_refresh(
+    yaml_path: Path, outdir: Path, backend: str
+) -> tuple[bool, str]:
+    """Cheaply decide whether the current machine/code needs a new render.
+
+    ``needs_render`` remains the historical mtime/output-presence facade.  This
+    companion check closes the migration gap it cannot see: renderer source,
+    runtime/DSP versions, SoundFont contents, or the concrete SFZ/sample files
+    selected by an unchanged score.
+    """
+    from .render.dependencies import dependency_change_summary
+    from .render.generated_layout import (
+        GeneratedRunLayout,
+        compute_score_render_dependencies,
+    )
+    from .render.score_core import load_yaml
+
+    try:
+        spec = load_yaml(yaml_path)
+        current = compute_score_render_dependencies(yaml_path, backend, spec=spec)
+    except Exception as ex:  # Let preflight/render report the actionable error.
+        return True, f"could not compute render dependencies: {ex}"
+    layout = GeneratedRunLayout(cue_dir=Path(outdir), hash_id=current.short_hash)
+    manifest_name = (
+        f"{spec.get('id', Path(yaml_path).stem)}_{current.short_hash}"
+        ".adaptive_manifest.json"
+    )
+    manifest_path = layout.run_dir / manifest_name
+    if not manifest_path.is_file():
+        return True, "no render for current dependency fingerprint"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf8"))
+    except Exception as ex:
+        return True, f"could not read current dependency manifest: {ex}"
+    reasons = dependency_change_summary(manifest.get("render_dependencies"), current)
+    if reasons:
+        return True, reasons[0]
+    return False, "render dependencies current"
+
+
 def python_exe() -> str:
     """Prefer the package venv if it exists, else current interpreter."""
     venv_python = package_dir() / ".venv" / "bin" / "python"
@@ -422,6 +462,8 @@ def render_cue_to_versioned_generated(
     cue_dir = generated_root() / cue
     layout = generated_run_layout(cue_dir, yaml_path, backend)
     outdir = begin_generated_run(layout)
+    render_args = list(extra_args or [])
+    render_args.append(f"--expected_render_hash={layout.hash_id}")
     ok = render_cue(
         cue,
         yaml_path,
@@ -429,18 +471,15 @@ def render_cue_to_versioned_generated(
         backend=backend,
         simple_mix=simple_mix,
         full_mix_only=full_mix_only,
-        extra_args=extra_args,
+        extra_args=render_args,
     )
     if ok:
         mark_generated_run_latest(layout)
-        # Record WHICH instrument files this render actually resolved to. The
-        # run hash covers the score and backend but deliberately not the
-        # installed sample libraries (hashing a 24GB tree is not viable), so
-        # this note is the only way to later ask whether a cue would render
-        # differently now that more instruments exist. See audit/instrument_drift.py.
-        #
-        # Bookkeeping must never fail a good render: a cue that rendered
-        # correctly is still correct if this file could not be written.
+        # Keep the narrow historical instrument-resolution report as a human
+        # diagnostic. Currentness itself is now owned by render_dependencies:
+        # it fingerprints only the SFZ/sample files this cue resolves to rather
+        # than hashing the complete audio-tools tree.
+        # Bookkeeping must never fail a good render.
         try:
             from .audit.instrument_drift import write_fingerprint
             from .render.score_core import load_yaml as _load_yaml
@@ -516,7 +555,16 @@ def _process_simple_mix_cue(
         return "resolve"
     outdir = generated_root() / cue
     if action in ("render", "render-publish"):
-        if force_render or needs_render(cue, yaml_path, outdir):
+        coarse_refresh = needs_render(cue, yaml_path, outdir)
+        dependency_refresh = False
+        dependency_reason = ""
+        if not force_render and not coarse_refresh:
+            dependency_refresh, dependency_reason = render_dependencies_need_refresh(
+                yaml_path, outdir, backend
+            )
+        if force_render or coarse_refresh or dependency_refresh:
+            if dependency_refresh and not coarse_refresh and not force_render:
+                print(f"refresh render {cue}: {dependency_reason}")
             # Batch and single-cue rendering share adaptive-cue mode selection.
             simple_mix, full_mix_only = render_mode_for_cue(cue)
             # ⛔ `--force_render` must reach the ISOLATED renderer, not just
@@ -542,7 +590,7 @@ def _process_simple_mix_cue(
             ):
                 return "render"
         else:
-            print(f"skip render {cue}: YAML unchanged since last render")
+            print(f"skip render {cue}: score and render dependencies unchanged")
     if action in ("publish", "render-publish"):
         if not publish_cue(cue, outdir, dest_root):
             # Compatibility output may still hold publishable mastered previews.
@@ -582,7 +630,13 @@ def _preflight_bulk_render(
             failures.append(f"{cue}: missing YAML")
             continue
         outdir = generated_root() / cue
-        if not force_render and not needs_render(cue, yaml_path, outdir):
+        coarse_refresh = needs_render(cue, yaml_path, outdir)
+        dependency_refresh = False
+        if not force_render and not coarse_refresh:
+            dependency_refresh, _reason = render_dependencies_need_refresh(
+                yaml_path, outdir, backend
+            )
+        if not force_render and not coarse_refresh and not dependency_refresh:
             continue
         try:
             spec = load_yaml(yaml_path)
@@ -1030,6 +1084,49 @@ class ValidateCommand(kwconf.Config):
         return 0
 
 
+class FingerprintCommand(kwconf.Config):
+    """Explain the exact static dependencies that determine a cue render."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    backend: str = kwconf.Value("pretty-midi", choices=list(BACKEND_CHOICES))
+    json: bool = kwconf.Flag(False, help="emit the complete dependency payload")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        candidate = Path(config.cue).expanduser()
+        score = candidate.resolve() if candidate.is_file() else find_score(config.cue)
+        if score is None:
+            print(f"cue not found: {config.cue}", file=sys.stderr)
+            return 2
+        from .render.dependencies import render_dependency_fingerprint_for_score
+        from .render.score_core import load_yaml
+
+        spec = load_yaml(score)
+        result = render_dependency_fingerprint_for_score(
+            score, str(config.backend), spec=spec
+        )
+        report = result.manifest_payload()
+        report["score"] = str(score)
+        report["id"] = spec.get("id")
+        if config.json:
+            print(json.dumps(report, indent=2, sort_keys=True))
+            return 0
+        print(f"{spec.get('id', score.stem)}  {result.short_hash}")
+        print(f"  full fingerprint: {result.fingerprint}")
+        deps = result.payload
+        print(f"  compiled score:   {deps.get('compiled_score_fingerprint')}")
+        impl = (deps.get("renderer_implementation") or {}).get("fingerprint")
+        print(f"  renderer source:  {impl}")
+        instruments = ((deps.get("instrument_resolution") or {}).get("instruments") or {})
+        for name, row in instruments.items():
+            sfz = row.get("resolved_sfz")
+            program = ((sfz or {}).get("program") or {}).get("path") if isinstance(sfz, dict) else None
+            selected = program or row.get("fallback_backend") or row.get("kind") or config.backend
+            print(f"  {name}: {selected}")
+        return 0
+
+
 class PublishCommand(kwconf.Config):
     """Publish newest preview to sandbox assets."""
 
@@ -1162,6 +1259,7 @@ class CueModal(kwconf.ModalCLI):
     render = RenderCommand
     midi = MidiCommand
     validate = ValidateCommand
+    fingerprint = FingerprintCommand
     publish = PublishCommand
     bundle = BundleCommand
 

@@ -82,10 +82,12 @@ a changed note velocity does.
 useful for answering "did the compiler feed different music to the renderer?"
 without confusing that question with local SFZ/SoundFont changes.
 
-This is not yet the final render-cache fingerprint. Machine realization still
-needs the resolved instrument plan, sample/SoundFont identities, effects, and
-renderer implementation identity. Those can be layered on later without
-changing the compiled musical contract.
+This remains distinct from the complete render-cache fingerprint.
+`render.dependencies` layers the compiled fingerprint together with resolved
+instrument/sample/SoundFont identity, processing dependencies, renderer source,
+and relevant runtime tools. See `docs/render_dependencies.md`. Keeping these
+two fingerprints separate lets a migration answer whether the *music* changed
+independently of whether its machine realization changed.
 
 ## Removal gates
 

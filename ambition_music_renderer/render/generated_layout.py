@@ -7,7 +7,7 @@ outputs in content-versioned run directories while exposing stable symlinks for
 humans and tools:
 
 ``generated/<cue>/.versioned/<hash>/``
-    Actual render contents for one renderer/spec hash.
+    Actual render contents for one canonical render-dependency hash.
 ``generated/<cue>/building``
     Symlink to the hash currently being constructed.
 ``generated/<cue>/latest``
@@ -99,17 +99,25 @@ def replace_directory_symlink(link: Path, target: Path) -> bool:
 
 
 @profile
-def compute_score_render_hash(score_path: Path, backend: str, spec: dict | None = None) -> str:
-    """Return the same render hash that ``render.isolated`` will use."""
+def compute_score_render_dependencies(
+    score_path: Path, backend: str, spec: dict | None = None
+):
+    """Return the canonical dependency fingerprint used by ``render.isolated``."""
 
-    from .score_core import choose_soundfont
-    from .synth import spec_hash
+    from .dependencies import render_dependency_fingerprint_for_score
 
     if spec is None:
         spec = yaml.safe_load(Path(score_path).read_text(encoding="utf8")) or {}
-    render_cfg = spec.get("render", {}) or {}
-    soundfont = choose_soundfont(render_cfg.get("soundfont"))
-    return str(spec_hash(Path(score_path), soundfont, backend))
+    return render_dependency_fingerprint_for_score(
+        Path(score_path), backend, spec=spec
+    )
+
+
+@profile
+def compute_score_render_hash(score_path: Path, backend: str, spec: dict | None = None) -> str:
+    """Return the canonical short render hash used for generated paths."""
+
+    return compute_score_render_dependencies(score_path, backend, spec=spec).short_hash
 
 
 @profile
