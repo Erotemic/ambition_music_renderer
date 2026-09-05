@@ -280,9 +280,12 @@ Current layer kinds are implemented in `render/score_layers.py`:
 
 `notes` is the literal-event escape hatch when a composed phrase is clearer as
 explicit events than as a generative layer. Note-producing layers can use
-phrase-level `dynamics`; layers can also carry CC automation. Guitar layers use
-a small performance compiler for string assignment, strum staggering, chugs,
-lead scoops, and explicit double-take authoring.
+phrase-level `dynamics`; layers can also carry CC automation. `chord_hits` can
+optionally roll each chord with `direction: up|down` plus `spread_ms`; use
+`directions` to cycle directions across successive hits. With no direction or
+spread, chord hits remain simultaneous as before. Guitar layers use a small
+performance compiler for string assignment, strum staggering, chugs, lead
+scoops, and explicit double-take authoring.
 `sampled_chord` is for libraries that record a complete chord behind one root
 key: it emits a classified keyswitch followed by exactly one root note, so it
 must not be fed through ordinary chord voicing expansion. The switch is scheduled
