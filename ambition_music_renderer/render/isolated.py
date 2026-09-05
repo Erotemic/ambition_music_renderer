@@ -28,6 +28,7 @@ import kwconf
 import numpy as np
 import yaml
 from ..audio_utils import coerce_stereo
+from ..music_timeline import write_render_authoring_artifacts
 from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio
@@ -36,6 +37,12 @@ from ..audit.spectral_masking_audit import analyze_spectral_masking, write_repor
 from .score_core import choose_soundfont
 from .score_layers import build_score
 from .synth import spec_hash
+from .stem_cache import (
+    restore_cached_stem,
+    stem_cache_key,
+    stem_cache_path,
+    store_cached_stem,
+)
 from ..profiler import PhaseTimer, profile
 from ..kwconf_runner import KwconfCommand
 from .._paths import project_root
@@ -87,8 +94,9 @@ class RenderIsolatedConfig(kwconf.Config):
     audition_stems: bool = kwconf.Flag(
         False,
         help=(
-            "Emit full-length normalized per-group audition stems under preview/. "
-            "Useful with --simple-mix for lean composition review."
+            "Emit full-length per-group review stems under preview/: native-level "
+            "files for recombination plus normalized solo audition files. Useful "
+            "with --simple-mix for lean composition review."
         ),
     )
     runtime_stem_gain_mode: str = kwconf.Value(
@@ -100,6 +108,18 @@ class RenderIsolatedConfig(kwconf.Config):
     keep_debug_stems: bool = kwconf.Flag(
         False,
         help="Keep intermediate .npy stem buffers under scratch_stems/.",
+    )
+    stem_cache: bool = kwconf.Flag(
+        False,
+        help=(
+            "Reuse content-identical rendered stem groups across sibling A/B renders. "
+            "The default cache lives at <outdir-parent>/.stem_cache."
+        ),
+    )
+    stem_cache_dir: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="Override the persistent stem cache directory; also enables stem caching.",
     )
     force: bool = kwconf.Flag(False, help="force regeneration")
     jobs: int = kwconf.Value(
@@ -127,7 +147,7 @@ class RenderIsolatedConfig(kwconf.Config):
         if self.simple_mix and self.full_mix_only:
             raise ValueError("--simple-mix and --full-mix-only are mutually exclusive")
         self.jobs = int(self.jobs)
-        for key in ("spec", "outdir", "timings_out", "profile_out"):
+        for key in ("spec", "outdir", "timings_out", "profile_out", "stem_cache_dir"):
             value = getattr(self, key)
             if value is not None and not isinstance(value, Path):
                 setattr(self, key, Path(value))
@@ -610,6 +630,61 @@ def _render_main(ns) -> int:
     target = int(math.ceil(total * sr))
     group_names = sorted(set(groups.values()))
 
+    # A/B composition edits often change only one stem. The cue hash must still
+    # identify the complete score, but an explicitly enabled stem cache can
+    # restore any group whose expanded MIDI + render settings are byte-for-byte
+    # equivalent to a prior variant. This remains safe in the presence of the
+    # score's shared humanization RNG because the key is built after build_score.
+    stem_cache_enabled = bool(ns.stem_cache or ns.stem_cache_dir is not None)
+    cache_dir: Path | None = None
+    cache_keys: dict[str, str] = {}
+    cache_hits: list[str] = []
+    groups_to_render = list(group_names)
+    if stem_cache_enabled:
+        cache_dir = (
+            Path(ns.stem_cache_dir)
+            if ns.stem_cache_dir is not None
+            else outdir.parent / ".stem_cache"
+        ).resolve()
+        resolved_outdir = outdir.resolve()
+        if cache_dir == resolved_outdir or resolved_outdir in cache_dir.parents:
+            raise ValueError(
+                "--stem-cache-dir must live outside the render outdir so regen/cleanup "
+                "cannot delete the persistent cache"
+            )
+        bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+        cache_misses: list[str] = []
+        with timings.phase("restore_stem_cache", groups=len(group_names)):
+            for group in group_names:
+                key = stem_cache_key(
+                    spec=spec,
+                    spec_path=spec_path,
+                    pm=pm,
+                    groups=groups,
+                    group=group,
+                    backend=ns.backend,
+                    soundfont=soundfont,
+                    sample_rate=sr,
+                    bpm=bpm,
+                    total_seconds=total,
+                )
+                cache_keys[group] = key
+                cached = stem_cache_path(cache_dir, str(spec["id"]), group, key)
+                scratch = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{group}.npy"
+                if cached.exists() and restore_cached_stem(
+                    cached, scratch, expected_samples=target
+                ):
+                    cache_hits.append(group)
+                else:
+                    cache_misses.append(group)
+        groups_to_render = cache_misses
+        print(
+            "render_isolated: stem cache "
+            f"hits={len(cache_hits)}/{len(group_names)} "
+            f"render={','.join(groups_to_render) if groups_to_render else 'none'}",
+            file=sys.stderr,
+        )
+
     # Run per-group workers. Production can keep subprocess isolation, but the
     # profiling/debug path uses direct Python calls so line_profiler sees below
     # the old worker process boundary. Serial/direct execution is also simpler
@@ -631,8 +706,13 @@ def _render_main(ns) -> int:
     )
 
     groups_in_process = bool(getattr(ns, "groups_in_process", False) or ns.profile_workers)
-    jobs = 1 if ns.jobs <= 1 else min(ns.jobs, len(group_names))
-    if groups_in_process and jobs != 1:
+    if not groups_to_render:
+        jobs = 0
+    elif ns.jobs <= 1:
+        jobs = 1
+    else:
+        jobs = min(ns.jobs, len(groups_to_render))
+    if groups_in_process and jobs > 1:
         print(
             "render_isolated: forcing serial in-process group rendering for profiling/debug visibility",
             file=sys.stderr,
@@ -641,12 +721,12 @@ def _render_main(ns) -> int:
     worker_mode = "direct" if groups_in_process else "subprocess"
     with timings.phase(
         "render_group_workers",
-        groups=len(group_names),
+        groups=len(groups_to_render),
         jobs=jobs,
         mode="in-process" if groups_in_process else "subprocess",
     ):
         if jobs == 1:
-            for group in group_names:
+            for group in groups_to_render:
                 start_group = time.perf_counter()
                 if groups_in_process:
                     run_worker_direct(worker_command, worker_plan, group)
@@ -658,14 +738,14 @@ def _render_main(ns) -> int:
                     group=group,
                     mode=worker_mode,
                 )
-        else:
+        elif jobs > 1:
             import time as _time
             import ubelt as ub
 
             with ub.Executor(mode="thread", max_workers=jobs) as pool:
                 futures = {
                     pool.submit(run_worker_subprocess, worker_command, worker_plan, group): (group, _time.perf_counter())
-                    for group in group_names
+                    for group in groups_to_render
                 }
                 for future, (group, start_group) in futures.items():
                     future.result()
@@ -676,7 +756,27 @@ def _render_main(ns) -> int:
                         mode=worker_mode,
                     )
 
-    output_files: dict = {"preview": {}, "adaptive": {}}
+    if stem_cache_enabled and cache_dir is not None:
+        with timings.phase("store_stem_cache", groups=len(groups_to_render)):
+            for group in groups_to_render:
+                scratch = outdir / "scratch_stems" / f"{spec['id']}_{cue_hash}.{group}.npy"
+                cached = stem_cache_path(
+                    cache_dir, str(spec["id"]), group, cache_keys[group]
+                )
+                store_cached_stem(scratch, cached)
+
+    output_files: dict = {"preview": {}, "adaptive": {}, "authoring": {}}
+
+    # Store immutable semantic provenance for read-only authoring frontends.
+    authoring = write_render_authoring_artifacts(
+        score_path=spec_path,
+        spec=spec,
+        pm=pm,
+        section_meta=meta,
+        render_hash=cue_hash,
+        run_dir=outdir,
+    )
+    output_files["authoring"] = authoring.manifest_files(outdir)
 
     # Load all stems into memory once.  These scratch stems are the native
     # post-stem-bus buffers written by the worker.  The mastered full mix should
@@ -825,15 +925,47 @@ def _render_main(ns) -> int:
         for group, audio in sorted(runtime_stem_audio.items())
     }
 
-    # Optional full-length audition stems for composition review. These are
-    # deliberately independent of the adaptive/runtime export set: authors can
-    # combine --simple-mix with --audition-stems to get the mastered soundtrack
-    # plus one comfortably normalized solo file per stem group, without section
-    # stems or runtime/audition maximal previews. Native levels remain available
-    # in diagnostics; these files are only for hearing timbre and arrangement.
+    # Optional full-length review stems for composition work. The native-level
+    # files preserve relative stem balance and are compact enough to keep many
+    # variants around for cross-version recombination. The normalized audition
+    # files remain useful when soloing a quiet part.
+    review_stem_stats: dict[str, dict[str, float]] = {}
     audition_stem_stats: dict[str, dict[str, float]] = {}
+    review_stem_gain_db = 0.0
     if ns.audition_stems:
+        # OGG encoders clip outside [-1, 1]. Apply at most one protective
+        # attenuation shared by every review stem so their relative levels are
+        # preserved across the whole version. Never boost quiet review stems.
+        review_peak = max(
+            (float(np.max(np.abs(audio))) for audio in stem_audio.values() if audio.size),
+            default=0.0,
+        )
+        if review_peak > 0.98:
+            review_stem_gain_db = 20.0 * math.log10(0.98 / review_peak)
+
         for group, audio in sorted(stem_audio.items()):
+            review_audio = _scale_audio(audio, review_stem_gain_db)
+            review_path = (
+                outdir
+                / "preview"
+                / f"{spec['id']}_{cue_hash}.review_stem_{group}.ogg"
+            )
+            review_meta = dict(cue_metadata)
+            review_meta["PREVIEW_TYPE"] = "review_stem"
+            review_meta["STEM_GROUP"] = group
+            write_ogg_from_audio(
+                review_audio,
+                sr,
+                review_path,
+                quality=quality,
+                keep_wav=False,
+                metadata=review_meta,
+            )
+            output_files["preview"][f"review_stem_{group}"] = str(
+                review_path.relative_to(outdir)
+            )
+            review_stem_stats[group] = _audio_stats(review_audio, sr)
+
             audition = soft_limit(audio, target_peak_db=-2.5, drive=1.0, normalize=True)
             audition_path = (
                 outdir
@@ -1013,10 +1145,18 @@ def _render_main(ns) -> int:
         )
 
     manifest = build_manifest(spec, cue_hash, meta, group_names, output_files, sr)
+    manifest["source_score_sha256"] = authoring.source_score_sha256
     manifest["render_mode"] = "isolated_process_stem_warmmix"
     manifest["simple_mix"] = bool(ns.simple_mix)
     manifest["full_mix_only"] = bool(ns.full_mix_only)
     manifest["audition_stems"] = bool(ns.audition_stems)
+    manifest["stem_cache"] = {
+        "enabled": stem_cache_enabled,
+        "directory": str(cache_dir) if cache_dir is not None else None,
+        "hits": list(cache_hits),
+        "rendered": list(groups_to_render),
+        "keys": dict(cache_keys),
+    }
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db
@@ -1039,6 +1179,8 @@ def _render_main(ns) -> int:
         "runtime_target_peak_db": runtime_target_peak_db,
         "runtime_max_gain_db": runtime_max_gain_db,
         "runtime_previews": runtime_preview_stats,
+        "review_stems": review_stem_stats,
+        "review_stem_gain_db": review_stem_gain_db,
         "audition_stems": audition_stem_stats,
         "adaptive_section_mastering": {
             **section_mastering,
@@ -1069,6 +1211,8 @@ def _render_main(ns) -> int:
         f"full_mix_only={1 if ns.full_mix_only else 0}\n"
         f"audition_stems={1 if ns.audition_stems else 0}\n"
         f"keep_debug_stems={1 if ns.keep_debug_stems else 0}\n"
+        f"stem_cache={1 if stem_cache_enabled else 0}\n"
+        f"stem_cache_dir={shlex.quote(str(cache_dir)) if cache_dir is not None else ''}\n"
         f"runtime_stem_gain_mode={shlex.quote(ns.runtime_stem_gain_mode)}\n"
         f"runtime_stem_max_gain_db={shlex.quote(str(runtime_max_gain_db))}\n"
         'cd "$renderer_dir"\n'
@@ -1078,6 +1222,8 @@ def _render_main(ns) -> int:
         'if [ "${full_mix_only}" -eq 1 ]; then args+=(--full-mix-only); fi\n'
         'if [ "${audition_stems}" -eq 1 ]; then args+=(--audition-stems); fi\n'
         'if [ "${keep_debug_stems}" -eq 1 ]; then args+=(--keep-debug-stems); fi\n'
+        'if [ "${stem_cache}" -eq 1 ]; then args+=(--stem-cache); fi\n'
+        'if [ -n "${stem_cache_dir}" ]; then args+=(--stem-cache-dir "${stem_cache_dir}"); fi\n'
         'python -m ambition_music_renderer.render.isolated "${args[@]}"\n',
         encoding="utf8",
     )
@@ -1113,6 +1259,11 @@ def _render_main(ns) -> int:
                         v
                         for k, v in output_files["preview"].items()
                         if k.startswith("audition_") and not k.startswith("audition_stem_")
+                    ],
+                    "review_stems": [
+                        v
+                        for k, v in output_files["preview"].items()
+                        if k.startswith("review_stem_")
                     ],
                     "audition_stems": [
                         v

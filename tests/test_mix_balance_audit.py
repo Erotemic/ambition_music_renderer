@@ -88,3 +88,14 @@ def test_section_stem_mix_gain_participates_in_budget():
     keys = next(r for r in verse["groups"] if r["group"] == "keys")
     assert keys["section_stem_gain_db"] == -18.0
     assert keys["buried_lead"] is True
+
+
+def test_explicit_state_omission_means_muted_not_native():
+    # Runtime state mixes are sparse mappings.  Once a section has an explicit
+    # state, a group absent from ``stems`` is not mixed at weight 1; it is absent.
+    spec = _base_spec(stems={"keys": 1.0, "guitars": 1.0})
+    payload = mb.audit_spec(spec)
+    verse = payload["sections"][0]
+    perc = next(r for r in verse["groups"] if r["group"] == "perc")
+    assert perc["state_weight"] == 0.0
+    assert perc["budget_db"] < -100.0

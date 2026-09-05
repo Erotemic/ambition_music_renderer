@@ -148,6 +148,8 @@ def build_rerun_script(
     zip_report_bundle: bool,
     render_audio_mode: str = "full",
     audition_stems: bool = False,
+    stem_cache: bool = False,
+    stem_cache_dir: Path | None = None,
     profile_render: bool = False,
     render_in_process: bool = False,
     spectrograms: bool = False,
@@ -180,6 +182,10 @@ def build_rerun_script(
     cmd.extend(["--force", "--render_audio_mode", str(render_audio_mode)])
     if audition_stems:
         cmd.append("--audition_stems")
+    if stem_cache:
+        cmd.append("--stem_cache")
+    if stem_cache_dir is not None:
+        cmd.extend(["--stem_cache_dir", str(stem_cache_dir)])
     if profile_render:
         cmd.append("--profile_render")
     if render_in_process:

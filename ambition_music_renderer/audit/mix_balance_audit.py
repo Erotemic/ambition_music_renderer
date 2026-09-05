@@ -141,8 +141,13 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
         # whether the mix is even *trying* to let the group be heard.
         budget: dict[str, float] = {}
         section_trims = sec_stem_mix_db.get(sec, {})
+        explicit_state_weights = sec in sec_weights
         for grp in energy[sec]:  # only groups that actually sound in this section
-            w = weights.get(grp, 1.0)  # sections without explicit weights play native
+            # Runtime state mixes are sparse: when a state explicitly provides
+            # ``stems``, an omitted group is absent from that mix (weight 0),
+            # not implicitly native/full-scale.  Only sections with no matched
+            # explicit state at all fall back to native weight 1.
+            w = weights.get(grp, 0.0 if explicit_state_weights else 1.0)
             stem_mix_lin = 10.0 ** (float(section_trims.get(grp, 0.0)) / 20.0)
             budget[grp] = max(1e-9, w * group_gain_lin(grp) * stem_mix_lin)
         peak_budget = max(budget.values(), default=1e-9)
@@ -165,7 +170,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
                     "group": grp,
                     "budget_db": round(rel_db, 1),
                     "note_share_db": round(share_db, 1),
-                    "state_weight": round(weights.get(grp, 1.0), 3),
+                    "state_weight": round(weights.get(grp, 0.0 if explicit_state_weights else 1.0), 3),
                     "group_gain_db": round(float((gpp.get(grp) or {}).get("gain_db", 0.0)), 1),
                     "section_stem_gain_db": round(float(section_trims.get(grp, 0.0)), 1),
                     "is_lead": is_lead,
@@ -178,7 +183,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
                     f"buried lead: section '{sec}' group '{grp}' carries "
                     f"{', '.join(sorted(leads[(sec, grp)]))} but its mix budget is "
                     f"{rel_db:.1f} dB below the loudest group "
-                    f"(state_weight={weights.get(grp, 1.0):g}, "
+                    f"(state_weight={weights.get(grp, 0.0 if explicit_state_weights else 1.0):g}, "
                     f"group_gain={float((gpp.get(grp) or {}).get('gain_db', 0.0)):+g}dB, "
                     f"section_stem_gain={float(section_trims.get(grp, 0.0)):+g}dB). "
                     f"Raise its authored section stem trim/state weight or move the lead to a foreground group."

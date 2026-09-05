@@ -88,6 +88,18 @@ class BundleOptions(kwconf.Config):
             "under preview/, without enabling runtime/audition maximal previews"
         ),
     )
+    stem_cache: bool = kwconf.Flag(
+        False,
+        help=(
+            "reuse content-identical stem-group renders across score variants; "
+            "default cache is shared by sibling render outdirs"
+        ),
+    )
+    stem_cache_dir: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="override the persistent stem cache directory; also enables caching",
+    )
     profile_render: bool = kwconf.Flag(
         False,
         help="enable LINE_PROFILE=1 and run render_isolated plus serial workers in-process for line_profiler",
@@ -100,7 +112,7 @@ class BundleOptions(kwconf.Config):
 
     def __post_init__(self) -> None:
         self.jpeg_quality = int(self.jpeg_quality)
-        for key in ("outdir", "bundle_root", "dest_root"):
+        for key in ("outdir", "bundle_root", "dest_root", "stem_cache_dir"):
             value = getattr(self, key)
             if value is not None and not isinstance(value, Path):
                 setattr(self, key, Path(value))

@@ -19,14 +19,18 @@ subject:
   source_kind: generated
   was_latest_render_at_review: true
 current:
-  score: 7.7
-  label: Strong
-  notes: Yeah, this gets my blood pumpin. On the weaker side of the strong tunes we have, but it fits the giant
-    gnu very well. The electric guitar and horns bop. The lumbering bassline is kickin'
+  score: 9.1
+  label: Standout
+  notes: 'Yeah, this gets my blood pumpin. On the weaker side of the strong tunes we have, but it fits the giant
+    gnu very well. The electric guitar and horns bop. The lumbering bassline is kickin''
+
+
+    I had this at a 7.7 previously, idk what I was thinking. I want to listen to this song. I think it probably
+    does need some polish and Eq work, but this is a banger.'
   issues: []
   furthest_played_seconds: 71.758
   furthest_played_fraction: 0.598
   created_at: '2026-08-16T15:40:08Z'
-  updated_at: '2026-08-16T15:40:19Z'
-  reviewed_at: '2026-08-16T15:40:19Z'
+  updated_at: '2026-09-02T00:26:42Z'
+  reviewed_at: '2026-09-02T00:26:42Z'
 history: []

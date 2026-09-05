@@ -91,6 +91,33 @@ The same markers are used as chapter metadata in rendered OGG previews.
 `simple-mix` is the preferred starting point when judging composition. Add
 more render products only when they answer a concrete debugging question.
 
+For repeated A/B edits to one or two parts, enable the content-addressed stem
+cache. The renderer hashes each *expanded* stem group's MIDI events, backend
+configuration, and postprocess settings after score construction. Groups whose
+render inputs are identical to an earlier sibling render are linked/copied from
+the cache; only cache misses synthesize again. This is intentionally stricter
+than comparing YAML blocks because shared humanization can make an earlier edit
+perturb later note timing.
+
+```bash
+AMBITION_AUDIO_TOOLS_ROOT=/data/audio-tools \
+uv run --project tools/ambition_music_renderer \
+  python -m ambition_music_renderer cue bundle \
+  <cue_id> \
+  --backend=auto \
+  --force \
+  --render_audio_mode=simple-mix \
+  --audition_stems \
+  --stem_cache
+```
+
+With an explicit `--outdir`, the default cache is `<outdir-parent>/.stem_cache`,
+so sibling variant directories share it. `--stem_cache_dir <path>` overrides
+that location and also enables caching. The cache directory must stay outside
+the render outdir because regeneration may remove the outdir. `--force` still
+rebuilds the requested output directory but may satisfy content-identical stem
+groups from an explicitly enabled cache.
+
 A compact report archive can be requested independently:
 
 ```bash
@@ -124,8 +151,31 @@ uv run --project tools/ambition_music_renderer \
   --zip_report
 ```
 
-The group audition files are normalized for inspection. They are debugging
-artifacts, not evidence of runtime loudness.
+`--audition_stems` emits two full-length products per group. `review_stem_*`
+keeps the version's relative stem level for cross-version recombination, while
+`audition_stem_*` is normalized for comfortable solo inspection. The normalized
+files are debugging artifacts, not evidence of runtime loudness.
+
+### Standalone Stem Lab
+
+Stem Lab is separate from the music review bank. It does not store ratings or
+pairwise review decisions; it is a playback workspace for loading selected
+render variants and routing each stem from a different version.
+
+```bash
+cd tools/ambition_music_renderer
+./stem_lab.sh --cue <cue_id>
+```
+
+Only a small working set is loaded by default. Versions can be loaded/unloaded
+from the on-disk library, an optional reference can be assigned, and each stem
+can be routed from a different loaded version. A reusable bottom transport
+provides start / play-pause / stop, scrubbing, and source switching while
+preserving the playhead. A synchronized read-only piano roll visualizes the
+expanded rendered notes and their section/bar timing. New renders retain an
+immutable score snapshot and exact note-timeline artifact so that visualization
+stays tied to the audio that produced it. See `docs/stem_lab.md` for the workflow
+and the safety boundary for future editing.
 
 ## CLI map
 
@@ -166,6 +216,14 @@ uv run --project tools/ambition_music_renderer \
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer plugins --help
 ```
+
+## Interactive authoring tools
+
+- `./review_music.sh` — existing render review/rating surface.
+- `./stem_lab.sh` — cross-version stem routing and note inspection.
+- `./instrument_inspector.sh` — standalone GM/SFZ instrument browser, full YAML-backed patch/effect editing, and disposable dry/processed probe auditioning.
+
+The Instrument Inspector does not save MusicIR scores. It can load a score instrument as a starting point and export reusable YAML snippets, but applying those snippets to a composition remains an explicit separate step.
 
 ## Scores
 
@@ -311,8 +369,19 @@ Treat these generated machine-local reports as the source of truth after running
 
 - `/data/audio-tools/SFZ_LIBRARY_SUMMARY.txt` - complete installed `.sfz` path list.
 - `/data/audio-tools/REFERENCE_SFZ_LIBRARY_REPORT.txt` - reference-library inventory.
+- `/data/audio-tools/SFZ_USAGE_CENSUS.json` - generated trigger/controller/keyswitch/sample metadata for remote agents and Instrument Inspector.
+- `/data/audio-tools/SFZ_USAGE_CENSUS.md` - human-readable usage-census companion.
 - `plugins list_sfz_libraries --json` - live resolver view, including `alias_hits`.
 - `plugins validate_score <cue_id>` - final check that a score's requested roles resolve.
+
+Generate the usage census after installing or changing SFZ libraries:
+
+```bash
+cd tools/ambition_music_renderer
+./instrument_usage_census.sh
+```
+
+See `docs/instrument_usage_census.md` for the schema and handoff guidance.
 
 For a remote/online-agent handoff, attach or paste `SFZ_LIBRARY_SUMMARY.txt` (or
 the relevant filtered lines) alongside the source archive. An agent that only

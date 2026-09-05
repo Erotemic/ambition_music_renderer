@@ -156,6 +156,8 @@ def create_bundle(
     runtime_stem_max_gain_db: float | None = None,
     render_audio_mode: str = "full",
     audition_stems: bool = False,
+    stem_cache: bool = False,
+    stem_cache_dir: Path | None = None,
     profile_render: bool = False,
     render_in_process: bool = False,
 ) -> dict[str, object]:
@@ -232,6 +234,8 @@ def create_bundle(
             "simple_mix": render_audio_mode == "simple-mix",
             "full_mix_only": render_audio_mode == "full-mix-only",
             "audition_stems": bool(audition_stems),
+            "stem_cache": bool(stem_cache),
+            "stem_cache_dir": stem_cache_dir,
         }
         line_profile_requested = bool(os.environ.get("LINE_PROFILE"))
         command_mode = "direct" if render_in_process else "subprocess"
@@ -637,6 +641,8 @@ def create_bundle(
         zip_report_bundle,
         render_audio_mode,
         audition_stems,
+        stem_cache,
+        stem_cache_dir,
         profile_render,
         render_in_process,
         write_spectrogram_plots,
@@ -669,6 +675,8 @@ def create_bundle(
         "plot_format": plot_format,
         "render_audio_mode": render_audio_mode,
         "audition_stems": bool(audition_stems),
+        "stem_cache": bool(stem_cache or stem_cache_dir is not None),
+        "stem_cache_dir": str(stem_cache_dir) if stem_cache_dir is not None else None,
         "profile_render": profile_render,
         "render_in_process": render_in_process,
         "render_hash": render_hash,
@@ -747,6 +755,8 @@ def create_bundle_from_config(config: CueBundleConfig) -> dict[str, object]:
         runtime_stem_max_gain_db=config.runtime_stem_max_gain_db,
         render_audio_mode=config.render_audio_mode,
         audition_stems=config.audition_stems,
+        stem_cache=config.stem_cache,
+        stem_cache_dir=config.stem_cache_dir,
         profile_render=config.profile_render,
         render_in_process=config.render_in_process,
     )
