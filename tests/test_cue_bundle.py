@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import soundfile as sf
 
 from ambition_music_renderer.cli import (
@@ -556,6 +557,15 @@ def test_stem_amplitude_report_shows_default_weighted_balance():
 
 
 def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
+    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
+    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
+    # not installed, write a clear note and let the rest of the bundle
+    # succeed" -- so on a machine set up exactly as `python_tools.sh`
+    # intends, this failed on a missing FILE and read as a renderer bug.
+    # The suite already skips for librosa, pyloudnorm, PySide6 and
+    # pedalboard; this is the same move, and the fallback the docstring
+    # promises has its own test below.
+    pytest.importorskip("matplotlib")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         sr = 48_000
@@ -588,6 +598,15 @@ def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
 
 
 def test_stem_loudness_report_writes_tables_and_plot():
+    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
+    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
+    # not installed, write a clear note and let the rest of the bundle
+    # succeed" -- so on a machine set up exactly as `python_tools.sh`
+    # intends, this failed on a missing FILE and read as a renderer bug.
+    # The suite already skips for librosa, pyloudnorm, PySide6 and
+    # pedalboard; this is the same move, and the fallback the docstring
+    # promises has its own test below.
+    pytest.importorskip("matplotlib")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         manifest = {
