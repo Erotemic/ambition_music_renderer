@@ -192,13 +192,18 @@ def _v1_grid(spec: Mapping[str, Any], section_meta: Iterable[Mapping[str, Any]])
     return tuple(rows)
 
 
-def _v2_grid(spec: Mapping[str, Any], pm: Any) -> tuple[TimelineGridLine, ...]:
+def _v2_grid(
+    spec: Mapping[str, Any],
+    pm: Any,
+    *,
+    exact_metadata: Mapping[str, Any] | None = None,
+) -> tuple[TimelineGridLine, ...]:
     from .render.exact_score import ExactTempoMap, ScoreClock
 
     score = dict(spec.get("score") or {})
     clock = ScoreClock(score)
     tempo = ExactTempoMap(score, clock).bind_ppq(clock.ppq)
-    exact_meta = getattr(pm, "_ambition_exact_score", {}) or {}
+    exact_meta = dict(exact_metadata or getattr(pm, "_ambition_exact_score", {}) or {})
     end_tick = int(exact_meta.get("end_tick", 0))
     if end_tick <= 0:
         return ()
@@ -230,9 +235,20 @@ def build_timeline(
     section_meta: Iterable[Mapping[str, Any]],
     *,
     render_hash: str = "",
+    note_events: Iterable[Mapping[str, Any]] | None = None,
+    exact_metadata: Mapping[str, Any] | None = None,
 ) -> MusicTimeline:
-    """Build a compact semantic timeline from the renderer's expanded score."""
-    events = getattr(pm, "_ambition_note_events", ()) or ()
+    """Build a compact semantic timeline from expanded score semantics.
+
+    ``note_events`` / ``exact_metadata`` are the canonical CompiledScore path.
+    Private PrettyMIDI metadata remains a compatibility fallback for callers
+    that have not migrated yet.
+    """
+    events = (
+        tuple(note_events)
+        if note_events is not None
+        else (getattr(pm, "_ambition_note_events", ()) or ())
+    )
     notes = tuple(
         note
         for row in events
@@ -246,7 +262,7 @@ def build_timeline(
         + [0.0]
     )
     if spec.get("schema") == "ambition.musicir.v2":
-        grid = _v2_grid(spec, pm)
+        grid = _v2_grid(spec, pm, exact_metadata=exact_metadata)
     else:
         grid = _v1_grid(spec, section_meta)
     cue_id = str(spec.get("id") or "cue")
@@ -304,14 +320,21 @@ def read_timeline(path: Path) -> MusicTimeline:
 
 def compile_score_timeline(score_path: Path, *, render_hash: str = "") -> MusicTimeline:
     """Compile a score into note events without synthesizing audio."""
-    from .render.score_layers import build_score
+    from .musicir.compile import compile_score
 
     score_path = Path(score_path).resolve()
     spec = yaml.safe_load(score_path.read_text(encoding="utf8")) or {}
     if not isinstance(spec, Mapping):
         raise ValueError(f"score must contain a YAML mapping: {score_path}")
-    pm, _groups, section_meta = build_score(dict(spec))
-    return build_timeline(spec, pm, section_meta, render_hash=render_hash)
+    compiled = compile_score(dict(spec))
+    return build_timeline(
+        compiled.normalized_spec,
+        compiled.pm,
+        compiled.sections,
+        render_hash=render_hash,
+        note_events=compiled.note_events,
+        exact_metadata=compiled.exact_metadata,
+    )
 
 
 def score_text_sha256(path: Path) -> str:
@@ -326,6 +349,7 @@ def write_render_authoring_artifacts(
     section_meta: Iterable[Mapping[str, Any]],
     render_hash: str,
     run_dir: Path,
+    compiled: Any | None = None,
 ) -> RenderAuthoringArtifacts:
     """Persist immutable score provenance and exact expanded note data.
 
@@ -340,7 +364,14 @@ def write_render_authoring_artifacts(
     shutil.copy2(Path(score_path), snapshot)
     timeline_path = authoring_dir / f"{cue_id}_{render_hash}.note_timeline.json"
     write_timeline(
-        build_timeline(spec, pm, section_meta, render_hash=render_hash),
+        build_timeline(
+            compiled.normalized_spec if compiled is not None else spec,
+            pm,
+            section_meta,
+            render_hash=render_hash,
+            note_events=(compiled.note_events if compiled is not None else None),
+            exact_metadata=(compiled.exact_metadata if compiled is not None else None),
+        ),
         timeline_path,
     )
     return RenderAuthoringArtifacts(

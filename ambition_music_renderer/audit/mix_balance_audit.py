@@ -81,10 +81,11 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
     velocity a lead's loudest note must reach to count as a *foreground* lead
     (rather than a quiet background "memory"/answer echo that is meant to sit low).
     """
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
-    pm, _groups, section_meta = build_score(spec)
-    events = musical_note_events(getattr(pm, "_ambition_note_events", []) or [])
+    compiled = compile_score(spec)
+    section_meta = compiled.sections
+    events = musical_note_events(compiled.note_events)
     if not events:
         return {
             "schema": "ambition.music_mix_balance_audit.v1",

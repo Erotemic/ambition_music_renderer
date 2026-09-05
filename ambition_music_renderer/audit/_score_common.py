@@ -21,17 +21,16 @@ from ..profiler import profile
 def events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, float]:
     """Expand ``spec`` into note events; return ``(events, bpm, beats_per_bar)``.
 
-    ``build_score`` always attaches the expanded events as
-    ``pm._ambition_note_events`` (``score_events.add_note`` is the only place
-    notes enter the score, and it records an event for each one), so an empty
-    list here means the score genuinely produced no notes.
+    ``compile_score`` returns expanded semantic events directly, so audits no
+    longer depend on private PrettyMIDI attributes. An empty event list means
+    the score genuinely produced no notes.
     """
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
-    pm, _groups, _section_meta = build_score(spec)
+    compiled = compile_score(spec)
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    events = musical_note_events(getattr(pm, "_ambition_note_events", []) or [])
+    events = musical_note_events(compiled.note_events)
     return events, bpm, beats_per_bar
 
 

@@ -10,6 +10,8 @@ from typing import Any
 import numpy as np
 import pretty_midi
 
+from ..musicir.model import CompiledScore
+from ..musicir.normalize import MUSICIR_V1_SCHEMA
 from ..profiler import profile
 from .score_core import ARTICULATION_GATE, RenderContext, TempoMap
 from .score_events import add_chord, add_drum, add_instrument, add_keyswitch, add_note, apply_automation, resolve_instruments, _layer_constraints, _layer_human
@@ -1338,15 +1340,19 @@ def merged_layers(
 
 
 @profile
-def build_score(
+def compile_procedural_score(
     spec: dict[str, Any],
-) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
-    if spec.get("schema") == "ambition.musicir.v2":
-        # Exact-score mode is independent of the procedural section/layer DSL.
-        # Dispatch before touching v1-only fields such as ``sections``.
-        from .exact_score import build_exact_score
+    *,
+    source_schema: str | None = MUSICIR_V1_SCHEMA,
+    normalization_warnings: tuple[str, ...] = (),
+) -> CompiledScore:
+    """Compile canonical MusicIR v1 into the shared semantic representation."""
 
-        return build_exact_score(spec)
+    if spec.get("schema") != MUSICIR_V1_SCHEMA:
+        raise ValueError(
+            f"procedural compiler requires schema {MUSICIR_V1_SCHEMA!r}; "
+            f"got {spec.get('schema')!r}"
+        )
 
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
@@ -1395,14 +1401,34 @@ def build_score(
             ctx.active_layer_id = str(layer.get("_source_layer", layer.get("kind", "layer")))
             ctx.active_layer_kind = str(layer.get("kind", ""))
             render_layer(ctx, section, layer)
-    pm._ambition_note_events = list(ctx.note_events)  # type: ignore[attr-defined]
-    pm._ambition_instrument_specs = copy.deepcopy(ctx.instrument_specs)  # type: ignore[attr-defined]
     # Sanitize at the score boundary so all consumers receive the same-pitch
     # overlap invariant.
     sanitize_same_pitch_overlaps(pm)
-    return pm, ctx.groups, section_meta
+    compiled = CompiledScore(
+        source_schema=source_schema,
+        canonical_schema=MUSICIR_V1_SCHEMA,
+        normalized_spec=copy.deepcopy(spec),
+        pm=pm,
+        groups=dict(ctx.groups),
+        sections=section_meta,
+        instrument_specs=copy.deepcopy(ctx.instrument_specs),
+        note_events=list(ctx.note_events),
+        exact_metadata=None,
+        normalization_warnings=tuple(normalization_warnings),
+    )
+    compiled.attach_legacy_metadata()
+    return compiled
 
 
+@profile
+def build_score(
+    spec: dict[str, Any],
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
+    """Historical score-build facade backed by canonical MusicIR compilation."""
+
+    from ..musicir.compile import compile_score
+
+    return compile_score(spec).legacy_tuple()
 
 
 def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:

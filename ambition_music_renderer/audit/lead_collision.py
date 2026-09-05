@@ -188,11 +188,11 @@ def _chord_at(spec: dict[str, Any], beat: float, beats_per_bar: float) -> str:
 
 @profile
 def audit_spec(spec: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    pm, _groups, _meta = build_score(spec)
-    events = musical_note_events(getattr(pm, "_ambition_note_events", []))
+    compiled = compile_score(spec)
+    events = musical_note_events(compiled.note_events)
     return audit_events(events, spec, beats_per_bar=beats_per_bar, **kwargs)
 
 

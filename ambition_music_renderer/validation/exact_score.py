@@ -16,7 +16,7 @@ from typing import Any
 import yaml
 
 from ambition_music_renderer.render.exact_score import EXACT_SCHEMA
-from ambition_music_renderer.render.score_layers import build_score
+from ambition_music_renderer.musicir.compile import compile_score
 
 
 _EXTERNAL_SCORE_KEYS = frozenset(
@@ -97,9 +97,12 @@ def validate_exact_score_spec(
         paths = ", ".join(item["path"] for item in dependencies)
         raise ValueError(f"exact score has external symbolic-score dependencies: {paths}")
 
-    pm, groups, sections = build_score(spec)
-    events = list(pm._ambition_note_events)  # type: ignore[attr-defined]
-    exact = dict(pm._ambition_exact_score)  # type: ignore[attr-defined]
+    compiled = compile_score(spec, strict_schema=True)
+    pm = compiled.pm
+    groups = compiled.groups
+    sections = compiled.sections
+    events = list(compiled.note_events)
+    exact = dict(compiled.exact_metadata or {})
     end_tick = int(exact["end_tick"])
     duration_seconds = max((float(event["end_time"]) for event in events), default=0.0)
 

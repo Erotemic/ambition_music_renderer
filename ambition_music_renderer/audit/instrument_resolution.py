@@ -36,7 +36,7 @@ def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[st
     from ..instrument_resolution import backend_spec_from_instrument, resolve_instrument_backend
     from ..backends.sfizz_backend import sfz_key_span
     from ..render.backend_notes import backend_note_remap
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
     render_cfg = spec.get("render") or {}
     sfizz_cfg = render_cfg.get("sfizz") or {}
@@ -47,8 +47,8 @@ def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[st
     pitches: dict[str, list[int]] = {}
     build_warnings: list[str] = []
     try:
-        pm, _groups, _meta = build_score(spec)
-        for ev in musical_note_events(getattr(pm, "_ambition_note_events", []) or []):
+        compiled = compile_score(spec)
+        for ev in musical_note_events(compiled.note_events):
             pitches.setdefault(str(ev.get("instrument")), []).append(int(ev["pitch"]))
     except Exception as ex:
         # This audit exists to make "asked for X, got Y" visible; a swallowed

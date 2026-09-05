@@ -102,6 +102,7 @@ def stem_cache_key(
     sample_rate: int,
     bpm: float,
     total_seconds: float,
+    instrument_specs: dict[str, Any] | None = None,
 ) -> str:
     """Return a stable content key for one postprocessed scratch stem.
 
@@ -111,7 +112,9 @@ def stem_cache_key(
     score event payload. In the common independent-stem path, only instruments
     assigned to ``group`` contribute event/backend state.
     """
-    instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
+    if instrument_specs is None:
+        # Compatibility path for pre-CompiledScore callers/tests.
+        instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
     render_cfg = dict(spec.get("render") or {})
     protection_cfg = dict(render_cfg.get("foreground_protection") or {})
     protection_mode = str(protection_cfg.get("mode", "group_density")).strip().lower().replace("-", "_")

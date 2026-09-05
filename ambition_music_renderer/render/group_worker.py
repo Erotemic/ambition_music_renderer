@@ -20,7 +20,7 @@ from .effects import post_process
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import ensure_audio_length, render_group_audio, slice_audio
 from .score_core import choose_soundfont
-from .score_layers import build_score
+from ..musicir.compile import compile_score
 from .synth import spec_hash
 from ..profiler import PhaseTimer, profile
 
@@ -93,7 +93,10 @@ def _worker_main(ns) -> int:
         soundfont = choose_soundfont(render_cfg.get("soundfont"))
         cue_hash = spec_hash(spec_path, soundfont, ns.backend)
         quality = float(render_cfg.get("ogg_quality", 5.0))
-        pm, groups, meta = build_score(spec)
+        compiled = compile_score(spec)
+        pm = compiled.pm
+        groups = compiled.groups
+        meta = compiled.sections
         cue_metadata = section_chapter_metadata(
             cue_id=str(spec.get("id", spec_path.stem)),
             title=str(spec.get("title", spec.get("id", spec_path.stem))),
@@ -112,6 +115,7 @@ def _worker_main(ns) -> int:
                 pm, groups, ns.group, ns.backend, soundfont, sr, Path(td), total, bpm,
                 base_dir=spec_path.parent,
                 render_cfg=render_cfg,
+                instrument_specs=compiled.instrument_specs,
             )
         with _visible_phase(ns.group, "postprocess_group"), timings.phase("postprocess_group", group=ns.group):
             raw = ensure_audio_length(raw, target)

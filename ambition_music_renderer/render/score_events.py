@@ -9,7 +9,8 @@ from typing import Any
 
 import pretty_midi
 
-from .score_core import ARTICULATION_GATE, CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext, velocity_to_cc_value
+from ..musicir.midi import add_initial_controls, create_midi_instrument
+from .score_core import ARTICULATION_GATE, CC_NUMBERS, DRUMS, RenderContext, velocity_to_cc_value
 from .score_theory import chord_pitches, clamp, fit_midi_pitch, midi_to_note, note_to_midi
 
 def add_cc(inst: pretty_midi.Instrument, number: int, value: int, time: float) -> None:
@@ -73,47 +74,15 @@ def add_keyswitch(
 
 
 def add_instrument(ctx: RenderContext, spec: dict[str, Any]) -> None:
-    name = spec["name"]
-    if spec.get("is_drum", False):
-        inst = pretty_midi.Instrument(program=0, is_drum=True, name=name)
-    else:
-        program_name = spec.get("program", "string_ensemble_1")
-        if isinstance(program_name, int):
-            program = int(program_name)
-        elif program_name in GM_PROGRAMS:
-            program = GM_PROGRAMS[program_name]
-        else:
-            raise ValueError(
-                f"instrument {name!r}: unknown program {program_name!r}. "
-                f"Use a GM program name (e.g. lead_saw, pad_warm, synth_brass_1) "
-                f"or an int 0-127. Valid names: {', '.join(sorted(GM_PROGRAMS))}"
-            )
-        inst = pretty_midi.Instrument(program=program, is_drum=False, name=name)
+    """Register one canonical instrument with the procedural render context."""
+
+    name = str(spec["name"])
+    inst = create_midi_instrument(spec)
+    add_initial_controls(inst, spec)
     ctx.pm.instruments.append(inst)
     ctx.instruments[name] = inst
     ctx.instrument_specs[name] = copy.deepcopy(spec)
-    ctx.groups[name] = spec.get("group", name)
-    add_cc(inst, 7, int(spec.get("volume", 100)), 0.0)
-    add_cc(inst, 10, int(spec.get("pan", 64)), 0.0)
-    add_cc(inst, 11, int(spec.get("expression", 100)), 0.0)
-    for key, cc_num in CC_NUMBERS.items():
-        if key in spec and key not in {"volume", "pan", "expression"}:
-            add_cc(inst, cc_num, int(spec[key]), 0.0)
-    # Arbitrary CC init for sample banks with custom control schemes, e.g.
-    # Karoryfer's Shinyguitar is silent until its CC100 "Blend" control is
-    # mid-position. Keys may be CC numbers or CC_NUMBERS names:
-    #   controls: {100: 64, sustain: 0}
-    for key, value in dict(spec.get("controls") or {}).items():
-        if isinstance(key, int) or str(key).isdigit():
-            cc_num = int(key)
-        elif key in CC_NUMBERS:
-            cc_num = CC_NUMBERS[key]
-        else:
-            raise KeyError(
-                f"instrument {name!r}: unknown controls key {key!r}; use a MIDI "
-                f"CC number or one of {sorted(CC_NUMBERS)}"
-            )
-        add_cc(inst, cc_num, int(value), 0.0)
+    ctx.groups[name] = str(spec.get("group", name))
 
 
 def resolve_instruments(ctx: RenderContext, layer: dict[str, Any]) -> list[str]:

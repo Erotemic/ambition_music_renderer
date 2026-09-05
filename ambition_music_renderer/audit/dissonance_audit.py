@@ -159,12 +159,13 @@ def _dense_hotspot_spans_multiple_parts(hotspot: dict[str, Any]) -> bool:
 @profile
 def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots: int = 40) -> dict[str, Any]:
     """Return JSON-serializable dissonance hotspot diagnostics."""
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
-    pm, _groups, section_meta = build_score(spec)
+    compiled = compile_score(spec)
+    section_meta = compiled.sections
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    all_events = list(compiled.note_events)
     events, ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return {
@@ -348,11 +349,12 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
     numbers agree) and the sour-note audit's key inference for the out-of-key
     overlay, keeping a single source of truth for both judgments.
     """
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
     from . import sour_note_audit as _sour
 
-    pm, _groups, section_meta = build_score(spec)
-    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    compiled = compile_score(spec)
+    section_meta = compiled.sections
+    all_events = list(compiled.note_events)
     events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None

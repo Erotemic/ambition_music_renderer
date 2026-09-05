@@ -245,6 +245,27 @@ scores/
 
 A score can be addressed by cue id or by YAML path.
 
+## Canonical MusicIR compilation
+
+Both MusicIR authoring frontends now compile through
+`ambition_music_renderer.musicir.compile.compile_score()` into a shared
+`CompiledScore`. Renderer, audit, timeline, inspector, and export code should
+consume that object rather than reinterpret raw YAML or private `PrettyMIDI`
+metadata. The historical `render.score_layers.build_score()` tuple API remains
+available as a migration compatibility facade.
+
+Validate compilation without synthesizing audio with:
+
+```bash
+python -m ambition_music_renderer cue validate <cue_id>
+python -m ambition_music_renderer cue validate <cue_id> --strict-schema
+```
+
+Validation reports a deterministic compiled-score fingerprint so refactors can
+distinguish changes to musical semantics from later backend/sample realization
+changes. See `docs/musicir_compilation.md` for the migration contract and
+removal gates.
+
 ## MusicIR overview
 
 MusicIR is intentionally declarative. Common top-level fields include:

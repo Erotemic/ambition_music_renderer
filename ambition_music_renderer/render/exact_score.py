@@ -22,11 +22,14 @@ from typing import Any, Iterable
 
 import pretty_midi
 
-from .score_core import CC_NUMBERS, GM_PROGRAMS, velocity_to_cc_value
+from ..musicir.midi import add_initial_controls, create_midi_instrument
+from ..musicir.model import CompiledScore
+from ..musicir.normalize import MUSICIR_V2_SCHEMA
+from .score_core import CC_NUMBERS, velocity_to_cc_value
 from .score_theory import clamp, fit_midi_pitch, midi_to_note, note_to_midi
 
 
-EXACT_SCHEMA = "ambition.musicir.v2"
+EXACT_SCHEMA = MUSICIR_V2_SCHEMA
 
 
 def _fraction(value: Any) -> Fraction:
@@ -359,34 +362,15 @@ class ExactTempoMap:
 
 
 def _instrument_from_spec(spec: dict[str, Any]) -> pretty_midi.Instrument:
-    name = str(spec["name"])
-    is_drum = bool(spec.get("is_drum", False))
-    if is_drum:
-        return pretty_midi.Instrument(program=0, is_drum=True, name=name)
-    program_name = spec.get("program", "string_ensemble_1")
-    if isinstance(program_name, int):
-        program = int(program_name)
-    elif program_name in GM_PROGRAMS:
-        program = GM_PROGRAMS[program_name]
-    else:
-        raise ValueError(f"instrument {name!r}: unknown program {program_name!r}")
-    return pretty_midi.Instrument(program=program, is_drum=False, name=name)
+    """Compatibility wrapper around the shared MusicIR instrument builder."""
+
+    return create_midi_instrument(spec)
 
 
 def _add_initial_cc(inst: pretty_midi.Instrument, spec: dict[str, Any]) -> None:
-    init = {7: int(spec.get("volume", 100)), 10: int(spec.get("pan", 64)), 11: int(spec.get("expression", 100))}
-    for key, cc_num in CC_NUMBERS.items():
-        if key in spec and key not in {"volume", "pan", "expression"}:
-            init[cc_num] = int(spec[key])
-    for key, value in dict(spec.get("controls") or {}).items():
-        if isinstance(key, int) or str(key).isdigit():
-            init[int(key)] = int(value)
-        elif key in CC_NUMBERS:
-            init[CC_NUMBERS[key]] = int(value)
-        else:
-            raise ValueError(f"instrument {spec['name']!r}: unknown CC key {key!r}")
-    for number, value in sorted(init.items()):
-        inst.control_changes.append(pretty_midi.ControlChange(number=number, value=int(clamp(value, 0, 127)), time=0.0))
+    """Compatibility wrapper around canonical initial-controller handling."""
+
+    add_initial_controls(inst, spec)
 
 
 def _event_rows(voice: dict[str, Any], phrases: dict[str, Any], clock: ScoreClock) -> Iterable[dict[str, Any]]:
@@ -515,7 +499,13 @@ def _form_metadata(spec: dict[str, Any], clock: ScoreClock, tempo: ExactTempoMap
     return out
 
 
-def build_exact_score(spec: dict[str, Any]) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
+def compile_exact_score(
+    spec: dict[str, Any],
+    *,
+    source_schema: str | None = EXACT_SCHEMA,
+    normalization_warnings: tuple[str, ...] = (),
+) -> CompiledScore:
+    """Compile canonical MusicIR v2 into the shared semantic representation."""
     if spec.get("schema") != EXACT_SCHEMA:
         raise ValueError(f"exact-score compiler requires schema {EXACT_SCHEMA!r}")
     score = spec.get("score") or {}
@@ -590,6 +580,7 @@ def build_exact_score(spec: dict[str, Any]) -> tuple[pretty_midi.PrettyMIDI, dic
                     instruments[target].notes.append(pretty_midi.Note(velocity=velocity, pitch=pitch, start=start, end=end))
                     position = clock.tick_to_position(tick)
                     note_events.append({
+                        "event_type": "note",
                         "instrument": target,
                         "group": groups.get(target, part_group),
                         "part": part_id,
@@ -640,9 +631,7 @@ def build_exact_score(spec: dict[str, Any]) -> tuple[pretty_midi.PrettyMIDI, dic
             None,
         )
 
-    pm._ambition_note_events = note_events  # type: ignore[attr-defined]
-    pm._ambition_instrument_specs = copy.deepcopy(instrument_specs)  # type: ignore[attr-defined]
-    pm._ambition_exact_score = {  # type: ignore[attr-defined]
+    exact_metadata = {
         "ppq": clock.ppq,
         "end_tick": end_tick,
         "meter_changes": [dc.asdict(x) for x in clock.meter_changes],
@@ -650,4 +639,25 @@ def build_exact_score(spec: dict[str, Any]) -> tuple[pretty_midi.PrettyMIDI, dic
         "holds": [{"tick": tick, "seconds": seconds} for tick, seconds in tempo.holds],
         "form": copy.deepcopy(score.get("form") or []),
     }
-    return pm, groups, meta
+    compiled = CompiledScore(
+        source_schema=source_schema,
+        canonical_schema=EXACT_SCHEMA,
+        normalized_spec=copy.deepcopy(spec),
+        pm=pm,
+        groups=groups,
+        sections=meta,
+        instrument_specs=instrument_specs,
+        note_events=note_events,
+        exact_metadata=exact_metadata,
+        normalization_warnings=tuple(normalization_warnings),
+    )
+    compiled.attach_legacy_metadata()
+    return compiled
+
+
+def build_exact_score(
+    spec: dict[str, Any],
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], list[dict[str, Any]]]:
+    """Historical exact-score API; prefer :func:`musicir.compile_score`."""
+
+    return compile_exact_score(spec).legacy_tuple()

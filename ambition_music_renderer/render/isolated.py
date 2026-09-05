@@ -35,7 +35,8 @@ from .group import build_manifest, ensure_audio_length, slice_audio
 from .foreground_protection import apply_foreground_protection, foreground_protection_mode
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
-from .score_layers import build_score
+from ..musicir.compile import compile_score
+from ..musicir.model import compiled_score_fingerprint
 from .synth import spec_hash
 from .stem_cache import (
     restore_cached_stem,
@@ -618,9 +619,13 @@ def _render_main(ns) -> int:
                 f"render_isolated: regenerating {spec['id']}: {reason}", file=sys.stderr
             )
 
-    with timings.phase("build_score"):
-        pm, groups, meta = build_score(spec)
-    cue_markers = timeline_markers_from_spec(spec, meta)
+    with timings.phase("compile_score"):
+        compiled = compile_score(spec)
+        pm = compiled.pm
+        groups = compiled.groups
+        meta = compiled.sections
+        compiled_fingerprint = compiled_score_fingerprint(compiled)
+    cue_markers = timeline_markers_from_spec(compiled.normalized_spec, meta)
     cue_metadata = section_chapter_metadata(
         cue_id=str(spec.get("id", spec_path.stem)),
         title=str(spec.get("title", spec.get("id", spec_path.stem))),
@@ -667,6 +672,7 @@ def _render_main(ns) -> int:
                     sample_rate=sr,
                     bpm=bpm,
                     total_seconds=total,
+                    instrument_specs=compiled.instrument_specs,
                 )
                 cache_keys[group] = key
                 cached = stem_cache_path(cache_dir, str(spec["id"]), group, key)
@@ -775,6 +781,7 @@ def _render_main(ns) -> int:
         section_meta=meta,
         render_hash=cue_hash,
         run_dir=outdir,
+        compiled=compiled,
     )
     output_files["authoring"] = authoring.manifest_files(outdir)
 
@@ -1144,7 +1151,21 @@ def _render_main(ns) -> int:
             "runtime stems remain quieter by design to avoid exporting amplified noise floors"
         )
 
-    manifest = build_manifest(spec, cue_hash, meta, group_names, output_files, sr)
+    manifest = build_manifest(
+        spec,
+        cue_hash,
+        meta,
+        group_names,
+        output_files,
+        sr,
+        compiled_score={
+            "schema": "ambition.compiled_score.v1",
+            "fingerprint": compiled_fingerprint,
+            "source_schema": compiled.source_schema,
+            "canonical_schema": compiled.canonical_schema,
+            "normalization_warnings": list(compiled.normalization_warnings),
+        },
+    )
     manifest["source_score_sha256"] = authoring.source_score_sha256
     manifest["render_mode"] = "isolated_process_stem_warmmix"
     manifest["simple_mix"] = bool(ns.simple_mix)

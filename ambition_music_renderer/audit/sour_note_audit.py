@@ -386,10 +386,11 @@ def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[
     out-of-key bonus — the same judgment as the candidate audit, but kept for
     every note so the plot can colour the whole roll.
     """
-    from ..render.score_layers import build_score
+    from ..musicir.compile import compile_score
 
-    pm, _groups, section_meta = build_score(spec)
-    all_events = list(getattr(pm, "_ambition_note_events", []) or [])
+    compiled = compile_score(spec)
+    section_meta = compiled.sections
+    all_events = list(compiled.note_events)
     events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None

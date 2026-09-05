@@ -7,6 +7,7 @@ Subcommands:
                             Add --publish to also install full.ogg into the
                             game asset tree.
     cue midi <cue>          Export a marked MIDI preview for score/form review.
+    cue validate <cue>      Compile/validate MusicIR without synthesizing audio.
     cue publish <cue>       Publish newest preview into the sandbox asset tree.
     cue bundle <cue>...     Render+debug+package one or more cues. For one cue,
                             -j/--jobs N parallelizes stem groups. For several,
@@ -567,6 +568,11 @@ def _preflight_bulk_render(
     dependencies.
     """
     from .render.score_core import load_yaml
+    # Keep bulk preflight on the historical public score-build facade during
+    # the CompiledScore migration.  build_score() delegates to compile_score()
+    # in normal operation, but retaining this boundary keeps downstream hooks,
+    # tests, and callers that intercept score construction observable until the
+    # compatibility facade is intentionally retired.
     from .render.score_layers import build_score
 
     failures: list[str] = []
@@ -967,16 +973,60 @@ class MidiCommand(kwconf.Config):
             return 2
 
         from .render.score_core import load_yaml
-        from .render.score_layers import build_score
+        from .musicir.compile import compile_score
         from .render.export import timeline_markers_from_spec, write_marked_midi
 
         spec = load_yaml(score)
-        pm, _groups, sections = build_score(spec)
-        markers = timeline_markers_from_spec(spec, sections)
+        compiled = compile_score(spec)
+        pm = compiled.pm
+        sections = compiled.sections
+        markers = timeline_markers_from_spec(compiled.normalized_spec, sections)
         cue_id = str(spec.get("id", cue_id_from_path(score)))
         output = Path(config.output) if config.output is not None else Path.cwd() / f"{cue_id}.mid"
         write_marked_midi(pm, output, markers)
         print(output)
+        return 0
+
+
+class ValidateCommand(kwconf.Config):
+    """Compile and validate one cue without synthesizing audio."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    strict_schema: bool = kwconf.Flag(
+        False,
+        help="reject missing, deprecated, or unknown MusicIR schema spellings",
+    )
+    allow_external_score: bool = kwconf.Flag(
+        False,
+        help="allow MusicIR v2 to depend on external symbolic score files",
+    )
+    json: bool = kwconf.Flag(False, help="emit the complete validation report as JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        candidate = Path(config.cue).expanduser()
+        score = candidate.resolve() if candidate.is_file() else find_score(config.cue)
+        if score is None:
+            print(f"cue not found: {config.cue}", file=sys.stderr)
+            return 2
+        from .validation.musicir import validate_musicir_file
+
+        report = validate_musicir_file(
+            score,
+            strict_schema=bool(config.strict_schema),
+            require_self_contained=not bool(config.allow_external_score),
+        )
+        if config.json:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        else:
+            print(
+                f"OK {report['score_id']}: {report['canonical_schema']} "
+                f"instruments={report['instruments']} notes={report['note_events']} "
+                f"sections={report['sections']} duration={report['duration_seconds']:.3f}s"
+            )
+            for warning in report.get("normalization_warnings", []):
+                print(f"WARNING: {warning}", file=sys.stderr)
         return 0
 
 
@@ -1111,6 +1161,7 @@ class CueModal(kwconf.ModalCLI):
     list = ListCommand
     render = RenderCommand
     midi = MidiCommand
+    validate = ValidateCommand
     publish = PublishCommand
     bundle = BundleCommand
 

@@ -137,10 +137,13 @@ def render_group_audio(
     *,
     base_dir: Path | None = None,
     render_cfg: dict[str, Any] | None = None,
+    instrument_specs: dict[str, Any] | None = None,
 ) -> np.ndarray:
     insts = [inst for inst in pm.instruments if groups.get(inst.name) == group]
     render_cfg = render_cfg or {}
-    instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
+    if instrument_specs is None:
+        # Compatibility path for callers that have not migrated to CompiledScore.
+        instrument_specs = getattr(pm, "_ambition_instrument_specs", {}) or {}
     sfizz_cfg = dict(render_cfg.get("sfizz") or {})
     protection_spec = {
         "render": render_cfg,
@@ -363,10 +366,12 @@ def build_manifest(
     group_names: list[str],
     output_files: dict[str, Any],
     sample_rate: int,
+    *,
+    compiled_score: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    return {
+    manifest = {
         "schema": "ambition.adaptive_music_manifest.v2",
         "renderer_version": RENDERER_VERSION,
         "id": spec["id"],
@@ -382,3 +387,6 @@ def build_manifest(
         "state_map": spec.get("state_map", {}),
         "notes": spec.get("notes", ""),
     }
+    if compiled_score is not None:
+        manifest["compiled_score"] = dict(compiled_score)
+    return manifest
