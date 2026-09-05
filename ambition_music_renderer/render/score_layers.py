@@ -359,9 +359,20 @@ def render_layer_chord_hits(
     }
     hk = _layer_human(layer, 6.0)
     constraints = _layer_constraints(ctx.spec, layer)
-    for local, beat in hits:
-        if float(local) >= section["bars"]:
+    directions = list(layer.get("directions") or [])
+    default_direction = str(layer.get("direction", "simultaneous"))
+    spread_ms = float(layer.get("spread_ms", 0.0))
+    velocity_slope = float(layer.get("velocity_slope", 0.0))
+    for hit_idx, item in enumerate(hits):
+        local = float(item[0])
+        beat = float(item[1])
+        if local >= section["bars"]:
             continue
+        direction = (
+            str(item[2])
+            if len(item) > 2 and isinstance(item[2], str)
+            else (str(directions[hit_idx % len(directions)]) if directions else default_direction)
+        )
         chord = chord_for_bar(section, int(local))
         for inst in insts:
             add_chord(
@@ -377,6 +388,9 @@ def render_layer_chord_hits(
                 voicing=layer.get("voicing", "closed"),
                 include_slash_bass=bool(layer.get("include_slash_bass", True)),
                 constraints=constraints,
+                direction=direction,
+                spread_ms=spread_ms,
+                velocity_slope=velocity_slope,
                 **hk,
             )
 

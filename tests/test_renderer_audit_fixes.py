@@ -143,3 +143,49 @@ def test_ffmpeg_audio_export_writes_metadata_sidecar(tmp_path: Path, monkeypatch
     sidecar = ogg_path.with_name("cue.ogg.metadata.json")
     assert sidecar.exists()
     assert '"CUE_ID": "cue"' in sidecar.read_text()
+
+
+def test_chord_hits_can_roll_up_or_down_without_song_specific_logic():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    base = {
+        "kind": "chord_hits",
+        "instrument": "keys",
+        "hits": [[0, 0.0]],
+        "duration_beats": 1.0,
+        "octave": 4,
+        "voicing": "triad",
+        "velocity": 90,
+        "humanize_ms": 0,
+        "humanize_velocity_pct": 0,
+        "spread_ms": 50,
+    }
+    up = dict(base, direction="up")
+    down = dict(base, direction="down")
+
+    pm_up, _groups, _sections = build_score(_minimal_spec(up))
+    pm_down, _groups, _sections = build_score(_minimal_spec(down))
+
+    up_notes = sorted(pm_up.instruments[0].notes, key=lambda note: note.start)
+    down_notes = sorted(pm_down.instruments[0].notes, key=lambda note: note.start)
+    assert [note.pitch for note in up_notes[:3]] == [60, 64, 67]
+    assert [note.pitch for note in down_notes[:3]] == [67, 64, 60]
+    assert [round(note.start, 3) for note in up_notes[:3]] == [0.0, 0.05, 0.1]
+    assert [round(note.start, 3) for note in down_notes[:3]] == [0.0, 0.05, 0.1]
+
+
+def test_chord_hits_reject_unknown_roll_direction():
+    from ambition_music_renderer.render.score_layers import build_score
+
+    with pytest.raises(ValueError, match="unsupported chord direction"):
+        build_score(
+            _minimal_spec(
+                {
+                    "kind": "chord_hits",
+                    "instrument": "keys",
+                    "hits": [[0, 0.0]],
+                    "direction": "sideways",
+                    "spread_ms": 40,
+                }
+            )
+        )

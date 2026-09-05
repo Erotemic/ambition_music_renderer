@@ -284,6 +284,9 @@ def add_chord(
     humanize_velocity_pct: float = 0.0,
     gate: float | None = None,
     constraints: dict[str, Any] | None = None,
+    direction: str = "simultaneous",
+    spread_ms: float = 0.0,
+    velocity_slope: float = 0.0,
 ) -> None:
     notes = chord_pitches(
         chord,
@@ -293,15 +296,35 @@ def add_chord(
     )
     if constraints:
         notes = _apply_voicing_constraints(ctx, inst_name, notes, constraints)
-    for idx, p in enumerate(notes):
+
+    direction_norm = str(direction).strip().lower().replace("-", "_")
+    if direction_norm in {"up", "low_to_high", "ascending"}:
+        ordered = sorted(notes)
+    elif direction_norm in {"down", "high_to_low", "descending"}:
+        ordered = sorted(notes, reverse=True)
+    elif direction_norm in {"simultaneous", "block", "none", ""}:
+        ordered = list(notes)
+    else:
+        raise ValueError(
+            f"unsupported chord direction {direction!r}; use simultaneous, up, or down"
+        )
+
+    spread_ms_f = max(0.0, float(spread_ms))
+    spread_beats = spread_ms_f / 1000.0 * float(ctx.bpm) / 60.0
+    rolled = spread_ms_f > 0.0 and direction_norm not in {"simultaneous", "block", "none", ""}
+    for idx, p in enumerate(ordered):
+        beat_offset = idx * spread_beats if rolled else 0.0
+        # Rolled chord tones should release together rather than extending the
+        # late notes beyond the authored chord envelope.
+        note_dur = max(0.03, float(dur_beats) - beat_offset)
         add_note(
             ctx,
             inst_name,
             p,
             bar,
-            beat,
-            dur_beats,
-            vel - idx * 2,
+            beat + beat_offset,
+            note_dur,
+            vel - idx * 2 + idx * float(velocity_slope),
             articulation=articulation,
             humanize_ms=humanize_ms,
             humanize_velocity_pct=humanize_velocity_pct,
