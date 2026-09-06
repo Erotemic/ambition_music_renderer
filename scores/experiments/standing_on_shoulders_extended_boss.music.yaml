@@ -1,11 +1,13 @@
 schema: ambition.musicir.v1
 id: standing_on_shoulders_extended_boss
-title: "Standing on Shoulders - Extended Boss Battle"
+title: Standing on Shoulders - Extended Boss Battle
 seed: 2026090506
-notes: Recovered from the pre-v3 AB extended-boss lineage as a separate alternative to the canonical short cue. The
-  3:33 battle arrangement starts with cymbal crash plus continuous bass/drum groove; the royal horn call rides on that groove,
-  then a brief scholar harpsichord/organ lick clears space for the giant guitar slam and low-register answer. The later AB giant
-  drive, strings lift, solo development, and recursive-crescendo wall remain intact.
+notes: 'Recovered from the pre-v3 AB extended-boss lineage as a separate alternative to the canonical short cue. The battle
+  arrangement keeps the opening cymbal crash and continuous bass/drum groove. The royal horn call now yields to a two-bar
+  harpsichord proclamation before the giant enters. The former says-yes/takes-stage split is combined into one restrained
+  three-bar reveal: sparse guitar impacts and a high, sustained lead preview the register of the later solos without pitch bends.
+  The recursive crescendo reserves crash cymbals for structural punctuation instead of striking them every bar/beat. Recursive
+  Duel Giant II resolves its B-minor-to-E-minor boundary onto E instead of sustaining F-sharp into the E-minor riff.'
 tempo:
   bpm: 88
 meter:
@@ -39,11 +41,11 @@ postprocess:
   target_peak_db: -2.5
 group_postprocess:
   scholar:
-    gain_db: 3.3
+    gain_db: 2.8
     highpass_hz: 105
     lowpass_hz: 10300
     high_shelf_hz: 4200
-    high_shelf_db: -1.2
+    high_shelf_db: -0.6
     transient_tame: 0.02
     reverb_wet: 0.018
   giant:
@@ -215,6 +217,23 @@ group_postprocess:
       effects:
       - effect: gain
         gain_db: -3.5
+  harpsichord:
+    gain_db: 3.8
+    highpass_hz: 92
+    lowpass_hz: 12600
+    high_shelf_hz: 4300
+    high_shelf_db: 0.9
+    transient_tame: 0.012
+    reverb_wet: 0.016
+    eq_bands:
+    - type: peak
+      hz: 2200
+      q: 0.9
+      db: 0.7
+    - type: peak
+      hz: 520
+      q: 0.8
+      db: -0.5
 stem_postprocess:
   gain_db: 0.0
   highpass_hz: 36
@@ -225,6 +244,105 @@ stem_postprocess:
   limiter_drive: 0.88
   normalize: false
   target_peak_db: -3.0
+authoring:
+  instrument_candidates:
+    harpsichord_voice:
+      primary: sonatina_full
+      candidates:
+      - id: sonatina_full
+        label: Sonatina Harpsichord Full
+        family: keys
+        summary: Baseline. Full registration with the broadest body for the proclamation.
+        program: harpsichord
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz'
+      - id: sonatina_8ft
+        label: Sonatina Harpsichord 8 ft
+        family: keys
+        summary: More focused fundamental registration; a cleaner alternative to the full patch.
+        program: harpsichord
+        instrument_backend:
+          kind: sfz
+          sfz_glob: "**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz"
+      - id: sonatina_4ft
+        label: Sonatina Harpsichord 4 ft
+        family: keys
+        summary: Brighter upper registration for testing whether the proclamation needs more cut.
+        program: harpsichord
+        instrument_backend:
+          kind: sfz
+          sfz_glob: "**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz"
+    giant_lead_emily:
+      primary: emily_basic
+      candidates:
+      - id: emily_basic
+        label: Emily Basic
+        family: guitar
+        summary: Baseline giant lead; broad single-note range and the established later-solo voice.
+        program: clean_guitar
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
+      - id: emily_clean
+        label: Emily Clean
+        family: guitar
+        summary: Cleaner Emily source for testing a less saturated giant entrance under the same lead chain.
+        program: clean_guitar
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Emilyguitar/Emilyguitar/emily_clean.sfz'
+      - id: shiny_five
+        label: Shiny Electric Five
+        family: guitar
+        summary: Sustained electric alternative with a different attack and body from Emily.
+        program: clean_guitar
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_five.sfz'
+    giant_bass:
+      primary: swagbass
+      candidates:
+      - id: swagbass
+        label: Swagbass Clean
+        family: bass
+        summary: Baseline bass voice.
+        program: fingered_bass
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Swagbass/Swagbass/swagbass_clean.sfz'
+      - id: growlybass
+        label: Growlybass Clean
+        family: bass
+        summary: Neutral clean finger-bass alternative.
+        program: fingered_bass
+        instrument_backend:
+          kind: sfz
+          library_ref: bass.growly
+      - id: black_and_blue
+        label: Black & Blue Bass
+        family: bass
+        summary: Broader sampled electric-bass character for testing denser passages.
+        program: fingered_bass
+        instrument_backend:
+          kind: sfz
+          library_ref: bass.black_and_blue
+      - id: fashionbass
+        label: Fashionbass Clean
+        family: bass
+        summary: Clean electric-bass alternative with a distinct midrange character.
+        program: fingered_bass
+        instrument_backend:
+          kind: sfz
+          library_ref: bass.fashion
+      - id: pastabass
+        label: Pastabass
+        family: bass
+        summary: Finger-bass family alternative for passages where Swagbass feels too similar to the guitars.
+        program: fingered_bass
+        instrument_backend:
+          kind: sfz
+          library_ref: bass.pastabass
 instruments:
 - name: organ_scholar_stopped
   group: scholar
@@ -245,13 +363,13 @@ instruments:
     settings:
       fold_to_range: false
 - name: harpsichord_voice
-  group: scholar
+  group: harpsichord
   program: harpsichord
-  volume: 78
+  volume: 82
   pan: 72
-  expression: 94
+  expression: 98
   reverb: 18
-  mix_gain_db: 3.0
+  mix_gain_db: 3.4
   controls:
     12: 127
   instrument_backend:
@@ -2010,6 +2128,94 @@ motifs:
   - 0.94
   - 0.96
   - 0.88
+- id: scholar_royal_proclamation
+  root: E4
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 12
+  - 10
+  - 7
+  - 3
+  - 2
+  - 0
+  - 7
+  - 10
+  - 12
+  - 7
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  durations:
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.52
+  - 0.18
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.52
+  - 0.18
+  - 0.34
+  - 0.82
+  velocities:
+  - 0.78
+  - 0.82
+  - 0.86
+  - 0.92
+  - 0.84
+  - 0.88
+  - 0.82
+  - 0.8
+  - 0.84
+  - 0.88
+  - 0.92
+  - 0.96
+  - 0.88
+  - 0.84
+  - 0.9
+- id: giant_royal_intro_tempered
+  root: E4
+  intervals:
+  - 0
+  - 7
+  - 10
+  - 12
+  rhythm:
+  - 1.0
+  - 1.0
+  - 0.75
+  - 0.25
+  durations:
+  - 0.88
+  - 0.84
+  - 0.64
+  - 0.5
+  velocities:
+  - 0.76
+  - 0.81
+  - 0.87
+  - 0.84
 - id: giant_tread_bm_aa
   root: B2
   intervals:
@@ -2133,7 +2339,7 @@ motifs:
   - 7
   - 3
   - 0
-  - 7
+  - 5
   - 5
   - 8
   - 12
@@ -3279,15 +3485,9 @@ layer_templates:
       duration_beats: 0.14
     - drum: crash
       bars:
-      - 4
       - 5
-      - 6
       - 7
-      beats:
-      - 0.5
-      - 1.5
-      - 2.5
-      - 3.5
+      beat: 3.5
       velocity: 124
       duration_beats: 0.48
     - drum: floor_tom
@@ -3303,12 +3503,10 @@ layer_templates:
       duration_beats: 0.14
     - drum: china
       bars:
-      - 4
       - 5
-      - 6
       - 7
       beat: 2.5
-      velocity: 116
+      velocity: 112
       duration_beats: 0.28
 sections:
 - id: royal_approach
@@ -3339,43 +3537,62 @@ sections:
     giant_riff: -12.0
     giant_lead: -12.0
     scholar: -5.0
+    harpsichord: -4.4
 - id: royal_proclamation
-  bars: 1
-  intensity: 0.96
+  bars: 2
+  intensity: 0.94
   harmony:
+  - Em
   - Em
   layers:
   - stomp_beat
   - giant_bassline_intro
   - strings_sustain
   - kind: motif
-    instruments:
-    - organ_scholar_stopped
-    - harpsichord_voice
-    motif: scholar_royal_fill
+    instrument: harpsichord_voice
+    motif: scholar_royal_proclamation
     starts:
     - - 0
       - 0.0
-    velocity: 101
+    velocity: 104
     articulation: tenuto
-    humanize_ms: 1.2
+    humanize_ms: 1.0
     humanize_velocity_pct: 1
-    instrument_velocity_offsets:
-      organ_scholar_stopped: -8
-      harpsichord_voice: 0
-    instrument_octave_offsets:
-      organ_scholar_stopped: 0
-      harpsichord_voice: 0
+  stem_mix_db:
+    bass: 1.7
+    drums: 0.7
+    strings: 0.2
+    harpsichord: 3.0
+    scholar: -6.0
+    giant: -12.0
+    giant_riff: -12.0
+    giant_lead: -12.0
+    brass: -5.0
+- id: the_giant_takes_stage
+  bars: 3
+  intensity: 0.99
+  harmony:
+  - Em
+  - Em
+  - Em
+  layers:
+  - stomp_beat
+  - giant_bassline_drive
+  - strings_sustain
   - kind: chord_hits
     instruments:
     - heavy_distortion
     - low_guitar
     hits:
     - - 0
-      - 1.25
-    duration_beats: 0.68
+      - 0.0
+    - - 1
+      - 0.0
+    - - 2
+      - 0.0
+    duration_beats: 0.72
     octave: 2
-    velocity: 114
+    velocity: 108
     articulation: marcato
     voicing: power
     humanize_ms: 1.5
@@ -3390,10 +3607,14 @@ sections:
     - giant_riff_shiny_four
     hits:
     - - 0
-      - 1.25
-    duration_beats: 0.48
+      - 0.0
+    - - 1
+      - 0.0
+    - - 2
+      - 0.0
+    duration_beats: 0.44
     octave: 2
-    velocity: 106
+    velocity: 100
     articulation: marcato
     voicing: power
     humanize_ms: 1.5
@@ -3404,81 +3625,44 @@ sections:
       max_pitch: 72
   - kind: motif
     instrument: giant_lead_emily
-    motif: giant_royal_prefix_low
+    motif: giant_royal_intro_tempered
     starts:
     - - 0
-      - 2.0
-    velocity: 110
+      - 0.9
+    velocity: 92
     articulation: legato
-    humanize_ms: 1.8
+    humanize_ms: 2.0
     humanize_velocity_pct: 2
-    rhythm_scale: 0.5
-  stem_mix_db:
-    bass: 2.0
-    drums: 0.8
-    strings: 0.4
-    scholar: 2.5
-    giant: 3.0
-    giant_riff: 2.5
-    giant_lead: 4.5
-    brass: -5.0
-- id: the_giant_says_yes
-  bars: 1
-  intensity: 0.99
-  harmony:
-  - Em
-  layers:
-  - stomp_beat
-  - giant_bassline_drive
-  - giant_riff
-  - strings_sustain
   - kind: motif
     instrument: giant_lead_emily
-    motif: giant_royal_prefix_low
+    motif: giant_royal_intro_tempered
     starts:
-    - - 0
-      - 0.0
-    velocity: 112
+    - - 1
+      - 0.55
+    velocity: 97
+    articulation: legato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 2
+  - kind: motif
+    instrument: giant_lead_emily
+    motif: giant_royal_intro_tempered
+    starts:
+    - - 2
+      - 0.2
+    velocity: 101
     articulation: legato
     humanize_ms: 1.8
     humanize_velocity_pct: 2
-    rhythm_scale: 0.75
   stem_mix_db:
-    bass: 1.7
+    bass: 1.6
     drums: 1.0
     strings: 0.4
-    giant_riff: 1.8
-    giant_lead: 4.8
+    giant: 1.2
+    giant_riff: 1.2
+    giant_lead: 0.2
     brass: -5.0
     scholar: -5.0
-- id: the_giant_takes_stage
-  bars: 2
-  intensity: 1.02
-  harmony:
-  - G
-  - D
-  layers:
-  - stomp_beat
-  - giant_bassline_drive
-  - giant_riff
-  - strings_sustain
-  - kind: motif
-    instrument: giant_lead_emily
-    motif: giant_royal_hook_low
-    starts:
-    - - 0
-      - 0.0
-    velocity: 110
-    articulation: legato
-    humanize_ms: 1.8
-    humanize_velocity_pct: 2
-  stem_mix_db:
-    bass: 1.5
-    drums: 1.0
-    strings: 0.4
-    giant_riff: 2.0
-    giant_lead: 4.5
-    brass: -3.0
+    harpsichord: -4.4
 - id: hands_of_gnu
   bars: 12
   intensity: 1.0
@@ -3754,6 +3938,7 @@ sections:
     strings: -0.4
     scholar: 1.0
     giant: -0.1
+    harpsichord: 1.6
 - id: the_weight_of_knowledge
   bars: 12
   intensity: 1.14
@@ -3915,6 +4100,7 @@ sections:
     scholar: 1.2
     brass: -1.0
     giant: 0.0
+    harpsichord: 1.8
 - id: recursive_duel_giant_i
   bars: 2
   intensity: 1.14
@@ -4018,6 +4204,7 @@ sections:
     giant_lead: 4.5
     scholar: -3.0
     giant: 0.35
+    harpsichord: -2.4
 - id: recursive_duel_scholar_ii
   bars: 2
   intensity: 1.12
@@ -4096,6 +4283,7 @@ sections:
     scholar: 1.4
     brass: -1.0
     giant: 0.0
+    harpsichord: 2.0
 - id: recursive_duel_giant_ii
   bars: 2
   intensity: 1.16
@@ -4199,6 +4387,7 @@ sections:
     giant_lead: 4.7
     scholar: -3.0
     giant: 0.35
+    harpsichord: -2.4
 - id: the_giant_answers
   bars: 8
   intensity: 1.15
@@ -4414,6 +4603,7 @@ sections:
     giant_riff: 1.25
     giant_lead: 4.8
     scholar: -2.5
+    harpsichord: -1.9
 - id: scholar_ascendant
   bars: 8
   intensity: 1.16
@@ -4528,6 +4718,7 @@ sections:
     scholar: 2.0
     giant_riff: 0.9
     giant: 0.0
+    harpsichord: 2.6
 - id: recursive_crescendo
   bars: 8
   intensity: 1.25
@@ -4541,7 +4732,7 @@ sections:
   - D
   - Em
   layers:
-  - stomp_beat_hard
+  - stomp_beat
   - stomp_crescendo_wall
   - giant_bassline_solo_drive
   - giant_riff
@@ -4735,6 +4926,7 @@ sections:
     scholar: 1.5
     brass: -1.0
     giant: 0.4
+    harpsichord: 2.1
 - id: final_giant_solo
   bars: 6
   intensity: 1.27
@@ -4888,6 +5080,7 @@ sections:
     scholar: -4.0
     brass: -3.0
     giant: 0.0
+    harpsichord: -3.4
 - id: final_royal_impacts
   bars: 2
   intensity: 1.3
@@ -4952,6 +5145,7 @@ sections:
     scholar: -5.0
     brass: 1.5
     giant: 1.5
+    harpsichord: -4.4
 - id: loop_turnaround
   bars: 1
   intensity: 1.16
@@ -4966,6 +5160,7 @@ sections:
     giant_lead: -8.0
     scholar: -6.0
     brass: -5.0
+    harpsichord: -5.4
   layers:
   - stomp_loop_bar
   - giant_bassline_drive

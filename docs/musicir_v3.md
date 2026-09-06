@@ -297,8 +297,7 @@ controls intended to make long sections less mechanical without changing old
 scores: `harmony.arpeggio` supports per-step `velocity_pattern` and
 `octave_pattern`; `harmony.bass` supports per-step/per-bar velocity patterns;
 and `drums.pattern` supports per-bar dynamics plus periodic `fill_events` in
-overlay or replace mode. Form-region `energy` (bounded), `intensity` (a positive
-gain) and `density` (bounded) provide
+overlay or replace mode. Form-region `energy`/`intensity` and `density` provide
 a shared section-level intent signal to procedural clips.
 
 ### Temporary generator-bridge restrictions
@@ -451,16 +450,8 @@ dependent.
 
 ## Form-level performance intent
 
-Form regions may carry `energy`, `density` and `variation` — each **bounded to
-0..1** — plus `intensity` and role metadata.
-
-⚠ **`intensity` IS NOT BOUNDED, and lumping it in with the others was wrong.** The
-validator requires `energy`, `density` and `variation` in `0..1`, and `intensity`
-only to be **greater than zero**: it is a positive multiplicative GAIN, not a 0..1
-intent. That is deliberate and has a parity reason — the reviewed v1 Standing on
-Shoulders authors `0.88, 1.00, 1.10, 1.14, 1.24, 1.20`, so a 0..1 ceiling would
-have made the v3 port unable to state what v1 already said. Raised by a GPT review
-2026-09-06, which found this page still describing all four as bounded. Procedural clips can consume the shared energy/density intent;
+Form regions may carry bounded `energy`/`intensity`, `density`, `variation`, and
+role metadata. Procedural clips can consume the shared energy/density intent;
 literal exact clips remain literal. This is a coordination signal for multiple
 generators, not a hidden postprocessor that rewrites authored notes.
 
@@ -514,6 +505,34 @@ python -S dev/music_authoring_reference.py summary
 python -S dev/music_authoring_reference.py search guitar
 python -S dev/music_authoring_reference.py describe guitar.strum
 ```
+
+## Authored instrument candidate banks
+
+Instrument A/B choices are authoring metadata rather than an alternate render authority. A score may declare a small bounded bank under `authoring.instrument_candidates`, keyed by the authored instrument name:
+
+```yaml
+authoring:
+  instrument_candidates:
+    lead_guitar:
+      primary: emily_basic
+      candidates:
+      - id: emily_basic
+        label: Emily Basic
+        program: clean_guitar
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
+      - id: emily_clean
+        label: Emily Clean
+        program: clean_guitar
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Emilyguitar/Emilyguitar/emily_clean.sfz'
+```
+
+The ordinary `instruments` entry remains authoritative for compilation and normal rendering. `primary` identifies which candidate describes that baseline. Alternative candidate rows are inert until an authoring tool explicitly creates a scratch variant that substitutes one candidate. This keeps ordinary render fingerprints and accepted score semantics independent of unrendered audition options while giving Stem Lab a bounded set it can pre-render and route for low-latency comparison.
+
+Candidate banks should contain only alternatives a composer actually intends to compare. They are not a replacement for `instrument_catalog.yaml`, and tools must not expand them into every catalog entry automatically. Where two instruments share a stem group, candidate selection still replaces that whole rendered group; use separate groups when independent A/B routing is a real authoring requirement.
 
 ## Starting a new score
 

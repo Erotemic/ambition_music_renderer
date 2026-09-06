@@ -13,6 +13,7 @@ from ambition_music_renderer.musicir.generators import (
     public_generator_names,
 )
 from ambition_music_renderer.musicir.interchange import build_interchange_manifest
+from ambition_music_renderer.musicir.model import compiled_score_fingerprint
 from ambition_music_renderer.musicir.pitch import pitch_syntax_reference
 from ambition_music_renderer.render.score_layers import LAYER_RENDERERS
 
@@ -348,3 +349,29 @@ def test_checked_in_audio_environment_snapshot_is_source_readable_without_site_p
     )
     assert "sfz_programs: 2403" in result.stdout
     assert "stable_aliases: 70" in result.stdout
+
+
+def test_instrument_candidate_bank_is_inert_until_a_scratch_variant_selects_it():
+    spec = _base_score(
+        clips=[{
+            "id": "note",
+            "at": {"bar": 1, "beat": 1},
+            "events": [[0, "1/4", "C4", 80]],
+        }],
+        end_bar=2,
+    )
+    baseline = compile_score(copy.deepcopy(spec))
+    spec["authoring"] = {
+        "instrument_candidates": {
+            "keys": {
+                "primary": "gm_piano",
+                "candidates": [
+                    {"id": "gm_piano", "label": "GM Piano", "program": "acoustic_grand_piano"},
+                    {"id": "electric", "label": "Electric Piano", "program": "electric_piano_1"},
+                ],
+            }
+        }
+    }
+    with_candidates = compile_score(spec)
+    assert compiled_score_fingerprint(with_candidates) == compiled_score_fingerprint(baseline)
+    assert _notes(with_candidates) == _notes(baseline)

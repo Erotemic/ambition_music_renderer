@@ -508,6 +508,14 @@ the generic test suite compiles all 73 auditions. Source-only readers can join
 normative catalog knowledge with the observational workstation snapshot without
 merging their authorities.
 
+Stem Lab now also consumes score-authored instrument candidate banks. The active
+`instruments` row remains the sole normal-render authority;
+`authoring.instrument_candidates` records a bounded A/B set and marks the primary
+baseline. Alternative rows are realized only through scratch variants on explicit
+request, then routed from pre-rendered group stems. This avoids turning catalog
+discovery into implicit combinatorial rendering while keeping candidate intent in
+the score rather than in GUI state.
+
 Continue by adding patch-specific reliable ranges, articulation realization,
 weak/silent zones, and family audition phrases only when supported by census,
 smoke-test, or listening evidence.

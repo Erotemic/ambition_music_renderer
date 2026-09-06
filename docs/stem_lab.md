@@ -62,3 +62,15 @@ That keeps direct manipulation useful without introducing a second authored trut
 - **Select all** and **Select none** beside Stem routing enable or disable every routable stem in one action.
 - The Stem inspector's **Main** side is always the source version currently routed for the selected stem. It is not an independent selector. **Compare with** chooses the alternate loaded version. This keeps the semantic diff anchored to the audio source that the routing table identifies as main for that stem.
 - Checkable controls expose their state in their label. For example, the piano-roll comparison control reads **Note diff: OFF** or **Note diff: ON** in addition to the platform's checked-button styling.
+
+## Pre-rendered instrument candidate banks
+
+Scores may author a deliberately small A/B bank under `authoring.instrument_candidates`. Each bank names one **primary** candidate, which is the baseline realization used by the ordinary score, plus a few alternatives worth spending render time on. Stem Lab shows the primary with a star and never interprets a bank as permission to render every compatible instrument in the global catalog. The collapsed manual one-off override remains available for broader catalog/path exploration when a score has no authored bank.
+
+For a stem containing one banked instrument, the routing table exposes an **Instrument candidate** selector directly. Ready candidates route to their already-rendered stem immediately. A missing candidate is marked **Play renders**: selecting it and pressing **Play** launches the generator/render pipeline, keeps the transport actionable while audio is missing, shows render progress in the Instrument A/B pane, loads the resulting variant, routes it, and begins playback when generation finishes.
+
+The Instrument A/B tab has **Render selected** and **Render missing candidates** actions. The latter renders only the score-authored alternatives that are not already loaded. Stem Lab processes the queue serially with one shared persistent stem cache, `--audition-stems`, and `--keep-debug-stems`. Only groups whose render fingerprint changes need synthesis after the cache is warm; completed variants become routing sources automatically. The progress bar is determinate for candidate-bank queues and indeterminate for a single renderer invocation whose backend does not expose sub-step completion.
+
+The routed playback mix is content-addressed by its selected stem sources. If you switch from routing A to B and then back to A during the same Stem Lab session, the already-built hybrid WAV is reused rather than mixed again.
+
+Candidate-bank rendering remains group-granular: if two authored instruments share one stem group, a variant that changes either instrument produces a replacement for that whole group. Split instruments into separate musical/mix authorities only when independent routing is actually useful.

@@ -19,7 +19,9 @@ from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
     QPushButton,
+    QScrollArea,
     QSplitter,
+    QTabWidget,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -40,7 +42,12 @@ from .music_stem_inspector import (
     instrument_definition_lines,
     score_source_for_version,
 )
-from .music_instrument_audition import instrument_choices, safe_variant_slug, write_instrument_variant
+from .music_instrument_audition import (
+    candidate_key_for_score,
+    instrument_choices,
+    safe_variant_slug,
+    write_instrument_variant,
+)
 from .music_instrument_audition_qt import InstrumentAuditionPanel
 from .music_stem_inspector_qt import StemInspectorPanel
 from .music_stem_lab_model import StemLabSession
@@ -104,6 +111,12 @@ class StemLabWindow(QMainWindow):
         self._instrument_render_group: str | None = None
         self._instrument_render_dir: Path | None = None
         self._instrument_render_log: list[str] = []
+        self._instrument_render_queue: list[dict[str, object]] = []
+        self._instrument_render_total = 0
+        self._instrument_render_done = 0
+        self._instrument_render_failures = 0
+        self._instrument_render_request: dict[str, object] | None = None
+        self._pending_candidate_request: dict[str, object] | None = None
 
         self.mix_timer = QTimer(self)
         self.mix_timer.setSingleShot(True)
@@ -218,8 +231,8 @@ class StemLabWindow(QMainWindow):
         route_top.addWidget(self.reference_all_button)
         right_layout.addLayout(route_top)
 
-        self.route_table = QTableWidget(0, 4)
-        self.route_table.setHorizontalHeaderLabels(["On", "Stem", "Source version", "Asset"])
+        self.route_table = QTableWidget(0, 5)
+        self.route_table.setHorizontalHeaderLabels(["On", "Stem", "Instrument candidate", "Source version", "Asset"])
         self.route_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.route_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.route_table.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -228,6 +241,7 @@ class StemLabWindow(QMainWindow):
         self.route_table.itemSelectionChanged.connect(self._route_selection_changed)
         self.route_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.route_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.route_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         right_layout.addWidget(self.route_table, 1)
 
         self.mix_status = QLabel("Load a rendered version with stems to begin.")
@@ -235,24 +249,30 @@ class StemLabWindow(QMainWindow):
         right_layout.addWidget(self.mix_status)
         top_right.addWidget(routing)
 
-        diagnostics = QWidget()
-        diagnostics_layout = QVBoxLayout(diagnostics)
-        diagnostics_layout.setContentsMargins(0, 0, 0, 0)
+        self.diagnostics_tabs = QTabWidget()
         self.stem_inspector = StemInspectorPanel()
         self.stem_inspector.groupChanged.connect(self._inspector_group_changed)
         self.stem_inspector.selectionChanged.connect(self._refresh_inspector_report)
         self.stem_inspector.diffViewChanged.connect(lambda _enabled: self._refresh_timeline())
-        diagnostics_layout.addWidget(self.stem_inspector, 2)
+        self.diagnostics_tabs.addTab(self.stem_inspector, "Stem inspector")
+
         self.instrument_audition = InstrumentAuditionPanel()
         self.instrument_audition.renderRequested.connect(self._render_instrument_audition)
-        diagnostics_layout.addWidget(self.instrument_audition, 1)
-        top_right.addWidget(diagnostics)
-        top_right.setSizes([620, 460])
+        self.instrument_audition.renderBankRequested.connect(self._render_instrument_bank)
+        self.instrument_audition.candidateSelected.connect(self._instrument_candidate_selected)
+        instrument_scroll = QScrollArea()
+        instrument_scroll.setWidgetResizable(True)
+        instrument_scroll.setFrameShape(QFrame.NoFrame)
+        instrument_scroll.setWidget(self.instrument_audition)
+        self.diagnostics_tabs.addTab(instrument_scroll, "Instrument A/B")
+        self.diagnostics_tabs.setMinimumWidth(430)
+        top_right.addWidget(self.diagnostics_tabs)
+        top_right.setSizes([560, 520])
 
         self.timeline_panel = NoteTimelinePanel()
         self.timeline_panel.seekRequested.connect(self._seek_from_timeline)
         right_split.addWidget(self.timeline_panel)
-        right_split.setSizes([360, 500])
+        right_split.setSizes([560, 300])
         split.setSizes([560, 940])
 
         transport_frame = QFrame()
@@ -260,6 +280,9 @@ class StemLabWindow(QMainWindow):
         transport_layout = QVBoxLayout(transport_frame)
         transport_layout.setContentsMargins(0, 0, 0, 0)
         self.transport = MusicTransport()
+        # Stem Lab can prepare a missing authored instrument candidate on demand,
+        # so Play remains actionable even before that candidate has audio.
+        self.transport.set_play_request_available(True)
         self.transport.sourceSelectionChanged.connect(self._listen_source_changed)
         self.transport.playRequested.connect(self._toggle_play)
         self.transport.positionChanged.connect(self.timeline_panel.set_playhead_ms)
@@ -396,6 +419,44 @@ class StemLabWindow(QMainWindow):
             stem_item.setToolTip(f"{group}: this swatch matches the note color in the piano roll")
             self.route_table.setItem(row, 1, stem_item)
 
+            version = self.session.versions.get(str(route.version_key)) if route.version_key else None
+            score_path, _exact = score_source_for_version(version) if version is not None else (None, False)
+            choices = instrument_choices(score_path, group) if score_path is not None else ()
+            authored = [choice for choice in choices if choice.candidates]
+            if len(authored) == 1:
+                choice = authored[0]
+                ready_by_instrument, selected_by_instrument = self._candidate_state_for_group(
+                    group, (choice,), str(route.version_key)
+                )
+                ready = ready_by_instrument.get(choice.name, {})
+                selected_candidate = selected_by_instrument.get(choice.name)
+                candidate_combo = QComboBox()
+                for candidate in choice.candidates:
+                    state = "ready" if candidate.key in ready else "Play renders"
+                    marker = "★ " if candidate.primary else ""
+                    candidate_combo.addItem(f"{marker}{candidate.label} · {state}", candidate.key)
+                candidate_index = next(
+                    (
+                        i
+                        for i in range(candidate_combo.count())
+                        if candidate_combo.itemData(i) == selected_candidate
+                    ),
+                    0,
+                )
+                if candidate_combo.count():
+                    candidate_combo.setCurrentIndex(candidate_index)
+                candidate_combo.currentIndexChanged.connect(
+                    lambda _index, g=group, n=choice.name, widget=candidate_combo:
+                    self._route_candidate_changed(g, n, widget)
+                )
+                self.route_table.setCellWidget(row, 2, candidate_combo)
+            elif authored:
+                item = QTableWidgetItem("Multiple parts · use Instrument A/B")
+                item.setToolTip("This stem contains more than one instrument with authored alternatives.")
+                self.route_table.setItem(row, 2, item)
+            else:
+                self.route_table.setItem(row, 2, QTableWidgetItem("—"))
+
             combo = QComboBox()
             candidates = self.session.candidates_for_group(group)
             for key in candidates:
@@ -406,10 +467,10 @@ class StemLabWindow(QMainWindow):
             combo.currentIndexChanged.connect(
                 lambda _index, g=group, widget=combo: self._route_source_changed(g, widget)
             )
-            self.route_table.setCellWidget(row, 2, combo)
+            self.route_table.setCellWidget(row, 3, combo)
 
             asset = self.session.assets_for(str(route.version_key)).get(group) if route.version_key else None
-            self.route_table.setItem(row, 3, QTableWidgetItem(asset.quality_label if asset else "unavailable"))
+            self.route_table.setItem(row, 4, QTableWidgetItem(asset.quality_label if asset else "unavailable"))
             self._route_widgets[group] = (enabled_item, combo)
         self.route_table.blockSignals(False)
         self._refresh_route_all_combo()
@@ -446,6 +507,56 @@ class StemLabWindow(QMainWindow):
         self._refresh_instrument_audition(group, main)
         self._refresh_inspector_report()
 
+    def _candidate_state_for_group(
+        self,
+        group: str,
+        choices,
+        main_key: str,
+    ) -> tuple[dict[str, dict[str, str]], dict[str, str]]:
+        """Map authored candidate ids to loaded render versions for this stem."""
+        by_instrument: dict[str, dict[str, str]] = {}
+        selected: dict[str, str] = {}
+        version_keys = self.session.candidates_for_group(group)
+        for choice in choices:
+            candidates = choice.candidates
+            if not candidates:
+                continue
+            ready: dict[str, str] = {}
+            for version_key in version_keys:
+                version = self.session.versions.get(version_key)
+                if version is None:
+                    continue
+                score_path, _exact = score_source_for_version(version)
+                if score_path is None:
+                    continue
+                candidate_id = candidate_key_for_score(
+                    score_path,
+                    group=group,
+                    instrument_name=choice.name,
+                    candidates=candidates,
+                )
+                if not candidate_id:
+                    continue
+                # Prefer the currently routed realization when duplicates exist;
+                # otherwise the newest discovered version wins.
+                if candidate_id not in ready or version_key == main_key:
+                    ready[candidate_id] = version_key
+            by_instrument[choice.name] = ready
+
+            main_version = self.session.versions.get(main_key)
+            if main_version is not None:
+                main_score, _exact = score_source_for_version(main_version)
+                if main_score is not None:
+                    candidate_id = candidate_key_for_score(
+                        main_score,
+                        group=group,
+                        instrument_name=choice.name,
+                        candidates=candidates,
+                    )
+                    if candidate_id:
+                        selected[choice.name] = candidate_id
+        return by_instrument, selected
+
     def _refresh_instrument_audition(self, group: str | None, main_key: str | None) -> None:
         if not group or not main_key or main_key not in self.session.versions:
             self.instrument_audition.set_context(
@@ -455,20 +566,79 @@ class StemLabWindow(QMainWindow):
         version = self.session.versions[main_key]
         source_score, exact = score_source_for_version(version)
         choices = instrument_choices(source_score, group) if source_score is not None else ()
+        candidate_versions, selected_candidates = self._candidate_state_for_group(group, choices, main_key)
         self.instrument_audition.set_context(
             base_label=version.label,
             group=group,
             source_score=source_score,
             exact_source=exact,
             choices=choices,
+            candidate_versions_by_instrument=candidate_versions,
+            selected_candidate_by_instrument=selected_candidates,
         )
 
-    def _render_instrument_audition(self, request: object) -> None:
-        if not isinstance(request, dict):
+    def _instrument_candidate_selected(self, payload: object) -> None:
+        if not isinstance(payload, dict):
             return
+        group = str(payload.get("group") or "")
+        version_key = str(payload.get("version_key") or "")
+        request = payload.get("render_request")
+        if version_key and version_key in self.session.versions:
+            self._pending_candidate_request = None
+            self.session.set_route_source(group, version_key)
+            self._refresh_route_table()
+            self._refresh_inspector(selected_group=group)
+            self._refresh_listen_sources()
+            self._mark_mix_dirty()
+            self._refresh_timeline()
+            self.statusBar().showMessage(
+                f"Routed {group} to {payload.get('candidate_label') or 'candidate'}; no synthesis needed.",
+                5000,
+            )
+            return
+        if isinstance(request, dict):
+            self._pending_candidate_request = dict(request)
+            self._pending_candidate_request["route_after"] = True
+            self.statusBar().showMessage(
+                f"{payload.get('candidate_label') or 'Candidate'} is not rendered yet. Press Play to generate and audition it.",
+                7000,
+            )
+
+    def _render_instrument_audition(self, request: object) -> None:
+        if isinstance(request, dict):
+            self._queue_instrument_renders([request])
+
+    def _render_instrument_bank(self, requests: object) -> None:
+        if not isinstance(requests, list):
+            return
+        queued = [dict(request) for request in requests if isinstance(request, dict)]
+        if queued:
+            self._queue_instrument_renders(queued)
+
+    def _queue_instrument_renders(self, requests: list[dict[str, object]]) -> None:
         if self.render_process is not None and self.render_process.state() != QProcess.ProcessState.NotRunning:
             self.statusBar().showMessage("An instrument audition render is already running.", 4000)
             return
+        self._instrument_render_queue = list(requests)
+        self._instrument_render_total = len(requests)
+        self._instrument_render_done = 0
+        self._instrument_render_failures = 0
+        self._instrument_render_request = None
+        self._pending_candidate_request = None
+        self.instrument_audition.set_rendering(
+            True,
+            f"Queued {self._instrument_render_total} instrument candidate render(s)…",
+            completed=0,
+            total=self._instrument_render_total,
+        )
+        self._start_next_instrument_render()
+
+    def _start_next_instrument_render(self) -> None:
+        if not self._instrument_render_queue:
+            self._complete_instrument_render_batch()
+            return
+        request = self._instrument_render_queue.pop(0)
+        self._instrument_render_request = request
         try:
             cue = safe_variant_slug(self.current_cue or "cue")
             requested_name = safe_variant_slug(str(request.get("variant_name") or "instrument_audition"))
@@ -482,13 +652,23 @@ class StemLabWindow(QMainWindow):
                 backend_mode=str(request.get("backend_mode") or "keep"),
                 library_ref=str(request.get("library_ref") or ""),
                 sfz_glob=str(request.get("sfz_glob") or ""),
+                candidate_id=str(request.get("candidate_id") or ""),
+                candidate_label=str(request.get("candidate_label") or ""),
             )
         except Exception as exc:
-            self.instrument_audition.set_rendering(False, f"Could not create scratch variant: {exc}")
+            self._instrument_render_failures += 1
+            self.instrument_audition.set_rendering(
+                True,
+                f"Could not create candidate variant: {exc}",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
+            QTimer.singleShot(0, self._start_next_instrument_render)
             return
 
         label = score_path.name.removesuffix(".music.yaml")
         render_dir = scratch_root / "renders" / label
+        cache_dir = scratch_root / "renders" / ".stem_cache"
         self._instrument_render_group = str(request["group"])
         self._instrument_render_dir = render_dir
         self._instrument_render_log = []
@@ -504,22 +684,32 @@ class StemLabWindow(QMainWindow):
             "--backend", "auto",
             "--simple_mix",
             "--audition_stems",
+            "--keep_debug_stems",
             "--stem_cache",
+            "--stem_cache_dir", str(cache_dir),
             "--force",
             "-j", "1",
             "--json",
         ])
-        process.readyReadStandardOutput.connect(self._instrument_render_output)
-        process.readyReadStandardError.connect(self._instrument_render_output)
-        process.errorOccurred.connect(self._instrument_render_error)
-        process.finished.connect(self._instrument_render_finished)
-        self.instrument_audition.set_rendering(True, f"Rendering scratch variant {label}…")
-        self.statusBar().showMessage(f"Rendering instrument audition {label}…")
+        process.readyReadStandardOutput.connect(lambda p=process: self._instrument_render_output(p))
+        process.readyReadStandardError.connect(lambda p=process: self._instrument_render_output(p))
+        process.errorOccurred.connect(lambda error, p=process: self._instrument_render_error(p, error))
+        process.finished.connect(lambda code, status, p=process: self._instrument_render_finished(p, code, status))
+        index = self._instrument_render_done + self._instrument_render_failures + 1
+        self.instrument_audition.set_rendering(
+            True,
+            f"Rendering candidate {index}/{self._instrument_render_total}: {label}…",
+            completed=self._instrument_render_done + self._instrument_render_failures,
+            total=self._instrument_render_total,
+        )
+        self.statusBar().showMessage(
+            f"Rendering instrument candidate {index}/{self._instrument_render_total}: {label}…"
+        )
         process.start()
 
-    def _instrument_render_output(self) -> None:
-        process = self.render_process
-        if process is None:
+    def _instrument_render_output(self, process: QProcess | None = None) -> None:
+        process = process or self.render_process
+        if process is None or process is not self.render_process:
             return
         chunks = [
             bytes(process.readAllStandardOutput()).decode("utf8", "replace"),
@@ -529,49 +719,104 @@ class StemLabWindow(QMainWindow):
             if chunk:
                 self._instrument_render_log.extend(line for line in chunk.splitlines() if line.strip())
         if self._instrument_render_log:
-            self.instrument_audition.set_rendering(True, self._instrument_render_log[-1][-240:])
+            index = self._instrument_render_done + self._instrument_render_failures + 1
+            self.instrument_audition.set_rendering(
+                True,
+                f"[{index}/{self._instrument_render_total}] {self._instrument_render_log[-1][-220:]}",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
 
-    def _instrument_render_error(self, error) -> None:
-        process = self.render_process
-        if process is None:
+    def _instrument_render_error(self, process: QProcess, error) -> None:
+        if process is not self.render_process:
             return
         message = process.errorString() or str(error)
         self._instrument_render_log.append(message)
-        # FailedToStart does not reliably reach the normal finished path on all
-        # Qt versions.  Restore the editor immediately; other process errors are
-        # still finalized by ``finished`` with their exit code.
         if process.state() == QProcess.ProcessState.NotRunning:
             self.render_process = None
-            self.instrument_audition.set_rendering(False, f"Render process failed: {message}")
-            self.statusBar().showMessage(f"Instrument audition could not start: {message}", 7000)
+            self._instrument_render_failures += 1
+            self.instrument_audition.set_rendering(
+                True,
+                f"Render process failed: {message}",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
+            self.statusBar().showMessage(f"Instrument candidate could not start: {message}", 7000)
+            QTimer.singleShot(0, self._start_next_instrument_render)
 
-    def _instrument_render_finished(self, exit_code: int, _status) -> None:
-        process = self.render_process
-        self._instrument_render_output()
+    def _instrument_render_finished(self, process: QProcess, exit_code: int, _status) -> None:
+        if process is not self.render_process:
+            return
+        self._instrument_render_output(process)
         render_dir = self._instrument_render_dir
         group = self._instrument_render_group
         self.render_process = None
         if exit_code != 0 or render_dir is None:
+            self._instrument_render_failures += 1
             tail = " | ".join(self._instrument_render_log[-3:]) or f"renderer exited with code {exit_code}"
-            self.instrument_audition.set_rendering(False, f"Render failed: {tail}")
-            self.statusBar().showMessage("Instrument audition render failed.", 6000)
+            self.instrument_audition.set_rendering(
+                True,
+                f"Candidate render failed: {tail}",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
+            self.statusBar().showMessage("Instrument candidate render failed; continuing bank.", 5000)
+            QTimer.singleShot(0, self._start_next_instrument_render)
             return
 
         versions = discover_versions_from_path(render_dir)
         if not versions:
-            self.instrument_audition.set_rendering(False, "Render finished but no Stem Lab manifest was found.")
+            self._instrument_render_failures += 1
+            self.instrument_audition.set_rendering(
+                True,
+                "Render finished but no Stem Lab manifest was found; continuing bank.",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
+            QTimer.singleShot(0, self._start_next_instrument_render)
             return
         self.session.add_versions(versions)
         version = max(versions, key=lambda item: item.generated_at)
         self.session.load(version.key)
-        if group and group in self.session.assets_for(version.key):
+        request = dict(self._instrument_render_request or {})
+        route_after = bool(request.get("route_after"))
+        play_after = bool(request.get("play_after"))
+        if route_after and group and group in self.session.assets_for(version.key):
             self.session.set_route_source(group, version.key)
         self._timeline_docs.pop(version.key, None)
+        self._instrument_render_done += 1
         self._refresh_all_tables()
         self._mark_mix_dirty()
         self._refresh_timeline()
-        self.instrument_audition.set_rendering(False, f"Loaded {version.label}; {group or 'edited'} is routed to the new render.")
-        self.statusBar().showMessage(f"Instrument audition ready: {version.label}", 6000)
+        if play_after and route_after:
+            self._select_routed_mix_source()
+            self.mix_timer.stop()
+            self._rebuild_mix()
+            path = self._current_listen_path(build_mix=False)
+            if path is not None:
+                self.transport.toggle(path)
+        if self._instrument_render_queue:
+            self.instrument_audition.set_rendering(
+                True,
+                f"Loaded {version.label}; {len(self._instrument_render_queue)} candidate(s) remain…",
+                completed=self._instrument_render_done + self._instrument_render_failures,
+                total=self._instrument_render_total,
+            )
+            QTimer.singleShot(0, self._start_next_instrument_render)
+        else:
+            self._complete_instrument_render_batch()
+
+    def _complete_instrument_render_batch(self) -> None:
+        total = self._instrument_render_total
+        done = self._instrument_render_done
+        failed = self._instrument_render_failures
+        self._instrument_render_queue = []
+        if total <= 0:
+            return
+        suffix = f"; {failed} failed" if failed else ""
+        message = f"Candidate bank ready: {done}/{total} rendered and loaded{suffix}. Route changes now reuse pre-rendered stems."
+        self.instrument_audition.set_rendering(False, message)
+        self.statusBar().showMessage(message, 9000)
 
     def _select_route_group(self, group: str) -> None:
         for row in range(self.route_table.rowCount()):
@@ -689,6 +934,16 @@ class StemLabWindow(QMainWindow):
         self._mark_mix_dirty()
         self._refresh_timeline()
 
+    def _route_candidate_changed(self, group: str, instrument_name: str, combo: QComboBox) -> None:
+        candidate_key = str(combo.currentData() or "")
+        if not candidate_key:
+            return
+        self._select_route_group(group)
+        self._refresh_inspector(selected_group=group)
+        self.diagnostics_tabs.setCurrentIndex(1)
+        if not self.instrument_audition.select_candidate(instrument_name, candidate_key):
+            self.statusBar().showMessage("Could not select the requested instrument candidate.", 5000)
+
     def _route_source_changed(self, group: str, combo: QComboBox) -> None:
         key = combo.currentData()
         if not key:
@@ -698,7 +953,7 @@ class StemLabWindow(QMainWindow):
         for row in range(self.route_table.rowCount()):
             stem_item = self.route_table.item(row, 1)
             if stem_item and stem_item.text() == group:
-                self.route_table.setItem(row, 3, QTableWidgetItem(asset.quality_label if asset else "unavailable"))
+                self.route_table.setItem(row, 4, QTableWidgetItem(asset.quality_label if asset else "unavailable"))
                 break
         self._mark_mix_dirty()
         self._refresh_inspector(selected_group=group)
@@ -713,6 +968,13 @@ class StemLabWindow(QMainWindow):
                 prefix = "Reference" if key == self.session.reference_key else "Full"
                 choices.append((f"{prefix} · {version.label}", ("full", key)))
         self.transport.set_source_choices(choices, selected=old)
+
+    def _select_routed_mix_source(self) -> None:
+        for index in range(self.transport.source_combo.count()):
+            if self.transport.source_combo.itemData(index) == ("mix", None):
+                if self.transport.source_combo.currentIndex() != index:
+                    self.transport.source_combo.setCurrentIndex(index)
+                return
 
     def _load_selected(self) -> None:
         rows = sorted({index.row() for index in self.library_table.selectionModel().selectedRows()})
@@ -787,7 +1049,7 @@ class StemLabWindow(QMainWindow):
             return
         identity = mix_identity(selections)
         path = self._temp_dir / f"{self.current_cue or 'cue'}-{identity}.wav"
-        if identity != self.mix_identity_value or not path.is_file():
+        if not path.is_file():
             try:
                 result = compose_stem_mix(selections, path)
             except Exception as exc:
@@ -851,6 +1113,26 @@ class StemLabWindow(QMainWindow):
         return None
 
     def _toggle_play(self) -> None:
+        # Play doubles as "make this audition playable". A deliberately
+        # authored candidate that has not been rendered yet is generated first,
+        # with progress shown in the Instrument A/B tab, then routed and played.
+        # This wins even if the previous candidate is currently playing: once a
+        # missing candidate is selected, Play means "play that selection".
+        pending = self.instrument_audition.selected_candidate_request()
+        if pending is None:
+            pending = self._pending_candidate_request
+        if pending is not None:
+            if self.render_process is not None and self.render_process.state() != QProcess.ProcessState.NotRunning:
+                self.statusBar().showMessage("Instrument candidate render is already in progress.", 4000)
+                return
+            if self.transport.wants_playback:
+                self.transport.stop()
+            request = dict(pending)
+            request["route_after"] = True
+            request["play_after"] = True
+            self._select_routed_mix_source()
+            self._queue_instrument_renders([request])
+            return
         path = self._current_listen_path(build_mix=True)
         if not self.transport.toggle(path):
             self.statusBar().showMessage("Selected source has no playable audio.", 4000)
