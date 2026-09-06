@@ -32,6 +32,7 @@ from typing import Any
 import kwconf
 
 from ._score_common import musical_note_events
+from ..musicir.timing import initial_bpm
 
 # Layer kinds whose notes are a foreground melodic line (a "lead").
 LEAD_LAYER_KINDS = {"guitar_lead", "motif"}
@@ -116,7 +117,7 @@ def audit_spec(spec: dict[str, Any], *, buried_db: float = 12.0,
     leads: dict[tuple[str, str], set[str]] = defaultdict(set)
     lead_vel: dict[tuple[str, str], float] = defaultdict(float)
 
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+    bpm = initial_bpm(spec)
     for ev in events:
         sec = str(ev.get("section"))
         grp = str(ev.get("group"))

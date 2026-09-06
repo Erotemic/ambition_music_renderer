@@ -190,7 +190,7 @@ def _normalize_key(value: Any) -> dict[str, Any] | None:
     }
 
 
-def _normalize_harmony(value: Any) -> dict[str, Any]:
+def normalize_v3_harmony(value: Any) -> dict[str, Any]:
     if value is None:
         return {"events": []}
     if isinstance(value, list):
@@ -222,6 +222,70 @@ def _normalize_clip(clip: Mapping[str, Any], *, path: str) -> dict[str, Any]:
     if "events" in row and not isinstance(row["events"], list):
         raise TypeError(f"MusicIR v3 clip {clip_id!r} events must be a list")
     return row
+
+
+def chord_for_bar_from_harmony(harmony: Mapping[str, Any], bar: int) -> str:
+    """Resolve a one-based bar from normalized v3 harmony configuration.
+
+    This is shared by the authoring graph and compatibility audit helpers so
+    v3 harmony has one interpretation even where an older audit still works in
+    bar coordinates.
+    """
+
+    bar = int(bar)
+    cfg = harmony
+    progression = cfg.get("progression")
+    if progression:
+        start_bar = int(cfg.get("start_bar", 1))
+        every = max(1, int(cfg.get("every_bars", 1)))
+        idx = (bar - start_bar) // every
+        if idx >= 0:
+            vals = list(progression)
+            if bool(cfg.get("cycle", False)) and vals:
+                return str(vals[idx % len(vals)])
+            if idx < len(vals):
+                return str(vals[idx])
+    best: tuple[int, str] | None = None
+    for event in cfg.get("events", []) or []:
+        if isinstance(event, Mapping):
+            raw_at = event.get("at")
+            if isinstance(raw_at, Mapping):
+                event_bar = int(raw_at.get("bar", event.get("bar", 1)))
+            else:
+                event_bar = int(event.get("bar", raw_at if raw_at is not None else 1))
+            chord = str(event.get("chord", event.get("harmony", "")))
+        elif isinstance(event, (list, tuple)) and len(event) >= 2:
+            event_bar = int(event[0])
+            chord = str(event[1])
+        else:
+            raise ValueError(f"invalid MusicIR v3 harmony event {event!r}")
+        if event_bar <= bar and chord and (best is None or event_bar >= best[0]):
+            best = (event_bar, chord)
+    if best is None:
+        raise KeyError(f"MusicIR v3 has no harmony defined for bar {bar}")
+    return best[1]
+
+
+def form_region_for_bar(form: Sequence[Mapping[str, Any]], bar: int) -> tuple[dict[str, Any] | None, int]:
+    """Map a one-based v3 score bar to ``(form region, zero-based local bar)``."""
+
+    bar = int(bar)
+    for row in form:
+        raw_from = row.get("from")
+        if isinstance(raw_from, Mapping):
+            start_bar = int(raw_from.get("bar", 1))
+        else:
+            start_bar = int(row.get("start_bar", 1))
+        raw_to = row.get("to")
+        if isinstance(raw_to, Mapping):
+            end_bar = int(raw_to.get("bar", start_bar))
+        elif row.get("bars") is not None:
+            end_bar = start_bar + int(row["bars"])
+        else:
+            continue
+        if start_bar <= bar < end_bar:
+            return copy.deepcopy(dict(row)), bar - start_bar
+    return None, max(0, bar - 1)
 
 
 @dc.dataclass
@@ -297,38 +361,7 @@ class NormalizedScoreGraph:
     def chord_for_bar(self, bar: int) -> str:
         """Resolve one-based score bar to its authored harmony symbol."""
 
-        bar = int(bar)
-        cfg = self.harmony
-        progression = cfg.get("progression")
-        if progression:
-            start_bar = int(cfg.get("start_bar", 1))
-            every = max(1, int(cfg.get("every_bars", 1)))
-            idx = (bar - start_bar) // every
-            if idx >= 0:
-                vals = list(progression)
-                if bool(cfg.get("cycle", False)) and vals:
-                    return str(vals[idx % len(vals)])
-                if idx < len(vals):
-                    return str(vals[idx])
-        best: tuple[int, str] | None = None
-        for event in cfg.get("events", []) or []:
-            if isinstance(event, Mapping):
-                raw_at = event.get("at")
-                if isinstance(raw_at, Mapping):
-                    event_bar = int(raw_at.get("bar", event.get("bar", 1)))
-                else:
-                    event_bar = int(event.get("bar", raw_at if raw_at is not None else 1))
-                chord = str(event.get("chord", event.get("harmony", "")))
-            elif isinstance(event, (list, tuple)) and len(event) >= 2:
-                event_bar = int(event[0])
-                chord = str(event[1])
-            else:
-                raise ValueError(f"invalid MusicIR v3 harmony event {event!r}")
-            if event_bar <= bar and chord and (best is None or event_bar >= best[0]):
-                best = (event_bar, chord)
-        if best is None:
-            raise KeyError(f"MusicIR v3 has no harmony defined for bar {bar}")
-        return best[1]
+        return chord_for_bar_from_harmony(self.harmony, bar)
 
     def chord_at_tick(self, clock: Any, tick: int) -> str:
         """Resolve harmony at an exact score tick, including mid-bar changes."""
@@ -409,7 +442,7 @@ def normalize_v3_score_graph(spec: Mapping[str, Any]) -> NormalizedScoreGraph:
         form=_copy_rows(source.get("form") or [], field="form"),
         end=copy.deepcopy(source.get("end")),
         instruments=instruments,
-        harmony=_normalize_harmony(source.get("harmony")),
+        harmony=normalize_v3_harmony(source.get("harmony")),
         key_context=_normalize_key(source.get("key")),
         materials=materials,
         parts=parts,

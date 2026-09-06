@@ -15,6 +15,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..profiler import profile
+from ..musicir.timing import initial_beats_per_bar, initial_bpm
+from ..musicir.normalize import MUSICIR_V3_SCHEMA
+from ..musicir.graph import chord_for_bar_from_harmony, form_region_for_bar, normalize_v3_harmony
 
 
 @profile
@@ -28,8 +31,8 @@ def events_for_spec(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], float, 
     from ..musicir.compile import compile_score
 
     compiled = compile_score(spec)
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    bpm = initial_bpm(spec)
+    beats_per_bar = initial_beats_per_bar(spec)
     events = musical_note_events(compiled.note_events)
     return events, bpm, beats_per_bar
 
@@ -56,7 +59,16 @@ def musical_note_events(events: Any) -> list[dict[str, Any]]:
 
 @profile
 def section_starts(spec: dict[str, Any]) -> dict[str, int]:
-    """Absolute start bar (0-based) of each section id."""
+    """Absolute start bar (0-based) of each section/form id."""
+    if spec.get("schema") == MUSICIR_V3_SCHEMA:
+        starts: dict[str, int] = {}
+        for row in spec.get("form", []) or []:
+            raw_from = row.get("from")
+            if isinstance(raw_from, dict):
+                starts[str(row.get("id", ""))] = int(raw_from.get("bar", 1)) - 1
+            elif row.get("start_bar") is not None:
+                starts[str(row.get("id", ""))] = int(row["start_bar"]) - 1
+        return starts
     starts: dict[str, int] = {}
     cursor = 0
     for section in spec.get("sections", []):
@@ -67,7 +79,9 @@ def section_starts(spec: dict[str, Any]) -> dict[str, int]:
 
 @profile
 def section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | None, int]:
-    """Map an absolute 0-based bar to ``(section, local_bar)``."""
+    """Map an absolute 0-based bar to ``(section/form region, local_bar)``."""
+    if spec.get("schema") == MUSICIR_V3_SCHEMA:
+        return form_region_for_bar(spec.get("form", []) or [], int(bar0) + 1)
     cursor = 0
     for section in spec.get("sections", []):
         bars = int(section.get("bars", 0))
@@ -80,6 +94,12 @@ def section_for_bar(spec: dict[str, Any], bar0: int) -> tuple[dict[str, Any] | N
 @profile
 def chord_for_abs_bar(spec: dict[str, Any], bar0: int) -> str:
     """The chord symbol sounding at an absolute 0-based bar ('' past the end)."""
+    if spec.get("schema") == MUSICIR_V3_SCHEMA:
+        try:
+            harmony = normalize_v3_harmony(spec.get("harmony"))
+            return chord_for_bar_from_harmony(harmony, int(bar0) + 1)
+        except KeyError:
+            return ""
     from ..render.score_theory import chord_for_bar
 
     section, local = section_for_bar(spec, bar0)
@@ -212,7 +232,18 @@ def source_hint(
     Returns ``(hint, repeat_index, motif_index, motif_interval)``; the indices
     are only populated for motif layers.
     """
-    from ..render.score_theory import chord_for_bar
+    if spec.get("schema") == MUSICIR_V3_SCHEMA:
+        ref = ev.get("source_ref") or {}
+        if isinstance(ref, dict) and ref:
+            parts = [
+                str(ref.get("part_id") or "?"),
+                str(ref.get("voice_id") or "?"),
+                str(ref.get("clip_id") or "?"),
+            ]
+            material = ref.get("material_id")
+            generator = ref.get("generator_kind")
+            suffix = f" material={material}" if material else (f" generator={generator}" if generator else "")
+            return f"parts/{parts[0]}/voices/{parts[1]}/clips/{parts[2]}{suffix}", None, None, None
 
     templates = _layer_templates(spec)
     layer_name = str(ev.get("layer") or "?")
@@ -222,7 +253,7 @@ def source_hint(
         return _motif_source_hint(spec, ev, starts, beats_per_bar)
     bar0 = int(float(ev.get("start_beat", 0.0)) // beats_per_bar)
     section, local_bar = section_for_bar(spec, bar0)
-    chord = chord_for_bar(section, local_bar) if section else ""
+    chord = chord_for_abs_bar(spec, bar0)
     section_id = str((section or {}).get("id") or ev.get("section") or "?")
     return (
         f"sections.{section_id}.harmony[{local_bar}]={chord}; layer_templates.{layer_name}",

@@ -14,6 +14,7 @@ hints such as ``layer_templates.answer_phrase.roots[2]``.
 from __future__ import annotations
 
 from ..profiler import profile
+from ..musicir.timing import initial_beats_per_bar
 
 import kwconf
 import json
@@ -81,6 +82,26 @@ def _chord_root_pc(chord: str) -> int | None:
 @profile
 def _infer_section_keys(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
     keys: dict[str, dict[str, Any]] = {}
+    if spec.get("schema") == "ambition.musicir.v3" and spec.get("key"):
+        from ..musicir.graph import normalize_v3_score_graph
+        from ..render.score_theory import note_to_midi
+
+        graph = normalize_v3_score_graph(spec)
+        key = graph.key_context or {}
+        tonic = str(key.get("tonic", "C"))
+        mode = str(key.get("mode", "major"))
+        tonic_pc = note_to_midi(f"{tonic}4") % 12
+        intervals = NATURAL_MINOR_SCALE if mode in {"minor", "natural_minor", "aeolian"} else MAJOR_SCALE
+        pcs = {(tonic_pc + i) % 12 for i in intervals}
+        for section in graph.form:
+            sid = str(section.get("id", ""))
+            keys[sid] = {
+                "name": f"{_pc_name(tonic_pc)} {mode}",
+                "tonic_pc": tonic_pc,
+                "mode": mode,
+                "pcs": pcs,
+            }
+        return keys
     for section in spec.get("sections", []):
         sid = str(section.get("id", ""))
         harmony = [str(ch) for ch in (section.get("harmony") or [])]
@@ -138,8 +159,6 @@ def _sample_contexts(
     section_keys: dict[str, dict[str, Any]],
     bucket_beats: float,
 ) -> list[dict[str, Any]]:
-    from ..render.score_theory import chord_for_bar
-
     start = float(ev.get("start_beat", 0.0))
     end = float(ev.get("end_beat", start))
     if end <= start:
@@ -151,7 +170,7 @@ def _sample_contexts(
         bar0 = int(beat // beats_per_bar)
         section, local_bar = section_for_bar(spec, bar0)
         sid = str((section or {}).get("id") or ev.get("section") or "")
-        chord = chord_for_bar(section, local_bar) if section else ""
+        chord = chord_for_abs_bar(spec, bar0)
         key = section_keys.get(sid, {"name": "unknown", "pcs": set()})
         contexts.append(
             {
@@ -394,7 +413,7 @@ def pianoroll_data(spec: dict[str, Any], *, bucket_beats: float = 0.25) -> dict[
     events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None
-    bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    bpb = initial_beats_per_bar(spec)
     end_beat = max(float(e["end_beat"]) for e in events)
     keys = _infer_section_keys(spec)
     nb = max(1, int(math.ceil(end_beat / bucket_beats)))

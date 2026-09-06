@@ -21,6 +21,7 @@ from .export import section_chapter_metadata, timeline_markers_from_spec, write_
 from .group import ensure_audio_length, render_group_audio, slice_audio
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
+from ..musicir.timing import initial_bpm
 from .dependencies import build_render_dependency_fingerprint
 from ..profiler import PhaseTimer, profile
 
@@ -93,7 +94,7 @@ def _worker_main(ns) -> int:
         spec = yaml.safe_load(spec_path.read_text())
         render_cfg = spec.get("render", {})
         sr = int(render_cfg.get("sample_rate", 48000))
-        bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+        bpm = initial_bpm(spec)
         soundfont = choose_soundfont(render_cfg.get("soundfont"))
         quality = float(render_cfg.get("ogg_quality", 5.0))
         compiled = compile_score(spec)

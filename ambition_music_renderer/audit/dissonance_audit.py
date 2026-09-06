@@ -13,6 +13,7 @@ listening pass.
 from __future__ import annotations
 
 from ..profiler import profile
+from ..musicir.timing import initial_beats_per_bar, initial_bpm
 
 import kwconf
 import json
@@ -163,8 +164,8 @@ def audit_spec(spec: dict[str, Any], *, bucket_beats: float = 0.25, max_hotspots
 
     compiled = compile_score(spec)
     section_meta = compiled.sections
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    bpm = initial_bpm(spec)
+    beats_per_bar = initial_beats_per_bar(spec)
     all_events = list(compiled.note_events)
     events, ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
@@ -358,7 +359,7 @@ def _pianoroll_data(spec: dict[str, Any], *, bucket_beats: float) -> dict[str, A
     events, _ignored_unpitched = harmonic_events(spec, all_events)
     if not events:
         return None
-    bpb = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    bpb = initial_beats_per_bar(spec)
     end_beat = max(float(e["end_beat"]) for e in events)
     nb = max(1, int(math.ceil(end_beat / bucket_beats)))
     beat_total = [0.0] * nb

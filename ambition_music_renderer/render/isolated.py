@@ -36,6 +36,7 @@ from .foreground_protection import apply_foreground_protection, foreground_prote
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
+from ..musicir.timing import initial_bpm
 from ..musicir.model import compiled_score_fingerprint
 from .synth import legacy_spec_hash
 from .dependencies import (
@@ -327,7 +328,7 @@ def section_mix_gain_envelope(
         envelope_db[start:end] = gain_db
         ordered.append((start, end, sec_id, gain_db))
 
-    bpm = float((spec.get("tempo") or {}).get("bpm", 120.0))
+    bpm = initial_bpm(spec)
     render_cfg = spec.get("render") or {}
     default_transition_beats = float(render_cfg.get("section_mix_transition_beats", 1.0))
     for idx in range(1, len(ordered)):
@@ -405,7 +406,7 @@ def section_stem_mix_gain_envelopes(
         for group in groups:
             envelopes_db[group][start:end] = sec_gains[group]
 
-    bpm = float((spec.get("tempo") or {}).get("bpm", 120.0))
+    bpm = initial_bpm(spec)
     render_cfg = spec.get("render") or {}
     default_transition_beats = float(
         render_cfg.get(
@@ -692,7 +693,7 @@ def _render_main(ns) -> int:
                 "--stem-cache-dir must live outside the render outdir so regen/cleanup "
                 "cannot delete the persistent cache"
             )
-        bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
+        bpm = initial_bpm(spec)
         cache_misses: list[str] = []
         with timings.phase("restore_stem_cache", groups=len(group_names)):
             for group in group_names:

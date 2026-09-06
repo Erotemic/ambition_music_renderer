@@ -5,7 +5,6 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-import pytest
 import soundfile as sf
 
 from ambition_music_renderer.cli import (
@@ -557,15 +556,6 @@ def test_stem_amplitude_report_shows_default_weighted_balance():
 
 
 def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
-    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
-    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
-    # not installed, write a clear note and let the rest of the bundle
-    # succeed" -- so on a machine set up exactly as `python_tools.sh`
-    # intends, this failed on a missing FILE and read as a renderer bug.
-    # The suite already skips for librosa, pyloudnorm, PySide6 and
-    # pedalboard; this is the same move, and the fallback the docstring
-    # promises has its own test below.
-    pytest.importorskip("matplotlib")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         sr = 48_000
@@ -598,15 +588,6 @@ def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
 
 
 def test_stem_loudness_report_writes_tables_and_plot():
-    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
-    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
-    # not installed, write a clear note and let the rest of the bundle
-    # succeed" -- so on a machine set up exactly as `python_tools.sh`
-    # intends, this failed on a missing FILE and read as a renderer bug.
-    # The suite already skips for librosa, pyloudnorm, PySide6 and
-    # pedalboard; this is the same move, and the fallback the docstring
-    # promises has its own test below.
-    pytest.importorskip("matplotlib")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         manifest = {
@@ -1060,3 +1041,69 @@ def test_audit_coverage_report_records_intentional_skips(tmp_path):
     ]
     text = (tmp_path / "audit_coverage.txt").read_text(encoding="utf8")
     assert "transition_audit" in text
+
+
+def test_v3_scalar_timing_and_form_work_across_static_bundle_audits():
+    """Bundle preflight/audits must consume v3 timing/form without v1 dict assumptions."""
+    from ambition_music_renderer.audit.lead_collision import audit_spec as audit_lead_collision_spec
+    from ambition_music_renderer.audit.mix_balance_audit import audit_spec as audit_mix_balance_spec
+    from ambition_music_renderer.musicir.timing import initial_beats_per_bar, initial_bpm
+
+    spec = {
+        "schema": "ambition.musicir.v3",
+        "id": "generic_v3_bundle_audit_contract",
+        "timebase": {"ppq": 480},
+        "meter": "4/4",
+        "tempo": 88,
+        "key": "E minor",
+        "form": [
+            {"id": "opening", "from": {"bar": 1, "beat": 1}, "to": {"bar": 2, "beat": 1}},
+            {"id": "answer", "from": {"bar": 2, "beat": 1}, "to": {"bar": 3, "beat": 1}},
+        ],
+        "end": {"bar": 3, "beat": 1},
+        "harmony": {"progression": ["Em", "G"], "cycle": False},
+        "instruments": [
+            {"name": "keys", "group": "lead", "program": "acoustic_grand_piano", "volume": 100, "pan": 64},
+        ],
+        "parts": [
+            {
+                "id": "keys_part",
+                "instrument": "keys",
+                "voices": [
+                    {
+                        "id": "right",
+                        "clips": [
+                            {
+                                "id": "phrase",
+                                "at": {"bar": 1, "beat": 1},
+                                "events": [
+                                    {"id": "e1", "at": 0, "dur": "1/2", "pitch": "E4", "velocity": 90},
+                                    {"id": "e2", "at": 1920, "dur": "1/2", "pitch": "G4", "velocity": 88},
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    assert initial_bpm(spec) == 88.0
+    assert initial_beats_per_bar(spec) == 4.0
+
+    arrangement = audit_arrangement_spec(spec)
+    dissonance = audit_spec(spec)
+    sour = audit_sour_note_spec(spec)
+    shrill = audit_shrill_note_spec(spec)
+    lead = audit_lead_collision_spec(spec)
+    mix = audit_mix_balance_spec(spec)
+
+    assert arrangement["id"] == spec["id"]
+    assert dissonance["id"] == spec["id"]
+    assert sour["id"] == spec["id"]
+    assert shrill["id"] == spec["id"]
+    assert lead["id"] == spec["id"]
+    assert mix["id"] == spec["id"]
+    # The v3 harmony must be visible to the audits rather than silently
+    # falling back to a v1 section default such as C major.
+    assert not any("unknown" == row.get("name") for row in sour.get("section_keys", {}).values())

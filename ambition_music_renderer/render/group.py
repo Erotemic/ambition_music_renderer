@@ -11,6 +11,7 @@ import numpy as np
 import pretty_midi
 
 from ..profiler import profile
+from ..musicir.timing import initial_beats_per_bar, initial_bpm
 from ..instrument_resolution import (
     backend_prefers_procedural_fm,
     backend_prefers_sfizz,
@@ -370,8 +371,8 @@ def build_manifest(
     compiled_score: dict[str, Any] | None = None,
     render_dependencies: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    bpm = float(spec.get("tempo", {}).get("bpm", spec.get("bpm", 120)))
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    bpm = initial_bpm(spec)
+    beats_per_bar = initial_beats_per_bar(spec)
     manifest = {
         "schema": "ambition.adaptive_music_manifest.v2",
         "renderer_version": RENDERER_VERSION,

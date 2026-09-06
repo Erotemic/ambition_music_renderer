@@ -24,6 +24,7 @@ gate a composition iteration before spending a render.
 from __future__ import annotations
 
 from ..profiler import profile
+from ..musicir.timing import initial_beats_per_bar
 
 import kwconf
 import json
@@ -168,29 +169,23 @@ def _chord_root_pc(chord: str) -> int | None:
 
 
 def _chord_at(spec: dict[str, Any], beat: float, beats_per_bar: float) -> str:
-    from ..render.score_theory import chord_for_bar
+    from ._score_common import chord_for_abs_bar
 
     # start_beat accumulates float error (a bar-56 note can arrive as beat
     # 223.99999999999997); nudge before flooring so boundary notes land in
     # the bar they were authored in.
     bar = int((beat + 1e-6) // beats_per_bar)
-    cursor = 0
-    for section in spec.get("sections", []):
-        bars = int(section.get("bars", 0))
-        if cursor <= bar < cursor + bars:
-            try:
-                return str(chord_for_bar(section, bar - cursor))
-            except Exception:
-                return ""
-        cursor += bars
-    return ""
+    try:
+        return chord_for_abs_bar(spec, bar)
+    except Exception:
+        return ""
 
 
 @profile
 def audit_spec(spec: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
     from ..musicir.compile import compile_score
 
-    beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
+    beats_per_bar = initial_beats_per_bar(spec)
     compiled = compile_score(spec)
     events = musical_note_events(compiled.note_events)
     return audit_events(events, spec, beats_per_bar=beats_per_bar, **kwargs)
