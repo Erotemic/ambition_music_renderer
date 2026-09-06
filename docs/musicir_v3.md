@@ -297,7 +297,8 @@ controls intended to make long sections less mechanical without changing old
 scores: `harmony.arpeggio` supports per-step `velocity_pattern` and
 `octave_pattern`; `harmony.bass` supports per-step/per-bar velocity patterns;
 and `drums.pattern` supports per-bar dynamics plus periodic `fill_events` in
-overlay or replace mode. Form-region `energy`/`intensity` and `density` provide
+overlay or replace mode. Form-region `energy` (bounded), `intensity` (a positive
+gain) and `density` (bounded) provide
 a shared section-level intent signal to procedural clips.
 
 ### Temporary generator-bridge restrictions
@@ -450,8 +451,16 @@ dependent.
 
 ## Form-level performance intent
 
-Form regions may carry bounded `energy`/`intensity`, `density`, `variation`, and
-role metadata. Procedural clips can consume the shared energy/density intent;
+Form regions may carry `energy`, `density` and `variation` — each **bounded to
+0..1** — plus `intensity` and role metadata.
+
+⚠ **`intensity` IS NOT BOUNDED, and lumping it in with the others was wrong.** The
+validator requires `energy`, `density` and `variation` in `0..1`, and `intensity`
+only to be **greater than zero**: it is a positive multiplicative GAIN, not a 0..1
+intent. That is deliberate and has a parity reason — the reviewed v1 Standing on
+Shoulders authors `0.88, 1.00, 1.10, 1.14, 1.24, 1.20`, so a 0..1 ceiling would
+have made the v3 port unable to state what v1 already said. Raised by a GPT review
+2026-09-06, which found this page still describing all four as bounded. Procedural clips can consume the shared energy/density intent;
 literal exact clips remain literal. This is a coordination signal for multiple
 generators, not a hidden postprocessor that rewrites authored notes.
 
