@@ -45,6 +45,41 @@ def test_section_mix_gain_scales_every_stem_without_changing_shape():
     assert np.isclose(stems["pads"][190, 0], 0.25 * 10 ** (-2.0 / 20.0), rtol=1e-5)
 
 
+def test_v3_section_mix_gain_uses_compiled_form_metadata():
+    spec = {
+        "schema": "ambition.musicir.v3",
+        "tempo": 120,
+        "form": [
+            {"id": "a", "from": {"bar": 1}, "to": {"bar": 2}, "mix_gain_db": 6.0},
+            {
+                "id": "b",
+                "from": {"bar": 2},
+                "to": {"bar": 3},
+                "mix_gain_db": -2.0,
+                "mix_gain_transition_beats": 0.5,
+            },
+        ],
+    }
+    meta = [
+        {"id": "a", "start_seconds": 0.0, "end_seconds": 1.0, "mix_gain_db": 6.0},
+        {
+            "id": "b",
+            "start_seconds": 1.0,
+            "end_seconds": 2.0,
+            "mix_gain_db": -2.0,
+            "mix_gain_transition_beats": 0.5,
+        },
+    ]
+
+    envelope, gains = section_mix_gain_envelope(spec, meta, sample_rate=100, frame_count=200)
+
+    assert gains == {"a": 6.0, "b": -2.0}
+    assert np.isclose(envelope[10], 10 ** (6.0 / 20.0), rtol=1e-5)
+    assert np.isclose(envelope[190], 10 ** (-2.0 / 20.0), rtol=1e-5)
+    # Half a beat at 120 BPM is a quarter-second transition.
+    assert envelope[90] > envelope[100] > envelope[110]
+
+
 def test_section_stem_mix_gain_scales_groups_independently():
     from ambition_music_renderer.render.isolated import apply_section_stem_mix_gains
 
@@ -90,6 +125,10 @@ def test_exact_form_metadata_preserves_audio_domain_mix_intent():
                 "id": "solo",
                 "from": {"tick": 0},
                 "to": {"tick": 3840},
+                "energy": 0.72,
+                "density": 0.44,
+                "variation": 0.25,
+                "role": "call",
                 "stem_mix_db": {"woodwinds": 3.0, "strings": -2.0},
                 "stem_mix_transition_beats": 0.5,
             }
@@ -99,5 +138,9 @@ def test_exact_form_metadata_preserves_audio_domain_mix_intent():
     tempo = ExactTempoMap(score, clock).bind_ppq(clock.ppq)
     meta = _form_metadata({"score": score}, clock, tempo, 3840)
 
+    assert meta[0]["energy"] == 0.72
+    assert meta[0]["density"] == 0.44
+    assert meta[0]["variation"] == 0.25
+    assert meta[0]["role"] == "call"
     assert meta[0]["stem_mix_db"] == {"woodwinds": 3.0, "strings": -2.0}
     assert meta[0]["stem_mix_transition_beats"] == 0.5

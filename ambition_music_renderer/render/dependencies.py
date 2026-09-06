@@ -43,6 +43,7 @@ from ..instrument_resolution import (
 )
 from ..musicir.compile import compile_score
 from ..musicir.model import CompiledScore, compiled_score_fingerprint
+from ..musicir.timing import authored_section_rows
 from .score_core import RENDERER_VERSION, choose_soundfont
 
 
@@ -358,11 +359,17 @@ def _audio_settings_payload(spec: Mapping[str, Any]) -> dict[str, Any]:
     from ..processing.plans import processing_plan_for_master
 
     section_mix_fields: list[dict[str, Any]] = []
-    for raw in spec.get("sections", []) or []:
+    for raw in authored_section_rows(spec):
         if not isinstance(raw, Mapping):
             continue
         row = {"id": raw.get("id")}
-        for key in ("mix_gain_db", "mix_gain_transition_beats", "postprocess"):
+        for key in (
+            "mix_gain_db",
+            "mix_gain_transition_beats",
+            "stem_mix_db",
+            "stem_mix_transition_beats",
+            "postprocess",
+        ):
             if key in raw:
                 row[key] = copy.deepcopy(raw.get(key))
         section_mix_fields.append(row)

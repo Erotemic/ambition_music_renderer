@@ -806,6 +806,61 @@ def test_adaptive_composition_mastering_report_prefers_global_slices():
             assert (root / "plots" / "adaptive_composition_noise_floor.jpg").exists()
 
 
+def test_adaptive_composition_mastering_report_reads_v3_form_energy():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 8_000
+        audio = np.zeros((sr // 10, 2), dtype="float32")
+        section_dir = root / "adaptive" / "main"
+        section_dir.mkdir(parents=True)
+        sf.write(section_dir / "cue_hash.main.full.wav", audio, sr)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [
+                {
+                    "id": "main",
+                    "start_seconds": 0.0,
+                    "end_seconds": 0.1,
+                    "duration_seconds": 0.1,
+                    "energy": 0.73,
+                    "density": 0.41,
+                    "role": "refrain",
+                }
+            ],
+            "files": {
+                "adaptive": {"main": {"full": "adaptive/main/cue_hash.main.full.wav"}},
+                "preview": {},
+            },
+        }
+        spec = {
+            "schema": "ambition.musicir.v3",
+            "id": "cue",
+            "form": [
+                {
+                    "id": "main",
+                    "from": {"bar": 1},
+                    "to": {"bar": 2},
+                    "energy": 0.73,
+                    "density": 0.41,
+                    "role": "refrain",
+                }
+            ],
+            "render": {"adaptive_section_mastering": {"mode": "composition_master"}},
+        }
+
+        report = write_adaptive_composition_mastering_report(
+            root, spec, manifest, root / "reports"
+        )
+        payload = json.loads(report.read_text())
+
+        assert payload["rows"][0]["intensity"] == 0.73
+        assert payload["rows"][0]["density"] == 0.41
+        summary = (root / "reports" / "adaptive_composition_mastering_summary.txt").read_text()
+        assert "intensity 0.73" in summary
+
+
 def test_shrill_note_audit_flags_whistle_register_sources():
     spec = {
         "schema": "ambition.musicir.v1",
@@ -1107,3 +1162,105 @@ def test_v3_scalar_timing_and_form_work_across_static_bundle_audits():
     # The v3 harmony must be visible to the audits rather than silently
     # falling back to a v1 section default such as C major.
     assert not any("unknown" == row.get("name") for row in sour.get("section_keys", {}).values())
+
+
+def test_v3_cue_bundle_smoke_preserves_form_intent_and_writes_compact_report(tmp_path):
+    """Exercise the real v3 compile -> render -> manifest -> bundle path."""
+    import zipfile
+
+    import yaml
+
+    from ambition_music_renderer.render.bundle import create_bundle
+
+    spec = {
+        "schema": "ambition.musicir.v3",
+        "id": "v3_bundle_smoke",
+        "timebase": {"ppq": 480},
+        "meter": "4/4",
+        "tempo": 120,
+        "form": [
+            {
+                "id": "main",
+                "from": {"bar": 1, "beat": 1},
+                "to": {"bar": 2, "beat": 1},
+                "energy": 0.73,
+                "density": 0.50,
+                "role": "refrain",
+                "mix_gain_db": -1.0,
+            }
+        ],
+        "end": {"bar": 2, "beat": 1},
+        "key": "C major",
+        "harmony": {"progression": ["C"], "cycle": True},
+        "instruments": [
+            {
+                "name": "keys",
+                "group": "lead",
+                "program": "acoustic_grand_piano",
+                "volume": 100,
+                "pan": 64,
+            }
+        ],
+        "parts": [
+            {
+                "id": "keys_part",
+                "instrument": "keys",
+                "voices": [
+                    {
+                        "id": "right",
+                        "clips": [
+                            {
+                                "id": "phrase",
+                                "at": {"bar": 1, "beat": 1},
+                                "events": [
+                                    [0, "1/4", "C4", 90],
+                                    ["1/4", "1/4", "E4", 88],
+                                    ["1/2", "1/4", "G4", 86],
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+        "render": {"sample_rate": 8_000, "ogg_quality": 2.0},
+    }
+    score_path = tmp_path / "v3_bundle_smoke.music.yaml"
+    score_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf8")
+
+    report = create_bundle(
+        str(score_path),
+        backend="fallback",
+        outdir=tmp_path / "out",
+        bundle_root=tmp_path / "bundle",
+        dest_root=tmp_path / "publish",
+        force=True,
+        # Reproduce the easy-to-misuse combination that created a 474 MB
+        # handoff archive. The full zip remains explicit, but bundle creation
+        # must also emit the compact report artifact automatically.
+        zip_bundle=True,
+        include_scratch_stems=True,
+        jobs=1,
+        render_audio_mode="full-mix-only",
+        # Keep the smoke test process-contained and independent of worker CLI
+        # startup while still exercising the production render functions.
+        profile_render=True,
+    )
+
+    assert report.get("ok", True)
+    manifest = json.loads(Path(report["manifest"]).read_text(encoding="utf8"))
+    section = manifest["sections"][0]
+    assert section["energy"] == 0.73
+    assert section["density"] == 0.50
+    assert section["role"] == "refrain"
+    assert section["mix_gain_db"] == -1.0
+
+    report_zip = Path(report["zip_report"])
+    assert Path(report["zip"]).exists()
+    assert report_zip.exists()
+    # This is intentionally a report archive, even though raw scratch NPYs were
+    # requested in the bundle directory.
+    with zipfile.ZipFile(report_zip) as zf:
+        names = zf.namelist()
+    excluded = {".ogg", ".oga", ".wav", ".flac", ".mp3", ".npy", ".mid", ".midi"}
+    assert not any(Path(name).suffix.lower() in excluded for name in names)

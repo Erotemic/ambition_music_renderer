@@ -12,7 +12,63 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from .normalize import MUSICIR_V3_SCHEMA, normalize_musicir_spec
+from .normalize import MUSICIR_V2_SCHEMA, MUSICIR_V3_SCHEMA, normalize_musicir_spec
+
+
+def authored_section_rows(spec: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    """Return authored form/section rows across MusicIR schema generations.
+
+    V1 authored adaptive sections at top level, while exact-score v2 stores
+    form regions under ``score.form`` and v3 promotes them to top-level
+    ``form``.  Render/audit consumers that need *authored intent* (as opposed
+    to compiled timing metadata) should use this accessor rather than reaching
+    into one schema spelling directly.
+    """
+
+    def _rows(raw: Any) -> list[Mapping[str, Any]]:
+        if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)):
+            return []
+        return [row for row in raw if isinstance(row, Mapping)]
+
+    def _merge(
+        primary: list[Mapping[str, Any]],
+        compatibility: list[Mapping[str, Any]],
+    ) -> list[Mapping[str, Any]]:
+        """Merge migration-era compatibility rows without overriding form."""
+
+        compat_by_id = {
+            str(row.get("id")): row
+            for row in compatibility
+            if row.get("id") is not None
+        }
+        used: set[str] = set()
+        out: list[Mapping[str, Any]] = []
+        for row in primary:
+            row_id = None if row.get("id") is None else str(row.get("id"))
+            merged = dict(compat_by_id.get(row_id, {})) if row_id is not None else {}
+            merged.update(row)
+            out.append(merged)
+            if row_id is not None:
+                used.add(row_id)
+        out.extend(
+            row
+            for row in compatibility
+            if row.get("id") is None or str(row.get("id")) not in used
+        )
+        return out
+
+    schema = spec.get("schema")
+    legacy = _rows(spec.get("sections") or [])
+    if schema == MUSICIR_V3_SCHEMA:
+        # During the migration a few v3 callers still carry top-level
+        # ``sections`` for legacy postprocess fields. Canonical form fields win
+        # by id while compatibility-only fields remain visible.
+        return _merge(_rows(spec.get("form") or []), legacy)
+    if schema == MUSICIR_V2_SCHEMA:
+        score = spec.get("score") or {}
+        form = _rows(score.get("form") or []) if isinstance(score, Mapping) else []
+        return _merge(form, legacy)
+    return legacy
 
 
 def _signature_quarter_beats(signature: str) -> float:

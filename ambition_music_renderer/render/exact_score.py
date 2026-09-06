@@ -510,10 +510,15 @@ def _form_metadata(spec: dict[str, Any], clock: ScoreClock, tempo: ExactTempoMap
             "loopable": bool(item.get("loopable", False)),
             "valid_exit_local_bars": item.get("valid_exit_local_bars", []),
         }
-        # Audio-domain mix intent belongs to the score form, not MIDI velocity.
-        # Preserve it in compiled section metadata so every rendering path and
-        # audit can apply the same authored hierarchy.
+        # Form intent belongs to the semantic section, not one frontend's YAML
+        # spelling. Preserve it in compiled section metadata so v2/v3 render,
+        # mastering, and audit paths consume the same authored hierarchy.
         for key in (
+            "energy",
+            "intensity",
+            "density",
+            "variation",
+            "role",
             "mix_gain_db",
             "mix_gain_transition_beats",
             "stem_mix_db",

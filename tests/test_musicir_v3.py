@@ -63,6 +63,32 @@ def _exact_v3():
     }
 
 
+def test_v3_form_intent_survives_compilation():
+    spec = _exact_v3()
+    spec["form"][0].update(
+        {
+            "energy": 0.76,
+            "density": 0.61,
+            "variation": 0.2,
+            "role": "refrain",
+            "mix_gain_db": -1.5,
+            "mix_gain_transition_beats": 0.75,
+            "stem_mix_db": {"harmony": -2.0},
+        }
+    )
+
+    compiled = compile_score(spec)
+    section = compiled.sections[0]
+
+    assert section["energy"] == 0.76
+    assert section["density"] == 0.61
+    assert section["variation"] == 0.2
+    assert section["role"] == "refrain"
+    assert section["mix_gain_db"] == -1.5
+    assert section["mix_gain_transition_beats"] == 0.75
+    assert section["stem_mix_db"] == {"harmony": -2.0}
+
+
 def _equivalent_v2():
     return {
         "schema": MUSICIR_V2_SCHEMA,

@@ -177,6 +177,12 @@ def create_bundle(
         id_warning = ""
     if render_audio_mode not in RENDER_AUDIO_MODES:
         raise ValueError(f"render_audio_mode must be one of {RENDER_AUDIO_MODES}, got {render_audio_mode!r}")
+    if zip_bundle and include_scratch_stems and not zip_report_bundle:
+        progress_line(
+            "WARNING: --zip plus --include_scratch_stems can create a very large "
+            "full archive; also writing a compact --zip_report artifact for review"
+        )
+        zip_report_bundle = True
 
     generated_layout = None
     explicit_outdir = Path(outdir) if outdir is not None else None

@@ -103,6 +103,21 @@ def _overlap_context(events: list[dict[str, Any]], ev: dict[str, Any]) -> dict[s
 def _section_maps(spec: dict[str, Any]) -> tuple[dict[int, str], dict[int, int]]:
     section_by_bar: dict[int, str] = {}
     local_by_bar: dict[int, int] = {}
+    if spec.get("schema") == "ambition.musicir.v3":
+        for section in spec.get("form", []) or []:
+            if not isinstance(section, dict):
+                continue
+            raw_from = section.get("from") or {}
+            raw_to = section.get("to") or {}
+            if not isinstance(raw_from, dict) or not isinstance(raw_to, dict):
+                continue
+            start = int(raw_from.get("bar", 1)) - 1
+            stop = int(raw_to.get("bar", start + 2)) - 1
+            sid = str(section.get("id", ""))
+            for bar0 in range(start, max(start, stop)):
+                section_by_bar[bar0] = sid
+                local_by_bar[bar0] = bar0 - start
+        return section_by_bar, local_by_bar
     cursor = 0
     for section in spec.get("sections", []) or []:
         bars = int(section.get("bars", 0) or 0)

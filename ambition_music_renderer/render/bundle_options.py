@@ -51,7 +51,11 @@ class BundleOptions(kwconf.Config):
     zip_bundle: bool = kwconf.Flag(
         False,
         alias=["zip"],
-        help="write a complete uploadable bundle zip including manifest-referenced audio",
+        help=(
+            "write the complete bundle zip including manifest-referenced audio; "
+            "this can be hundreds of MB with scratch stems, so use --zip_report "
+            "for an upload/review artifact"
+        ),
     )
     zip_report_bundle: bool = kwconf.Flag(
         False,
@@ -66,7 +70,11 @@ class BundleOptions(kwconf.Config):
     jpeg_quality: int = kwconf.Value(84, help="JPEG quality for spectrogram plots")
     include_scratch_stems: bool = kwconf.Flag(
         False,
-        help="include raw scratch_stems/*.npy in the bundle zip; useful but can be large",
+        help=(
+            "copy raw scratch_stems/*.npy into the bundle directory/full zip; "
+            "these are intentionally excluded from --zip_report and can make "
+            "--zip hundreds of MB"
+        ),
     )
     skip_render: bool = kwconf.Flag(False, help="bundle/analyze existing outdir")
     spectrograms: bool = kwconf.Flag(False, help="write spectrogram plots; off by default")

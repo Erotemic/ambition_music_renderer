@@ -36,7 +36,7 @@ from .foreground_protection import apply_foreground_protection, foreground_prote
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
-from ..musicir.timing import initial_bpm
+from ..musicir.timing import authored_section_rows, initial_bpm
 from ..musicir.model import compiled_score_fingerprint
 from .synth import legacy_spec_hash
 from .dependencies import (
@@ -313,31 +313,41 @@ def section_mix_gain_envelope(
     if frame_count <= 0:
         return np.ones(0, dtype=np.float32), {}
 
-    sections = {str(row.get("id")): row for row in spec.get("sections", [])}
-    gains_db = {
-        str(sec.get("id")): float(sections.get(str(sec.get("id")), {}).get("mix_gain_db", 0.0))
-        for sec in meta
+    authored_sections = {
+        str(row.get("id")): row
+        for row in authored_section_rows(spec)
+        if row.get("id") is not None
     }
+    gains_db = {}
+    for sec in meta:
+        sec_id = str(sec.get("id"))
+        authored = authored_sections.get(sec_id, {})
+        gains_db[sec_id] = float(sec.get("mix_gain_db", authored.get("mix_gain_db", 0.0)))
     envelope_db = np.zeros(frame_count, dtype=np.float32)
-    ordered: list[tuple[int, int, str, float]] = []
+    ordered: list[tuple[int, int, str, float, dict]] = []
     for sec in meta:
         sec_id = str(sec.get("id"))
         start = max(0, min(frame_count, int(round(float(sec.get("start_seconds", 0.0)) * sample_rate))))
         end = max(start, min(frame_count, int(round(float(sec.get("end_seconds", 0.0)) * sample_rate))))
         gain_db = gains_db.get(sec_id, 0.0)
         envelope_db[start:end] = gain_db
-        ordered.append((start, end, sec_id, gain_db))
+        ordered.append((start, end, sec_id, gain_db, sec))
 
     bpm = initial_bpm(spec)
     render_cfg = spec.get("render") or {}
     default_transition_beats = float(render_cfg.get("section_mix_transition_beats", 1.0))
     for idx in range(1, len(ordered)):
-        prev_start, prev_end, prev_id, prev_gain = ordered[idx - 1]
-        next_start, next_end, next_id, next_gain = ordered[idx]
+        prev_start, prev_end, prev_id, prev_gain, _prev_meta = ordered[idx - 1]
+        next_start, next_end, next_id, next_gain, next_meta = ordered[idx]
         if abs(next_gain - prev_gain) < 1e-9:
             continue
-        next_spec = sections.get(next_id, {})
-        beats = float(next_spec.get("mix_gain_transition_beats", default_transition_beats))
+        authored = authored_sections.get(next_id, {})
+        beats = float(
+            next_meta.get(
+                "mix_gain_transition_beats",
+                authored.get("mix_gain_transition_beats", default_transition_beats),
+            )
+        )
         if beats <= 0.0 or bpm <= 0.0:
             continue
         transition_frames = max(2, int(round((beats * 60.0 / bpm) * sample_rate)))
@@ -388,7 +398,11 @@ def section_stem_mix_gain_envelopes(
     if frame_count <= 0:
         return {group: np.ones(0, dtype=np.float32) for group in groups}, {}
 
-    authored_sections = {str(row.get("id")): row for row in spec.get("sections", [])}
+    authored_sections = {
+        str(row.get("id")): row
+        for row in authored_section_rows(spec)
+        if row.get("id") is not None
+    }
     gains_db: dict[str, dict[str, float]] = {}
     ordered: list[tuple[int, int, str, dict[str, float], dict]] = []
     for sec in meta:

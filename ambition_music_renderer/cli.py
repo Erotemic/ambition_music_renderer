@@ -2178,6 +2178,7 @@ def cmd_processing_schema(args) -> int:
 
 
 def cmd_processing_plan(args) -> int:
+    from .musicir.timing import authored_section_rows
     from .processing.mastering import mastering_policy
     from .processing.plans import processing_plan_summary
     from .render.score_core import load_yaml
@@ -2187,7 +2188,7 @@ def cmd_processing_plan(args) -> int:
         raise FileNotFoundError(f"could not find score {args.cue!r}")
     spec = load_yaml(path)
     groups = sorted({str(row.get("group")) for row in spec.get("instruments", []) if isinstance(row, dict) and row.get("group")})
-    sections = [str(row.get("id")) for row in spec.get("sections", []) if isinstance(row, dict) and row.get("id")]
+    sections = [str(row.get("id")) for row in authored_section_rows(spec) if row.get("id")]
     payload = processing_plan_summary(spec, groups=groups, sections=sections)
     payload["mastering_policy"] = mastering_policy(spec).as_dict()
     payload["score"] = str(path)

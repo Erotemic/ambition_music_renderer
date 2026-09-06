@@ -8,6 +8,8 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 
+from ..musicir.timing import authored_section_rows
+
 from .legacy import legacy_processing_plan
 from .pipeline import apply_processing_plan
 from .plans import processing_plan_for_master, processing_plan_for_section
@@ -139,11 +141,22 @@ def adaptive_full_mix(
             "mode": COMPOSITION_MASTER,
             "section": section_id,
             "section_postprocess_ignored": bool(
-                next((s for s in spec.get("sections", []) if str(s.get("id")) == section_id and s.get("postprocess")), None)
+                next(
+                    (
+                        s
+                        for s in authored_section_rows(spec)
+                        if str(s.get("id")) == section_id and s.get("postprocess")
+                    ),
+                    None,
+                )
             ),
         }
 
-    section_specs = {str(s.get("id")): s for s in spec.get("sections", []) if isinstance(s, Mapping)}
+    section_specs = {
+        str(s.get("id")): s
+        for s in authored_section_rows(spec)
+        if isinstance(s, Mapping)
+    }
     section_spec = section_specs.get(section_id, {})
     section_pp = section_spec.get("postprocess") if isinstance(section_spec, Mapping) else None
     if not section_pp:

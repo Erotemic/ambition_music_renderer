@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from ..audio_utils import coerce_stereo
+from ..musicir.timing import authored_section_rows
 from .bundle_base import (
     DBFS_SILENCE_FLOOR,
     _format_dbfs,
@@ -62,7 +63,7 @@ def write_adaptive_section_report(
     }
 
     mastering_cfg = adaptive_section_mastering_config_from_spec(spec)
-    section_specs = [s0 for s0 in spec.get("sections", []) if isinstance(s0, dict)]
+    section_specs = [dict(s0) for s0 in authored_section_rows(spec)]
     section_postprocess_ids = [
         str(s0.get("id")) for s0 in section_specs if isinstance(s0.get("postprocess"), dict)
     ]
@@ -433,21 +434,30 @@ def write_adaptive_composition_mastering_report(
         plots_dir.mkdir(parents=True, exist_ok=True)
 
     mastering_cfg = adaptive_section_mastering_config_from_spec(spec)
-    spec_sections = [s0 for s0 in spec.get("sections", []) if isinstance(s0, dict)]
+    spec_sections = [dict(s0) for s0 in authored_section_rows(spec)]
     spec_by_id = {str(s0.get("id")): s0 for s0 in spec_sections if s0.get("id") is not None}
+    manifest_sections = [s0 for s0 in manifest.get("sections", []) if isinstance(s0, dict)]
+    manifest_by_id = {
+        str(s0.get("id")): s0 for s0 in manifest_sections if s0.get("id") is not None
+    }
     section_order = ordered_section_ids(manifest)
     adaptive = ((manifest.get("files") or {}).get("adaptive") or {})
     rows: list[dict[str, object]] = []
     for idx, section in enumerate(section_order):
         section_files = adaptive.get(section) if isinstance(adaptive, dict) else None
         rel = section_files.get("full") if isinstance(section_files, dict) else None
+        section_intent = {
+            **spec_by_id.get(section, {}),
+            **manifest_by_id.get(section, {}),
+        }
+        intensity = section_intent.get("intensity", section_intent.get("energy", 0.0))
         row: dict[str, object] = {
             "section": section,
             "order": idx,
-            "kind": spec_by_id.get(section, {}).get("kind", ""),
-            "intensity": float(spec_by_id.get(section, {}).get("intensity", 0.0) or 0.0),
-            "density": float(spec_by_id.get(section, {}).get("density", 0.0) or 0.0),
-            "loopable": bool(spec_by_id.get(section, {}).get("loopable", False)),
+            "kind": section_intent.get("kind", ""),
+            "intensity": float(intensity or 0.0),
+            "density": float(section_intent.get("density", 0.0) or 0.0),
+            "loopable": bool(section_intent.get("loopable", False)),
             "has_section_postprocess": isinstance(spec_by_id.get(section, {}).get("postprocess"), dict),
             "path": rel or "",
             "error": "",
