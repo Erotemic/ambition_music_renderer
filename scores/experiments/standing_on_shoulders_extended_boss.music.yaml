@@ -5,7 +5,8 @@ seed: 2026090506
 notes: 'Recovered from the pre-v3 AB extended-boss lineage as a separate alternative to the canonical short cue. The battle
   arrangement keeps the opening cymbal crash and continuous bass/drum groove. The royal horn call now yields to a two-bar
   harpsichord proclamation before the giant enters. The former says-yes/takes-stage split is combined into one restrained
-  three-bar reveal: sparse guitar impacts and a high, sustained lead preview the register of the later solos without pitch bends.
+  three-bar reveal: the giant mirrors the scholar''s two-bar royal proclamation an octave lower, then adds a compact guitar
+  variation in the third bar that descends through E minor and resolves to tonic before the Hands of GNU downbeat.
   The recursive crescendo reserves crash cymbals for structural punctuation instead of striking them every bar/beat. Recursive
   Duel Giant II resolves its B-minor-to-E-minor boundary onto E instead of sustaining F-sharp into the E-minor riff.'
 tempo:
@@ -159,7 +160,7 @@ group_postprocess:
     transient_tame: 0.015
     reverb_wet: 0.003
   giant_riff:
-    gain_db: 1.6
+    gain_db: 3.1
     highpass_hz: 70
     lowpass_hz: 10200
     reverb_wet: 0.003
@@ -774,7 +775,7 @@ motifs:
   - 1.5
   - 0.5
   - 0.5
-  - 1.0
+  - 0.5
   - 0.5
   durations:
   - 1.25
@@ -2206,36 +2207,110 @@ motifs:
 - id: giant_royal_intro_tempered
   root: E3
   intervals:
+  # The giant mirrors the scholar's two-bar royal proclamation one octave
+  # lower, then adds a one-bar guitar answer that resolves cleanly to E.
+  - 0
+  - 3
   - 7
   - 12
+  - 10
+  - 7
+  - 3
+  - 2
+  - 0
+  - 7
+  - 10
+  - 12
+  - 7
+  - 3
+  - 0
+  # Giant's twist: rise once more, then descend through E minor to tonic.
+  - 7
+  - 10
+  - 12
+  - 10
   - 7
   - 5
   - 3
+  - 2
   - 0
-  - -2
   rhythm:
+  # First two bars intentionally mirror scholar_royal_proclamation.
   - 0.5
-  - 4.0
   - 0.5
   - 0.5
-  - 1.5
-  - 0.5
-  - 3.0
-  durations:
-  - 0.4
-  - 3.6
-  - 0.4
-  - 0.4
   - 0.75
-  - 0.4
-  - 2.6
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.25
+  - 0.5
+  - 1.0
+  # One-bar guitar answer.
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 1.0
+  durations:
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.52
+  - 0.18
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.52
+  - 0.18
+  - 0.34
+  - 0.82
+  - 0.34
+  - 0.34
+  - 0.34
+  - 0.18
+  - 0.18
+  - 0.18
+  - 0.18
+  - 0.34
+  - 0.9
   velocities:
-  - 0.8
+  # Slightly more assertive than the harpsichord, while preserving its shape.
+  - 0.82
+  - 0.84
+  - 0.88
   - 0.92
+  - 0.84
+  - 0.88
+  - 0.82
+  - 0.8
+  - 0.84
+  - 0.88
+  - 0.92
+  - 0.96
   - 0.88
   - 0.84
+  - 0.9
+  - 0.9
+  - 0.94
+  - 0.98
+  - 0.88
   - 0.82
-  - 0.86
+  - 0.76
+  - 0.72
+  - 0.68
   - 0.9
 - id: giant_tread_bm_aa
   root: B2
@@ -3649,7 +3724,7 @@ sections:
     motif: giant_royal_intro_tempered
     starts:
     - - 0
-      - 0.9
+      - 0.0
     velocity: 97
     articulation: legato
     humanize_ms: 1.8
