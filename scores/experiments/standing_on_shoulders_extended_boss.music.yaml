@@ -311,6 +311,11 @@ authoring:
         instrument_backend:
           kind: sfz
           sfz_glob: '**/Swagbass/Swagbass/swagbass_clean.sfz'
+      - id: original_gm_picked
+        label: Original GM Picked Bass
+        family: bass
+        summary: Original Standing on Shoulders picked_bass timbre, kept under the current v3 mix levels for a clean timbre A/B.
+        program: picked_bass
       - id: growlybass
         label: Growlybass Clean
         family: bass
@@ -762,11 +767,13 @@ motifs:
   intervals:
   - 0
   - -2
+  - 0
   - -4
   - -7
   rhythm:
   - 1.5
-  - 1.0
+  - 0.5
+  - 0.5
   - 1.0
   - 0.5
   durations:
@@ -774,9 +781,11 @@ motifs:
   - 0.4
   - 0.4
   - 0.4
+  - 0.4
   velocities:
   - 1.0
   - 0.84
+  - 0.92
   - 0.96
   - 0.8
 - id: final_charge
@@ -2195,27 +2204,39 @@ motifs:
   - 0.84
   - 0.9
 - id: giant_royal_intro_tempered
-  root: E4
+  root: E3
   intervals:
-  - 0
   - 7
-  - 10
   - 12
+  - 7
+  - 5
+  - 3
+  - 0
+  - -2
   rhythm:
-  - 1.0
-  - 1.0
-  - 0.75
-  - 0.25
+  - 0.5
+  - 4.0
+  - 0.5
+  - 0.5
+  - 1.5
+  - 0.5
+  - 3.0
   durations:
+  - 0.4
+  - 3.6
+  - 0.4
+  - 0.4
+  - 0.75
+  - 0.4
+  - 2.6
+  velocities:
+  - 0.8
+  - 0.92
   - 0.88
   - 0.84
-  - 0.64
-  - 0.5
-  velocities:
-  - 0.76
-  - 0.81
-  - 0.87
-  - 0.84
+  - 0.82
+  - 0.86
+  - 0.9
 - id: giant_tread_bm_aa
   root: B2
   intervals:
@@ -3629,27 +3650,7 @@ sections:
     starts:
     - - 0
       - 0.9
-    velocity: 92
-    articulation: legato
-    humanize_ms: 2.0
-    humanize_velocity_pct: 2
-  - kind: motif
-    instrument: giant_lead_emily
-    motif: giant_royal_intro_tempered
-    starts:
-    - - 1
-      - 0.55
     velocity: 97
-    articulation: legato
-    humanize_ms: 2.0
-    humanize_velocity_pct: 2
-  - kind: motif
-    instrument: giant_lead_emily
-    motif: giant_royal_intro_tempered
-    starts:
-    - - 2
-      - 0.2
-    velocity: 101
     articulation: legato
     humanize_ms: 1.8
     humanize_velocity_pct: 2
