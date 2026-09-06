@@ -22,6 +22,7 @@ from .music_instrument_audition import (
     InstrumentCandidate,
     InstrumentChoice,
     gm_program_names,
+    instrument_realization_label,
     safe_variant_slug,
     sfz_library_refs,
 )
@@ -223,7 +224,13 @@ class InstrumentAuditionPanel(QWidget):
             self.instrument_combo.blockSignals(False)
             self._set_enabled(True)
             self._instrument_changed()
-            self.status.setText("Select a ready candidate to switch instantly. Play renders the selected candidate when needed.")
+            row = self._choice()
+            if row is not None and row.candidates:
+                self.status.setText("Select a ready candidate to switch instantly. Play renders the selected candidate when needed.")
+            elif row is not None:
+                self.status.setText(
+                    f"Current instrument: {instrument_realization_label(row, include_name=False)}. No authored A/B alternatives."
+                )
         finally:
             self._updating_context = False
 
@@ -274,6 +281,11 @@ class InstrumentAuditionPanel(QWidget):
             prefix = "★ " if candidate.primary else ""
             state = "ready" if ready else "render on Play"
             self.candidate_combo.addItem(f"{prefix}{candidate.label} — {state}", candidate.key)
+        if not self._candidates:
+            self.candidate_combo.addItem(
+                f"Current · {instrument_realization_label(row, include_name=False)}",
+                "",
+            )
         fallback = next((candidate.key for candidate in self._candidates if candidate.primary), None)
         target = old if any(candidate.key == old for candidate in self._candidates) else fallback
         index = next(
@@ -289,9 +301,13 @@ class InstrumentAuditionPanel(QWidget):
     def _candidate_changed(self, *_args, emit: bool = True) -> None:
         candidate = self._candidate()
         row = self._choice()
-        if candidate is None or row is None:
+        if row is None:
+            self.candidate_detail.setText("No instrument is selected.")
+            return
+        if candidate is None:
             self.candidate_detail.setText(
-                "No authored candidate bank for this part. Expand Manual one-off override to explore the broader catalog."
+                f"Current instrument: {instrument_realization_label(row, include_name=False)}. "
+                "No authored alternatives for this part; expand Manual one-off override to explore the broader catalog."
             )
             return
         ready_key = self._candidate_versions.get(candidate.key)

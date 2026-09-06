@@ -8,6 +8,7 @@ import numpy as np
 import soundfile as sf
 
 from ambition_music_renderer.music_audition import (
+    StemMixWorkspace,
     compose_stem_mix,
     discover_stem_assets,
     discover_versions,
@@ -146,3 +147,51 @@ def test_cross_version_stem_mix_uses_selected_sources(tmp_path: Path):
     assert sr == 8000
     assert result.used_normalized_fallback is False
     np.testing.assert_allclose(mixed[:80], 0.30, atol=1e-6)
+
+
+
+def test_incremental_stem_mix_only_reads_changed_group(tmp_path: Path, monkeypatch):
+    bass_a = np.full((80, 2), 0.10, dtype=np.float32)
+    bass_b = np.full((80, 2), 0.30, dtype=np.float32)
+    strings = np.full((80, 2), 0.20, dtype=np.float32)
+    _write_render(tmp_path, "A", "aaaaaaaaaaaaaaaa", {"bass": bass_a, "strings": strings})
+    _write_render(tmp_path, "B", "bbbbbbbbbbbbbbbb", {"bass": bass_b, "strings": strings})
+    versions = {version.label: version for version in discover_versions(tmp_path)}
+    a_assets = discover_stem_assets(versions["A"])
+    b_assets = discover_stem_assets(versions["B"])
+
+    import ambition_music_renderer.music_audition as module
+    original = module._read_asset
+    reads: list[str] = []
+
+    def counted(asset, target_sample_rate):
+        reads.append(asset.group + ":" + asset.path.name)
+        return original(asset, target_sample_rate)
+
+    monkeypatch.setattr(module, "_read_asset", counted)
+    workspace = StemMixWorkspace()
+    initial = workspace.sync(
+        {
+            "bass": (versions["A"], a_assets["bass"]),
+            "strings": (versions["A"], a_assets["strings"]),
+        }
+    )
+    assert initial.rebuilt is True
+    assert set(initial.changed_groups) == {"bass", "strings"}
+    assert len(reads) == 2
+
+    changed = workspace.sync(
+        {
+            "bass": (versions["B"], b_assets["bass"]),
+            "strings": (versions["A"], a_assets["strings"]),
+        }
+    )
+    assert changed.rebuilt is False
+    assert changed.changed_groups == ("bass",)
+    assert len(reads) == 3
+
+    out = tmp_path / "incremental.wav"
+    workspace.write(out, changed)
+    mixed, sr = sf.read(out, dtype="float32", always_2d=True)
+    assert sr == 8000
+    np.testing.assert_allclose(mixed[:80], 0.50, atol=1e-6)

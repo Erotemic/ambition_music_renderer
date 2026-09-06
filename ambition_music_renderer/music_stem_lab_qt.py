@@ -29,8 +29,8 @@ from PySide6.QtWidgets import (
 )
 
 from .music_audition import (
+    StemMixWorkspace,
     StemVersion,
-    compose_stem_mix,
     discover_versions,
     discover_versions_from_path,
     mix_identity,
@@ -45,6 +45,7 @@ from .music_stem_inspector import (
 from .music_instrument_audition import (
     candidate_key_for_score,
     instrument_choices,
+    instrument_realization_label,
     safe_variant_slug,
     write_instrument_variant,
 )
@@ -104,6 +105,7 @@ class StemLabWindow(QMainWindow):
         self.session = StemLabSession.from_versions(versions)
         self.mix_path: Path | None = None
         self.mix_identity_value: str | None = None
+        self.mix_workspace = StemMixWorkspace()
         self._temp_dir = Path(tempfile.mkdtemp(prefix="ambition-stem-lab-"))
         self._route_widgets: dict[str, tuple[QTableWidgetItem, QComboBox]] = {}
         self._timeline_docs: dict[str, TimelineDocument | None] = {}
@@ -321,6 +323,7 @@ class StemLabWindow(QMainWindow):
         cue = str(cue) if cue else None
         if cue != self.current_cue:
             self.transport.stop()
+            self.mix_workspace.clear()
             self.timeline_panel.reset_view_on_next_timeline()
             self.session.select_cue(cue)
         self._refresh_all_tables()
@@ -445,17 +448,36 @@ class StemLabWindow(QMainWindow):
                 )
                 if candidate_combo.count():
                     candidate_combo.setCurrentIndex(candidate_index)
+                fixed = [row for row in choices if row.name != choice.name]
+                tooltip = f"A/B part: {instrument_realization_label(choice)}"
+                if fixed:
+                    tooltip += "\nFixed in this stem: " + "; ".join(
+                        instrument_realization_label(row) for row in fixed
+                    )
+                candidate_combo.setToolTip(tooltip)
                 candidate_combo.currentIndexChanged.connect(
                     lambda _index, g=group, n=choice.name, widget=candidate_combo:
                     self._route_candidate_changed(g, n, widget)
                 )
                 self.route_table.setCellWidget(row, 2, candidate_combo)
             elif authored:
-                item = QTableWidgetItem("Multiple parts · use Instrument A/B")
-                item.setToolTip("This stem contains more than one instrument with authored alternatives.")
+                item = QTableWidgetItem("Multiple candidate parts · use Instrument A/B")
+                item.setToolTip(
+                    "\n".join(instrument_realization_label(choice) for choice in choices)
+                )
+                self.route_table.setItem(row, 2, item)
+            elif choices:
+                label = " + ".join(
+                    instrument_realization_label(choice, include_name=False) for choice in choices
+                )
+                item = QTableWidgetItem(label)
+                item.setToolTip(
+                    "No authored alternatives. Current instrument(s):\n"
+                    + "\n".join(instrument_realization_label(choice) for choice in choices)
+                )
                 self.route_table.setItem(row, 2, item)
             else:
-                self.route_table.setItem(row, 2, QTableWidgetItem("—"))
+                self.route_table.setItem(row, 2, QTableWidgetItem("No instrument metadata"))
 
             combo = QComboBox()
             candidates = self.session.candidates_for_group(group)
@@ -585,6 +607,7 @@ class StemLabWindow(QMainWindow):
         request = payload.get("render_request")
         if version_key and version_key in self.session.versions:
             self._pending_candidate_request = None
+            self._suspend_routed_mix_for_edit()
             self.session.set_route_source(group, version_key)
             self._refresh_route_table()
             self._refresh_inspector(selected_group=group)
@@ -599,8 +622,10 @@ class StemLabWindow(QMainWindow):
         if isinstance(request, dict):
             self._pending_candidate_request = dict(request)
             self._pending_candidate_request["route_after"] = True
+            if self.transport.wants_playback:
+                self.transport.pause()
             self.statusBar().showMessage(
-                f"{payload.get('candidate_label') or 'Candidate'} is not rendered yet. Press Play to generate and audition it.",
+                f"{payload.get('candidate_label') or 'Candidate'} is not rendered yet. Playback is paused at the current position; press Play to render and continue there.",
                 7000,
             )
 
@@ -924,12 +949,18 @@ class StemLabWindow(QMainWindow):
         if self.stem_inspector.diff_enabled:
             self._refresh_timeline()
 
+    def _suspend_routed_mix_for_edit(self) -> None:
+        data = self.transport.current_source_data()
+        if data and data[0] == "mix" and self.transport.wants_playback:
+            self.transport.suspend_for_source_change()
+
     def _route_item_changed(self, item: QTableWidgetItem) -> None:
         if item.column() != 0:
             return
         group = item.data(Qt.UserRole)
         if not group:
             return
+        self._suspend_routed_mix_for_edit()
         self.session.set_route_enabled(str(group), item.checkState() == Qt.Checked)
         self._mark_mix_dirty()
         self._refresh_timeline()
@@ -948,6 +979,7 @@ class StemLabWindow(QMainWindow):
         key = combo.currentData()
         if not key:
             return
+        self._suspend_routed_mix_for_edit()
         self.session.set_route_source(group, str(key))
         asset = self.session.assets_for(str(key)).get(group)
         for row in range(self.route_table.rowCount()):
@@ -1002,6 +1034,7 @@ class StemLabWindow(QMainWindow):
         self._refresh_listen_sources()
 
     def _set_all_route_enabled(self, enabled: bool) -> None:
+        self._suspend_routed_mix_for_edit()
         self.session.set_all_routes_enabled(enabled)
         self.route_table.blockSignals(True)
         state = Qt.Checked if enabled else Qt.Unchecked
@@ -1017,6 +1050,7 @@ class StemLabWindow(QMainWindow):
         key = self.route_all_combo.currentData()
         if not key:
             return
+        self._suspend_routed_mix_for_edit()
         self.session.route_all(str(key))
         self._refresh_route_table()
         self._refresh_inspector()
@@ -1024,9 +1058,11 @@ class StemLabWindow(QMainWindow):
         self._refresh_timeline()
 
     def _route_all_reference(self) -> None:
-        if not self.session.route_reference():
+        if self.session.reference_key is None:
             self.statusBar().showMessage("No reference is selected for this cue.", 4000)
             return
+        self._suspend_routed_mix_for_edit()
+        self.session.route_reference()
         self._refresh_route_table()
         self._refresh_inspector()
         self._mark_mix_dirty()
@@ -1035,34 +1071,53 @@ class StemLabWindow(QMainWindow):
     def _mark_mix_dirty(self, *_args) -> None:
         self.mix_identity_value = None
         if self.current_cue and self.session.loaded_keys:
-            self.mix_status.setText("Routing changed; rebuilding playback mix…")
+            # Stop the old routing immediately, but preserve play intent so
+            # the replacement mix resumes at this exact playhead.
+            self._suspend_routed_mix_for_edit()
+            self.mix_status.setText("Routing changed; updating playback mix…")
             self.mix_timer.start()
 
     def _rebuild_mix(self) -> None:
         selections = self.session.selections()
         if not selections:
             self.mix_path = None
+            self.mix_identity_value = None
+            self.mix_workspace.clear()
             self.mix_status.setText("No enabled routable stems.")
             data = self.transport.current_source_data()
             if data and data[0] == "mix":
-                self.transport.stop()
+                self.transport.pause()
             return
+
         identity = mix_identity(selections)
         path = self._temp_dir / f"{self.current_cue or 'cue'}-{identity}.wav"
-        if not path.is_file():
-            try:
-                result = compose_stem_mix(selections, path)
-            except Exception as exc:
-                self.mix_path = None
-                self.mix_status.setText(f"Could not build routed mix: {exc}")
-                return
-            self.mix_identity_value = identity
-            self.mix_path = result.path
-            fallback = " · normalized fallback present; do not judge balance" if result.used_normalized_fallback else ""
-            guard = f" · peak guard {result.peak_before_guard:.2f}" if result.peak_before_guard > 0.98 else ""
-            self.mix_status.setText(f"Routed mix ready · {len(selections)} stems{fallback}{guard}")
+        cached_path = path.is_file()
+        try:
+            prepared = self.mix_workspace.sync(selections)
+            if cached_path:
+                result = None
+            else:
+                result = self.mix_workspace.write(path, prepared)
+        except Exception as exc:
+            self.mix_path = None
+            self.mix_status.setText(f"Could not build routed mix: {exc}")
+            return
+
+        self.mix_identity_value = identity
+        self.mix_path = path if cached_path else result.path
+        fallback = " · normalized fallback present; do not judge balance" if prepared.used_normalized_fallback else ""
+        guard = f" · peak guard {prepared.peak_before_guard:.2f}" if prepared.peak_before_guard > 0.98 else ""
+        if cached_path:
+            work = "cached combination"
+        elif prepared.rebuilt:
+            work = "initial stem sum"
+        elif prepared.changed_groups:
+            work = "incremental: " + ", ".join(prepared.changed_groups)
         else:
-            self.mix_path = path
+            work = "unchanged"
+        self.mix_status.setText(
+            f"Routed mix ready · {len(selections)} stems · {work}{fallback}{guard}"
+        )
 
         data = self.transport.current_source_data()
         if data and data[0] == "mix" and self.transport.has_media:
@@ -1126,7 +1181,7 @@ class StemLabWindow(QMainWindow):
                 self.statusBar().showMessage("Instrument candidate render is already in progress.", 4000)
                 return
             if self.transport.wants_playback:
-                self.transport.stop()
+                self.transport.pause()
             request = dict(pending)
             request["route_after"] = True
             request["play_after"] = True

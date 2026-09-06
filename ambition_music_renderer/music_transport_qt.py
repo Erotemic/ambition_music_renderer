@@ -287,6 +287,31 @@ class MusicTransport(QWidget):
             self.player.play()
         return True
 
+    def pause(self) -> None:
+        """Pause at the current playhead and cancel automatic resume."""
+        self._desired_playing = False
+        self._pending_resume = False
+        self._pending_seek_ms = None
+        if self.has_media:
+            self.player.pause()
+        self._update_play_button()
+
+    def suspend_for_source_change(self) -> bool:
+        """Pause media while preserving whether playback should resume.
+
+        Returns True when the user had requested playback. This is intended for
+        short route/mix replacements: the old audio stops immediately, and a
+        later ``set_media(..., preserve=True)`` resumes from the same playhead.
+        """
+        should_resume = self.wants_playback
+        self._pending_resume = False
+        self._pending_seek_ms = None
+        if self.has_media:
+            self.player.pause()
+        self._desired_playing = should_resume
+        self._update_play_button()
+        return should_resume
+
     def stop(self) -> None:
         self._desired_playing = False
         self._pending_resume = False

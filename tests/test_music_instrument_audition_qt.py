@@ -95,3 +95,38 @@ def test_stem_lab_keeps_play_actionable_for_generate_on_play(tmp_path: Path):
     finally:
         window.close()
         app.processEvents()
+
+
+
+def test_candidate_panel_still_names_current_instrument_without_alternatives(tmp_path: Path):
+    app = QApplication.instance() or QApplication([])
+    source = tmp_path / "fixed.music.yaml"
+    source.write_text(
+        yaml.safe_dump(
+            {
+                "id": "fixed_ui",
+                "instruments": [
+                    {"name": "bass", "group": "bass", "program": "picked_bass"}
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf8",
+    )
+    panel = InstrumentAuditionPanel()
+    try:
+        choices = instrument_choices(source, "bass")
+        panel.set_context(
+            base_label="baseline",
+            group="bass",
+            source_score=source,
+            exact_source=True,
+            choices=choices,
+        )
+        assert panel.candidate_combo.count() == 1
+        assert "GM picked_bass" in panel.candidate_combo.itemText(0)
+        assert "GM picked_bass" in panel.candidate_detail.text()
+        assert not panel.candidate_combo.isEnabled()
+    finally:
+        panel.close()
+        app.processEvents()

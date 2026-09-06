@@ -7,6 +7,7 @@ from ambition_music_renderer.music_instrument_audition import (
     candidate_key_for_score,
     instrument_candidates,
     instrument_choices,
+    instrument_realization_label,
     safe_variant_slug,
     write_instrument_variant,
 )
@@ -216,3 +217,57 @@ def test_patch_swap_applies_startup_controls_when_glob_omits_inventory_prefix(tm
     lead = yaml.safe_load(output.read_text())["instruments"][0]
     assert lead["controls"][100] == 64
     assert lead["controls"][107] == 127
+
+
+
+def test_authored_candidates_can_include_gm_realization(tmp_path: Path):
+    source = _score(tmp_path / "source.music.yaml")
+    data = yaml.safe_load(source.read_text())
+    data["authoring"] = {
+        "instrument_candidates": {
+            "bass": {
+                "primary": "sampled",
+                "candidates": [
+                    {
+                        "id": "sampled",
+                        "label": "Sampled Bass",
+                        "program": "fingered_bass",
+                        "instrument_backend": {"kind": "sfz", "library_ref": "bass.growly"},
+                    },
+                    {
+                        "id": "legacy_gm",
+                        "label": "Legacy GM Picked Bass",
+                        "program": "picked_bass",
+                    },
+                ],
+            }
+        }
+    }
+    data["instruments"][1]["program"] = "fingered_bass"
+    data["instruments"][1]["instrument_backend"] = {"kind": "sfz", "library_ref": "bass.growly"}
+    source.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf8")
+
+    choice = instrument_choices(source, "bass")[0]
+    assert [row.backend_mode for row in choice.candidates] == ["sfz_library", "gm"]
+    gm = choice.candidates[1]
+    output = write_instrument_variant(
+        source_score=source,
+        destination_score=tmp_path / "gm.music.yaml",
+        group="bass",
+        instrument_name="bass",
+        program=gm.program,
+        backend_mode=gm.backend_mode,
+        candidate_id=gm.key,
+        candidate_label=gm.label,
+    )
+    bass = yaml.safe_load(output.read_text())["instruments"][1]
+    assert bass["program"] == "picked_bass"
+    assert "instrument_backend" not in bass
+
+
+def test_instrument_realization_label_names_fixed_gm_and_sfz_choices(tmp_path: Path):
+    source = _score(tmp_path / "source.music.yaml")
+    lead = instrument_choices(source, "lead")[0]
+    bass = instrument_choices(source, "bass")[0]
+    assert instrument_realization_label(lead) == "lead: guitar.emily"
+    assert instrument_realization_label(bass) == "bass: GM picked_bass"

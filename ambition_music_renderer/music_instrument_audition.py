@@ -72,7 +72,7 @@ def _backend_fields(row: Mapping[str, Any]) -> tuple[str, str, str]:
         mode = "sfz_library"
     elif sfz_glob:
         mode = "sfz_path"
-    elif backend:
+    elif str(backend.get("kind") or "").strip():
         mode = "custom_backend"
     else:
         mode = "gm"
@@ -197,6 +197,21 @@ def instrument_choices(score_path: Path, group: str) -> tuple[InstrumentChoice, 
             )
         )
     return tuple(result)
+
+
+
+def instrument_realization_label(choice: InstrumentChoice, *, include_name: bool = True) -> str:
+    """Return a compact human-readable label for the active instrument realization."""
+    if choice.backend_mode == "sfz_library" and choice.library_ref:
+        realization = choice.library_ref
+    elif choice.backend_mode == "sfz_path" and choice.sfz_glob:
+        realization = Path(choice.sfz_glob).name or choice.sfz_glob
+    elif choice.backend_mode == "gm":
+        realization = f"GM {choice.program}"
+    else:
+        realization = f"{choice.backend_mode} · {choice.program}"
+    return f"{choice.name}: {realization}" if include_name else realization
+
 
 
 

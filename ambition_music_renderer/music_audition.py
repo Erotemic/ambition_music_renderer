@@ -69,6 +69,155 @@ class MixResult:
     used_normalized_fallback: bool
 
 
+@dataclass(frozen=True)
+class PreparedStemMix:
+    """In-memory routed mix state before it is written for QMediaPlayer."""
+
+    sample_rate: int
+    duration_seconds: float
+    peak_before_guard: float
+    used_normalized_fallback: bool
+    changed_groups: tuple[str, ...]
+    rebuilt: bool
+
+
+class StemMixWorkspace:
+    """Incrementally maintain one routed stem sum for low-latency A/B work.
+
+    Stem synthesis is deliberately outside this class. It consumes only already
+    rendered stem assets. After the initial mix, route edits update the
+    accumulator by subtracting removed/replaced stems and adding new ones instead
+    of rereading and resumming every enabled stem.
+    """
+
+    def __init__(self) -> None:
+        self.sample_rate: int | None = None
+        self._mix: np.ndarray | None = None
+        self._group_audio: dict[str, np.ndarray] = {}
+        self._group_keys: dict[str, tuple[str, str, str, int]] = {}
+        self._group_fallback: dict[str, bool] = {}
+
+    def clear(self) -> None:
+        self.sample_rate = None
+        self._mix = None
+        self._group_audio.clear()
+        self._group_keys.clear()
+        self._group_fallback.clear()
+
+    @staticmethod
+    def _selection_key(version: StemVersion, asset: StemAsset) -> tuple[str, str, str, int]:
+        return (version.key, str(asset.path), asset.kind, int(asset.sample_rate))
+
+    def _ensure_length(self, length: int) -> None:
+        if self._mix is None:
+            self._mix = np.zeros((length, 2), dtype=np.float32)
+            return
+        if len(self._mix) >= length:
+            return
+        extended = np.zeros((length, 2), dtype=np.float32)
+        extended[: len(self._mix)] = self._mix
+        self._mix = extended
+
+    def _rebuild(
+        self,
+        selections: Mapping[str, tuple[StemVersion, StemAsset]],
+        target_rate: int,
+    ) -> None:
+        self.clear()
+        self.sample_rate = int(target_rate)
+        for group, (version, asset) in sorted(selections.items()):
+            audio = _read_asset(asset, target_rate)
+            self._ensure_length(len(audio))
+            assert self._mix is not None
+            self._mix[: len(audio)] += audio
+            self._group_audio[group] = audio
+            self._group_keys[group] = self._selection_key(version, asset)
+            self._group_fallback[group] = not asset.balance_faithful
+
+    def sync(
+        self,
+        selections: Mapping[str, tuple[StemVersion, StemAsset]],
+    ) -> PreparedStemMix:
+        if not selections:
+            raise ValueError("cannot compose an empty stem mix")
+        target_rate = max(asset.sample_rate for _, asset in selections.values())
+        new_keys = {
+            group: self._selection_key(version, asset)
+            for group, (version, asset) in selections.items()
+        }
+        changed = tuple(sorted(
+            group
+            for group in set(self._group_keys) | set(new_keys)
+            if self._group_keys.get(group) != new_keys.get(group)
+        ))
+        rebuilt = self._mix is None or self.sample_rate != int(target_rate)
+        if rebuilt:
+            self._rebuild(selections, int(target_rate))
+        else:
+            assert self._mix is not None
+            for group in changed:
+                old_audio = self._group_audio.pop(group, None)
+                self._group_keys.pop(group, None)
+                self._group_fallback.pop(group, None)
+                if old_audio is not None:
+                    self._mix[: len(old_audio)] -= old_audio
+
+                selected = selections.get(group)
+                if selected is None:
+                    continue
+                version, asset = selected
+                audio = _read_asset(asset, int(target_rate))
+                self._ensure_length(len(audio))
+                assert self._mix is not None
+                self._mix[: len(audio)] += audio
+                self._group_audio[group] = audio
+                self._group_keys[group] = self._selection_key(version, asset)
+                self._group_fallback[group] = not asset.balance_faithful
+
+            max_len = max((len(audio) for audio in self._group_audio.values()), default=0)
+            if len(self._mix) > max_len:
+                self._mix = self._mix[:max_len]
+
+        assert self._mix is not None
+        peak = float(np.max(np.abs(self._mix))) if self._mix.size else 0.0
+        return PreparedStemMix(
+            sample_rate=int(self.sample_rate or target_rate),
+            duration_seconds=len(self._mix) / float(self.sample_rate or target_rate),
+            peak_before_guard=peak,
+            used_normalized_fallback=any(self._group_fallback.values()),
+            changed_groups=changed,
+            rebuilt=rebuilt,
+        )
+
+    def write(self, output_path: Path, prepared: PreparedStemMix | None = None) -> MixResult:
+        if self._mix is None or self.sample_rate is None:
+            raise ValueError("no routed stem mix has been prepared")
+        if prepared is None:
+            peak = float(np.max(np.abs(self._mix))) if self._mix.size else 0.0
+            prepared = PreparedStemMix(
+                sample_rate=self.sample_rate,
+                duration_seconds=len(self._mix) / float(self.sample_rate),
+                peak_before_guard=peak,
+                used_normalized_fallback=any(self._group_fallback.values()),
+                changed_groups=(),
+                rebuilt=False,
+            )
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        if prepared.peak_before_guard > 0.98:
+            scale = np.float32(0.98 / prepared.peak_before_guard)
+            sf.write(output_path, self._mix * scale, self.sample_rate, subtype="FLOAT")
+        else:
+            sf.write(output_path, self._mix, self.sample_rate, subtype="FLOAT")
+        return MixResult(
+            path=output_path,
+            sample_rate=self.sample_rate,
+            duration_seconds=prepared.duration_seconds,
+            peak_before_guard=prepared.peak_before_guard,
+            used_normalized_fallback=prepared.used_normalized_fallback,
+        )
+
+
 _REFERENCE_WORDS = (
     "canonical_original",
     "canonical original",
@@ -332,28 +481,6 @@ def compose_stem_mix(
     output_path: Path,
 ) -> MixResult:
     """Assemble selected full-length stems into one temporary WAV for audition."""
-    if not selections:
-        raise ValueError("cannot compose an empty stem mix")
-    target_rate = max(asset.sample_rate for _, asset in selections.values())
-    rendered: list[np.ndarray] = []
-    used_fallback = False
-    for _group, (_version, asset) in sorted(selections.items()):
-        rendered.append(_read_asset(asset, target_rate))
-        used_fallback |= not asset.balance_faithful
-    max_len = max(len(audio) for audio in rendered)
-    out = np.zeros((max_len, 2), dtype=np.float32)
-    for audio in rendered:
-        out[: len(audio)] += audio
-    peak = float(np.max(np.abs(out))) if out.size else 0.0
-    if peak > 0.98:
-        out *= np.float32(0.98 / peak)
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    sf.write(output_path, out, target_rate, subtype="FLOAT")
-    return MixResult(
-        path=output_path,
-        sample_rate=target_rate,
-        duration_seconds=max_len / float(target_rate),
-        peak_before_guard=peak,
-        used_normalized_fallback=used_fallback,
-    )
+    workspace = StemMixWorkspace()
+    prepared = workspace.sync(selections)
+    return workspace.write(output_path, prepared)
