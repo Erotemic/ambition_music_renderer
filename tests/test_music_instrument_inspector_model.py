@@ -220,3 +220,16 @@ def test_probe_pm_emits_suggested_controller_before_notes(tmp_path: Path):
     pm, _groups, _group = _make_probe_pm(req)
     ccs = {(cc.number, cc.value, cc.time) for cc in pm.instruments[0].control_changes}
     assert (107, 88, 0.0) in ccs
+
+
+def test_shamisen_catalog_alias_applies_soundfont_backend():
+    inst = apply_library_entry(
+        default_instrument_document(),
+        LibraryEntry("catalog_alias", "japan.shamisen", "Shamisen", "japan.shamisen"),
+    )
+    assert inst["program"] == 106
+    assert inst["instrument_backend"] == {
+        "kind": "soundfont",
+        "renderer": "fluidsynth-cli",
+        "library_ref": "japan.shamisen",
+    }

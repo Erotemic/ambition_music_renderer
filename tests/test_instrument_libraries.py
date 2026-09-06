@@ -5,6 +5,7 @@ from pathlib import Path
 from ambition_music_renderer.instrument_libraries import (
     collect_sfz_library_diagnostics,
     resolve_sfz_reference,
+    resolve_soundfont_reference,
 )
 from ambition_music_renderer.audio_plugins import validate_instrument_backend_spec
 
@@ -346,3 +347,11 @@ def test_diagnostics_report_missing_expected_download_sources(tmp_path: Path, mo
     assert report["source_hits"]["virtual_playing_orchestra"] == str(sfz.resolve())
     assert "virtual_playing_orchestra" not in report["expected_sources_missing"]
     assert "karoryfer.emilyguitar" in report["expected_sources_missing"]
+
+
+def test_resolve_catalog_soundfont_library_ref(tmp_path: Path):
+    root = tmp_path / "soundfonts"
+    sf2 = root / "Yukinisuzume" / "yukishami20v1.sf2"
+    sf2.parent.mkdir(parents=True)
+    sf2.write_bytes(b"RIFF-test-sf2")
+    assert resolve_soundfont_reference(library_ref="japan.shamisen", roots=[root]) == sf2.resolve()

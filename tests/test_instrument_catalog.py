@@ -31,6 +31,7 @@ def test_catalog_is_packaged_authoring_authority():
         "strings.violas",
         "orchestra.horns_sustain",
         "orchestra.vsco2",
+        "japan.shamisen",
     } <= set(catalog)
 
 
@@ -51,8 +52,8 @@ def test_every_expected_source_maps_to_downloader_destination():
         if not source.get("expected"):
             continue
         relative_root = str(source["relative_root"])
-        assert relative_root.startswith("sfz/"), source_name
-        installer_relative = relative_root.removeprefix("sfz/")
+        assert relative_root.startswith(("sfz/", "soundfonts/")), source_name
+        installer_relative = relative_root.split("/", 1)[1]
         assert installer_relative in installer, (source_name, installer_relative)
 
 
@@ -129,3 +130,63 @@ def test_force_sfz_preserves_top_level_sfizz_default_behavior(tmp_path: Path):
     )
     assert plan.wants_sfz
     assert plan.resolved_sfz == sfz.resolve()
+
+
+def test_shamisen_catalog_uses_reproducible_per_instrument_soundfont(tmp_path: Path):
+    description = describe_instrument("japan.shamisen")
+    assert description["musicir"] == {
+        "instrument_backend": {
+            "kind": "soundfont",
+            "renderer": "fluidsynth-cli",
+            "library_ref": "japan.shamisen",
+        },
+        "program": 106,
+    }
+    sf2 = tmp_path / "soundfonts" / "Yukinisuzume" / "yukishami20v1.sf2"
+    sf2.parent.mkdir(parents=True)
+    sf2.write_bytes(b"RIFF-test-sf2")
+    plan = resolve_instrument_backend({
+        "kind": "soundfont",
+        "library_ref": "japan.shamisen",
+        "library_roots": [str(tmp_path / "soundfonts")],
+    })
+    assert plan.wants_soundfont
+    assert plan.resolved_soundfont == sf2.resolve()
+
+
+def test_installer_has_upstream_shamisen_and_raw_articulation_urls():
+    repo_root = Path(__file__).resolve().parents[1]
+    installer = (repo_root / "download_ambition_audio_tools.sh").read_text(encoding="utf8")
+    assert "https://yukinisuzume.up.seesaa.net/image/yukishami20v1.sf2" in installer
+    for name in ("shami-ff1.rar", "shami-f1.rar", "shamisen-p.rar", "shami-sukui1.rar", "shami-pizz1.rar"):
+        assert name in installer
+
+
+def test_group_routes_per_instrument_soundfont(monkeypatch, tmp_path: Path):
+    import numpy as np
+    import pretty_midi
+    import ambition_music_renderer.render.group as group_mod
+
+    sf2 = tmp_path / "shamisen.sf2"
+    sf2.write_bytes(b"soundfont")
+    pm = pretty_midi.PrettyMIDI(initial_tempo=120)
+    inst = pretty_midi.Instrument(program=106, name="shamisen")
+    inst.notes.append(pretty_midi.Note(velocity=96, pitch=64, start=0.0, end=0.25))
+    pm.instruments.append(inst)
+    calls = []
+    def fake_render(pm_arg, backend, soundfont, sample_rate, midi_path, dry_wav_path, minimum_duration):
+        calls.append((backend, soundfont, pm_arg.instruments[0].program))
+        return np.ones((100, 2), dtype=np.float32) * 0.01
+    monkeypatch.setattr(group_mod, "render_synth_audio", fake_render)
+    audio = group_mod.render_group_audio(
+        pm, {"shamisen": "lead"}, "lead", "fallback", "", 12000, tmp_path, 0.25, 120.0,
+        base_dir=tmp_path,
+        instrument_specs={"shamisen": {
+            "name": "shamisen", "group": "lead", "program": 106,
+            "instrument_backend": {
+                "kind": "soundfont", "soundfont": str(sf2), "renderer": "fluidsynth-cli"
+            },
+        }},
+    )
+    assert len(audio) == 100
+    assert calls == [("fluidsynth-cli", str(sf2.resolve()), 106)]

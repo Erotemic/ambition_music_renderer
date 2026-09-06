@@ -193,7 +193,7 @@ def test_source_only_authoring_register_check_runs_with_python_S():
         cwd=ROOT, text=True, capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "73 instruments" in proc.stdout
+    assert "74 instruments" in proc.stdout
     assert "16 generators" in proc.stdout
 
     index_check = subprocess.run(

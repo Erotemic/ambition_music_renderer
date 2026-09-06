@@ -174,3 +174,20 @@ def test_instrument_resolution_excludes_keyswitch_from_playable_part_range(monke
     assert row["part_low"] == 52
     assert row["part_high"] == 52
     assert row["notes_out_of_range"] == 0
+
+
+def test_catalog_soundfont_instrument_reports_its_own_soundfont(monkeypatch, tmp_path):
+    import ambition_music_renderer.instrument_libraries as instrument_libraries
+
+    sf2 = tmp_path / "yukishami20v1.sf2"
+    sf2.write_bytes(b"RIFF-test-sf2")
+    monkeypatch.setattr(instrument_libraries, "resolve_soundfont_reference", lambda *a, **kw: sf2)
+    inst = {
+        "name": "shamisen", "group": "folk", "program": 106,
+        "instrument_backend": {"kind": "soundfont", "library_ref": "japan.shamisen"},
+    }
+    row = ir.audit_spec(_spec([inst], ["bassline"]))["instruments"][0]
+    assert row["backend"] == "soundfont"
+    assert row["requested"] == "japan.shamisen"
+    assert row["resolved_name"] == "yukishami20v1.sf2"
+    assert row["catalog_ref"] == "japan.shamisen"

@@ -13,6 +13,7 @@
 #   MODE=all     ./download_ambition_audio_tools.sh /data/audio-tools
 #   PLUGINS=0    ./download_ambition_audio_tools.sh /data/audio-tools
 #   ORCHESTRA_EXTRAS=0 ./download_ambition_audio_tools.sh /data/audio-tools
+#   JAPANESE_RAW_SAMPLES=0 ./download_ambition_audio_tools.sh /data/audio-tools
 #   DRY_RUN=1    ./download_ambition_audio_tools.sh /data/audio-tools
 
 set -euo pipefail
@@ -23,9 +24,11 @@ DRY_RUN="${DRY_RUN:-0}"
 PLUGINS="${PLUGINS:-1}"
 SOUNDFONTS="${SOUNDFONTS:-1}"
 ORCHESTRA_EXTRAS="${ORCHESTRA_EXTRAS:-1}"
+JAPANESE_RAW_SAMPLES="${JAPANESE_RAW_SAMPLES:-1}"
 ARCHIVES="$ROOT/archives"
 SFZ_ROOT="$ROOT/sfz"
 SOUNDFONT_ROOT="$ROOT/soundfonts"
+RAW_SAMPLE_ROOT="$ROOT/raw-samples"
 PLUGIN_ROOT="$ROOT/plugins"
 PLUGIN_ARCHIVES="$ARCHIVES/plugins"
 PLUGIN_UNPACKED="$PLUGIN_ROOT/unpacked"
@@ -43,7 +46,7 @@ PYTHON_TOOLS_REPORT="$ROOT/PYTHON_AUDIO_TOOLS_REPORT.txt"
 APT_HINTS="$ROOT/APT_AUDIO_PLUGIN_PACKAGES.md"
 ENV_FILE="$ROOT/env.sh"
 
-mkdir -p "$ARCHIVES" "$SFZ_ROOT" "$SOUNDFONT_ROOT" "$PLUGIN_ARCHIVES" "$PLUGIN_UNPACKED" "$CLAP_ROOT" "$LV2_ROOT" "$VST3_ROOT" "$INBOX" "$LOG_DIR"
+mkdir -p "$ARCHIVES" "$SFZ_ROOT" "$SOUNDFONT_ROOT" "$RAW_SAMPLE_ROOT" "$PLUGIN_ARCHIVES" "$PLUGIN_UNPACKED" "$CLAP_ROOT" "$LV2_ROOT" "$VST3_ROOT" "$INBOX" "$LOG_DIR"
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
@@ -163,11 +166,11 @@ extract_archive() {
         *.zip)
             unzip -o "$archive" -d "$dest"
             ;;
-        *.7z)
+        *.7z|*.rar)
             if have_cmd 7z || have_cmd 7za; then
                 seven_zip x -y "-o$dest" "$archive"
             else
-                log "cannot extract .7z without p7zip-full: $archive"
+                log "cannot extract ${archive##*.} without p7zip-full: $archive"
                 return 1
             fi
             ;;
@@ -244,6 +247,33 @@ download_file_optional() {
     fi
     mkdir -p "$(dirname "$dest_path")"
     cp -f "$archive" "$dest_path"
+}
+
+download_raw_sample_archive_optional() {
+    local label="$1"
+    local url="$2"
+    local archive_name="$3"
+    local dest_dir="$4"
+    local archive="$ARCHIVES/$archive_name"
+    local marker="$dest_dir/.ambition_audio_tools_extracted.$archive_name"
+    if [[ "$DRY_RUN" != "1" && -e "$marker" && -n "$(find "$dest_dir" -type f ! -name '.ambition_audio_tools_extracted.*' -print -quit 2>/dev/null)" ]]; then
+        log "raw samples already extracted: $label -> $dest_dir"
+        return 0
+    fi
+    if ! download "$url" "$archive" "$label"; then
+        log "optional raw-sample download failed: $label"
+        return 1
+    fi
+    if [[ "$DRY_RUN" == "1" ]]; then
+        return 0
+    fi
+    if ! have_cmd 7z && ! have_cmd 7za; then
+        log "raw archive cached but not extracted (install p7zip-full): $archive"
+        return 0
+    fi
+    mkdir -p "$dest_dir"
+    seven_zip x -y "-o$dest_dir" "$archive" >/dev/null
+    date -Iseconds > "$marker"
 }
 
 want_pro() { [[ "$MODE" == "pro" || "$MODE" == "all" ]]; }
@@ -636,6 +666,43 @@ download_generaluser_gs() {
     fi
 }
 
+download_yukinisuzume_shamisen() {
+    if [[ "$SOUNDFONTS" == "0" ]]; then
+        log "Yukinisuzume Shamisen skipped because SOUNDFONTS=0"
+        return 0
+    fi
+    # Original author page / license:
+    #   https://yukinisuzume.seesaa.net/article/37019170.html
+    #   https://yukinisuzume.seesaa.net/article/37455059.html
+    # The lightweight SF2 is a stable direct download and is usable without the
+    # Windows-only SFPack decompressor required by the larger six-layer release.
+    download_file_optional \
+        "Yukinisuzume Shamisen SoundFont" \
+        "https://yukinisuzume.up.seesaa.net/image/yukishami20v1.sf2" \
+        "yukishami20v1.sf2" \
+        "$SOUNDFONT_ROOT/Yukinisuzume/yukishami20v1.sf2"
+
+    if [[ "$JAPANESE_RAW_SAMPLES" != "0" ]]; then
+        # Keep the author's raw articulation recordings reproducible as well.
+        # These are not the active renderer backend yet; they are staged for a
+        # future SFZ realization with explicit Tsugaru strike / normal / weak /
+        # sukui (up-pick) / hajiki (pull-off) articulation switching.
+        local base="https://yukinisuzume.up.seesaa.net/image"
+        local raw="$RAW_SAMPLE_ROOT/Yukinisuzume/Shamisen"
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen strong/Tsugaru 1" "$base/shami-ff1.rar" "yukinisuzume-shami-ff1.rar" "$raw/strong" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen strong/Tsugaru 2" "$base/shami-ff2.rar" "yukinisuzume-shami-ff2.rar" "$raw/strong" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen normal 1" "$base/shami-f1.rar" "yukinisuzume-shami-f1.rar" "$raw/normal" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen normal 2" "$base/shami-f2.rar" "yukinisuzume-shami-f2.rar" "$raw/normal" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen weak" "$base/shamisen-p.rar" "yukinisuzume-shamisen-p.rar" "$raw/weak" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen sukui/up-pick 1" "$base/shami-sukui1.rar" "yukinisuzume-shami-sukui1.rar" "$raw/sukui" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen sukui/up-pick 2" "$base/shami-sukui2.rar" "yukinisuzume-shami-sukui2.rar" "$raw/sukui" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen hajiki/pull-off 1" "$base/shami-pizz1.rar" "yukinisuzume-shami-pizz1.rar" "$raw/hajiki" || true
+        download_raw_sample_archive_optional "Yukinisuzume Shamisen hajiki/pull-off 2" "$base/shami-pizz2.rar" "yukinisuzume-shami-pizz2.rar" "$raw/hajiki" || true
+    else
+        log "Yukinisuzume raw articulation downloads disabled by JAPANESE_RAW_SAMPLES=0"
+    fi
+}
+
 write_soundfont_report() {
     {
         echo "Ambition audio-tools SoundFont summary"
@@ -649,9 +716,8 @@ write_soundfont_report() {
         echo "  render:"
         echo "    soundfont: $SOUNDFONT_ROOT/GeneralUser-GS.sf2"
         echo
-        echo "Note: the current renderer only auto-detects hard-coded system paths."
-        echo "This installer exports AMBITION_MUSIC_DEFAULT_SOUNDFONT in env.sh, but the"
-        echo "renderer must be taught to read it or scores must set render.soundfont explicitly."
+        echo "Catalog-backed per-instrument SoundFonts resolve from this root as well."
+        echo "For example: japan.shamisen -> $SOUNDFONT_ROOT/Yukinisuzume/yukishami20v1.sf2"
     } > "$SOUNDFONT_SUMMARY"
 }
 
@@ -1020,6 +1086,9 @@ if want_pro; then
 fi
 
 download_generaluser_gs
+if want_pro; then
+    download_yukinisuzume_shamisen
+fi
 download_open_plugin_bundles
 
 ingest_inbox_archives

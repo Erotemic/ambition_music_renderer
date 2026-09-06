@@ -83,6 +83,31 @@ def _resolved_sfz_identities(
     return out
 
 
+def _resolved_soundfont_identities(
+    instrument_specs: dict[str, Any],
+    instrument_names: list[str],
+    *,
+    base_dir: Path,
+    render_cfg: dict[str, Any],
+    backend: str,
+) -> dict[str, dict[str, Any] | None]:
+    """Record exact per-instrument SoundFont files for cache invalidation."""
+
+    sfizz_cfg = dict(render_cfg.get("sfizz") or {})
+    force_sfz = backend in {"sfizz", "sfizz-render"}
+    out: dict[str, dict[str, Any] | None] = {}
+    for name in instrument_names:
+        inst_backend = instrument_backend_spec(instrument_specs, name)
+        plan = resolve_instrument_backend(
+            inst_backend,
+            base_dir=base_dir,
+            sfizz_cfg=sfizz_cfg,
+            force_sfz=force_sfz,
+        )
+        out[name] = file_identity(plan.resolved_soundfont) if plan.resolved_soundfont is not None else None
+    return out
+
+
 def stem_cache_key(
     *,
     spec: dict[str, Any],
@@ -134,6 +159,13 @@ def stem_cache_key(
         render_cfg=render_cfg,
         backend=backend,
     )
+    resolved_soundfont = _resolved_soundfont_identities(
+        instrument_specs,
+        relevant_names,
+        base_dir=Path(spec_path).resolve().parent,
+        render_cfg=render_cfg,
+        backend=backend,
+    )
 
     from ..processing.plans import processing_plan_for_group
 
@@ -155,6 +187,7 @@ def stem_cache_key(
         "processing_plan": group_processing_plan.as_dict(),
         "instrument_specs": backend_specs,
         "resolved_sfz": resolved_sfz,
+        "resolved_soundfont": resolved_soundfont,
         "groups": group_map,
         "events": [_event_payload(inst) for inst in event_instruments],
     }

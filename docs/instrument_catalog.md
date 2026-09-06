@@ -209,3 +209,10 @@ When adding a downloaded sample library:
 
 Do not add a second hard-coded alias table, inspector list, or smoke-candidate
 list. Those are consumers of the catalog.
+
+## Per-instrument SoundFonts
+
+Catalog entries may use a sampled SoundFont backend when an upstream instrument is distributed as SF2/SF3 rather than SFZ. Scores still author a stable `library_ref`; the catalog owns the backend kind and MIDI program. The installer places these under `$AMBITION_AUDIO_TOOLS_ROOT/soundfonts/`, and rendering resolves the concrete file through the same canonical instrument-resolution plan used by audits and cache fingerprints.
+
+`japan.shamisen` is the first such entry. `download_ambition_audio_tools.sh` fetches Yukinisuzume's original `yukishami20v1.sf2` directly and also preserves the author's raw shamisen articulation archives under `raw-samples/Yukinisuzume/Shamisen/` for future SFZ work.
+

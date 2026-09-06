@@ -1,4 +1,4 @@
-"""Machine-local SFZ discovery for the checked-in instrument catalog.
+"""Machine-local sampled-instrument discovery for the checked-in catalog.
 
 Stable authoring identities and resolver hints live in ``instrument_catalog.yaml``.
 This module owns only filesystem discovery and resolution against the current
@@ -45,6 +45,29 @@ def _dedupe_roots(roots: Iterable[Path]) -> list[Path]:
         seen.add(expanded)
         out.append(expanded)
     return out
+
+
+def configured_soundfont_roots(extra_roots: Iterable[str | Path] | None = None) -> list[Path]:
+    """Return configured SoundFont search roots in priority order."""
+
+    if extra_roots:
+        return _dedupe_roots(Path(root).expanduser() for root in extra_roots)
+    env_roots: list[Path] = []
+    for env_name in ("AMBITION_MUSIC_SOUNDFONT_ROOTS", "AMBITION_SOUNDFONT_ROOTS"):
+        env_value = os.environ.get(env_name)
+        if env_value:
+            env_roots.extend(Path(part).expanduser() for part in env_value.split(os.pathsep) if part)
+    if env_roots:
+        return _dedupe_roots(env_roots)
+    audio_tools_root = os.environ.get("AMBITION_AUDIO_TOOLS_ROOT")
+    if audio_tools_root:
+        root = Path(audio_tools_root).expanduser()
+        return _dedupe_roots((root / "soundfonts", root))
+    roots: list[Path] = []
+    for root in DEFAULT_AUDIO_TOOLS_ROOTS:
+        roots.append(root / "soundfonts")
+        roots.append(root)
+    return _dedupe_roots(roots)
 
 
 def configured_sfz_roots(extra_roots: Iterable[str | Path] | None = None) -> list[Path]:
@@ -110,6 +133,31 @@ def discover_sfz_files(roots: Iterable[str | Path] | None = None) -> list[Path]:
 
 
 
+@functools.lru_cache(maxsize=8)
+def _discover_soundfont_files_cached(root_keys: tuple[str, ...]) -> tuple[Path, ...]:
+    out: list[Path] = []
+    for key in root_keys:
+        root = Path(key)
+        if not root.exists():
+            continue
+        try:
+            out.extend(
+                path.resolve()
+                for path in root.rglob("*")
+                if path.is_file() and path.suffix.lower() in {".sf2", ".sf3"}
+            )
+        except OSError:
+            continue
+    return tuple(sorted(set(out), key=lambda p: str(p).lower()))
+
+
+def discover_soundfont_files(roots: Iterable[str | Path] | None = None) -> list[Path]:
+    """Discover SF2/SF3 files under configured local SoundFont roots."""
+
+    root_keys = tuple(str(root) for root in configured_soundfont_roots(roots))
+    return list(_discover_soundfont_files_cached(root_keys))
+
+
 
 def _candidate_text(path: Path, roots: Iterable[str | Path] | None = None) -> str:
     """Normalize the library-relative path, not the user's absolute prefix."""
@@ -136,7 +184,7 @@ def _source_relative_tokens(source_info: dict[str, Any]) -> tuple[str, ...]:
     if not relative_root:
         return ()
     parts = list(Path(relative_root).parts)
-    if parts and _normalize_text(parts[0]) == "sfz":
+    if parts and _normalize_text(parts[0]) in {"sfz", "soundfonts"}:
         parts = parts[1:]
     return tuple(norm for part in parts if (norm := _normalize_text(part)))
 
@@ -272,6 +320,50 @@ def resolve_sfz_reference(
     )[0]
 
 
+def resolve_soundfont_reference(
+    value: str | Path | None = None,
+    *,
+    library_ref: str | None = None,
+    prefer: Iterable[str] = (),
+    base_dir: Path | None = None,
+    roots: Iterable[str | Path] | None = None,
+) -> Path | None:
+    """Resolve an explicit SF2/SF3 path or catalog-backed SoundFont reference."""
+
+    explicit = str(value).strip() if value is not None else ""
+    search_roots = configured_soundfont_roots(roots)
+    if explicit:
+        p = Path(explicit).expanduser()
+        direct_candidates: list[Path] = []
+        if not p.is_absolute() and base_dir is not None:
+            direct_candidates.append((base_dir / p).resolve())
+        direct_candidates.append(p.resolve())
+        for candidate in direct_candidates:
+            if candidate.is_file() and candidate.suffix.lower() in {".sf2", ".sf3"}:
+                return candidate
+    if not library_ref:
+        return None
+    entry = get_instrument_catalog_entry(library_ref)
+    alias = entry.resolver if entry is not None else ResolverHints(
+        required_any=(tuple(_normalize_text(library_ref).split()),)
+    )
+    candidates = []
+    for path in discover_soundfont_files(search_roots):
+        text = _candidate_text(path, search_roots)
+        if _matches_required(text, alias):
+            candidates.append(path)
+    if not candidates:
+        return None
+    candidates = _prefer_catalog_source(candidates, entry)
+    return sorted(
+        candidates,
+        key=lambda p: (
+            -_score_candidate(p, alias=alias, prefer=prefer, roots=search_roots),
+            str(p),
+        ),
+    )[0]
+
+
 def collect_sfz_library_diagnostics(*, limit: int = 200) -> dict[str, Any]:
     """Return a JSON-serializable report of configured SFZ libraries."""
 
@@ -281,6 +373,9 @@ def collect_sfz_library_diagnostics(*, limit: int = 200) -> dict[str, Any]:
     expected_missing: list[str] = []
     catalog = instrument_catalog()
     for name, entry in sorted(catalog.items()):
+        backend_kind = str((entry.backend or {}).get("kind") or "sfz").lower()
+        if backend_kind not in {"sfz", "sfizz", "sample", "sampled"}:
+            continue
         resolved = resolve_sfz_reference(library_ref=name, roots=roots)
         alias_hits[name] = str(resolved) if resolved is not None else None
         if entry.expected and resolved is None:
@@ -289,6 +384,8 @@ def collect_sfz_library_diagnostics(*, limit: int = 200) -> dict[str, Any]:
     source_hits: dict[str, str | None] = {}
     expected_sources_missing: list[str] = []
     for name, source_info in sorted(instrument_source_catalog().items()):
+        if not str(source_info.get("relative_root") or "").startswith("sfz/"):
+            continue
         hit = next((path for path in files if _matches_source(path, source_info)), None)
         source_hits[name] = str(hit) if hit is not None else None
         if bool(source_info.get("expected", False)) and hit is None:

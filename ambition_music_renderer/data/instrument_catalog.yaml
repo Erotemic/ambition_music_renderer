@@ -180,6 +180,18 @@ sources:
     relative_root: sfz/DrumGizmo/MuldjordKit
     notes:
     - Attribution is required when redistributing the samples. Prefer the Stereo kit program for normal rendering.
+  yukinisuzume.shamisen:
+    label: Yukinisuzume Shamisen
+    expected: true
+    install_profile: pro
+    relative_root: soundfonts/Yukinisuzume/yukishami20v1.sf2
+    license: Custom free-use terms; rendered music including commercial use permitted
+    homepage: https://yukinisuzume.seesaa.net/article/37019170.html
+    notes:
+    - Installer fetches the original upstream SF2 directly; Ambition does not vendor the sample data.
+    - The author's Read Me permits use in music, including commercial music.
+    - Program 106 is the GM Shamisen slot used for this lightweight SF2.
+    - The installer also preserves the author's raw strong, normal, weak, sukui/up-pick, and hajiki/pull-off archives under raw-samples for a future articulation-rich SFZ realization.
 instruments:
   freepats.upright_piano_kw:
     family: piano
@@ -2208,54 +2220,32 @@ instruments:
       summary: Horse Pulse bowed/tagelharpa family.
       nuances:
       - The main keyswitch program uses states 31..36 and startup controller defaults.
+  japan.shamisen:
+    family: folk
+    role: shamisen
+    backend:
+      kind: soundfont
+      renderer: fluidsynth-cli
+    program: 106
+    resolver:
+      required_any:
+      - - yukishami20v1
+      - - yukishami
+        - sf2
+      prefer:
+      - yukishami20v1
+      - yukishami
+      avoid: []
+    source: yukinisuzume.shamisen
+    expected: true
+    install_profile: pro
+    usage:
+      summary: Recorded Japanese shamisen SoundFont from Yukinisuzume; use as a real shamisen voice rather than a generic GM ethnic patch.
+      nuances:
+      - The lightweight SF2 is machine-reproducible and pinned to program 106.
+      - The author notes SoundFont gain can vary by sampler, so measure/render before committing final mix gain.
+      - Raw articulation recordings are downloaded separately for future Tsugaru strike, sukui, and hajiki support.
 smoke_profiles:
-- name: emily_clean
-  path: Karoryfer/Emilyguitar/Emilyguitar/emily_clean.sfz
-  source: karoryfer.emilyguitar
-  family: guitar
-  articulation: clean-single-note
-  probes:
-  - 48
-  - 55
-  - 60
-  pitch_probe: false
-- name: shiny_electric_four
-  path: Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz
-  source: karoryfer.shinyguitar
-  family: guitar
-  articulation: electric-sustain
-  probes:
-  - 37
-  - 52
-  - 64
-  - 76
-- name: sonatina_harpsichord_full
-  path: Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz
-  source: sonatina
-  family: keys
-  articulation: harpsichord-full
-  probes:
-  - 48
-  - 60
-  - 72
-- name: sonatina_harpsichord_8ft
-  path: "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz"
-  source: sonatina
-  family: keys
-  articulation: harpsichord-8ft
-  probes:
-  - 48
-  - 60
-  - 72
-- name: sonatina_harpsichord_4ft
-  path: "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz"
-  source: sonatina
-  family: keys
-  articulation: harpsichord-4ft
-  probes:
-  - 48
-  - 60
-  - 72
 - name: emily_basic
   path: Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz
   source: karoryfer.emilyguitar
@@ -2343,7 +2333,6 @@ smoke_profiles:
   - 67
 - name: shiny_electric
   path: Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz
-  library_ref: guitar.electric_lead
   source: karoryfer.shinyguitar
   family: guitar
   articulation: electric-sustain

@@ -281,3 +281,21 @@ def test_canonical_processing_tracks_vst3_bundle_identity(tmp_path):
     assert before.fingerprint != after.fingerprint
     rows = before.payload["processing"]["effects"]
     assert any(row.get("vst3", {}).get("resolved", {}).get("kind") == "directory" for row in rows.values())
+
+
+def test_per_instrument_soundfont_identity_invalidates_render(tmp_path):
+    renderer_root = _fake_renderer_root(tmp_path)
+    sf2 = tmp_path / "shamisen.sf2"
+    sf2.write_bytes(b"soundfont-v1")
+    spec = _score(backend={
+        "kind": "soundfont",
+        "soundfont": str(sf2),
+        "renderer": "fluidsynth-cli",
+    })
+    before = _fingerprint(tmp_path, spec, package_root=renderer_root)
+    sf2.write_bytes(b"soundfont-v2-with-different-size")
+    after = _fingerprint(tmp_path, spec, package_root=renderer_root)
+    assert before.fingerprint != after.fingerprint
+    row = before.payload["instrument_resolution"]["instruments"]["lead"]
+    assert row["wants_soundfont"] is True
+    assert row["resolved_soundfont"]["path"].endswith("shamisen.sf2")

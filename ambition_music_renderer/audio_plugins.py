@@ -373,6 +373,25 @@ def validate_instrument_backend_spec(
     canonical = normalize_backend_spec(spec)
     severity = _spec_missing_severity(canonical)
     plan = resolve_instrument_backend(canonical, base_dir=base_dir)
+    if plan.wants_soundfont:
+        resolved = plan.resolved_soundfont
+        renderer = str(canonical.get("renderer") or "fluidsynth-cli").lower().strip()
+        if renderer == "fluidsynth-cli" and not shutil.which("fluidsynth"):
+            messages.append({
+                "severity": severity,
+                "message": "'fluidsynth' not found for per-instrument SoundFont rendering",
+            })
+        if resolved is None:
+            message = (
+                f"expected Ambition SoundFont catalog instrument did not resolve: {plan.library_ref!r}; "
+                "run or repair download_ambition_audio_tools.sh"
+                if plan.expected_catalog_instrument
+                else f"SoundFont library reference did not resolve: {plan.requested!r}"
+            )
+            messages.append({"severity": severity, "message": message})
+        else:
+            messages.append({"severity": "info", "message": f"SoundFont instrument resolved: {resolved}"})
+        return messages
     if not plan.wants_sfz:
         return messages
     settings = dict(plan.sfizz_settings)

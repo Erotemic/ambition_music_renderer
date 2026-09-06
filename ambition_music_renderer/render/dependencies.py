@@ -43,7 +43,6 @@ from ..instrument_resolution import (
 )
 from ..musicir.compile import compile_score
 from ..musicir.model import CompiledScore, compiled_score_fingerprint
-from ..musicir.timing import authored_section_rows
 from .score_core import RENDERER_VERSION, choose_soundfont
 
 
@@ -359,17 +358,11 @@ def _audio_settings_payload(spec: Mapping[str, Any]) -> dict[str, Any]:
     from ..processing.plans import processing_plan_for_master
 
     section_mix_fields: list[dict[str, Any]] = []
-    for raw in authored_section_rows(spec):
+    for raw in spec.get("sections", []) or []:
         if not isinstance(raw, Mapping):
             continue
         row = {"id": raw.get("id")}
-        for key in (
-            "mix_gain_db",
-            "mix_gain_transition_beats",
-            "stem_mix_db",
-            "stem_mix_transition_beats",
-            "postprocess",
-        ):
+        for key in ("mix_gain_db", "mix_gain_transition_beats", "postprocess"):
             if key in raw:
                 row[key] = copy.deepcopy(raw.get(key))
         section_mix_fields.append(row)
@@ -594,6 +587,7 @@ def instrument_dependency_payload(
     fallbacks = _group_default_fallbacks(compiled, backend=backend, render_cfg=render_cfg)
     rows: dict[str, Any] = {}
     sfz_binary_requests: set[str] = set()
+    soundfont_binary_requests: set[str] = set()
     vst3_cache: dict[str, dict[str, Any]] = {}
 
     for inst in compiled.pm.instruments:
@@ -635,6 +629,10 @@ def instrument_dependency_payload(
                         plugin_ref, base_dir=base_dir
                     )
                 sfizz_execution["vst3"] = copy.deepcopy(vst3_cache[cache_key])
+        if plan.wants_soundfont:
+            renderer = str(raw_backend.get("renderer") or "fluidsynth-cli")
+            if renderer == "fluidsynth-cli":
+                soundfont_binary_requests.add("fluidsynth")
         rows[name] = {
             "group": group,
             "kind": plan.kind,
@@ -645,9 +643,11 @@ def instrument_dependency_payload(
                 if plan.resolved_sfz is not None
                 else None
             ),
+            "resolved_soundfont": file_identity(plan.resolved_soundfont) if plan.resolved_soundfont else None,
             "fallback_backend": plan.fallback_backend,
             "optional": bool(plan.optional),
             "wants_sfz": bool(plan.wants_sfz),
+            "wants_soundfont": bool(plan.wants_soundfont),
             "wants_procedural_fm": bool(plan.wants_procedural_fm),
             "sfizz_renderer": settings.get("renderer", "auto") if plan.wants_sfz else None,
             "sfizz_binary": settings.get("binary", "sfizz_render") if plan.wants_sfz else None,
@@ -658,7 +658,8 @@ def instrument_dependency_payload(
     return {
         "instruments": rows,
         "executables": {
-            binary: executable_identity(binary) for binary in sorted(sfz_binary_requests)
+            binary: executable_identity(binary)
+            for binary in sorted(sfz_binary_requests | soundfont_binary_requests)
         },
     }
 

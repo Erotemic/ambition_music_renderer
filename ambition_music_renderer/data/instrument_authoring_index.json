@@ -1,5 +1,5 @@
 {
-  "catalog_semantic_sha256": "5b852c3dbda625a6da21d9646fdad5022c17a2d44c615d2617b00026ee10b1cc",
+  "catalog_semantic_sha256": "2da0aa07e490eba11428a7561a66e23a43771c88ba66484070fd8f162865ed30",
   "family_profiles": {
     "bass": {
       "audition": {
@@ -517,9 +517,12 @@
     }
   },
   "generated_from": "instrument_catalog.yaml + instrument_family_profiles.json",
-  "instrument_count": 73,
+  "instrument_count": 74,
   "instruments": {
     "bass.black_and_blue": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -594,6 +597,7 @@
           "library_ref": "bass.black_and_blue"
         }
       },
+      "program": null,
       "ref": "bass.black_and_blue",
       "resolver": {
         "avoid": [
@@ -641,6 +645,9 @@
       }
     },
     "bass.electric": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -711,6 +718,7 @@
           "library_ref": "bass.electric"
         }
       },
+      "program": null,
       "ref": "bass.electric",
       "resolver": {
         "avoid": [
@@ -781,6 +789,9 @@
       "usage": {}
     },
     "bass.fashion": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -851,6 +862,7 @@
           "library_ref": "bass.fashion"
         }
       },
+      "program": null,
       "ref": "bass.fashion",
       "resolver": {
         "avoid": [
@@ -892,6 +904,9 @@
       }
     },
     "bass.growly": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -962,6 +977,7 @@
           "library_ref": "bass.growly"
         }
       },
+      "program": null,
       "ref": "bass.growly",
       "resolver": {
         "avoid": [
@@ -1014,6 +1030,9 @@
       }
     },
     "bass.meatbass_pizz": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -1070,6 +1089,7 @@
           "library_ref": "bass.meatbass_pizz"
         }
       },
+      "program": null,
       "ref": "bass.meatbass_pizz",
       "resolver": {
         "avoid": [
@@ -1103,6 +1123,9 @@
       "usage": {}
     },
     "bass.pastabass": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -1173,6 +1196,7 @@
           "library_ref": "bass.pastabass"
         }
       },
+      "program": null,
       "ref": "bass.pastabass",
       "resolver": {
         "avoid": [
@@ -1210,6 +1234,9 @@
       }
     },
     "bass.swag": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -1280,6 +1307,7 @@
           "library_ref": "bass.swag"
         }
       },
+      "program": null,
       "ref": "bass.swag",
       "resolver": {
         "avoid": [
@@ -1316,6 +1344,9 @@
       }
     },
     "bass.upright": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "bass",
       "family_profile": {
@@ -1366,50 +1397,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "bass.upright"
         }
       },
+      "program": null,
       "ref": "bass.upright",
       "resolver": {
         "avoid": [
@@ -1473,6 +1467,9 @@
       }
     },
     "brass.tuba": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "brass",
       "family_profile": {
@@ -1528,6 +1525,7 @@
           "library_ref": "brass.tuba"
         }
       },
+      "program": null,
       "ref": "brass.tuba",
       "resolver": {
         "avoid": [
@@ -1572,6 +1570,9 @@
       }
     },
     "drums.big_rusty": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "drums",
       "family_profile": {
@@ -1701,6 +1702,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "drums.big_rusty",
       "resolver": {
         "avoid": [
@@ -1749,6 +1751,9 @@
       }
     },
     "drums.gogodze": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "drums",
       "family_profile": {
@@ -1874,6 +1879,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "drums.gogodze",
       "resolver": {
         "avoid": [
@@ -1915,6 +1921,9 @@
       }
     },
     "drums.muldjord": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "drums",
       "family_profile": {
@@ -2040,6 +2049,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "drums.muldjord",
       "resolver": {
         "avoid": [
@@ -2079,6 +2089,9 @@
       }
     },
     "drums.naked": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "drums",
       "family_profile": {
@@ -2204,6 +2217,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "drums.naked",
       "resolver": {
         "avoid": [
@@ -2251,6 +2265,9 @@
       }
     },
     "drums.rock": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "drums",
       "family_profile": {
@@ -2376,6 +2393,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "drums.rock",
       "resolver": {
         "avoid": [
@@ -2429,6 +2447,9 @@
       }
     },
     "epiano.rhodes": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "keys",
       "family_profile": {
@@ -2483,6 +2504,7 @@
           "library_ref": "epiano.rhodes"
         }
       },
+      "program": null,
       "ref": "epiano.rhodes",
       "resolver": {
         "avoid": [
@@ -2519,6 +2541,9 @@
       }
     },
     "folk.banjo": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "folk",
       "family_profile": {
@@ -2574,6 +2599,7 @@
           "library_ref": "folk.banjo"
         }
       },
+      "program": null,
       "ref": "folk.banjo",
       "resolver": {
         "avoid": [
@@ -2608,6 +2634,9 @@
       "usage": {}
     },
     "folk.bass_tagelharpa": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "folk",
       "family_profile": {
@@ -2663,6 +2692,7 @@
           "library_ref": "folk.bass_tagelharpa"
         }
       },
+      "program": null,
       "ref": "folk.bass_tagelharpa",
       "resolver": {
         "avoid": [
@@ -2706,6 +2736,9 @@
       }
     },
     "folk.harp": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "folk",
       "family_profile": {
@@ -2761,6 +2794,7 @@
           "library_ref": "folk.harp"
         }
       },
+      "program": null,
       "ref": "folk.harp",
       "resolver": {
         "avoid": [
@@ -2804,6 +2838,9 @@
       }
     },
     "freepats.salamander_grand": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "piano",
       "family_profile": {
@@ -2862,6 +2899,7 @@
           "library_ref": "freepats.salamander_grand"
         }
       },
+      "program": null,
       "ref": "freepats.salamander_grand",
       "resolver": {
         "avoid": [
@@ -2899,6 +2937,9 @@
       }
     },
     "freepats.upright_piano_kw": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "piano",
       "family_profile": {
@@ -2957,6 +2998,7 @@
           "library_ref": "freepats.upright_piano_kw"
         }
       },
+      "program": null,
       "ref": "freepats.upright_piano_kw",
       "resolver": {
         "avoid": [],
@@ -2992,6 +3034,9 @@
       }
     },
     "guitar.acoustic": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3044,20 +3089,6 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
-          "name": "shiny_electric_four",
-          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
-          "probes": [
-            37,
-            52,
-            64,
-            76
-          ],
-          "source": "karoryfer.shinyguitar"
-        },
-        {
-          "articulation": "electric-sustain",
-          "family": "guitar",
-          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3079,6 +3110,7 @@
           "library_ref": "guitar.acoustic"
         }
       },
+      "program": null,
       "ref": "guitar.acoustic",
       "resolver": {
         "avoid": [
@@ -3127,6 +3159,9 @@
       "usage": {}
     },
     "guitar.acoustic_warm": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3179,20 +3214,6 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
-          "name": "shiny_electric_four",
-          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
-          "probes": [
-            37,
-            52,
-            64,
-            76
-          ],
-          "source": "karoryfer.shinyguitar"
-        },
-        {
-          "articulation": "electric-sustain",
-          "family": "guitar",
-          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3214,6 +3235,7 @@
           "library_ref": "guitar.acoustic_warm"
         }
       },
+      "program": null,
       "ref": "guitar.acoustic_warm",
       "resolver": {
         "avoid": [
@@ -3279,6 +3301,9 @@
       "usage": {}
     },
     "guitar.clean": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3331,20 +3356,6 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
-          "name": "shiny_electric_four",
-          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
-          "probes": [
-            37,
-            52,
-            64,
-            76
-          ],
-          "source": "karoryfer.shinyguitar"
-        },
-        {
-          "articulation": "electric-sustain",
-          "family": "guitar",
-          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3366,6 +3377,7 @@
           "library_ref": "guitar.clean"
         }
       },
+      "program": null,
       "ref": "guitar.clean",
       "resolver": {
         "avoid": [
@@ -3421,6 +3433,9 @@
       "usage": {}
     },
     "guitar.electric_lead": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3473,20 +3488,6 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
-          "name": "shiny_electric_four",
-          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
-          "probes": [
-            37,
-            52,
-            64,
-            76
-          ],
-          "source": "karoryfer.shinyguitar"
-        },
-        {
-          "articulation": "electric-sustain",
-          "family": "guitar",
-          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3508,6 +3509,7 @@
           "library_ref": "guitar.electric_lead"
         }
       },
+      "program": null,
       "ref": "guitar.electric_lead",
       "resolver": {
         "avoid": [
@@ -3561,6 +3563,9 @@
       "usage": {}
     },
     "guitar.emily": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3610,19 +3615,6 @@
       "install_profile": "starter",
       "is_drum": false,
       "known_patch_profiles": [
-        {
-          "articulation": "clean-single-note",
-          "family": "guitar",
-          "name": "emily_clean",
-          "path": "Karoryfer/Emilyguitar/Emilyguitar/emily_clean.sfz",
-          "pitch_probe": false,
-          "probes": [
-            48,
-            55,
-            60
-          ],
-          "source": "karoryfer.emilyguitar"
-        },
         {
           "articulation": "basic",
           "family": "guitar",
@@ -3683,6 +3675,7 @@
           "library_ref": "guitar.emily"
         }
       },
+      "program": null,
       "ref": "guitar.emily",
       "resolver": {
         "avoid": [
@@ -3729,6 +3722,9 @@
       }
     },
     "guitar.hollowbody": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "guitar",
       "family_profile": {
@@ -3843,6 +3839,7 @@
           "library_ref": "guitar.hollowbody"
         }
       },
+      "program": null,
       "ref": "guitar.hollowbody",
       "resolver": {
         "avoid": [
@@ -3891,7 +3888,116 @@
       },
       "usage": {}
     },
+    "japan.shamisen": {
+      "backend": {
+        "kind": "soundfont",
+        "renderer": "fluidsynth-cli"
+      },
+      "expected": true,
+      "family": "folk",
+      "family_profile": {
+        "audition": {
+          "base": "D3",
+          "chord": [
+            0,
+            7,
+            12
+          ],
+          "durations": [
+            0.35,
+            0.35,
+            0.35,
+            0.35,
+            0.35,
+            0.35,
+            0.35,
+            0.9
+          ],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            9,
+            10,
+            12
+          ]
+        },
+        "composition_techniques": [
+          "normal",
+          "sustain",
+          "staccato",
+          "pluck"
+        ],
+        "recommended_midi_range": [
+          45,
+          80
+        ],
+        "summary": "Folk/ethnic sampled instruments with patch-specific playing behavior.",
+        "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+        "writing_tips": [
+          "Inspect the instrument-specific usage notes and observed range before exposed writing."
+        ]
+      },
+      "install_profile": "pro",
+      "is_drum": false,
+      "musicir": {
+        "instrument_backend": {
+          "kind": "soundfont",
+          "library_ref": "japan.shamisen",
+          "renderer": "fluidsynth-cli"
+        },
+        "program": 106
+      },
+      "program": 106,
+      "ref": "japan.shamisen",
+      "resolver": {
+        "avoid": [],
+        "prefer": [
+          "yukishami20v1",
+          "yukishami"
+        ],
+        "prefer_source": true,
+        "required_any": [
+          [
+            "yukishami20v1"
+          ],
+          [
+            "yukishami",
+            "sf2"
+          ]
+        ]
+      },
+      "role": "shamisen",
+      "source": "yukinisuzume.shamisen",
+      "source_info": {
+        "expected": true,
+        "homepage": "https://yukinisuzume.seesaa.net/article/37019170.html",
+        "install_profile": "pro",
+        "label": "Yukinisuzume Shamisen",
+        "license": "Custom free-use terms; rendered music including commercial use permitted",
+        "notes": [
+          "Installer fetches the original upstream SF2 directly; Ambition does not vendor the sample data.",
+          "The author's Read Me permits use in music, including commercial music.",
+          "Program 106 is the GM Shamisen slot used for this lightweight SF2.",
+          "The installer also preserves the author's raw strong, normal, weak, sukui/up-pick, and hajiki/pull-off archives under raw-samples for a future articulation-rich SFZ realization."
+        ],
+        "relative_root": "soundfonts/Yukinisuzume/yukishami20v1.sf2"
+      },
+      "usage": {
+        "nuances": [
+          "The lightweight SF2 is machine-reproducible and pinned to program 106.",
+          "The author notes SoundFont gain can vary by sampler, so measure/render before committing final mix gain.",
+          "Raw articulation recordings are downloaded separately for future Tsugaru strike, sukui, and hajiki support."
+        ],
+        "summary": "Recorded Japanese shamisen SoundFont from Yukinisuzume; use as a real shamisen voice rather than a generic GM ethnic patch."
+      }
+    },
     "orchestra.bass_drum": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -3951,6 +4057,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.bass_drum",
       "resolver": {
         "avoid": [
@@ -3988,6 +4095,9 @@
       "usage": {}
     },
     "orchestra.clarinets_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4040,50 +4150,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.clarinets_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.clarinets_sustain",
       "resolver": {
         "avoid": [
@@ -4130,6 +4203,9 @@
       "usage": {}
     },
     "orchestra.cymbal": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4189,6 +4265,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.cymbal",
       "resolver": {
         "avoid": [
@@ -4229,6 +4306,9 @@
       "usage": {}
     },
     "orchestra.flutes_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4281,50 +4361,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.flutes_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.flutes_sustain",
       "resolver": {
         "avoid": [
@@ -4372,6 +4415,9 @@
       "usage": {}
     },
     "orchestra.horns_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4424,50 +4470,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.horns_staccato"
         }
       },
+      "program": null,
       "ref": "orchestra.horns_staccato",
       "resolver": {
         "avoid": [
@@ -4513,6 +4522,9 @@
       "usage": {}
     },
     "orchestra.horns_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4565,50 +4577,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.horns_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.horns_sustain",
       "resolver": {
         "avoid": [
@@ -4655,6 +4630,9 @@
       "usage": {}
     },
     "orchestra.marching_tenor": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4714,6 +4692,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.marching_tenor",
       "resolver": {
         "avoid": [
@@ -4766,6 +4745,9 @@
       "usage": {}
     },
     "orchestra.oboes_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4818,50 +4800,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.oboes_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.oboes_sustain",
       "resolver": {
         "avoid": [
@@ -4908,6 +4853,9 @@
       "usage": {}
     },
     "orchestra.snare": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -4967,6 +4915,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.snare",
       "resolver": {
         "avoid": [
@@ -5006,6 +4955,9 @@
       "usage": {}
     },
     "orchestra.snare_march": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5065,6 +5017,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.snare_march",
       "resolver": {
         "avoid": [
@@ -5113,6 +5066,9 @@
       "usage": {}
     },
     "orchestra.snare_roll": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5172,6 +5128,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.snare_roll",
       "resolver": {
         "avoid": [
@@ -5224,6 +5181,9 @@
       "usage": {}
     },
     "orchestra.timpani": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5283,6 +5243,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "orchestra.timpani",
       "resolver": {
         "avoid": [
@@ -5324,6 +5285,9 @@
       "usage": {}
     },
     "orchestra.trombones_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5376,50 +5340,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.trombones_staccato"
         }
       },
+      "program": null,
       "ref": "orchestra.trombones_staccato",
       "resolver": {
         "avoid": [
@@ -5465,6 +5392,9 @@
       "usage": {}
     },
     "orchestra.trombones_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5517,50 +5447,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.trombones_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.trombones_sustain",
       "resolver": {
         "avoid": [
@@ -5607,6 +5500,9 @@
       "usage": {}
     },
     "orchestra.trumpets_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5659,50 +5555,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.trumpets_staccato"
         }
       },
+      "program": null,
       "ref": "orchestra.trumpets_staccato",
       "resolver": {
         "avoid": [
@@ -5748,6 +5607,9 @@
       "usage": {}
     },
     "orchestra.trumpets_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5800,50 +5662,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.trumpets_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.trumpets_sustain",
       "resolver": {
         "avoid": [
@@ -5890,6 +5715,9 @@
       "usage": {}
     },
     "orchestra.tuba_sustain": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -5942,50 +5770,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "orchestra.tuba_sustain"
         }
       },
+      "program": null,
       "ref": "orchestra.tuba_sustain",
       "resolver": {
         "avoid": [
@@ -6032,6 +5823,9 @@
       "usage": {}
     },
     "orchestra.vsco2": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -6090,6 +5884,7 @@
           "library_ref": "orchestra.vsco2"
         }
       },
+      "program": null,
       "ref": "orchestra.vsco2",
       "resolver": {
         "avoid": [
@@ -6122,6 +5917,9 @@
       "usage": {}
     },
     "piano.acoustic": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "piano",
       "family_profile": {
@@ -6180,6 +5978,7 @@
           "library_ref": "piano.acoustic"
         }
       },
+      "program": null,
       "ref": "piano.acoustic",
       "resolver": {
         "avoid": [],
@@ -6214,6 +6013,9 @@
       "usage": {}
     },
     "strings.basses": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6268,50 +6070,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.basses"
         }
       },
+      "program": null,
       "ref": "strings.basses",
       "resolver": {
         "avoid": [
@@ -6357,6 +6122,9 @@
       "usage": {}
     },
     "strings.celli": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6411,50 +6179,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.celli"
         }
       },
+      "program": null,
       "ref": "strings.celli",
       "resolver": {
         "avoid": [
@@ -6500,6 +6231,9 @@
       "usage": {}
     },
     "strings.celli_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6554,50 +6288,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.celli_staccato"
         }
       },
+      "program": null,
       "ref": "strings.celli_staccato",
       "resolver": {
         "avoid": [
@@ -6638,6 +6335,9 @@
       "usage": {}
     },
     "strings.cello": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6698,6 +6398,7 @@
           "library_ref": "strings.cello"
         }
       },
+      "program": null,
       "ref": "strings.cello",
       "resolver": {
         "avoid": [
@@ -6738,6 +6439,9 @@
       }
     },
     "strings.cyborg": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6798,6 +6502,7 @@
           "library_ref": "strings.cyborg"
         }
       },
+      "program": null,
       "ref": "strings.cyborg",
       "resolver": {
         "avoid": [
@@ -6836,6 +6541,9 @@
       }
     },
     "strings.violas": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -6890,50 +6598,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violas"
         }
       },
+      "program": null,
       "ref": "strings.violas",
       "resolver": {
         "avoid": [
@@ -6979,6 +6650,9 @@
       "usage": {}
     },
     "strings.violin_solo": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7033,50 +6707,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violin_solo"
         }
       },
+      "program": null,
       "ref": "strings.violin_solo",
       "resolver": {
         "avoid": [
@@ -7123,6 +6760,9 @@
       "usage": {}
     },
     "strings.violin_solo_marcato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7177,50 +6817,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violin_solo_marcato"
         }
       },
+      "program": null,
       "ref": "strings.violin_solo_marcato",
       "resolver": {
         "avoid": [
@@ -7257,6 +6860,9 @@
       "usage": {}
     },
     "strings.violins_1": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7311,50 +6917,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violins_1"
         }
       },
+      "program": null,
       "ref": "strings.violins_1",
       "resolver": {
         "avoid": [
@@ -7401,6 +6970,9 @@
       "usage": {}
     },
     "strings.violins_1_marcato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7455,50 +7027,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violins_1_marcato"
         }
       },
+      "program": null,
       "ref": "strings.violins_1_marcato",
       "resolver": {
         "avoid": [
@@ -7532,6 +7067,9 @@
       "usage": {}
     },
     "strings.violins_1_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7586,50 +7124,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violins_1_staccato"
         }
       },
+      "program": null,
       "ref": "strings.violins_1_staccato",
       "resolver": {
         "avoid": [
@@ -7672,6 +7173,9 @@
       "usage": {}
     },
     "strings.violins_2": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7726,50 +7230,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violins_2"
         }
       },
+      "program": null,
       "ref": "strings.violins_2",
       "resolver": {
         "avoid": [
@@ -7816,6 +7283,9 @@
       "usage": {}
     },
     "strings.violins_2_staccato": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "strings",
       "family_profile": {
@@ -7870,50 +7340,13 @@
       },
       "install_profile": "pro",
       "is_drum": false,
-      "known_patch_profiles": [
-        {
-          "articulation": "harpsichord-full",
-          "family": "keys",
-          "name": "sonatina_harpsichord_full",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-8ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_8ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        },
-        {
-          "articulation": "harpsichord-4ft",
-          "family": "keys",
-          "name": "sonatina_harpsichord_4ft",
-          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
-          "probes": [
-            48,
-            60,
-            72
-          ],
-          "source": "sonatina"
-        }
-      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
           "library_ref": "strings.violins_2_staccato"
         }
       },
+      "program": null,
       "ref": "strings.violins_2_staccato",
       "resolver": {
         "avoid": [
@@ -7956,6 +7389,9 @@
       "usage": {}
     },
     "vpo.brass": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8014,6 +7450,7 @@
           "library_ref": "vpo.brass"
         }
       },
+      "program": null,
       "ref": "vpo.brass",
       "resolver": {
         "avoid": [
@@ -8066,6 +7503,9 @@
       "usage": {}
     },
     "vpo.choir": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8124,6 +7564,7 @@
           "library_ref": "vpo.choir"
         }
       },
+      "program": null,
       "ref": "vpo.choir",
       "resolver": {
         "avoid": [],
@@ -8169,6 +7610,9 @@
       "usage": {}
     },
     "vpo.choir_male": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8227,6 +7671,7 @@
           "library_ref": "vpo.choir_male"
         }
       },
+      "program": null,
       "ref": "vpo.choir_male",
       "resolver": {
         "avoid": [
@@ -8282,6 +7727,9 @@
       "usage": {}
     },
     "vpo.clarinet_solo_perf": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8340,6 +7788,7 @@
           "library_ref": "vpo.clarinet_solo_perf"
         }
       },
+      "program": null,
       "ref": "vpo.clarinet_solo_perf",
       "resolver": {
         "avoid": [
@@ -8389,6 +7838,9 @@
       }
     },
     "vpo.flute_solo_perf": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8447,6 +7899,7 @@
           "library_ref": "vpo.flute_solo_perf"
         }
       },
+      "program": null,
       "ref": "vpo.flute_solo_perf",
       "resolver": {
         "avoid": [
@@ -8497,6 +7950,9 @@
       }
     },
     "vpo.oboe_solo_perf": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8555,6 +8011,7 @@
           "library_ref": "vpo.oboe_solo_perf"
         }
       },
+      "program": null,
       "ref": "vpo.oboe_solo_perf",
       "resolver": {
         "avoid": [
@@ -8602,6 +8059,9 @@
       }
     },
     "vpo.percussion": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8661,6 +8121,7 @@
         },
         "is_drum": true
       },
+      "program": null,
       "ref": "vpo.percussion",
       "resolver": {
         "avoid": [
@@ -8707,6 +8168,9 @@
       "usage": {}
     },
     "vpo.piccolo_solo_perf": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8765,6 +8229,7 @@
           "library_ref": "vpo.piccolo_solo_perf"
         }
       },
+      "program": null,
       "ref": "vpo.piccolo_solo_perf",
       "resolver": {
         "avoid": [
@@ -8812,6 +8277,9 @@
       }
     },
     "vpo.strings": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8870,6 +8338,7 @@
           "library_ref": "vpo.strings"
         }
       },
+      "program": null,
       "ref": "vpo.strings",
       "resolver": {
         "avoid": [
@@ -8925,6 +8394,9 @@
       "usage": {}
     },
     "vpo.timpani_hit": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -8983,6 +8455,7 @@
           "library_ref": "vpo.timpani_hit"
         }
       },
+      "program": null,
       "ref": "vpo.timpani_hit",
       "resolver": {
         "avoid": [
@@ -9019,6 +8492,9 @@
       "usage": {}
     },
     "vpo.violin": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -9077,6 +8553,7 @@
           "library_ref": "vpo.violin"
         }
       },
+      "program": null,
       "ref": "vpo.violin",
       "resolver": {
         "avoid": [
@@ -9124,6 +8601,9 @@
       "usage": {}
     },
     "vpo.violin_solo_perf": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -9182,6 +8662,7 @@
           "library_ref": "vpo.violin_solo_perf"
         }
       },
+      "program": null,
       "ref": "vpo.violin_solo_perf",
       "resolver": {
         "avoid": [
@@ -9233,6 +8714,9 @@
       }
     },
     "vpo.woodwinds": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "orchestra",
       "family_profile": {
@@ -9291,6 +8775,7 @@
           "library_ref": "vpo.woodwinds"
         }
       },
+      "program": null,
       "ref": "vpo.woodwinds",
       "resolver": {
         "avoid": [
@@ -9337,6 +8822,9 @@
       "usage": {}
     },
     "winds.alto_sax": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "woodwinds",
       "family_profile": {
@@ -9396,6 +8884,7 @@
           "library_ref": "winds.alto_sax"
         }
       },
+      "program": null,
       "ref": "winds.alto_sax",
       "resolver": {
         "avoid": [
@@ -9443,6 +8932,9 @@
       "usage": {}
     },
     "winds.tenor_sax": {
+      "backend": {
+        "kind": "sfz"
+      },
       "expected": true,
       "family": "woodwinds",
       "family_profile": {
@@ -9502,6 +8994,7 @@
           "library_ref": "winds.tenor_sax"
         }
       },
+      "program": null,
       "ref": "winds.tenor_sax",
       "resolver": {
         "avoid": [

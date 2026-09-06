@@ -1189,6 +1189,7 @@ def cmd_instruments_doctor(args) -> int:
 
     from .instrument_catalog import instrument_catalog, instrument_catalog_policy, instrument_source_catalog
     from .instrument_libraries import collect_sfz_library_diagnostics
+    from .instrument_resolution import resolve_instrument_backend
 
     catalog = instrument_catalog()
     diagnostics = collect_sfz_library_diagnostics(limit=int(args.limit))
@@ -1196,18 +1197,28 @@ def cmd_instruments_doctor(args) -> int:
     for ref, entry in sorted(catalog.items()):
         if not entry.expected:
             continue
-        resolved = diagnostics["alias_hits"].get(ref)
+        backend = entry.authoring_snippet()["instrument_backend"]
+        plan = resolve_instrument_backend(backend)
+        resolved_path = plan.resolved_sfz or plan.resolved_soundfont
+        resolved = str(resolved_path) if resolved_path else None
         rows.append({
             "ref": ref,
             "family": entry.family,
             "source": entry.source,
             "install_profile": entry.install_profile,
+            "backend": plan.kind or "sfz",
             "resolved": resolved,
             "ok": bool(resolved),
         })
     missing = [row for row in rows if not row["ok"]]
-    source_hits = diagnostics.get("source_hits") or {}
-    expected_sources_missing = list(diagnostics.get("expected_sources_missing") or [])
+    source_hits = {}
+    for source_name, source in instrument_source_catalog().items():
+        hit = next((row["resolved"] for row in rows if row.get("source") == source_name and row.get("resolved")), None)
+        source_hits[source_name] = hit
+    expected_sources_missing = [
+        name for name, info in instrument_source_catalog().items()
+        if bool(info.get("expected", False)) and not source_hits.get(name)
+    ]
     expected_source_count = sum(
         1 for info in instrument_source_catalog().values() if bool(info.get("expected", False))
     )
@@ -1501,7 +1512,7 @@ class ExpandCommand(kwconf.Config):
         if len(rows) > int(config.limit):
             print(f"  ... {len(rows) - int(config.limit)} more events; use --json or raise --limit")
         for name, plan in report.get("instrument_resolution", {}).items():
-            selected = plan.get("resolved_sfz") or plan.get("fallback_backend") or plan.get("kind") or "default backend"
+            selected = plan.get("resolved_sfz") or plan.get("resolved_soundfont") or plan.get("fallback_backend") or plan.get("kind") or "default backend"
             print(f"instrument {name}: {selected}")
         return 0
 
@@ -1582,7 +1593,7 @@ class TraceEventCommand(kwconf.Config):
             print(f"  clip: {clip['path']} source={clip.get('generator_kind') or clip.get('material_id') or clip.get('source_kind')}")
         plan = report.get("instrument_resolution") or {}
         if plan:
-            print(f"  realization: {plan.get('resolved_sfz') or plan.get('fallback_backend') or plan.get('kind')}")
+            print(f"  realization: {plan.get('resolved_sfz') or plan.get('resolved_soundfont') or plan.get('fallback_backend') or plan.get('kind')}")
         return 0
 
 
@@ -1688,8 +1699,10 @@ class FingerprintCommand(kwconf.Config):
         instruments = ((deps.get("instrument_resolution") or {}).get("instruments") or {})
         for name, row in instruments.items():
             sfz = row.get("resolved_sfz")
+            soundfont = row.get("resolved_soundfont")
             program = ((sfz or {}).get("program") or {}).get("path") if isinstance(sfz, dict) else None
-            selected = program or row.get("fallback_backend") or row.get("kind") or config.backend
+            soundfont_path = soundfont.get("path") if isinstance(soundfont, dict) else None
+            selected = program or soundfont_path or row.get("fallback_backend") or row.get("kind") or config.backend
             print(f"  {name}: {selected}")
         return 0
 
@@ -2178,7 +2191,6 @@ def cmd_processing_schema(args) -> int:
 
 
 def cmd_processing_plan(args) -> int:
-    from .musicir.timing import authored_section_rows
     from .processing.mastering import mastering_policy
     from .processing.plans import processing_plan_summary
     from .render.score_core import load_yaml
@@ -2188,7 +2200,7 @@ def cmd_processing_plan(args) -> int:
         raise FileNotFoundError(f"could not find score {args.cue!r}")
     spec = load_yaml(path)
     groups = sorted({str(row.get("group")) for row in spec.get("instruments", []) if isinstance(row, dict) and row.get("group")})
-    sections = [str(row.get("id")) for row in authored_section_rows(spec) if row.get("id")]
+    sections = [str(row.get("id")) for row in spec.get("sections", []) if isinstance(row, dict) and row.get("id")]
     payload = processing_plan_summary(spec, groups=groups, sections=sections)
     payload["mastering_policy"] = mastering_policy(spec).as_dict()
     payload["score"] = str(path)

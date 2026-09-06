@@ -43,13 +43,17 @@ class InstrumentCatalogEntry:
     expected: bool
     install_profile: str | None
     is_drum: bool
+    backend: Mapping[str, Any]
+    program: int | str | None
     resolver: ResolverHints
     usage: Mapping[str, Any]
 
     def authoring_snippet(self) -> dict[str, Any]:
-        instrument: dict[str, Any] = {
-            "instrument_backend": {"kind": "sfz", "library_ref": self.ref},
-        }
+        backend = dict(self.backend or {"kind": "sfz"})
+        backend["library_ref"] = self.ref
+        instrument: dict[str, Any] = {"instrument_backend": backend}
+        if self.program is not None:
+            instrument["program"] = self.program
         if self.is_drum:
             instrument["is_drum"] = True
         return instrument
@@ -63,6 +67,8 @@ class InstrumentCatalogEntry:
             "expected": self.expected,
             "install_profile": self.install_profile,
             "is_drum": self.is_drum,
+            "backend": dict(self.backend),
+            "program": self.program,
             "usage": dict(self.usage),
             "musicir": self.authoring_snippet(),
         }
@@ -153,6 +159,8 @@ def instrument_catalog() -> dict[str, InstrumentCatalogEntry]:
             expected=bool(raw.get("expected", False)),
             install_profile=str(raw["install_profile"]) if raw.get("install_profile") else None,
             is_drum=bool(raw.get("is_drum", False)),
+            backend=dict(raw.get("backend") or {"kind": "sfz"}),
+            program=raw.get("program"),
             resolver=resolver,
             usage=dict(raw.get("usage") or {}),
         )

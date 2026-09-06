@@ -162,6 +162,22 @@ def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[st
                 row["status"] = "resolved"
             if row.get("performance_patch_cc1_driven"):
                 row["status"] += "; CC1 dynamics driven"
+        elif plan.wants_soundfont:
+            resolved = plan.resolved_soundfont
+            row.update({
+                "backend": "soundfont",
+                "requested": plan.requested,
+                "resolved": str(resolved) if resolved else None,
+                "resolved_name": Path(resolved).name if resolved else None,
+                "catalog_ref": plan.library_ref if plan.catalog_entry else None,
+                "expected_catalog_instrument": plan.expected_catalog_instrument,
+                "status": "resolved sampled SoundFont" if resolved else "UNRESOLVED → fallback",
+            })
+            if resolved is None:
+                warnings.append(
+                    f"{name!r}: expected SoundFont catalog instrument {plan.library_ref or plan.requested!r} did not resolve; "
+                    "run or repair download_ambition_audio_tools.sh."
+                )
         else:
             row.update({
                 "backend": "soundfont",

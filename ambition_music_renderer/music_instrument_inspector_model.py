@@ -108,7 +108,7 @@ def alias_library_entries() -> tuple[LibraryEntry, ...]:
     for name, entry in sorted(instrument_catalog().items()):
         family = entry.family.replace("_", " ").title()
         label = name.split(".")[-1].replace("_", " ").title()
-        rows.append(LibraryEntry("sfz_alias", name, label, name, (family,)))
+        rows.append(LibraryEntry("catalog_alias", name, label, name, (family,)))
     return tuple(rows)
 
 
@@ -181,11 +181,13 @@ def apply_library_entry(instrument: Mapping[str, Any], entry: LibraryEntry) -> d
         inst["program"] = entry.value
         inst.pop("instrument_backend", None)
         inst.pop("is_drum", None)
-    elif entry.kind == "sfz_alias":
-        inst.setdefault("program", "acoustic_grand_piano")
-        inst["instrument_backend"] = {"kind": "sfz", "library_ref": entry.value}
+    elif entry.kind in {"catalog_alias", "sfz_alias"}:
         catalog_entry = get_instrument_catalog_entry(entry.value)
-        if catalog_entry is not None and catalog_entry.is_drum:
+        if catalog_entry is None:
+            raise KeyError(entry.value)
+        authored = catalog_entry.authoring_snippet()
+        inst.update({key: value for key, value in authored.items() if key != "is_drum"})
+        if catalog_entry.is_drum:
             inst["is_drum"] = True
         else:
             inst.pop("is_drum", None)
@@ -202,7 +204,7 @@ def resolved_backend_path(instrument: Mapping[str, Any], *, base_dir: Path | Non
     if not backend:
         return None
     plan = resolve_instrument_backend(backend, base_dir=base_dir)
-    return plan.resolved_sfz
+    return plan.resolved_sfz or plan.resolved_soundfont
 
 
 def load_score_instrument(score_path: Path, instrument_name: str) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -577,9 +579,10 @@ def sfz_probe_preflight(request: Mapping[str, Any], *, base_dir: Path | None = N
     playable patch.  The actual renderer remains authoritative.
     """
     instrument = normalize_instrument_document(request.get("instrument") or {})
-    path = resolved_backend_path(instrument, base_dir=base_dir)
-    backend = instrument.get("instrument_backend")
-    if not isinstance(backend, Mapping) or path is None:
+    backend = backend_spec_from_instrument(instrument)
+    plan = resolve_instrument_backend(backend, base_dir=base_dir)
+    path = plan.resolved_sfz
+    if not plan.wants_sfz or path is None:
         return {"kind": "non_sfz", "status": "ok", "summary": "GM / non-SFZ backend; region preflight does not apply."}
 
     regions = sfz_regions(path)
