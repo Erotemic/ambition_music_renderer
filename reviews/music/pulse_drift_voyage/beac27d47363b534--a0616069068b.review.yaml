@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pulse_drift_voyage
+  title: Pulse Drift Voyage
+  version_id: beac27d47363b534:a0616069068b
+  render_hash: beac27d47363b534
+  preview_sha256: a0616069068bbaf2b48f23880100628ca92881a127cdf992b0282e1ce21d7ec6
+  preview_path: generated/pulse_drift_voyage/.versioned/beac27d47363b534/preview/pulse_drift_voyage_beac27d47363b534.full_soundtrack_preview.ogg
+  manifest_path: generated/pulse_drift_voyage/.versioned/beac27d47363b534/pulse_drift_voyage_beac27d47363b534.adaptive_manifest.json
+  manifest_sha256: 25ea98f20fb3d12b1b105a6a1914d1199fc0c2a422e1808ae2e4aa5e1e77ee0b
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/pulse_drift_voyage.music.yaml
+  score_sha256_at_review: 8ad9d8120454a04293cdd282c6fc8bbd6e71e725fd88bcef303fed7bf065e0b0
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.0
+  label: Acceptable
+  notes: This feels very boring to me.
+  issues: []
+  furthest_played_seconds: 12.86
+  furthest_played_fraction: 0.1027
+  created_at: '2026-08-16T15:32:30Z'
+  updated_at: '2026-08-16T15:32:30Z'
+  reviewed_at: '2026-08-16T15:32:30Z'
+history: []

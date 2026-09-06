@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: aether_severance
+  title: Aether Severance
+  version_id: 6d1ef549125895d1:f067cedfa7f8
+  render_hash: 6d1ef549125895d1
+  preview_sha256: f067cedfa7f8bddd3bbacf59c62258d0bdac4d8d1d267d17ff0666b419b663a5
+  preview_path: generated/aether_severance/.versioned/6d1ef549125895d1/preview/aether_severance_6d1ef549125895d1.full_soundtrack_preview.ogg
+  manifest_path: generated/aether_severance/.versioned/6d1ef549125895d1/aether_severance_6d1ef549125895d1.adaptive_manifest.json
+  manifest_sha256: 0b58838685c1e3546467e6090f20ced7867f538c6deed2084e3dcefadda3a492
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/aether_severance.music.yaml
+  score_sha256_at_review: ea3742a90c4be83dbd71e00b8fc509b7ce896666209408435dab797daf7de696
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.2
+  label: Strong
+  notes: I'm kinda ok with this. We started out with trying to hit some sort of dragonforce / anime fight feel but
+    ended up with a neat hard rock piano piece.
+  issues: []
+  furthest_played_seconds: 57.142
+  furthest_played_fraction: 0.6564
+  created_at: '2026-09-02T00:29:49Z'
+  updated_at: '2026-09-02T00:29:49Z'
+  reviewed_at: '2026-09-02T00:29:49Z'
+history: []

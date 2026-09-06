@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: mary_o_you_died
+  title: 'Mary-O: You Died'
+  version_id: 074f04fa318e38de:c50609f1f047
+  render_hash: 074f04fa318e38de
+  preview_sha256: c50609f1f0472bed4826e4fda9c22fe6f9a1521d6ab624bc6ffd1e5e1ba8c5da
+  preview_path: generated/mary_o_you_died/.versioned/074f04fa318e38de/preview/mary_o_you_died_074f04fa318e38de.full_soundtrack_preview.ogg
+  manifest_path: generated/mary_o_you_died/.versioned/074f04fa318e38de/mary_o_you_died_074f04fa318e38de.adaptive_manifest.json
+  manifest_sha256: 527b53dcf93776b4df1b3940e891b0544b6e7ccf419c31b0f5cc9804db025685
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/mary_o_you_died.music.yaml
+  score_sha256_at_review: 98ec0e233ce63df6c703547b8df5186d26db3881e4b45d98934d4114ad70d66b
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: ''
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-08-16T15:27:10Z'
+  updated_at: '2026-08-16T15:27:10Z'
+  reviewed_at: '2026-08-16T15:27:10Z'
+history: []

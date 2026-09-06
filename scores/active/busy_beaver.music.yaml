@@ -1,0 +1,284 @@
+schema: ambition.musicir.v1
+id: busy_beaver
+title: Busy Beaver
+seed: 2026072502
+notes: >-
+  A low, bass-heavy, loop-first work song for a colony that has confused
+  relentless repetition with productivity. The cue evokes the comic momentum
+  of an early internet chant loop without borrowing its melody or words: an
+  original four-syllable call rides a thick sub-bass floor, blunt low drums,
+  and restrained wooden punctuation. A bassoon-led dam inspection and a muted
+  river alarm briefly interrupt the machinery before the loop drops back into
+  its central groove.
+
+tempo:
+  bpm: 148
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+
+postprocess:
+  gain_db: -1.8
+  highpass_hz: 25
+  lowpass_hz: 10500
+  presence_low_hz: 1500
+  presence_high_hz: 4300
+  presence_db: -1.4
+  transient_tame: 0.08
+  transient_lowpass_hz: 6200
+  reverb_wet: 0.012
+  reverb_decay_seconds: 0.34
+  reverb_damping_hz: 5600
+  stereo_width: 0.035
+  compressor_threshold_db: -20.0
+  compressor_ratio: 3.4
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 105.0
+  compressor_makeup_db: 1.1
+  compressor_knee_db: 5.0
+  limiter_drive: 0.88
+  normalize: true
+  target_peak_db: -3.0
+  eq_bands:
+    - {type: low_shelf, hz: 78, q: 0.75, db: 3.0}
+    - {type: peak, hz: 155, q: 0.85, db: 1.5}
+    - {type: peak, hz: 360, q: 0.90, db: -1.6}
+    - {type: high_shelf, hz: 4800, q: 0.70, db: -2.8}
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 25
+  reverb_wet: 0.001
+  reverb_decay_seconds: 0.16
+  reverb_damping_hz: 5600
+  stereo_width: 0.02
+  limiter_drive: 0.84
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: colony_chant, group: chant,        program: lead_voice,      volume: 88,  pan: 56, expression: 96,  modulation: 1}
+  - {name: wooden_reply, group: wood,         program: marimba,         volume: 50,  pan: 72, expression: 68}
+  - {name: log_clicks,   group: wood,         program: woodblock,       volume: 48,  pan: 46, expression: 68}
+  - {name: sub_floor,    group: bass,         program: synth_bass_1,    volume: 92,  pan: 64, expression: 100}
+  - {name: river_bass,   group: bass,         program: synth_bass_2,    volume: 88,  pan: 64, expression: 98}
+  - {name: low_brass,    group: bass,         program: tuba,            volume: 66,  pan: 62, expression: 74}
+  - {name: dam_bassoon,  group: interruption, program: bassoon,         volume: 78,  pan: 50, expression: 90}
+  - {name: alarm_pipe,   group: interruption, program: whistle,         volume: 54,  pan: 76, expression: 68, modulation: 2}
+  - {name: work_kit,     group: percussion,   is_drum: true,            volume: 98,  pan: 64, expression: 108}
+
+motifs:
+  - id: busy_call
+    root: D4
+    intervals: [0, 0, 5, 3, 0, 2, 7, 5]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.94, 0.76, 0.86, 0.72, 0.92, 0.76, 0.88, 0.78]
+
+  - id: busy_answer
+    root: D4
+    intervals: [0, -2, -5, -2, 0, 2, 3, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.84, 0.72, 0.88, 0.70, 0.84, 0.70, 0.76, 0.86]
+
+  - id: sub_pulse
+    root: D1
+    intervals: [0, 0, 7, 0]
+    rhythm: [1.0, 1.0, 1.0, 1.0]
+    velocities: [1.00, 0.88, 0.96, 0.90]
+
+  - id: low_brass_pulse
+    root: D2
+    intervals: [0, 0, -2, 0]
+    rhythm: [2.0, 1.0, 0.5, 0.5]
+    velocities: [0.88, 0.74, 0.70, 0.78]
+
+  - id: dam_inspection
+    root: D2
+    intervals: [0, -5, 0, 3, 2, -2, -5, 0]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5]
+    velocities: [0.92, 0.68, 0.82, 0.72, 0.88, 0.66, 0.78, 0.86]
+
+  - id: river_alarm
+    root: A4
+    intervals: [0, 2, 0, 5, 2, 7, 5, 2, 0, -3, 0, 7]
+    rhythm: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.72, 0.62, 0.74, 0.66, 0.76, 0.70, 0.80, 0.66, 0.76, 0.64, 0.74, 0.84]
+
+layer_templates:
+  sub_floor_cycle:
+    kind: motif
+    instrument: sub_floor
+    motif: sub_pulse
+    velocity: 88
+    articulation: tenuto
+    gate: 0.92
+    starts: [[0, 0.0]]
+    repeats: 20
+    every_bars: 1
+    humanize_ms: 1
+    humanize_velocity_pct: 1
+
+  bass_work_cycle:
+    kind: bassline
+    instrument: river_bass
+    octave: 1
+    pattern:
+      - [0, 0.0, 0.42]
+      - [0, 0.5, 0.30]
+      - [7, 1.0, 0.36]
+      - [0, 1.5, 0.30]
+      - [12, 2.0, 0.40]
+      - [7, 2.5, 0.30]
+      - [0, 3.0, 0.36]
+      - [7, 3.5, 0.30]
+    velocity: 84
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 1
+
+  low_brass_bed:
+    kind: motif
+    instrument: low_brass
+    motif: low_brass_pulse
+    velocity: 72
+    articulation: tenuto
+    gate: 0.88
+    starts: [[0, 0.0]]
+    repeats: 20
+    every_bars: 1
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  chant_call:
+    kind: motif
+    instrument: colony_chant
+    motif: busy_call
+    root: D4
+    velocity: 82
+    articulation: staccato
+    gate: 0.60
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  chant_answer:
+    kind: motif
+    instrument: colony_chant
+    motif: busy_answer
+    root: D4
+    velocity: 78
+    articulation: staccato
+    gate: 0.60
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  wooden_conveyor:
+    kind: ostinato
+    instruments: [wooden_reply, log_clicks]
+    octave: 3
+    intervals: [0, 0, 7, 0, 5, 0, 7, 2]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 32
+    articulation: hit
+    instrument_velocity_offsets: {wooden_reply: -8, log_clicks: 0}
+    instrument_octave_offsets: {wooden_reply: 0, log_clicks: 1}
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  dam_break:
+    kind: motif
+    instrument: dam_bassoon
+    motif: dam_inspection
+    root: D2
+    velocity: 70
+    articulation: marcato
+    gate: 0.80
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  alarm_break:
+    kind: motif
+    instrument: alarm_pipe
+    motif: river_alarm
+    root: A4
+    velocity: 52
+    articulation: staccato
+    gate: 0.54
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  work_drums:
+    kind: drums
+    instrument: work_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,          beats: [0.0, 1.0, 2.0, 3.0], velocity: 78}
+      - {drum: floor_tom,     beats: [0.5, 1.5, 2.5, 3.5], velocity: 48}
+      - {drum: side_stick,    beats: [1.0, 3.0],           velocity: 28}
+      - {drum: woodblock_low, beats: [0.5, 2.5],           velocity: 22}
+
+  interruption_drums:
+    kind: drums
+    instrument: work_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,      beats: [0.0, 1.0, 2.0, 3.0], velocity: 82}
+      - {drum: floor_tom, beats: [0.0, 0.5, 1.5, 2.0, 2.5, 3.5], velocity: 58}
+
+playback:
+  mode: section_stem_matrix
+  loop_components: [main_loop]
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+    bridge_stems: [bass, percussion]
+    fade_stems: []
+
+state_map:
+  default:
+    section: main_loop
+    stems: {chant: 0.76, wood: 0.42, bass: 1.0, interruption: 0.78, percussion: 0.94}
+  exploring:
+    preferred_section: main_loop
+    stems: {chant: 0.64, wood: 0.34, bass: 0.96, interruption: 0.64, percussion: 0.82}
+  busy:
+    preferred_section: main_loop
+    stems: {chant: 0.82, wood: 0.48, bass: 1.0, interruption: 0.84, percussion: 1.0}
+
+sections:
+  - id: main_loop
+    kind: loop_component
+    label: subterranean construction loop
+    bars: 20
+    intensity: 0.80
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [10, 20]
+    harmony: [D, D, C, G, D, D, C, A, D, D, C, G, D, D, C, A, D, D, A, D]
+    layers:
+      - sub_floor_cycle
+      - {template: bass_work_cycle, velocity: 84}
+      - low_brass_bed
+      - {template: wooden_conveyor, velocity: 32}
+      - {template: chant_call, starts: [[0, 0.0], [1, 0.0], [2, 0.0], [3, 0.0], [4, 0.0], [5, 0.0], [8, 0.0], [9, 0.0], [10, 0.0], [11, 0.0], [12, 0.0], [13, 0.0]], repeats: 1}
+      - {template: chant_answer, starts: [[16, 0.0], [17, 0.0]], repeats: 1}
+      - {template: dam_break, starts: [[6, 0.0], [7, 0.0]], repeats: 1}
+      - {template: alarm_break, starts: [[18, 0.0], [19, 0.0]], repeats: 1}
+      - work_drums
+      - {template: interruption_drums, starts: [[6, 0.0], [7, 0.0], [18, 0.0], [19, 0.0]]}
+
+group_postprocess:
+  chant:        {gain_db: 2.0,  lowpass_hz: 7600,  high_shelf_hz: 4200, high_shelf_db: -2.0, transient_tame: 0.04, reverb_wet: 0.001}
+  wood:         {gain_db: -2.5, lowpass_hz: 6200,  high_shelf_hz: 3600, high_shelf_db: -2.4, transient_tame: 0.12, reverb_wet: 0.001}
+  bass:         {gain_db: 1.0,  lowpass_hz: 4200,  transient_tame: 0.03, reverb_wet: 0.0}
+  interruption: {gain_db: 1.5,  lowpass_hz: 7600,  high_shelf_hz: 4200, high_shelf_db: -1.8, transient_tame: 0.05, reverb_wet: 0.001}
+  percussion:   {gain_db: 1.5,  lowpass_hz: 7200,  transient_tame: 0.08, reverb_wet: 0.0}

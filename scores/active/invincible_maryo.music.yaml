@@ -1,0 +1,353 @@
+schema: ambition.musicir.v1
+id: invincible_maryo
+title: Invincible-Maryo
+seed: 2026072510
+notes: >-
+  Ground-up high-speed redesign for Mary-O's superstar state. A sampled marcato
+  violin carries a broad but urgent melody over continuous sixteenth-note grand
+  piano motion, clean electric bass, a fast rock kit, and sparse harp flashes.
+  The cue is intentionally not chiptune, brass-led, organ-led, heartbeat-like,
+  or waltz-like. The sensation of speed comes from uninterrupted piano and bass
+  motion at 208 BPM while the violin phrases remain readable. Melody, harmony,
+  orchestration, and rhythm are original.
+
+tempo:
+  bpm: 208
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 14.0
+
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 30
+  lowpass_hz: 12800
+  presence_low_hz: 1700
+  presence_high_hz: 5200
+  presence_db: 0.6
+  transient_tame: 0.03
+  transient_lowpass_hz: 10500
+  reverb_wet: 0.035
+  reverb_decay_seconds: 0.68
+  reverb_damping_hz: 7600
+  stereo_width: 0.16
+  compressor_threshold_db: -17.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 78.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 5.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -3.0
+  eq_bands:
+    - {type: low_shelf, hz: 85, q: 0.75, db: 1.0}
+    - {type: peak, hz: 320, q: 0.90, db: -1.3}
+    - {type: peak, hz: 2800, q: 1.00, db: -0.7}
+    - {type: high_shelf, hz: 8200, q: 0.70, db: 0.5}
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.32
+  reverb_damping_hz: 7200
+  stereo_width: 0.04
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -4.0
+
+instruments:
+  - name: star_violin
+    group: lead
+    program: violin
+    volume: 106
+    pan: 70
+    expression: 112
+    modulation: 8
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violin_solo_marcato
+      prefer: [notation, marcato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: velocity_grand
+    group: piano
+    program: acoustic_grand_piano
+    volume: 92
+    pan: 48
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.salamander_grand
+      prefer: [salamander, grand, piano, flac]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: string_lift
+    group: strings
+    program: string_ensemble_1
+    volume: 54
+    pan: 76
+    expression: 72
+    modulation: 5
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1_marcato
+      prefer: [notation, marcato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: electric_bass
+    group: bass
+    program: fingered_bass
+    volume: 96
+    pan: 56
+    expression: 106
+    instrument_backend:
+      kind: sfz
+      library_ref: bass.growly
+      prefer: [clean, finger, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: star_harp
+    group: sparkle
+    program: orchestral_harp
+    volume: 52
+    pan: 84
+    expression: 66
+    instrument_backend:
+      kind: sfz
+      library_ref: folk.harp
+      prefer: [harp, normal, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: velocity_kit
+    group: drums
+    is_drum: true
+    volume: 102
+    pan: 64
+    expression: 112
+    instrument_backend:
+      kind: sfz
+      library_ref: drums.gogodze
+      prefer: [kit, drum, gm, gogodze]
+      optional: true
+      fallback_backend: pretty-midi
+
+motifs:
+  - id: star_run_a
+    root: A4
+    intervals: [7, 9, 12, 16, 14, 12, 11, 9, 7, 9, 11, 12, 16, 14, 12, 11, 9, 7, 4]
+    rhythm: [0.5, 0.5, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.82, 0.76, 0.90, 0.96, 0.84, 0.86, 0.74, 0.82, 0.90, 0.78, 0.82, 0.86, 0.98, 0.88, 0.84, 0.78, 0.76, 0.84, 0.92]
+
+  - id: star_run_b
+    root: A4
+    intervals: [12, 16, 19, 21, 19, 16, 14, 12, 11, 9, 12, 14, 16, 14, 12, 11, 9, 7, 4]
+    rhythm: [0.5, 0.5, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.84, 0.80, 0.92, 1.00, 0.88, 0.86, 0.80, 0.84, 0.90, 0.78, 0.86, 0.90, 0.96, 0.88, 0.84, 0.78, 0.76, 0.84, 0.94]
+
+  - id: harp_flash
+    root: E5
+    intervals: [0, 4, 7, 12]
+    rhythm: [0.25, 0.25, 0.25, 0.25]
+    velocities: [0.52, 0.58, 0.66, 0.78]
+
+layer_templates:
+  lead_a:
+    kind: motif
+    instrument: star_violin
+    motif: star_run_a
+    velocity: 88
+    articulation: marcato
+    gate: 0.84
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  lead_b:
+    kind: motif
+    instrument: star_violin
+    motif: star_run_b
+    velocity: 90
+    articulation: marcato
+    gate: 0.84
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  piano_velocity:
+    kind: arpeggio
+    instrument: velocity_grand
+    octave: 4
+    pattern: [0, 1, 2, 1, 0, 2, 3, 2, 0, 1, 2, 4, 3, 2, 1, 2]
+    step: 0.25
+    duration_beats: 0.22
+    velocity: 58
+    density: 1.0
+    articulation: staccato
+    voicing: open
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  string_air:
+    kind: pad_chords
+    instruments: [string_lift]
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.85
+    velocity: 30
+    articulation: tenuto
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+
+  bass_velocity:
+    kind: bassline
+    instrument: electric_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.44]
+      - [12, 0.5, 0.38]
+      - [7, 1.0, 0.42]
+      - [12, 1.5, 0.38]
+      - [0, 2.0, 0.44]
+      - [12, 2.5, 0.38]
+      - [7, 3.0, 0.42]
+      - [12, 3.5, 0.38]
+    velocity: 76
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  harp_flares:
+    kind: motif
+    instrument: star_harp
+    motif: harp_flash
+    root: E5
+    velocity: 46
+    articulation: pluck
+    gate: 0.72
+    starts: [[1, 3.0], [3, 3.0], [5, 3.0], [7, 3.0]]
+    repeats: 1
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  sprint_drums:
+    kind: drums
+    instrument: velocity_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick, beats: [0.0, 1.5, 2.5], velocity: 82}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 74}
+      - {drum: closed_hat, beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5], velocity: 42}
+      - {drum: open_hat, beats: [3.5], velocity: 34}
+      - {drum: crash, beats: [0.0], velocity: 38}
+
+playback:
+  mode: section_stem_matrix
+  loop_components: [main_loop]
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+    bridge_stems: [lead, piano, bass, drums]
+    fade_stems: [strings, sparkle]
+
+state_map:
+  default:
+    section: main_loop
+    stems: {lead: 1.0, piano: 0.78, strings: 0.34, bass: 0.84, sparkle: 0.44, drums: 0.88}
+  invincible:
+    preferred_section: main_loop
+    stems: {lead: 1.0, piano: 0.88, strings: 0.40, bass: 0.92, sparkle: 0.54, drums: 0.98}
+
+sections:
+  - id: main_loop
+    kind: loop_component
+    label: invincible-maryo velocity bloom
+    bars: 8
+    intensity: 0.98
+    density: 0.84
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: [A, E, F#m, D, A, E, D, E]
+    layers:
+      - {template: lead_a, starts: [[0, 0.0]], repeats: 1}
+      - {template: lead_b, starts: [[4, 0.0]], repeats: 1}
+      - piano_velocity
+      - string_air
+      - bass_velocity
+      - harp_flares
+      - sprint_drums
+
+group_postprocess:
+  lead:
+    gain_db: 1.2
+    highpass_hz: 150
+    lowpass_hz: 10800
+    transient_tame: 0.03
+    reverb_wet: 0.018
+    effect_chain:
+      - kind: pedalboard
+        optional: true
+        effects:
+          - {effect: chorus, rate_hz: 1.2, depth: 0.025, mix: 0.08}
+
+  piano:
+    gain_db: -1.0
+    highpass_hz: 80
+    lowpass_hz: 11200
+    transient_tame: 0.05
+    reverb_wet: 0.012
+
+  strings:
+    gain_db: -5.0
+    highpass_hz: 160
+    lowpass_hz: 8200
+    transient_tame: 0.02
+    reverb_wet: 0.016
+
+  bass:
+    gain_db: 0.4
+    highpass_hz: 35
+    lowpass_hz: 3600
+    compressor_threshold_db: -18.0
+    compressor_ratio: 3.0
+    compressor_attack_ms: 5.0
+    compressor_release_ms: 65.0
+    reverb_wet: 0.0
+
+  sparkle:
+    gain_db: -3.8
+    highpass_hz: 520
+    lowpass_hz: 11200
+    transient_tame: 0.04
+    reverb_wet: 0.024
+
+  drums:
+    gain_db: 0.2
+    highpass_hz: 38
+    lowpass_hz: 11800
+    transient_tame: 0.02
+    reverb_wet: 0.006

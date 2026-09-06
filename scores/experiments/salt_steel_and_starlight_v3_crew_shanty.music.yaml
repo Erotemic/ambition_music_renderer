@@ -1,0 +1,3395 @@
+schema: ambition.musicir.v3
+id: salt_steel_and_starlight_v3_crew_shanty
+title: Salt, Steel, and Starlight — Crew Shanty (v3)
+description: 'Fresh v3 rewrite of the pirate cue: a stomp-and-sing crew shanty built around authored call/response phrases,
+  physical two-way accordion motion, root/fifth acoustic bass, and sparse folk/orchestral punctuation.'
+notes:
+- Experimental replacement candidate; the v1 G checkpoint remains unchanged.
+- The high plucked backing is an acoustic-guitar patch used as a mandolin-like chop, not a mandolin sample.
+- Accordion low-register gain staging intentionally preserves the compensation measured in the G checkpoint until a v3 bundle
+  supports retuning it.
+seed: 314159
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 118.76288659793815
+key: E minor
+duration_target_seconds: 194.0
+end: {bar: 97, beat: 1}
+form:
+- id: all_hands_on_deck
+  from: {bar: 1, beat: 1}
+  to: {bar: 9, beat: 1}
+  energy: 0.92
+  density: 0.82
+  role: opening refrain
+- id: haul_the_line
+  from: {bar: 9, beat: 1}
+  to: {bar: 25, beat: 1}
+  energy: 0.72
+  density: 0.66
+  role: captain and crew verse
+- id: raise_the_black
+  from: {bar: 25, beat: 1}
+  to: {bar: 41, beat: 1}
+  energy: 0.96
+  density: 0.88
+  role: full crew refrain
+- id: below_the_hatches
+  from: {bar: 41, beat: 1}
+  to: {bar: 49, beat: 1}
+  energy: 0.52
+  density: 0.43
+  role: breathing-room breakdown
+- id: haul_again
+  from: {bar: 49, beat: 1}
+  to: {bar: 65, beat: 1}
+  energy: 0.78
+  density: 0.68
+  role: second call and response verse
+- id: broadside_shanty
+  from: {bar: 65, beat: 1}
+  to: {bar: 81, beat: 1}
+  energy: 1.0
+  density: 0.92
+  role: largest crew refrain
+- id: last_round
+  from: {bar: 81, beat: 1}
+  to: {bar: 89, beat: 1}
+  energy: 0.7
+  density: 0.52
+  role: stripped captain and accordion exchange
+- id: north_star_home
+  from: {bar: 89, beat: 1}
+  to: {bar: 97, beat: 1}
+  energy: 1.0
+  density: 0.86
+  role: final refrain and hard cadence
+harmony:
+  progression: [Em, D, C, B7, Em, D, B7, Em]
+  cycle: true
+instruments:
+- name: deck_guitar
+  group: rhythm
+  program: steel_guitar
+  volume: 100
+  pan: 40
+  expression: 106
+  controls:
+    100: 64
+  mix_gain_db: 0.0
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.acoustic
+    prefer: [shinyguitar, acoustic]
+    settings:
+      fold_to_range: false
+- name: fiddle
+  group: fiddle
+  program: violin
+  volume: 108
+  pan: 82
+  expression: 110
+  modulation: 24
+  mix_gain_db: -0.5
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer: [violin, solo, performance]
+    settings:
+      fold_to_range: false
+- name: lead_fiddle
+  group: lead
+  program: violin
+  volume: 114
+  pan: 64
+  expression: 114
+  modulation: 22
+  mix_gain_db: 2.5
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer: [violin, solo, performance]
+    settings:
+      fold_to_range: false
+- name: high_acoustic_chop
+  group: plucked_backing
+  program: steel_guitar
+  volume: 92
+  pan: 88
+  expression: 104
+  controls:
+    100: 64
+    107: 12
+  mix_gain_db: -2.0
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/acoustic_one.sfz'
+    prefer: [shinyguitar, acoustic_one]
+    settings:
+      fold_to_range: false
+- name: whistle
+  group: whistle
+  program: flute
+  volume: 90
+  pan: 88
+  expression: 98
+  modulation: 18
+  mix_gain_db: -1.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.flute_solo_perf
+    prefer: [flute, solo, performance]
+    settings:
+      fold_to_range: false
+- name: accordion
+  group: squeeze_push
+  program: accordion
+  volume: 112
+  pan: 55
+  expression: 114
+  mix_gain_db: 2.0
+- name: accordion_pull
+  group: squeeze_pull
+  program: 23
+  volume: 112
+  pan: 63
+  expression: 114
+  mix_gain_db: 2.0
+- name: accordion_bass_root
+  group: squeeze_bass
+  program: accordion
+  volume: 112
+  pan: 58
+  expression: 114
+  mix_gain_db: 14.5
+- name: accordion_bass_fifth
+  group: squeeze_bass
+  program: accordion
+  volume: 112
+  pan: 58
+  expression: 114
+  mix_gain_db: 12.0
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 112
+  pan: 50
+  expression: 110
+  mix_gain_db: 3.0
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer: [sonatina, basses, pizzicato]
+    settings:
+      fold_to_range: false
+- name: tagelharpa
+  group: drone
+  program: cello
+  volume: 90
+  pan: 38
+  expression: 102
+  mix_gain_db: -1.0
+  controls:
+    31: 127
+    107: 40
+    110: 95
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.bass_tagelharpa
+    prefer: [horse, tagelharpa]
+    settings:
+      fold_to_range: false
+- name: celli_sustain
+  group: low_strings
+  program: cello
+  volume: 88
+  pan: 46
+  expression: 94
+  mix_gain_db: 0.0
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer: [celli, sustain]
+    settings:
+      fold_to_range: false
+- name: horns
+  group: brass
+  program: french_horn
+  volume: 98
+  pan: 54
+  expression: 106
+  mix_gain_db: 3.5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer: [horns, sustain]
+    settings:
+      fold_to_range: false
+- name: trumpets
+  group: brass
+  program: trumpet
+  volume: 96
+  pan: 78
+  expression: 104
+  mix_gain_db: 2.5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trumpets_staccato
+    prefer: [trumpets, staccato]
+    settings:
+      fold_to_range: false
+- name: trombones
+  group: brass
+  program: trombone
+  volume: 100
+  pan: 42
+  expression: 106
+  mix_gain_db: 3.0
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trombones_staccato
+    prefer: [trombones, staccato]
+    settings:
+      fold_to_range: false
+- name: deck_kit
+  group: drums
+  program: 0
+  is_drum: true
+  volume: 112
+  pan: 64
+  expression: 112
+  mix_gain_db: -0.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer: [muldjord, stereo, kit]
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 105
+  pan: 60
+  expression: 108
+  mix_gain_db: 2.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.timpani_hit
+    prefer: [timpani, hit]
+    settings:
+      fold_to_range: false
+materials:
+  refrain_a:
+    kind: events
+    events:
+    - id: rfa01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: B4
+      velocity: 104
+    - id: rfa02
+      at: {beats: 1}
+      dur: {beats: 0.75}
+      pitch: B4
+      velocity: 96
+    - id: rfa03
+      at: {beats: 2}
+      dur: {beats: 0.4}
+      pitch: B4
+      velocity: 108
+    - id: rfa04
+      at: {beats: 2.5}
+      dur: {beats: 0.4}
+      pitch: D5
+      velocity: 101
+    - id: rfa05
+      at: {beats: 3}
+      dur: {beats: 0.8}
+      pitch: E5
+      velocity: 111
+    - id: rfa06
+      at: {beats: 4}
+      dur: {beats: 1.7}
+      pitch: E5
+      velocity: 106
+    - id: rfa07
+      at: {beats: 6}
+      dur: {beats: 0.8}
+      pitch: D5
+      velocity: 96
+    - id: rfa08
+      at: {beats: 7}
+      dur: {beats: 0.7}
+      pitch: B4
+      velocity: 94
+    - id: rfa09
+      at: {beats: 8}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 99
+    - id: rfa10
+      at: {beats: 9}
+      dur: {beats: 0.75}
+      pitch: G4
+      velocity: 93
+    - id: rfa11
+      at: {beats: 10}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 102
+    - id: rfa12
+      at: {beats: 11}
+      dur: {beats: 0.75}
+      pitch: B4
+      velocity: 106
+    - id: rfa13
+      at: {beats: 12}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 98
+    - id: rfa14
+      at: {beats: 13}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 92
+    - id: rfa15
+      at: {beats: 14}
+      dur: {beats: 1.7}
+      pitch: E4
+      velocity: 108
+  refrain_b:
+    kind: events
+    events:
+    - id: rfb01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: B4
+      velocity: 102
+    - id: rfb02
+      at: {beats: 1}
+      dur: {beats: 0.8}
+      pitch: B4
+      velocity: 96
+    - id: rfb03
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 99
+    - id: rfb04
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: G4
+      velocity: 94
+    - id: rfb05
+      at: {beats: 4}
+      dur: {beats: 1.65}
+      pitch: E4
+      velocity: 104
+    - id: rfb06
+      at: {beats: 7}
+      dur: {beats: 0.7}
+      pitch: G4
+      velocity: 88
+    - id: rfb07
+      at: {beats: 8}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 98
+    - id: rfb08
+      at: {beats: 9}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 103
+    - id: rfb09
+      at: {beats: 10}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 108
+    - id: rfb10
+      at: {beats: 11}
+      dur: {beats: 0.7}
+      pitch: B4
+      velocity: 96
+    - id: rfb11
+      at: {beats: 12}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 96
+    - id: rfb12
+      at: {beats: 13}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 92
+    - id: rfb13
+      at: {beats: 14}
+      dur: {beats: 1.7}
+      pitch: E4
+      velocity: 110
+  captain_call_a:
+    kind: events
+    events:
+    - id: cca01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 96
+    - id: cca02
+      at: {beats: 1}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 91
+    - id: cca03
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 99
+    - id: cca04
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: G4
+      velocity: 92
+    - id: cca05
+      at: {beats: 4}
+      dur: {beats: 1.65}
+      pitch: B4
+      velocity: 104
+    - id: cca06
+      at: {beats: 6}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 94
+    - id: cca07
+      at: {beats: 7}
+      dur: {beats: 0.7}
+      pitch: G4
+      velocity: 90
+  captain_call_b:
+    kind: events
+    events:
+    - id: ccb01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: B4
+      velocity: 99
+    - id: ccb02
+      at: {beats: 1}
+      dur: {beats: 0.8}
+      pitch: B4
+      velocity: 94
+    - id: ccb03
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: D5
+      velocity: 104
+    - id: ccb04
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: B4
+      velocity: 95
+    - id: ccb05
+      at: {beats: 4}
+      dur: {beats: 0.8}
+      pitch: A4
+      velocity: 95
+    - id: ccb06
+      at: {beats: 5}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 91
+    - id: ccb07
+      at: {beats: 6}
+      dur: {beats: 1.65}
+      pitch: E4
+      velocity: 105
+  crew_response_a:
+    kind: events
+    events:
+    - id: cra01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: E4
+      velocity: 96
+    - id: cra02
+      at: {beats: 1}
+      dur: {beats: 0.8}
+      pitch: E4
+      velocity: 91
+    - id: cra03
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 101
+    - id: cra04
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: E4
+      velocity: 94
+    - id: cra05
+      at: {beats: 4}
+      dur: {beats: 0.8}
+      pitch: D4
+      velocity: 92
+    - id: cra06
+      at: {beats: 5}
+      dur: {beats: 0.8}
+      pitch: C4
+      velocity: 89
+    - id: cra07
+      at: {beats: 6}
+      dur: {beats: 1.65}
+      pitch: B3
+      velocity: 101
+  crew_response_b:
+    kind: events
+    events:
+    - id: crb01
+      at: {beats: 0}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 97
+    - id: crb02
+      at: {beats: 1}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 91
+    - id: crb03
+      at: {beats: 2}
+      dur: {beats: 0.4}
+      pitch: A4
+      velocity: 100
+    - id: crb04
+      at: {beats: 2.5}
+      dur: {beats: 0.4}
+      pitch: G4
+      velocity: 94
+    - id: crb05
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: F#4
+      velocity: 91
+    - id: crb06
+      at: {beats: 4}
+      dur: {beats: 0.8}
+      pitch: E4
+      velocity: 94
+    - id: crb07
+      at: {beats: 5}
+      dur: {beats: 0.8}
+      pitch: D4
+      velocity: 89
+    - id: crb08
+      at: {beats: 6}
+      dur: {beats: 1.65}
+      pitch: B3
+      velocity: 102
+  bridge_call:
+    kind: events
+    events:
+    - id: bca01
+      at: {beats: 0}
+      dur: {beats: 1.65}
+      pitch: B4
+      velocity: 92
+    - id: bca02
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: G4
+      velocity: 87
+    - id: bca03
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: E4
+      velocity: 90
+    - id: bca04
+      at: {beats: 5}
+      dur: {beats: 0.8}
+      pitch: D4
+      velocity: 86
+    - id: bca05
+      at: {beats: 6}
+      dur: {beats: 1.65}
+      pitch: E4
+      velocity: 98
+  whistle_answer:
+    kind: events
+    events:
+    - id: wha01
+      at: {beats: 0}
+      dur: {beats: 1.65}
+      pitch: B5
+      velocity: 84
+    - id: wha02
+      at: {beats: 2}
+      dur: {beats: 0.8}
+      pitch: A5
+      velocity: 79
+    - id: wha03
+      at: {beats: 3}
+      dur: {beats: 0.7}
+      pitch: G5
+      velocity: 77
+    - id: wha04
+      at: {beats: 4}
+      dur: {beats: 0.8}
+      pitch: E5
+      velocity: 79
+    - id: wha05
+      at: {beats: 5}
+      dur: {beats: 0.8}
+      pitch: D5
+      velocity: 76
+    - id: wha06
+      at: {beats: 6}
+      dur: {beats: 1.65}
+      pitch: B4
+      velocity: 84
+parts:
+- id: lead_part
+  instrument: lead_fiddle
+  voices:
+  - id: singer_line
+    clips:
+    - id: opening_refrain_a
+      at: {bar: 1, beat: 1}
+      use: refrain_a
+      technique: legato
+    - id: opening_refrain_b
+      at: {bar: 5, beat: 1}
+      use: refrain_b
+      technique: legato
+    - id: verse1_call_a1
+      at: {bar: 9, beat: 1}
+      use: captain_call_a
+      technique: legato
+    - id: verse1_call_b1
+      at: {bar: 13, beat: 1}
+      use: captain_call_b
+      technique: legato
+    - id: verse1_call_a2
+      at: {bar: 17, beat: 1}
+      use: captain_call_a
+      technique: legato
+      velocity_scale: 0.96
+    - id: verse1_call_b2
+      at: {bar: 21, beat: 1}
+      use: captain_call_b
+      technique: legato
+      velocity_scale: 1.03
+    - id: chorus1_refrain_a1
+      at: {bar: 25, beat: 1}
+      use: refrain_a
+      technique: legato
+    - id: chorus1_refrain_b1
+      at: {bar: 29, beat: 1}
+      use: refrain_b
+      technique: legato
+    - id: chorus1_refrain_a2
+      at: {bar: 33, beat: 1}
+      use: refrain_a
+      technique: legato
+      velocity_scale: 1.03
+    - id: chorus1_refrain_b2
+      at: {bar: 37, beat: 1}
+      use: refrain_b
+      technique: legato
+      velocity_scale: 1.04
+    - id: bridge_low_call_1
+      at: {bar: 41, beat: 1}
+      use: bridge_call
+      technique: legato
+      velocity_scale: 0.88
+    - id: bridge_low_call_2
+      at: {bar: 45, beat: 1}
+      use: bridge_call
+      technique: legato
+      velocity_scale: 0.92
+    - id: verse2_call_b1
+      at: {bar: 49, beat: 1}
+      use: captain_call_b
+      technique: legato
+    - id: verse2_call_a1
+      at: {bar: 53, beat: 1}
+      use: captain_call_a
+      technique: legato
+      velocity_scale: 0.98
+    - id: verse2_call_b2
+      at: {bar: 57, beat: 1}
+      use: captain_call_b
+      technique: legato
+      velocity_scale: 1.02
+    - id: verse2_call_a2
+      at: {bar: 61, beat: 1}
+      use: captain_call_a
+      technique: legato
+      velocity_scale: 1.04
+    - id: broadside_refrain_a1
+      at: {bar: 65, beat: 1}
+      use: refrain_a
+      technique: legato
+      velocity_scale: 1.04
+    - id: broadside_refrain_b1
+      at: {bar: 69, beat: 1}
+      use: refrain_b
+      technique: legato
+      velocity_scale: 1.05
+    - id: broadside_refrain_a2
+      at: {bar: 73, beat: 1}
+      use: refrain_a
+      technique: legato
+      velocity_scale: 1.06
+    - id: broadside_refrain_b2
+      at: {bar: 77, beat: 1}
+      use: refrain_b
+      technique: legato
+      velocity_scale: 1.07
+    - id: last_round_call_a
+      at: {bar: 81, beat: 1}
+      use: captain_call_a
+      technique: legato
+      velocity_scale: 0.96
+    - id: last_round_call_b
+      at: {bar: 85, beat: 1}
+      use: captain_call_b
+      technique: legato
+      velocity_scale: 1.0
+    - id: final_refrain_a
+      at: {bar: 89, beat: 1}
+      use: refrain_a
+      technique: legato
+      velocity_scale: 1.08
+    - id: final_refrain_b
+      at: {bar: 93, beat: 1}
+      use: refrain_b
+      technique: legato
+      velocity_scale: 1.08
+    - id: final_shout
+      at: {bar: 96, beat: 3}
+      events:
+      - id: last_e
+        at: 0
+        dur: {beats: 1.85}
+        pitch: E5
+        velocity: 118
+      technique: marcato
+- id: fiddle_part
+  instrument: fiddle
+  voices:
+  - id: crew_answers
+    clips:
+    - id: verse1_response_a1
+      at: {bar: 11, beat: 1}
+      use: crew_response_a
+      technique: legato
+      velocity_scale: 0.94
+    - id: verse1_response_b1
+      at: {bar: 15, beat: 1}
+      use: crew_response_b
+      technique: legato
+      velocity_scale: 0.92
+    - id: verse1_response_a2
+      at: {bar: 19, beat: 1}
+      use: crew_response_a
+      technique: legato
+      velocity_scale: 0.97
+    - id: verse1_response_b2
+      at: {bar: 23, beat: 1}
+      use: crew_response_b
+      technique: legato
+      velocity_scale: 0.98
+    - id: verse2_response_a1
+      at: {bar: 51, beat: 1}
+      use: crew_response_a
+      technique: legato
+      velocity_scale: 0.95
+    - id: verse2_response_b2
+      at: {bar: 59, beat: 1}
+      use: crew_response_b
+      technique: legato
+      velocity_scale: 0.97
+- id: whistle_part
+  instrument: whistle
+  voices:
+  - id: whistle_answers
+    clips:
+    - id: bridge_whistle_answer_1
+      at: {bar: 43, beat: 1}
+      use: whistle_answer
+      technique: legato
+      velocity_scale: 0.9
+    - id: bridge_whistle_answer_2
+      at: {bar: 47, beat: 1}
+      use: whistle_answer
+      technique: legato
+      velocity_scale: 0.84
+    - id: verse2_whistle_answer_1
+      at: {bar: 55, beat: 1}
+      use: whistle_answer
+      technique: legato
+      velocity_scale: 0.82
+    - id: verse2_whistle_answer_2
+      at: {bar: 63, beat: 1}
+      use: whistle_answer
+      technique: legato
+      velocity_scale: 0.86
+- id: accordion_push_part
+  instrument: accordion
+  voices:
+  - id: bellows_push
+    clips:
+    - id: accordion_push_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 0.75]
+        - [1, 1.0]
+        - [2, 1.25]
+        - [3, 0.75]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 0.75]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 84
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.0]
+        - [1, 0.75]
+        - [2, 1.25]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 1.0]
+        - [8, 1.0]
+        - [9, 0.75]
+        - [10, 1.25]
+        - [12, 0.5]
+        - [13, 1.0]
+        - [14, 1.5]
+        - [15, 1.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 79
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 0.75]
+        - [1, 1.0]
+        - [2, 1.25]
+        - [3, 0.75]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 0.75]
+        - [8, 0.75]
+        - [9, 1.0]
+        - [10, 1.25]
+        - [11, 0.75]
+        - [12, 0.5]
+        - [13, 1.0]
+        - [14, 1.5]
+        - [15, 0.75]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 84
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.0]
+        - [2, 1.5]
+        - [4, 0.75]
+        - [6, 1.25]
+        duration_beats: 0.92
+        octave: 3
+        voicing: triad
+        velocity: 69
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.0]
+        - [1, 0.75]
+        - [2, 1.25]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 1.0]
+        - [8, 1.0]
+        - [9, 0.75]
+        - [10, 1.25]
+        - [12, 0.5]
+        - [13, 1.0]
+        - [14, 1.5]
+        - [15, 1.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 79
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 0.75]
+        - [1, 1.0]
+        - [2, 1.25]
+        - [3, 0.75]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 0.75]
+        - [8, 0.75]
+        - [9, 1.0]
+        - [10, 1.25]
+        - [11, 0.75]
+        - [12, 0.5]
+        - [13, 1.0]
+        - [14, 1.5]
+        - [15, 0.75]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 84
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.0]
+        - [2, 1.5]
+        - [4, 0.75]
+        - [6, 1.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 72
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_push_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 0.75]
+        - [1, 1.0]
+        - [2, 1.25]
+        - [3, 0.75]
+        - [4, 0.5]
+        - [5, 1.0]
+        - [6, 1.5]
+        - [7, 0.75]
+        duration_beats: 0.7
+        octave: 3
+        voicing: triad
+        velocity: 84
+        direction: up
+        spread_ms: 68
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 11
+        humanize_velocity_pct: 4.0
+        articulation: normal
+    - id: accordion_last_reply_a
+      at: {bar: 83, beat: 1}
+      use: crew_response_a
+      technique: legato
+      transpose: -12
+      velocity_scale: 0.87
+    - id: accordion_last_reply_b
+      at: {bar: 87, beat: 1}
+      use: crew_response_b
+      technique: legato
+      transpose: -12
+      velocity_scale: 0.9
+- id: accordion_pull_part
+  instrument: accordion_pull
+  voices:
+  - id: bellows_pull
+    clips:
+    - id: accordion_pull_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        - [7, 3.5]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        - [8, 3.0]
+        - [9, 3.25]
+        - [10, 2.75]
+        - [11, 3.5]
+        - [12, 3.0]
+        - [13, 2.75]
+        - [14, 3.25]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        - [7, 3.5]
+        - [8, 3.0]
+        - [9, 3.25]
+        - [10, 2.75]
+        - [11, 3.5]
+        - [12, 3.0]
+        - [13, 2.75]
+        - [14, 3.25]
+        - [15, 3.5]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.25]
+        - [2, 3.0]
+        - [4, 3.5]
+        - [6, 2.75]
+        duration_beats: 1.0
+        octave: 3
+        voicing: triad
+        velocity: 68
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        - [8, 3.0]
+        - [9, 3.25]
+        - [10, 2.75]
+        - [11, 3.5]
+        - [12, 3.0]
+        - [13, 2.75]
+        - [14, 3.25]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        - [7, 3.5]
+        - [8, 3.0]
+        - [9, 3.25]
+        - [10, 2.75]
+        - [11, 3.5]
+        - [12, 3.0]
+        - [13, 2.75]
+        - [14, 3.25]
+        - [15, 3.5]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.25]
+        - [2, 3.0]
+        - [4, 3.5]
+        - [6, 3.0]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 70
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+    - id: accordion_pull_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 3.0]
+        - [1, 3.25]
+        - [2, 2.75]
+        - [3, 3.5]
+        - [4, 3.0]
+        - [5, 2.75]
+        - [6, 3.25]
+        duration_beats: 0.74
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: down
+        spread_ms: 74
+        velocity_slope: 1.6
+        include_slash_bass: false
+        constraints:
+          min_pitch: 47
+          max_pitch: 76
+        humanize_ms: 12
+        humanize_velocity_pct: 4.2
+        articulation: normal
+- id: accordion_root_part
+  instrument: accordion_bass_root
+  voices:
+  - id: left_hand_root
+    clips:
+    - id: accordion_root_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 84
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        - [8, 0.0, 0, 0.34]
+        - [9, 0.0, 0, 0.34]
+        - [10, 0.0, 0, 0.34]
+        - [11, 0.0, 0, 0.34]
+        - [12, 0.0, 0, 0.34]
+        - [13, 0.0, 0, 0.34]
+        - [14, 0.0, 0, 0.34]
+        - [15, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 80
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        - [8, 0.0, 0, 0.34]
+        - [9, 0.0, 0, 0.34]
+        - [10, 0.0, 0, 0.34]
+        - [11, 0.0, 0, 0.34]
+        - [12, 0.0, 0, 0.34]
+        - [13, 0.0, 0, 0.34]
+        - [14, 0.0, 0, 0.34]
+        - [15, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 84
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.3]
+        - [1, 0.0, 0, 0.3]
+        - [2, 0.0, 0, 0.3]
+        - [3, 0.0, 0, 0.3]
+        - [4, 0.0, 0, 0.3]
+        - [5, 0.0, 0, 0.3]
+        - [6, 0.0, 0, 0.3]
+        - [7, 0.0, 0, 0.3]
+        octave: 2
+        velocity: 72
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        - [8, 0.0, 0, 0.34]
+        - [9, 0.0, 0, 0.34]
+        - [10, 0.0, 0, 0.34]
+        - [11, 0.0, 0, 0.34]
+        - [12, 0.0, 0, 0.34]
+        - [13, 0.0, 0, 0.34]
+        - [14, 0.0, 0, 0.34]
+        - [15, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 80
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        - [8, 0.0, 0, 0.34]
+        - [9, 0.0, 0, 0.34]
+        - [10, 0.0, 0, 0.34]
+        - [11, 0.0, 0, 0.34]
+        - [12, 0.0, 0, 0.34]
+        - [13, 0.0, 0, 0.34]
+        - [14, 0.0, 0, 0.34]
+        - [15, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 84
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.3]
+        - [1, 0.0, 0, 0.3]
+        - [2, 0.0, 0, 0.3]
+        - [3, 0.0, 0, 0.3]
+        - [4, 0.0, 0, 0.3]
+        - [5, 0.0, 0, 0.3]
+        - [6, 0.0, 0, 0.3]
+        - [7, 0.0, 0, 0.3]
+        octave: 2
+        velocity: 73
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_root_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 0.0, 0, 0.34]
+        - [1, 0.0, 0, 0.34]
+        - [2, 0.0, 0, 0.34]
+        - [3, 0.0, 0, 0.34]
+        - [4, 0.0, 0, 0.34]
+        - [5, 0.0, 0, 0.34]
+        - [6, 0.0, 0, 0.34]
+        - [7, 0.0, 0, 0.34]
+        octave: 2
+        velocity: 84
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+- id: accordion_fifth_part
+  instrument: accordion_bass_fifth
+  voices:
+  - id: left_hand_fifth
+    clips:
+    - id: accordion_fifth_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [7, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 82
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [8, 2.0, 7, 0.31]
+        - [9, 2.0, 7, 0.31]
+        - [10, 2.0, 7, 0.31]
+        - [11, 2.0, 7, 0.31]
+        - [12, 2.0, 7, 0.31]
+        - [13, 2.0, 7, 0.31]
+        - [14, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 78
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [7, 2.0, 7, 0.31]
+        - [8, 2.0, 7, 0.31]
+        - [9, 2.0, 7, 0.31]
+        - [10, 2.0, 7, 0.31]
+        - [11, 2.0, 7, 0.31]
+        - [12, 2.0, 7, 0.31]
+        - [13, 2.0, 7, 0.31]
+        - [14, 2.0, 7, 0.31]
+        - [15, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 82
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.28]
+        - [2, 2.0, 7, 0.28]
+        - [4, 2.0, 7, 0.28]
+        - [6, 2.0, 7, 0.28]
+        octave: 2
+        velocity: 70
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [8, 2.0, 7, 0.31]
+        - [9, 2.0, 7, 0.31]
+        - [10, 2.0, 7, 0.31]
+        - [11, 2.0, 7, 0.31]
+        - [12, 2.0, 7, 0.31]
+        - [13, 2.0, 7, 0.31]
+        - [14, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 78
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [7, 2.0, 7, 0.31]
+        - [8, 2.0, 7, 0.31]
+        - [9, 2.0, 7, 0.31]
+        - [10, 2.0, 7, 0.31]
+        - [11, 2.0, 7, 0.31]
+        - [12, 2.0, 7, 0.31]
+        - [13, 2.0, 7, 0.31]
+        - [14, 2.0, 7, 0.31]
+        - [15, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 82
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.28]
+        - [2, 2.0, 7, 0.28]
+        - [4, 2.0, 7, 0.28]
+        - [6, 2.0, 7, 0.28]
+        octave: 2
+        velocity: 71
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+    - id: accordion_fifth_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [0, 2.0, 7, 0.31]
+        - [1, 2.0, 7, 0.31]
+        - [2, 2.0, 7, 0.31]
+        - [3, 2.0, 7, 0.31]
+        - [4, 2.0, 7, 0.31]
+        - [5, 2.0, 7, 0.31]
+        - [6, 2.0, 7, 0.31]
+        - [7, 2.0, 7, 0.31]
+        octave: 2
+        velocity: 82
+        articulation: staccato
+        humanize_ms: 10
+        humanize_velocity_pct: 3.5
+- id: deck_guitar_part
+  instrument: deck_guitar
+  voices:
+  - id: deck_strums
+    clips:
+    - id: deck_strum_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.35]
+        - [0, 1.5, up, 0.3]
+        - [0, 2.0, down, 1.05]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.35]
+        - [1, 1.5, up, 0.3]
+        - [1, 2.0, down, 1.05]
+        - [1, 3.5, up, 0.28]
+        - [2, 0.0, down, 1.35]
+        - [2, 1.5, up, 0.3]
+        - [2, 2.0, down, 1.05]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.35]
+        - [3, 1.5, up, 0.3]
+        - [3, 2.0, down, 1.65]
+        - [4, 0.0, down, 1.35]
+        - [4, 1.5, up, 0.3]
+        - [4, 2.0, down, 1.05]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.35]
+        - [5, 1.5, up, 0.3]
+        - [5, 2.0, down, 1.05]
+        - [5, 3.5, up, 0.28]
+        - [6, 0.0, down, 1.35]
+        - [6, 1.5, up, 0.3]
+        - [6, 2.0, down, 1.05]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.35]
+        - [7, 1.5, up, 0.3]
+        - [7, 2.0, down, 1.65]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 35
+        velocity: 84
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.45]
+        - [0, 2.0, down, 1.12]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.45]
+        - [1, 2.0, down, 1.12]
+        - [1, 1.75, up, 0.3]
+        - [2, 0.0, down, 1.45]
+        - [2, 2.0, down, 1.12]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.45]
+        - [3, 2.0, down, 1.12]
+        - [4, 0.0, down, 1.45]
+        - [4, 2.0, down, 1.12]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.45]
+        - [5, 2.0, down, 1.12]
+        - [5, 1.75, up, 0.3]
+        - [6, 0.0, down, 1.45]
+        - [6, 2.0, down, 1.12]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.45]
+        - [7, 2.0, down, 1.12]
+        - [8, 0.0, down, 1.45]
+        - [8, 2.0, down, 1.12]
+        - [8, 3.5, up, 0.28]
+        - [9, 0.0, down, 1.45]
+        - [9, 2.0, down, 1.12]
+        - [9, 1.75, up, 0.3]
+        - [10, 0.0, down, 1.45]
+        - [10, 2.0, down, 1.12]
+        - [10, 3.5, up, 0.28]
+        - [11, 0.0, down, 1.45]
+        - [11, 2.0, down, 1.12]
+        - [12, 0.0, down, 1.45]
+        - [12, 2.0, down, 1.12]
+        - [12, 3.5, up, 0.28]
+        - [13, 0.0, down, 1.45]
+        - [13, 2.0, down, 1.12]
+        - [13, 1.75, up, 0.3]
+        - [14, 0.0, down, 1.45]
+        - [14, 2.0, down, 1.12]
+        - [14, 3.5, up, 0.28]
+        - [15, 0.0, down, 1.45]
+        - [15, 2.0, down, 1.12]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 31
+        velocity: 76
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.35]
+        - [0, 1.5, up, 0.3]
+        - [0, 2.0, down, 1.05]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.35]
+        - [1, 1.5, up, 0.3]
+        - [1, 2.0, down, 1.05]
+        - [1, 3.5, up, 0.28]
+        - [2, 0.0, down, 1.35]
+        - [2, 1.5, up, 0.3]
+        - [2, 2.0, down, 1.05]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.35]
+        - [3, 1.5, up, 0.3]
+        - [3, 2.0, down, 1.65]
+        - [4, 0.0, down, 1.35]
+        - [4, 1.5, up, 0.3]
+        - [4, 2.0, down, 1.05]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.35]
+        - [5, 1.5, up, 0.3]
+        - [5, 2.0, down, 1.05]
+        - [5, 3.5, up, 0.28]
+        - [6, 0.0, down, 1.35]
+        - [6, 1.5, up, 0.3]
+        - [6, 2.0, down, 1.05]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.35]
+        - [7, 1.5, up, 0.3]
+        - [7, 2.0, down, 1.65]
+        - [8, 0.0, down, 1.35]
+        - [8, 1.5, up, 0.3]
+        - [8, 2.0, down, 1.05]
+        - [8, 3.5, up, 0.28]
+        - [9, 0.0, down, 1.35]
+        - [9, 1.5, up, 0.3]
+        - [9, 2.0, down, 1.05]
+        - [9, 3.5, up, 0.28]
+        - [10, 0.0, down, 1.35]
+        - [10, 1.5, up, 0.3]
+        - [10, 2.0, down, 1.05]
+        - [10, 3.5, up, 0.28]
+        - [11, 0.0, down, 1.35]
+        - [11, 1.5, up, 0.3]
+        - [11, 2.0, down, 1.65]
+        - [12, 0.0, down, 1.35]
+        - [12, 1.5, up, 0.3]
+        - [12, 2.0, down, 1.05]
+        - [12, 3.5, up, 0.28]
+        - [13, 0.0, down, 1.35]
+        - [13, 1.5, up, 0.3]
+        - [13, 2.0, down, 1.05]
+        - [13, 3.5, up, 0.28]
+        - [14, 0.0, down, 1.35]
+        - [14, 1.5, up, 0.3]
+        - [14, 2.0, down, 1.05]
+        - [14, 3.5, up, 0.28]
+        - [15, 0.0, down, 1.35]
+        - [15, 1.5, up, 0.3]
+        - [15, 2.0, down, 1.65]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 35
+        velocity: 84
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.75]
+        - [1, 2.0, down, 1.35]
+        - [2, 0.0, down, 1.75]
+        - [3, 2.0, down, 1.35]
+        - [4, 0.0, down, 1.75]
+        - [5, 2.0, down, 1.35]
+        - [6, 0.0, down, 1.75]
+        - [7, 2.0, down, 1.35]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 31
+        velocity: 67
+        velocity_slope: -1.8
+        humanize_ms: 17
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.45]
+        - [0, 2.0, down, 1.12]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.45]
+        - [1, 2.0, down, 1.12]
+        - [1, 1.75, up, 0.3]
+        - [2, 0.0, down, 1.45]
+        - [2, 2.0, down, 1.12]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.45]
+        - [3, 2.0, down, 1.12]
+        - [4, 0.0, down, 1.45]
+        - [4, 2.0, down, 1.12]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.45]
+        - [5, 2.0, down, 1.12]
+        - [5, 1.75, up, 0.3]
+        - [6, 0.0, down, 1.45]
+        - [6, 2.0, down, 1.12]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.45]
+        - [7, 2.0, down, 1.12]
+        - [8, 0.0, down, 1.45]
+        - [8, 2.0, down, 1.12]
+        - [8, 3.5, up, 0.28]
+        - [9, 0.0, down, 1.45]
+        - [9, 2.0, down, 1.12]
+        - [9, 1.75, up, 0.3]
+        - [10, 0.0, down, 1.45]
+        - [10, 2.0, down, 1.12]
+        - [10, 3.5, up, 0.28]
+        - [11, 0.0, down, 1.45]
+        - [11, 2.0, down, 1.12]
+        - [12, 0.0, down, 1.45]
+        - [12, 2.0, down, 1.12]
+        - [12, 3.5, up, 0.28]
+        - [13, 0.0, down, 1.45]
+        - [13, 2.0, down, 1.12]
+        - [13, 1.75, up, 0.3]
+        - [14, 0.0, down, 1.45]
+        - [14, 2.0, down, 1.12]
+        - [14, 3.5, up, 0.28]
+        - [15, 0.0, down, 1.45]
+        - [15, 2.0, down, 1.12]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 31
+        velocity: 76
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.35]
+        - [0, 1.5, up, 0.3]
+        - [0, 2.0, down, 1.05]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.35]
+        - [1, 1.5, up, 0.3]
+        - [1, 2.0, down, 1.05]
+        - [1, 3.5, up, 0.28]
+        - [2, 0.0, down, 1.35]
+        - [2, 1.5, up, 0.3]
+        - [2, 2.0, down, 1.05]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.35]
+        - [3, 1.5, up, 0.3]
+        - [3, 2.0, down, 1.65]
+        - [4, 0.0, down, 1.35]
+        - [4, 1.5, up, 0.3]
+        - [4, 2.0, down, 1.05]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.35]
+        - [5, 1.5, up, 0.3]
+        - [5, 2.0, down, 1.05]
+        - [5, 3.5, up, 0.28]
+        - [6, 0.0, down, 1.35]
+        - [6, 1.5, up, 0.3]
+        - [6, 2.0, down, 1.05]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.35]
+        - [7, 1.5, up, 0.3]
+        - [7, 2.0, down, 1.65]
+        - [8, 0.0, down, 1.35]
+        - [8, 1.5, up, 0.3]
+        - [8, 2.0, down, 1.05]
+        - [8, 3.5, up, 0.28]
+        - [9, 0.0, down, 1.35]
+        - [9, 1.5, up, 0.3]
+        - [9, 2.0, down, 1.05]
+        - [9, 3.5, up, 0.28]
+        - [10, 0.0, down, 1.35]
+        - [10, 1.5, up, 0.3]
+        - [10, 2.0, down, 1.05]
+        - [10, 3.5, up, 0.28]
+        - [11, 0.0, down, 1.35]
+        - [11, 1.5, up, 0.3]
+        - [11, 2.0, down, 1.65]
+        - [12, 0.0, down, 1.35]
+        - [12, 1.5, up, 0.3]
+        - [12, 2.0, down, 1.05]
+        - [12, 3.5, up, 0.28]
+        - [13, 0.0, down, 1.35]
+        - [13, 1.5, up, 0.3]
+        - [13, 2.0, down, 1.05]
+        - [13, 3.5, up, 0.28]
+        - [14, 0.0, down, 1.35]
+        - [14, 1.5, up, 0.3]
+        - [14, 2.0, down, 1.05]
+        - [14, 3.5, up, 0.28]
+        - [15, 0.0, down, 1.35]
+        - [15, 1.5, up, 0.3]
+        - [15, 2.0, down, 1.65]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 35
+        velocity: 84
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.55]
+        - [1, 0.0, down, 1.55]
+        - [1, 2.0, down, 1.15]
+        - [2, 0.0, down, 1.55]
+        - [2, 2.0, down, 1.15]
+        - [3, 0.0, down, 1.55]
+        - [4, 0.0, down, 1.55]
+        - [5, 0.0, down, 1.55]
+        - [5, 2.0, down, 1.15]
+        - [6, 0.0, down, 1.55]
+        - [6, 2.0, down, 1.15]
+        - [7, 0.0, down, 1.55]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 31
+        velocity: 72
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+    - id: deck_strum_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: guitar.strum
+        hits:
+        - [0, 0.0, down, 1.35]
+        - [0, 1.5, up, 0.3]
+        - [0, 2.0, down, 1.05]
+        - [0, 3.5, up, 0.28]
+        - [1, 0.0, down, 1.35]
+        - [1, 1.5, up, 0.3]
+        - [1, 2.0, down, 1.05]
+        - [1, 3.5, up, 0.28]
+        - [2, 0.0, down, 1.35]
+        - [2, 1.5, up, 0.3]
+        - [2, 2.0, down, 1.05]
+        - [2, 3.5, up, 0.28]
+        - [3, 0.0, down, 1.35]
+        - [3, 1.5, up, 0.3]
+        - [3, 2.0, down, 1.65]
+        - [4, 0.0, down, 1.35]
+        - [4, 1.5, up, 0.3]
+        - [4, 2.0, down, 1.05]
+        - [4, 3.5, up, 0.28]
+        - [5, 0.0, down, 1.35]
+        - [5, 1.5, up, 0.3]
+        - [5, 2.0, down, 1.05]
+        - [5, 3.5, up, 0.28]
+        - [6, 0.0, down, 1.35]
+        - [6, 1.5, up, 0.3]
+        - [6, 2.0, down, 1.05]
+        - [6, 3.5, up, 0.28]
+        - [7, 0.0, down, 1.35]
+        - [7, 1.5, up, 0.3]
+        - [7, 2.0, down, 1.65]
+        tuning: standard
+        physical_string_sustain: true
+        string_choke_ms: 4.0
+        spread_ms: 35
+        velocity: 84
+        velocity_slope: -1.8
+        humanize_ms: 13
+        humanize_velocity_pct: 4.0
+        articulation: pluck
+- id: high_acoustic_part
+  instrument: high_acoustic_chop
+  voices:
+  - id: offbeat_chops
+    clips:
+    - id: high_chop_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [3, 3.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [7, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 72
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [8, 1.5]
+        - [8, 3.5]
+        - [9, 1.5]
+        - [9, 3.5]
+        - [10, 1.5]
+        - [10, 3.5]
+        - [11, 1.5]
+        - [12, 1.5]
+        - [12, 3.5]
+        - [13, 1.5]
+        - [13, 3.5]
+        - [14, 1.5]
+        - [14, 3.5]
+        - [15, 1.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 64
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [3, 3.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [7, 3.5]
+        - [8, 1.5]
+        - [8, 3.5]
+        - [9, 1.5]
+        - [9, 3.5]
+        - [10, 1.5]
+        - [10, 3.5]
+        - [11, 1.5]
+        - [11, 3.5]
+        - [12, 1.5]
+        - [12, 3.5]
+        - [13, 1.5]
+        - [13, 3.5]
+        - [14, 1.5]
+        - [14, 3.5]
+        - [15, 1.5]
+        - [15, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 72
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [1, 3.5]
+        - [3, 3.5]
+        - [5, 3.5]
+        - [7, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.32
+        velocity: 55
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [8, 1.5]
+        - [8, 3.5]
+        - [9, 1.5]
+        - [9, 3.5]
+        - [10, 1.5]
+        - [10, 3.5]
+        - [11, 1.5]
+        - [12, 1.5]
+        - [12, 3.5]
+        - [13, 1.5]
+        - [13, 3.5]
+        - [14, 1.5]
+        - [14, 3.5]
+        - [15, 1.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 64
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [3, 3.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [7, 3.5]
+        - [8, 1.5]
+        - [8, 3.5]
+        - [9, 1.5]
+        - [9, 3.5]
+        - [10, 1.5]
+        - [10, 3.5]
+        - [11, 1.5]
+        - [11, 3.5]
+        - [12, 1.5]
+        - [12, 3.5]
+        - [13, 1.5]
+        - [13, 3.5]
+        - [14, 1.5]
+        - [14, 3.5]
+        - [15, 1.5]
+        - [15, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 72
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [3, 3.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [7, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 60
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+    - id: high_chop_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [0, 1.5]
+        - [0, 3.5]
+        - [1, 1.5]
+        - [1, 3.5]
+        - [2, 1.5]
+        - [2, 3.5]
+        - [3, 1.5]
+        - [3, 3.5]
+        - [4, 1.5]
+        - [4, 3.5]
+        - [5, 1.5]
+        - [5, 3.5]
+        - [6, 1.5]
+        - [6, 3.5]
+        - [7, 1.5]
+        - [7, 3.5]
+        octave: 4
+        voicing: triad
+        duration_beats: 0.24
+        velocity: 72
+        direction: up
+        spread_ms: 26
+        velocity_slope: 0.8
+        include_slash_bass: false
+        humanize_ms: 14
+        humanize_velocity_pct: 5.0
+        articulation: staccato
+        constraints:
+          min_pitch: 55
+          max_pitch: 88
+- id: upright_bass_part
+  instrument: upright_bass
+  voices:
+  - id: root_fifth_line
+    clips:
+    - id: upright_bass_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.28
+        - - 7
+          - 2.0
+          - 1.02
+        - - 12
+          - 3.5
+          - 0.28
+        velocity: 101
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        - 0.88
+        bar_velocity_pattern: [1.0, 0.94, 1.02, 0.92, 1.0, 0.96, 1.04, 0.9]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.34
+        - - 7
+          - 2.0
+          - 1.18
+        velocity: 96
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        bar_velocity_pattern: [1.0, 0.92, 0.98, 0.88, 0.98, 0.94, 1.0, 0.86]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.28
+        - - 7
+          - 2.0
+          - 1.02
+        - - 12
+          - 3.5
+          - 0.28
+        velocity: 101
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        - 0.88
+        bar_velocity_pattern: [1.0, 0.94, 1.02, 0.92, 1.0, 0.96, 1.04, 0.9]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.55
+        - - 7
+          - 2.0
+          - 1.15
+        velocity: 86
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        bar_velocity_pattern: [0.88, 0.82, 0.9, 0.78]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.34
+        - - 7
+          - 2.0
+          - 1.18
+        velocity: 96
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        bar_velocity_pattern: [1.0, 0.92, 0.98, 0.88, 0.98, 0.94, 1.0, 0.86]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.28
+        - - 7
+          - 2.0
+          - 1.02
+        - - 12
+          - 3.5
+          - 0.28
+        velocity: 101
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        - 0.88
+        bar_velocity_pattern: [1.0, 0.94, 1.02, 0.92, 1.0, 0.96, 1.04, 0.9]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.42
+        - - 7
+          - 2.0
+          - 1.05
+        velocity: 92
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        bar_velocity_pattern: [0.96, 0.88, 1.0, 0.84]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+    - id: upright_bass_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.28
+        - - 7
+          - 2.0
+          - 1.02
+        - - 12
+          - 3.5
+          - 0.28
+        velocity: 101
+        velocity_pattern:
+        - 1.0
+        - 0.92
+        - 0.88
+        bar_velocity_pattern: [1.0, 0.94, 1.02, 0.92, 1.0, 0.96, 1.04, 0.9]
+        articulation: normal
+        humanize_ms: 14
+        humanize_velocity_pct: 4.5
+- id: deck_kit_part
+  instrument: deck_kit
+  voices:
+  - id: stomp_kit
+    clips:
+    - id: deck_drums_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 108
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 94
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 38
+        bar_velocity_pattern: [1.0, 0.95, 1.03, 1.08, 0.98, 0.96, 1.04, 1.1]
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 88
+        - drum: mid_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 94
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 11
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_9
+      at: {bar: 9, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 103
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 86
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 31
+        bar_velocity_pattern: [0.96, 0.91, 1.0, 0.89, 0.98, 0.93, 1.01, 1.04]
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 80
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 86
+        humanize_ms: 14
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 108
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 94
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 38
+        bar_velocity_pattern: [1.0, 0.95, 1.03, 1.08, 0.98, 0.96, 1.04, 1.1]
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 88
+        - drum: mid_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 94
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 11
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_41
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 92
+        - drum: snare
+          beats:
+          - 3.0
+          velocity: 70
+        - drum: closed_hat
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 28
+        bar_velocity_pattern: [0.84, 0.76, 0.88, 0.72]
+        fill_every_bars: 0
+        fill_mode: overlay
+        fill_events: []
+        humanize_ms: 14
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_49
+      at: {bar: 49, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 103
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 86
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 31
+        bar_velocity_pattern: [0.96, 0.91, 1.0, 0.89, 0.98, 0.93, 1.01, 1.04]
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 80
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 86
+        humanize_ms: 14
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 108
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 94
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 38
+        bar_velocity_pattern: [1.0, 0.95, 1.03, 1.08, 0.98, 0.96, 1.04, 1.1]
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 88
+        - drum: mid_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 94
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 11
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_81
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 100
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 80
+        bar_velocity_pattern: [0.94, 0.88, 1.0, 1.03]
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.5
+          - 3.0
+          velocity: 82
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 90
+        humanize_ms: 14
+        humanize_velocity_pct: 3.0
+    - id: deck_drums_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 108
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 94
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 38
+        bar_velocity_pattern: [1.0, 0.95, 1.03, 1.08, 0.98, 0.96, 1.04, 1.1]
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 88
+        - drum: mid_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 94
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 11
+        humanize_velocity_pct: 3.0
+- id: tagelharpa_part
+  instrument: tagelharpa
+  voices:
+  - id: bridge_drone
+    clips:
+    - id: tagelharpa_bridge
+      at: {bar: 41, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.pedal
+        note: E3
+        octave: 3
+        velocity: 48
+        articulation: pad
+        humanize_ms: 8
+    - id: tagelharpa_last_round
+      at: {bar: 81, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.pedal
+        note: E3
+        octave: 3
+        velocity: 42
+        articulation: pad
+        humanize_ms: 9
+- id: celli_part
+  instrument: celli_sustain
+  voices:
+  - id: final_low_anchor
+    clips:
+    - id: celli_final_anchor
+      at: {bar: 96, beat: 1}
+      events:
+      - id: cello_e3
+        at: 0
+        dur: {beats: 3.85}
+        pitches: [E3, B3]
+        velocity: 88
+      technique: sustain
+- id: horn_part
+  instrument: horns
+  voices:
+  - id: cadences
+    clips:
+    - id: horn_cadence_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 78
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: horn_cadence_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 78
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: horn_cadence_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 78
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: horn_cadence_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 78
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+- id: trombone_part
+  instrument: trombones
+  voices:
+  - id: cadences
+    clips:
+    - id: trombone_cadence_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 82
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trombone_cadence_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 82
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trombone_cadence_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 82
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trombone_cadence_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 3
+        voicing: power
+        velocity: 82
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+- id: trumpet_part
+  instrument: trumpets
+  voices:
+  - id: cadences
+    clips:
+    - id: trumpet_cadence_1
+      at: {bar: 1, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 4
+        voicing: power
+        velocity: 70
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trumpet_cadence_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 4
+        voicing: power
+        velocity: 70
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trumpet_cadence_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        - [11, 3.0]
+        - [15, 3.0]
+        duration_beats: 0.7
+        octave: 4
+        voicing: power
+        velocity: 70
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+    - id: trumpet_cadence_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - [3, 3.0]
+        - [7, 3.0]
+        duration_beats: 0.7
+        octave: 4
+        voicing: power
+        velocity: 70
+        include_slash_bass: false
+        humanize_ms: 7
+        humanize_velocity_pct: 2.5
+        articulation: marcato
+        constraints:
+          max_pitch: 84
+- id: timpani_part
+  instrument: timpani
+  voices:
+  - id: cadences
+    clips:
+    - id: timpani_cadence_25
+      at: {bar: 25, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [3, 3.0, 0, 0.62]
+        - [7, 3.0, 0, 0.62]
+        - [11, 3.0, 0, 0.62]
+        - [15, 3.0, 0, 0.62]
+        octave: 3
+        velocity: 92
+        articulation: marcato
+        humanize_ms: 5
+    - id: timpani_cadence_65
+      at: {bar: 65, beat: 1}
+      duration: {bars: 16}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [3, 3.0, 0, 0.62]
+        - [7, 3.0, 0, 0.62]
+        - [11, 3.0, 0, 0.62]
+        - [15, 3.0, 0, 0.62]
+        octave: 3
+        velocity: 92
+        articulation: marcato
+        humanize_ms: 5
+    - id: timpani_cadence_89
+      at: {bar: 89, beat: 1}
+      duration: {bars: 8}
+      generate:
+        kind: harmony.root_hits
+        hits:
+        - [3, 3.0, 0, 0.62]
+        - [7, 3.0, 0, 0.62]
+        octave: 3
+        velocity: 92
+        articulation: marcato
+        humanize_ms: 5
+processing:
+  groups:
+    rhythm:
+      chain:
+      - processor: highpass
+        cutoff_hz: 82
+      - processor: lowpass
+        cutoff_hz: 10800
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.55
+        attack_ms: 18
+        release_ms: 115
+    bass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 30
+      - processor: lowpass
+        cutoff_hz: 4300
+      - processor: compressor
+        threshold_db: -24
+        ratio: 1.9
+        attack_ms: 22
+        release_ms: 120
+        makeup_db: 0.6
+    lead:
+      chain:
+      - processor: highpass
+        cutoff_hz: 165
+      - processor: lowpass
+        cutoff_hz: 11800
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.3
+        attack_ms: 18
+        release_ms: 115
+    squeeze_push:
+      chain:
+      - processor: highpass
+        cutoff_hz: 64
+      - processor: lowpass
+        cutoff_hz: 9300
+      - processor: compressor
+        threshold_db: -25
+        ratio: 1.4
+        attack_ms: 22
+        release_ms: 120
+    squeeze_pull:
+      chain:
+      - processor: highpass
+        cutoff_hz: 64
+      - processor: lowpass
+        cutoff_hz: 9300
+      - processor: compressor
+        threshold_db: -25
+        ratio: 1.4
+        attack_ms: 22
+        release_ms: 120
+    squeeze_bass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 46
+      - processor: lowpass
+        cutoff_hz: 5200
+      - processor: compressor
+        threshold_db: -25
+        ratio: 1.4
+        attack_ms: 22
+        release_ms: 120
+    plucked_backing:
+      chain:
+      - processor: highpass
+        cutoff_hz: 260
+      - processor: lowpass
+        cutoff_hz: 9400
+      - processor: gain
+        gain_db: -1.0
+    brass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 120
+      - processor: lowpass
+        cutoff_hz: 9800
+      - processor: gain
+        gain_db: -1.0
+  master:
+    chain:
+    - processor: highpass
+      cutoff_hz: 28
+    - processor: compressor
+      threshold_db: -14
+      ratio: 1.35
+      attack_ms: 24
+      release_ms: 160
+    - processor: reverb
+      wet: 0.035
+      decay_seconds: 0.9
+      damping_hz: 6200
+    - processor: stereo_width
+      amount: 0.08
+    - processor: limiter
+      target_peak_db: -2.0
+      drive: 1.03
+      normalize: true
+  adaptive_sections:
+    mode: composition_master
+render:
+  metadata_markers: true
+  strict_backends: true

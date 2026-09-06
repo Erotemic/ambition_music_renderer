@@ -1,0 +1,235 @@
+"""Instrument resolution provenance — exactly what each instrument resolved to.
+
+Authoring asks for an instrument by a *role* (``library_ref: bass.growly``, a GM
+``program``, a ``prefer`` list).  The renderer then does a lot of implicit work:
+fuzzy-matches the alias to a concrete ``.sfz`` file, picks a program, octave-folds
+notes that fall outside the sampled range, or falls back to GM when an SFZ is
+silent.  That "we asked for X but got Y" magic was invisible.
+
+This audit records it, statically (no audio render): for every instrument it
+reports what was requested, what it resolved to on disk, the playable key range,
+how many of the part's notes fall outside that range (and would be octave-folded),
+and whether it is at risk of silence.  Runs by default in every bundle.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+from ._score_common import musical_note_events
+
+
+def _instrument_drives_cc1(inst: dict[str, Any]) -> bool:
+    if "modulation" in inst:
+        return True
+    controls = dict(inst.get("controls") or {})
+    if 1 in controls or "1" in controls or "modulation" in controls:
+        return True
+    velocity_map = inst.get("velocity_to_cc")
+    if isinstance(velocity_map, dict):
+        raw = velocity_map.get("cc", velocity_map.get("controller", "expression"))
+        return raw == 1 or str(raw).strip().lower() in {"1", "modulation"}
+    return False
+
+
+def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
+    from ..instrument_resolution import backend_spec_from_instrument, resolve_instrument_backend
+    from ..backends.sfizz_backend import sfz_key_span
+    from ..render.backend_notes import backend_note_remap
+    from ..musicir.compile import compile_score
+
+    render_cfg = spec.get("render") or {}
+    sfizz_cfg = render_cfg.get("sfizz") or {}
+    roots = list(sfizz_cfg.get("library_roots") or [])
+    default_soundfont = render_cfg.get("soundfont")
+
+    # per-instrument note pitches (to predict folding / silence)
+    pitches: dict[str, list[int]] = {}
+    build_warnings: list[str] = []
+    try:
+        compiled = compile_score(spec)
+        for ev in musical_note_events(compiled.note_events):
+            pitches.setdefault(str(ev.get("instrument")), []).append(int(ev["pitch"]))
+    except Exception as ex:
+        # This audit exists to make "asked for X, got Y" visible; a swallowed
+        # score-build failure used to report every instrument as resolved with
+        # zero notes — a lying diagnostic.
+        build_warnings.append(
+            f"score build failed ({type(ex).__name__}: {ex}); note ranges and "
+            f"octave-fold predictions are unavailable"
+        )
+    note_lo = {k: min(v) for k, v in pitches.items() if v}
+    note_hi = {k: max(v) for k, v in pitches.items() if v}
+    note_n = {k: len(v) for k, v in pitches.items()}
+
+    rows: list[dict[str, Any]] = []
+    warnings: list[str] = list(build_warnings)
+    for inst in spec.get("instruments", []):
+        name = str(inst.get("name"))
+        is_drum = bool(inst.get("is_drum"))
+        be = backend_spec_from_instrument(inst)
+        plan = resolve_instrument_backend(
+            be,
+            base_dir=base_dir,
+            sfizz_cfg=sfizz_cfg,
+            default_fallback_backend=sfizz_cfg.get("fallback_backend"),
+        )
+        row: dict[str, Any] = {
+            "instrument": name,
+            "group": inst.get("group", name),
+            "program": inst.get("program"),
+            "note_count": note_n.get(name, 0),
+            "part_low": note_lo.get(name),
+            "part_high": note_hi.get(name),
+        }
+        if plan.wants_sfz:
+            requested = plan.requested
+            prefer = list(plan.prefer)
+            resolved = plan.resolved_sfz
+            span = sfz_key_span(str(resolved)) if resolved else None
+            authored_pitches = list(pitches.get(name) or [])
+            try:
+                note_remap = backend_note_remap(be)
+            except (TypeError, ValueError) as ex:
+                note_remap = {}
+                row["note_remap_error"] = str(ex)
+                warnings.append(f"{name!r}: invalid backend note remap: {ex}")
+            rendered_pitches = [note_remap.get(p, p) for p in authored_pitches]
+            remapped_count = sum(1 for a, b in zip(authored_pitches, rendered_pitches) if a != b)
+            oob = 0
+            if span and rendered_pitches:
+                lo, hi = span
+                oob = sum(1 for p in rendered_pitches if p < lo or p > hi)
+            row.update({
+                "backend": "sfz",
+                "requested": requested,
+                "prefer": prefer or None,
+                "resolved": str(resolved) if resolved else None,
+                "resolved_name": Path(resolved).name if resolved else None,
+                "fallback_backend": plan.fallback_backend,
+                "catalog_ref": plan.library_ref if plan.catalog_entry else None,
+                "expected_catalog_instrument": plan.expected_catalog_instrument,
+                "catalog_usage": list(plan.catalog_entry.usage) if plan.catalog_entry else None,
+                "key_span": list(span) if span else None,
+                "notes_out_of_range": oob,
+                "backend_note_remap": {str(src): dst for src, dst in sorted(note_remap.items())} or None,
+                "remapped_note_count": remapped_count,
+                "render_part_low": min(rendered_pitches) if rendered_pitches else None,
+                "render_part_high": max(rendered_pitches) if rendered_pitches else None,
+            })
+            if resolved is not None and "-perf" in Path(str(resolved)).name.lower():
+                row["performance_patch_cc1_driven"] = _instrument_drives_cc1(inst)
+                if not row["performance_patch_cc1_driven"]:
+                    warnings.append(
+                        f"{name!r}: resolved performance patch {Path(str(resolved)).name} but the "
+                        "instrument does not drive CC1/modulation; performance patches that use "
+                        "CC1 for dynamics can render foreground notes extremely quietly."
+                    )
+            if resolved is None:
+                if plan.expected_catalog_instrument:
+                    row["status"] = "MISSING EXPECTED CATALOG INSTRUMENT → fallback"
+                    warnings.append(
+                        f"{name!r}: expected catalog instrument {plan.library_ref!r} did not resolve. "
+                        "The normal Ambition authoring environment is expected to contain it; run or "
+                        "repair download_ambition_audio_tools.sh. Rendering may use the configured fallback."
+                    )
+                else:
+                    row["status"] = "UNRESOLVED → fallback"
+                    warnings.append(
+                        f"{name!r}: SFZ {requested!r} did not resolve to any file; "
+                        "rendering may use the configured fallback."
+                    )
+            elif oob and is_drum:
+                # Drum maps use key→piece semantics. Backend note remaps are
+                # applied before this check, so remaining misses really are silent.
+                row["status"] = f"resolved; {oob}/{note_n.get(name,0)} drum hits UNMAPPED (silent)"
+                rendered_lo = row.get("render_part_low")
+                rendered_hi = row.get("render_part_high")
+                warnings.append(
+                    f"{name!r} (drum kit): requested {requested!r} → {Path(str(resolved)).name} maps "
+                    f"keys {span[0]}..{span[1]}, but {oob}/{note_n.get(name,0)} rendered hits remain "
+                    f"outside that ({rendered_lo}..{rendered_hi}) after backend note remapping.")
+            elif oob:
+                row["status"] = f"resolved; {oob}/{note_n.get(name,0)} notes octave-folded into range"
+                warnings.append(
+                    f"{name!r}: requested {requested!r} → {Path(str(resolved)).name}; "
+                    f"{oob}/{note_n.get(name,0)} notes ({note_lo[name]}..{note_hi[name]}) fall outside "
+                    f"the sampled range {span[0]}..{span[1]} and are octave-folded.")
+            elif remapped_count:
+                noun = "drum hits" if is_drum else "notes"
+                row["status"] = f"resolved; {remapped_count}/{note_n.get(name,0)} {noun} remapped for SFZ"
+            else:
+                row["status"] = "resolved"
+            if row.get("performance_patch_cc1_driven"):
+                row["status"] += "; CC1 dynamics driven"
+        else:
+            row.update({
+                "backend": "soundfont",
+                "requested": f"GM program {inst.get('program')}",
+                "resolved": default_soundfont,
+                "resolved_name": Path(default_soundfont).name if default_soundfont else "renderer default GM",
+                "status": "GM soundfont" if default_soundfont else "GM (renderer default soundfont)",
+            })
+        rows.append(row)
+
+    return {
+        "schema": "ambition.music_instrument_resolution.v1",
+        "id": spec.get("id"),
+        "default_soundfont": default_soundfont,
+        "sfizz_library_roots": roots,
+        "instruments": rows,
+        "warnings": warnings,
+    }
+
+
+def audit_file(path: Path) -> dict[str, Any]:
+    from ..render.score_core import load_yaml
+    return audit_spec(load_yaml(path), base_dir=path.resolve().parent)
+
+
+def _summary(payload: dict[str, Any]) -> str:
+    lines = [f"cue: {payload.get('id')}",
+             f"default soundfont: {payload.get('default_soundfont')}",
+             "what each instrument actually resolved to:", ""]
+    for r in payload["instruments"]:
+        if r["backend"] == "sfz":
+            rendered_part = ""
+            if r.get("remapped_note_count"):
+                rendered_part = f" → render {r.get('render_part_low')}..{r.get('render_part_high')}"
+            lines.append(
+                f"  {r['instrument']:<20} [{r['group']}]  requested {r.get('requested')!r}"
+                f" → {r.get('resolved_name') or 'UNRESOLVED'}"
+                f"  span {r.get('key_span')}  part {r.get('part_low')}..{r.get('part_high')}"
+                f"{rendered_part}  · {r['status']}")
+        else:
+            lines.append(
+                f"  {r['instrument']:<20} [{r['group']}]  GM program {r.get('program')}"
+                f" → {r.get('resolved_name')}  · {r['status']}")
+    lines.append("")
+    lines.append(f"warnings ({len(payload['warnings'])}):")
+    lines.extend(f"  - {w}" for w in payload["warnings"])
+    return "\n".join(lines) + "\n"
+
+
+def write_reports(payload: dict[str, Any], reports_dir: Path) -> dict[str, str]:
+    import json
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    paths = {}
+    (reports_dir / "instrument_resolution.json").write_text(json.dumps(payload, indent=2))
+    paths["json"] = str(reports_dir / "instrument_resolution.json")
+    (reports_dir / "instrument_resolution_summary.txt").write_text(_summary(payload))
+    paths["summary"] = str(reports_dir / "instrument_resolution_summary.txt")
+    md = [f"# Instrument resolution — {payload.get('id')}", "",
+          f"Default soundfont: `{payload.get('default_soundfont')}`", "",
+          "| instrument | group | requested | resolved | range | part | status |",
+          "| --- | --- | --- | --- | --- | --- | --- |"]
+    for r in payload["instruments"]:
+        req = r.get("requested")
+        md.append(f"| {r['instrument']} | {r['group']} | `{req}` | "
+                  f"`{r.get('resolved_name') or '—'}` | {r.get('key_span') or '—'} | "
+                  f"{r.get('part_low')}..{r.get('part_high')}"
+                  f"{' → ' + str(r.get('render_part_low')) + '..' + str(r.get('render_part_high')) if r.get('remapped_note_count') else ''}"
+                  f" | {r['status']} |")
+    (reports_dir / "instrument_resolution.md").write_text("\n".join(md))
+    paths["markdown"] = str(reports_dir / "instrument_resolution.md")
+    return paths

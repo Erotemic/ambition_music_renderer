@@ -1,0 +1,1389 @@
+schema: ambition.music.v1
+id: salt_steel_and_starlight
+title: Salt, Steel, and Starlight
+description: 'A new cinematic pirate jig: lantern-lit opening, swaggering deck chorus, cutlass chase, dead-calm threat, broadside climax,
+  and victorious horizon coda.'
+seed: 314159
+bpm: 178.1443298969072
+meter:
+  beats_per_bar: 6
+  beat_unit: 8
+key: E minor
+duration_target_seconds: 194.0
+notes: Original 96-bar 6/8 pirate cue. At the authored BPM, 576 beats is exactly 194 seconds (3:14). Sample choices are census-informed
+  and range-safe; accordion remains supporting GM color because no high-quality sampled accordion was present in the supplied census.
+instruments:
+- name: deck_guitar
+  group: rhythm
+  program: steel_guitar
+  volume: 112
+  pan: 42
+  expression: 112
+  controls:
+    100: 64
+  mix_gain_db: 1.5
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.acoustic
+    prefer:
+    - shinyguitar
+    - acoustic
+    settings:
+      fold_to_range: false
+- name: fiddle
+  group: fiddle
+  program: violin
+  volume: 116
+  pan: 78
+  expression: 115
+  modulation: 24
+  mix_gain_db: 2.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: whistle
+  group: whistle
+  program: flute
+  volume: 102
+  pan: 88
+  expression: 108
+  modulation: 18
+  mix_gain_db: 1.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.flute_solo_perf
+    prefer:
+    - flute
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: accordion
+  group: squeeze
+  program: accordion
+  volume: 74
+  pan: 56
+  expression: 82
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 114
+  pan: 50
+  expression: 112
+  mix_gain_db: 4.0
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - sonatina
+    - basses
+    - pizzicato
+    settings:
+      fold_to_range: false
+- name: tagelharpa
+  group: drone
+  program: cello
+  volume: 90
+  pan: 38
+  expression: 102
+  mix_gain_db: -1.0
+  controls:
+    31: 127
+    107: 40
+    110: 95
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.bass_tagelharpa
+    prefer:
+    - horse
+    - tagelharpa
+    settings:
+      fold_to_range: false
+- name: celli_sustain
+  group: low_strings
+  program: cello
+  volume: 96
+  pan: 46
+  expression: 102
+  mix_gain_db: 2.5
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - celli
+    - sustain
+    settings:
+      fold_to_range: false
+- name: celli_staccato
+  group: low_strings
+  program: cello
+  volume: 100
+  pan: 46
+  expression: 104
+  mix_gain_db: 2.0
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli_staccato
+    prefer:
+    - celli
+    - staccato
+    settings:
+      fold_to_range: false
+- name: violas
+  group: strings
+  program: viola
+  volume: 92
+  pan: 72
+  expression: 100
+  mix_gain_db: 2.0
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - violas
+    - sustain
+    settings:
+      fold_to_range: false
+- name: horns
+  group: brass
+  program: french_horn
+  volume: 98
+  pan: 54
+  expression: 106
+  mix_gain_db: 3.5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.horns_sustain
+    prefer:
+    - horns
+    - sustain
+    settings:
+      fold_to_range: false
+- name: trumpets
+  group: brass
+  program: trumpet
+  volume: 96
+  pan: 78
+  expression: 104
+  mix_gain_db: 2.5
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trumpets_staccato
+    prefer:
+    - trumpets
+    - staccato
+    settings:
+      fold_to_range: false
+- name: trombones
+  group: brass
+  program: trombone
+  volume: 100
+  pan: 42
+  expression: 106
+  mix_gain_db: 3.0
+  instrument_backend:
+    kind: sfz
+    library_ref: orchestra.trombones_staccato
+    prefer:
+    - trombones
+    - staccato
+    settings:
+      fold_to_range: false
+- name: harp
+  group: harp
+  program: orchestral_harp
+  volume: 92
+  pan: 66
+  expression: 98
+  mix_gain_db: 1.0
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Sonatina Symphonic Orchestra/Concert Harp.sfz'
+    prefer:
+    - sonatina
+    - concert
+    - harp
+    settings:
+      fold_to_range: false
+- name: deck_kit
+  group: drums
+  program: 0
+  is_drum: true
+  volume: 112
+  pan: 64
+  expression: 112
+  mix_gain_db: -0.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer:
+    - muldjord
+    - stereo
+    - kit
+- name: timpani
+  group: percussion
+  program: timpani
+  volume: 105
+  pan: 60
+  expression: 108
+  mix_gain_db: 2.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.timpani_hit
+    prefer:
+    - timpani
+    - hit
+    settings:
+      fold_to_range: false
+motifs:
+- id: salt_steel_hook
+  root: E5
+  intervals:
+  - 0
+  - 3
+  - 5
+  - 7
+  - 10
+  - 7
+  - 5
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.5
+  durations:
+  - 0.42
+  - 0.42
+  - 0.42
+  - 0.42
+  - 0.82
+  - 0.42
+  - 0.42
+  - 0.42
+  - 1.25
+  velocities:
+  - 100
+  - 92
+  - 96
+  - 104
+  - 116
+  - 106
+  - 98
+  - 94
+  - 110
+- id: whistle_answer
+  root: C6
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.5
+  durations:
+  - 0.4
+  - 0.4
+  - 0.4
+  - 0.4
+  - 0.8
+  - 0.4
+  - 0.4
+  - 0.4
+  - 1.2
+  velocities:
+  - 80
+  - 84
+  - 88
+  - 96
+  - 104
+  - 96
+  - 88
+  - 84
+  - 92
+- id: cutlass_run
+  root: E5
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 12
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  durations:
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.82
+  velocities:
+  - 90
+  - 92
+  - 96
+  - 102
+  - 106
+  - 116
+  - 108
+  - 104
+  - 100
+  - 96
+  - 110
+- id: horizon_hook
+  root: G5
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  rhythm:
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  durations:
+  - 0.6
+  - 0.6
+  - 0.6
+  - 0.6
+  - 0.6
+  - 0.6
+  - 0.6
+  - 0.6
+  velocities:
+  - 88
+  - 92
+  - 96
+  - 104
+  - 112
+  - 104
+  - 98
+  - 94
+- id: low_motto
+  root: E3
+  intervals:
+  - 0
+  - 7
+  - 12
+  - 10
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  rhythm:
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  durations:
+  - 0.82
+  - 0.38
+  - 0.38
+  - 0.82
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.38
+  - 0.82
+  velocities:
+  - 92
+  - 88
+  - 96
+  - 104
+  - 98
+  - 94
+  - 92
+  - 90
+  - 106
+layer_templates:
+  deck_strum:
+    kind: guitar_strum
+    instrument: deck_guitar
+    every_bars: 1
+    standard_tuning: true
+    physical_string_sustain: true
+    chord_shapes: &id001
+      Em:
+      - 0
+      - 2
+      - 2
+      - 0
+      - 0
+      - 0
+      D:
+      - x
+      - x
+      - 0
+      - 2
+      - 3
+      - 2
+      C:
+      - x
+      - 3
+      - 2
+      - 0
+      - 1
+      - 0
+      Cmaj7:
+      - x
+      - 3
+      - 2
+      - 0
+      - 0
+      - 0
+      B7:
+      - x
+      - 2
+      - 1
+      - 2
+      - 0
+      - 2
+      G:
+      - 3
+      - 2
+      - 0
+      - 0
+      - 0
+      - 3
+      Am:
+      - x
+      - 0
+      - 2
+      - 2
+      - 1
+      - 0
+      D/F#:
+      - 2
+      - x
+      - 0
+      - 2
+      - 3
+      - 2
+      G/B:
+      - x
+      - 2
+      - 0
+      - 0
+      - 0
+      - 3
+      Em/D:
+      - x
+      - x
+      - 0
+      - 0
+      - 0
+      - 0
+      Em/G:
+      - 3
+      - 2
+      - 2
+      - 0
+      - 0
+      - 0
+    hits:
+    - - 0
+      - 0.0
+      - down
+      - 2.8
+    - - 0
+      - 1.5
+      - up
+      - 1.0
+    - - 0
+      - 3.0
+      - down
+      - 2.8
+    - - 0
+      - 4.5
+      - up
+      - 1.0
+    velocity: 78
+    velocity_jitter: 5
+    humanize_ms: 12
+  deck_strum_sparse:
+    kind: guitar_strum
+    instrument: deck_guitar
+    every_bars: 1
+    standard_tuning: true
+    physical_string_sustain: true
+    chord_shapes: *id001
+    hits:
+    - - 0
+      - 0.0
+      - down
+      - 2.5
+    - - 0
+      - 3.0
+      - down
+      - 2.4
+    velocity: 62
+    velocity_jitter: 4
+    humanize_ms: 14
+  sea_bass:
+    kind: bassline
+    instrument: upright_bass
+    every_bars: 1
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 1.0
+    - - 7
+      - 1.5
+      - 0.65
+    - - 12
+      - 3.0
+      - 1.0
+    - - 7
+      - 4.5
+      - 0.65
+    velocity: 102
+    humanize_ms: 9
+  sea_bass_chase:
+    kind: bassline
+    instrument: upright_bass
+    every_bars: 1
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.65
+    - - 7
+      - 1.0
+      - 0.55
+    - - 12
+      - 2.0
+      - 0.55
+    - - 0
+      - 3.0
+      - 0.65
+    - - 7
+      - 4.0
+      - 0.55
+    - - 12
+      - 5.0
+      - 0.55
+    velocity: 108
+    humanize_ms: 7
+  accordion_bed:
+    kind: pad_chords
+    instruments:
+    - accordion
+    every_bars: 1
+    duration_beats: 5.7
+    octave: 3
+    velocity: 32
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_pitch: 77
+    humanize_ms: 20
+  cello_bed:
+    kind: pad_chords
+    instruments:
+    - celli_sustain
+    every_bars: 1
+    duration_beats: 5.75
+    octave: 2
+    velocity: 52
+    articulation: pad
+    voicing: power
+    constraints:
+      max_pitch: 65
+    humanize_ms: 16
+  viola_bed:
+    kind: pad_chords
+    instruments:
+    - violas
+    every_bars: 1
+    duration_beats: 5.7
+    octave: 3
+    velocity: 46
+    articulation: pad
+    voicing: shell
+    constraints:
+      min_pitch: 48
+      max_pitch: 79
+    humanize_ms: 18
+  cello_drive:
+    kind: ostinato
+    instrument: celli_staccato
+    every_bars: 1
+    octave: 2
+    intervals:
+    - 0
+    - 7
+    - 12
+    - 7
+    - 0
+    - 7
+    rhythm:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    durations:
+    - 0.58
+    - 0.58
+    - 0.58
+    - 0.58
+    - 0.58
+    - 0.58
+    velocities:
+    - 88
+    - 80
+    - 92
+    - 82
+    - 90
+    - 84
+    humanize_ms: 8
+  fiddle_hook:
+    kind: motif
+    motif: salt_steel_hook
+    instrument: fiddle
+    starts:
+    - - 0
+      - 0.0
+    repeats: 4
+    every_bars: 4
+    humanize_ms: 10
+  fiddle_hook_twice:
+    kind: motif
+    motif: salt_steel_hook
+    instrument: fiddle
+    starts:
+    - - 0
+      - 0.0
+    repeats: 2
+    every_bars: 4
+    humanize_ms: 9
+  whistle_answers:
+    kind: motif
+    motif: whistle_answer
+    instrument: whistle
+    roots:
+    - C6
+    - D6
+    - G5
+    - B5
+    starts:
+    - - 2
+      - 0.0
+    repeats: 4
+    every_bars: 4
+    humanize_ms: 12
+  whistle_answers_broadside:
+    kind: motif
+    motif: whistle_answer
+    instrument: whistle
+    roots:
+    - G5
+    - B5
+    - C6
+    - B5
+    starts:
+    - - 2
+      - 0.0
+    repeats: 4
+    every_bars: 4
+    humanize_ms: 12
+  cutlass_runs:
+    kind: motif
+    motif: cutlass_run
+    instrument: fiddle
+    roots:
+    - D5
+    - D5
+    - G5
+    - D5
+    starts:
+    - - 1
+      - 0.0
+    repeats: 4
+    every_bars: 4
+    humanize_ms: 6
+  horizon_fiddle:
+    kind: motif
+    motif: horizon_hook
+    instrument: fiddle
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    humanize_ms: 11
+  low_motto:
+    kind: motif
+    motif: low_motto
+    instrument: celli_sustain
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    humanize_ms: 12
+  drums_deck:
+    kind: drums
+    instrument: deck_kit
+    every_bars: 1
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 3.0
+      velocity: 108
+    - drum: snare
+      beats:
+      - 1.5
+      - 4.5
+      velocity: 92
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 5.0
+      velocity: 66
+    - drum: open_hat
+      beats:
+      - 2.5
+      - 5.5
+      velocity: 48
+      probability: 0.55
+    - drum: crash
+      beat: 0.0
+      velocity: 94
+      every: 8
+    humanize_ms: 7
+  drums_chase:
+    kind: drums
+    instrument: deck_kit
+    every_bars: 1
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      - 3.0
+      - 5.0
+      velocity: 108
+    - drum: snare
+      beats:
+      - 1.0
+      - 2.5
+      - 4.0
+      - 5.5
+      velocity: 78
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      - 4.0
+      - 4.5
+      - 5.0
+      - 5.5
+      velocity: 62
+    - drum: crash
+      beat: 0.0
+      velocity: 106
+      every: 4
+    humanize_ms: 6
+  drums_sparse:
+    kind: drums
+    instrument: deck_kit
+    every_bars: 1
+    events:
+    - drum: kick
+      beat: 0.0
+      velocity: 88
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 3.0
+      velocity: 52
+    - drum: snare
+      beat: 3.0
+      velocity: 64
+    humanize_ms: 12
+  broadside_brass:
+    kind: chord_hits
+    instruments:
+    - horns
+    - trombones
+    - trumpets
+    hits:
+    - - 1
+      - 0.0
+    - - 5
+      - 0.0
+    - - 9
+      - 0.0
+    - - 13
+      - 0.0
+    duration_beats: 2.0
+    octave: 3
+    voicing: power
+    velocity: 104
+    instrument_octave_offsets:
+      trumpets: 1
+    instrument_velocity_offsets:
+      horns: 0
+      trombones: 4
+      trumpets: -4
+    constraints:
+      max_pitch: 84
+    humanize_ms: 9
+  brass_stabs:
+    kind: chord_hits
+    instruments:
+    - trombones
+    - trumpets
+    hits:
+    - - 1
+      - 3.0
+    - - 3
+      - 3.0
+    - - 5
+      - 3.0
+    - - 7
+      - 3.0
+    - - 9
+      - 3.0
+    - - 11
+      - 3.0
+    - - 13
+      - 3.0
+    - - 15
+      - 3.0
+    duration_beats: 0.7
+    octave: 3
+    voicing: power
+    velocity: 96
+    instrument_octave_offsets:
+      trumpets: 1
+    constraints:
+      max_pitch: 86
+    humanize_ms: 7
+  timpani_broadsides:
+    kind: root_hits
+    instruments:
+    - timpani
+    octave: 2
+    hits:
+    - - 1
+      - 0.0
+      - 0
+      - 1.1
+    - - 1
+      - 0.45
+      - 0
+      - 0.65
+    - - 5
+      - 0.0
+      - 0
+      - 1.1
+    - - 5
+      - 0.45
+      - 0
+      - 0.65
+    - - 9
+      - 0.0
+      - 0
+      - 1.1
+    - - 9
+      - 0.45
+      - 0
+      - 0.65
+    - - 13
+      - 0.0
+      - 0
+      - 1.1
+    - - 13
+      - 0.45
+      - 0
+      - 0.65
+    velocity: 112
+    humanize_ms: 5
+  harp_roll:
+    kind: arpeggio
+    instrument: harp
+    every_bars: 1
+    octave: 3
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 1
+    rhythm:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    durations:
+    - 0.72
+    - 0.72
+    - 0.72
+    - 0.72
+    - 0.72
+    - 0.72
+    velocity: 62
+    humanize_ms: 14
+  tagelharpa_roots:
+    kind: bassline
+    instrument: tagelharpa
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 5.7
+    velocity: 70
+    articulation: pad
+    humanize_ms: 14
+  final_hold:
+    kind: notes
+    instruments:
+    - celli_sustain
+    - violas
+    - horns
+    humanize_ms: 0
+    notes:
+    - bar: 7
+      beat: 0.0
+      note:
+      - E3
+      - B3
+      - E4
+      dur: 6.0
+      vel: 104
+      gate: 1.0
+      articulation: pad
+  final_low_anchor:
+    kind: notes
+    instrument: celli_sustain
+    humanize_ms: 0
+    notes:
+    - bar: 7
+      beat: 0.0
+      note: E2
+      dur: 6.0
+      vel: 108
+      gate: 1.0
+      articulation: pad
+sections:
+- id: lanterns_in_the_fog
+  title: Lanterns in the Fog
+  bars: 8
+  harmony:
+  - Em
+  - Em
+  - Cmaj7
+  - B7
+  - Em
+  - G
+  - C
+  - B7
+  intensity: 0.62
+  layers:
+  - harp_roll
+  - deck_strum_sparse
+  - cello_bed
+- id: no_king_past_the_breakers
+  title: No King Past the Breakers
+  bars: 16
+  harmony:
+  - Em
+  - D
+  - C
+  - B7
+  - Em
+  - G
+  - D
+  - B7
+  - Em
+  - C
+  - G
+  - D
+  - Em
+  - Am
+  - B7
+  - Em
+  intensity: 0.84
+  layers:
+  - deck_strum
+  - sea_bass
+  - accordion_bed
+  - cello_bed
+  - fiddle_hook
+  - whistle_answers
+  - drums_deck
+- id: cutlass_weather
+  title: Cutlass Weather
+  bars: 16
+  harmony:
+  - Em
+  - D
+  - C
+  - B7
+  - G
+  - D
+  - Em
+  - B7
+  - C
+  - G
+  - Am
+  - Em
+  - C
+  - D
+  - B7
+  - Em
+  intensity: 0.96
+  layers:
+  - deck_strum
+  - sea_bass_chase
+  - cello_drive
+  - cutlass_runs
+  - drums_chase
+  - brass_stabs
+- id: dead_calm_loaded_guns
+  title: Dead Calm, Loaded Guns
+  bars: 8
+  harmony:
+  - Em
+  - Em/D
+  - Am
+  - B7
+  - Am
+  - Em/G
+  - B7
+  - Em
+  intensity: 0.58
+  layers:
+  - deck_strum_sparse
+  - tagelharpa_roots
+  - cello_bed
+  - viola_bed
+  - harp_roll
+  - drums_sparse
+- id: run_out_the_guns
+  title: Run Out the Guns
+  bars: 16
+  harmony:
+  - Em
+  - D
+  - C
+  - B7
+  - Em
+  - D
+  - C
+  - B7
+  - Am
+  - C
+  - D
+  - B7
+  - Em
+  - C
+  - B7
+  - Em
+  intensity: 1.0
+  layers:
+  - deck_strum
+  - sea_bass_chase
+  - cello_drive
+  - fiddle_hook
+  - drums_chase
+  - brass_stabs
+- id: broadside_chorus
+  title: Broadside Chorus
+  bars: 16
+  harmony:
+  - G
+  - D
+  - Em
+  - C
+  - G
+  - Am
+  - B7
+  - Em
+  - G
+  - D
+  - C
+  - Am
+  - Em
+  - C
+  - B7
+  - Em
+  intensity: 1.06
+  layers:
+  - deck_strum
+  - sea_bass
+  - accordion_bed
+  - cello_bed
+  - viola_bed
+  - fiddle_hook
+  - whistle_answers_broadside
+  - drums_deck
+  - broadside_brass
+  - timpani_broadsides
+- id: treasure_sky
+  title: Treasure Sky
+  bars: 8
+  harmony:
+  - G
+  - D
+  - C
+  - G
+  - Em
+  - C
+  - D
+  - B7
+  intensity: 0.76
+  layers:
+  - deck_strum_sparse
+  - sea_bass
+  - harp_roll
+  - viola_bed
+  - horizon_fiddle
+  - drums_sparse
+- id: no_flag_but_ours
+  title: No Flag But Ours
+  bars: 8
+  harmony:
+  - Em
+  - C
+  - G
+  - D
+  - Am
+  - C
+  - B7
+  - Em
+  intensity: 1.08
+  layers:
+  - deck_strum
+  - sea_bass
+  - accordion_bed
+  - cello_bed
+  - viola_bed
+  - fiddle_hook_twice
+  - drums_deck
+  - broadside_brass
+  - timpani_broadsides
+  - final_hold
+  - final_low_anchor
+group_postprocess:
+  rhythm:
+    gain_db: -1.0
+    highpass_hz: 75
+    lowpass_hz: 12000
+    reverb_wet: 0.01
+    compressor_threshold_db: -22.0
+    compressor_ratio: 1.7
+    compressor_attack_ms: 18.0
+    compressor_release_ms: 120.0
+    eq_bands:
+    - type: peak
+      hz: 240
+      q: 0.9
+      db: -1.0
+    - type: peak
+      hz: 2400
+      q: 1.1
+      db: 0.7
+  fiddle:
+    gain_db: 0.3
+    highpass_hz: 170
+    lowpass_hz: 12500
+    reverb_wet: 0.02
+    compressor_threshold_db: -20.0
+    compressor_ratio: 1.5
+    compressor_attack_ms: 14.0
+    compressor_release_ms: 100.0
+    eq_bands:
+    - type: peak
+      hz: 3100
+      q: 1.2
+      db: -0.7
+    - type: peak
+      hz: 6500
+      q: 0.8
+      db: 0.5
+  whistle:
+    gain_db: -1.0
+    highpass_hz: 300
+    lowpass_hz: 10500
+    reverb_wet: 0.025
+    eq_bands:
+    - type: peak
+      hz: 2700
+      q: 1.1
+      db: -1.0
+  squeeze:
+    gain_db: -3.5
+    highpass_hz: 150
+    lowpass_hz: 8500
+    reverb_wet: 0.018
+    stereo_width: 0.04
+  bass:
+    gain_db: 0.8
+    highpass_hz: 30
+    lowpass_hz: 4800
+    reverb_wet: 0.001
+    compressor_threshold_db: -24.0
+    compressor_ratio: 2.2
+    compressor_attack_ms: 20.0
+    compressor_release_ms: 110.0
+    compressor_makeup_db: 1.0
+    eq_bands:
+    - type: peak
+      hz: 95
+      q: 0.8
+      db: 1.0
+    - type: peak
+      hz: 260
+      q: 1.0
+      db: -0.8
+  drone:
+    gain_db: -3.5
+    highpass_hz: 55
+    lowpass_hz: 6500
+    reverb_wet: 0.035
+    stereo_width: 0.06
+  low_strings:
+    gain_db: -1.5
+    highpass_hz: 55
+    lowpass_hz: 10500
+    reverb_wet: 0.024
+    stereo_width: 0.08
+  strings:
+    gain_db: -2.0
+    highpass_hz: 110
+    lowpass_hz: 11500
+    reverb_wet: 0.026
+    stereo_width: 0.1
+  brass:
+    gain_db: -1.0
+    highpass_hz: 115
+    lowpass_hz: 10500
+    reverb_wet: 0.014
+    compressor_threshold_db: -19.0
+    compressor_ratio: 1.6
+    compressor_attack_ms: 12.0
+    compressor_release_ms: 95.0
+    eq_bands:
+    - type: peak
+      hz: 420
+      q: 0.9
+      db: -0.7
+    - type: peak
+      hz: 2200
+      q: 1.0
+      db: 0.6
+  harp:
+    gain_db: -2.0
+    highpass_hz: 120
+    lowpass_hz: 11500
+    reverb_wet: 0.03
+    stereo_width: 0.08
+  drums:
+    gain_db: -2.0
+    highpass_hz: 30
+    lowpass_hz: 13200
+    reverb_wet: 0.004
+    compressor_threshold_db: -18.0
+    compressor_ratio: 1.8
+    compressor_attack_ms: 8.0
+    compressor_release_ms: 90.0
+  percussion:
+    gain_db: -2.0
+    highpass_hz: 34
+    lowpass_hz: 11000
+    reverb_wet: 0.012
+postprocess:
+  gain_db: -2.2
+  highpass_hz: 28
+  lowpass_hz: 13500
+  stereo_width: 0.1
+  reverb_wet: 0.004
+  compressor_threshold_db: -13.5
+  compressor_ratio: 1.35
+  compressor_attack_ms: 24.0
+  compressor_release_ms: 160.0
+  limiter_enabled: true
+  target_peak_dbfs: -2.0
+render:
+  metadata_markers: true
+  strict_backends: true

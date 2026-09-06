@@ -1,0 +1,893 @@
+schema: ambition.musicir.v1
+id: fia_act1_deep_polish_82_new_room_glass_stair
+title: 'Fia Act I Deep Polish 82 — New Room: Glass Stair'
+seed: 20260816
+notes: Deep composition polish. Preserve the accepted chromatic bass descent/ascent exactly, but replace the clustered
+  upper sonorities with open seventh-chord shells and write the lead as a contrary-motion guide-tone line. The resulting
+  harmony is stranger because of the bass path, not because neighboring notes grind against each other.
+tempo:
+  bpm: 86
+  map:
+  - bar: 16
+    bpm: 90
+    ramp_bars: 2
+  - bar: 24
+    bpm: 84
+    ramp_bars: 3
+  - bar: 30
+    bpm: 78
+    ramp_bars: 2
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+postprocess:
+  gain_db: -0.25
+  highpass_hz: 24
+  lowpass_hz: 15500
+  reverb_wet: 0.065
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 7000
+  stereo_width: 0.05
+  compressor_threshold_db: -14.5
+  compressor_ratio: 1.12
+  compressor_attack_ms: 38.0
+  compressor_release_ms: 220.0
+  compressor_makeup_db: 0.0
+  limiter_drive: 0.9
+  normalize: true
+  target_peak_db: -3.0
+instruments:
+- name: fia_piano
+  group: piano
+  program: acoustic_grand_piano
+  volume: 106
+  pan: 64
+  expression: 112
+  reverb: 16
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    - flac
+    optional: true
+    fallback_backend: pretty-midi
+authoring:
+  audition_axis: chromatic bass plus open seventh-chord planing is the identity
+  bass_policy: Every bar-long bass note is copied exactly from polish 79, including the reverse ascent in the middle.
+  backing_revision: Close D/E, E/F, and D/Eb clusters are replaced with open seventh-chord shells. Chord attacks retain
+    .68 and 1.82 timing.
+  harmonic_grammar: Dmaj7 → C#m7 → Cmaj7 → Bm7 → Bbmaj7 → A major → Abmaj7 → Gmaj7; middle section traverses the chain
+    in reverse.
+  melody_revision: Alternating one-note and two-note bars create a repeated upward answer against the descending bass,
+    then invert the relationship in the middle section.
+  special_hook: Bass falls chromatically while the upper voice repeatedly climbs within each chord; the middle eight
+    bars reverse that geometry.
+  foreshadowing_policy: A single E5 ninth over the late Dmaj7 return is a normal extension, voiced softly and resolved
+    into the chord.
+  subtle_foreshadowing_color:
+    bar: 24
+    beat: 0.68
+    pitch: E5
+    duration: 0.82
+    velocity: 68
+    idea: A ninth above D, soft enough to feel like air in the voicing rather than a wrong note.
+  instrument: freepats.salamander_grand
+sections:
+- id: complete_piece
+  kind: theme
+  label: New Room — Glass Stair
+  bars: 32
+  intensity: 1.0
+  density: 0.52
+  loopable: false
+  harmony:
+  - Dmaj7
+  - C#m7
+  - Cmaj7
+  - Bm7
+  - Bbmaj7
+  - A
+  - Abmaj7
+  - Gmaj7
+  - Dmaj7
+  - C#m7
+  - Cmaj7
+  - Bm7
+  - Bbmaj7
+  - A
+  - Abmaj7
+  - Gmaj7
+  - Gmaj7
+  - Abmaj7
+  - A
+  - Bbmaj7
+  - Bm7
+  - Cmaj7
+  - C#m7
+  - Dmaj7
+  - Dmaj7
+  - C#m7
+  - Cmaj7
+  - Bm7
+  - Bbmaj7
+  - A
+  - Abmaj7
+  - Gmaj7
+  layers:
+  - kind: notes
+    instrument: fia_piano
+    articulation: tenuto
+    gate: 1.0
+    humanize_ms: 0
+    notes:
+    - - 0
+      - 0.0
+      - D2
+      - 2.72
+      - 58
+    - - 0
+      - 0.68
+      - &id001
+        - A3
+        - C#4
+        - F#4
+      - 0.96
+      - 57
+    - - 0
+      - 1.82
+      - &id002
+        - C#4
+        - F#4
+      - 0.82
+      - 54
+    - - 1
+      - 0.0
+      - C#2
+      - 2.72
+      - 58
+    - - 1
+      - 0.68
+      - &id003
+        - G#3
+        - B3
+        - E4
+      - 0.96
+      - 57
+    - - 1
+      - 1.82
+      - &id004
+        - B3
+        - E4
+      - 0.82
+      - 54
+    - - 2
+      - 0.0
+      - C2
+      - 2.72
+      - 58
+    - - 2
+      - 0.68
+      - &id005
+        - G3
+        - B3
+        - E4
+      - 0.96
+      - 57
+    - - 2
+      - 1.82
+      - &id006
+        - B3
+        - E4
+      - 0.82
+      - 54
+    - - 3
+      - 0.0
+      - B2
+      - 2.72
+      - 58
+    - - 3
+      - 0.68
+      - &id007
+        - F#3
+        - A3
+        - D4
+      - 0.96
+      - 57
+    - - 3
+      - 1.82
+      - &id008
+        - A3
+        - D4
+      - 0.82
+      - 54
+    - - 4
+      - 0.0
+      - Bb2
+      - 2.72
+      - 58
+    - - 4
+      - 0.68
+      - &id009
+        - F3
+        - A3
+        - D4
+      - 0.96
+      - 57
+    - - 4
+      - 1.82
+      - &id010
+        - A3
+        - D4
+      - 0.82
+      - 54
+    - - 5
+      - 0.0
+      - A2
+      - 2.72
+      - 58
+    - - 5
+      - 0.68
+      - &id011
+        - E3
+        - A3
+        - C#4
+      - 0.96
+      - 57
+    - - 5
+      - 1.82
+      - &id012
+        - A3
+        - C#4
+      - 0.82
+      - 54
+    - - 6
+      - 0.0
+      - Ab2
+      - 2.72
+      - 58
+    - - 6
+      - 0.68
+      - &id013
+        - G3
+        - C4
+        - Eb4
+      - 0.96
+      - 57
+    - - 6
+      - 1.82
+      - &id014
+        - C4
+        - Eb4
+      - 0.82
+      - 54
+    - - 7
+      - 0.0
+      - G2
+      - 2.72
+      - 58
+    - - 7
+      - 0.68
+      - &id015
+        - F#3
+        - B3
+        - D4
+      - 0.96
+      - 57
+    - - 7
+      - 1.82
+      - &id016
+        - B3
+        - D4
+      - 0.82
+      - 54
+    - - 8
+      - 0.0
+      - D2
+      - 2.72
+      - 58
+    - - 8
+      - 0.68
+      - *id001
+      - 0.96
+      - 57
+    - - 8
+      - 1.82
+      - *id002
+      - 0.82
+      - 54
+    - - 9
+      - 0.0
+      - C#2
+      - 2.72
+      - 58
+    - - 9
+      - 0.68
+      - *id003
+      - 0.96
+      - 57
+    - - 9
+      - 1.82
+      - *id004
+      - 0.82
+      - 54
+    - - 10
+      - 0.0
+      - C2
+      - 2.72
+      - 58
+    - - 10
+      - 0.68
+      - *id005
+      - 0.96
+      - 57
+    - - 10
+      - 1.82
+      - *id006
+      - 0.82
+      - 54
+    - - 11
+      - 0.0
+      - B2
+      - 2.72
+      - 58
+    - - 11
+      - 0.68
+      - *id007
+      - 0.96
+      - 57
+    - - 11
+      - 1.82
+      - *id008
+      - 0.82
+      - 54
+    - - 12
+      - 0.0
+      - Bb2
+      - 2.72
+      - 58
+    - - 12
+      - 0.68
+      - *id009
+      - 0.96
+      - 57
+    - - 12
+      - 1.82
+      - *id010
+      - 0.82
+      - 54
+    - - 13
+      - 0.0
+      - A2
+      - 2.72
+      - 58
+    - - 13
+      - 0.68
+      - *id011
+      - 0.96
+      - 57
+    - - 13
+      - 1.82
+      - *id012
+      - 0.82
+      - 54
+    - - 14
+      - 0.0
+      - Ab2
+      - 2.72
+      - 58
+    - - 14
+      - 0.68
+      - *id013
+      - 0.96
+      - 57
+    - - 14
+      - 1.82
+      - *id014
+      - 0.82
+      - 54
+    - - 15
+      - 0.0
+      - G2
+      - 2.72
+      - 58
+    - - 15
+      - 0.68
+      - *id015
+      - 0.96
+      - 57
+    - - 15
+      - 1.82
+      - *id016
+      - 0.82
+      - 54
+    - - 16
+      - 0.0
+      - G2
+      - 2.72
+      - 61
+    - - 16
+      - 0.68
+      - *id015
+      - 0.96
+      - 60
+    - - 16
+      - 1.82
+      - *id016
+      - 0.82
+      - 57
+    - - 17
+      - 0.0
+      - Ab2
+      - 2.72
+      - 61
+    - - 17
+      - 0.68
+      - *id013
+      - 0.96
+      - 60
+    - - 17
+      - 1.82
+      - *id014
+      - 0.82
+      - 57
+    - - 18
+      - 0.0
+      - A2
+      - 2.72
+      - 61
+    - - 18
+      - 0.68
+      - *id011
+      - 0.96
+      - 60
+    - - 18
+      - 1.82
+      - *id012
+      - 0.82
+      - 57
+    - - 19
+      - 0.0
+      - Bb2
+      - 2.72
+      - 61
+    - - 19
+      - 0.68
+      - *id009
+      - 0.96
+      - 60
+    - - 19
+      - 1.82
+      - *id010
+      - 0.82
+      - 57
+    - - 20
+      - 0.0
+      - B2
+      - 2.72
+      - 61
+    - - 20
+      - 0.68
+      - *id007
+      - 0.96
+      - 60
+    - - 20
+      - 1.82
+      - *id008
+      - 0.82
+      - 57
+    - - 21
+      - 0.0
+      - C2
+      - 2.72
+      - 61
+    - - 21
+      - 0.68
+      - *id005
+      - 0.96
+      - 60
+    - - 21
+      - 1.82
+      - *id006
+      - 0.82
+      - 57
+    - - 22
+      - 0.0
+      - C#2
+      - 2.72
+      - 61
+    - - 22
+      - 0.68
+      - *id003
+      - 0.96
+      - 60
+    - - 22
+      - 1.82
+      - *id004
+      - 0.82
+      - 57
+    - - 23
+      - 0.0
+      - D2
+      - 2.72
+      - 61
+    - - 23
+      - 0.68
+      - *id001
+      - 0.96
+      - 60
+    - - 23
+      - 1.82
+      - *id002
+      - 0.82
+      - 57
+    - - 24
+      - 0.0
+      - D2
+      - 2.72
+      - 58
+    - - 24
+      - 0.68
+      - *id001
+      - 0.96
+      - 57
+    - - 24
+      - 1.82
+      - *id002
+      - 0.82
+      - 54
+    - - 25
+      - 0.0
+      - C#2
+      - 2.72
+      - 58
+    - - 25
+      - 0.68
+      - *id003
+      - 0.96
+      - 57
+    - - 25
+      - 1.82
+      - *id004
+      - 0.82
+      - 54
+    - - 26
+      - 0.0
+      - C2
+      - 2.72
+      - 58
+    - - 26
+      - 0.68
+      - *id005
+      - 0.96
+      - 57
+    - - 26
+      - 1.82
+      - *id006
+      - 0.82
+      - 54
+    - - 27
+      - 0.0
+      - B2
+      - 2.72
+      - 58
+    - - 27
+      - 0.68
+      - *id007
+      - 0.96
+      - 57
+    - - 27
+      - 1.82
+      - *id008
+      - 0.82
+      - 54
+    - - 28
+      - 0.0
+      - Bb2
+      - 2.72
+      - 58
+    - - 28
+      - 0.68
+      - *id009
+      - 0.96
+      - 57
+    - - 28
+      - 1.82
+      - *id010
+      - 0.82
+      - 54
+    - - 29
+      - 0.0
+      - A2
+      - 2.72
+      - 58
+    - - 29
+      - 0.68
+      - *id011
+      - 0.96
+      - 57
+    - - 29
+      - 1.82
+      - *id012
+      - 0.82
+      - 54
+    - - 30
+      - 0.0
+      - Ab2
+      - 2.72
+      - 58
+    - - 30
+      - 0.68
+      - *id013
+      - 0.96
+      - 57
+    - - 30
+      - 1.82
+      - *id014
+      - 0.82
+      - 54
+    - - 31
+      - 0.0
+      - G2
+      - 2.72
+      - 58
+    - - 31
+      - 0.68
+      - *id015
+      - 0.96
+      - 57
+    - - 31
+      - 1.82
+      - *id016
+      - 0.82
+      - 54
+  - kind: notes
+    instrument: fia_piano
+    articulation: tenuto
+    gate: 1.0
+    humanize_ms: 0
+    notes:
+    - - 0
+      - 0.68
+      - C#5
+      - 0.82
+      - 71
+    - - 0
+      - 1.82
+      - F#5
+      - 0.82
+      - 74
+    - - 1
+      - 0.68
+      - E5
+      - 1.72
+      - 72
+    - - 2
+      - 0.68
+      - E5
+      - 0.82
+      - 72
+    - - 2
+      - 1.82
+      - G5
+      - 0.82
+      - 75
+    - - 3
+      - 0.68
+      - D5
+      - 1.72
+      - 71
+    - - 4
+      - 0.68
+      - D5
+      - 0.82
+      - 71
+    - - 4
+      - 1.82
+      - F5
+      - 0.82
+      - 74
+    - - 5
+      - 0.68
+      - C#5
+      - 1.72
+      - 70
+    - - 6
+      - 0.68
+      - C5
+      - 0.82
+      - 70
+    - - 6
+      - 1.82
+      - Eb5
+      - 0.82
+      - 73
+    - - 7
+      - 0.68
+      - B4
+      - 1.72
+      - 69
+    - - 8
+      - 0.68
+      - F#5
+      - 1.72
+      - 75
+    - - 9
+      - 0.68
+      - E5
+      - 0.82
+      - 72
+    - - 9
+      - 1.82
+      - G#5
+      - 0.82
+      - 76
+    - - 10
+      - 0.68
+      - G5
+      - 1.72
+      - 75
+    - - 11
+      - 0.68
+      - D5
+      - 0.82
+      - 71
+    - - 11
+      - 1.82
+      - F#5
+      - 0.82
+      - 74
+    - - 12
+      - 0.68
+      - F5
+      - 1.72
+      - 74
+    - - 13
+      - 0.68
+      - C#5
+      - 0.82
+      - 70
+    - - 13
+      - 1.82
+      - E5
+      - 0.82
+      - 73
+    - - 14
+      - 0.68
+      - Eb5
+      - 1.72
+      - 72
+    - - 15
+      - 0.68
+      - B4
+      - 0.82
+      - 68
+    - - 15
+      - 1.82
+      - D5
+      - 0.82
+      - 71
+    - - 16
+      - 0.68
+      - F#5
+      - 1.72
+      - 75
+    - - 17
+      - 0.68
+      - Eb5
+      - 1.72
+      - 72
+    - - 18
+      - 0.68
+      - E5
+      - 0.82
+      - 73
+    - - 18
+      - 1.82
+      - C#5
+      - 0.82
+      - 70
+    - - 19
+      - 0.68
+      - D5
+      - 1.72
+      - 71
+    - - 20
+      - 0.68
+      - D5
+      - 0.82
+      - 71
+    - - 20
+      - 1.82
+      - B4
+      - 0.82
+      - 68
+    - - 21
+      - 0.68
+      - E5
+      - 1.72
+      - 72
+    - - 22
+      - 0.68
+      - E5
+      - 0.82
+      - 72
+    - - 22
+      - 1.82
+      - C#5
+      - 0.82
+      - 69
+    - - 23
+      - 0.68
+      - F#5
+      - 1.72
+      - 73
+    - - 24
+      - 0.68
+      - E5
+      - 0.82
+      - 68
+    - - 24
+      - 1.82
+      - C#5
+      - 0.82
+      - 69
+    - - 25
+      - 0.68
+      - E5
+      - 1.72
+      - 70
+    - - 26
+      - 0.68
+      - E5
+      - 0.82
+      - 70
+    - - 26
+      - 1.82
+      - G5
+      - 0.82
+      - 73
+    - - 27
+      - 0.68
+      - D5
+      - 1.72
+      - 69
+    - - 28
+      - 0.68
+      - D5
+      - 0.82
+      - 69
+    - - 28
+      - 1.82
+      - F5
+      - 0.82
+      - 72
+    - - 29
+      - 0.68
+      - C#5
+      - 1.72
+      - 68
+    - - 30
+      - 0.68
+      - C5
+      - 0.82
+      - 68
+    - - 30
+      - 1.82
+      - Eb5
+      - 0.82
+      - 71
+    - - 31
+      - 0.68
+      - B4
+      - 1.72
+      - 66

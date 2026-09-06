@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: shareholder_ritual
+  title: Shareholder Ritual
+  version_id: 8e5a37dfb96c9410:5ca8efc08859
+  render_hash: 8e5a37dfb96c9410
+  preview_sha256: 5ca8efc0885916ad52b7069c91fdd635d0f3d684cfbcc9e24f01141242c96fdc
+  preview_path: generated/shareholder_ritual/.versioned/8e5a37dfb96c9410/preview/shareholder_ritual_8e5a37dfb96c9410.full_soundtrack_preview.ogg
+  manifest_path: generated/shareholder_ritual/.versioned/8e5a37dfb96c9410/shareholder_ritual_8e5a37dfb96c9410.adaptive_manifest.json
+  manifest_sha256: 72709190772d2135b78dba78b8509c9e1fd4cbc7da80fe9fa2b709d8770d3847
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/shareholder_ritual.music.yaml
+  score_sha256_at_review: aeaa866182dfd30dfea8d4344bc54e22129b34e326f3e15851f58c13f3a38a9c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 126.038
+  furthest_played_fraction: 0.8753
+  created_at: '2026-08-16T15:58:28Z'
+  updated_at: '2026-08-16T15:58:28Z'
+  reviewed_at: '2026-08-16T15:58:28Z'
+history: []

@@ -1,0 +1,2085 @@
+{
+  "generators": {
+    "drums.pattern": {
+      "bridge_kind": "drums",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "percussion_notes"
+        ],
+        "harmony": "none",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "events": [
+          {
+            "beats": [
+              0.0,
+              2.0
+            ],
+            "drum": "kick"
+          },
+          {
+            "beats": [
+              1.0,
+              3.0
+            ],
+            "drum": "snare"
+          }
+        ],
+        "kind": "drums.pattern",
+        "velocity": 76
+      },
+      "harmony": "none",
+      "parameters": {
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bar_velocity_pattern": {
+          "default": [
+            1.0
+          ],
+          "description": "Per-bar multiplicative kit intensity contour.",
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "events": {
+          "default": [],
+          "description": "Generator-specific event rows.",
+          "type": "array"
+        },
+        "fill_events": {
+          "default": [],
+          "description": "Drum event rows using the same event vocabulary as events, used on fill bars.",
+          "type": "array"
+        },
+        "fill_every_bars": {
+          "default": 0,
+          "description": "When >0, play fill_events on every Nth local bar.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fill_mode": {
+          "default": "overlay",
+          "description": "Whether fill_events augment or replace the base pattern on fill bars.",
+          "enum": [
+            "overlay",
+            "replace"
+          ],
+          "type": "string"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "default": 2.0,
+          "description": "Deterministic timing humanization used by the drum generator.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "velocity": {
+          "default": 70,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Place a bar-relative percussion event pattern; does not consume harmony."
+    },
+    "guitar.chug": {
+      "bridge_kind": "guitar_chug",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "kind": "guitar.chug",
+        "pattern": [
+          [
+            0,
+            0.0,
+            0.5
+          ],
+          [
+            0,
+            0.5,
+            0.5
+          ],
+          [
+            7,
+            1.0,
+            0.5
+          ]
+        ],
+        "shape": "fifth_octave",
+        "velocity": 94
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "staccato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bass_policy": {
+          "default": "bass",
+          "type": "string"
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "gate": {
+          "default": 0.48,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "min_pitch": {
+          "default": null
+        },
+        "octave": {
+          "default": 2,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "pattern": {
+          "default": [
+            [
+              0,
+              0.0,
+              0.5
+            ],
+            [
+              0,
+              0.5,
+              0.5
+            ],
+            [
+              7,
+              1.0,
+              0.5
+            ],
+            [
+              0,
+              1.5,
+              0.5
+            ]
+          ],
+          "description": "Generator-specific repeating pattern.",
+          "type": "array"
+        },
+        "root_policy": {
+          "default": "derived"
+        },
+        "shape": {
+          "default": "fifth_octave",
+          "type": "string"
+        },
+        "spread_ms": {
+          "default": 8.0,
+          "description": "Inter-note/string spread used for chord/strum attacks.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "velocity": {
+          "default": 92,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Generate palm-muted/power-chord style guitar rhythm from harmony roots."
+    },
+    "guitar.lead": {
+      "bridge_kind": "guitar_lead",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes",
+          "pitch_bend"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "every_bars": 2,
+        "kind": "guitar.lead",
+        "material": "hero_motif",
+        "velocity": 80,
+        "vibrato_cents": 14
+      },
+      "harmony": "required",
+      "notes": [
+        "Use `material` to reference a v3 `kind: motif` material. The bridge maps it to the mature v1 guitar-lead performer."
+      ],
+      "parameters": {
+        "articulation": {
+          "default": "pluck",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "every_bars": {
+          "default": 2.0,
+          "description": "Bar spacing for motif/lead placements.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "gate": {
+          "default": 0.78,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instrument_octave_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_pitch_bend_curves": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_pitch_scoop_cents": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_velocity_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "material": {
+          "description": "V3 motif material id consumed by motif-aware generators.",
+          "required": true
+        },
+        "max_fret": {
+          "default": 19,
+          "maximum": 36,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "note_velocity_pattern": {
+          "default": null
+        },
+        "pitch_bend_curve": {
+          "default": null
+        },
+        "pitch_scoop_cents": {
+          "default": 12.0,
+          "type": "number"
+        },
+        "pitch_vibrato_cents": {
+          "default": "derived",
+          "minimum": 0,
+          "type": "number"
+        },
+        "pitch_vibrato_delay_beats": {
+          "default": "derived",
+          "minimum": 0,
+          "type": "number"
+        },
+        "pitch_vibrato_rate_hz": {
+          "default": "derived",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "position_scoop_scale": {
+          "default": 1.0,
+          "minimum": 0,
+          "type": "number"
+        },
+        "repeats": {
+          "default": 1,
+          "description": "Generator-internal motif repeat count.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "rhythm_scale": {
+          "default": 1.0,
+          "description": "Scale motif timing relative to its stored rhythm.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "root": {
+          "default": null,
+          "description": "Explicit pitch/root override."
+        },
+        "roots": {
+          "default": null,
+          "description": "Sequence of explicit root overrides."
+        },
+        "starts": {
+          "default": null,
+          "description": "Explicit bar/beat placement list for motif/lead material."
+        },
+        "transform": {
+          "default": null,
+          "description": "Generator-specific motif transform such as inversion/retrograde/transpose."
+        },
+        "transpose": {
+          "default": 0,
+          "description": "Generator-internal motif transposition in semitones.",
+          "maximum": 48,
+          "minimum": -48,
+          "type": "integer"
+        },
+        "tuning": {
+          "default": "standard",
+          "description": "Named guitar tuning or tuning specification.",
+          "type": "string"
+        },
+        "velocity": {
+          "default": 76,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "vibrato_cents": {
+          "default": 0.0,
+          "minimum": 0,
+          "type": "number"
+        },
+        "vibrato_delay_beats": {
+          "default": 0.45,
+          "minimum": 0,
+          "type": "number"
+        },
+        "vibrato_rate_hz": {
+          "default": 5.4,
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "summary": "Perform motif material through guitar-aware fingering and pitch-expression logic."
+    },
+    "guitar.shape_pick": {
+      "bridge_kind": "guitar_shape_pick",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "chord_shapes": {
+          "C": [
+            "x",
+            3,
+            2,
+            0,
+            1,
+            0
+          ]
+        },
+        "kind": "guitar.shape_pick",
+        "pattern": [
+          0,
+          3,
+          1,
+          4,
+          2,
+          3
+        ],
+        "step": 0.5,
+        "tuning": "standard",
+        "velocity": 64
+      },
+      "harmony": "required",
+      "notes": [
+        "Physical string allocation is retained from the v1 performer."
+      ],
+      "parameters": {
+        "articulation": {
+          "default": "tenuto",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bar_end_margin_beats": {
+          "default": 0.045,
+          "minimum": 0,
+          "type": "number"
+        },
+        "chord_shapes": {
+          "description": "Mapping from authored harmony symbols to six-string fret shapes; use x for muted strings."
+        },
+        "clip_to_bar": {
+          "default": true,
+          "type": "boolean"
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "density": {
+          "default": "derived",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "duration_beats": {
+          "default": "derived",
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "gate": {
+          "default": null,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "paired_course_articulation": {
+          "default": "derived"
+        },
+        "paired_course_delay_ms": {
+          "default": 7.0,
+          "type": "number"
+        },
+        "paired_course_duration_scale": {
+          "default": 0.9,
+          "type": "number"
+        },
+        "paired_course_instrument": {
+          "default": null
+        },
+        "paired_course_octave_strings": {
+          "default": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "array"
+        },
+        "paired_course_velocity_scale": {
+          "default": 0.45,
+          "type": "number"
+        },
+        "pattern": {
+          "default": [
+            0,
+            3,
+            1,
+            4,
+            2,
+            5,
+            3,
+            4
+          ],
+          "description": "Generator-specific repeating pattern.",
+          "type": "array"
+        },
+        "step": {
+          "default": 0.5,
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "tuning": {
+          "default": "standard",
+          "description": "Named guitar tuning or tuning specification.",
+          "type": "string"
+        },
+        "velocity": {
+          "default": 60,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Finger/pick physically allocated guitar chord shapes over the harmony."
+    },
+    "guitar.strum": {
+      "bridge_kind": "guitar_strum",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "beats": [
+          0.0,
+          2.0
+        ],
+        "direction": "down",
+        "kind": "guitar.strum",
+        "spread_ms": 32,
+        "velocity": 84
+      },
+      "harmony": "required",
+      "notes": [
+        "Physical string allocation is retained from the v1 performer; prefer this over literal simultaneous chord notes for rhythm guitar."
+      ],
+      "parameters": {
+        "articulation": {
+          "default": "pluck",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "beats": {
+          "default": [
+            0.0
+          ],
+          "type": "array"
+        },
+        "chord_shapes": {
+          "default": {},
+          "type": "object"
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "direction": {
+          "default": "down",
+          "type": "string"
+        },
+        "directions": {
+          "default": [],
+          "type": "array"
+        },
+        "dur_beats": {
+          "default": 1.5,
+          "type": "number"
+        },
+        "duration_beats": {
+          "default": "derived",
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "every_bars": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "gate": {
+          "default": null,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "hits": {
+          "default": null,
+          "description": "Generator-specific rhythmic hit placements."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "max_fret": {
+          "default": 17,
+          "maximum": 36,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max_notes": {
+          "default": 6,
+          "type": "integer"
+        },
+        "max_span": {
+          "default": 5,
+          "type": "integer"
+        },
+        "octave": {
+          "default": 3,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "paired_course_articulation": {
+          "default": "derived"
+        },
+        "paired_course_delay_ms": {
+          "default": 7.0,
+          "type": "number"
+        },
+        "paired_course_duration_scale": {
+          "default": 0.9,
+          "type": "number"
+        },
+        "paired_course_gate": {
+          "default": "derived"
+        },
+        "paired_course_instrument": {
+          "default": null
+        },
+        "paired_course_octave_strings": {
+          "default": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "array"
+        },
+        "paired_course_velocity_scale": {
+          "default": 0.48,
+          "type": "number"
+        },
+        "physical_string_sustain": {
+          "default": true,
+          "type": "boolean"
+        },
+        "prefer_open": {
+          "default": true,
+          "type": "boolean"
+        },
+        "repeat_hits": {
+          "default": false,
+          "type": "boolean"
+        },
+        "spread_ms": {
+          "default": 38.0,
+          "description": "Inter-note/string spread used for chord/strum attacks.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "string_choke_ms": {
+          "default": 2.5,
+          "type": "number"
+        },
+        "tuning": {
+          "default": "standard",
+          "description": "Named guitar tuning or tuning specification.",
+          "type": "string"
+        },
+        "velocity": {
+          "default": 82,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "velocity_slope": {
+          "default": -2.0,
+          "type": "number"
+        },
+        "voicing": {
+          "default": "closed",
+          "description": "Chord voicing policy such as closed/open/wide/drop2/power.",
+          "type": "string"
+        }
+      },
+      "summary": "Strum physically allocated guitar chord shapes with direction and string timing."
+    },
+    "harmony.arpeggio": {
+      "bridge_kind": "arpeggio",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "kind": "harmony.arpeggio",
+        "octave": 4,
+        "pattern": [
+          0,
+          2,
+          1,
+          2
+        ],
+        "step": 0.5,
+        "velocity": 72
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "staccato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bar_end_margin_beats": {
+          "default": 0.04,
+          "minimum": 0,
+          "type": "number"
+        },
+        "clip_to_bar": {
+          "default": false,
+          "type": "boolean"
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "density": {
+          "default": "derived",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "duration_beats": {
+          "default": "derived",
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "every": {
+          "description": "Optional integer bar-stride filter; `step` controls note spacing."
+        },
+        "gate": {
+          "default": null,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "include_slash_bass": {
+          "default": true,
+          "type": "boolean"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instrument_octave_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_velocity_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "max_pitch": {
+          "default": null
+        },
+        "min_pitch": {
+          "default": null
+        },
+        "octave": {
+          "default": 4,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "octave_pattern": {
+          "default": [
+            0
+          ],
+          "description": "Per-step octave offsets cycled across the arpeggio.",
+          "items": {
+            "maximum": 3,
+            "minimum": -3,
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "offset": {
+          "default": 0,
+          "type": "integer"
+        },
+        "pattern": {
+          "default": [
+            0,
+            2,
+            1,
+            2
+          ],
+          "description": "Generator-specific repeating pattern.",
+          "type": "array"
+        },
+        "step": {
+          "default": 0.5,
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "velocity": {
+          "default": 64,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "velocity_pattern": {
+          "default": [
+            1.0
+          ],
+          "description": "Per-step multiplicative velocity contour cycled across the arpeggio.",
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "voicing": {
+          "default": "closed",
+          "description": "Chord voicing policy such as closed/open/wide/drop2/power.",
+          "type": "string"
+        }
+      },
+      "summary": "Arpeggiate voiced chord tones from the active harmony timeline."
+    },
+    "harmony.bass": {
+      "bridge_kind": "bassline",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "kind": "harmony.bass",
+        "octave": 2,
+        "pattern": [
+          [
+            0,
+            0.0,
+            0.75
+          ],
+          [
+            7,
+            1.5,
+            0.5
+          ]
+        ],
+        "velocity": 78
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "marcato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bar_velocity_pattern": {
+          "default": [
+            1.0
+          ],
+          "description": "Per-bar multiplicative intensity contour cycled across the clip.",
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "bars": {},
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "octave": {
+          "default": 2,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "pattern": {
+          "default": [
+            [
+              0,
+              0.0,
+              0.75
+            ],
+            [
+              7,
+              1.5,
+              0.5
+            ],
+            [
+              12,
+              2.5,
+              0.5
+            ],
+            [
+              7,
+              3.25,
+              0.4
+            ]
+          ],
+          "description": "Generator-specific repeating pattern.",
+          "type": "array"
+        },
+        "velocity": {
+          "default": 74,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "velocity_pattern": {
+          "default": [
+            1.0
+          ],
+          "description": "Per-pattern-note multiplicative velocity contour.",
+          "items": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 2.0,
+            "type": "number"
+          },
+          "type": "array"
+        }
+      },
+      "summary": "Generate a repeating bass pattern from each harmony root or slash bass."
+    },
+    "harmony.chord_hits": {
+      "bridge_kind": "chord_hits",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "hits": [
+          [
+            0,
+            0.0
+          ],
+          [
+            4,
+            0.0
+          ]
+        ],
+        "kind": "harmony.chord_hits",
+        "octave": 3,
+        "velocity": 88
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "marcato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "direction": {
+          "default": "simultaneous",
+          "type": "string"
+        },
+        "directions": {
+          "default": null
+        },
+        "duration_beats": {
+          "default": 0.75,
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "hits": {
+          "default": [
+            [
+              0,
+              0.0
+            ],
+            [
+              4,
+              0.0
+            ],
+            [
+              8,
+              0.0
+            ],
+            [
+              12,
+              0.0
+            ]
+          ],
+          "description": "Generator-specific rhythmic hit placements.",
+          "type": "array"
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "include_slash_bass": {
+          "default": true,
+          "type": "boolean"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instrument_octave_offsets": {
+          "default": null
+        },
+        "instrument_velocity_offsets": {
+          "default": null
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "octave": {
+          "default": 3,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "spread_ms": {
+          "default": 0.0,
+          "description": "Inter-note/string spread used for chord/strum attacks.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "velocity": {
+          "default": 90,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "velocity_slope": {
+          "default": 0.0,
+          "type": "number"
+        },
+        "voicing": {
+          "default": "closed",
+          "description": "Chord voicing policy such as closed/open/wide/drop2/power.",
+          "type": "string"
+        }
+      },
+      "summary": "Place rhythmic chord stabs/strums from the active harmony."
+    },
+    "harmony.pad": {
+      "bridge_kind": "pad_chords",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "duration_beats": 3.8,
+        "kind": "harmony.pad",
+        "octave": 4,
+        "velocity": 58,
+        "voicing": "open"
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "pad",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "duration_beats": {
+          "default": "derived",
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "every_bars": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "include_slash_bass": {
+          "default": true,
+          "type": "boolean"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "octave": {
+          "default": 4,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "velocity": {
+          "default": 60,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "voicing": {
+          "default": "open",
+          "description": "Chord voicing policy such as closed/open/wide/drop2/power.",
+          "type": "string"
+        }
+      },
+      "summary": "Sustain voiced chords from the active harmony timeline."
+    },
+    "harmony.pedal": {
+      "bridge_kind": "pedal",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "kind": "harmony.pedal",
+        "octave": 2,
+        "velocity": 46
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "pad",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "note": {
+          "default": null
+        },
+        "octave": {
+          "default": 2,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "velocity": {
+          "default": 45,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Sustain a pedal pitch, normally derived from harmony when note is omitted."
+    },
+    "harmony.root_hits": {
+      "bridge_kind": "root_hits",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "hits": [
+          [
+            0,
+            0.0,
+            0,
+            0.75
+          ]
+        ],
+        "kind": "harmony.root_hits",
+        "octave": 2,
+        "velocity": 76
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "marcato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "duration_beats": {
+          "default": 0.75,
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "hits": {
+          "default": [
+            [
+              0,
+              0.0,
+              0,
+              0.75
+            ]
+          ],
+          "description": "Generator-specific rhythmic hit placements.",
+          "type": "array"
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "octave": {
+          "default": 2,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "velocity": {
+          "default": 76,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Place rhythmic single-note hits derived from harmony roots."
+    },
+    "harmony.sampled_chord": {
+      "bridge_kind": "sampled_chord",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "keyswitches": {
+          "power": 24
+        },
+        "kind": "harmony.sampled_chord",
+        "pattern": [
+          [
+            0,
+            0.0,
+            0.75
+          ],
+          [
+            0,
+            2.0,
+            0.55
+          ]
+        ],
+        "quality": "power",
+        "velocity": 84
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "marcato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "bars": {},
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "gate": {
+          "default": null,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "keyswitch_duration_ms": {
+          "default": 5.0,
+          "type": "number"
+        },
+        "keyswitch_lead_ms": {
+          "default": 10.0,
+          "type": "number"
+        },
+        "keyswitches": {
+          "default": null
+        },
+        "min_pitch": {
+          "default": null
+        },
+        "octave": {
+          "default": 3,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "pattern": {
+          "default": [
+            [
+              0,
+              0.0,
+              0.75
+            ],
+            [
+              0,
+              2.0,
+              0.55
+            ]
+          ],
+          "description": "Generator-specific repeating pattern.",
+          "type": "array"
+        },
+        "quality": {
+          "default": "power",
+          "type": "string"
+        },
+        "velocity": {
+          "default": 82,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Trigger sampled chord/power-chord mappings, including optional keyswitches."
+    },
+    "melody.motif": {
+      "bridge_kind": "motif",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes",
+          "pitch_bend"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "every_bars": 2,
+        "kind": "melody.motif",
+        "material": "hero_motif",
+        "velocity": 82
+      },
+      "harmony": "required",
+      "notes": [
+        "Use `material` to reference a v3 `kind: motif` material."
+      ],
+      "parameters": {
+        "articulation": {
+          "default": "normal",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "every_bars": {
+          "default": 2.0,
+          "description": "Bar spacing for motif/lead placements.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "gate": {
+          "default": null,
+          "description": "Sounding-duration scale for generated notes.",
+          "exclusiveMinimum": 0,
+          "maximum": 2.0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instrument_octave_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_pitch_bend_curves": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_pitch_scoop_cents": {
+          "default": {},
+          "type": "object"
+        },
+        "instrument_velocity_offsets": {
+          "default": {},
+          "type": "object"
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "material": {
+          "description": "V3 motif material id consumed by motif-aware generators.",
+          "required": true
+        },
+        "note_velocity_pattern": {
+          "default": null
+        },
+        "pitch_bend_curve": {
+          "default": null
+        },
+        "pitch_scoop_cents": {
+          "default": 0.0,
+          "type": "number"
+        },
+        "repeats": {
+          "default": 1,
+          "description": "Generator-internal motif repeat count.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "rhythm_scale": {
+          "default": 1.0,
+          "description": "Scale motif timing relative to its stored rhythm.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "root": {
+          "default": null,
+          "description": "Explicit pitch/root override."
+        },
+        "roots": {
+          "default": null,
+          "description": "Sequence of explicit root overrides."
+        },
+        "starts": {
+          "default": null,
+          "description": "Explicit bar/beat placement list for motif/lead material."
+        },
+        "transform": {
+          "default": null,
+          "description": "Generator-specific motif transform such as inversion/retrograde/transpose."
+        },
+        "transpose": {
+          "default": 0,
+          "description": "Generator-internal motif transposition in semitones.",
+          "maximum": 48,
+          "minimum": -48,
+          "type": "integer"
+        },
+        "velocity": {
+          "default": 78,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Place and transform a reusable motif material with optional pitch expression."
+    },
+    "midi.automation": {
+      "bridge_kind": "automation",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "controllers"
+        ],
+        "harmony": "none",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "dynamics": [
+          {
+            "at": 0,
+            "value": 72
+          },
+          {
+            "at": 4,
+            "value": 110
+          }
+        ],
+        "kind": "midi.automation"
+      },
+      "harmony": "none",
+      "notes": [
+        "Automation currently uses the established v1 automation layer semantics."
+      ],
+      "parameters": {
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        }
+      },
+      "summary": "Emit controller/dynamics automation without generating pitched notes."
+    },
+    "rhythm.ostinato": {
+      "bridge_kind": "ostinato",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "required",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "intervals": [
+          0,
+          7,
+          12,
+          7
+        ],
+        "kind": "rhythm.ostinato",
+        "octave": 3,
+        "rhythm": [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "velocity": 64
+      },
+      "harmony": "required",
+      "parameters": {
+        "articulation": {
+          "default": "spiccato",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "intervals": {
+          "default": [
+            0,
+            7,
+            12,
+            7
+          ],
+          "type": "array"
+        },
+        "octave": {
+          "default": 3,
+          "description": "Register/octave used by the generator.",
+          "maximum": 9,
+          "minimum": -1,
+          "type": "integer"
+        },
+        "rhythm": {
+          "default": "derived"
+        },
+        "velocity": {
+          "default": 60,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Repeat an interval/rhythm figure against each harmony root."
+    },
+    "texture.pattern": {
+      "bridge_kind": "texture",
+      "capabilities": {
+        "deterministic": true,
+        "duration": "whole_bars",
+        "event_domains": [
+          "notes"
+        ],
+        "harmony": "none",
+        "implementation": "established_v1_bridge",
+        "placement": "bar_boundary",
+        "tempo_meter": "constant_within_clip"
+      },
+      "example": {
+        "events_per_bar": 1.0,
+        "kind": "texture.pattern",
+        "root": "D5",
+        "scale": [
+          0,
+          2,
+          3,
+          5,
+          7,
+          10,
+          12
+        ],
+        "velocity": 38
+      },
+      "harmony": "none",
+      "parameters": {
+        "articulation": {
+          "default": "bell",
+          "description": "Authored articulation label carried into generated event diagnostics.",
+          "type": "string"
+        },
+        "automation": {
+          "description": "Controller automation curves applied after this generator through the established v1 automation engine."
+        },
+        "constraints": {
+          "description": "Layer-local performance/range constraints merged with score constraints."
+        },
+        "duration_beats": {
+          "default": 0.25,
+          "description": "Nominal generated note/chord duration in quarter-note beats.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "dynamics": {
+          "description": "Automation/dynamics curve payload consumed by shared v1 automation semantics."
+        },
+        "events_per_bar": {
+          "default": 1.0,
+          "minimum": 0,
+          "type": "number"
+        },
+        "group": {
+          "description": "Target all instruments in a score group."
+        },
+        "humanize_ms": {
+          "description": "Deterministic timing humanization in milliseconds; generator-specific defaults apply when omitted.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "humanize_velocity_pct": {
+          "description": "Deterministic velocity humanization percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument": {
+          "description": "Target one named score instrument."
+        },
+        "instruments": {
+          "description": "Target multiple named score instruments."
+        },
+        "root": {
+          "default": "D5",
+          "description": "Explicit pitch/root override.",
+          "type": "string"
+        },
+        "scale": {
+          "default": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            10,
+            12
+          ],
+          "type": "array"
+        },
+        "velocity": {
+          "default": 38,
+          "description": "Base MIDI velocity before per-instrument/common clip transforms.",
+          "maximum": 127,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "summary": "Generate sparse deterministic scale texture events; harmony is optional."
+    }
+  },
+  "policy": {
+    "bridge": "Generators currently execute the mature MusicIR v1 layer implementations named by bridge_kind.",
+    "common_clip_transforms": [
+      "transpose",
+      "octave",
+      "velocity_scale",
+      "velocity_offset",
+      "gate",
+      "time_scale",
+      "repeat"
+    ],
+    "purpose": "Single checked-in authority for the public MusicIR v3 generator vocabulary and agent-facing parameter surface."
+  },
+  "schema": "ambition.musicir.generator_catalog.v1"
+}

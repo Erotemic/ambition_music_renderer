@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: dinosaur_liberators_long
+  title: Dinosaur Liberators (Full Length) - Southern Rock Anthem
+  version_id: 6c4468d1f519d80c:7b69e581d38c
+  render_hash: 6c4468d1f519d80c
+  preview_sha256: 7b69e581d38cbbc82dde18de004082131dd5a933e2eb4cbe859b8dae621a81a2
+  preview_path: generated/dinosaur_liberators_long/.versioned/6c4468d1f519d80c/preview/dinosaur_liberators_long_6c4468d1f519d80c.full_soundtrack_preview.ogg
+  manifest_path: generated/dinosaur_liberators_long/.versioned/6c4468d1f519d80c/dinosaur_liberators_long_6c4468d1f519d80c.adaptive_manifest.json
+  manifest_sha256: be3758c826c008cdcd407fbe52fad59ae8cbdb38dd21c113bed153d2527ad829
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/dinosaur_liberators_long.music.yaml
+  score_sha256_at_review: ecdbe1168fcc0203518d3a3aeb0a5edd7ede22811f4004c1eb1114ca4ad0c66d
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.0
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-08-16T15:54:13Z'
+  updated_at: '2026-08-16T15:54:13Z'
+  reviewed_at: '2026-08-16T15:54:13Z'
+history: []

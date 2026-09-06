@@ -1,0 +1,83 @@
+# Starter for new agent-authored music. Existing v1/v2 scores should remain in
+# their original schemas for regeneration; new compositions should start here.
+schema: ambition.musicir.v3
+id: new_v3_cue
+title: New MusicIR v3 cue
+seed: 1
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 120
+key: A minor
+end: {bar: 9, beat: 1}
+form:
+  - {id: main, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}}
+harmony:
+  progression: [Am, F, C, G]
+  cycle: true
+
+instruments:
+  - {name: keys, group: harmony, program: acoustic_grand_piano, volume: 96, pan: 64}
+  - {name: bass, group: bass, program: fingered_bass, volume: 96, pan: 64}
+  - {name: drums, group: drums, is_drum: true, volume: 100, pan: 64}
+
+processing:
+  master:
+    chain:
+      - {processor: compressor, threshold_db: -20, ratio: 2.0, attack_ms: 12, release_ms: 100}
+      - {processor: limiter, target_peak_db: -1.2, drive: 1.02, normalize: true}
+  adaptive_sections: {mode: composition_master}
+
+parts:
+  - id: keys_part
+    instrument: keys
+    voices:
+      - id: harmony
+        clips:
+          - id: harmony_motion
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: harmony.arpeggio
+              pattern: [0, 2, 1, 2]
+              step: 0.5
+              duration_beats: 0.44
+              octave: 4
+              velocity: 70
+              velocity_pattern: [1.0, 0.82, 0.94, 0.86]
+              octave_pattern: [0, 0, 1, 0]
+
+  - id: bass_part
+    instrument: bass
+    voices:
+      - id: bassline
+        clips:
+          - id: bass_motion
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: harmony.bass
+              octave: 2
+              velocity: 78
+              velocity_pattern: [1.0, 0.86, 0.94, 0.82]
+              bar_velocity_pattern: [0.9, 1.0, 0.95, 1.05]
+
+  - id: drums_part
+    instrument: drums
+    voices:
+      - id: groove
+        clips:
+          - id: main_groove
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              bar_velocity_pattern: [0.88, 0.96, 0.92, 1.04]
+              fill_every_bars: 4
+              fill_mode: overlay
+              events:
+                - {drum: kick, beats: [0, 2], velocity: 88}
+                - {drum: snare, beats: [1, 3], velocity: 94}
+                - {drum: closed_hat, beats: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], velocity: 66}
+              fill_events:
+                - {drum: mid_tom, beats: [3.0, 3.25], velocity: 82}
+                - {drum: high_tom, beats: [3.5, 3.75], velocity: 88}

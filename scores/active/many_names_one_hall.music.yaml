@@ -1,0 +1,552 @@
+schema: ambition.musicir.v1
+id: many_names_one_hall
+title: Every Pedestal Talks Back
+seed: 2026081603
+notes: >-
+  Dedicated Hall of Characters music, replacing the earlier ceremonial chamber
+  concept. The Hall is a huge inhabited gallery, not a wedding, palace, or
+  memorial: 144 strange people on pedestals, ambient barks, little jokes,
+  academic references, monsters, animals, scientists, and fighters all sharing
+  one impossible room.
+
+  The cue therefore walks in dry 5/4 (felt as 3+2) rather than flowing in a
+  lyrical common-time arc. An upright bass and short low strings make a quiet
+  museum-footstep engine; marimba lands as occasional exhibit-label stamps;
+  clarinet and bassoon trade compact conversational fragments with changing
+  entrances and contours, as if neighboring portraits interrupt one another;
+  isolated celesta notes are audible but peripheral nameplate glints. Sparse
+  woodblock and side-stick punctuation keeps the room awake without becoming a
+  drum groove or competing with character dialogue.
+
+  This pass deliberately leaves more negative space than the first rewrite.
+  Wind phrases no longer recur with identical clockwork placement, string cards
+  are less continuous, and the adaptive dialogue state strips the arrangement
+  down far enough to create actual conversational room rather than just a
+  slightly quieter version of the same mix.
+
+  Harmony lives mostly around D Dorian with C-Lydian/F-major windows and open
+  sus/add9 sonorities. Dominant-tonic cadences are avoided. The recurring hook
+  intentionally ends on scale degree 2, and the final bar is another Dm6/9
+  beginning rather than a romantic resolution. There are no harp arpeggios,
+  broad legato string pads, choir, cymbal swells, or triumphant brass. Wall III
+  now contains a restrained four-bar breathing valley before the familiar final
+  wall returns. The full 32-bar loop is about 84 seconds at 114 BPM and is
+  designed to disappear under browsing while remaining recognizable when
+  listened to deliberately.
+
+tempo:
+  bpm: 114
+
+meter:
+  beats_per_bar: 5
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+  runtime_stems:
+    target_peak_db: -10.0
+    # Shared-gain export needs about +32.6 dB on the latest sampled render.
+    # Keep one common gain across all stems so adaptive state balance remains intact.
+    max_gain_db: 34.0
+
+postprocess:
+  gain_db: -1.1
+  highpass_hz: 32
+  lowpass_hz: 11900
+  high_shelf_hz: 6900
+  high_shelf_db: -0.7
+  presence_low_hz: 1600
+  presence_high_hz: 4200
+  presence_db: -0.45
+  transient_tame: 0.045
+  transient_lowpass_hz: 8100
+  reverb_wet: 0.055
+  reverb_decay_seconds: 1.05
+  reverb_damping_hz: 5900
+  stereo_width: 0.10
+  compressor_threshold_db: -20.0
+  compressor_ratio: 1.65
+  compressor_attack_ms: 26.0
+  compressor_release_ms: 170.0
+  compressor_makeup_db: 0.35
+  compressor_knee_db: 7.0
+  limiter_drive: 0.84
+  normalize: true
+  target_peak_db: -7.0
+
+stem_postprocess:
+  # The first render required >31 dB of mastering lift from the raw stem sum.
+  # Raise authored stems before the master so adaptive playback is healthier and
+  # the full preview does not magnify sample-library noise floors as aggressively.
+  gain_db: 12.0
+  highpass_hz: 30
+  lowpass_hz: 12500
+  transient_tame: 0.02
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 6200
+  stereo_width: 0.03
+  limiter_drive: 0.82
+  normalize: false
+  target_peak_db: -4.0
+
+group_postprocess:
+  bass:
+    gain_db: -0.2
+    highpass_hz: 32
+    lowpass_hz: 5600
+    compressor_threshold_db: -22.0
+    compressor_ratio: 1.35
+    compressor_attack_ms: 32.0
+    compressor_release_ms: 190.0
+  pluck:
+    gain_db: 1.2
+    highpass_hz: 75
+    lowpass_hz: 10500
+    transient_tame: 0.045
+    transient_lowpass_hz: 6800
+  mallets:
+    gain_db: 0.2
+    highpass_hz: 120
+    lowpass_hz: 10400
+    reverb_wet: 0.012
+  winds:
+    gain_db: 0.0
+    highpass_hz: 105
+    lowpass_hz: 10400
+    reverb_wet: 0.025
+    reverb_decay_seconds: 0.95
+  glimmer:
+    gain_db: 2.2
+    highpass_hz: 420
+    lowpass_hz: 11000
+    reverb_wet: 0.05
+    reverb_decay_seconds: 1.35
+  percussion:
+    gain_db: -1.6
+    highpass_hz: 42
+    lowpass_hz: 9200
+    transient_tame: 0.03
+
+instruments:
+  - name: gallery_bass
+    group: bass
+    program: acoustic_bass
+    volume: 90
+    pan: 58
+    expression: 98
+    instrument_backend:
+      kind: sfz
+      library_ref: bass.upright
+      prefer: [notation, basses pizzicato, pizzicato, pizz, upright, acoustic]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cello_cards
+    group: pluck
+    program: pizzicato_strings
+    volume: 82
+    pan: 44
+    expression: 90
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli_staccato
+      prefer: [celli, staccato, cello]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violin_cards
+    group: pluck
+    program: pizzicato_strings
+    volume: 72
+    pan: 80
+    expression: 82
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1_staccato
+      prefer: [1st violins staccato, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: label_marimba
+    group: mallets
+    program: marimba
+    volume: 72
+    pan: 70
+    expression: 84
+    instrument_backend:
+      kind: sfz
+      library_ref: marimba
+      prefer: [marimba, concert, mallet, orchestral]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: gallery_clarinet
+    group: winds
+    program: clarinet
+    volume: 84
+    pan: 76
+    expression: 90
+    modulation: 18
+    instrument_backend:
+      kind: sfz
+      library_ref: vpo.clarinet_solo_perf
+      prefer: [clarinet solo perf, solo perf]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: gallery_bassoon
+    group: winds
+    program: bassoon
+    volume: 82
+    pan: 48
+    expression: 90
+    modulation: 16
+    instrument_backend:
+      kind: sfz
+      # VPO names the plain performance patch in lowercase; the prior
+      # case-sensitive *Bassoon* glob missed it and silently fell back to GM.
+      sfz_glob: "**/bassoon-SOLO-PERF.sfz"
+      prefer: [bassoon solo perf, solo perf, bassoon]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: nameplate_celesta
+    group: glimmer
+    program: celesta
+    volume: 74
+    pan: 84
+    expression: 84
+    instrument_backend:
+      kind: sfz
+      library_ref: celeste
+      prefer: [celeste]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: gallery_kit
+    group: percussion
+    is_drum: true
+    volume: 62
+    pan: 64
+    expression: 82
+
+motifs:
+  # A compact five-beat identity: conversational, not lyrical. It climbs by a
+  # fourth, questions the octave, and leaves the phrase on E rather than D.
+  - id: who_are_you
+    root: D4
+    intervals: [0, 5, 2, 7, 9, 7, 2]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 1.0, 0.75, 1.25]
+    durations: [0.30, 0.24, 0.42, 0.12, 0.62, 0.38, 0.58]
+    velocities: [0.70, 0.60, 0.56, 0.48, 0.70, 0.55, 0.42]
+
+  # Low dry response from the next pedestal over. Same pitch world, different
+  # contour, so the Hall sounds populated rather than accompanied by one soloist.
+  - id: someone_answers
+    root: A3
+    intervals: [0, -2, 3, 0, 5, 3, 0]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 1.0, 0.75, 1.25]
+    durations: [0.46, 0.12, 0.30, 0.28, 0.58, 0.36, 0.62]
+    velocities: [0.56, 0.42, 0.60, 0.48, 0.62, 0.48, 0.40]
+
+
+layer_templates:
+  # 3+2 footfall. The line intentionally uses fifths and modal steps rather
+  # than walking through functional jazz changes.
+  gallery_walk:
+    kind: bassline
+    instrument: gallery_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.42]
+      - [7, 1.75, 0.18]
+      - [0, 3.0, 0.31]
+      - [7, 4.35, 0.17]
+    velocity: 49
+    articulation: normal
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  gallery_walk_sparse:
+    kind: bassline
+    instrument: gallery_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.52]
+      - [7, 3.0, 0.38]
+    velocity: 48
+    articulation: normal
+    humanize_ms: 9
+    humanize_velocity_pct: 4
+
+  # Short strings behave like index cards being flipped, but each bar uses
+  # the actual current chord tones. Cello and violin alternate bars instead of
+  # doubling into a lush string section.
+  index_cards_cello:
+    kind: arpeggio
+    instrument: cello_cards
+    octave: 3
+    pattern: [0, 2, 1, 2]
+    step: 1.25
+    duration_beats: 0.22
+    velocity: 41
+    density: 0.68
+    articulation: staccato
+    every: 2
+    offset: 0
+    min_pitch: 38
+    max_pitch: 67
+    clip_to_bar: true
+    humanize_ms: 5
+    humanize_velocity_pct: 5
+
+  index_cards_violin:
+    kind: arpeggio
+    instrument: violin_cards
+    octave: 4
+    pattern: [0, 1, 2, 1]
+    step: 1.25
+    duration_beats: 0.20
+    velocity: 35
+    density: 0.58
+    articulation: staccato
+    every: 2
+    offset: 1
+    min_pitch: 55
+    max_pitch: 77
+    clip_to_bar: true
+    humanize_ms: 5
+    humanize_velocity_pct: 5
+
+  # Exhibit labels are intentional punctuation now, not a constant arpeggio.
+  # Irregular placements make the Hall feel inhabited rather than sequenced.
+  marimba_labels:
+    kind: chord_hits
+    instruments: [label_marimba]
+    octave: 4
+    hits:
+      - [1, 1.00]
+      - [4, 3.50]
+      - [9, 2.00]
+      - [13, 4.00]
+      - [17, 1.50]
+      - [21, 3.25]
+      - [26, 0.75]
+      - [30, 3.50]
+    duration_beats: 0.16
+    velocity: 38
+    articulation: pluck
+    voicing: triad
+    humanize_ms: 6
+    humanize_velocity_pct: 6
+
+  clarinet_question:
+    kind: motif
+    instrument: gallery_clarinet
+    motif: who_are_you
+    roots: [D4]
+    velocity: 56
+    articulation: normal
+    starts: [[0, 0.0]]
+    repeats: 1
+    humanize_ms: 10
+    humanize_velocity_pct: 7
+
+  bassoon_answer:
+    kind: motif
+    instrument: gallery_bassoon
+    motif: someone_answers
+    roots: [A3]
+    velocity: 52
+    articulation: normal
+    starts: [[2, 0.0]]
+    repeats: 1
+    humanize_ms: 11
+    humanize_velocity_pct: 7
+
+  nameplate_glints:
+    kind: texture
+    instruments: [nameplate_celesta]
+    root: D5
+    scale: [0, 5, 7, 10, 12]
+    events_per_bar: 0.28
+    duration_beats: 0.15
+    velocity: 44
+    articulation: bell
+    humanize_ms: 9
+    humanize_velocity_pct: 12
+
+  # Dry and quiet; percussion identifies the asymmetrical gait without becoming
+  # a beat track. There is intentionally no crash cymbal anywhere in the cue.
+  gallery_steps:
+    kind: drums
+    instrument: gallery_kit
+    humanize_ms: 8
+    humanize_velocity_pct: 8
+    events:
+      - {drum: side_stick, beats: [2.0, 4.0], velocity: 22, probability: 0.78}
+      - {drum: woodblock_low, beats: [0.0], velocity: 24, probability: 0.64}
+      - {drum: woodblock_hi, beats: [3.5], velocity: 17, probability: 0.46}
+      - {drum: closed_hat, beats: [1.5, 4.5], velocity: 10, probability: 0.34}
+
+  gallery_steps_sparse:
+    kind: drums
+    instrument: gallery_kit
+    humanize_ms: 9
+    humanize_velocity_pct: 8
+    events:
+      - {drum: side_stick, beats: [0.0, 3.0], velocity: 22}
+      - {drum: woodblock_low, beats: [1.5], velocity: 16, probability: 0.50}
+
+  # Wall III briefly exhales. The speaking winds are already absent here; these
+  # expression ramps let the walking machinery recede for about four bars while
+  # occasional nameplate glints remain visible, then restore the normal gallery
+  # gait before Wall IV. This is macro shape, not a cinematic breakdown.
+  breathing_valley:
+    kind: automation
+    automation:
+      - {instrument: gallery_bass, cc: expression, start_bar: 19.0, bars: 0.75, from: 98, to: 72, curve: smooth, points: 8}
+      - {instrument: cello_cards, cc: expression, start_bar: 19.0, bars: 0.75, from: 90, to: 66, curve: smooth, points: 8}
+      - {instrument: violin_cards, cc: expression, start_bar: 19.0, bars: 0.75, from: 82, to: 60, curve: smooth, points: 8}
+      - {instrument: gallery_kit, cc: expression, start_bar: 19.0, bars: 0.75, from: 82, to: 58, curve: smooth, points: 8}
+      - {instrument: gallery_bass, cc: expression, start_bar: 23.25, bars: 0.75, from: 72, to: 98, curve: smooth, points: 8}
+      - {instrument: cello_cards, cc: expression, start_bar: 23.25, bars: 0.75, from: 66, to: 90, curve: smooth, points: 8}
+      - {instrument: violin_cards, cc: expression, start_bar: 23.25, bars: 0.75, from: 60, to: 82, curve: smooth, points: 8}
+      - {instrument: gallery_kit, cc: expression, start_bar: 23.25, bars: 0.75, from: 58, to: 82, curve: smooth, points: 8}
+
+  # Tiny punctuation on the beginning of each eight-bar "wall". This is the
+  # closest thing the piece has to a section marker.
+  exhibit_marker:
+    kind: chord_hits
+    instruments: [cello_cards, label_marimba]
+    instrument_octave_offsets: {cello_cards: -1, label_marimba: 0}
+    instrument_velocity_offsets: {cello_cards: 0, label_marimba: -10}
+    octave: 4
+    hits: [[0, 0.0], [8, 0.0], [16, 0.0], [24, 0.0]]
+    duration_beats: 0.28
+    velocity: 42
+    articulation: staccato
+    voicing: shell
+
+playback:
+  mode: section_stem_matrix
+  loop_components: [living_catalog]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 5
+    bridge_stems: [bass, pluck, mallets]
+    fade_stems: [winds, glimmer, percussion]
+
+state_map:
+  default:
+    section: living_catalog
+    stems:
+      bass: 0.70
+      pluck: 0.70
+      mallets: 0.46
+      winds: 0.50
+      glimmer: 0.48
+      percussion: 0.30
+  dialogue_dense:
+    section: living_catalog
+    stems:
+      bass: 0.52
+      pluck: 0.34
+      mallets: 0.14
+      winds: 0.12
+      glimmer: 0.10
+      percussion: 0.10
+  quiet_browse:
+    section: living_catalog
+    stems:
+      # After-hours color: the speaking winds recede and isolated nameplates
+      # become proportionally more noticeable.
+      bass: 0.58
+      pluck: 0.44
+      mallets: 0.22
+      winds: 0.26
+      glimmer: 0.52
+      percussion: 0.12
+
+sections:
+  - id: living_catalog
+    kind: loop_component
+    label: the Hall is full of people pretending not to listen
+    bars: 32
+    intensity: 0.60
+    density: 0.47
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      # Wall I: D Dorian, dry and grounded.
+      - Dm6
+      - G6/D
+      - Cmaj7(#11)
+      - Em7/D
+      - Dm(add9)
+      - G6
+      - Cmaj7(#11)
+      - Dm6
+
+      # Wall II: the room opens sideways into brighter modal color without
+      # turning into a major-key arrival.
+      - F6/9
+      - Em7
+      - Gsus2/D
+      - Dm6
+      - Cmaj7(#11)
+      - Bb6(add9)
+      - Gm6
+      - Dm(add9)
+
+      # Wall III: more eccentric exhibits. A couple of borrowed sonorities make
+      # the corridor bend, but every move remains consonant enough for dialogue.
+      - Dm6
+      - Ebmaj7(#11)/D
+      - G6/D
+      - Am7
+      - F6/9
+      - Cmaj7(#11)
+      - Gm6
+      - Asus4(add9)
+
+      # Wall IV: recognizable material returns, but the last bar is a renewed
+      # beginning rather than a final cadence.
+      - Dm(add9)
+      - G6/D
+      - Cmaj7(#11)
+      - Em7/D
+      - Bb6(add9)
+      - G6
+      - Asus4(add9)
+      - Dm6/9
+    layers:
+      - gallery_walk
+      - index_cards_cello
+      - index_cards_violin
+      - marimba_labels
+      # Wind conversations are deliberately not on identical eight-bar clocks.
+      - {template: clarinet_question, starts: [[0, 0.00]], roots: [D4], velocity: 56}
+      - {template: bassoon_answer, starts: [[2, 0.25]], roots: [A3], velocity: 50}
+      - {template: clarinet_question, starts: [[8, 0.50]], roots: [C4], transform: retrograde, velocity: 53}
+      - {template: bassoon_answer, starts: [[11, 0.00]], roots: [A3], velocity: 49}
+      - {template: clarinet_question, starts: [[16, 0.00]], roots: [D4], transform: invert, transpose: 12, velocity: 52}
+      - {template: bassoon_answer, starts: [[18, 0.75]], roots: [A3], transform: retrograde, velocity: 48}
+      - {template: clarinet_question, starts: [[24, 0.25]], roots: [D4], velocity: 55}
+      - {template: bassoon_answer, starts: [[27, 0.00]], roots: [A3], velocity: 50}
+      - nameplate_glints
+      - gallery_steps
+      - breathing_valley
+      - exhibit_marker

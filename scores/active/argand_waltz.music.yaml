@@ -1,0 +1,676 @@
+schema: ambition.musicir.v1
+id: argand_waltz
+title: "The Argand Waltz \u2014 a turn through the complex plane"
+seed: 20260624
+notes: 'Sweet violin waltz inspired by complex numbers: the waltz is rotation (Euler
+  e^{i theta}); solo violin = real part, cello = imaginary part a quarter-turn out
+  of phase; the theme is a palindrome (conjugate symmetry); the harp winds the unit
+  circle; the bridge floats the three cube roots of unity (D-F#-Bb).'
+tempo:
+  bpm: 88
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/FluidR3_GM.sf2
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 34
+  lowpass_hz: 11000
+  high_shelf_hz: 7000
+  high_shelf_db: -1.2
+  eq_bands:
+  - type: low_shelf
+    hz: 110
+    q: 0.8
+    db: 1.0
+  - type: peak
+    hz: 330
+    q: 0.9
+    db: -1.4
+  - type: peak
+    hz: 2600
+    q: 1.1
+    db: -1.2
+  reverb_wet: 0.16
+  reverb_decay_seconds: 2.0
+  reverb_damping_hz: 4200
+  stereo_width: 0.22
+  compressor_threshold_db: -18
+  compressor_ratio: 1.4
+  compressor_attack_ms: 24
+  compressor_release_ms: 180
+  limiter_drive: 0.7
+  normalize: true
+  target_peak_db: -2.0
+instruments:
+- name: solo_violin
+  group: lead
+  program: violin
+  volume: 104
+  pan: 58
+  expression: 110
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violin_solo
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: cello
+  group: low_strings
+  program: cello
+  volume: 92
+  pan: 44
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: piano
+  group: keys
+  program: acoustic_grand_piano
+  volume: 92
+  pan: 50
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    optional: true
+    fallback_backend: pretty-midi
+- name: low_piano
+  group: keys
+  program: acoustic_grand_piano
+  volume: 80
+  pan: 46
+  expression: 92
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    optional: true
+    fallback_backend: pretty-midi
+- name: harp
+  group: glimmer
+  program: orchestral_harp
+  volume: 78
+  pan: 70
+  expression: 92
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.harp
+    prefer:
+    - harp
+    - normal
+    optional: true
+    fallback_backend: pretty-midi
+- name: string_pad
+  group: pad
+  program: string_ensemble_1
+  volume: 52
+  pan: 54
+  expression: 70
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: celesta
+  group: glimmer
+  program: celesta
+  volume: 60
+  pan: 76
+  expression: 84
+motifs:
+- id: real_part
+  root: D5
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 9
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.6
+  - 0.66
+  - 0.74
+  - 0.82
+  - 0.86
+  - 0.8
+  - 0.72
+  - 0.64
+  - 0.56
+- id: imag_part
+  root: D4
+  intervals:
+  - 4
+  - 5
+  - 7
+  - 9
+  - 7
+  - 5
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 0.75
+  - 0.75
+  velocities:
+  - 0.42
+  - 0.48
+  - 0.54
+  - 0.58
+  - 0.54
+  - 0.48
+  - 0.44
+  - 0.4
+  - 0.36
+- id: real_answer
+  root: A4
+  intervals:
+  - 0
+  - 2
+  - 4
+  - 7
+  - 7
+  - 4
+  - 2
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.58
+  - 0.64
+  - 0.72
+  - 0.78
+  - 0.7
+  - 0.62
+  - 0.56
+  - 0.5
+layer_templates:
+  waltz_bass:
+    kind: bassline
+    instrument: low_piano
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 1.0
+    velocity: 56
+    articulation: tenuto
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+  waltz_chords:
+    kind: chord_hits
+    instrument: piano
+    octave: 3
+    hits:
+    - - 0
+      - 1.0
+    - - 0
+      - 2.0
+    duration_beats: 0.9
+    velocity: 40
+    articulation: tenuto
+    voicing: open
+    constraints:
+      max_notes: 3
+    humanize_ms: 8
+    humanize_velocity_pct: 4
+  harp_winding:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 4
+    - 3
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.55
+    velocity: 42
+    density: 0.85
+    articulation: bell
+    voicing: open
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+  string_warmth:
+    kind: pad_chords
+    instruments:
+    - string_pad
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.0
+    velocity: 38
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+  cello_cushion:
+    kind: pad_chords
+    instruments:
+    - cello
+    octave: 2
+    every_bars: 1
+    duration_beats: 3.0
+    velocity: 34
+    articulation: pad
+    voicing: root_fifth
+    constraints:
+      max_notes: 2
+    humanize_ms: 12
+    humanize_velocity_pct: 3
+  celesta_glint:
+    kind: arpeggio
+    instrument: celesta
+    octave: 5
+    pattern:
+    - 0
+    - 2
+    - 4
+    - 2
+    step: 1.0
+    duration_beats: 0.6
+    velocity: 24
+    density: 0.32
+    articulation: bell
+    humanize_ms: 8
+    humanize_velocity_pct: 6
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components:
+  - verse_a
+  - verse_b
+  - bridge
+  - verse_a2
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems:
+    - lead
+    - low_strings
+    - keys
+    - pad
+    fade_stems:
+    - glimmer
+state_map:
+  default:
+    section: verse_a
+    stems:
+      lead: 1.0
+      low_strings: 0.7
+      keys: 0.7
+      pad: 0.5
+      glimmer: 0.55
+sections:
+- id: intro
+  kind: intro
+  bars: 8
+  intensity: 0.52
+  density: 0.58
+  loopable: false
+  harmony:
+  - D
+  - D
+  - G
+  - A
+  - Bm
+  - G
+  - A
+  - A7sus4
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - cello_cushion
+  - harp_winding
+  - celesta_glint
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - A4
+    starts:
+    - - 2
+      - 0.0
+    velocity: 80
+    articulation: legato
+    humanize_ms: 14
+    humanize_velocity_pct: 5
+- id: verse_a
+  kind: loop_component
+  bars: 16
+  intensity: 0.52
+  density: 0.54
+  loopable: true
+  harmony: &id001
+  - D
+  - Bm
+  - G
+  - A
+  - D
+  - Bm
+  - Em
+  - A
+  - D
+  - Bm
+  - G
+  - A
+  - F#m
+  - G
+  - A7sus4
+  - D
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - harp_winding
+  - celesta_glint
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 84
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - D3
+    - D3
+    starts:
+    - - 0
+      - 1.0
+    - - 8
+      - 1.0
+    velocity: 58
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: verse_b
+  kind: loop_component
+  bars: 16
+  intensity: 0.58
+  density: 0.58
+  loopable: true
+  harmony: *id001
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - harp_winding
+  - celesta_glint
+  - kind: motif
+    instrument: solo_violin
+    motif: real_answer
+    roots:
+    - A4
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 84
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - A2
+    - D3
+    starts:
+    - - 0
+      - 1.5
+    - - 8
+      - 1.5
+    velocity: 60
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: bridge
+  kind: loop_component
+  bars: 8
+  intensity: 0.5
+  density: 0.5
+  loopable: true
+  harmony:
+  - D
+  - F#
+  - Bb
+  - D
+  - F#
+  - Bb
+  - G
+  - A7
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - harp_winding
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    velocity: 80
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+    transform: down_octave
+  - kind: motif
+    instrument: cello
+    motif: real_part
+    roots:
+    - D3
+    starts:
+    - - 4
+      - 0.0
+    velocity: 64
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  valid_exit_local_bars:
+  - 4
+  - 8
+- id: verse_a2
+  kind: loop_component
+  bars: 16
+  intensity: 0.56
+  density: 0.58
+  loopable: true
+  harmony: *id001
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - harp_winding
+  - celesta_glint
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 86
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - D3
+    - D3
+    starts:
+    - - 0
+      - 1.0
+    - - 8
+      - 1.0
+    velocity: 60
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  - kind: motif
+    instrument: solo_violin
+    motif: real_answer
+    roots:
+    - A4
+    starts:
+    - - 12
+      - 0.0
+    velocity: 72
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  valid_exit_local_bars:
+  - 8
+  - 16
+- id: outro
+  kind: outro
+  bars: 8
+  intensity: 0.36
+  density: 0.34
+  loopable: false
+  harmony:
+  - D
+  - Bm
+  - G
+  - A
+  - G
+  - Em
+  - A7sus4
+  - D
+  layers:
+  - waltz_bass
+  - waltz_chords
+  - string_warmth
+  - harp_winding
+  - celesta_glint
+  - kind: motif
+    instrument: solo_violin
+    motif: real_part
+    roots:
+    - D5
+    starts:
+    - - 0
+      - 0.0
+    velocity: 70
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+  - kind: motif
+    instrument: cello
+    motif: imag_part
+    roots:
+    - D3
+    starts:
+    - - 2
+      - 0.0
+    velocity: 52
+    articulation: legato
+    humanize_ms: 12
+    humanize_velocity_pct: 5
+group_postprocess:
+  lead:
+    gain_db: 3.0
+    reverb_wet: 0.05
+  keys:
+    gain_db: 1.0
+    highpass_hz: 40
+    reverb_wet: 0.04
+  low_strings:
+    gain_db: 8.0
+    reverb_wet: 0.05
+  pad:
+    gain_db: 16.0
+    lowpass_hz: 6000
+    reverb_wet: 0.07
+  glimmer:
+    gain_db: 7.0
+    highpass_hz: 300
+    reverb_wet: 0.08

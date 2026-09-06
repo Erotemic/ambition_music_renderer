@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: doves_of_the_commons
+  title: Doves of the Commons - Left Faction Theme
+  version_id: 3bfc267deb4d4de7:ea33ab3eda22
+  render_hash: 3bfc267deb4d4de7
+  preview_sha256: ea33ab3eda227eb21bd5188636ac13df5d2547e0501948e11eb8aeeba240c1a6
+  preview_path: generated/doves_of_the_commons/.versioned/3bfc267deb4d4de7/preview/doves_of_the_commons_3bfc267deb4d4de7.full_soundtrack_preview.ogg
+  manifest_path: generated/doves_of_the_commons/.versioned/3bfc267deb4d4de7/doves_of_the_commons_3bfc267deb4d4de7.adaptive_manifest.json
+  manifest_sha256: 7ec6aa1e80582f866d8a26daf73e9d3e33ea59f5dc44346ea18f6b54c225f80c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/doves_of_the_commons.music.yaml
+  score_sha256_at_review: 152b66b7a589467deee3fdb78c5e4086bf78dbfe77f545dbca61f52e40e7279d
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 2.9
+  label: Replace
+  notes: Blegh, boring boring boring.
+  issues: []
+  furthest_played_seconds: 20.374
+  furthest_played_fraction: 0.2547
+  created_at: '2026-08-16T15:37:28Z'
+  updated_at: '2026-08-16T15:37:28Z'
+  reviewed_at: '2026-08-16T15:37:28Z'
+history: []

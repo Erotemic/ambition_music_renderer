@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: argand_waltz
+  title: The Argand Waltz — a turn through the complex plane
+  version_id: 0b1c104915b604f0:9a82041897dc
+  render_hash: 0b1c104915b604f0
+  preview_sha256: 9a82041897dca5ada80160e3f9560ec686eacf305fda7e57b91a4f5f93958c6c
+  preview_path: generated/argand_waltz/.versioned/0b1c104915b604f0/preview/argand_waltz_0b1c104915b604f0.full_soundtrack_preview.ogg
+  manifest_path: generated/argand_waltz/.versioned/0b1c104915b604f0/argand_waltz_0b1c104915b604f0.adaptive_manifest.json
+  manifest_sha256: dd4059155ab57b2ba3ac40d857977541c2dd39af537a4b49efb068d9b3500a12
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/argand_waltz.music.yaml
+  score_sha256_at_review: 432e3adf662ed0f1088cdcf2bcfb8d691276f16f834782a92dcb58eb0477c15a
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Boring. I forget about this.
+  issues: []
+  furthest_played_seconds: 104.169
+  furthest_played_fraction: 0.7073
+  created_at: '2026-08-16T15:51:27Z'
+  updated_at: '2026-08-16T15:51:27Z'
+  reviewed_at: '2026-08-16T15:51:27Z'
+history: []

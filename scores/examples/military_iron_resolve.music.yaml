@@ -1,0 +1,647 @@
+schema: ambition.musicir.v1
+id: military_iron_resolve
+title: Iron Resolve - Military Faction Stronghold
+seed: 81920473
+notes: >-
+  Faction-stronghold theme. G minor military march, 108 BPM, 4/4. Brass
+  carries the foreground throughout — horns and trombones deliver block-
+  chord fanfares, trumpets pierce the climax with a perfect-fourth bugle
+  call, tuba walks the bass. Strings are tutti rhythmic accompaniment
+  (down-bow stabs on the beat). Snare drum + bass drum drive the regimented
+  groove; no melodic woodwinds on top of march except a piccolo countermelody
+  in the high section. Long-form layout (intro + four 16-bar loop sections
+  + outro = ~150 s) so in-game repetition is less obvious.
+
+tempo:
+  bpm: 108
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.035
+  reverb_decay_seconds: 1.20
+  reverb_damping_hz: 6500
+  stereo_width: 0.04
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.92
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.005
+  reverb_decay_seconds: 0.45
+  reverb_damping_hz: 6500
+  stereo_width: 0.025
+  limiter_drive: 0.90
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  # Brass — the foreground.
+  - {name: horns_a,    group: brass,      program: french_horn,       volume: 96, pan: 70, expression: 100, modulation: 6}
+  - {name: horns_b,    group: brass,      program: french_horn,       volume: 90, pan: 64, expression: 96,  modulation: 4}
+  - {name: trumpets,   group: brass,      program: trumpet,           volume: 92, pan: 78, expression: 98,  modulation: 4}
+  - {name: trombones,  group: brass,      program: trombone,          volume: 90, pan: 44, expression: 96,  modulation: 3}
+  - {name: tuba,       group: brass,      program: tuba,              volume: 84, pan: 32, expression: 90}
+
+  # Strings — tutti backing, no melodic foreground role.
+  - {name: violins,    group: strings,    program: string_ensemble_1, volume: 80, pan: 70, expression: 86, modulation: 6}
+  - {name: violas,     group: strings,    program: viola,             volume: 76, pan: 50, expression: 84, modulation: 5}
+  - {name: celli,      group: strings,    program: cello,             volume: 80, pan: 38, expression: 86, modulation: 5}
+  - {name: contrabass, group: strings,    program: contrabass,        volume: 76, pan: 30, expression: 84}
+
+  # Winds — sparse use. Piccolo countermelody only in the heavy section.
+  - {name: piccolo,    group: winds,      program: piccolo,           volume: 80, pan: 84, expression: 88}
+  - {name: clarinet,   group: winds,      program: clarinet,          volume: 76, pan: 56, expression: 84, modulation: 3}
+  - {name: bassoon,    group: winds,      program: bassoon,           volume: 80, pan: 40, expression: 86, modulation: 3}
+
+  # Choir — austere male oohs only on the climax.
+  - {name: voice_oohs, group: choir_pad,  program: voice_oohs,        volume: 56, pan: 64, expression: 70, modulation: 2}
+  - {name: pad_warm,   group: choir_pad,  program: pad_warm,          volume: 44, pan: 64, expression: 64, modulation: 2}
+
+  # Mallets — orchestra hit + tubular bell tolls only.
+  - {name: bells,      group: mallets,    program: tubular_bells,     volume: 76, pan: 70, expression: 86}
+  - {name: orch_hit,   group: mallets,    program: orchestra_hit,     volume: 88, pan: 64, expression: 96}
+
+  # Percussion — military kit: snare drum + bass drum + cymbals.
+  - {name: timpani,    group: percussion, program: timpani,           volume: 86, pan: 50, expression: 92}
+  - {name: kit,        group: percussion, is_drum: true,              volume: 100, pan: 64, expression: 108}
+
+motifs:
+  # Bugle fanfare — perfect 4ths and 5ths, dotted rhythm.
+  # G3 - C4 - D4 - G4 - F4 - D4 - G3
+  - id: bugle_call
+    root: G3
+    intervals: [0, 5, 7, 12, 10, 7, 0]
+    rhythm:    [0.75, 0.25, 0.5, 1.5, 0.5, 0.5, 1.0]
+    velocities: [0.96, 0.86, 0.94, 1.00, 0.92, 0.90, 0.88]
+
+  # March theme A — dotted quarters, descending then resolving up.
+  # G4 - F4 - Eb4 - D4 - F4 - Eb4 - D4 - G4 (in G minor)
+  - id: march_theme_a
+    root: G4
+    intervals: [0, -2, -4, -5, -2, -4, -5, 0]
+    rhythm:    [0.75, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5, 1.5]
+    velocities: [0.94, 0.84, 0.90, 0.96, 0.92, 0.84, 0.96, 1.00]
+
+  # March theme B — variant with a leap up to b6 (Eb).
+  # G4 - Bb4 - C5 - D5 - Bb4 - G4 - F#4 - G4
+  - id: march_theme_b
+    root: G4
+    intervals: [0, 3, 5, 7, 3, 0, -1, 0]
+    rhythm:    [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.92, 0.88, 0.94, 1.00, 0.92, 0.88, 0.94, 0.94]
+
+  # Bass walk — quarter note tonic + chromatic neighbor + dominant.
+  # G2 - G2 - F#2 - G2 - D2 - D2 - G2 - G2 (over 4 beats, two notes per beat)
+  - id: bass_walk
+    root: G2
+    intervals: [0, 0, -1, 0, -5, -5, 0, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [1.00, 0.78, 0.88, 0.78, 0.96, 0.78, 0.88, 0.78]
+
+  # Trumpet bugle climax — high register, fanfare resolution.
+  # G4 - C5 - Eb5 - F5 - Eb5 - D5 - C5 - G4
+  - id: trumpet_climax_call
+    root: G4
+    intervals: [0, 5, 8, 10, 8, 7, 5, 0]
+    rhythm:    [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.96, 0.92, 1.00, 1.00, 0.92, 0.88, 0.86, 0.84]
+
+  # Piccolo descant — runs above the brass in main_c.
+  # D6 - C6 - Bb5 - C6 - D6 - Eb6 - D6 - Bb5
+  - id: piccolo_descant
+    root: D6
+    intervals: [0, -2, -4, -2, 0, 1, 0, -4]
+    rhythm:    [0.5, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.92, 0.84, 0.86, 0.84, 0.94, 0.96, 0.92, 0.84]
+
+  # String response — descending counterline, pizzicato-like staccato feel.
+  - id: string_counter
+    root: D5
+    intervals: [0, -2, -3, -5, -2, -3, -5, -7]
+    rhythm:    [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.86, 0.82, 0.84, 0.86, 0.88, 0.82, 0.84, 0.78]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+      - {group: brass,     cc: expression, from: 80, to: 110, curve: smooth, points: 12}
+      - {group: strings,   cc: expression, from: 70, to: 100, curve: smooth, points: 12}
+      - {group: percussion,cc: expression, from: 80, to: 110, curve: smooth, points: 8}
+
+  # Brass block-chord pad — horns + trombones holding chord, full section.
+  brass_block:
+    kind: pad_chords
+    instruments: [horns_a, horns_b, trombones]
+    instrument_octave_offsets: {horns_a: 0, horns_b: 0, trombones: -1}
+    instrument_velocity_offsets: {horns_a: 0, horns_b: -6, trombones: -4}
+    octave: 3
+    duration_beats: 4.0
+    velocity: 78
+    articulation: legato
+    voicing: closed
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Brass stab — short marcato hits on phrase tops.
+  brass_stab:
+    kind: chord_hits
+    instruments: [horns_a, trombones, tuba]
+    octave: 3
+    velocity: 92
+    duration_beats: 1.25
+    articulation: marcato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Bass walk on tuba + contrabass + celli (octave-displaced).
+  bass_walk_voice:
+    kind: motif
+    instruments: [tuba, contrabass, celli]
+    motif: bass_walk
+    velocity: 80
+    articulation: marcato
+    instrument_octave_offsets: {tuba: 0, contrabass: 1, celli: 2}
+    instrument_velocity_offsets: {tuba: 0, contrabass: -4, celli: -10}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # Bugle call (horns + trumpets on phrase boundaries).
+  bugle_call_voice:
+    kind: motif
+    instruments: [horns_a, trumpets]
+    motif: bugle_call
+    velocity: 92
+    articulation: marcato
+    instrument_octave_offsets: {horns_a: 0, trumpets: 1}
+    instrument_velocity_offsets: {horns_a: 0, trumpets: -4}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # March theme A (horns).
+  march_theme_a_voice:
+    kind: motif
+    instruments: [horns_a, horns_b]
+    motif: march_theme_a
+    velocity: 90
+    articulation: tenuto
+    instrument_octave_offsets: {horns_a: 0, horns_b: -1}
+    instrument_velocity_offsets: {horns_a: 0, horns_b: -6}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # March theme B (trombones + horns).
+  march_theme_b_voice:
+    kind: motif
+    instruments: [horns_a, trombones]
+    motif: march_theme_b
+    velocity: 90
+    articulation: tenuto
+    instrument_octave_offsets: {horns_a: 0, trombones: -1}
+    instrument_velocity_offsets: {horns_a: 0, trombones: -4}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # String counter line.
+  string_counter_voice:
+    kind: motif
+    instruments: [violins, violas]
+    motif: string_counter
+    velocity: 76
+    articulation: spiccato
+    instrument_octave_offsets: {violins: 0, violas: -1}
+    instrument_velocity_offsets: {violins: 0, violas: -6}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Trumpet climax fanfare.
+  trumpet_climax:
+    kind: motif
+    instrument: trumpets
+    motif: trumpet_climax_call
+    transpose: 12
+    velocity: 96
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Piccolo descant for main_c.
+  piccolo_descant_voice:
+    kind: motif
+    instrument: piccolo
+    motif: piccolo_descant
+    velocity: 78
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  # String tutti chord stab on every quarter beat (full down-bow feel).
+  string_pulse:
+    kind: chord_hits
+    instruments: [violins, violas, celli]
+    instrument_octave_offsets: {violins: 1, violas: 0, celli: -1}
+    octave: 3
+    velocity: 70
+    duration_beats: 0.4
+    articulation: spiccato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Bassoon doubling the bass walk (woodwind reinforcement).
+  bassoon_walk:
+    kind: motif
+    instrument: bassoon
+    motif: bass_walk
+    transpose: 12
+    velocity: 64
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # Tuba pedal under the climax.
+  tuba_pedal:
+    kind: pedal
+    instrument: tuba
+    octave: 1
+    velocity: 64
+
+  # Timpani roll on tonic + dominant.
+  timpani_hit:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 86
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Snare-drum military pattern. Kick on 1+3, snare on 2+4, plus a roll fill
+  # at the end of each 4-bar phrase.
+  drums_march_steady:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 78}
+      - {drum: snare,             beats: [1.0, 3.0], velocity: 70}
+      - {drum: snare,             beats: [3.5, 3.75], velocity: 56, bars: [3, 7, 11, 15], probability: 1.0}
+
+  # Heavier march for climax — adds 8th-note snare fills and crashes.
+  drums_march_heavy:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.0
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 1.0, 2.0, 3.0], velocity: 80}
+      - {drum: snare,             beats: [1.0, 3.0], velocity: 80}
+      - {drum: snare,             beats: [0.5, 1.5, 2.5, 3.25, 3.5, 3.75], velocity: 38}
+      - {drum: crash,             beat: 0.0, velocity: 88, bars: [0, 4, 8, 12]}
+      - {drum: ride,              beats: [0.5, 1.5, 2.5, 3.5], velocity: 32}
+
+  # Bell tolls on phrase boundaries.
+  bell_toll:
+    kind: chord_hits
+    instrument: bells
+    octave: 4
+    velocity: 76
+    duration_beats: 4.0
+    articulation: bell
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Orchestra hit for major impact moments — fires on bar 0 of climax sections.
+  orchestra_hit:
+    kind: chord_hits
+    instrument: orch_hit
+    octave: 4
+    velocity: 100
+    duration_beats: 0.5
+    articulation: hit
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Voice-oohs choir wash for the highest section only.
+  voice_choir:
+    kind: pad_chords
+    instrument: voice_oohs
+    octave: 4
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 52
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  warm_pad_layer:
+    kind: pad_chords
+    instrument: pad_warm
+    octave: 3
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 36
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components: [main_a, main_b, bridge, main_c]
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, brass]
+    fade_stems: [winds, percussion, choir_pad, mallets]
+
+state_map:
+  starting: {section: intro}
+
+  patrolling:
+    preferred_section: main_a
+    stems: {brass: 1.0, strings: 0.85, mallets: 0.10, percussion: 0.85, winds: 0.05, choir_pad: 0.20}
+
+  inspection:
+    preferred_section: main_b
+    stems: {brass: 0.85, strings: 1.0, mallets: 0.20, percussion: 0.85, winds: 0.10, choir_pad: 0.25}
+
+  stand_down:
+    preferred_section: bridge
+    stems: {brass: 0.55, strings: 0.85, mallets: 0.15, percussion: 0.40, winds: 0.45, choir_pad: 0.30}
+
+  alerted:
+    preferred_section: main_c
+    stems: {brass: 1.0, strings: 1.0, mallets: 0.40, percussion: 1.0, winds: 0.65, choir_pad: 0.45}
+
+  withdrawing:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+
+sections:
+  - id: intro
+    kind: intro
+    label: distant approach - snare roll opening
+    bars: 8
+    intensity: 0.50
+    density: 0.30
+    loopable: false
+    harmony: ["Gm", "Eb", "D7", "Gm", "Cm", "Eb", "D7", "Gm"]
+    # Intimate ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.30
+    layers:
+      - expression_swell
+      # Snare drum approach: starts as a quiet roll, builds to a tutti hit on bar 7.
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: snare,             beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75], velocity: 30}
+          - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 56, bars: [4, 5, 6, 7]}
+          - {drum: snare,             beats: [1.0, 3.0], velocity: 60, bars: [4, 5, 6, 7]}
+          - {drum: crash,             beat: 0.0, velocity: 78, bars: [7]}
+      # Single distant horn call on bars 4 and 6.
+      - {template: bugle_call_voice, starts: [[4, 0.0]], velocity: 64}
+      # Tuba/contrabass holding tonic root from bar 4 onward.
+      - kind: pedal
+        instrument: tuba
+        octave: 1
+        note: G1
+        velocity: 56
+      - kind: pedal
+        instrument: contrabass
+        octave: 2
+        note: G2
+        velocity: 56
+      # Tubular bell on bar 0 and bar 7 (entrance + cadence).
+      - kind: chord_hits
+        instrument: bells
+        octave: 4
+        velocity: 70
+        duration_beats: 4.0
+        articulation: bell
+        humanize_ms: 0
+        hits: [[0, 0.0], [7, 0.0]]
+      # Subtle warm pad.
+      - {template: warm_pad_layer, velocity: 28}
+
+  - id: main_a
+    kind: loop_component
+    label: main march - horns lead, full march groove
+    bars: 16
+    intensity: 0.74
+    density: 0.55
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12, 16]
+    harmony: ["Gm", "F", "Eb", "D7", "Gm", "Cm", "Eb", "D7",
+              "Gm", "Bb", "F", "D7", "Gm", "Cm", "Bb", "D7"]
+    layers:
+      - {template: march_theme_a_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 90}
+      - {template: bass_walk_voice, repeats: 16, velocity: 80}
+      - {template: bassoon_walk, repeats: 16, velocity: 60}
+      - {template: brass_block, velocity: 70}
+      - {template: string_pulse, hits: [[0, 0.0], [0, 1.0], [0, 2.0], [0, 3.0],
+                                          [1, 0.0], [1, 1.0], [1, 2.0], [1, 3.0],
+                                          [2, 0.0], [2, 1.0], [2, 2.0], [2, 3.0],
+                                          [3, 0.0], [3, 1.0], [3, 2.0], [3, 3.0],
+                                          [4, 0.0], [4, 1.0], [4, 2.0], [4, 3.0],
+                                          [5, 0.0], [5, 1.0], [5, 2.0], [5, 3.0],
+                                          [6, 0.0], [6, 1.0], [6, 2.0], [6, 3.0],
+                                          [7, 0.0], [7, 1.0], [7, 2.0], [7, 3.0],
+                                          [8, 0.0], [8, 1.0], [8, 2.0], [8, 3.0],
+                                          [9, 0.0], [9, 1.0], [9, 2.0], [9, 3.0],
+                                          [10, 0.0], [10, 1.0], [10, 2.0], [10, 3.0],
+                                          [11, 0.0], [11, 1.0], [11, 2.0], [11, 3.0],
+                                          [12, 0.0], [12, 1.0], [12, 2.0], [12, 3.0],
+                                          [13, 0.0], [13, 1.0], [13, 2.0], [13, 3.0],
+                                          [14, 0.0], [14, 1.0], [14, 2.0], [14, 3.0],
+                                          [15, 0.0], [15, 1.0], [15, 2.0], [15, 3.0]], velocity: 60}
+      - drums_march_steady
+      - {template: warm_pad_layer, velocity: 30}
+
+  - id: main_b
+    kind: loop_component
+    label: variation - strings lead, brass stabs
+    bars: 16
+    intensity: 0.72
+    density: 0.55
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12, 16]
+    harmony: ["Gm", "Cm", "Bb", "D7", "Gm", "F", "Eb", "D7",
+              "Gm", "Eb", "F", "D7", "Gm", "Cm", "Eb", "D7"]
+    layers:
+      - {template: march_theme_b_voice, starts: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 86}
+      - {template: string_counter_voice, starts: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0]], velocity: 78}
+      - {template: bass_walk_voice, repeats: 16, velocity: 78}
+      - {template: bassoon_walk, repeats: 16, velocity: 58}
+      - {template: brass_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 86}
+      - drums_march_steady
+      - {template: bell_toll, hits: [[0, 0.0], [8, 0.0]], velocity: 64}
+      - {template: warm_pad_layer, velocity: 32}
+
+  - id: bridge
+    kind: loop_component
+    label: bridge - stand-down, clarinet solo over light march
+    bars: 12
+    intensity: 0.55
+    density: 0.40
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12]
+    harmony: ["Cm", "Bb", "Eb", "D7", "Cm", "Gm", "Bb", "D7",
+              "Cm", "F", "Eb", "D7"]
+    # Drier, more intimate ambience for the bridge.
+    postprocess:
+      reverb_wet: 0.025
+      reverb_decay_seconds: 0.70
+    layers:
+      # Clarinet solo carries the bridge.
+      - kind: motif
+        instrument: clarinet
+        motif: march_theme_a
+        velocity: 78
+        articulation: legato
+        humanize_ms: 5
+        starts: [[0, 0.0], [4, 0.0], [8, 0.0]]
+      # Bassoon countermelody.
+      - kind: motif
+        instrument: bassoon
+        motif: string_counter
+        velocity: 70
+        articulation: legato
+        humanize_ms: 5
+        starts: [[2, 0.0], [6, 0.0], [10, 0.0]]
+      - {template: bass_walk_voice, repeats: 12, velocity: 60}
+      # Sustained low strings only — no rhythmic tutti.
+      - kind: pad_chords
+        instruments: [violas, celli]
+        instrument_octave_offsets: {violas: 0, celli: -1}
+        octave: 3
+        duration_beats: 4.0
+        velocity: 60
+        articulation: legato
+        voicing: open
+        humanize_ms: 5
+      # Sparse drums — kick on 1+3, no snare backbeat.
+      - kind: drums
+        instrument: kit
+        humanize_ms: 1
+        events:
+          - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 60}
+          - {drum: side_stick, beats: [1.0, 3.0], velocity: 32}
+      - {template: warm_pad_layer, velocity: 38}
+
+  - id: main_c
+    kind: loop_component
+    label: alerted - climax with piccolo descant + trumpet fanfare
+    bars: 16
+    intensity: 0.92
+    density: 0.78
+    loopable: true
+    valid_exit_local_bars: [4, 8, 12, 16]
+    harmony: ["Gm", "Eb", "F", "D7", "Gm", "Cm", "Bb", "D7",
+              "Gm", "Bb", "Eb", "D7", "Gm", "F", "Eb", "D7"]
+    # Cathedral ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.40
+    layers:
+      - {template: march_theme_a_voice, starts: [[0, 0.0], [8, 0.0]], velocity: 96}
+      - {template: trumpet_climax, starts: [[4, 0.0], [12, 0.0]], velocity: 92}
+      - {template: piccolo_descant_voice, starts: [[2, 0.0], [6, 0.0], [10, 0.0], [14, 0.0]], velocity: 76}
+      - {template: bass_walk_voice, repeats: 16, velocity: 84}
+      - {template: bassoon_walk, repeats: 16, velocity: 64}
+      - {template: brass_block, velocity: 80}
+      - {template: brass_stab, hits: [[0, 0.0], [4, 0.0], [8, 0.0], [12, 0.0]], velocity: 92}
+      - {template: tuba_pedal, velocity: 70}
+      - {template: timpani_hit, hits: [[0, 0.0, 0, 0.5], [4, 0.0, 0, 0.5], [8, 0.0, 0, 0.5], [12, 0.0, 0, 0.5]], velocity: 86}
+      - {template: orchestra_hit, hits: [[0, 0.0], [8, 0.0]], velocity: 96}
+      - drums_march_heavy
+      - {template: bell_toll, hits: [[0, 0.0], [8, 0.0]], velocity: 76}
+      - {template: voice_choir, velocity: 56}
+      - {template: warm_pad_layer, velocity: 40}
+
+  - id: outro
+    kind: outro
+    label: stand-down - final cadence
+    bars: 4
+    intensity: 0.55
+    density: 0.40
+    loopable: false
+    harmony: ["Cm", "D7", "Gm", "Gm"]
+    layers:
+      - {template: brass_block, velocity: 70}
+      - {template: bass_walk_voice, repeats: 4, velocity: 60}
+      # Final bugle call on bar 0.
+      - {template: bugle_call_voice, starts: [[0, 0.0]], velocity: 80}
+      # Final orchestra-hit + crash on bar 3.
+      - {template: orchestra_hit, hits: [[3, 0.0]], velocity: 96}
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: concert_bass_drum, beat: 0.0, velocity: 78, bars: [3]}
+          - {drum: crash,             beat: 0.0, velocity: 84, bars: [3]}
+          - {drum: snare,             beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0], velocity: 50, bars: [2]}
+      - kind: root_hits
+        instrument: timpani
+        octave: 2
+        velocity: 86
+        articulation: marcato
+        hits: [[3, 0.0, 0, 1.0]]
+      - kind: chord_hits
+        instrument: bells
+        octave: 4
+        velocity: 70
+        duration_beats: 4.0
+        articulation: bell
+        humanize_ms: 0
+        hits: [[3, 0.0]]
+      - {template: warm_pad_layer, velocity: 36}
+
+group_postprocess:
+  brass:      {gain_db: 1.0,  lowpass_hz: 11500, high_shelf_hz: 5200, high_shelf_db: 0.6, transient_tame: 0.04, reverb_wet: 0.005}
+  strings:    {gain_db: 0.5,  lowpass_hz: 13000, high_shelf_hz: 5500, high_shelf_db: 0.4, transient_tame: 0.03, reverb_wet: 0.005}
+  winds:      {gain_db: 0.0,  lowpass_hz: 12500, high_shelf_hz: 4800, high_shelf_db: 0.6, transient_tame: 0.02, reverb_wet: 0.005}
+  percussion: {gain_db: -1.0, lowpass_hz: 11000, high_shelf_hz: 5500, high_shelf_db: 0.0, transient_tame: 0.05, reverb_wet: 0.004}
+  mallets:    {gain_db: -2.0, lowpass_hz: 11000, high_shelf_hz: 5500, high_shelf_db: 0.0, transient_tame: 0.06, reverb_wet: 0.012}
+  choir_pad:  {gain_db: -5.0, lowpass_hz: 9000,  high_shelf_hz: 5000, high_shelf_db: -0.4, transient_tame: 0.04, reverb_wet: 0.012}

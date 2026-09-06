@@ -1,0 +1,569 @@
+schema: ambition.musicir.v1
+id: a_possible_morning
+title: A Possible Morning
+seed: 2026071101
+notes: >-
+  Start-menu music for Ambition. Soft, melancholy, futuristic, sophisticated,
+  and only slightly hopeful. Existing songs were consulted only for MusicIR
+  syntax and renderer conventions, not as compositional models.
+
+  The tonal center is C-sharp minor. D-sharp repeatedly appears as a Dorian
+  light / A-major sharp-eleven color, but the cue never grants a simple major
+  resolution. One borrowed D-major sonority opens a colder space before the
+  harmony returns. Five-four is felt as a quiet 3+2 breath, not an odd-meter
+  stunt. The glass lattice and low pulse suggest the machine; a cello line with
+  a faint synthetic shadow suggests the person inside it.
+
+  The main phrase ends on D-sharp rather than the tonic. Its later answer reaches
+  C-sharp an octave higher, then settles back to E: hope is possible, not
+  promised. A quiet five-beat carrier code and a pitch-bent synthetic shadow now
+  make the technological presence audible without turning the menu into a bank
+  of retro bleeps. Foreground phrases enter after the section seam and continue
+  into the final bars so repeated and crossfaded loops breathe rather than
+  restart. The final transition pass lets awakening bloom into the loop, lets
+  depth hand its breath forward, and lets horizon arrive over one bar instead
+  of appearing at full brightness on the cut. Quiet and ready states now differ
+  clearly without changing the default mix. The 24-bar loop lasts about 116
+  seconds at 62 BPM. There are no drums, trailer swells, or triumphant cadences.
+
+tempo:
+  bpm: 62
+
+meter:
+  beats_per_bar: 5
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+  runtime_stems:
+    target_peak_db: -10.0
+    max_gain_db: 12.0
+
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 30
+  lowpass_hz: 10800
+  high_shelf_hz: 5600
+  high_shelf_db: -1.6
+  presence_low_hz: 1500
+  presence_high_hz: 3900
+  presence_db: -0.35
+  transient_tame: 0.08
+  transient_lowpass_hz: 7600
+  reverb_wet: 0.135
+  reverb_decay_seconds: 2.35
+  reverb_damping_hz: 4700
+  post_reverb_high_shelf_hz: 5200
+  post_reverb_high_shelf_db: -1.2
+  stereo_width: 0.14
+  compressor_threshold_db: -20.0
+  compressor_ratio: 1.55
+  compressor_attack_ms: 30.0
+  compressor_release_ms: 220.0
+  compressor_makeup_db: 0.4
+  compressor_knee_db: 9.0
+  limiter_drive: 0.84
+  normalize: true
+  target_peak_db: -9.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  lowpass_hz: 11200
+  transient_tame: 0.055
+  transient_lowpass_hz: 8000
+  reverb_wet: 0.020
+  reverb_decay_seconds: 0.95
+  reverb_damping_hz: 5000
+  stereo_width: 0.05
+  limiter_drive: 0.84
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: felt_piano,      group: keys,       program: acoustic_grand_piano, volume: 77, pan: 52, expression: 86, reverb: 20}
+  - {name: glass_keys,      group: lattice,    program: electric_piano_2,     volume: 76, pan: 72, expression: 86, chorus: 7, reverb: 24}
+  - {name: cello_voice,     group: voice,      program: cello,                volume: 75, pan: 55, expression: 84, modulation: 5, reverb: 24}
+  - {name: spectral_double, group: voice,      program: synth_voice,          volume: 58, pan: 75, expression: 72, modulation: 7, chorus: 10, reverb: 34}
+  - {name: bowed_haze,      group: atmosphere, program: pad_bowed,            volume: 64, pan: 52, expression: 78, modulation: 8, reverb: 30}
+  - {name: halo_air,        group: atmosphere, program: pad_halo,             volume: 49, pan: 78, expression: 65, modulation: 9, reverb: 38}
+  - {name: machine_room,    group: atmosphere, program: fx_scifi,             volume: 54, pan: 64, expression: 68, modulation: 5, chorus: 8, reverb: 42}
+  - {name: low_pulse,       group: foundation, program: synth_bass_1,         volume: 64, pan: 64, expression: 74}
+  - {name: carrier_hum,     group: signal,     program: pad_metallic,         volume: 60, pan: 86, expression: 74, modulation: 7, chorus: 11, reverb: 34}
+  - {name: distant_glass,   group: signal,     program: vibraphone,           volume: 68, pan: 39, expression: 80, reverb: 34}
+  - {name: cold_star,       group: signal,     program: celesta,              volume: 60, pan: 83, expression: 72, reverb: 38}
+
+motifs:
+  - id: unanswered
+    notes: [C#4, E4, G#4, F#4, B4, A4, E4, D#4]
+    rhythm: [1.5, 1.0, 0.5, 2.0, 1.0, 1.0, 1.5, 1.5]
+    velocities: [0.60, 0.67, 0.75, 0.70, 0.83, 0.76, 0.65, 0.55]
+
+  - id: possible_answer
+    notes: [E4, G#4, B4, C#5, B4, G#4, F#4, E4]
+    rhythm: [1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.5, 1.5]
+    velocities: [0.62, 0.70, 0.77, 0.86, 0.78, 0.70, 0.64, 0.57]
+
+  - id: colder_window
+    notes: [F#4, A4, C#5, D5, C#5, A4, G#4, F#4]
+    rhythm: [1.25, 1.0, 0.75, 2.0, 1.0, 1.0, 1.5, 1.5]
+    velocities: [0.58, 0.65, 0.74, 0.80, 0.72, 0.64, 0.60, 0.54]
+
+  - id: remembered_fragment
+    notes: [C#5, G#4, E4, D#4]
+    rhythm: [2.0, 1.0, 1.0, 1.0]
+    velocities: [0.65, 0.58, 0.52, 0.45]
+
+  - id: distant_signal
+    notes: [C#5, G#5, B5, D#6]
+    rhythm: [1.0, 1.0, 1.5, 1.5]
+    velocities: [0.52, 0.60, 0.66, 0.54]
+
+  # One complete 5/4 bar. Short gates turn the rhythm itself into the signal;
+  # the final low B leaves space before the pattern returns.
+  - id: carrier_code
+    notes: [C#5, D#5, G#5, E5, B4]
+    rhythm: [0.5, 0.5, 1.5, 0.5, 2.0]
+    velocities: [0.50, 0.38, 0.62, 0.44, 0.32]
+
+layer_templates:
+  atmosphere_bed:
+    kind: pad_chords
+    instrument: bowed_haze
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.90
+    velocity: 49
+    articulation: pad
+    # A stable three-note shell leaves the extensions to keys and melody.
+    voicing: guitar_shell
+    humanize_ms: 13
+    humanize_velocity_pct: 3
+
+  halo_drift:
+    kind: arpeggio
+    instrument: halo_air
+    octave: 4
+    pattern: [0, 2, 1, 2, 0]
+    step: 1.0
+    duration_beats: 1.65
+    velocity: 27
+    density: 0.30
+    articulation: pad
+    voicing: triad
+    humanize_ms: 22
+    humanize_velocity_pct: 5
+
+  machine_undertone:
+    kind: pad_chords
+    instrument: machine_room
+    octave: 4
+    every_bars: 1
+    duration_beats: 4.88
+    velocity: 21
+    articulation: pad
+    voicing: root_fifth
+    humanize_ms: 18
+    humanize_velocity_pct: 2
+
+  felt_resonance:
+    kind: pad_chords
+    instrument: felt_piano
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.88
+    velocity: 36
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 17
+    humanize_velocity_pct: 5
+
+  glass_lattice:
+    kind: arpeggio
+    instrument: glass_keys
+    octave: 4
+    pattern: [0, 2, 1, 3, 1]
+    step: 1.0
+    duration_beats: 0.86
+    velocity: 43
+    density: 0.82
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 15
+    humanize_velocity_pct: 7
+
+  glass_lattice_sparse:
+    kind: arpeggio
+    instrument: glass_keys
+    octave: 4
+    pattern: [0, 2, 1, 3, 1]
+    step: 1.0
+    duration_beats: 0.84
+    velocity: 38
+    density: 0.52
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 18
+    humanize_velocity_pct: 8
+
+  low_breath:
+    kind: bassline
+    instrument: low_pulse
+    octave: 1
+    pattern:
+      - [0, 0.0, 2.55]
+      - [12, 3.0, 1.75]
+    velocity: 43
+    articulation: legato
+    humanize_ms: 8
+    humanize_velocity_pct: 3
+
+  unanswered_voice:
+    kind: motif
+    instruments: [cello_voice, spectral_double]
+    instrument_octave_offsets: {cello_voice: 0, spectral_double: 1}
+    instrument_velocity_offsets: {cello_voice: 0, spectral_double: -17}
+    instrument_pitch_scoop_cents: {spectral_double: -22}
+    motif: unanswered
+    velocity: 67
+    articulation: legato
+    gate: 0.94
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  answer_voice:
+    kind: motif
+    instruments: [cello_voice, spectral_double]
+    instrument_octave_offsets: {cello_voice: 0, spectral_double: 1}
+    instrument_velocity_offsets: {cello_voice: 0, spectral_double: -16}
+    instrument_pitch_scoop_cents: {spectral_double: 18}
+    motif: possible_answer
+    velocity: 69
+    articulation: legato
+    gate: 0.95
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  colder_voice:
+    kind: motif
+    instruments: [cello_voice, spectral_double]
+    instrument_octave_offsets: {cello_voice: 0, spectral_double: 1}
+    instrument_velocity_offsets: {cello_voice: 0, spectral_double: -18}
+    instrument_pitch_scoop_cents: {spectral_double: -30}
+    motif: colder_window
+    velocity: 64
+    articulation: legato
+    gate: 0.94
+    humanize_ms: 11
+    humanize_velocity_pct: 4
+
+  fragment_voice:
+    kind: motif
+    instruments: [cello_voice, spectral_double]
+    instrument_octave_offsets: {cello_voice: 0, spectral_double: 1}
+    instrument_velocity_offsets: {cello_voice: 0, spectral_double: -19}
+    instrument_pitch_scoop_cents: {spectral_double: -18}
+    motif: remembered_fragment
+    velocity: 60
+    articulation: legato
+    gate: 0.92
+    humanize_ms: 12
+    humanize_velocity_pct: 4
+
+  signal_glint:
+    kind: motif
+    instruments: [distant_glass, cold_star]
+    instrument_velocity_offsets: {distant_glass: 0, cold_star: -7}
+    motif: distant_signal
+    velocity: 51
+    articulation: bell
+    gate: 0.78
+    humanize_ms: 15
+    humanize_velocity_pct: 6
+
+  carrier_whisper:
+    kind: motif
+    instrument: carrier_hum
+    instrument_pitch_scoop_cents: {carrier_hum: -24}
+    motif: carrier_code
+    velocity: 48
+    articulation: normal
+    gate: 0.36
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+
+  opening_swell:
+    kind: automation
+    automation:
+      - {group: atmosphere, cc: expression, from: 60, to: 78, curve: smooth, points: 18}
+      - {group: keys,       cc: expression, from: 68, to: 86, curve: smooth, points: 14}
+      - {group: lattice,    cc: expression, from: 64, to: 86, curve: smooth, points: 14}
+      - {group: voice,      cc: expression, from: 64, to: 84, curve: smooth, points: 10}
+      - {group: foundation, cc: expression, from: 58, to: 74, curve: smooth, points: 10}
+      - {group: signal,     cc: expression, from: 62, to: 80, curve: smooth, points: 12}
+
+  departure_fade:
+    kind: automation
+    automation:
+      - {group: voice,      cc: expression, from: 84, to: 60, curve: smooth, points: 12}
+      - {group: lattice,    cc: expression, from: 82, to: 54, curve: smooth, points: 12}
+      - {group: foundation, cc: expression, from: 72, to: 46, curve: smooth, points: 10}
+      - {group: atmosphere, cc: expression, from: 76, to: 56, curve: smooth, points: 12}
+      - {group: signal,     cc: expression, from: 78, to: 50, curve: smooth, points: 10}
+
+playback:
+  mode: section_stem_matrix
+  intro: awakening
+  loop_components: [stillness, depth, horizon]
+  outro: departure
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 10
+    bridge_stems: [atmosphere, keys]
+    fade_stems: [voice, lattice, foundation, signal]
+
+state_map:
+  default:
+    preferred_section: stillness
+    stems: {atmosphere: 0.98, keys: 0.96, lattice: 0.88, voice: 0.88, foundation: 0.82, signal: 0.90}
+  quiet:
+    preferred_section: depth
+    # Let the room and felt resonance remain while the visible machine recedes.
+    stems: {atmosphere: 1.0, keys: 0.88, lattice: 0.60, voice: 0.74, foundation: 0.72, signal: 0.56}
+  ready:
+    preferred_section: horizon
+    # A clearer, still restrained state: less haze and more articulated future.
+    stems: {atmosphere: 0.88, keys: 1.0, lattice: 1.0, voice: 1.0, foundation: 0.92, signal: 1.0}
+  starting_game:
+    transition: outro_at_next_valid_exit_bar
+    outro: departure
+
+sections:
+  - id: awakening
+    kind: intro
+    label: the screen wakes before the world does
+    bars: 4
+    intensity: 0.69
+    density: 0.43
+    loopable: false
+    harmony: [C#m(add9), Amaj7(#11)/C#, Emaj9/B, G#7sus4]
+    layers:
+      - opening_swell
+      # Build gently through the final two bars. Unlike a CC boost, this
+      # cannot leak into stillness after the section boundary.
+      - template: atmosphere_bed
+        velocity: 47
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.38, curve: smooth}]
+      - template: halo_drift
+        density: 0.22
+        velocity: 24
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.28, curve: smooth}]
+      - template: machine_undertone
+        velocity: 19
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.28, curve: smooth}]
+      - template: felt_resonance
+        velocity: 33
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.38, curve: smooth}]
+      - template: glass_lattice_sparse
+        density: 0.44
+        velocity: 36
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.38, curve: smooth}]
+      - template: low_breath
+        velocity: 34
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.34, curve: smooth}]
+      - template: carrier_whisper
+        starts: [[0, 0.25], [2.75, 0.25]]
+        velocity: 44
+        dynamics: [{start_bar: 2.0, bars: 2.0, from: 1.0, to: 1.24, curve: smooth}]
+      - {template: fragment_voice, starts: [[1.5, 0.0]], velocity: 58}
+
+  - id: stillness
+    kind: loop_component
+    label: the unanswered shape
+    bars: 8
+    intensity: 0.70
+    density: 0.52
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony:
+      - C#m(add9)
+      - Amaj7(#11)/C#
+      - Emaj9/B
+      - B6/9
+      - F#m7add11
+      - Amaj9(#11)/E
+      - Emaj7/G#
+      - G#7sus4
+    layers:
+      - {template: atmosphere_bed, velocity: 47}
+      - {template: halo_drift, density: 0.28, velocity: 26}
+      - {template: machine_undertone, velocity: 17}
+      - {template: felt_resonance, velocity: 33}
+      - {template: glass_lattice, density: 0.74, velocity: 41}
+      - {template: low_breath, velocity: 41}
+      - {template: unanswered_voice, starts: [[1, 0.0], [5.75, 0.0]], velocity: 64}
+      - {template: carrier_whisper, starts: [[0, 0.25], [4, 0.25]], velocity: 47}
+      - {template: signal_glint, starts: [[3, 0.0]], velocity: 47}
+
+  - id: depth
+    kind: loop_component
+    label: a colder window opens
+    bars: 8
+    intensity: 0.72
+    density: 0.50
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony:
+      - C#m9
+      - Emaj7/B
+      - Amaj7(#11)
+      - F#m7add11/A
+      - Dmaj7(#11)/A
+      - Amaj9
+      - E6/9/G#
+      - G#7sus4
+    layers:
+      # A small two-bar lift makes the colder section hand its breath forward
+      # instead of falling away just before horizon begins.
+      - template: atmosphere_bed
+        velocity: 48
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.24, curve: smooth}]
+      - template: halo_drift
+        density: 0.25
+        velocity: 25
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.18, curve: smooth}]
+      - template: machine_undertone
+        velocity: 18
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.18, curve: smooth}]
+      - template: felt_resonance
+        velocity: 32
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.26, curve: smooth}]
+      - template: glass_lattice_sparse
+        density: 0.64
+        velocity: 39
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.26, curve: smooth}]
+      - template: low_breath
+        velocity: 42
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.20, curve: smooth}]
+      - {template: unanswered_voice, starts: [[1, 0.0]], velocity: 62}
+      - {template: colder_voice, starts: [[4, 0.0]], velocity: 61}
+      - template: fragment_voice
+        starts: [[6.5, 0.0]]
+        velocity: 54
+        dynamics: [{start_bar: 6.0, bars: 2.0, from: 1.0, to: 1.18, curve: smooth}]
+      - {template: carrier_whisper, starts: [[0, 0.25]], velocity: 46}
+      - {template: signal_glint, starts: [[3, 0.0]], velocity: 46}
+
+  - id: horizon
+    kind: loop_component
+    label: not dawn, but evidence that dawn is possible
+    bars: 8
+    intensity: 0.76
+    density: 0.58
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony:
+      - C#m9
+      - Amaj7(#11)/C#
+      - Emaj9
+      - B6/9/D#
+      - F#m7add11
+      - Amaj9(#11)
+      - G#m7
+      - B6/9
+    layers:
+      # Horizon is still the hopeful lift, but it now arrives over one bar
+      # instead of presenting its full lattice and carrier on the cut.
+      - {template: atmosphere_bed, velocity: 49}
+      - {template: halo_drift, density: 0.34, velocity: 27}
+      - {template: machine_undertone, velocity: 17}
+      - {template: felt_resonance, velocity: 35}
+      - template: glass_lattice
+        density: 0.82
+        velocity: 43
+        dynamics: [{start_bar: 0.0, bars: 1.0, from: 0.86, to: 1.0, curve: smooth}]
+      - {template: low_breath, velocity: 44}
+      - {template: answer_voice, starts: [[1, 0.0]], velocity: 66}
+      - {template: unanswered_voice, starts: [[5.5, 0.0]], velocity: 63}
+      - template: carrier_whisper
+        starts: [[0, 0.25], [4, 0.25]]
+        velocity: 48
+        dynamics: [{start_bar: 0.0, bars: 1.0, from: 0.84, to: 1.0, curve: smooth}]
+      - {template: signal_glint, starts: [[3, 0.0], [7, 0.0]], velocity: 48}
+
+  - id: departure
+    kind: outro
+    label: the menu lets go without resolving the question
+    bars: 4
+    intensity: 0.68
+    density: 0.41
+    loopable: false
+    harmony: [C#m(add9), Amaj7(#11)/C#, Emaj9/B, C#m(add9)]
+    layers:
+      - departure_fade
+      - {template: atmosphere_bed, velocity: 47}
+      - {template: halo_drift, density: 0.20, velocity: 23}
+      - {template: machine_undertone, velocity: 18}
+      - {template: felt_resonance, velocity: 33}
+      - {template: glass_lattice_sparse, density: 0.40, velocity: 35}
+      - {template: low_breath, velocity: 34}
+      - {template: carrier_whisper, starts: [[0, 0.25], [2.75, 0.25]], velocity: 43}
+      - {template: fragment_voice, starts: [[1.25, 0.0]], velocity: 57}
+
+group_postprocess:
+  keys:
+    gain_db: 0.9
+    lowpass_hz: 9200
+    high_shelf_hz: 5200
+    high_shelf_db: -1.4
+    transient_tame: 0.10
+    reverb_wet: 0.020
+  lattice:
+    gain_db: 0.1
+    highpass_hz: 95
+    lowpass_hz: 8800
+    high_shelf_hz: 5000
+    high_shelf_db: -2.0
+    transient_tame: 0.14
+    reverb_wet: 0.024
+  voice:
+    gain_db: -0.9
+    highpass_hz: 75
+    lowpass_hz: 8200
+    high_shelf_hz: 4700
+    high_shelf_db: -1.15
+    presence_low_hz: 1100
+    presence_high_hz: 3300
+    presence_db: 0.45
+    transient_tame: 0.055
+    reverb_wet: 0.030
+  atmosphere:
+    gain_db: -0.5
+    highpass_hz: 42
+    lowpass_hz: 7600
+    high_shelf_hz: 4300
+    high_shelf_db: -1.8
+    transient_tame: 0.08
+    reverb_wet: 0.035
+  foundation:
+    gain_db: -0.4
+    highpass_hz: 30
+    lowpass_hz: 3100
+    transient_tame: 0.08
+    reverb_wet: 0.006
+  signal:
+    gain_db: 3.2
+    highpass_hz: 190
+    lowpass_hz: 8600
+    high_shelf_hz: 5400
+    high_shelf_db: -1.6
+    transient_tame: 0.15
+    reverb_wet: 0.032

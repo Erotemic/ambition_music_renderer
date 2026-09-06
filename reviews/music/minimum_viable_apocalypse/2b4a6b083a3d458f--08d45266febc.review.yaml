@@ -1,0 +1,34 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: minimum_viable_apocalypse
+  title: Minimum Viable Apocalypse
+  version_id: 2b4a6b083a3d458f:08d45266febc
+  render_hash: 2b4a6b083a3d458f
+  preview_sha256: 08d45266febc74941b840450571fda0e897a3e79c005a08d2e12d2f317e6088d
+  preview_path: generated/minimum_viable_apocalypse/.versioned/2b4a6b083a3d458f/preview/minimum_viable_apocalypse_2b4a6b083a3d458f.full_soundtrack_preview.ogg
+  manifest_path: generated/minimum_viable_apocalypse/.versioned/2b4a6b083a3d458f/minimum_viable_apocalypse_2b4a6b083a3d458f.adaptive_manifest.json
+  manifest_sha256: 150c47200b8e4333c1e911519dc3561e020e8e14a93f750db4c35c2ea06e423a
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/minimum_viable_apocalypse.music.yaml
+  score_sha256_at_review: f844631ddb4e942d10d5bd7ecfc59cf15802c186651c704ccf6ada7a972baf67
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: I don't even remember this one. For good reason I see. Pretty bleh. The Eq levels are way off I think.
+  issues:
+  - composition
+  - arrangement
+  - mix-master
+  furthest_played_seconds: 178.012
+  furthest_played_fraction: 0.9642
+  created_at: '2026-08-16T15:31:33Z'
+  updated_at: '2026-08-16T15:31:33Z'
+  reviewed_at: '2026-08-16T15:31:33Z'
+history: []

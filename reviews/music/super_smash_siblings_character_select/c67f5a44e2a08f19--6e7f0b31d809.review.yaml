@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: super_smash_siblings_character_select
+  title: Roster Ignition - Super Smash Siblings Character Select
+  version_id: c67f5a44e2a08f19:6e7f0b31d809
+  render_hash: c67f5a44e2a08f19
+  preview_sha256: 6e7f0b31d8097895eb49879539f2bc05d9cebad2a8be480de1e83dcddc9df352
+  preview_path: generated/super_smash_siblings_character_select/.versioned/c67f5a44e2a08f19/preview/super_smash_siblings_character_select_c67f5a44e2a08f19.full_soundtrack_preview.ogg
+  manifest_path: generated/super_smash_siblings_character_select/.versioned/c67f5a44e2a08f19/super_smash_siblings_character_select_c67f5a44e2a08f19.adaptive_manifest.json
+  manifest_sha256: d804dde6f3bdcb058021f81c96bacfdbc9ce4f9f27e8feb1a152cc6d6dece289
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/super_smash_siblings_character_select.music.yaml
+  score_sha256_at_review: 9f1026e750bd300b8d69e06a453e0b97f2d6bb523c4d57da3840bbd54a7f81eb
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.5
+  label: Strong
+  notes: overall solid, has a good beat. Not going to write home about it.
+  issues: []
+  furthest_played_seconds: 33.833
+  furthest_played_fraction: 0.2359
+  created_at: '2026-09-02T00:27:46Z'
+  updated_at: '2026-09-02T00:27:46Z'
+  reviewed_at: '2026-09-02T00:27:46Z'
+history: []

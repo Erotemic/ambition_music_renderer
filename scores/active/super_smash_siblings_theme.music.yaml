@@ -1,0 +1,900 @@
+schema: ambition.musicir.v1
+id: super_smash_siblings_theme
+title: Raise the Banner - Super Smash Siblings Main Theme
+seed: 2026080601
+notes: >-
+  Original orchestral title theme for Super Smash Siblings. A two-bar D-minor
+  sibling-call motif keeps returning in different orchestral colors: first as a
+  brass summons, then as a woodwind relay, and finally as a full-ensemble clash.
+  The score is intentionally bold and game-readable rather than film-score
+  ambient: hard rhythmic silhouettes, clear cadences, an immediately singable
+  hook, and a final D-minor handoff that loops back into the opening downbeat.
+  Sonatina/VCSL SFZ roles are preferred for the full orchestra; every sampled
+  part retains an audible General MIDI fallback.
+
+tempo:
+  bpm: 152
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  runtime_stems:
+    max_gain_db: 22.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: -0.6
+  highpass_hz: 30
+  lowpass_hz: 13500
+  eq_bands:
+    - {type: low_shelf, hz: 82, q: 0.75, db: 1.4}
+    - {type: peak, hz: 280, q: 0.90, db: -1.8}
+    - {type: peak, hz: 2300, q: 1.05, db: 0.8}
+    - {type: high_shelf, hz: 8200, q: 0.70, db: 0.7}
+  reverb_wet: 0.115
+  reverb_decay_seconds: 1.65
+  reverb_damping_hz: 6700
+  stereo_width: 0.16
+  compressor_threshold_db: -17.0
+  compressor_ratio: 3.2
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 105.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 5.5
+  limiter_drive: 0.96
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.012
+  reverb_decay_seconds: 0.62
+  reverb_damping_hz: 7000
+  stereo_width: 0.045
+  limiter_drive: 0.88
+  normalize: false
+  target_peak_db: -3.5
+
+group_postprocess:
+  brass:
+    gain_db: 1.2
+    highpass_hz: 42
+    lowpass_hz: 12200
+    presence_low_hz: 1400
+    presence_high_hz: 4300
+    presence_db: 1.0
+    compressor_threshold_db: -18.0
+    compressor_ratio: 2.4
+    compressor_attack_ms: 11.0
+    compressor_release_ms: 95.0
+    reverb_wet: 0.018
+  strings:
+    gain_db: 1.5
+    highpass_hz: 38
+    lowpass_hz: 13200
+    high_shelf_hz: 6200
+    high_shelf_db: 0.7
+    reverb_wet: 0.024
+  woodwinds:
+    gain_db: 6.2
+    highpass_hz: 90
+    lowpass_hz: 12800
+    presence_low_hz: 1700
+    presence_high_hz: 5200
+    presence_db: 1.2
+    reverb_wet: 0.032
+  percussion:
+    gain_db: 0.2
+    highpass_hz: 28
+    lowpass_hz: 12000
+    compressor_threshold_db: -15.0
+    compressor_ratio: 3.6
+    compressor_attack_ms: 5.0
+    compressor_release_ms: 82.0
+    transient_tame: 0.025
+    reverb_wet: 0.006
+
+instruments:
+  # Brass sustain choir.
+  - name: horns_sus
+    group: brass
+    program: french_horn
+    volume: 92
+    pan: 70
+    expression: 104
+    modulation: 7
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.horns_sustain
+      prefer: [notation, horns, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: trumpets_sus
+    group: brass
+    program: trumpet
+    volume: 90
+    pan: 82
+    expression: 100
+    modulation: 5
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.trumpets_sustain
+      prefer: [notation, trumpets, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: trombones_sus
+    group: brass
+    program: trombone
+    volume: 94
+    pan: 44
+    expression: 104
+    modulation: 4
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.trombones_sustain
+      prefer: [notation, trombones, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: tuba_sus
+    group: brass
+    program: tuba
+    volume: 94
+    pan: 34
+    expression: 102
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.tuba_sustain
+      prefer: [notation, tuba, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  # Brass attack choir. Separate staccato patches keep fanfares crisp instead
+  # of trying to fake attacks by shortening a sustained sample.
+  - name: horns_stacc
+    group: brass
+    program: french_horn
+    volume: 100
+    pan: 68
+    expression: 108
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.horns_staccato
+      prefer: [notation, horns, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: trumpets_stacc
+    group: brass
+    program: trumpet
+    volume: 102
+    pan: 84
+    expression: 110
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.trumpets_staccato
+      prefer: [notation, trumpets, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: trombones_stacc
+    group: brass
+    program: trombone
+    volume: 102
+    pan: 42
+    expression: 110
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.trombones_staccato
+      prefer: [notation, trombones, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  # Sweeping sampled strings.
+  - name: violins_i
+    group: strings
+    program: string_ensemble_1
+    volume: 86
+    pan: 84
+    expression: 98
+    modulation: 9
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violins_ii
+    group: strings
+    program: string_ensemble_2
+    volume: 82
+    pan: 72
+    expression: 94
+    modulation: 8
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_2
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violins_i_stacc
+    group: strings
+    program: string_ensemble_1
+    volume: 92
+    pan: 84
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1_staccato
+      prefer: [notation, 1st violins staccato, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violins_ii_stacc
+    group: strings
+    program: string_ensemble_2
+    volume: 88
+    pan: 72
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_2_staccato
+      prefer: [notation, 2nd violins staccato, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violas
+    group: strings
+    program: viola
+    volume: 84
+    pan: 52
+    expression: 96
+    modulation: 7
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violas
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: celli
+    group: strings
+    program: cello
+    volume: 90
+    pan: 40
+    expression: 100
+    modulation: 6
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: celli_stacc
+    group: strings
+    program: cello
+    volume: 96
+    pan: 40
+    expression: 106
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli_staccato
+      prefer: [notation, celli staccato, staccato]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: double_basses
+    group: strings
+    program: contrabass
+    volume: 92
+    pan: 30
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.basses
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  # Woodwind relay choir.
+  - name: flutes
+    group: woodwinds
+    program: flute
+    volume: 102
+    pan: 86
+    expression: 98
+    modulation: 6
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.flutes_sustain
+      prefer: [notation, flutes, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: oboes
+    group: woodwinds
+    program: oboe
+    volume: 100
+    pan: 64
+    expression: 96
+    modulation: 5
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.oboes_sustain
+      prefer: [notation, oboes, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: clarinets
+    group: woodwinds
+    program: clarinet
+    volume: 98
+    pan: 52
+    expression: 96
+    modulation: 5
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.clarinets_sustain
+      prefer: [notation, clarinets, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  # Pitched timpani plus dedicated sampled one-shot percussion. VCSL's
+  # individual percussion SFZs typically expose their hits around C4; the
+  # backend remap applies only to the SFZ render and leaves GM fallback intact.
+  - name: timpani
+    group: percussion
+    program: timpani
+    volume: 100
+    pan: 48
+    expression: 110
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.timpani
+      prefer: [timpani, hit, normal]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: concert_bass_drum
+    group: percussion
+    is_drum: true
+    volume: 108
+    pan: 52
+    expression: 116
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.bass_drum
+      prefer: [bass drum 1, concert bass drum]
+      note_remap: {concert_bass_drum: C4}
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: orchestral_snare
+    group: percussion
+    is_drum: true
+    volume: 106
+    pan: 66
+    expression: 114
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.snare
+      prefer: [snare drum rope tension, snare drum]
+      note_remap: {snare: C4}
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: orchestral_cymbal
+    group: percussion
+    is_drum: true
+    volume: 104
+    pan: 72
+    expression: 112
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.cymbal
+      prefer: [suspended cymbal, crash cymbal]
+      note_remap: {crash: C4}
+      optional: true
+      fallback_backend: pretty-midi
+
+motifs:
+  # Two-bar title call: D-A-C-D, then a falling answer. The rhythm is designed
+  # to be shouted by brass and still remain legible when doubled by strings.
+  - id: sibling_call
+    root: D4
+    intervals: [0, 7, 10, 12, 10, 7, 5, 3, 0, 8, 5, 0]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0]
+    velocities: [0.94, 0.88, 1.00, 0.96, 0.90, 0.98, 0.86, 0.82, 0.92, 0.90, 0.84, 1.00]
+
+  # Lower response for horns/trombones and celli.
+  - id: sibling_answer
+    root: A2
+    intervals: [0, 3, 5, 8, 12, 10, 8, 5, 3, 1, 3, -2]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.82, 0.86, 0.90, 0.94, 1.00, 0.88, 0.84, 0.90, 0.84, 0.80, 0.88, 0.96]
+
+  # G-minor answer used in the later, heavier statements. Rooting the response
+  # on G keeps the celli out of the sustained violins' A/Bb semitone grind.
+  - id: sibling_answer_gm
+    root: G2
+    intervals: [0, 3, 5, 7, 12, 10, 7, 5, 3, 2, 0, -2]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0]
+    velocities: [0.82, 0.86, 0.90, 0.94, 1.00, 0.88, 0.84, 0.90, 0.84, 0.80, 0.88, 0.96]
+
+  # Eight-beat woodwind relay: a D-minor/Bb pentatonic lift that stays clear
+  # of the sustained string thirds while retaining a bright, singable contour.
+  - id: wind_relay
+    root: D5
+    intervals: [0, 3, 5, 8, 10, 12, 15, 12, 5, 7, 10, 12, 10, 7, 5, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.72, 0.76, 0.80, 0.84, 0.88, 0.92, 0.96, 0.82, 0.78, 0.84, 0.90, 1.00, 0.92, 0.86, 0.82, 0.90]
+
+  # Long-note climb used to make the climax feel larger without adding a new tune.
+  - id: clash_rise
+    root: D4
+    intervals: [0, 3, 5, 7, 10, 12, 17, 12]
+    rhythm: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    velocities: [0.78, 0.82, 0.86, 0.90, 0.96, 1.00, 1.00, 0.96]
+
+layer_templates:
+  # Section-specific sustained voicings keep each sampled string family in its
+  # natural register while sustaining cleanly through each harmonic turn.
+  violins_i_sweep:
+    kind: pad_chords
+    instrument: violins_i
+    octave: 5
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 58
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.72, to: 0.72}
+
+  violins_ii_sweep:
+    kind: pad_chords
+    instrument: violins_ii
+    octave: 4
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 53
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.70, to: 0.70}
+
+  viola_sweep:
+    kind: pad_chords
+    instrument: violas
+    octave: 4
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 50
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.74, to: 0.74}
+
+  violin_drive:
+    kind: arpeggio
+    instruments: [violins_i_stacc, violins_ii_stacc]
+    octave: 4
+    voicing: triad
+    include_slash_bass: false
+    pattern: [0, 1, 2, 1, 0, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.5
+    velocity: 54
+    articulation: spiccato
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.78, to: 0.78}
+
+  cello_drive:
+    kind: arpeggio
+    instrument: celli_stacc
+    octave: 3
+    voicing: root_fifth_octave
+    pattern: [0, 1, 2, 1, 0, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.5
+    velocity: 66
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 4
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.82, to: 0.82}
+
+  bass_foundation:
+    kind: bassline
+    instrument: double_basses
+    octave: 1
+    pattern:
+      - [0, 0.0, 0.72]
+      - [0, 1.0, 0.42]
+      - [12, 2.0, 0.66]
+      - [0, 3.0, 0.46]
+    velocity: 72
+    articulation: marcato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  tuba_foundation:
+    kind: bassline
+    instrument: tuba_sus
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.78]
+      - [12, 2.0, 0.62]
+      - [0, 3.0, 0.42]
+    velocity: 74
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+
+  horn_bed:
+    kind: pad_chords
+    instrument: horns_sus
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.85
+    velocity: 44
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  trombone_bed:
+    kind: pad_chords
+    instrument: trombones_sus
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.85
+    velocity: 38
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  brass_main_call:
+    kind: motif
+    instruments: [horns_stacc, trumpets_stacc]
+    motif: sibling_call
+    root: D4
+    starts: [[0, 0.0], [8, 0.0], [16, 0.0], [40, 0.0], [48, 0.0], [56, 0.0]]
+    velocity: 94
+    articulation: marcato
+    gate: 0.82
+    instrument_octave_offsets: {horns_stacc: 0, trumpets_stacc: 0}
+    instrument_velocity_offsets: {horns_stacc: -5, trumpets_stacc: 0}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  low_answer_dm:
+    kind: motif
+    instruments: [trombones_stacc, celli]
+    motif: sibling_answer
+    root: A2
+    starts: [[4, 0.0], [12, 0.0]]
+    velocity: 84
+    articulation: marcato
+    gate: 0.80
+    instrument_octave_offsets: {trombones_stacc: 0, celli: 1}
+    instrument_velocity_offsets: {trombones_stacc: 0, celli: -10}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  low_answer_gm:
+    kind: motif
+    instruments: [trombones_stacc, celli]
+    motif: sibling_answer_gm
+    root: G2
+    starts: [[20, 0.0], [44, 0.0], [52, 0.0], [60, 0.0]]
+    velocity: 84
+    articulation: marcato
+    gate: 0.80
+    instrument_octave_offsets: {trombones_stacc: 0, celli: 1}
+    instrument_velocity_offsets: {trombones_stacc: 0, celli: -10}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  bridge_winds:
+    kind: motif
+    instruments: [oboes, clarinets]
+    motif: wind_relay
+    roots: [D5, D5, D5, D5]
+    starts: [[24, 0.0]]
+    repeats: 4
+    every_bars: 4
+    velocity: 78
+    articulation: tenuto
+    gate: 0.90
+    instrument_octave_offsets: {oboes: 0, clarinets: -1}
+    instrument_velocity_offsets: {oboes: 0, clarinets: -8}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    dynamics:
+      - {start_bar: 24, bars: 16, from: 0.90, to: 1.08, curve: smooth}
+
+  flute_relay:
+    kind: motif
+    instrument: flutes
+    motif: wind_relay
+    root: D5
+    starts: [[28, 0.0], [36, 0.0], [42, 0.0], [50, 0.0]]
+    velocity: 82
+    articulation: tenuto
+    gate: 0.88
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+    dynamics:
+      - {start_bar: 28, bars: 24, from: 0.94, to: 1.08, curve: smooth}
+
+  climax_rise:
+    kind: motif
+    instruments: [horns_sus, trumpets_sus, violins_i]
+    motif: clash_rise
+    root: D4
+    starts: [[40, 0.0], [48, 0.0]]
+    velocity: 82
+    articulation: tenuto
+    gate: 0.96
+    instrument_octave_offsets: {horns_sus: -1, trumpets_sus: 0, violins_i: 1}
+    instrument_velocity_offsets: {horns_sus: -6, trumpets_sus: 0, violins_i: -14}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  transition_brass_hits:
+    kind: chord_hits
+    instruments: [horns_stacc, trumpets_stacc, trombones_stacc]
+    hits:
+      - [0, 0.0]
+      - [8, 0.0]
+      - [16, 0.0]
+      - [24, 0.0]
+      - [32, 0.0]
+      - [40, 0.0]
+      - [48, 0.0]
+      - [56, 0.0]
+      - [63, 3.0]
+    octave: 3
+    velocity: 96
+    duration_beats: 0.65
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    instrument_octave_offsets: {horns_stacc: 0, trumpets_stacc: 1, trombones_stacc: 0}
+    instrument_velocity_offsets: {horns_stacc: -5, trumpets_stacc: 0, trombones_stacc: -4}
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+
+  timpani_punctuation:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 92
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+    hits:
+      - [0, 0.0, 0, 0.70]
+      - [0, 2.0, 7, 0.52]
+      - [7, 2.0, 0, 0.42]
+      - [7, 2.5, 0, 0.34]
+      - [7, 3.0, 7, 0.34]
+      - [7, 3.5, 12, 0.34]
+      - [8, 0.0, 0, 0.72]
+      - [15, 2.0, 0, 0.42]
+      - [15, 2.5, 0, 0.34]
+      - [15, 3.0, 7, 0.34]
+      - [15, 3.5, 12, 0.34]
+      - [16, 0.0, 0, 0.72]
+      - [23, 2.0, 0, 0.42]
+      - [23, 2.5, 0, 0.34]
+      - [23, 3.0, 7, 0.34]
+      - [23, 3.5, 12, 0.34]
+      - [24, 0.0, 0, 0.72]
+      - [31, 2.0, 0, 0.42]
+      - [31, 2.5, 0, 0.34]
+      - [31, 3.0, 7, 0.34]
+      - [31, 3.5, 12, 0.34]
+      - [32, 0.0, 0, 0.72]
+      - [39, 2.0, 0, 0.42]
+      - [39, 2.5, 0, 0.34]
+      - [39, 3.0, 7, 0.34]
+      - [39, 3.5, 12, 0.34]
+      - [40, 0.0, 0, 0.80]
+      - [40, 2.0, 7, 0.52]
+      - [42, 0.0, 0, 0.62]
+      - [42, 2.0, 7, 0.48]
+      - [44, 0.0, 0, 0.62]
+      - [44, 2.0, 7, 0.48]
+      - [46, 0.0, 0, 0.62]
+      - [46, 2.0, 7, 0.48]
+      - [48, 0.0, 0, 0.82]
+      - [48, 2.0, 7, 0.54]
+      - [50, 0.0, 0, 0.64]
+      - [50, 2.0, 7, 0.50]
+      - [52, 0.0, 0, 0.64]
+      - [52, 2.0, 7, 0.50]
+      - [54, 0.0, 0, 0.64]
+      - [54, 2.0, 7, 0.50]
+      - [55, 2.0, 0, 0.42]
+      - [55, 2.5, 0, 0.34]
+      - [55, 3.0, 7, 0.34]
+      - [55, 3.5, 12, 0.34]
+      - [56, 0.0, 0, 0.78]
+      - [63, 2.0, 0, 0.42]
+      - [63, 2.5, 0, 0.34]
+      - [63, 3.0, 7, 0.34]
+      - [63, 3.5, 12, 0.34]
+
+  bass_drum_drive:
+    kind: drums
+    instrument: concert_bass_drum
+    humanize_ms: 2
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 92, duration_beats: 0.16}
+      - {drum: concert_bass_drum, beat: 3.5, velocity: 72, duration_beats: 0.12, every: 2, offset: 1}
+
+  snare_drive:
+    kind: drums
+    instrument: orchestral_snare
+    humanize_ms: 2
+    events:
+      - {drum: snare, beats: [1.0, 3.0], velocity: 90, duration_beats: 0.10}
+      - {drum: snare, beats: [0.5, 1.5, 2.5, 3.5], velocity: 46, duration_beats: 0.08, probability: 0.72}
+      - {drum: snare, beats: [3.0, 3.25, 3.5, 3.75], bars: [7, 15, 23, 31, 39, 47, 55, 63], velocity: 84, duration_beats: 0.06}
+
+  cymbal_crashes:
+    kind: drums
+    instrument: orchestral_cymbal
+    humanize_ms: 1
+    events:
+      - {drum: crash, beat: 0.0, velocity: 94, duration_beats: 0.60, every: 8}
+      - {drum: crash, beat: 2.0, bars: [39, 47, 55], velocity: 86, duration_beats: 0.50}
+      - {drum: crash, beat: 3.0, bars: [63], velocity: 96, duration_beats: 0.70}
+
+playback:
+  mode: section_stem_matrix
+  loop_components: [siblings_theme_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, brass, woodwinds]
+    fade_stems: [percussion]
+
+state_map:
+  default:
+    section: siblings_theme_loop
+    stems: {brass: 0.96, strings: 0.92, woodwinds: 0.90, percussion: 0.92}
+
+sections:
+  - id: siblings_theme_loop
+    kind: loop_component
+    label: title-screen orchestral clash
+    bars: 64
+    intensity: 0.92
+    density: 0.90
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32, 40, 48, 56, 64]
+    harmony:
+      # Summons: bars 0-7.
+      - Dm7add11
+      - Bbmaj9#11add13
+      - F/A
+      - Csus4
+      - Dm7add11
+      - Bbmaj9add13
+      - Gm9
+      - A7
+      # Main statement: bars 8-23.
+      - Dm7add11
+      - Bbmaj9#11add13
+      - F
+      - C
+      - Dm7add11
+      - Bbmaj9add13
+      - Gm
+      - A7
+      - Dm7add11
+      - C13add9add11/E
+      - F
+      - Bb
+      - Gm7add11
+      - Dm7add11b13/A
+      - A7
+      - A7
+      # Woodwind relay: bars 24-39.
+      - Bbmaj9#11add13
+      - C6/9
+      - Dm
+      - Am
+      - Bbmaj9#11add13
+      - F6/9/A
+      - Gm
+      - A7
+      - Gm7add11
+      - Dm7add11/F
+      - Bb
+      - F/A
+      - Gm7add11
+      - Dm7add11/A
+      - A7
+      - A7
+      # Full-ensemble clash: bars 40-55.
+      - Dm7add11
+      - Bbmaj9#11add13
+      - F6/9add11
+      - C6/9
+      - Gm7add11
+      - Dm7add11b13/A
+      - Bb
+      - A7
+      - Dm7add11
+      - C13add9add11/E
+      - F6/9add11
+      - Bbmaj9#11add13
+      - Gm7add11
+      - Dm7add11b13/A
+      - A7
+      - Dm
+      # Reprise and loop handoff: bars 56-63.
+      - F6
+      - C13add9add11/E
+      - Dm
+      - Bb
+      - Gm7add11
+      - Dm7add11b13/A
+      - A7
+      - Dm
+    layers:
+      - violins_i_sweep
+      - violins_ii_sweep
+      - viola_sweep
+      - violin_drive
+      - cello_drive
+      - bass_foundation
+      - tuba_foundation
+      - horn_bed
+      - trombone_bed
+      - brass_main_call
+      - low_answer_dm
+      - low_answer_gm
+      - bridge_winds
+      - flute_relay
+      - climax_rise
+      - transition_brass_hits
+      - timpani_punctuation
+      - bass_drum_drive
+      - snare_drive
+      - cymbal_crashes

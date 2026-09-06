@@ -1,0 +1,365 @@
+schema: ambition.musicir.v1
+id: public_domain_ode_to_joy_autopiano_control
+title: "Public Domain Control — Ode to Joy, Exact Rhythmic Timing"
+one_shot: true
+seed: 2026081602
+notes: >-
+  Timing-and-polyphony control based on the public-domain Mutopia Ode to Joy
+  SATB transcription (Mutopia-2009/08/05-528). The source tempo is quarter
+  note = 100. Alto, tenor, and bass preserve the source transcription. The
+  soprano melody preserves every pitch class, onset, and written duration but
+  is raised one octave solely to keep the control melody clearly above the
+  accompaniment on a single piano. Literal note events use gate 1.0 and zero
+  humanization so dotted quarters, eighth notes, quarter notes, half notes,
+  and the syncopated eighth-note pairs are represented exactly in beat time.
+
+tempo:
+  bpm: 100
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+# Deliberately plain whole-piano processing. The control is about score timing
+# and voicing; no bass/lead split is available to hide a compositional error.
+postprocess:
+  gain_db: -2.0
+  highpass_hz: 25
+  lowpass_hz: 16000
+  reverb_wet: 0.06
+  reverb_decay_seconds: 1.0
+  reverb_damping_hz: 7200
+  stereo_width: 0.04
+  compressor_threshold_db: -24.0
+  compressor_ratio: 1.15
+  compressor_attack_ms: 35
+  compressor_release_ms: 220
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 8
+  limiter_drive: 0.75
+  normalize: true
+  target_peak_db: -4.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 25
+  lowpass_hz: 16000
+  reverb_wet: 0.0
+  stereo_width: 0.0
+  normalize: false
+
+instruments:
+  - name: autopiano
+    group: piano
+    program: acoustic_grand_piano
+    volume: 108
+    pan: 64
+    expression: 112
+    reverb: 6
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.salamander_grand
+      prefer: [salamander, grand, piano]
+      optional: true
+      fallback_backend: pretty-midi
+
+state_map:
+  default:
+    section: ode_control
+    stems: {piano: 1.0}
+
+sections:
+  - id: ode_control
+    kind: verse
+    label: Ode to Joy public-domain timing control
+    bars: 16
+    intensity: 1.0
+    density: 0.72
+    loopable: false
+    layers:
+      - id: left_bass
+        kind: notes
+        instrument: autopiano
+        articulation: normal
+        gate: 1.0
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - [0, 0.0, G3, 1.0, 54]
+          - [0, 1.0, G3, 1.0, 54]
+          - [0, 2.0, G3, 1.0, 54]
+          - [0, 3.0, G3, 1.0, 54]
+          - [1, 0.0, E3, 1.5, 54]
+          - [1, 1.5, F#3, 0.5, 54]
+          - [1, 2.0, G3, 1.0, 54]
+          - [1, 3.0, D3, 1.0, 54]
+          - [2, 0.0, B2, 1.0, 54]
+          - [2, 1.0, B2, 1.0, 54]
+          - [2, 2.0, A2, 1.0, 54]
+          - [2, 3.0, G2, 1.0, 54]
+          - [3, 0.0, D3, 1.5, 54]
+          - [3, 1.5, D3, 0.5, 54]
+          - [3, 2.0, D3, 2.0, 54]
+          - [4, 0.0, G3, 1.0, 54]
+          - [4, 1.0, G3, 1.0, 54]
+          - [4, 2.0, G3, 1.0, 54]
+          - [4, 3.0, G3, 1.0, 54]
+          - [5, 0.0, E3, 1.5, 54]
+          - [5, 1.5, F#3, 0.5, 54]
+          - [5, 2.0, G3, 1.0, 54]
+          - [5, 3.0, D3, 1.0, 54]
+          - [6, 0.0, B2, 1.0, 54]
+          - [6, 1.0, B2, 1.0, 54]
+          - [6, 2.0, A2, 1.0, 54]
+          - [6, 3.0, G2, 1.0, 54]
+          - [7, 0.0, D3, 1.0, 54]
+          - [7, 1.0, D3, 1.0, 54]
+          - [7, 2.0, G2, 2.0, 54]
+          - [8, 0.0, D3, 1.0, 54]
+          - [8, 1.0, D3, 1.0, 54]
+          - [8, 2.0, D3, 1.0, 54]
+          - [8, 3.0, D3, 1.0, 54]
+          - [9, 0.0, D3, 1.0, 54]
+          - [9, 1.0, D3, 1.0, 54]
+          - [9, 2.0, D3, 1.0, 54]
+          - [9, 3.0, D3, 1.0, 54]
+          - [10, 0.0, D3, 1.0, 54]
+          - [10, 1.0, D3, 1.0, 54]
+          - [10, 2.0, D#3, 1.0, 54]
+          - [10, 3.0, D#3, 1.0, 54]
+          - [11, 0.0, E3, 1.0, 54]
+          - [11, 1.0, A2, 1.0, 54]
+          - [11, 2.0, D3, 2.0, 54]
+          - [12, 0.0, G3, 1.0, 54]
+          - [12, 1.0, G3, 1.0, 54]
+          - [12, 2.0, F3, 1.0, 54]
+          - [12, 3.0, F3, 1.0, 54]
+          - [13, 0.0, E3, 1.5, 54]
+          - [13, 1.5, F#3, 0.5, 54]
+          - [13, 2.0, G3, 1.0, 54]
+          - [13, 3.0, C3, 1.0, 54]
+          - [14, 0.0, C3, 1.0, 54]
+          - [14, 1.0, B2, 1.0, 54]
+          - [14, 2.0, A2, 1.0, 54]
+          - [14, 3.0, G2, 1.0, 54]
+          - [15, 0.0, D3, 1.0, 54]
+          - [15, 1.0, D3, 1.0, 54]
+          - [15, 2.0, G2, 2.0, 54]
+      - id: inner_tenor
+        kind: notes
+        instrument: autopiano
+        articulation: normal
+        gate: 1.0
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - [0, 0.0, D4, 1.0, 47]
+          - [0, 1.0, D4, 1.0, 47]
+          - [0, 2.0, C4, 1.0, 47]
+          - [0, 3.0, B3, 1.0, 47]
+          - [1, 0.0, E4, 1.5, 47]
+          - [1, 1.5, D4, 0.5, 47]
+          - [1, 2.0, D4, 1.0, 47]
+          - [1, 3.0, D4, 1.0, 47]
+          - [2, 0.0, B3, 1.0, 47]
+          - [2, 1.0, B3, 1.0, 47]
+          - [2, 2.0, D4, 1.0, 47]
+          - [2, 3.0, D4, 1.0, 47]
+          - [3, 0.0, D4, 1.5, 47]
+          - [3, 1.5, D4, 0.5, 47]
+          - [3, 2.0, D4, 2.0, 47]
+          - [4, 0.0, D4, 1.0, 47]
+          - [4, 1.0, D4, 1.0, 47]
+          - [4, 2.0, C4, 1.0, 47]
+          - [4, 3.0, B3, 1.0, 47]
+          - [5, 0.0, E4, 1.5, 47]
+          - [5, 1.5, D4, 0.5, 47]
+          - [5, 2.0, D4, 1.0, 47]
+          - [5, 3.0, D4, 1.0, 47]
+          - [6, 0.0, B3, 1.0, 47]
+          - [6, 1.0, B3, 1.0, 47]
+          - [6, 2.0, D4, 1.0, 47]
+          - [6, 3.0, D4, 1.0, 47]
+          - [7, 0.0, D4, 1.0, 47]
+          - [7, 1.0, D4, 1.0, 47]
+          - [7, 2.0, B3, 2.0, 47]
+          - [8, 0.0, F#3, 1.0, 47]
+          - [8, 1.0, F#3, 1.0, 47]
+          - [8, 2.0, G3, 1.0, 47]
+          - [8, 3.0, E3, 1.0, 47]
+          - [9, 0.0, F#3, 1.0, 47]
+          - [9, 1.0, G3, 0.5, 47]
+          - [9, 1.5, A3, 0.5, 47]
+          - [9, 2.0, G3, 1.0, 47]
+          - [9, 3.0, E3, 1.0, 47]
+          - [10, 0.0, F#3, 1.0, 47]
+          - [10, 1.0, F#3, 1.0, 47]
+          - [10, 2.0, F#3, 1.0, 47]
+          - [10, 3.0, B3, 1.0, 47]
+          - [11, 0.0, B3, 1.0, 47]
+          - [11, 1.0, A3, 1.0, 47]
+          - [11, 2.0, G3, 1.0, 47]
+          - [11, 3.0, F#3, 1.0, 47]
+          - [12, 0.0, G3, 1.0, 47]
+          - [12, 1.0, D4, 1.0, 47]
+          - [12, 2.0, F4, 1.0, 47]
+          - [12, 3.0, F4, 1.0, 47]
+          - [13, 0.0, G4, 1.5, 47]
+          - [13, 1.5, D4, 0.5, 47]
+          - [13, 2.0, D4, 1.0, 47]
+          - [13, 3.0, C4, 1.0, 47]
+          - [14, 0.0, G3, 1.0, 47]
+          - [14, 1.0, G3, 1.0, 47]
+          - [14, 2.0, C4, 1.0, 47]
+          - [14, 3.0, D4, 1.0, 47]
+          - [15, 0.0, D4, 1.0, 47]
+          - [15, 1.0, D4, 1.0, 47]
+          - [15, 2.0, B3, 2.0, 47]
+      - id: inner_alto
+        kind: notes
+        instrument: autopiano
+        articulation: normal
+        gate: 1.0
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - [0, 0.0, G4, 1.0, 51]
+          - [0, 1.0, G4, 1.0, 51]
+          - [0, 2.0, A4, 1.0, 51]
+          - [0, 3.0, G4, 1.0, 51]
+          - [1, 0.0, G4, 1.5, 51]
+          - [1, 1.5, A4, 0.5, 51]
+          - [1, 2.0, G4, 1.0, 51]
+          - [1, 3.0, F#4, 1.0, 51]
+          - [2, 0.0, D4, 1.0, 51]
+          - [2, 1.0, D4, 1.0, 51]
+          - [2, 2.0, F#4, 1.0, 51]
+          - [2, 3.0, G4, 1.0, 51]
+          - [3, 0.0, G4, 1.5, 51]
+          - [3, 1.5, F#4, 0.5, 51]
+          - [3, 2.0, F#4, 2.0, 51]
+          - [4, 0.0, G4, 1.0, 51]
+          - [4, 1.0, G4, 1.0, 51]
+          - [4, 2.0, A4, 1.0, 51]
+          - [4, 3.0, G4, 1.0, 51]
+          - [5, 0.0, G4, 1.5, 51]
+          - [5, 1.5, A4, 0.5, 51]
+          - [5, 2.0, G4, 1.0, 51]
+          - [5, 3.0, F#4, 1.0, 51]
+          - [6, 0.0, D4, 1.0, 51]
+          - [6, 1.0, D4, 1.0, 51]
+          - [6, 2.0, F#4, 1.0, 51]
+          - [6, 3.0, G4, 1.0, 51]
+          - [7, 0.0, G4, 1.0, 51]
+          - [7, 1.0, F#4, 1.0, 51]
+          - [7, 2.0, D4, 2.0, 51]
+          - [8, 0.0, D4, 1.0, 51]
+          - [8, 1.0, D4, 1.0, 51]
+          - [8, 2.0, D4, 1.0, 51]
+          - [8, 3.0, D4, 1.0, 51]
+          - [9, 0.0, D4, 1.0, 51]
+          - [9, 1.0, D4, 1.0, 51]
+          - [9, 2.0, D4, 1.0, 51]
+          - [9, 3.0, D4, 1.0, 51]
+          - [10, 0.0, D4, 1.0, 51]
+          - [10, 1.0, D4, 1.0, 51]
+          - [10, 2.0, F#4, 1.0, 51]
+          - [10, 3.0, F#4, 1.0, 51]
+          - [11, 0.0, E4, 1.0, 51]
+          - [11, 1.0, C#4, 1.0, 51]
+          - [11, 2.0, D4, 2.0, 51]
+          - [12, 0.0, D4, 1.0, 51]
+          - [12, 1.0, G4, 1.0, 51]
+          - [12, 2.0, A4, 1.0, 51]
+          - [12, 3.0, A4, 1.0, 51]
+          - [13, 0.0, B4, 1.0, 51]
+          - [13, 1.0, G4, 0.5, 51]
+          - [13, 1.5, A4, 0.5, 51]
+          - [13, 2.0, G4, 1.0, 51]
+          - [13, 3.0, E4, 1.0, 51]
+          - [14, 0.0, E4, 1.0, 51]
+          - [14, 1.0, D4, 1.0, 51]
+          - [14, 2.0, F#4, 1.0, 51]
+          - [14, 3.0, G4, 1.0, 51]
+          - [15, 0.0, G4, 1.0, 51]
+          - [15, 1.0, F#4, 1.0, 51]
+          - [15, 2.0, G4, 2.0, 51]
+      - id: right_hand_exact_melody
+        kind: notes
+        instrument: autopiano
+        articulation: normal
+        gate: 1.0
+        humanize_ms: 0
+        humanize_velocity_pct: 0
+        notes:
+          - [0, 0.0, B5, 1.0, 86]
+          - [0, 1.0, B5, 1.0, 86]
+          - [0, 2.0, C6, 1.0, 86]
+          - [0, 3.0, D6, 1.0, 86]
+          - [1, 0.0, D6, 1.0, 86]
+          - [1, 1.0, C6, 1.0, 86]
+          - [1, 2.0, B5, 1.0, 86]
+          - [1, 3.0, A5, 1.0, 86]
+          - [2, 0.0, G5, 1.0, 86]
+          - [2, 1.0, G5, 1.0, 86]
+          - [2, 2.0, A5, 1.0, 86]
+          - [2, 3.0, B5, 1.0, 86]
+          - [3, 0.0, B5, 1.5, 86]
+          - [3, 1.5, A5, 0.5, 86]
+          - [3, 2.0, A5, 2.0, 86]
+          - [4, 0.0, B5, 1.0, 86]
+          - [4, 1.0, B5, 1.0, 86]
+          - [4, 2.0, C6, 1.0, 86]
+          - [4, 3.0, D6, 1.0, 86]
+          - [5, 0.0, D6, 1.0, 86]
+          - [5, 1.0, C6, 1.0, 86]
+          - [5, 2.0, B5, 1.0, 86]
+          - [5, 3.0, A5, 1.0, 86]
+          - [6, 0.0, G5, 1.0, 86]
+          - [6, 1.0, G5, 1.0, 86]
+          - [6, 2.0, A5, 1.0, 86]
+          - [6, 3.0, B5, 1.0, 86]
+          - [7, 0.0, A5, 1.5, 86]
+          - [7, 1.5, G5, 0.5, 86]
+          - [7, 2.0, G5, 2.0, 86]
+          - [8, 0.0, A5, 1.0, 86]
+          - [8, 1.0, A5, 1.0, 86]
+          - [8, 2.0, B5, 1.0, 86]
+          - [8, 3.0, G5, 1.0, 86]
+          - [9, 0.0, A5, 1.0, 86]
+          - [9, 1.0, B5, 0.5, 86]
+          - [9, 1.5, C6, 0.5, 86]
+          - [9, 2.0, B5, 1.0, 86]
+          - [9, 3.0, G5, 1.0, 86]
+          - [10, 0.0, A5, 1.0, 86]
+          - [10, 1.0, B5, 0.5, 86]
+          - [10, 1.5, C6, 0.5, 86]
+          - [10, 2.0, B5, 1.0, 86]
+          - [10, 3.0, A5, 1.0, 86]
+          - [11, 0.0, G5, 1.0, 86]
+          - [11, 1.0, A5, 1.0, 86]
+          - [11, 2.0, D6, 2.0, 86]
+          - [12, 0.0, B5, 1.0, 86]
+          - [12, 1.0, B5, 1.0, 86]
+          - [12, 2.0, C6, 1.0, 86]
+          - [12, 3.0, D6, 1.0, 86]
+          - [13, 0.0, D6, 1.0, 86]
+          - [13, 1.0, C6, 1.0, 86]
+          - [13, 2.0, B5, 1.0, 86]
+          - [13, 3.0, A5, 1.0, 86]
+          - [14, 0.0, G5, 1.0, 86]
+          - [14, 1.0, G5, 1.0, 86]
+          - [14, 2.0, A5, 1.0, 86]
+          - [14, 3.0, B5, 1.0, 86]
+          - [15, 0.0, A5, 1.5, 86]
+          - [15, 1.5, G5, 0.5, 86]
+          - [15, 2.0, G5, 2.0, 86]

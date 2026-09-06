@@ -1,0 +1,586 @@
+schema: ambition.musicir.v1
+id: crooked_ascent_boss
+title: Crooked Ascent - Klezmer/Bartok Boss Battle
+seed: 33170522
+notes: >-
+  Adaptive boss-battle cue in 5/4, A Phrygian Dominant (A Bb C# D E F G).
+  Foreground is woodwinds in dialogue: clarinet calls, oboe answers, with
+  bassoon and contrabass-clarinet-style low reeds doubling the bass. The
+  augmented-2nd interval (Bb to C#) is the distinctive melodic gesture.
+  Strings are NOT melodic lead — they carry a tremolo'd drone and stabbing
+  chord accents. Percussion is tribal: hand drums (low/mid toms) on a 3+2
+  grouping, no 4-on-the-floor. Brass enters as massive chord stabs and a
+  closing fanfare. Harp glissando-style arpeggios sit on top of climax.
+
+tempo:
+  bpm: 152
+meter:
+  beats_per_bar: 5
+  beat_unit: 4
+
+
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.045
+  reverb_decay_seconds: 1.30
+  reverb_damping_hz: 6200
+  stereo_width: 0.05
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.92
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 35
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.50
+  reverb_damping_hz: 6200
+  stereo_width: 0.030
+  limiter_drive: 0.90
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  # Strings: drone + chord stabs only. Pulled back from the foreground.
+  - {name: violins,    group: strings,    program: tremolo_strings,   volume: 86, pan: 78, expression: 90, modulation: 16}
+  - {name: violas,     group: strings,    program: viola,             volume: 80, pan: 50, expression: 86, modulation: 8}
+  - {name: celli,      group: strings,    program: cello,             volume: 86, pan: 36, expression: 90, modulation: 6}
+  - {name: contrabass, group: strings,    program: contrabass,        volume: 84, pan: 30, expression: 88}
+
+  # Winds: the lead voice. Clarinet + oboe in call-and-response, bassoon below.
+  - {name: clarinet,   group: winds,      program: clarinet,          volume: 96, pan: 60, expression: 100, modulation: 8}
+  - {name: oboe,       group: winds,      program: oboe,              volume: 94, pan: 80, expression: 100, modulation: 7}
+  - {name: english_horn, group: winds,    program: english_horn,      volume: 88, pan: 70, expression: 92,  modulation: 5}
+  - {name: bassoon,    group: winds,      program: bassoon,           volume: 84, pan: 38, expression: 90,  modulation: 4}
+  - {name: piccolo,    group: winds,      program: piccolo,           volume: 80, pan: 88, expression: 88}
+
+  # Brass: stabs and a closing fanfare. Heavier on low brass.
+  - {name: horns,      group: brass,      program: french_horn,       volume: 80, pan: 68, expression: 88, modulation: 3}
+  - {name: trombones,  group: brass,      program: trombone,          volume: 82, pan: 44, expression: 90, modulation: 3}
+  - {name: tuba,       group: brass,      program: tuba,              volume: 78, pan: 32, expression: 86}
+
+  # Choir: thin male wash for dread.
+  - {name: voice_oohs, group: choir_pad,  program: voice_oohs,        volume: 60, pan: 64, expression: 78, modulation: 4}
+  - {name: pad_dark,   group: choir_pad,  program: pad_metallic,      volume: 50, pan: 64, expression: 70, modulation: 3}
+
+  # Mallets: harp arpeggios + a single celesta sparkle for color.
+  - {name: harp,       group: mallets,    program: orchestral_harp,   volume: 76, pan: 56, expression: 86, modulation: 0}
+  - {name: celesta,    group: mallets,    program: celesta,           volume: 64, pan: 76, expression: 80}
+
+  # Percussion: tribal hand-drum kit + timpani.
+  - {name: timpani,    group: percussion, program: timpani,           volume: 88, pan: 50, expression: 96}
+  - {name: kit,        group: percussion, is_drum: true,              volume: 100, pan: 64, expression: 108}
+
+motifs:
+  # Clarinet "call" — descends through the augmented-2nd interval (Bb -> C#)
+  # with a chromatic tail. Total 5 beats fits a 5/4 bar exactly.
+  # A4 Bb4 C#5 Bb4 A4 G4 A4
+  - id: clarinet_call
+    root: A4
+    intervals: [0, 1, 4, 1, 0, -2, 0]
+    rhythm:    [0.5, 0.5, 0.75, 0.5, 0.5, 0.5, 1.75]
+    velocities: [0.92, 0.86, 1.00, 0.96, 0.94, 0.88, 0.74]
+
+  # Oboe "answer" — ascends to the b6 (F) and resolves down through the scale.
+  # A4 F5 E5 D5 F5 A4 (sustained final)
+  - id: oboe_answer
+    root: A4
+    intervals: [0, 8, 7, 5, 8, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 2.5]
+    velocities: [0.84, 1.00, 0.96, 0.92, 0.98, 0.88]
+
+  # Bass figure — 3+2 grouping characteristic of 5/4 (Take Five etc.).
+  # A2 A2 A2 - E2 - (interpreted as: hit beats 1,2,3,4 with accent on 4)
+  - id: bass_lurch
+    root: A2
+    intervals: [0, 0, 0, 7, 0]
+    rhythm:    [1.0, 1.0, 1.0, 1.0, 1.0]
+    velocities: [1.00, 0.74, 0.82, 0.96, 0.78]
+
+  # Brass "war stab" — Phrygian half-step rocking, then leap to b3 (C).
+  # Used only in climax. A3 Bb3 A3 Bb3 C4 (5 beats)
+  - id: brass_stab_motif
+    root: A3
+    intervals: [0, 1, 0, 1, 3]
+    rhythm:    [1.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.98, 0.92, 0.94, 1.00, 1.00]
+
+  # Climax wail — high oboe / piccolo soaring countermelody, harmonic minor
+  # raised seventh emphasized.
+  # E5 F5 G#5 A5 G#5 F5 E5 D5
+  - id: high_wail
+    root: E5
+    intervals: [0, 1, 4, 5, 4, 1, 0, -2]
+    rhythm:    [0.75, 0.25, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.96, 0.86, 1.00, 1.00, 0.94, 0.92, 0.88, 0.78]
+
+  # English-horn / bassoon countermelody for the bridge — slow weeping figure
+  # focused on the augmented 2nd Bb -> C#.
+  - id: lament_aug2
+    root: A4
+    intervals: [0, 1, 4, 1, -1, -3, -4, -5]
+    rhythm:    [1.5, 1.0, 1.5, 0.5, 0.5, 0.5, 0.5, 4.0]
+    velocities: [0.86, 0.84, 0.92, 0.84, 0.80, 0.82, 0.78, 0.70]
+
+layer_templates:
+  # Section-wide expression ramp. Pulls dynamics up across the section.
+  expression_swell:
+    kind: automation
+    automation:
+      - {group: winds,     cc: expression, from: 70, to: 110, curve: smooth, points: 12}
+      - {group: strings,   cc: expression, from: 60, to: 96,  curve: smooth, points: 12}
+      - {group: brass,     cc: expression, from: 50, to: 100, curve: smooth, points: 12}
+      - {group: choir_pad, cc: expression, from: 40, to: 80,  curve: smooth, points: 8}
+
+  # Tremolo violin drone on the tonic (uses the GM tremolo-strings preset
+  # so we get genuine tremolo sample articulation, not a sustained note).
+  violin_drone:
+    kind: pedal
+    instrument: violins
+    octave: 5
+    velocity: 70
+    articulation: pad
+
+  # Sustained dark string pad below the drone (violas + celli + contrabass).
+  low_string_pad:
+    kind: pad_chords
+    instruments: [violas, celli, contrabass]
+    instrument_octave_offsets: {violas: 0, celli: -1, contrabass: -2}
+    instrument_velocity_offsets: {violas: -4, celli: 0, contrabass: -8}
+    octave: 3
+    duration_beats: 5.0
+    velocity: 64
+    articulation: legato
+    voicing: open
+    humanize_ms: 6
+    humanize_velocity_pct: 3
+
+  # Chord stabs in the strings on phrase boundaries (every 4 bars).
+  string_stab:
+    kind: chord_hits
+    instruments: [violins, violas, celli]
+    instrument_octave_offsets: {violins: 1, violas: 0, celli: -1}
+    octave: 3
+    velocity: 80
+    duration_beats: 1.5
+    articulation: marcato
+    voicing: closed
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Bass lurch — the 3+2 5/4 ostinato played by contrabass + bassoon.
+  bass_lurch_voice:
+    kind: motif
+    instruments: [contrabass, bassoon]
+    motif: bass_lurch
+    velocity: 78
+    articulation: marcato
+    instrument_octave_offsets: {contrabass: 0, bassoon: 1}
+    instrument_velocity_offsets: {contrabass: 0, bassoon: -10}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 16
+    every_bars: 1
+
+  # Clarinet call template (foreground).
+  clarinet_voice:
+    kind: motif
+    instrument: clarinet
+    motif: clarinet_call
+    velocity: 90
+    articulation: legato
+    instrument_pitch_scoop_cents: {clarinet: 8.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Oboe answer (foreground).
+  oboe_voice:
+    kind: motif
+    instrument: oboe
+    motif: oboe_answer
+    velocity: 88
+    articulation: legato
+    instrument_pitch_scoop_cents: {oboe: 6.0}
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # English horn + bassoon lament (bridge).
+  reed_lament:
+    kind: motif
+    instruments: [english_horn, bassoon]
+    motif: lament_aug2
+    velocity: 80
+    articulation: legato
+    instrument_octave_offsets: {english_horn: 0, bassoon: -1}
+    instrument_velocity_offsets: {english_horn: 0, bassoon: -8}
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+
+  # Soaring climax wail (oboe + piccolo two octaves apart).
+  climax_wail:
+    kind: motif
+    instruments: [oboe, piccolo]
+    motif: high_wail
+    velocity: 92
+    articulation: tenuto
+    instrument_octave_offsets: {oboe: 0, piccolo: 1}
+    instrument_velocity_offsets: {oboe: 0, piccolo: -8}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Brass war-stab.
+  brass_war_stab:
+    kind: motif
+    instruments: [horns, trombones]
+    motif: brass_stab_motif
+    velocity: 86
+    articulation: marcato
+    instrument_octave_offsets: {horns: 0, trombones: -1}
+    instrument_velocity_offsets: {horns: 0, trombones: -4}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  # Tuba pedal for climax (chord root, sustained).
+  tuba_pedal:
+    kind: pedal
+    instrument: tuba
+    octave: 1
+    velocity: 64
+
+  # Timpani — accents on the 3+2 boundary points.
+  timpani_accent:
+    kind: root_hits
+    instrument: timpani
+    octave: 2
+    velocity: 84
+    articulation: marcato
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  # Tribal kit — hand-drum feel using low/mid toms instead of kick + snare.
+  # 3+2 grouping: hits land on beats 1, 3, 4 of the 5/4 bar.
+  drums_tribal_light:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: low_tom,  beats: [0.0],      velocity: 64}
+      - {drum: mid_tom,  beats: [2.0],      velocity: 50}
+      - {drum: low_tom,  beats: [3.0],      velocity: 60}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5, 4.5], velocity: 26}
+
+  drums_tribal_heavy:
+    kind: drums
+    instrument: kit
+    humanize_ms: 1.5
+    humanize_velocity_pct: 3
+    events:
+      - {drum: concert_bass_drum, beats: [0.0],      velocity: 72}
+      - {drum: low_tom,           beats: [0.5, 2.0, 3.0, 4.5], velocity: 56}
+      - {drum: mid_tom,           beats: [1.0, 3.5], velocity: 50}
+      - {drum: floor_tom,         beats: [3.0],      velocity: 64}
+      - {drum: tambourine,        beats: [0.5, 1.5, 2.5, 3.5, 4.5], velocity: 36}
+      - {drum: crash,             beat: 0.0, velocity: 80, bars: [0, 4]}
+
+  # Harp arpeggio (climax) — sweeping flourish using pattern indices over
+  # whatever chord the bar is on. Step 0.5 = 10 plucks per 5/4 bar.
+  harp_sweep:
+    kind: arpeggio
+    instrument: harp
+    octave: 4
+    pattern: [0, 1, 2, 3, 2, 1]
+    step: 0.25
+    duration_beats: 0.20
+    velocity: 60
+    density: 0.85
+    voicing: open
+    articulation: pluck
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+
+  # Celesta high tone — single ringing pitch on phrase tops.
+  celesta_chime:
+    kind: chord_hits
+    instrument: celesta
+    octave: 6
+    velocity: 70
+    duration_beats: 4.0
+    articulation: bell
+    voicing: closed
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Voice "oohs" wash — sparse and dread-y.
+  voice_wash:
+    kind: pad_chords
+    instrument: voice_oohs
+    octave: 4
+    every_bars: 4
+    duration_beats: 20.0   # 4 bars * 5 beats/bar
+    velocity: 50
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  # Metallic pad layer — adds dread / sci-fi atmospherics.
+  metallic_pad:
+    kind: pad_chords
+    instrument: pad_dark
+    octave: 3
+    every_bars: 4
+    duration_beats: 20.0
+    velocity: 38
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+playback:
+  mode: section_stem_matrix
+  intro: intro
+  loop_components: [verse, chorus, bridge, climax]
+  outro: outro
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 2
+    bridge_stems: [winds, choir_pad]
+    fade_stems: [strings, brass, percussion, mallets]
+
+state_map:
+  starting: {section: intro}
+
+  encounter_low:
+    preferred_section: verse
+    stems: {winds: 1.0, strings: 0.5, mallets: 0.20, percussion: 0.55, brass: 0.05, choir_pad: 0.30}
+
+  encounter_mid:
+    preferred_section: chorus
+    stems: {winds: 1.0, strings: 0.85, mallets: 0.35, percussion: 0.85, brass: 0.55, choir_pad: 0.40}
+
+  encounter_breakdown:
+    preferred_section: bridge
+    stems: {winds: 1.0, strings: 0.55, mallets: 0.15, percussion: 0.20, brass: 0.10, choir_pad: 0.55}
+
+  encounter_high:
+    preferred_section: climax
+    stems: {winds: 1.0, strings: 1.0, mallets: 0.65, percussion: 1.00, brass: 0.95, choir_pad: 0.50}
+
+  defeated:
+    transition: outro_at_next_valid_exit_bar
+    outro: outro
+
+sections:
+  - id: intro
+    kind: intro
+    label: ritual approach - drone and lone clarinet
+    bars: 4
+    intensity: 0.45
+    density: 0.30
+    loopable: false
+    harmony: ["A", "Bb", "F", "A"]
+    # Intimate ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.30
+    layers:
+      - expression_swell
+      # Sustained tonic drone (tremolo violins on E5 — the dominant, hovering).
+      - kind: pedal
+        instrument: violins
+        octave: 5
+        note: E5
+        velocity: 60
+      # Low contrabass-bassoon doubled drone on tonic.
+      - kind: pedal
+        instrument: contrabass
+        octave: 2
+        note: A2
+        velocity: 60
+      - kind: pedal
+        instrument: bassoon
+        octave: 3
+        note: A3
+        velocity: 50
+      # Single clarinet call on bar 1 (after one bar of drone).
+      - {template: clarinet_voice, starts: [[1, 0.0], [3, 0.0]], velocity: 76}
+      # Distant timpani heartbeat.
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: low_tom, beat: 0.0, velocity: 40, bars: [0, 2]}
+          - {drum: low_tom, beat: 0.0, velocity: 56, bars: [3]}
+          - {drum: mid_tom, beat: 3.0, velocity: 44, bars: [3]}
+      # Voice wash, very low.
+      - {template: voice_wash, velocity: 32}
+      - {template: metallic_pad, velocity: 26}
+
+  - id: verse
+    kind: loop_component
+    label: pursuit verse - clarinet/oboe dialogue, tribal pulse
+    bars: 8
+    intensity: 0.62
+    density: 0.50
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "Bb", "F", "A", "Dm", "Bb", "A", "A"]
+    layers:
+      - {template: clarinet_voice, starts: [[0, 0.0], [4, 0.0]], velocity: 86}
+      - {template: oboe_voice,     starts: [[2, 0.0], [6, 0.0]], velocity: 80}
+      - {template: bass_lurch_voice, repeats: 8, velocity: 72}
+      - {template: low_string_pad, velocity: 56}
+      - drums_tribal_light
+      - {template: voice_wash, velocity: 38}
+      - {template: metallic_pad, velocity: 30}
+
+  - id: chorus
+    kind: loop_component
+    label: pursuit chorus - winds full, strings stabbing, drums building
+    bars: 8
+    intensity: 0.78
+    density: 0.62
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    reinforcement_bar: 4
+    harmony: ["A", "Bb", "Dm", "A", "F", "Bb", "Em", "A"]
+    layers:
+      - {template: clarinet_voice, starts: [[0, 0.0], [4, 0.0]], velocity: 92}
+      - {template: oboe_voice,     starts: [[2, 0.0], [6, 0.0]], velocity: 88}
+      - {template: bass_lurch_voice, repeats: 8, velocity: 80}
+      - {template: low_string_pad, velocity: 64}
+      - {template: violin_drone, velocity: 64}
+      - {template: string_stab, hits: [[0, 0.0], [4, 0.0]], velocity: 78}
+      - {template: timpani_accent, hits: [[0, 0.0, 0, 0.5], [3, 3.0, 0, 0.4], [4, 0.0, 0, 0.5]], velocity: 80}
+      - drums_tribal_heavy
+      - {template: voice_wash, velocity: 48}
+      - {template: metallic_pad, velocity: 34}
+
+  - id: bridge
+    kind: loop_component
+    label: bridge - reed lament, pulled-back textural
+    bars: 8
+    intensity: 0.58
+    density: 0.42
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["Dm", "F", "Bb", "A", "Dm", "Gm", "F", "A"]
+    # Drier, more intimate ambience for the bridge.
+    postprocess:
+      reverb_wet: 0.025
+      reverb_decay_seconds: 0.70
+    layers:
+      - {template: reed_lament, starts: [[0, 0.0], [4, 0.0]], velocity: 84}
+      - {template: low_string_pad, velocity: 60}
+      - {template: violin_drone, velocity: 56}
+      - {template: harp_sweep, density: 0.5, velocity: 46}
+      # Sparse hand-drum heartbeat (no closed hat = more spacious).
+      - kind: drums
+        instrument: kit
+        humanize_ms: 1
+        events:
+          - {drum: low_tom, beat: 0.0, velocity: 56}
+          - {drum: mid_tom, beat: 3.0, velocity: 46, probability: 0.7}
+      - {template: voice_wash, velocity: 56}
+      - {template: metallic_pad, velocity: 40}
+
+  - id: climax
+    kind: loop_component
+    label: climax - full ensemble, brass stabs, oboe + piccolo wail
+    bars: 8
+    intensity: 0.94
+    density: 0.80
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "Bb", "F", "A", "Dm", "Bb", "Edim", "A"]
+    # Cathedral ambience for the section.
+    postprocess:
+      reverb_wet: 0.075
+      reverb_decay_seconds: 1.40
+    layers:
+      - {template: clarinet_voice, starts: [[0, 0.0], [4, 0.0]], velocity: 96}
+      - {template: oboe_voice,     starts: [[2, 0.0], [6, 0.0]], velocity: 92}
+      - {template: climax_wail,    starts: [[0, 0.0], [4, 0.0]], velocity: 92}
+      - {template: bass_lurch_voice, repeats: 8, velocity: 88}
+      - {template: low_string_pad, velocity: 70}
+      - {template: violin_drone, velocity: 72}
+      - {template: brass_war_stab, starts: [[1, 0.0], [3, 0.0], [5, 0.0], [7, 0.0]], velocity: 88}
+      - {template: tuba_pedal, velocity: 70}
+      - {template: timpani_accent, hits: [[0, 0.0, 0, 0.5], [2, 0.0, 0, 0.4], [4, 0.0, 0, 0.5], [6, 0.0, 0, 0.4]], velocity: 86}
+      - drums_tribal_heavy
+      - {template: harp_sweep, density: 0.92, velocity: 64}
+      - {template: celesta_chime, hits: [[0, 0.0], [4, 0.0]], velocity: 74}
+      - {template: voice_wash, velocity: 60}
+      - {template: metallic_pad, velocity: 42}
+
+  - id: outro
+    kind: outro
+    label: closing sigil - phrygian cadence to tonic
+    bars: 4
+    intensity: 0.55
+    density: 0.42
+    loopable: false
+    harmony: ["A", "Bb", "A", "A"]
+    layers:
+      # Final clarinet call, slower.
+      - {template: clarinet_voice, starts: [[0, 0.0]], velocity: 80}
+      - {template: low_string_pad, velocity: 64}
+      - {template: violin_drone, velocity: 56}
+      - kind: pedal
+        instrument: bassoon
+        octave: 3
+        note: A3
+        velocity: 56
+      # Final tutti stinger on bar 3.
+      - kind: drums
+        instrument: kit
+        humanize_ms: 0
+        events:
+          - {drum: concert_bass_drum, beat: 0.0, velocity: 80, bars: [3]}
+          - {drum: floor_tom, beat: 0.0, velocity: 70, bars: [3]}
+          - {drum: crash, beat: 0.0, velocity: 84, bars: [3]}
+      - kind: root_hits
+        instrument: timpani
+        octave: 2
+        velocity: 86
+        articulation: marcato
+        hits: [[3, 0.0, 0, 1.0]]
+      - kind: chord_hits
+        instrument: celesta
+        octave: 6
+        velocity: 70
+        duration_beats: 4.0
+        articulation: bell
+        humanize_ms: 0
+        hits: [[3, 0.0]]
+      - {template: voice_wash, velocity: 56}
+      - {template: metallic_pad, velocity: 38}
+
+group_postprocess:
+  strings:    {gain_db: 0.0,  lowpass_hz: 13000, high_shelf_hz: 5500, high_shelf_db: 0.4, transient_tame: 0.04, reverb_wet: 0.006}
+  winds:      {gain_db: 1.5,  lowpass_hz: 13000, high_shelf_hz: 4800, high_shelf_db: 1.2, presence_low_hz: 1500, presence_high_hz: 5000, presence_db: 1.8, transient_tame: 0.02, reverb_wet: 0.006}
+  brass:      {gain_db: 0.5,  lowpass_hz: 11000, high_shelf_hz: 5200, high_shelf_db: 0.4, transient_tame: 0.04, reverb_wet: 0.006}
+  mallets:    {gain_db: -2.0, lowpass_hz: 11000, high_shelf_hz: 5500, high_shelf_db: 0.0, transient_tame: 0.06, reverb_wet: 0.012}
+  percussion: {gain_db: -2.0, lowpass_hz: 10500, high_shelf_hz: 5500, high_shelf_db: -0.2, transient_tame: 0.06, reverb_wet: 0.005}
+  choir_pad:  {gain_db: -4.0, lowpass_hz: 9000,  high_shelf_hz: 5000, high_shelf_db: -0.4, transient_tame: 0.04, reverb_wet: 0.012}

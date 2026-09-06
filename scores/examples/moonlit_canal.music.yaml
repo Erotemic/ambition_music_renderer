@@ -1,0 +1,564 @@
+schema: ambition.musicir.v1
+id: moonlit_canal_nocturne
+title: Moonlit Canal Nocturne - Flexible Non-Battle Demonstration
+seed: 230519
+notes: 'A contrasting cue proving the same renderer can express a calm, harmonically glassy exploration mood: sparse piano,
+  watery mallets, breathy winds, warm pads, no battle drums, and gentle algorithmic sparkles.'
+tempo:
+  bpm: 84
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+# Spec-level voicing constraints — keep chord-pad voicings smooth across
+# section transitions and prevent semitone clusters.
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fast
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+postprocess:
+  highpass_hz: 26
+  lowpass_hz: 9800
+  high_shelf_hz: 3800
+  high_shelf_db: -4.0
+  presence_low_hz: 1900
+  presence_high_hz: 4200
+  presence_db: -1.2
+  reverb_wet: 0.24
+  reverb_decay_seconds: 2.4
+  reverb_damping_hz: 4200
+  post_reverb_high_shelf_hz: 4800
+  post_reverb_high_shelf_db: -1.8
+  stereo_width: 0.12
+  # Master bus compressor — gentle glue (3:1 over -18 dB).
+  compressor_threshold_db: -18.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 100.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 1.03
+  normalize: true
+  target_peak_db: -1.4
+stem_postprocess:
+  highpass_hz: 24
+  reverb_wet: 0.08
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 4200
+  stereo_width: 0.06
+  limiter_drive: 1.0
+  normalize: false
+  target_peak_db: -2.5
+instruments:
+- name: felt_piano
+  group: piano
+  program: acoustic_grand_piano
+  volume: 72
+  pan: 58
+  expression: 78
+- name: celesta
+  group: glimmer
+  program: celesta
+  volume: 51
+  pan: 76
+  expression: 67
+- name: vibraphone
+  group: glimmer
+  program: vibraphone
+  volume: 50
+  pan: 46
+  expression: 63
+- name: harp
+  group: glimmer
+  program: orchestral_harp
+  volume: 51
+  pan: 66
+  expression: 65
+- name: flute
+  group: winds
+  program: flute
+  volume: 65
+  pan: 78
+  expression: 75
+  modulation: 14
+- name: clarinet
+  group: winds
+  program: clarinet
+  volume: 66
+  pan: 48
+  expression: 75
+  modulation: 8
+- name: bassoon
+  group: winds
+  program: bassoon
+  volume: 59
+  pan: 34
+  expression: 71
+- name: warm_strings
+  group: strings
+  program: string_ensemble_2
+  volume: 82
+  pan: 64
+  expression: 78
+  modulation: 14
+- name: cello_solo
+  group: strings
+  program: cello
+  volume: 76
+  pan: 42
+  expression: 82
+  modulation: 8
+- name: halo_pad
+  group: pad
+  program: pad_halo
+  volume: 56
+  pan: 64
+  expression: 70
+  modulation: 20
+- name: rainstick_kit
+  group: texture
+  is_drum: true
+  volume: 64
+  pan: 64
+  expression: 82
+motifs:
+- id: canal_lilt
+  root: F4
+  intervals:
+  - 0
+  - 2
+  - 5
+  - 9
+  - 7
+  - 5
+  rhythm:
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.72
+  - 0.68
+  - 0.76
+  - 0.86
+  - 0.7
+  - 0.82
+- id: distant_answer
+  root: A4
+  intervals:
+  - 0
+  - -2
+  - -5
+  - -7
+  - -5
+  - 0
+  rhythm:
+  - 1.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 0.5
+  - 1.5
+- id: water_drops
+  root: F5
+  intervals:
+  - 0
+  - 7
+  - 14
+  - 9
+  - 5
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 1.5
+layer_templates:
+  nocturne_pad:
+    kind: pad_chords
+    instruments:
+    - warm_strings
+    - halo_pad
+    octave: 3
+    duration_beats: 3
+    velocity: 44
+    articulation: pad
+    voicing: wide
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+    automation:
+    - cc: expression
+      from: 55
+      to: 88
+      curve: smooth
+      points: 10
+  piano_broken_chords:
+    kind: arpeggio
+    instrument: felt_piano
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 1
+    - 3
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.48
+    velocity: 32
+    density: 0.72
+    articulation: normal
+    humanize_ms: 18
+    humanize_velocity_pct: 3
+    events_per_bar: null
+  water_glimmer:
+    kind: texture
+    instruments:
+    - celesta
+    - vibraphone
+    - harp
+    root: F5
+    scale:
+    - 0
+    - 2
+    - 5
+    - 7
+    - 9
+    - 12
+    - 14
+    events_per_bar: 1.2
+    velocity: 32
+    duration_beats: 0.45
+    articulation: bell
+playback:
+  mode: section_stem_matrix
+  intro: mist_intro
+  loop_components:
+  - canal_loop_a
+  - canal_loop_b
+  outro: dawn_tag
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems:
+    - strings
+    - pad
+    - piano
+    fade_stems:
+    - glimmer
+    - winds
+    - texture
+state_map:
+  exploration_start:
+    section: mist_intro
+  calm_loop:
+    preferred_section: canal_loop_a
+    stems:
+      strings: 0.8
+      pad: 0.7
+      piano: 0.65
+      glimmer: 0.45
+      winds: 0.25
+      texture: 0.3
+  discovery:
+    preferred_section: canal_loop_b
+    stems:
+      strings: 0.9
+      pad: 0.8
+      piano: 0.75
+      glimmer: 0.8
+      winds: 0.55
+      texture: 0.35
+  exit:
+    transition: outro_at_next_valid_exit_bar
+    outro: dawn_tag
+sections:
+- id: mist_intro
+  kind: intro
+  label: fog over dark water
+  bars: 8
+  intensity: 0.44
+  density: 0.38
+  loopable: false
+  harmony:
+  - Fm(add9)
+  - Dbmaj7(#11)
+  - Ab/Eb
+  - Ebsus4
+  - Fm(add9)
+  - Bbm9
+  - Dbmaj7
+  - Csus4
+  # Intimate ambience for the section.
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.30
+  layers:
+  - nocturne_pad
+  - kind: pedal
+    instruments:
+    - halo_pad
+    note: F3
+    velocity: 30
+    articulation: pad
+  - kind: motif
+    instrument: flute
+    motif: canal_lilt
+    root: F4
+    starts:
+    - - 2
+      - 0.0
+    velocity: 52
+    articulation: legato
+    humanize_ms: 20
+    humanize_velocity_pct: 3
+  - template: water_glimmer
+    events_per_bar: 0.8
+    velocity: 28
+- id: canal_loop_a
+  kind: loop_component
+  label: quiet current
+  bars: 16
+  intensity: 0.55
+  density: 0.55
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Fm(add9)
+  - Dbmaj7(#11)
+  - Ab/Eb
+  - Ebsus4
+  - Bbm9
+  - Fm/Ab
+  - Gbmaj7
+  - Csus4
+  - Fm(add9)
+  - Abmaj7
+  - Dbmaj7
+  - Eb
+  - Bbm9
+  - Dbmaj7
+  - Csus4
+  - C7b9
+  layers:
+  - nocturne_pad
+  - piano_broken_chords
+  - kind: motif
+    instrument: clarinet
+    motif: canal_lilt
+    roots:
+    - F4
+    - Ab4
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 58
+    articulation: legato
+    humanize_ms: 20
+    humanize_velocity_pct: 3
+  - kind: motif
+    instrument: cello_solo
+    motif: distant_answer
+    roots:
+    - C3
+    - Db3
+    starts:
+    - - 4
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 48
+    articulation: tenuto
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+  - water_glimmer
+  - kind: drums
+    instrument: rainstick_kit
+    events:
+    - drum: shaker
+      beats:
+      - 0.0
+      - 1.5
+      velocity: 22
+      probability: 0.55
+    - drum: triangle
+      beats:
+      - 2.5
+      velocity: 24
+      probability: 0.35
+- id: canal_loop_b
+  kind: loop_component
+  label: moon reflection starts to shimmer
+  bars: 16
+  intensity: 0.72
+  density: 0.72
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  harmony:
+  - Dbmaj7(#11)
+  - Eb
+  - Fm9
+  - Abmaj7
+  - Gbmaj7
+  - Bbm9
+  - C7b9
+  - Fm
+  - Abmaj7
+  - Dbmaj7
+  - Bbm9
+  - Csus4
+  - Fm(add9)
+  - Dbmaj7
+  - Eb
+  - C7b9
+  # Cathedral ambience for the section.
+  postprocess:
+    reverb_wet: 0.075
+    reverb_decay_seconds: 1.40
+  layers:
+  - nocturne_pad
+  - template: piano_broken_chords
+    density: 0.9
+    velocity: 62
+  - kind: motif
+    instrument: flute
+    motif: canal_lilt
+    root: F5
+    starts:
+    - - 0
+      - 0.0
+    - - 8
+      - 0.0
+    velocity: 66
+    articulation: legato
+    transform: up_octave
+    humanize_ms: 18
+    humanize_velocity_pct: 3
+  - kind: motif
+    instrument: clarinet
+    motif: distant_answer
+    root: C4
+    starts:
+    - - 4
+      - 0.0
+    - - 12
+      - 0.0
+    velocity: 56
+    articulation: tenuto
+    humanize_ms: 15
+    humanize_velocity_pct: 3
+  - template: water_glimmer
+    events_per_bar: 2.2
+    velocity: 42
+  - kind: arpeggio
+    instrument: harp
+    octave: 5
+    pattern:
+    - 0
+    - 1
+    - 3
+    - 4
+    - 2
+    - 1
+    step: 0.5
+    duration_beats: 0.5
+    velocity: 46
+    density: 0.7
+    articulation: pluck
+- id: dawn_tag
+  kind: outro
+  label: first light on the canal
+  bars: 8
+  intensity: 0.48
+  density: 0.34
+  loopable: false
+  harmony:
+  - Fm(add9)
+  - Dbmaj7(#11)
+  - Ab/Eb
+  - Bbm9
+  - Dbmaj7
+  - Csus4
+  - Fm(add9)
+  - Fm6/9
+  layers:
+  - template: nocturne_pad
+    automation:
+    - cc: expression
+      from: 88
+      to: 52
+      curve: smooth
+      points: 10
+  - kind: motif
+    instrument: flute
+    motif: canal_lilt
+    root: F4
+    starts:
+    - - 0
+      - 0.0
+    velocity: 50
+    articulation: legato
+    humanize_ms: 22
+    humanize_velocity_pct: 3
+  - kind: motif
+    instrument: felt_piano
+    motif: water_drops
+    root: F5
+    starts:
+    - - 4
+      - 0.0
+    velocity: 42
+    articulation: bell
+    humanize_ms: 15
+    humanize_velocity_pct: 3
+  - template: water_glimmer
+    events_per_bar: 0.7
+    velocity: 24
+group_postprocess:
+  glimmer:
+    gain_db: -7.5
+    lowpass_hz: 5200
+    high_shelf_hz: 3000
+    high_shelf_db: -8.0
+    transient_tame: 0.58
+    reverb_wet: 0.045
+  piano:
+    gain_db: -1.3
+    lowpass_hz: 6500
+    high_shelf_hz: 3600
+    high_shelf_db: -3.4
+    transient_tame: 0.22
+  winds:
+    gain_db: -2.6
+    lowpass_hz: 5600
+    high_shelf_hz: 3400
+    high_shelf_db: -4.6
+    presence_db: -1.0
+  strings:
+    gain_db: -0.6
+    lowpass_hz: 7600
+    high_shelf_hz: 4200
+    high_shelf_db: -2.2
+  pad:
+    gain_db: -0.8
+    lowpass_hz: 6800
+    high_shelf_hz: 4200
+    high_shelf_db: -2.6
+  texture:
+    gain_db: -5.0
+    lowpass_hz: 5000
+    high_shelf_hz: 3000
+    high_shelf_db: -7.0
+    transient_tame: 0.55

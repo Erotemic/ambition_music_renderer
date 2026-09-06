@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: fable
+  title: Fable
+  version_id: 6c06d8a7876e9999:e57167fb95e9
+  render_hash: 6c06d8a7876e9999
+  preview_sha256: e57167fb95e981a8913bf6668621db3ddc1d38fd47ef9ebb35c572b8d27bd7bf
+  preview_path: generated/fable/.versioned/6c06d8a7876e9999/preview/fable_6c06d8a7876e9999.full_soundtrack_preview.ogg
+  manifest_path: generated/fable/.versioned/6c06d8a7876e9999/fable_6c06d8a7876e9999.adaptive_manifest.json
+  manifest_sha256: f1304520ff4951d88e43b535f766e226fa1859c56ca5170994a42f9db79e9b96
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/fable.music.yaml
+  score_sha256_at_review: a6006100ca3342e28eee38709515d12b0c9e667a5cb9d05c9d0975c599a3fb6b
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.2
+  label: Acceptable
+  notes: Kinda peter and the wolf nursery school boring.
+  issues: []
+  furthest_played_seconds: 151.982
+  furthest_played_fraction: 0.8878
+  created_at: '2026-08-16T15:48:50Z'
+  updated_at: '2026-08-16T15:48:58Z'
+  reviewed_at: '2026-08-16T15:48:58Z'
+history: []

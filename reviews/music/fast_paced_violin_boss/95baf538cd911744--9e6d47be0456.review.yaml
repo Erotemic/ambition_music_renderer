@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: fast_paced_violin_boss
+  title: Fast-Paced Violin Boss r2 (Sonatina strings, remaster)
+  version_id: 95baf538cd911744:9e6d47be0456
+  render_hash: 95baf538cd911744
+  preview_sha256: 9e6d47be0456389cc4149a1c3d5d303deb28f093c25ba2952feea85a4fa9a925
+  preview_path: generated/fast_paced_violin_boss/.versioned/95baf538cd911744/preview/fast_paced_violin_boss_95baf538cd911744.full_soundtrack_preview.ogg
+  manifest_path: generated/fast_paced_violin_boss/.versioned/95baf538cd911744/fast_paced_violin_boss_95baf538cd911744.adaptive_manifest.json
+  manifest_sha256: 47bcd6d448739a0e515a938082a495f548093458218b8e58ab5f94da59dbe569
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/fast_paced_violin_boss.music.yaml
+  score_sha256_at_review: 50bca504a736d90d5e41bfc425a5246bc3d58b3af99ed247298a1fbc845fa43d
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.5
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 76.363
+  furthest_played_fraction: 1.0
+  created_at: '2026-08-16T15:49:44Z'
+  updated_at: '2026-08-16T15:49:44Z'
+  reviewed_at: '2026-08-16T15:49:44Z'
+history: []

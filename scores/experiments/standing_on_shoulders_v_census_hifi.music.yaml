@@ -1,0 +1,1253 @@
+schema: ambition.musicir.v1
+id: standing_on_shoulders_v_census_hifi
+title: "Standing on Shoulders \u2014 V Census Hi-Fi"
+seed: 2026051802
+notes: "GNU-ton boss battle. Scholar on a giant wildebeest \u2014 heavy progressive rock at 88 BPM in E minor. Two voices\
+  \ compete: a slow stomping foundation (the giant \u2014 heavy bass, massive kick, low guitar riff) and a quick recursive\
+  \ harpsichord/organ figure (the scholar \u2014 ascending E minor scale that returns to its root, just like GNU is Not Unix).\
+  \ Brass hits for pomposity. Structure is intentionally self-similar: the scholar motif recurs at every section start, just\
+  \ like a recursive function. Total: 44 bars \u2248 90 seconds.\n\nV census hi-fi pass: preserve U's composition fixes and\
+  \ A's defining brass phrase; restore a sustained A-like string bed with safer per-bar power voicings; shorten only the scholar's\
+  \ F# passing-tone sustain; use census/smoke-validated sampled timbres where the song's actual pitch range is covered. The\
+  \ deep giant impact chords and high scholar harpsichord remain GM because available sampled replacements do not cover their\
+  \ authored ranges without folding/dropping notes."
+tempo:
+  bpm: 88
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  adaptive_section_mastering:
+    mode: global_master_slices
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 38
+  reverb_wet: 0.055
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 5200
+  stereo_width: 0.085
+  compressor_threshold_db: -17.0
+  compressor_ratio: 4.5
+  compressor_attack_ms: 11.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 3.2
+  compressor_knee_db: 6.0
+  limiter_drive: 0.91
+  normalize: true
+  target_peak_db: -2.6
+group_postprocess:
+  scholar:
+    gain_db: 3.0
+    highpass_hz: 125
+    lowpass_hz: 10500
+    high_shelf_hz: 4800
+    high_shelf_db: -0.5
+    transient_tame: 0.02
+    reverb_wet: 0.012
+  giant:
+    gain_db: -0.7
+    highpass_hz: 65
+    lowpass_hz: 10800
+    high_shelf_hz: 4800
+    high_shelf_db: -0.6
+    transient_tame: 0.02
+    reverb_wet: 0.004
+    eq_bands:
+    - type: peak
+      hz: 260
+      q: 0.9
+      db: -1.0
+  giant_lead:
+    gain_db: 0.0
+    highpass_hz: 90
+    lowpass_hz: 9800
+    reverb_wet: 0.006
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.0
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 90.0
+    effect_chain:
+    - kind: pedalboard
+      label: emily-lead-pre
+      effects:
+      - effect: gain
+        gain_db: 12.0
+      - effect: compressor
+        threshold_db: -24.0
+        ratio: 2.4
+        attack_ms: 8.0
+        release_ms: 110.0
+    - kind: lv2proc
+      label: guitarix-ts9
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.52
+      params:
+        fslider0_: -4.0
+        fslider1_: 680.0
+        fslider2_: 0.68
+        BYPASS: 1.0
+      binary: lv2apply
+    - kind: lv2proc
+      label: guitarix-jcm800-lead
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+      required: true
+      wet_mix: 0.58
+      params:
+        P6v: 0.74
+        Middle: 0.68
+        Bass: 0.48
+        Treble: 0.6
+        WET_DRY: 60.0
+        GAIN: -2.0
+      binary: lv2apply
+    - kind: pedalboard
+      label: emily-lead-post
+      effects:
+      - effect: gain
+        gain_db: 1.0
+  bass:
+    gain_db: 1.0
+    highpass_hz: 30
+    lowpass_hz: 5200
+    reverb_wet: 0.001
+    compressor_threshold_db: -24.0
+    compressor_ratio: 2.4
+    compressor_attack_ms: 18.0
+    compressor_release_ms: 105.0
+    compressor_makeup_db: 1.2
+    eq_bands:
+    - type: low_shelf
+      hz: 90
+      q: 0.8
+      db: 0.8
+    - type: peak
+      hz: 240
+      q: 0.9
+      db: -1.0
+  brass:
+    gain_db: 3.0
+    highpass_hz: 110
+    lowpass_hz: 10800
+    high_shelf_hz: 5600
+    high_shelf_db: -0.3
+    transient_tame: 0.02
+    reverb_wet: 0.012
+  strings:
+    gain_db: -0.8
+    highpass_hz: 70
+    lowpass_hz: 11000
+    high_shelf_hz: 5600
+    high_shelf_db: -0.3
+    reverb_wet: 0.022
+    stereo_width: 0.08
+  drums:
+    gain_db: -1.8
+    highpass_hz: 32
+    lowpass_hz: 12500
+    high_shelf_hz: 6200
+    high_shelf_db: -0.4
+    transient_tame: 0.015
+    reverb_wet: 0.003
+  giant_riff:
+    gain_db: -1.0
+    highpass_hz: 70
+    lowpass_hz: 10200
+    reverb_wet: 0.003
+    compressor_threshold_db: -22.0
+    compressor_ratio: 2.1
+    compressor_attack_ms: 8.0
+    compressor_release_ms: 90.0
+    eq_bands:
+    - type: peak
+      hz: 260
+      q: 0.9
+      db: -1.2
+    - type: peak
+      hz: 3200
+      q: 1.0
+      db: 0.7
+    effect_chain:
+    - kind: pedalboard
+      label: giant-riff-pre
+      effects:
+      - effect: gain
+        gain_db: 8.0
+      - effect: compressor
+        threshold_db: -23.0
+        ratio: 2.2
+        attack_ms: 8.0
+        release_ms: 95.0
+    - kind: lv2proc
+      label: guitarix-ts9
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.48
+      params:
+        fslider0_: -5.0
+        fslider1_: 640.0
+        fslider2_: 0.62
+        BYPASS: 1.0
+      binary: lv2apply
+    - kind: lv2proc
+      label: guitarix-jcm800-riff
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+      required: true
+      wet_mix: 0.52
+      params:
+        P6v: 0.68
+        Middle: 0.64
+        Bass: 0.52
+        Treble: 0.58
+        WET_DRY: 58.0
+        GAIN: -3.0
+      binary: lv2apply
+    - kind: pedalboard
+      label: giant-riff-post
+      effects:
+      - effect: gain
+        gain_db: -5.0
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 36
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 5800
+  stereo_width: 0.04
+  limiter_drive: 0.88
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: organ_scholar
+  group: scholar
+  program: drawbar_organ
+  volume: 84
+  pan: 68
+  expression: 96
+  modulation: 5
+  chorus: 10
+  reverb: 22
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Sonatina Symphonic Orchestra/Organ/Organ All Stops.sfz'
+    prefer:
+    - sonatina
+    - organ
+    - all_stops
+    settings:
+      fold_to_range: false
+- name: harpsichord_voice
+  group: scholar
+  program: harpsichord
+  volume: 70
+  pan: 78
+  expression: 88
+  reverb: 18
+- name: heavy_distortion
+  group: giant
+  program: distortion_guitar
+  volume: 112
+  pan: 42
+  expression: 114
+  chorus: 5
+- name: low_guitar
+  group: giant
+  program: overdrive_guitar
+  volume: 94
+  pan: 56
+  expression: 102
+  chorus: 4
+- name: giant_riff_shiny_five
+  group: giant_riff
+  program: clean_guitar
+  volume: 98
+  pan: 34
+  expression: 108
+  controls:
+    100: 64
+    107: 114
+  mix_gain_db: -2.0
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_five.sfz'
+    prefer:
+    - shinyguitar
+    - electric_five
+    settings:
+      fold_to_range: false
+- name: giant_riff_shiny_four
+  group: giant_riff
+  program: clean_guitar
+  volume: 96
+  pan: 94
+  expression: 106
+  controls:
+    100: 64
+    107: 88
+  mix_gain_db: -2.5
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_four.sfz'
+    prefer:
+    - shinyguitar
+    - electric_four
+    settings:
+      fold_to_range: false
+- name: giant_lead_emily
+  group: giant_lead
+  program: clean_guitar
+  volume: 94
+  pan: 68
+  expression: 108
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
+    prefer:
+    - emily
+    - basic
+    - single_note
+    settings:
+      fold_to_range: false
+  mix_gain_db: 2.0
+- name: giant_bass
+  group: bass
+  program: fingered_bass
+  volume: 110
+  pan: 50
+  expression: 112
+  mix_gain_db: 6.0
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.swag
+    prefer:
+    - swag
+    - bass
+    settings:
+      fold_to_range: false
+- name: synth_low
+  group: bass
+  program: synth_bass_2
+  volume: 88
+  pan: 46
+  expression: 98
+- name: brass_pompous
+  group: brass
+  program: brass_section
+  volume: 90
+  pan: 64
+  expression: 98
+  reverb: 14
+  mix_gain_db: 6.7
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Sonatina Symphonic Orchestra/Brass - Performance/All Brass Marcato.sfz'
+    prefer:
+    - sonatina
+    - brass
+    - marcato
+    settings:
+      fold_to_range: false
+- name: brass_final_accent
+  group: brass
+  program: brass_section
+  volume: 90
+  pan: 64
+  expression: 98
+  reverb: 12
+  mix_gain_db: 5.0
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Virtual-Playing-Orchestra3/Brass/all-brass-SEC-accent-panned.sfz'
+    prefer:
+    - vpo
+    - all_brass
+    - accent
+    - panned
+    settings:
+      fold_to_range: false
+- name: strings_academic
+  group: strings
+  program: string_ensemble_1
+  volume: 68
+  pan: 64
+  expression: 84
+  modulation: 6
+  reverb: 24
+  mix_gain_db: 10.5
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.strings
+    prefer:
+    - all_strings
+    - section
+    - sustain
+    - panned
+    settings:
+      fold_to_range: false
+- name: stomp_kit
+  group: drums
+  is_drum: true
+  volume: 124
+  pan: 64
+  expression: 120
+  mix_gain_db: 0.0
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer:
+    - muldjord
+    - stereo
+    - kit
+motifs:
+- id: scholar_recursive
+  root: E4
+  intervals:
+  - 0
+  - 2
+  - 3
+  - 5
+  - 7
+  - 10
+  - 12
+  - 10
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  - 2
+  - 3
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.88
+  - 0.78
+  - 0.82
+  - 0.86
+  - 0.9
+  - 0.94
+  - 1.0
+  - 0.9
+  - 0.86
+  - 0.8
+  - 0.78
+  - 0.8
+  - 0.84
+  - 0.88
+  - 0.9
+  - 0.78
+  durations:
+  - 0.25
+  - 0.1
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.1
+  - 0.25
+  - 0.1
+  - 0.5
+  - 2.0
+- id: scholar_recursive_grounded
+  root: E4
+  intervals:
+  - 0
+  - 2
+  - 3
+  - 5
+  - 7
+  - 10
+  - 12
+  - 10
+  - 7
+  - 5
+  - 3
+  - 2
+  - 0
+  - -2
+  - 3
+  - 0
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 1.5
+  - 2.0
+  durations:
+  - 0.25
+  - 0.1
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.25
+  - 0.25
+  - 0.1
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.88
+  - 0.78
+  - 0.82
+  - 0.86
+  - 0.9
+  - 0.94
+  - 1.0
+  - 0.9
+  - 0.86
+  - 0.8
+  - 0.78
+  - 0.8
+  - 0.84
+  - 0.88
+  - 0.9
+  - 0.78
+- id: scholar_quip
+  root: E5
+  intervals:
+  - 0
+  - 3
+  - 5
+  - 7
+  - 5
+  - 3
+  - 0
+  - 3
+  rhythm:
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.25
+  - 0.5
+  - 0.5
+  - 1.5
+  velocities:
+  - 0.9
+  - 0.8
+  - 0.86
+  - 0.96
+  - 0.86
+  - 0.8
+  - 0.84
+  - 0.72
+- id: brass_declaration
+  root: E4
+  intervals:
+  - 0
+  - 0
+  - 7
+  - 5
+  - 3
+  - 0
+  - 12
+  - 7
+  rhythm:
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 3.0
+  velocities:
+  - 0.9
+  - 0.88
+  - 1.0
+  - 0.92
+  - 0.86
+  - 0.9
+  - 1.0
+  - 0.82
+- id: giant_tread_lead
+  root: B3
+  intervals:
+  - 0
+  - -2
+  - -4
+  - -7
+  rhythm:
+  - 1.5
+  - 1.0
+  - 1.0
+  - 0.5
+  durations:
+  - 1.25
+  - 0.4
+  - 0.4
+  - 0.4
+  velocities:
+  - 1.0
+  - 0.84
+  - 0.96
+  - 0.8
+- id: final_charge
+  root: E4
+  intervals:
+  - 0
+  - 3
+  - 7
+  - 10
+  - 12
+  - 15
+  - 12
+  - 10
+  - 7
+  - 5
+  - 3
+  - 0
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 1.0
+  velocities:
+  - 0.86
+  - 0.9
+  - 0.94
+  - 0.98
+  - 1.0
+  - 1.0
+  - 0.92
+  - 0.88
+  - 0.86
+  - 0.84
+  - 0.9
+  - 0.96
+layer_templates:
+  stomp_beat:
+    kind: drums
+    instrument: stomp_kit
+    humanize_ms: 3.0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 122
+      duration_beats: 0.14
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 118
+      duration_beats: 0.14
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      velocity: 64
+      duration_beats: 0.07
+    - drum: crash
+      beat: 0.0
+      every: 4
+      velocity: 108
+      duration_beats: 0.4
+  stomp_beat_enrage:
+    kind: drums
+    instrument: stomp_kit
+    humanize_ms: 2.5
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 0.75
+      - 2.0
+      - 2.75
+      velocity: 124
+      duration_beats: 0.12
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 120
+      duration_beats: 0.12
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.25
+      - 0.5
+      - 0.75
+      - 1.0
+      - 1.25
+      - 1.5
+      - 1.75
+      - 2.0
+      - 2.25
+      - 2.5
+      - 2.75
+      - 3.0
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 58
+      duration_beats: 0.05
+    - drum: open_hat
+      beats:
+      - 1.75
+      - 3.75
+      velocity: 80
+      duration_beats: 0.09
+    - drum: crash
+      beat: 0.0
+      every: 4
+      velocity: 112
+      duration_beats: 0.4
+    - drum: china
+      beat: 2.0
+      every: 4
+      velocity: 90
+      duration_beats: 0.22
+  giant_bassline:
+    kind: bassline
+    instruments:
+    - giant_bass
+    - synth_low
+    octave: 2
+    velocity: 98
+    articulation: marcato
+    humanize_ms: 3.0
+    humanize_velocity_pct: 2
+    instrument_velocity_offsets:
+      giant_bass: 0
+      synth_low: -14
+    pattern:
+    - - 0
+      - 0.0
+      - 0.75
+    - - 0
+      - 1.0
+      - 0.75
+    - - 7
+      - 2.0
+      - 0.75
+    - - 0
+      - 3.0
+      - 0.75
+  giant_riff:
+    kind: ostinato
+    instruments:
+    - giant_riff_shiny_five
+    - giant_riff_shiny_four
+    octave: 2
+    intervals:
+    - 0
+    - 0
+    - 7
+    - 0
+    - 7
+    - 0
+    - 0
+    - 7
+    rhythm:
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    velocity: 92
+    articulation: staccato
+    humanize_ms: 3.5
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      giant_riff_shiny_five: 0
+      giant_riff_shiny_four: -8
+  strings_sustain:
+    kind: pad_chords
+    instruments:
+    - strings_academic
+    every_bars: 1
+    duration_beats: 3.65
+    octave: 2
+    velocity: 52
+    articulation: pad
+    voicing: power
+    constraints:
+      max_pitch: 72
+    humanize_ms: 14
+  scholar_voice:
+    kind: motif
+    instruments:
+    - organ_scholar
+    - harpsichord_voice
+    motif: scholar_recursive_grounded
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 2.5
+    humanize_velocity_pct: 3
+    instrument_velocity_offsets:
+      organ_scholar: 0
+      harpsichord_voice: -14
+    instrument_octave_offsets:
+      organ_scholar: 0
+      harpsichord_voice: 1
+  harpsichord_quip:
+    kind: motif
+    instrument: harpsichord_voice
+    motif: scholar_quip
+    starts:
+    - - 2
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 78
+    articulation: staccato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 4
+  brass_hit:
+    kind: chord_hits
+    instruments:
+    - brass_pompous
+    hits:
+    - - 0
+      - 0.0
+    - - 2
+      - 0.0
+    duration_beats: 0.6
+    octave: 3
+    velocity: 86
+    articulation: marcato
+    voicing: power
+  tread_voice:
+    kind: motif
+    instrument: giant_lead_emily
+    motif: giant_tread_lead
+    starts:
+    - - 3
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 86
+    articulation: legato
+    transpose: -12
+    humanize_ms: 4.0
+    humanize_velocity_pct: 3
+sections:
+- id: the_giant_approaches
+  bars: 4
+  intensity: 0.88
+  harmony:
+  - Em
+  - Em
+  - G
+  - D
+  layers:
+  - stomp_beat
+  - giant_bassline
+  - giant_riff
+  - strings_sustain
+  - kind: chord_hits
+    instruments:
+    - heavy_distortion
+    - low_guitar
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 2.0
+    - - 2
+      - 0.0
+    - - 3
+      - 2.0
+    duration_beats: 0.8
+    octave: 2
+    velocity: 96
+    articulation: marcato
+    voicing: power
+- id: hands_of_gnu
+  bars: 12
+  intensity: 1.0
+  harmony:
+  - Em
+  - G
+  - D
+  - Em
+  - Em
+  - G
+  - Bm
+  - Em
+  - Em
+  - G
+  - Am
+  - Em
+  layers:
+  - stomp_beat
+  - giant_bassline
+  - giant_riff
+  - strings_sustain
+  - template: scholar_voice
+    repeats: 3
+  - template: harpsichord_quip
+    repeats: 3
+  - template: brass_hit
+    hits:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    - - 8
+      - 0.0
+  - template: tread_voice
+    repeats: 3
+- id: head_descends
+  bars: 8
+  intensity: 1.1
+  harmony:
+  - Am
+  - G
+  - Em
+  - Bm
+  - C
+  - G
+  - D
+  - Em
+  layers:
+  - stomp_beat
+  - giant_bassline
+  - strings_sustain
+  - template: scholar_voice
+    repeats: 2
+    velocity: 96
+  - kind: motif
+    instruments:
+    - brass_pompous
+    motif: brass_declaration
+    starts:
+    - - 0
+      - 0.0
+    - - 4
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 96
+    articulation: marcato
+    humanize_ms: 4
+- id: the_weight_of_knowledge
+  bars: 12
+  intensity: 1.14
+  harmony:
+  - Em
+  - D
+  - G
+  - Bm
+  - Em
+  - D
+  - Am
+  - Em
+  - Em
+  - G
+  - D
+  - Em
+  layers:
+  - stomp_beat
+  - giant_bassline
+  - giant_riff
+  - strings_sustain
+  - template: scholar_voice
+    repeats: 3
+    velocity: 96
+  - template: harpsichord_quip
+    repeats: 3
+    velocity: 84
+  - template: brass_hit
+    hits:
+    - - 0
+      - 0.0
+    - - 2
+      - 0.0
+    - - 4
+      - 0.0
+    - - 6
+      - 0.0
+    - - 8
+      - 0.0
+    - - 10
+      - 0.0
+    velocity: 94
+  - template: tread_voice
+    repeats: 1
+    starts:
+    - - 7
+      - 0.0
+    - - 11
+      - 0.0
+    velocity: 92
+  - kind: chord_hits
+    instruments:
+    - heavy_distortion
+    - low_guitar
+    hits:
+    - - 0
+      - 0.0
+    - - 1
+      - 0.0
+    - - 2
+      - 0.0
+    - - 4
+      - 0.0
+    - - 5
+      - 0.0
+    - - 6
+      - 0.0
+    - - 8
+      - 0.0
+    - - 9
+      - 0.0
+    - - 10
+      - 0.0
+    duration_beats: 0.55
+    octave: 2
+    velocity: 104
+    articulation: marcato
+    voicing: power
+- id: recursive_crescendo
+  bars: 4
+  intensity: 1.24
+  harmony:
+  - Em
+  - Bm
+  - G
+  - Em
+  layers:
+  - stomp_beat_enrage
+  - giant_bassline
+  - giant_riff
+  - strings_sustain
+  - kind: motif
+    instruments:
+    - organ_scholar
+    - harpsichord_voice
+    motif: scholar_recursive
+    starts:
+    - - 0
+      - 0.0
+    - - 2
+      - 0.0
+    repeats: 1
+    every_bars: 2
+    velocity: 106
+    articulation: tenuto
+    instrument_velocity_offsets:
+      organ_scholar: 0
+      harpsichord_voice: -12
+    instrument_octave_offsets:
+      organ_scholar: 0
+      harpsichord_voice: 1
+    humanize_ms: 2.0
+    humanize_velocity_pct: 2
+  - kind: chord_hits
+    instruments:
+    - heavy_distortion
+    - low_guitar
+    - brass_pompous
+    hits:
+    - - 0
+      - 0.0
+    - - 0
+      - 1.0
+    - - 0
+      - 2.0
+    - - 0
+      - 3.0
+    - - 1
+      - 0.0
+    - - 1
+      - 1.0
+    - - 1
+      - 2.0
+    - - 1
+      - 3.0
+    - - 2
+      - 0.0
+    - - 2
+      - 1.0
+    - - 2
+      - 2.0
+    - - 2
+      - 3.0
+    - - 3
+      - 0.0
+    - - 3
+      - 1.0
+    - - 3
+      - 2.0
+    - - 3
+      - 3.0
+    duration_beats: 0.45
+    octave: 2
+    velocity: 112
+    articulation: marcato
+    voicing: power
+    instrument_velocity_offsets:
+      heavy_distortion: 0
+      low_guitar: -8
+      brass_pompous: -16
+- id: final_footnote
+  bars: 4
+  intensity: 1.2
+  harmony:
+  - Em
+  - G
+  - D
+  - Em
+  layers:
+  - stomp_beat_enrage
+  - giant_bassline
+  - giant_riff
+  - strings_sustain
+  - kind: motif
+    instruments:
+    - organ_scholar
+    - harpsichord_voice
+    motif: final_charge
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    every_bars: 4
+    velocity: 112
+    articulation: marcato
+    instrument_velocity_offsets:
+      organ_scholar: 0
+      harpsichord_voice: -8
+    instrument_octave_offsets:
+      organ_scholar: 0
+      harpsichord_voice: 1
+    humanize_ms: 2.5
+    humanize_velocity_pct: 2
+  - kind: chord_hits
+    instruments:
+    - heavy_distortion
+    - low_guitar
+    - brass_final_accent
+    hits:
+    - - 0
+      - 0.0
+    - - 1
+      - 0.0
+    - - 2
+      - 0.0
+    - - 2
+      - 2.0
+    - - 3
+      - 0.0
+    duration_beats: 0.9
+    octave: 2
+    velocity: 116
+    articulation: marcato
+    voicing: wide
+    instrument_velocity_offsets:
+      heavy_distortion: 0
+      low_guitar: -8
+      brass_final_accent: -14
+    instrument_octave_offsets:
+      heavy_distortion: 0
+      low_guitar: 0
+      brass_final_accent: 0
+    constraints:
+      max_pitch: 84
+  - kind: chord_hits
+    instruments:
+    - heavy_distortion
+    - low_guitar
+    - brass_final_accent
+    hits:
+    - - 3
+      - 2.0
+    - - 3
+      - 3.0
+    duration_beats: 0.9
+    octave: 2
+    velocity: 116
+    articulation: marcato
+    voicing: power
+    instrument_velocity_offsets:
+      heavy_distortion: 0
+      low_guitar: -8
+      brass_final_accent: -14
+    instrument_octave_offsets:
+      heavy_distortion: 0
+      low_guitar: 0
+      brass_final_accent: 0
+    constraints:
+      max_pitch: 84
+  - kind: root_hits
+    instruments:
+    - giant_bass
+    - synth_low
+    hits:
+    - - 3
+      - 3.5
+      - 0
+      - 0.75
+    octave: 2
+    velocity: 120
+    articulation: hit

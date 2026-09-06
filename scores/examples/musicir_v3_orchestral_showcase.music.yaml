@@ -1,0 +1,60 @@
+schema: ambition.musicir.v3
+id: musicir_v3_orchestral_showcase
+title: MusicIR v3 orchestral-intent showcase
+seed: 37
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 92
+key: D minor
+end: {bar: 9, beat: 1}
+harmony:
+  progression: [Dm, Bb, F, C]
+  cycle: true
+instruments:
+  - {name: strings, group: strings, program: string_ensemble_1, volume: 92, pan: 58}
+  - {name: horn, group: brass, program: french_horn, volume: 86, pan: 70}
+parts:
+  - id: strings_part
+    instrument: strings
+    voices:
+      - id: pad
+        clips:
+          - id: string_bed
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            technique: sustain
+            generate:
+              kind: harmony.pad
+              octave: 4
+              voicing: open
+              duration_beats: 3.8
+              velocity: 58
+            automation:
+              - id: string_expression
+                cc: expression
+                points: [[0, 68], [{beats: 16}, 112], [{beats: 32}, 82]]
+                interpolation: smooth
+                resolution: 1/16
+  - id: horn_part
+    instrument: horn
+    voices:
+      - id: accents
+        clips:
+          - id: horn_roots
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            technique: marcato
+            generate:
+              kind: harmony.root_hits
+              hits:
+                - [0, 0, 0, 0.8]
+                - [1, 0, 0, 0.8]
+                - [2, 0, 0, 0.8]
+                - [3, 0, 0, 0.8]
+                - [4, 0, 0, 0.8]
+                - [5, 0, 0, 0.8]
+                - [6, 0, 0, 0.8]
+                - [7, 0, 0, 0.8]
+              octave: 3
+              duration_beats: 0.8
+              velocity: 78

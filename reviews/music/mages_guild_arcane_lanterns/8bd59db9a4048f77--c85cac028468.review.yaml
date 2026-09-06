@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: mages_guild_arcane_lanterns
+  title: Arcane Lanterns - Mages Guild Theme
+  version_id: 8bd59db9a4048f77:c85cac028468
+  render_hash: 8bd59db9a4048f77
+  preview_sha256: c85cac028468a2e4ce5e3ec2b90f2d8ee2ca18156768a0ba63ffe6c012b1f363
+  preview_path: generated/mages_guild_arcane_lanterns/.versioned/8bd59db9a4048f77/preview/mages_guild_arcane_lanterns_8bd59db9a4048f77.full_soundtrack_preview.ogg
+  manifest_path: generated/mages_guild_arcane_lanterns/.versioned/8bd59db9a4048f77/mages_guild_arcane_lanterns_8bd59db9a4048f77.adaptive_manifest.json
+  manifest_sha256: 5fd9c635bb3a30f3cf593e69d1a7fc7b1877f95452a619eccef26171aaca0e61
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/mages_guild_arcane_lanterns.music.yaml
+  score_sha256_at_review: 0ba16f55477fa12bc404184b1df7957bc269cfe85041c489557b0ae9a0937ff0
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.1
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 75.433
+  furthest_played_fraction: 0.6286
+  created_at: '2026-08-16T16:01:47Z'
+  updated_at: '2026-08-16T16:01:47Z'
+  reviewed_at: '2026-08-16T16:01:47Z'
+history: []

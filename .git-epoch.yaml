@@ -1,0 +1,6 @@
+format_version: 1
+repository: ambition_music_renderer
+history_store:
+  id: ambition-history
+  url: https://github.com/Erotemic/ambition-history.git
+  browse_url: https://github.com/Erotemic/ambition-history

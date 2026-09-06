@@ -1,0 +1,78 @@
+schema: ambition.musicir.v3
+id: musicir_v3_authoring_example
+seed: 17
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 126
+form:
+  - id: main
+    from: {bar: 1, beat: 1}
+    to: {bar: 5, beat: 1}
+end: {bar: 5, beat: 1}
+
+harmony:
+  progression: [Am, F, C, G]
+
+instruments:
+  - name: keys
+    group: harmony
+    program: acoustic_grand_piano
+    volume: 100
+    pan: 64
+
+# New v3 music can author the render-time signal chain explicitly.  The checked-in
+# processing catalog owns processor names, aliases, parameters, and defaults.
+processing:
+  master:
+    chain:
+      - {processor: compressor, threshold_db: -20, ratio: 2.2, attack_ms: 12, release_ms: 100}
+      - {processor: reverb, wet: 0.08, decay_seconds: 1.1, damping_hz: 5500}
+      - {processor: limiter, target_peak_db: -1.2, drive: 1.04, normalize: true}
+  adaptive_sections:
+    mode: composition_master
+
+materials:
+  answer:
+    events:
+      - {id: a1, at: 0, dur: 1/4, pitch: A4, velocity: 92}
+      - {id: a2, at: 1/4, dur: 1/4, pitch: C5, velocity: 86}
+      - {id: a3, at: 1/2, dur: 1/2, pitch: E5, velocity: 96}
+
+parts:
+  - id: keys_part
+    instrument: keys
+    voices:
+      - id: right_hand
+        clips:
+          # Exact reusable material: concise when exact notes are the clearest intent.
+          - id: opening_answer
+            at: {bar: 1, beat: 1}
+            use: answer
+            # Common transforms work the same way on `use`, `events`, and
+            # `generate` clips.
+            velocity_scale: 0.96
+            gate: 0.94
+
+          # Procedural material: reuse an established musical generator rather than
+          # expanding the arpeggio into literal notes in source.
+          - id: harmony_motion
+            at: {bar: 2, beat: 1}
+            duration: {bars: 3}
+            generate:
+              kind: harmony.arpeggio
+              pattern: [0, 2, 1, 2]
+              step: 0.5
+              duration_beats: 0.45
+              octave: 4
+              velocity: 72
+              humanize_ms: 0
+            # Clip-local automation is source-mapped for later DAW round trips.
+            automation:
+              - {id: arp_expression, at: 1/2, cc: expression, value: 112}
+
+          # Literal events can coexist with generated material in the same voice.
+          - id: final_accent
+            at: {bar: 4, beat: 4}
+            events:
+              # Explicit pitch semantics can preserve harmony-relative intent.
+              - {id: accent, at: 0, dur: 1/4, pitch: {kind: chord_tone, degree: 1, octave: 5}, velocity: 104}

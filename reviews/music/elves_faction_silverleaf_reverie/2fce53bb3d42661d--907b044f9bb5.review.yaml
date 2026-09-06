@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: elves_faction_silverleaf_reverie
+  title: Silverleaf Reverie - Elves Faction Theme
+  version_id: 2fce53bb3d42661d:907b044f9bb5
+  render_hash: 2fce53bb3d42661d
+  preview_sha256: 907b044f9bb5d27833f6d29ebaf15950d2a34fc5f263c8b38b6d0246ce12407c
+  preview_path: generated/elves_faction_silverleaf_reverie/.versioned/2fce53bb3d42661d/preview/elves_faction_silverleaf_reverie_2fce53bb3d42661d.full_soundtrack_preview.ogg
+  manifest_path: generated/elves_faction_silverleaf_reverie/.versioned/2fce53bb3d42661d/elves_faction_silverleaf_reverie_2fce53bb3d42661d.adaptive_manifest.json
+  manifest_sha256: 32ccf1df88e0f0be6e8d9f01652ce1e488f84f33354b8714b0ae6e6d8e83b15b
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/elves_faction_silverleaf_reverie.music.yaml
+  score_sha256_at_review: 80bba06c3b4d06ca9367c19e1c5821a04f7c6fddbbf81531bc0e7784cb6fbf59
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Has the flute I don't really like, and overall boring.
+  issues: []
+  furthest_played_seconds: 96.35
+  furthest_played_fraction: 0.8698
+  created_at: '2026-08-16T15:55:39Z'
+  updated_at: '2026-08-16T15:55:39Z'
+  reviewed_at: '2026-08-16T15:55:39Z'
+history: []

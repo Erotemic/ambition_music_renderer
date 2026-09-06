@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: smirking_behemoth_boss
+  title: You Have To Cut The Rope
+  version_id: 4a7e7b0d8e5ca8a5:348918c45eee
+  render_hash: 4a7e7b0d8e5ca8a5
+  preview_sha256: 348918c45eee8737c7f6e14ff34dfd9d8d0a7d740a54e101fc936e363f3d3411
+  preview_path: generated/smirking_behemoth_boss/.versioned/4a7e7b0d8e5ca8a5/preview/smirking_behemoth_boss_4a7e7b0d8e5ca8a5.full_soundtrack_preview.ogg
+  manifest_path: generated/smirking_behemoth_boss/.versioned/4a7e7b0d8e5ca8a5/smirking_behemoth_boss_4a7e7b0d8e5ca8a5.adaptive_manifest.json
+  manifest_sha256: 6a395f95c2b8e148430f3aad82a7f1d63486e134962310025554ecdd41ef5751
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/smirking_behemoth_boss.music.yaml
+  score_sha256_at_review: 7c71edf845619416949e0375e45a5f30059f7490c04e672fa715f06525e36cf2
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: I feel like this does a good job for the boss it goes with.
+  issues: []
+  furthest_played_seconds: 22.762
+  furthest_played_fraction: 0.275
+  created_at: '2026-08-16T15:44:29Z'
+  updated_at: '2026-08-16T15:44:29Z'
+  reviewed_at: '2026-08-16T15:44:29Z'
+history: []

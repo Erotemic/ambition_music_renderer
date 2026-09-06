@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: velocity
+  title: Velocity - The Joy of Building
+  version_id: 9f54b721217b5f17:b0def41a108e
+  render_hash: 9f54b721217b5f17
+  preview_sha256: b0def41a108ebacf7500c16aec2cf873b0a912e5b807d82feb73502a1519b6c3
+  preview_path: generated/velocity/.versioned/9f54b721217b5f17/preview/velocity_9f54b721217b5f17.full_soundtrack_preview.ogg
+  manifest_path: generated/velocity/.versioned/9f54b721217b5f17/velocity_9f54b721217b5f17.adaptive_manifest.json
+  manifest_sha256: 9a582d7ecb4fc92bca02efdff38c33a81026b2b7a51a055ebc07bf7082b83c7c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/velocity.music.yaml
+  score_sha256_at_review: fbcdf00028b981a67ba9d84e50a1f0b7de05df58c9a505b8251ec31c47eb9a28
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.2
+  label: Acceptable
+  notes: This is the better version of gradient ascent. I can climb a mountain to this and not hate myself, well..
+    at least until 0:20 where it starts to get unpleasant. Needs work.
+  issues: []
+  furthest_played_seconds: 64.0
+  furthest_played_fraction: 1.0
+  created_at: '2026-08-16T15:46:44Z'
+  updated_at: '2026-08-16T15:46:44Z'
+  reviewed_at: '2026-08-16T15:46:44Z'
+history: []

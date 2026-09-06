@@ -1,0 +1,37 @@
+schema: ambition.musicir.v3
+id: musicir_v3_automation_showcase
+title: MusicIR v3 automation and pitch semantics
+seed: 41
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 110
+key: A minor
+end: {bar: 5, beat: 1}
+harmony: {progression: [Am, F, C, G]}
+instruments:
+  - {name: lead, group: lead, program: lead_square, volume: 92, pan: 64}
+parts:
+  - id: lead_part
+    instrument: lead
+    voices:
+      - id: melody
+        clips:
+          - id: expressive_phrase
+            at: {bar: 1, beat: 1}
+            technique: legato
+            events:
+              - {id: n1, at: 0, dur: 1/4, pitch: {kind: scale_degree, degree: 1, octave: 5}, velocity: 82}
+              - {id: n2, at: 1/4, dur: 1/4, pitch: {kind: scale_degree, degree: 3, octave: 5}, velocity: 86}
+              - {id: n3, at: 1/2, dur: 1/2, pitch: {kind: chord_tone, degree: 3, octave: 5}, velocity: 94}
+            repeat: {count: 4, every: {bars: 1}}
+            automation:
+              - id: expression_arc
+                cc: expression
+                points: [[0, 70], [1/2, 116], [1, 78]]
+                interpolation: smooth
+                resolution: 1/32
+              - id: bend_arc
+                pitch_bend: 0
+                points: [[0, 0], [1/2, 1200], [1, 0]]
+                interpolation: linear
+                resolution: 1/32

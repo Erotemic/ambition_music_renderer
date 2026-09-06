@@ -1,0 +1,502 @@
+schema: ambition.musicir.v1
+id: something_worth_building
+title: Something Worth Building
+seed: 2026072101
+notes: >-
+  Alternative title-screen music for Ambition. The cue keeps its restrained
+  momentum and sampled acoustic palette, but now behaves as one composition
+  instead of several attractive layers running beside each other. A compact
+  four-note rising cell shapes the title melody, its answer, and the start-game
+  ascent. The default and ready loops share one harmonic spine, so readiness is
+  expressed through orchestration and energy rather than a different chord
+  journey. Harp motion is slower and more selective, the marcato strings answer
+  phrase endings, and the stereo image is pulled inward so piano, Rhodes, harp,
+  and strings occupy one room. The result should remain subdued and hopeful,
+  but with a clearer identity and a stronger invitation to press Start.
+
+tempo:
+  bpm: 96
+
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+  adaptive_section_mastering:
+    mode: global_master_slices
+  runtime_stems:
+    target_peak_db: -10.0
+    max_gain_db: 12.0
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+
+postprocess:
+  gain_db: -0.5
+  highpass_hz: 30
+  lowpass_hz: 11200
+  high_shelf_hz: 6500
+  high_shelf_db: -1.0
+  presence_low_hz: 1350
+  presence_high_hz: 4200
+  presence_db: -0.10
+  transient_tame: 0.055
+  transient_lowpass_hz: 8200
+  reverb_wet: 0.105
+  reverb_decay_seconds: 1.65
+  reverb_damping_hz: 5200
+  post_reverb_high_shelf_hz: 5900
+  post_reverb_high_shelf_db: -0.45
+  stereo_width: 0.14
+  compressor_threshold_db: -19.0
+  compressor_ratio: 1.8
+  compressor_attack_ms: 22.0
+  compressor_release_ms: 165.0
+  compressor_makeup_db: 0.35
+  compressor_knee_db: 8.0
+  limiter_drive: 0.86
+  normalize: true
+  target_peak_db: -5.5
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  lowpass_hz: 11400
+  transient_tame: 0.035
+  transient_lowpass_hz: 8500
+  reverb_wet: 0.014
+  reverb_decay_seconds: 0.72
+  reverb_damping_hz: 5500
+  stereo_width: 0.04
+  limiter_drive: 0.82
+  normalize: false
+  target_peak_db: -4.0
+
+instruments:
+  - name: pulse_grand
+    group: pulse
+    program: acoustic_grand_piano
+    volume: 82
+    pan: 50
+    expression: 92
+    reverb: 14
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.salamander_grand
+      prefer: [salamander, grand, piano]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: title_grand
+    group: lead
+    program: acoustic_grand_piano
+    volume: 85
+    pan: 54
+    expression: 95
+    reverb: 18
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.salamander_grand
+      prefer: [salamander, grand, piano]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: rhodes_air
+    group: keys
+    program: electric_piano_1
+    volume: 66
+    pan: 61
+    expression: 80
+    chorus: 4
+    reverb: 20
+    instrument_backend:
+      kind: sfz
+      library_ref: epiano.rhodes
+      prefer: [rhodes, stereo, looped]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: harp_current
+    group: shimmer
+    program: orchestral_harp
+    volume: 60
+    pan: 67
+    expression: 74
+    reverb: 22
+    instrument_backend:
+      kind: sfz
+      sfz: /data/audio-tools/sfz/Versilian/EtherealwindsHarpII_CE/Harp_Normal.sfz
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: celli_pulse
+    group: foundation
+    program: cello
+    volume: 73
+    pan: 46
+    expression: 84
+    modulation: 2
+    reverb: 16
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.celli
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: viola_bed
+    group: atmosphere
+    program: string_ensemble_1
+    volume: 54
+    pan: 57
+    expression: 70
+    modulation: 4
+    reverb: 26
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violas
+      prefer: [notation, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: violin_lift
+    group: lift
+    program: string_ensemble_1
+    volume: 65
+    pan: 64
+    expression: 82
+    modulation: 2
+    reverb: 18
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1_marcato
+      prefer: [notation, marcato]
+      optional: true
+      fallback_backend: pretty-midi
+
+motifs:
+  - id: forward_call
+    notes: [F#4, B4, D#5, F#5, G#4, B4, C#5, E5]
+    rhythm: [0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.58, 0.65, 0.72, 0.80, 0.60, 0.68, 0.75, 0.82]
+
+  - id: forward_answer
+    notes: [B4, C#5, E5, G#5, C#5, E5, F#5, A5]
+    rhythm: [0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.60, 0.67, 0.75, 0.82, 0.62, 0.70, 0.78, 0.85]
+
+  - id: start_ascent
+    notes: [A4, B4, C#5, E5, B4, C#5, E5, F#5, G#5, B5, F#6, E6]
+    rhythm: [0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 1.0, 2.0, 0.5, 0.5, 1.0, 2.0]
+    velocities: [0.58, 0.64, 0.71, 0.78, 0.62, 0.68, 0.76, 0.82, 0.72, 0.80, 0.88, 0.86]
+
+layer_templates:
+  # The primary pulse is articulated but not hard. The repeating root-fifth-
+  # octave contour makes the menu feel alive, while the two longer accents at
+  # the start of each 3+3+2 group prevent it from becoming a busy arpeggio.
+  piano_current:
+    kind: ostinato
+    instrument: pulse_grand
+    octave: 3
+    intervals: [0, 7, 12, 7, 0, 7, 12, 7]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 43
+    articulation: staccato
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+
+  piano_current_quiet:
+    kind: ostinato
+    instrument: pulse_grand
+    octave: 3
+    intervals: [0, 7, 12, 7]
+    rhythm: [1.0, 1.0, 1.0, 1.0]
+    velocity: 36
+    articulation: tenuto
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+
+  # Three attacks across the bar form the understated 3+3+2 heartbeat.
+  cello_heartbeat:
+    kind: bassline
+    instrument: celli_pulse
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.78]
+      - [0, 1.5, 0.54]
+      - [7, 3.0, 0.72]
+    velocity: 43
+    articulation: marcato
+    humanize_ms: 8
+    humanize_velocity_pct: 4
+
+  rhodes_horizon:
+    kind: pad_chords
+    instrument: rhodes_air
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.96
+    velocity: 31
+    articulation: tenuto
+    voicing: shell
+    constraints: {max_notes: 3, max_pitch: 76}
+    humanize_ms: 15
+    humanize_velocity_pct: 4
+
+  viola_air:
+    kind: pad_chords
+    instrument: viola_bed
+    octave: 3
+    every_bars: 1
+    duration_beats: 3.92
+    velocity: 27
+    articulation: pad
+    voicing: root_fifth
+    humanize_ms: 17
+    humanize_velocity_pct: 3
+
+  harp_underflow:
+    kind: arpeggio
+    instrument: harp_current
+    octave: 4
+    pattern: [0, 1, 2, 1]
+    step: 1.0
+    duration_beats: 0.72
+    velocity: 29
+    density: 0.44
+    articulation: normal
+    voicing: open
+    humanize_ms: 8
+    humanize_velocity_pct: 7
+
+  harp_underflow_ready:
+    kind: arpeggio
+    instrument: harp_current
+    octave: 4
+    pattern: [0, 1, 2, 1]
+    step: 1.0
+    duration_beats: 0.72
+    velocity: 31
+    density: 0.58
+    articulation: normal
+    voicing: open
+    humanize_ms: 7
+    humanize_velocity_pct: 6
+
+  # Sampled marcato strings are a readiness layer, not a permanent action bed.
+  # Their off-beat hits raise the pulse while preserving room for the title motif.
+  ready_strings:
+    kind: chord_hits
+    instrument: violin_lift
+    octave: 4
+    hits: [[1, 3.0], [3, 3.0], [5, 3.0], [7, 3.0]]
+    duration_beats: 0.72
+    velocity: 42
+    articulation: marcato
+    voicing: root_fifth
+    humanize_ms: 6
+    humanize_velocity_pct: 4
+
+  title_call:
+    kind: motif
+    instrument: title_grand
+    motif: forward_call
+    velocity: 59
+    articulation: tenuto
+    gate: 0.86
+    humanize_ms: 10
+    humanize_velocity_pct: 4
+
+  title_answer:
+    kind: motif
+    instrument: title_grand
+    motif: forward_answer
+    velocity: 61
+    articulation: tenuto
+    gate: 0.87
+    humanize_ms: 9
+    humanize_velocity_pct: 4
+
+  begin_phrase:
+    kind: motif
+    instrument: title_grand
+    motif: start_ascent
+    velocity: 66
+    articulation: tenuto
+    gate: 0.88
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+
+  wake:
+    kind: automation
+    automation:
+      - {group: pulse, cc: expression, from: 58, to: 92, curve: smooth, points: 14}
+      - {group: foundation, cc: expression, from: 56, to: 84, curve: smooth, points: 12}
+      - {group: keys, cc: expression, from: 58, to: 80, curve: smooth, points: 12}
+      - {group: atmosphere, cc: expression, from: 50, to: 68, curve: smooth, points: 12}
+      - {group: shimmer, cc: expression, from: 48, to: 76, curve: smooth, points: 12}
+
+  launch:
+    kind: automation
+    automation:
+      - {group: lead, cc: expression, from: 90, to: 104, curve: smooth, points: 10}
+      - {group: lift, cc: expression, from: 64, to: 84, curve: smooth, points: 10}
+      - {group: pulse, cc: expression, from: 90, to: 72, curve: smooth, points: 10}
+      - {group: foundation, cc: expression, from: 82, to: 68, curve: smooth, points: 10}
+      - {group: shimmer, cc: expression, from: 76, to: 56, curve: smooth, points: 10}
+
+playback:
+  mode: section_stem_matrix
+  intro: ignition
+  loop_components: [held_breath, ready_to_move]
+  outro: begin
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [atmosphere, keys]
+    fade_stems: [lead, pulse, foundation, shimmer, lift]
+
+state_map:
+  default:
+    preferred_section: held_breath
+    stems: {pulse: 0.90, foundation: 0.86, keys: 0.90, atmosphere: 0.92, shimmer: 0.84, lead: 0.92, lift: 0.18}
+  quiet:
+    preferred_section: held_breath
+    stems: {pulse: 0.62, foundation: 0.66, keys: 0.88, atmosphere: 0.98, shimmer: 0.48, lead: 0.72, lift: 0.0}
+  ready:
+    preferred_section: ready_to_move
+    stems: {pulse: 1.0, foundation: 0.96, keys: 0.94, atmosphere: 0.88, shimmer: 0.92, lead: 1.0, lift: 0.90}
+  starting_game:
+    transition: outro_at_next_valid_exit_bar
+    outro: begin
+
+sections:
+  - id: ignition
+    kind: intro
+    label: the pulse arrives before the invitation
+    bars: 4
+    intensity: 0.55
+    density: 0.41
+    loopable: false
+    harmony: [Eadd9, B, C#m7, Amaj9]
+    layers:
+      - wake
+      - {template: viola_air, velocity: 25}
+      - {template: rhodes_horizon, velocity: 30}
+      - {template: piano_current, velocity: 38}
+      - {template: cello_heartbeat, velocity: 40}
+      - {template: harp_underflow, density: 0.38, velocity: 27}
+      - {template: title_call, starts: [[1, 0.0]], velocity: 54}
+
+  - id: held_breath
+    kind: loop_component
+    label: controlled momentum with somewhere to go
+    bars: 8
+    intensity: 0.64
+    density: 0.52
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: [Eadd9, B, C#m7, Amaj9, E, F#m7, Aadd9, Bsus4]
+    layers:
+      - {template: viola_air, velocity: 27}
+      - {template: rhodes_horizon, velocity: 31}
+      - {template: piano_current, velocity: 42}
+      - {template: cello_heartbeat, velocity: 42}
+      - {template: harp_underflow, density: 0.44, velocity: 29}
+      - {template: title_call, starts: [[1, 0.0]], velocity: 58}
+      - {template: title_answer, starts: [[4, 0.0]], velocity: 59}
+
+  - id: ready_to_move
+    kind: loop_component
+    label: the same invitation with the heart rate one notch higher
+    bars: 8
+    intensity: 0.72
+    density: 0.61
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: [Eadd9, B, C#m7, Amaj9, E, F#m7, Aadd9, Bsus4]
+    layers:
+      - {template: viola_air, velocity: 27}
+      - {template: rhodes_horizon, velocity: 31}
+      - {template: piano_current, velocity: 45}
+      - {template: cello_heartbeat, velocity: 45}
+      - {template: harp_underflow_ready, density: 0.58, velocity: 31}
+      - {template: ready_strings, velocity: 44}
+      - {template: title_call, starts: [[1, 0.0]], velocity: 61}
+      - {template: title_answer, starts: [[4, 0.0]], velocity: 62}
+
+  - id: begin
+    kind: outro
+    label: start releases the held dominant and opens the world
+    bars: 4
+    intensity: 0.78
+    density: 0.58
+    loopable: false
+    harmony: [C#m7, Aadd9, Bsus4, Eadd9]
+    layers:
+      - launch
+      - {template: viola_air, velocity: 25}
+      - {template: rhodes_horizon, velocity: 29}
+      - {template: piano_current, velocity: 40}
+      - {template: cello_heartbeat, velocity: 39}
+      - {template: harp_underflow_ready, density: 0.54, velocity: 29}
+      - {template: ready_strings, velocity: 42}
+      - {template: begin_phrase, starts: [[1, 0.0]], velocity: 65}
+
+group_postprocess:
+  pulse:
+    gain_db: -0.2
+    highpass_hz: 75
+    lowpass_hz: 9300
+    transient_tame: 0.045
+    reverb_wet: 0.012
+  lead:
+    gain_db: 0.15
+    highpass_hz: 78
+    lowpass_hz: 9200
+    transient_tame: 0.045
+    reverb_wet: 0.018
+  keys:
+    gain_db: -0.4
+    highpass_hz: 95
+    lowpass_hz: 8500
+    transient_tame: 0.05
+    reverb_wet: 0.020
+  shimmer:
+    gain_db: -0.9
+    highpass_hz: 170
+    lowpass_hz: 9600
+    high_shelf_hz: 5900
+    high_shelf_db: -0.7
+    transient_tame: 0.075
+    reverb_wet: 0.020
+  foundation:
+    gain_db: -0.35
+    highpass_hz: 34
+    lowpass_hz: 3400
+    transient_tame: 0.035
+    reverb_wet: 0.010
+  atmosphere:
+    gain_db: -0.8
+    highpass_hz: 70
+    lowpass_hz: 6900
+    high_shelf_hz: 4500
+    high_shelf_db: -0.8
+    reverb_wet: 0.030
+  lift:
+    gain_db: 1.35
+    highpass_hz: 155
+    lowpass_hz: 6900
+    high_shelf_hz: 5000
+    high_shelf_db: -1.2
+    transient_tame: 0.04
+    reverb_wet: 0.016

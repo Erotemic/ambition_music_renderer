@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: you_are_too_slow
+  title: You Are Too Slow
+  version_id: 1df13c8805a28210:06d196503905
+  render_hash: 1df13c8805a28210
+  preview_sha256: 06d196503905bb7eaf15c59baf1a98dfa98eb309212aeda8b59437ee8a4fc3bd
+  preview_path: generated/you_are_too_slow/.versioned/1df13c8805a28210/preview/you_are_too_slow_1df13c8805a28210.full_soundtrack_preview.ogg
+  manifest_path: generated/you_are_too_slow/.versioned/1df13c8805a28210/you_are_too_slow_1df13c8805a28210.adaptive_manifest.json
+  manifest_sha256: 830a3c4d9449cc77412ee5c07402ff01c942732323b6151df299a2d235e551a5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/you_are_too_slow.music.yaml
+  score_sha256_at_review: 39688b8de5775f04955bc9880704a541d65d6284eb059a1ff52c5ec7f50efab2
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.4
+  label: Major polish
+  notes: Its a song. I wouldn't ship it or write home about it.
+  issues: []
+  furthest_played_seconds: 14.442
+  furthest_played_fraction: 0.6018
+  created_at: '2026-08-16T15:34:54Z'
+  updated_at: '2026-08-16T15:34:54Z'
+  reviewed_at: '2026-08-16T15:34:54Z'
+history: []

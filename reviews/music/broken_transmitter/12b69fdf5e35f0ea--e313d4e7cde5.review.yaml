@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: broken_transmitter
+  title: Broken Transmitter
+  version_id: 12b69fdf5e35f0ea:e313d4e7cde5
+  render_hash: 12b69fdf5e35f0ea
+  preview_sha256: e313d4e7cde54fa59a8ded3a2ddd2e563b948cc21d615e21a80fbd773b0bfa3d
+  preview_path: generated/broken_transmitter/.versioned/12b69fdf5e35f0ea/preview/broken_transmitter_12b69fdf5e35f0ea.full_soundtrack_preview.ogg
+  manifest_path: generated/broken_transmitter/.versioned/12b69fdf5e35f0ea/broken_transmitter_12b69fdf5e35f0ea.adaptive_manifest.json
+  manifest_sha256: cf98521a95db3e7e1864d39c1194a9ba45deba2000c7cb8475e39a5faf054288
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/broken_transmitter.music.yaml
+  score_sha256_at_review: e0364163c3bce7d87c01838b3b583a8be2ba349a3e28773cfe899993ff357743
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.5
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 220.153
+  furthest_played_fraction: 0.9696
+  created_at: '2026-08-16T15:52:32Z'
+  updated_at: '2026-08-16T15:52:32Z'
+  reviewed_at: '2026-08-16T15:52:32Z'
+history: []

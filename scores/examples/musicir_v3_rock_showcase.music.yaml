@@ -1,0 +1,70 @@
+schema: ambition.musicir.v3
+id: musicir_v3_rock_showcase
+title: MusicIR v3 rock generator showcase
+seed: 31
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 148
+key: E minor
+end: {bar: 9, beat: 1}
+form:
+  - {id: verse, from: {bar: 1, beat: 1}, to: {bar: 5, beat: 1}}
+  - {id: lift, from: {bar: 5, beat: 1}, to: {bar: 9, beat: 1}}
+harmony:
+  progression: [Em, C, G, D]
+  cycle: true
+instruments:
+  - {name: guitar, group: guitars, program: distortion_guitar, volume: 94, pan: 54}
+  - {name: bass, group: bass, program: picked_bass, volume: 98, pan: 64}
+  - {name: drums, group: drums, is_drum: true, volume: 104, pan: 64}
+parts:
+  - id: guitar_part
+    instrument: guitar
+    voices:
+      - id: rhythm
+        clips:
+          - id: rhythm_strums
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            technique: palm_mute
+            generate:
+              kind: guitar.strum
+              beats: [0, 1.5, 2, 3.5]
+              direction: down
+              spread_ms: 18
+              velocity: 84
+  - id: bass_part
+    instrument: bass
+    voices:
+      - id: line
+        clips:
+          - id: bass_line
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: harmony.bass
+              octave: 2
+              velocity: 82
+              velocity_pattern: [1.0, 0.82, 0.96, 0.86]
+              bar_velocity_pattern: [0.9, 0.96, 1.0, 1.08]
+  - id: drums_part
+    instrument: drums
+    voices:
+      - id: kit
+        clips:
+          - id: driving_kit
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              bar_velocity_pattern: [0.9, 0.96, 1.0, 1.08]
+              fill_every_bars: 4
+              fill_mode: overlay
+              events:
+                - {drum: kick, beats: [0, 2, 2.75], velocity: 92}
+                - {drum: snare, beats: [1, 3], velocity: 100}
+                - {drum: closed_hat, beats: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], velocity: 68}
+              fill_events:
+                - {drum: low_tom, beats: [3.0, 3.25], velocity: 88}
+                - {drum: mid_tom, beats: [3.5], velocity: 94}
+                - {drum: crash, beats: [3.75], velocity: 102}

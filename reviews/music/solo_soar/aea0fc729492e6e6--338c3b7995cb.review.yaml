@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: solo_soar
+  title: Solo Soar
+  version_id: aea0fc729492e6e6:338c3b7995cb
+  render_hash: aea0fc729492e6e6
+  preview_sha256: 338c3b7995cba72bdf4ea0a79d2368b74c252b3d829f2abced84f657f79ea5a7
+  preview_path: generated/solo_soar/.versioned/aea0fc729492e6e6/preview/solo_soar_aea0fc729492e6e6.full_soundtrack_preview.ogg
+  manifest_path: generated/solo_soar/.versioned/aea0fc729492e6e6/solo_soar_aea0fc729492e6e6.adaptive_manifest.json
+  manifest_sha256: 24b6cf967d5aac2aea8e5a23f06b28b1c9f348777c212cc329fdc35e0c7a1034
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/solo_soar.music.yaml
+  score_sha256_at_review: a84f0800d9191041e9900f559d73ca4633decc418076f03c30191b1d4b73c861
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 1.0
+  label: Replace
+  notes: This was another freebird parody attempt. It has some parts that are interesting, but overall its quite
+    bad.
+  issues: []
+  furthest_played_seconds: 69.385
+  furthest_played_fraction: 0.7339
+  created_at: '2026-08-16T15:35:46Z'
+  updated_at: '2026-08-16T15:35:46Z'
+  reviewed_at: '2026-08-16T15:35:46Z'
+history: []

@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Single-number squeak metric for an A/B sweep.
+
+Reads `<cue_outdir>/scratch_stems/*.npy`, sums vhigh (3-6 kHz) and air
+(6-12 kHz) band energy across all groups in a target window, and prints
+both the absolute squeak energy and its ratio to mid-band (300-1000 Hz)
+energy in the same window. The ratio is a "perceived brightness" proxy
+that doesn't fall just from lowering master volume.
+
+Lower numbers = less squeak.
+"""
+
+from __future__ import annotations
+
+import sys
+
+from ..profiler import profile
+
+import lazy_loader as lazy
+
+import kwconf
+from pathlib import Path
+
+from ._common import to_mono
+
+np = lazy.load("numpy")
+
+
+@profile
+def band_energy(
+    mono: np.ndarray, sr: int, t_lo: float, t_hi: float, lo_hz: float, hi_hz: float
+) -> float:
+    s = int(t_lo * sr)
+    e = int(t_hi * sr)
+    seg = mono[s:e]
+    if len(seg) == 0:
+        return 0.0
+    nfft = 1 << (len(seg) - 1).bit_length()
+    spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)).astype("float32"), nfft)) ** 2
+    freqs = np.fft.rfftfreq(nfft, 1.0 / sr)
+    mask = (freqs >= lo_hz) & (freqs < hi_hz)
+    return float(spec[mask].sum())
+
+
+class SpectralCompareConfig(kwconf.Config):
+    """Compare spectral energy in rendered scratch stems."""
+
+    cue_outdir: Path = kwconf.Value(None, position=1, parser=Path)
+    window: list[float] = kwconf.Value(
+        default_factory=lambda: [0.0, -1.0],
+        nargs=2,
+        help="analysis window seconds; a negative hi means 'to end of track'",
+    )
+    sr: int = kwconf.Value(48000)
+    label: str = kwconf.Value("")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        return run(cls.cli(argv=argv, data=kwargs))
+
+
+@profile
+def run(args: SpectralCompareConfig) -> int:
+    stems = sorted((args.cue_outdir / "scratch_stems").glob("*.npy"))
+    t_lo, t_hi = [float(v) for v in args.window]
+
+    by_group = {}
+    for p in stems:
+        name = p.stem.split(".")[-1]
+        mono = to_mono(np.load(p))
+        # A negative high bound means "to end of track" across spectral audits.
+        hi = float(len(mono)) / args.sr if t_hi < 0 else t_hi
+        if int(t_lo * args.sr) >= len(mono):
+            print(
+                f"WARNING: window start {t_lo:.1f}s is past the end of {name} "
+                f"({len(mono) / args.sr:.1f}s); energies report as zero",
+                file=sys.stderr,
+            )
+        by_group[name] = {
+            "mid": band_energy(mono, args.sr, t_lo, hi, 300, 1000),
+            "vhigh": band_energy(mono, args.sr, t_lo, hi, 3000, 6000),
+            "air": band_energy(mono, args.sr, t_lo, hi, 6000, 12000),
+        }
+
+    total = {b: sum(by_group[g][b] for g in by_group) for b in ("mid", "vhigh", "air")}
+    squeak = total["vhigh"] + total["air"]
+    ratio = squeak / max(total["mid"], 1e-12)
+
+    label = f"[{args.label}] " if args.label else ""
+    print(f"{label}window={t_lo:.1f}-{t_hi:.1f}s")
+    print(f"  squeak (vhigh+air absolute):  {squeak:11.3e}")
+    print(f"  mid (300-1k absolute):        {total['mid']:11.3e}")
+    print(f"  squeak/mid ratio:             {ratio:7.4f}")
+    print("  per-group vhigh contributions:")
+    vhigh_total = max(total["vhigh"], 1e-12)
+    for g in sorted(by_group, key=lambda x: -by_group[x]["vhigh"]):
+        frac = by_group[g]["vhigh"] / vhigh_total
+        print(f"    {g:14s} {frac * 100:5.1f}%   abs={by_group[g]['vhigh']:.3e}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(SpectralCompareConfig.main())

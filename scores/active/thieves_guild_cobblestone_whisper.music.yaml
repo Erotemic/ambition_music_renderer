@@ -1,0 +1,200 @@
+schema: ambition.musicir.v1
+id: thieves_guild_cobblestone_whisper
+title: Cobblestone Whisper - Thieves Guild Theme
+seed: 2026050914
+notes: >-
+  Thieves Guild faction loop. Nimble 7/8 stealth-jazz: pizzicato strings,
+  muted trumpet hints, clarinet alley-calls, brushed side-stick, and a hook
+  that keeps slipping one beat early. Memorable by contour, but never quite
+  stands under the streetlamp.
+tempo:
+  bpm: 126
+meter:
+  beats_per_bar: 7
+  beat_unit: 8
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.7
+  highpass_hz: 34
+  lowpass_hz: 9300
+  presence_low_hz: 1600
+  presence_high_hz: 3600
+  presence_db: 0.5
+  reverb_wet: 0.12
+  reverb_decay_seconds: 1.15
+  reverb_damping_hz: 5200
+  stereo_width: 0.14
+  compressor_threshold_db: -18.5
+  compressor_ratio: 2.7
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 80.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 5.0
+  limiter_drive: 0.96
+  normalize: true
+  target_peak_db: -7.2
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.045
+  reverb_decay_seconds: 0.75
+  reverb_damping_hz: 5400
+  stereo_width: 0.08
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: pizz_strings, group: strings, program: pizzicato_strings, volume: 74, pan: 40, expression: 86}
+  - {name: muted_trumpet, group: brass, program: muted_trumpet, volume: 54, pan: 76, expression: 70}
+  - {name: clarinet, group: winds, program: clarinet, volume: 62, pan: 58, expression: 82, modulation: 5}
+  - {name: vibraphone, group: glimmer, program: vibraphone, volume: 44, pan: 80, expression: 66}
+  - {name: upright_bass, group: bass, program: acoustic_bass, volume: 72, pan: 44, expression: 84}
+  - {name: alley_kit, group: percussion, is_drum: true, volume: 56, pan: 64, expression: 86}
+motifs:
+  - id: pocket_hook
+    root: Eb4
+    intervals: [0, 3, 5, 6, 5, 3, -2, 0]
+    rhythm: [0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.5]
+    velocities: [0.62, 0.58, 0.64, 0.76, 0.54, 0.50, 0.68, 0.46]
+  - id: shadow_reply
+    root: Bb3
+    intervals: [0, -2, -5, -7, -5, -2, 1]
+    rhythm: [0.75, 0.25, 0.5, 1.0, 0.5, 0.5, 1.5]
+    velocities: [0.48, 0.42, 0.54, 0.66, 0.52, 0.44, 0.38]
+layer_templates:
+  alley_pad:
+    kind: pad_chords
+    instruments: [vibraphone]
+    octave: 4
+    every_bars: 2
+    duration_beats: 7.0
+    velocity: 24
+    articulation: bell
+    voicing: shell
+    humanize_ms: 20
+    humanize_velocity_pct: 8
+  pizz_lockpick:
+    kind: ostinato
+    instruments: [pizz_strings]
+    octave: 4
+    intervals: [0, 7, 3, 10, 7, 3, -2]
+    rhythm: [0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0]
+    velocity: 48
+    articulation: pluck
+    humanize_ms: 6
+    humanize_velocity_pct: 7
+  bass_sneak:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    pattern: [[0, 0.0, 0.8], [7, 2.0, 0.5], [10, 3.0, 0.45], [5, 5.0, 0.55]]
+    velocity: 58
+    articulation: normal
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+  clarinet_hook:
+    kind: motif
+    instruments: [clarinet, muted_trumpet]
+    motif: pocket_hook
+    root: Eb4
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 54
+    articulation: staccato
+    instrument_velocity_offsets: {clarinet: 2, muted_trumpet: -8}
+    humanize_ms: 9
+    humanize_velocity_pct: 6
+  bass_reply:
+    kind: motif
+    instrument: upright_bass
+    motif: shadow_reply
+    root: Bb2
+    every_bars: 8
+    repeats: 4
+    starts: [[2, 0.0]]
+    velocity: 54
+    articulation: normal
+    humanize_ms: 10
+    humanize_velocity_pct: 6
+  lamp_glints:
+    kind: texture
+    instruments: [vibraphone]
+    root: Eb5
+    scale: [0, 2, 3, 5, 6, 8, 10, 12]
+    events_per_bar: 0.65
+    duration_beats: 0.28
+    velocity: 28
+    articulation: bell
+    humanize_ms: 4
+    humanize_velocity_pct: 10
+  alley_brushes:
+    kind: drums
+    instrument: alley_kit
+    velocity: 38
+    humanize_ms: 12
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0, 4.0], velocity: 38}
+      - {drum: side_stick, beats: [2.0, 5.5], velocity: 30}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5], velocity: 14, probability: 0.70}
+      - {drum: triangle_mute, beats: [6.0], velocity: 12, probability: 0.35}
+playback:
+  mode: section_stem_matrix
+  loop_components: [whisper_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, bass]
+    fade_stems: [winds, brass, glimmer, percussion]
+state_map:
+  default:
+    section: whisper_loop
+    stems: {strings: 0.78, bass: 0.82, winds: 0.74, brass: 0.50, glimmer: 0.50, percussion: 0.48}
+sections:
+  - id: whisper_loop
+    kind: loop_component
+    label: thieves guild rooftops
+    bars: 32
+    intensity: 0.60
+    density: 0.64
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Ebm9
+      - Ab13
+      - Dbmaj7
+      - Gbmaj7(#11)
+      - Ebm9
+      - B7
+      - Bb7(b9)
+      - Ebm9
+      - Gbmaj7
+      - Fm7b5
+      - Bb7(b9)
+      - Ebm9
+      - Abm9
+      - Db13
+      - Gbmaj7
+      - Bb7(b9)
+      - Ebm9
+      - Ab13
+      - Dbmaj7
+      - Gbmaj7(#11)
+      - Ebm9
+      - B7
+      - Bb7(b9)
+      - Ebm9
+      - Fm7b5
+      - Bb7(b9)
+      - Ebm9
+      - Abm9
+      - Db13
+      - Gbmaj7
+      - Bb7(b9)
+      - Ebm9
+    layers: [alley_pad, pizz_lockpick, bass_sneak, clarinet_hook, bass_reply, lamp_glints, alley_brushes]

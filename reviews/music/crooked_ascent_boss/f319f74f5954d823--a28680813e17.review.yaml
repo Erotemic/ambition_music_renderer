@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: crooked_ascent_boss
+  title: Crooked Ascent - Klezmer/Bartok Boss Battle
+  version_id: f319f74f5954d823:a28680813e17
+  render_hash: f319f74f5954d823
+  preview_sha256: a28680813e17942c9713e24bf3bcd5ce8944459dd6d560b6c5ca7441668bb3e1
+  preview_path: generated/crooked_ascent_boss/.versioned/f319f74f5954d823/preview/crooked_ascent_boss_f319f74f5954d823.full_soundtrack_preview.ogg
+  manifest_path: generated/crooked_ascent_boss/.versioned/f319f74f5954d823/crooked_ascent_boss_f319f74f5954d823.adaptive_manifest.json
+  manifest_sha256: 554eccc117db7d406104374285a0aff53952cd1f089ae50a3e7eb794aebb2dca
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/crooked_ascent_boss.music.yaml
+  score_sha256_at_review: d1f0ae9e799a7d31ce05d22d37ba66e2e5afcfba911033f82f7b91be29a87166
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 70.5
+  furthest_played_fraction: 0.893
+  created_at: '2026-08-16T15:53:46Z'
+  updated_at: '2026-08-16T15:53:46Z'
+  reviewed_at: '2026-08-16T15:53:46Z'
+history: []

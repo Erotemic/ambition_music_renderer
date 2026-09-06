@@ -1,0 +1,192 @@
+schema: ambition.musicir.v1
+id: doves_of_the_commons
+title: Doves of the Commons - Left Faction Theme
+seed: 2026051002
+notes: >-
+  Left faction loop. A warm, communal protest-folk theme with doves in the
+  title: singable, compassionate, and stubbornly hopeful. Coal Bert can lead
+  this faction without needing a separate cue.
+tempo:
+  bpm: 96
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.6
+  highpass_hz: 35
+  lowpass_hz: 10500
+  presence_low_hz: 1500
+  presence_high_hz: 3900
+  presence_db: 0.4
+  reverb_wet: 0.13
+  reverb_decay_seconds: 1.25
+  reverb_damping_hz: 5600
+  stereo_width: 0.14
+  compressor_threshold_db: -17.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 9.0
+  compressor_release_ms: 115.0
+  compressor_makeup_db: 1.1
+  compressor_knee_db: 6.0
+  limiter_drive: 0.98
+  normalize: true
+  target_peak_db: -6.7
+stem_postprocess:
+  highpass_hz: 32
+  reverb_wet: 0.045
+  reverb_decay_seconds: 0.85
+  reverb_damping_hz: 5600
+  stereo_width: 0.08
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: accordion, group: squeeze, program: accordion, volume: 62, pan: 58, expression: 78}
+  - {name: clarinet, group: winds, program: clarinet, volume: 58, pan: 76, expression: 78, modulation: 5}
+  - {name: acoustic_guitar, group: pluck, program: steel_guitar, volume: 56, pan: 38, expression: 72}
+  - {name: upright_bass, group: bass, program: acoustic_bass, volume: 66, pan: 46, expression: 84}
+  - {name: choir, group: choir_pad, program: choir_aahs, volume: 54, pan: 66, expression: 72}
+  - {name: violin, group: strings, program: violin, volume: 54, pan: 72, expression: 72, modulation: 6}
+  - {name: march_kit, group: percussion, is_drum: true, volume: 48, pan: 54, expression: 82}
+motifs:
+  - id: common_dove_song
+    root: G4
+    intervals: [0, 2, 4, 5, 7, 9, 7, 5, 4, 2, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.68, 0.54, 0.58, 0.62, 0.82, 0.66, 0.58, 0.52, 0.48, 0.44, 0.36]
+  - id: raised_hands_answer
+    root: D4
+    intervals: [0, 4, 5, 7, 9, 7, 5, 4]
+    rhythm: [0.75, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5, 1.5]
+    velocities: [0.58, 0.48, 0.52, 0.66, 0.78, 0.56, 0.50, 0.38]
+layer_templates:
+  accordion_commons:
+    kind: pad_chords
+    instrument: accordion
+    octave: 3
+    every_bars: 1
+    duration_beats: 4.0
+    velocity: 40
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 11
+    humanize_velocity_pct: 5
+  guitar_strum:
+    kind: arpeggio
+    instrument: acoustic_guitar
+    octave: 3
+    pattern: [0, 1, 2, 1, 3, 1, 2, 1]
+    step: 0.5
+    duration_beats: 0.34
+    velocity: 42
+    density: 0.82
+    articulation: pluck
+    humanize_ms: 9
+    humanize_velocity_pct: 7
+  bass_step:
+    kind: bassline
+    instrument: upright_bass
+    octave: 2
+    pattern: [[0, 0.0, 0.8], [7, 1.0, 0.45], [0, 2.0, 0.8], [12, 3.0, 0.45]]
+    velocity: 54
+    articulation: normal
+    humanize_ms: 6
+    humanize_velocity_pct: 5
+  dove_hook:
+    kind: motif
+    instruments: [clarinet, violin]
+    motif: common_dove_song
+    root: G4
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 56
+    articulation: legato
+    instrument_velocity_offsets: {clarinet: 0, violin: -7}
+    instrument_octave_offsets: {clarinet: 0, violin: 1}
+    humanize_ms: 8
+    humanize_velocity_pct: 5
+  choir_answer:
+    kind: motif
+    instruments: [choir, accordion]
+    motif: raised_hands_answer
+    root: D4
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 48
+    articulation: tenuto
+    instrument_velocity_offsets: {choir: 0, accordion: -10}
+    humanize_ms: 10
+    humanize_velocity_pct: 5
+  picket_drums:
+    kind: drums
+    instrument: march_kit
+    velocity: 36
+    humanize_ms: 8
+    humanize_velocity_pct: 8
+    events:
+      - {drum: kick, beats: [0.0, 2.0], velocity: 38}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 30}
+      - {drum: tambourine, beats: [0.5, 1.5, 2.5, 3.5], velocity: 20, probability: 0.72}
+playback:
+  mode: section_stem_matrix
+  loop_components: [commons_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [squeeze, pluck, bass]
+    fade_stems: [winds, strings, choir_pad, percussion]
+state_map:
+  default:
+    section: commons_loop
+    stems: {squeeze: 0.70, winds: 0.70, pluck: 0.72, bass: 0.72, choir_pad: 0.52, strings: 0.55, percussion: 0.42}
+sections:
+  - id: commons_loop
+    kind: loop_component
+    label: left faction dove commons
+    bars: 32
+    intensity: 0.72
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - G
+      - C
+      - D
+      - G
+      - Em
+      - C
+      - G/B
+      - D
+      - G
+      - C
+      - Am
+      - D
+      - Em
+      - C
+      - D
+      - G
+      - C
+      - G/B
+      - Am
+      - D
+      - G
+      - D/F#
+      - Em
+      - C
+      - Am
+      - G/B
+      - C
+      - D
+      - Em
+      - C
+      - D
+      - G
+    layers: [accordion_commons, guitar_strum, bass_step, dove_hook, choir_answer, picket_drums]

@@ -1,0 +1,80 @@
+{
+  "schema": "ambition.musicir.technique_catalog.v1",
+  "policy": {
+    "purpose": "Backend-independent performance intent for MusicIR v3. A technique may change note gate immediately; sampled-patch/keyswitch realization is selected separately through part.technique_map and instrument knowledge.",
+    "fallback": "normal",
+    "custom_mapping": "A score may use a custom technique name only when part.technique_map explicitly maps that name to an instrument realization."
+  },
+  "techniques": {
+    "normal": {
+      "summary": "Neutral detached/sustained note treatment.",
+      "default_gate": 0.86,
+      "aliases": ["ordinary"]
+    },
+    "sustain": {
+      "summary": "Let the note ring close to its full notated duration.",
+      "default_gate": 0.98,
+      "aliases": ["sustained"]
+    },
+    "tenuto": {
+      "summary": "Hold nearly the full written value with a connected feel.",
+      "default_gate": 0.98,
+      "aliases": []
+    },
+    "legato": {
+      "summary": "Overlap successive notes slightly when the instrument supports it.",
+      "default_gate": 1.10,
+      "aliases": []
+    },
+    "staccato": {
+      "summary": "Short detached note.",
+      "default_gate": 0.40,
+      "aliases": ["short"]
+    },
+    "spiccato": {
+      "summary": "Very short bounced-string style articulation.",
+      "default_gate": 0.34,
+      "aliases": []
+    },
+    "marcato": {
+      "summary": "Accented, clearly separated attack with moderate sustain.",
+      "default_gate": 0.68,
+      "aliases": ["accented"]
+    },
+    "pluck": {
+      "summary": "Short plucked articulation.",
+      "default_gate": 0.46,
+      "aliases": []
+    },
+    "pizzicato": {
+      "summary": "Plucked-string articulation; route to a pizzicato patch when available.",
+      "default_gate": 0.46,
+      "aliases": ["pizz"]
+    },
+    "palm_mute": {
+      "summary": "Short damped guitar/bass articulation; route to a muted patch when available.",
+      "default_gate": 0.42,
+      "aliases": ["palm-muted", "palm_mute_short"]
+    },
+    "tremolo": {
+      "summary": "Sustained tremolo texture; usually requires a dedicated sampled articulation.",
+      "default_gate": 0.98,
+      "aliases": []
+    },
+    "pad": {
+      "summary": "Slightly overlapping sustained accompaniment.",
+      "default_gate": 1.02,
+      "aliases": []
+    },
+    "hit": {
+      "summary": "Short impact or orchestral-hit articulation.",
+      "default_gate": 0.28,
+      "aliases": []
+    },
+    "bell": {
+      "summary": "Allow long decay for bell-like material.",
+      "default_gate": 1.40,
+      "aliases": []
+    }
+  }
+}

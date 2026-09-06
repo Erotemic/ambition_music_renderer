@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: many_names_one_hall
+  title: Every Pedestal Talks Back
+  version_id: 9b9978b2f78085f3:fdcb46fae489
+  render_hash: 9b9978b2f78085f3
+  preview_sha256: fdcb46fae489a10442b95dad528518d875e127d5afdbadf88c857a5c0a2adcf8
+  preview_path: generated/many_names_one_hall/.versioned/9b9978b2f78085f3/preview/many_names_one_hall_9b9978b2f78085f3.full_soundtrack_preview.ogg
+  manifest_path: generated/many_names_one_hall/.versioned/9b9978b2f78085f3/many_names_one_hall_9b9978b2f78085f3.adaptive_manifest.json
+  manifest_sha256: 1c42e28ce2292476329d2d08bcdf27ceef18098ea955d70f0b01a2f88ffcafe5
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.1-procedural-fm-v1
+  score_path: scores/active/many_names_one_hall.music.yaml
+  score_sha256_at_review: f6a829027333b11ee530b3c148fb5257f299d6caa4a2a6921df359daab3760f3
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.2
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 7.068
+  furthest_played_fraction: 0.0839
+  created_at: '2026-08-16T16:03:00Z'
+  updated_at: '2026-08-16T16:03:00Z'
+  reviewed_at: '2026-08-16T16:03:00Z'
+history: []

@@ -1,0 +1,3905 @@
+schema: ambition.musicir.v1
+id: blazingly_fast
+title: Blazingly Fast
+seed: 2026090101
+notes: 'V34 extends the garage-blues loop to 144 bars and gives its sax density a longer arc: a foreground vibrato whine pulls the first fast
+  passage into half-time, the added third cycle leaves wider horn rests, and the last three bars clear the tenor before returning to the guitar-only
+  opening. Internal form markers expose every fast, downshift, slow, and rise boundary as OGG chapters.'
+tempo:
+  bpm: 180
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 7
+  backend: pretty-midi
+  strict_backends: true
+  metadata_markers:
+  - id: downshift_one
+    label: Downshift I - tenor whine
+    bar: 17
+  - id: slow_one
+    label: Slow I - low smoke
+    bar: 21
+  - id: rise_one
+    label: Rise I - 3+3+2
+    bar: 41
+  - id: fast_two
+    label: Fast II - crowded answer
+    bar: 45
+  - id: downshift_two
+    label: Downshift II - clipped fall
+    bar: 65
+  - id: slow_two
+    label: Slow II - crooked replies
+    bar: 69
+  - id: rise_two
+    label: Rise II - higher pressure
+    bar: 89
+  - id: fast_three
+    label: Fast III - long run
+    bar: 93
+  - id: downshift_three
+    label: Downshift III - open air
+    bar: 113
+  - id: slow_three
+    label: Slow III - sparse memory
+    bar: 117
+  - id: rise_three
+    label: Rise III - last climb
+    bar: 129
+  - id: fast_return
+    label: Fast return - sax clears
+    bar: 133
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    render_timeout_s: 240
+  foreground_protection:
+    enabled: true
+    mode: group_density
+    groups:
+    - melody
+    - guitars
+    exclude_groups:
+    - percussion
+    - bass
+    - keys
+    role_priorities:
+      background: 0
+      support: 1
+      lead: 2
+      foreground: 3
+    min_density_ratio: 0.5
+    min_target_notes: 1
+    duck_db_per_priority: -1.5
+    max_duck_db: -4.5
+    control_hop_ms: 15
+    attack_ms: 15
+    release_ms: 85
+  adaptive_section_mastering:
+    mode: global_master_slices
+    notes: Master once; the authored macro-cycle owns dynamics.
+  section_mix_transition_beats: 1.0
+postprocess:
+  gain_db: -1.0
+  highpass_hz: 30
+  lowpass_hz: 19000
+  reverb_wet: 0.005
+  reverb_decay_seconds: 0.38
+  reverb_damping_hz: 9000
+  stereo_width: 0.055
+  compressor_threshold_db: -20.0
+  compressor_ratio: 2.1
+  compressor_attack_ms: 11
+  compressor_release_ms: 96
+  compressor_makeup_db: 0.0
+  compressor_knee_db: 3.0
+  limiter_drive: 1.0
+  normalize: true
+  target_peak_db: -3.5
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 25
+  lowpass_hz: 20000
+  reverb_wet: 0.001
+  reverb_decay_seconds: 0.2
+  reverb_damping_hz: 9000
+  stereo_width: 0.006
+  normalize: false
+  target_peak_db: -4.0
+  limiter_enabled: false
+group_postprocess:
+  keys:
+    gain_db: -2.0
+    highpass_hz: 45
+    lowpass_hz: 15000
+    reverb_wet: 0.008
+    reverb_decay_seconds: 0.42
+    reverb_damping_hz: 7800
+    stereo_width: 0.03
+    compressor_threshold_db: -23.0
+    compressor_ratio: 1.6
+    compressor_attack_ms: 12
+    compressor_release_ms: 100
+    compressor_makeup_db: 0.0
+  melody:
+    gain_db: 1.2
+    highpass_hz: 65
+    lowpass_hz: 16000
+    reverb_wet: 0.012
+    reverb_decay_seconds: 0.38
+    reverb_damping_hz: 7800
+    stereo_width: 0.01
+    compressor_threshold_db: -20.0
+    compressor_ratio: 1.35
+    compressor_attack_ms: 20
+    compressor_release_ms: 135
+    compressor_makeup_db: 0.0
+  percussion:
+    gain_db: -4.4
+    highpass_hz: 38
+    lowpass_hz: 18000
+    reverb_wet: 0.0008
+    reverb_decay_seconds: 0.23
+    reverb_damping_hz: 8200
+    stereo_width: 0.015
+    transient_tame: 0.05
+    transient_lowpass_hz: 16000
+    high_shelf_db: 1.3
+    high_shelf_hz: 6800
+    compressor_threshold_db: -24.0
+    compressor_ratio: 2.5
+    compressor_attack_ms: 3.5
+    compressor_release_ms: 68.0
+    compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      label: overloaded-drum-room
+      effects:
+      - effect: gain
+        gain_db: 8.0
+      - effect: clipping
+        threshold_db: -24.0
+        wet_mix: 0.18
+      - effect: compressor
+        threshold_db: -30.0
+        ratio: 3.2
+        attack_ms: 4.0
+        release_ms: 72.0
+        wet_mix: 0.2
+      - effect: gain
+        gain_db: -8.0
+  bass:
+    gain_db: 1.6
+    highpass_hz: 35
+    lowpass_hz: 9000
+    reverb_wet: 0.001
+    reverb_decay_seconds: 0.22
+    reverb_damping_hz: 7000
+    stereo_width: 0.004
+    compressor_threshold_db: -23.0
+    compressor_ratio: 2.2
+    compressor_attack_ms: 8.0
+    compressor_release_ms: 88.0
+    compressor_makeup_db: 0.0
+  guitars:
+    gain_db: -1.0
+    highpass_hz: 62
+    lowpass_hz: 14500
+    high_shelf_db: -1.4
+    high_shelf_hz: 3200
+    reverb_wet: 0.004
+    reverb_decay_seconds: 0.3
+    reverb_damping_hz: 7600
+    stereo_width: 0.085
+    compressor_threshold_db: -23.0
+    compressor_ratio: 2.0
+    compressor_attack_ms: 7.0
+    compressor_release_ms: 90.0
+    compressor_makeup_db: 0.0
+    effect_chain:
+    - kind: pedalboard
+      label: guitar-pre
+      report_levels: true
+      effects:
+      - effect: gain
+        gain_db: 12.0
+      - effect: compressor
+        threshold_db: -24.0
+        ratio: 2.4
+        attack_ms: 8.0
+        release_ms: 110.0
+    - kind: lv2proc
+      label: guitarix-ts9
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+      channel_mode: dual_mono
+      required: true
+      wet_mix: 0.52
+      report_levels: true
+      params:
+        fslider0_: -4.0
+        fslider1_: 680.0
+        fslider2_: 0.68
+        BYPASS: 1.0
+      binary: lv2apply
+    - kind: lv2proc
+      label: guitarix-jcm800-corroded-crunch
+      plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+      required: true
+      wet_mix: 0.58
+      report_levels: true
+      params:
+        P6v: 0.74
+        Middle: 0.68
+        Bass: 0.48
+        Treble: 0.6
+        WET_DRY: 60.0
+        GAIN: -2.0
+      binary: lv2apply
+    - kind: pedalboard
+      label: guitar-post
+      report_levels: true
+      effects:
+      - effect: gain
+        gain_db: -16.0
+instruments:
+- name: grand_piano
+  group: keys
+  program: acoustic_grand_piano
+  volume: 84
+  pan: 64
+  expression: 92
+  mix_role: background
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    - flac
+- name: tenor_sax_nv
+  group: melody
+  program: tenor_sax
+  volume: 78
+  pan: 65
+  expression: 94
+  mix_role: foreground
+  instrument_backend:
+    kind: sfz
+    sfz: /data/audio-tools/sfz/Versilian/VCSL/VCSL-1.2.2-RC/Aerophones/Reed Aerophones/Tenor Saxophone - Non-Vibrato.sfz
+    settings:
+      fold_to_range: false
+- name: tenor_sax_staccato
+  group: melody
+  program: tenor_sax
+  volume: 74
+  pan: 65
+  expression: 90
+  mix_role: foreground
+  instrument_backend:
+    kind: sfz
+    sfz: /data/audio-tools/sfz/Versilian/VCSL/VCSL-1.2.2-RC/Aerophones/Reed Aerophones/Tenor Saxophone - Staccato.sfz
+    settings:
+      fold_to_range: false
+- name: tenor_sax_vibrato
+  group: melody
+  program: tenor_sax
+  volume: 76
+  pan: 65
+  expression: 92
+  mix_role: foreground
+  instrument_backend:
+    kind: sfz
+    sfz: /data/audio-tools/sfz/Versilian/VCSL/VCSL-1.2.2-RC/Aerophones/Reed Aerophones/Tenor Saxophone - Vibrato.sfz
+    settings:
+      fold_to_range: false
+- name: rust_gtr_l
+  group: guitars
+  program: clean_guitar
+  volume: 78
+  pan: 32
+  expression: 102
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.emily
+    prefer:
+    - chords
+    - emily
+    settings:
+      fold_to_range: false
+- name: rust_gtr_r
+  group: guitars
+  program: clean_guitar
+  volume: 77
+  pan: 96
+  expression: 100
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.emily
+    prefer:
+    - chords
+    - emily
+    settings:
+      fold_to_range: false
+- name: locked_bass
+  group: bass
+  program: fingered_bass
+  volume: 108
+  pan: 64
+  expression: 102
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.swag
+    prefer:
+    - swagbass
+    - clean
+    settings:
+      fold_to_range: false
+- name: rock_drums
+  group: percussion
+  is_drum: true
+  volume: 92
+  pan: 64
+  expression: 105
+  mix_role: support
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.big_rusty
+    prefer:
+    - 01 full
+    - big rusty
+    settings:
+      fold_to_range: false
+layer_templates:
+  guitar_up:
+    kind: sampled_chord
+    takes: &id001
+    - instrument: rust_gtr_l
+      timing_offset_ms: -5
+      velocity_offset: 0
+    - instrument: rust_gtr_r
+      timing_offset_ms: 7
+      velocity_offset: -4
+    bars: &id003
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 44
+    - 45
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+    - 51
+    - 52
+    - 53
+    - 54
+    - 55
+    - 56
+    - 57
+    - 58
+    - 59
+    - 60
+    - 61
+    - 62
+    - 63
+    - 92
+    - 93
+    - 94
+    - 95
+    - 96
+    - 97
+    - 98
+    - 99
+    - 100
+    - 101
+    - 102
+    - 103
+    - 104
+    - 105
+    - 106
+    - 107
+    - 108
+    - 109
+    - 110
+    - 111
+    octave: 2
+    quality: power
+    keyswitches: &id002
+      power: 33
+      minor: 34
+      major: 35
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+      - 1.0
+    - - 12
+      - 0.75
+      - 0.28
+      - 0.72
+    - - 0
+      - 1.5
+      - 0.65
+      - 0.92
+    - - 0
+      - 2.5
+      - 0.26
+      - 0.68
+    - - 12
+      - 3.0
+      - 0.72
+      - 0.84
+    velocity: 73
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+  guitar_brake_a:
+    kind: sampled_chord
+    takes: *id001
+    bars: &id005
+    - 16
+    - 17
+    - 64
+    - 65
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.85
+      - 1.0
+    - - 0
+      - 2.0
+      - 1.15
+      - 0.9
+    - - 12
+      - 3.25
+      - 0.6
+      - 0.72
+    velocity: 71
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.6
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+  guitar_brake_b:
+    kind: sampled_chord
+    takes: *id001
+    bars: &id006
+    - 18
+    - 19
+    - 66
+    - 67
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.15
+      - 0.88
+    - - 12
+      - 3.0
+      - 0.62
+      - 0.66
+    velocity: 69
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 2.5
+    min_pitch: 31
+  guitar_down:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 21
+    - 22
+    - 23
+    - 24
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 69
+    - 70
+    - 71
+    - 72
+    - 74
+    - 75
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+    - 82
+    - 83
+    - 84
+    - 85
+    - 86
+    - 87
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 2.15
+      - 0.88
+    - - 12
+      - 3.0
+      - 0.62
+      - 0.66
+    velocity: 68
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3.0
+    min_pitch: 31
+  guitar_down_open:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 20
+    - 68
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+      - 0.86
+    - - 12
+      - 3.0
+      - 0.62
+      - 0.66
+    velocity: 68
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3.0
+    min_pitch: 31
+  guitar_down_reply:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 25
+    - 33
+    - 73
+    - 81
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.92
+      - 0.82
+    - - 12
+      - 1.5
+      - 0.28
+      - 0.64
+    - - 0
+      - 2.25
+      - 0.32
+      - 0.72
+    - - 12
+      - 3.0
+      - 0.62
+      - 0.78
+    velocity: 69
+    gate: 0.94
+    articulation: marcato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3.0
+    min_pitch: 31
+  guitar_rise:
+    kind: sampled_chord
+    takes: *id001
+    bars: &id007
+    - 40
+    - 41
+    - 42
+    - 43
+    - 88
+    - 89
+    - 90
+    - 91
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.88
+      - 0.9
+    - - 12
+      - 1.5
+      - 0.52
+      - 0.78
+    - - 0
+      - 3.0
+      - 0.72
+      - 0.96
+    velocity: 72
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.6
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+    dynamics:
+    - start_bar: 14
+      bars: 4
+      from: 0.72
+      to: 1.0
+      curve: smooth
+  bass_up:
+    kind: bassline
+    instrument: locked_bass
+    bars: *id003
+    octave: 2
+    velocity: 50
+    articulation: staccato
+    humanize_ms: 1.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.34
+    - - 7
+      - 0.75
+      - 0.24
+    - - 12
+      - 1.5
+      - 0.3
+    - - 7
+      - 2.0
+      - 0.28
+    - - 0
+      - 2.75
+      - 0.34
+    - - 7
+      - 3.5
+      - 0.24
+  bass_down:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 68
+    - 69
+    - 70
+    - 71
+    - 72
+    - 73
+    - 74
+    - 75
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+    - 81
+    - 82
+    - 83
+    - 84
+    - 85
+    - 86
+    - 87
+    octave: 2
+    velocity: 46
+    articulation: tenuto
+    humanize_ms: 3.5
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 1.75
+    - - 7
+      - 2.75
+      - 0.62
+  bass_brake_a:
+    kind: bassline
+    instrument: locked_bass
+    bars: *id005
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.6
+    - - 7
+      - 2.0
+      - 0.42
+    - - 12
+      - 3.25
+      - 0.34
+  bass_brake_b:
+    kind: bassline
+    instrument: locked_bass
+    bars: *id006
+    octave: 2
+    velocity: 47
+    articulation: tenuto
+    humanize_ms: 2.8
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 1.65
+    - - 7
+      - 2.75
+      - 0.62
+  bass_rise:
+    kind: bassline
+    instrument: locked_bass
+    bars: *id007
+    octave: 2
+    velocity: 50
+    articulation: staccato
+    humanize_ms: 2.0
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.58
+    - - 7
+      - 1.5
+      - 0.46
+    - - 12
+      - 3.0
+      - 0.42
+    dynamics:
+    - start_bar: 14
+      bars: 4
+      from: 0.68
+      to: 1.0
+      curve: smooth
+  tenor_whine_one:
+    kind: notes
+    instrument: tenor_sax_vibrato
+    articulation: tenuto
+    gate: 0.97
+    humanize_ms: 5.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 15
+      - 2.82
+      - B4
+      - 1.05
+      - 82
+    - - 16
+      - 0.18
+      - B4
+      - 2.9
+      - 86
+    - - 17
+      - 0.12
+      - G4
+      - 2.75
+      - 83
+    - - 18
+      - 0.3
+      - F#4
+      - 2.35
+      - 80
+    - - 19
+      - 0.62
+      - D#4
+      - 1.95
+      - 77
+    - - 19
+      - 3.05
+      - B3
+      - 0.62
+      - 70
+    dynamics:
+    - start_bar: 15
+      bars: 2
+      from: 0.8
+      to: 1.0
+      curve: smooth
+    - start_bar: 17
+      bars: 3
+      from: 0.96
+      to: 0.72
+      curve: smooth
+  tenor_main:
+    kind: notes
+    instrument: tenor_sax_nv
+    articulation: tenuto
+    gate: 0.92
+    humanize_ms: 10.0
+    humanize_velocity_pct: 5
+    notes:
+    - - 4
+      - 0.25
+      - B3
+      - 0.34
+      - 70
+    - - 4
+      - 0.9
+      - D4
+      - 0.28
+      - 74
+    - - 4
+      - 1.5
+      - E4
+      - 0.92
+      - 80
+    - - 4
+      - 2.78
+      - G4
+      - 0.28
+      - 77
+    - - 4
+      - 3.28
+      - E4
+      - 0.4
+      - 73
+    - - 5
+      - 1.0
+      - D#4
+      - 0.38
+      - 72
+    - - 5
+      - 1.72
+      - B3
+      - 0.68
+      - 68
+    - - 5
+      - 3.05
+      - A3
+      - 0.34
+      - 70
+    - - 6
+      - 0.22
+      - G4
+      - 0.42
+      - 78
+    - - 6
+      - 0.95
+      - E4
+      - 0.3
+      - 73
+    - - 6
+      - 1.52
+      - C4
+      - 0.3
+      - 71
+    - - 6
+      - 2.25
+      - E4
+      - 0.88
+      - 76
+    - - 7
+      - 0.45
+      - D#4
+      - 0.44
+      - 74
+    - - 7
+      - 1.18
+      - B3
+      - 0.4
+      - 70
+    - - 7
+      - 1.9
+      - A3
+      - 0.62
+      - 72
+    - - 7
+      - 3.05
+      - F#4
+      - 0.38
+      - 76
+    - - 8
+      - 0.0
+      - G4
+      - 0.3
+      - 79
+    - - 8
+      - 0.75
+      - F#4
+      - 0.34
+      - 76
+    - - 8
+      - 1.75
+      - E4
+      - 0.46
+      - 73
+    - - 8
+      - 3.0
+      - D4
+      - 0.62
+      - 70
+    - - 9
+      - 0.0
+      - F#4
+      - 0.4
+      - 76
+    - - 9
+      - 1.5
+      - D4
+      - 0.52
+      - 73
+    - - 9
+      - 3.25
+      - B3
+      - 0.48
+      - 67
+    - - 10
+      - 0.0
+      - B3
+      - 0.32
+      - 72
+    - - 10
+      - 0.62
+      - C4
+      - 0.28
+      - 76
+    - - 10
+      - 1.2
+      - E4
+      - 0.82
+      - 82
+    - - 10
+      - 2.45
+      - G4
+      - 0.28
+      - 80
+    - - 10
+      - 2.95
+      - B4
+      - 0.58
+      - 83
+    - - 11
+      - 0.72
+      - F4
+      - 0.38
+      - 78
+    - - 11
+      - 1.42
+      - F4
+      - 0.34
+      - 74
+    - - 11
+      - 2.15
+      - D4
+      - 0.7
+      - 72
+    - - 12
+      - 0.18
+      - E4
+      - 0.3
+      - 75
+    - - 12
+      - 0.75
+      - G4
+      - 0.34
+      - 79
+    - - 12
+      - 1.4
+      - B4
+      - 0.4
+      - 81
+    - - 12
+      - 2.18
+      - G4
+      - 0.72
+      - 77
+    - - 13
+      - 0.4
+      - D#4
+      - 0.36
+      - 73
+    - - 13
+      - 1.05
+      - F#4
+      - 0.42
+      - 78
+    - - 13
+      - 1.8
+      - D#4
+      - 0.34
+      - 73
+    - - 13
+      - 2.5
+      - A3
+      - 0.78
+      - 70
+    - - 14
+      - 0.18
+      - A#3
+      - 0.32
+      - 69
+    - - 14
+      - 0.78
+      - C4
+      - 0.34
+      - 73
+    - - 14
+      - 1.45
+      - E4
+      - 0.42
+      - 79
+    - - 14
+      - 2.25
+      - A#4
+      - 0.68
+      - 81
+    - - 15
+      - 0.0
+      - A4
+      - 0.3
+      - 80
+    - - 15
+      - 0.62
+      - F#4
+      - 0.3
+      - 77
+    - - 15
+      - 1.25
+      - D#4
+      - 0.34
+      - 74
+    - - 15
+      - 2.0
+      - B3
+      - 0.72
+      - 69
+    - - 20
+      - 0.72
+      - B3
+      - 0.48
+      - 62
+    - - 20
+      - 1.62
+      - E4
+      - 1.5
+      - 70
+    - - 21
+      - 3.18
+      - G3
+      - 0.34
+      - 59
+    - - 22
+      - 0.48
+      - A#3
+      - 0.52
+      - 63
+    - - 22
+      - 1.48
+      - D4
+      - 0.52
+      - 67
+    - - 22
+      - 2.4
+      - G4
+      - 1.02
+      - 72
+    - - 23
+      - 0.92
+      - F4
+      - 0.54
+      - 69
+    - - 23
+      - 1.92
+      - D4
+      - 0.58
+      - 66
+    - - 23
+      - 3.0
+      - A#3
+      - 0.5
+      - 62
+    - - 24
+      - 0.45
+      - E4
+      - 1.35
+      - 70
+    - - 24
+      - 2.52
+      - C4
+      - 0.4
+      - 65
+    - - 24
+      - 3.22
+      - C4
+      - 0.38
+      - 63
+    - - 26
+      - 0.35
+      - E4
+      - 1.65
+      - 69
+    - - 26
+      - 2.72
+      - E4
+      - 0.42
+      - 65
+    - - 27
+      - 0.32
+      - D#4
+      - 0.44
+      - 69
+    - - 27
+      - 1.18
+      - F#4
+      - 0.52
+      - 73
+    - - 27
+      - 2.2
+      - B3
+      - 1.02
+      - 64
+    - - 28
+      - 0.84
+      - B3
+      - 0.48
+      - 64
+    - - 28
+      - 1.74
+      - E4
+      - 1.5
+      - 72
+    - - 29
+      - 3.3
+      - G3
+      - 0.34
+      - 61
+    - - 30
+      - 0.6
+      - A#3
+      - 0.52
+      - 65
+    - - 30
+      - 1.6
+      - D4
+      - 0.52
+      - 69
+    - - 30
+      - 2.52
+      - G4
+      - 1.02
+      - 74
+    - - 31
+      - 1.04
+      - F4
+      - 0.54
+      - 71
+    - - 31
+      - 2.04
+      - D4
+      - 0.58
+      - 68
+    - - 31
+      - 3.12
+      - A#3
+      - 0.5
+      - 64
+    - - 32
+      - 0.57
+      - E4
+      - 1.35
+      - 72
+    - - 32
+      - 2.64
+      - C4
+      - 0.4
+      - 67
+    - - 32
+      - 3.34
+      - C4
+      - 0.38
+      - 65
+    - - 34
+      - 0.47
+      - E4
+      - 1.65
+      - 71
+    - - 34
+      - 2.84
+      - E4
+      - 0.42
+      - 67
+    - - 35
+      - 0.44
+      - D#4
+      - 0.44
+      - 71
+    - - 35
+      - 1.3
+      - F#4
+      - 0.52
+      - 75
+    - - 35
+      - 2.32
+      - B3
+      - 1.02
+      - 66
+    - - 36
+      - 0.64
+      - B3
+      - 0.48
+      - 65
+    - - 36
+      - 1.54
+      - E4
+      - 1.5
+      - 73
+    - - 37
+      - 3.1
+      - G3
+      - 0.34
+      - 62
+    - - 38
+      - 0.4
+      - A#3
+      - 0.52
+      - 66
+    - - 38
+      - 1.4
+      - D4
+      - 0.52
+      - 70
+    - - 38
+      - 2.32
+      - G4
+      - 1.02
+      - 75
+    - - 39
+      - 0.84
+      - F4
+      - 0.54
+      - 72
+    - - 39
+      - 1.84
+      - D4
+      - 0.58
+      - 69
+    - - 39
+      - 2.92
+      - A#3
+      - 0.5
+      - 65
+    - - 40
+      - 0.37
+      - E4
+      - 1.35
+      - 73
+    - - 40
+      - 0.5
+      - B3
+      - 0.42
+      - 65
+    - - 40
+      - 2.0
+      - E4
+      - 0.48
+      - 70
+    - - 40
+      - 3.25
+      - G4
+      - 0.34
+      - 73
+    - - 41
+      - 0.25
+      - C4
+      - 0.36
+      - 68
+    - - 41
+      - 1.5
+      - F4
+      - 0.42
+      - 73
+    - - 41
+      - 2.5
+      - A4
+      - 0.38
+      - 76
+    - - 41
+      - 3.25
+      - C5
+      - 0.3
+      - 78
+    - - 42
+      - 0.0
+      - C#4
+      - 0.3
+      - 70
+    - - 42
+      - 0.75
+      - F#4
+      - 0.32
+      - 75
+    - - 42
+      - 1.5
+      - A#4
+      - 0.34
+      - 78
+    - - 42
+      - 2.25
+      - C#5
+      - 0.34
+      - 81
+    - - 42
+      - 3.0
+      - A#4
+      - 0.42
+      - 77
+    - - 43
+      - 0.0
+      - D#4
+      - 0.3
+      - 72
+    - - 43
+      - 0.75
+      - F#4
+      - 0.32
+      - 77
+    - - 43
+      - 1.5
+      - A4
+      - 0.34
+      - 80
+    - - 44
+      - 0.0
+      - B3
+      - 0.32
+      - 72
+    - - 44
+      - 0.62
+      - D4
+      - 0.28
+      - 76
+    - - 44
+      - 1.2
+      - E4
+      - 0.82
+      - 82
+    - - 44
+      - 2.45
+      - G4
+      - 0.28
+      - 80
+    - - 44
+      - 2.95
+      - B4
+      - 0.58
+      - 83
+    - - 45
+      - 0.72
+      - G4
+      - 0.38
+      - 78
+    - - 45
+      - 1.42
+      - E4
+      - 0.34
+      - 74
+    - - 45
+      - 2.15
+      - D4
+      - 0.7
+      - 72
+    - - 46
+      - 0.18
+      - E4
+      - 0.3
+      - 75
+    - - 46
+      - 0.75
+      - G4
+      - 0.34
+      - 79
+    - - 46
+      - 1.4
+      - B4
+      - 0.4
+      - 81
+    - - 46
+      - 2.18
+      - G4
+      - 0.72
+      - 77
+    - - 47
+      - 0.4
+      - D4
+      - 0.36
+      - 73
+    - - 47
+      - 1.05
+      - F4
+      - 0.42
+      - 78
+    - - 47
+      - 1.8
+      - D4
+      - 0.34
+      - 73
+    - - 47
+      - 2.5
+      - A#3
+      - 0.78
+      - 70
+    - - 48
+      - 0.18
+      - G3
+      - 0.32
+      - 69
+    - - 48
+      - 0.78
+      - B3
+      - 0.34
+      - 73
+    - - 48
+      - 1.45
+      - E4
+      - 0.42
+      - 79
+    - - 48
+      - 2.25
+      - G4
+      - 0.68
+      - 81
+    - - 49
+      - 0.0
+      - A4
+      - 0.3
+      - 80
+    - - 49
+      - 0.62
+      - F#4
+      - 0.3
+      - 77
+    - - 49
+      - 1.25
+      - D#4
+      - 0.34
+      - 74
+    - - 49
+      - 2.0
+      - B3
+      - 0.72
+      - 69
+    - - 50
+      - 0.35
+      - A#3
+      - 0.34
+      - 72
+    - - 50
+      - 1.0
+      - C4
+      - 0.28
+      - 76
+    - - 50
+      - 1.6
+      - E4
+      - 0.92
+      - 82
+    - - 50
+      - 2.88
+      - G4
+      - 0.28
+      - 79
+    - - 50
+      - 3.38
+      - E4
+      - 0.4
+      - 75
+    - - 51
+      - 1.1
+      - D#4
+      - 0.38
+      - 74
+    - - 51
+      - 1.82
+      - B3
+      - 0.68
+      - 70
+    - - 51
+      - 3.15
+      - A3
+      - 0.34
+      - 72
+    - - 52
+      - 0.32
+      - G4
+      - 0.42
+      - 80
+    - - 52
+      - 1.05
+      - E4
+      - 0.3
+      - 75
+    - - 52
+      - 1.62
+      - D4
+      - 0.3
+      - 73
+    - - 52
+      - 2.35
+      - E4
+      - 0.88
+      - 78
+    - - 53
+      - 0.55
+      - D4
+      - 0.44
+      - 76
+    - - 53
+      - 1.28
+      - B3
+      - 0.4
+      - 72
+    - - 53
+      - 2.0
+      - B3
+      - 0.62
+      - 74
+    - - 53
+      - 3.15
+      - E4
+      - 0.38
+      - 78
+    - - 54
+      - 0.1
+      - G4
+      - 0.3
+      - 81
+    - - 54
+      - 0.85
+      - G4
+      - 0.34
+      - 78
+    - - 54
+      - 1.85
+      - E4
+      - 0.46
+      - 75
+    - - 54
+      - 3.1
+      - C4
+      - 0.62
+      - 72
+    - - 55
+      - 0.1
+      - F4
+      - 0.4
+      - 78
+    - - 55
+      - 1.6
+      - D4
+      - 0.52
+      - 75
+    - - 55
+      - 3.35
+      - A#3
+      - 0.48
+      - 69
+    - - 56
+      - -0.08
+      - B3
+      - 0.32
+      - 73
+    - - 56
+      - 0.54
+      - D4
+      - 0.28
+      - 77
+    - - 56
+      - 1.12
+      - E4
+      - 0.82
+      - 83
+    - - 56
+      - 2.37
+      - G4
+      - 0.28
+      - 81
+    - - 56
+      - 2.87
+      - B4
+      - 0.58
+      - 84
+    - - 57
+      - 0.64
+      - F#4
+      - 0.38
+      - 79
+    - - 57
+      - 1.34
+      - D#4
+      - 0.34
+      - 75
+    - - 57
+      - 2.07
+      - D#4
+      - 0.7
+      - 73
+    - - 58
+      - 0.1
+      - E4
+      - 0.3
+      - 76
+    - - 58
+      - 0.67
+      - G4
+      - 0.34
+      - 80
+    - - 58
+      - 1.32
+      - A#4
+      - 0.4
+      - 82
+    - - 58
+      - 2.1
+      - G4
+      - 0.72
+      - 78
+    - - 59
+      - 0.32
+      - D#4
+      - 0.36
+      - 74
+    - - 59
+      - 0.97
+      - F#4
+      - 0.42
+      - 79
+    - - 59
+      - 1.72
+      - D#4
+      - 0.34
+      - 74
+    - - 59
+      - 2.42
+      - A3
+      - 0.78
+      - 71
+    - - 60
+      - 0.1
+      - G3
+      - 0.32
+      - 70
+    - - 60
+      - 0.7
+      - B3
+      - 0.34
+      - 74
+    - - 60
+      - 1.37
+      - E4
+      - 0.42
+      - 80
+    - - 60
+      - 2.17
+      - G4
+      - 0.68
+      - 82
+    - - 61
+      - -0.08
+      - G4
+      - 0.3
+      - 81
+    - - 61
+      - 0.54
+      - F#4
+      - 0.3
+      - 78
+    - - 61
+      - 1.17
+      - D4
+      - 0.34
+      - 75
+    - - 61
+      - 1.92
+      - B3
+      - 0.72
+      - 70
+    - - 62
+      - 0.25
+      - E4
+      - 0.4
+      - 74
+    - - 62
+      - 1.0
+      - G4
+      - 0.45
+      - 78
+    - - 63
+      - 0.25
+      - F4
+      - 0.55
+      - 76
+    - - 63
+      - 1.2
+      - D4
+      - 0.55
+      - 73
+    - - 63
+      - 2.3
+      - A#3
+      - 0.9
+      - 68
+    - - 64
+      - 0.2
+      - B4
+      - 0.45
+      - 78
+    - - 64
+      - 1.0
+      - G4
+      - 0.65
+      - 74
+    - - 65
+      - 0.25
+      - E4
+      - 1.35
+      - 71
+    - - 66
+      - 0.5
+      - F#4
+      - 0.55
+      - 73
+    - - 67
+      - 1.2
+      - B3
+      - 1.65
+      - 65
+    - - 68
+      - 0.72
+      - B3
+      - 0.48
+      - 63
+    - - 68
+      - 1.62
+      - E4
+      - 1.5
+      - 71
+    - - 69
+      - 3.18
+      - G3
+      - 0.34
+      - 60
+    - - 70
+      - 0.48
+      - A#3
+      - 0.52
+      - 64
+    - - 70
+      - 1.48
+      - D4
+      - 0.52
+      - 68
+    - - 70
+      - 2.4
+      - G4
+      - 1.02
+      - 73
+    - - 71
+      - 0.92
+      - F4
+      - 0.54
+      - 70
+    - - 71
+      - 1.92
+      - D4
+      - 0.58
+      - 67
+    - - 71
+      - 3.0
+      - A#3
+      - 0.5
+      - 63
+    - - 72
+      - 0.45
+      - E4
+      - 1.35
+      - 71
+    - - 72
+      - 2.52
+      - C4
+      - 0.4
+      - 66
+    - - 72
+      - 3.22
+      - C4
+      - 0.38
+      - 64
+    - - 74
+      - 0.35
+      - E4
+      - 1.65
+      - 70
+    - - 74
+      - 2.72
+      - E4
+      - 0.42
+      - 66
+    - - 75
+      - 0.32
+      - D#4
+      - 0.44
+      - 70
+    - - 75
+      - 1.18
+      - F#4
+      - 0.52
+      - 74
+    - - 75
+      - 2.2
+      - B3
+      - 1.02
+      - 65
+    - - 76
+      - 0.62
+      - B3
+      - 0.48
+      - 65
+    - - 76
+      - 1.52
+      - E4
+      - 1.5
+      - 73
+    - - 77
+      - 3.08
+      - G3
+      - 0.34
+      - 62
+    - - 78
+      - 0.38
+      - A#3
+      - 0.52
+      - 66
+    - - 78
+      - 1.38
+      - D4
+      - 0.52
+      - 70
+    - - 78
+      - 2.3
+      - G4
+      - 1.02
+      - 75
+    - - 79
+      - 0.82
+      - F4
+      - 0.54
+      - 72
+    - - 79
+      - 1.82
+      - D4
+      - 0.58
+      - 69
+    - - 79
+      - 2.9
+      - A#3
+      - 0.5
+      - 65
+    - - 80
+      - 0.35
+      - E4
+      - 1.35
+      - 73
+    - - 80
+      - 2.42
+      - C4
+      - 0.4
+      - 68
+    - - 80
+      - 3.12
+      - C4
+      - 0.38
+      - 66
+    - - 82
+      - 0.25
+      - E4
+      - 1.65
+      - 72
+    - - 82
+      - 2.62
+      - E4
+      - 0.42
+      - 68
+    - - 83
+      - 0.22
+      - D#4
+      - 0.44
+      - 72
+    - - 83
+      - 1.08
+      - F#4
+      - 0.52
+      - 76
+    - - 83
+      - 2.1
+      - B3
+      - 1.02
+      - 67
+    - - 84
+      - 0.87
+      - B3
+      - 0.48
+      - 66
+    - - 84
+      - 1.77
+      - E4
+      - 1.5
+      - 74
+    - - 85
+      - 3.33
+      - G3
+      - 0.34
+      - 63
+    - - 86
+      - 0.63
+      - A#3
+      - 0.52
+      - 67
+    - - 86
+      - 1.63
+      - D4
+      - 0.52
+      - 71
+    - - 86
+      - 2.55
+      - G4
+      - 1.02
+      - 76
+    - - 87
+      - 1.07
+      - F4
+      - 0.54
+      - 73
+    - - 87
+      - 2.07
+      - D4
+      - 0.58
+      - 70
+    - - 87
+      - 3.15
+      - A#3
+      - 0.5
+      - 66
+    - - 88
+      - 0.58
+      - B3
+      - 0.42
+      - 67
+    - - 88
+      - 0.6
+      - E4
+      - 1.35
+      - 74
+    - - 88
+      - 2.08
+      - E4
+      - 0.48
+      - 72
+    - - 88
+      - 2.67
+      - D4
+      - 0.4
+      - 69
+    - - 88
+      - 3.33
+      - G4
+      - 0.34
+      - 75
+    - - 88
+      - 3.37
+      - B3
+      - 0.38
+      - 67
+    - - 89
+      - 0.33
+      - C4
+      - 0.36
+      - 70
+    - - 89
+      - 1.58
+      - F4
+      - 0.42
+      - 75
+    - - 89
+      - 2.58
+      - A4
+      - 0.38
+      - 78
+    - - 89
+      - 3.33
+      - C5
+      - 0.3
+      - 80
+    - - 90
+      - 0.08
+      - C#4
+      - 0.3
+      - 72
+    - - 90
+      - 0.83
+      - F#4
+      - 0.32
+      - 77
+    - - 90
+      - 1.58
+      - A#4
+      - 0.34
+      - 80
+    - - 90
+      - 2.33
+      - C#5
+      - 0.34
+      - 83
+    - - 90
+      - 3.08
+      - A#4
+      - 0.42
+      - 79
+    - - 91
+      - 0.08
+      - D#4
+      - 0.3
+      - 74
+    - - 91
+      - 0.83
+      - F#4
+      - 0.32
+      - 79
+    - - 91
+      - 1.58
+      - A4
+      - 0.34
+      - 82
+    - - 92
+      - 0.25
+      - B3
+      - 0.34
+      - 72
+    - - 92
+      - 0.9
+      - D4
+      - 0.28
+      - 76
+    - - 92
+      - 1.5
+      - E4
+      - 0.92
+      - 82
+    - - 92
+      - 2.78
+      - G4
+      - 0.28
+      - 79
+    - - 92
+      - 3.28
+      - E4
+      - 0.4
+      - 75
+    - - 93
+      - 1.0
+      - D4
+      - 0.38
+      - 74
+    - - 93
+      - 1.72
+      - B3
+      - 0.68
+      - 70
+    - - 93
+      - 3.05
+      - G3
+      - 0.34
+      - 72
+    - - 94
+      - 0.22
+      - G4
+      - 0.42
+      - 80
+    - - 94
+      - 0.95
+      - E4
+      - 0.3
+      - 75
+    - - 94
+      - 1.52
+      - C4
+      - 0.3
+      - 73
+    - - 94
+      - 2.25
+      - E4
+      - 0.88
+      - 78
+    - - 95
+      - 0.45
+      - D4
+      - 0.44
+      - 76
+    - - 95
+      - 1.18
+      - A#3
+      - 0.4
+      - 72
+    - - 95
+      - 1.9
+      - A#3
+      - 0.62
+      - 74
+    - - 95
+      - 3.05
+      - F4
+      - 0.38
+      - 78
+    - - 96
+      - 0.0
+      - G4
+      - 0.3
+      - 81
+    - - 96
+      - 0.75
+      - F#4
+      - 0.34
+      - 78
+    - - 96
+      - 1.75
+      - E4
+      - 0.46
+      - 75
+    - - 96
+      - 3.0
+      - D4
+      - 0.62
+      - 72
+    - - 97
+      - 0.0
+      - F#4
+      - 0.4
+      - 78
+    - - 97
+      - 1.5
+      - D#4
+      - 0.52
+      - 75
+    - - 97
+      - 3.25
+      - B3
+      - 0.48
+      - 69
+    - - 98
+      - -0.08
+      - A#3
+      - 0.32
+      - 74
+    - - 98
+      - 0.54
+      - C4
+      - 0.28
+      - 78
+    - - 98
+      - 1.12
+      - E4
+      - 0.82
+      - 84
+    - - 98
+      - 2.37
+      - G4
+      - 0.28
+      - 82
+    - - 98
+      - 2.87
+      - A#4
+      - 0.58
+      - 85
+    - - 99
+      - 0.64
+      - F#4
+      - 0.38
+      - 80
+    - - 99
+      - 1.34
+      - D#4
+      - 0.34
+      - 76
+    - - 99
+      - 2.07
+      - D#4
+      - 0.7
+      - 74
+    - - 100
+      - 0.1
+      - E4
+      - 0.3
+      - 77
+    - - 100
+      - 0.67
+      - G4
+      - 0.34
+      - 81
+    - - 100
+      - 1.32
+      - B4
+      - 0.4
+      - 83
+    - - 100
+      - 2.1
+      - G4
+      - 0.72
+      - 79
+    - - 101
+      - 0.32
+      - D4
+      - 0.36
+      - 75
+    - - 101
+      - 0.97
+      - E4
+      - 0.42
+      - 80
+    - - 101
+      - 1.72
+      - D4
+      - 0.34
+      - 75
+    - - 101
+      - 2.42
+      - B3
+      - 0.78
+      - 72
+    - - 102
+      - 0.1
+      - G3
+      - 0.32
+      - 71
+    - - 102
+      - 0.7
+      - C4
+      - 0.34
+      - 75
+    - - 102
+      - 1.37
+      - E4
+      - 0.42
+      - 81
+    - - 102
+      - 2.17
+      - G4
+      - 0.68
+      - 83
+    - - 103
+      - -0.08
+      - A#4
+      - 0.3
+      - 82
+    - - 103
+      - 0.54
+      - F4
+      - 0.3
+      - 79
+    - - 103
+      - 1.17
+      - D4
+      - 0.34
+      - 76
+    - - 103
+      - 1.92
+      - A#3
+      - 0.72
+      - 71
+    - - 104
+      - 0.37
+      - B3
+      - 0.34
+      - 73
+    - - 104
+      - 1.02
+      - D4
+      - 0.28
+      - 77
+    - - 104
+      - 1.62
+      - E4
+      - 0.92
+      - 83
+    - - 104
+      - 2.9
+      - G4
+      - 0.28
+      - 80
+    - - 104
+      - 3.4
+      - E4
+      - 0.4
+      - 76
+    - - 105
+      - 1.12
+      - D#4
+      - 0.38
+      - 75
+    - - 105
+      - 1.84
+      - B3
+      - 0.68
+      - 71
+    - - 105
+      - 3.17
+      - A3
+      - 0.34
+      - 73
+    - - 106
+      - 0.34
+      - G4
+      - 0.42
+      - 81
+    - - 106
+      - 1.07
+      - E4
+      - 0.3
+      - 76
+    - - 106
+      - 1.64
+      - C4
+      - 0.3
+      - 74
+    - - 106
+      - 2.37
+      - E4
+      - 0.88
+      - 79
+    - - 107
+      - 0.57
+      - D#4
+      - 0.44
+      - 77
+    - - 107
+      - 1.3
+      - B3
+      - 0.4
+      - 73
+    - - 107
+      - 2.02
+      - A3
+      - 0.62
+      - 75
+    - - 107
+      - 3.17
+      - F#4
+      - 0.38
+      - 79
+    - - 108
+      - 0.12
+      - G4
+      - 0.3
+      - 82
+    - - 108
+      - 0.87
+      - F#4
+      - 0.34
+      - 79
+    - - 108
+      - 1.87
+      - E4
+      - 0.46
+      - 76
+    - - 108
+      - 3.12
+      - D4
+      - 0.62
+      - 73
+    - - 109
+      - 0.12
+      - F#4
+      - 0.4
+      - 79
+    - - 109
+      - 1.62
+      - D4
+      - 0.52
+      - 76
+    - - 109
+      - 3.37
+      - B3
+      - 0.48
+      - 70
+    - - 110
+      - 0.2
+      - G4
+      - 0.35
+      - 80
+    - - 110
+      - 0.9
+      - G4
+      - 0.4
+      - 76
+    - - 111
+      - 0.2
+      - D4
+      - 0.45
+      - 73
+    - - 111
+      - 1.2
+      - A#3
+      - 1.3
+      - 67
+  tenor_bites:
+    kind: notes
+    instrument: tenor_sax_staccato
+    articulation: staccato
+    gate: 0.72
+    humanize_ms: 7.0
+    humanize_velocity_pct: 5
+    notes:
+    - - 6
+      - 3.4
+      - G4
+      - 0.2
+      - 70
+    - - 14
+      - 3.35
+      - E4
+      - 0.2
+      - 72
+    - - 42
+      - 3.5
+      - C#5
+      - 0.2
+      - 78
+    - - 52
+      - 3.4
+      - G4
+      - 0.2
+      - 73
+    - - 60
+      - 3.4
+      - E4
+      - 0.2
+      - 72
+    - - 90
+      - 3.5
+      - C#5
+      - 0.2
+      - 79
+    - - 102
+      - 3.4
+      - G4
+      - 0.2
+      - 74
+    - - 108
+      - 3.45
+      - E4
+      - 0.2
+      - 73
+  tenor_peak:
+    kind: notes
+    instrument: tenor_sax_vibrato
+    articulation: tenuto
+    gate: 0.94
+    humanize_ms: 6.0
+    humanize_velocity_pct: 3
+    notes:
+    - - 43
+      - 2.0
+      - B4
+      - 1.5
+      - 82
+    - - 91
+      - 2.0
+      - B4
+      - 1.5
+      - 80
+    dynamics:
+    - start_bar: 43
+      bars: 1
+      from: 0.82
+      to: 1.0
+      curve: smooth
+    - start_bar: 91
+      bars: 1
+      from: 0.84
+      to: 1.0
+      curve: smooth
+  piano_down:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 20
+      - 0.0
+    - - 24
+      - 0.0
+    - - 28
+      - 0.0
+    - - 32
+      - 0.0
+    - - 36
+      - 0.0
+    - - 68
+      - 0.0
+    - - 72
+      - 0.0
+    - - 76
+      - 0.0
+    - - 80
+      - 0.0
+    - - 84
+      - 0.0
+    duration_beats: 0.72
+    velocity: 40
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 5.0
+    humanize_velocity_pct: 5
+  piano_rise:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 40
+      - 0.0
+    - - 41
+      - 0.0
+    - - 41
+      - 2.5
+    - - 42
+      - 0.0
+    - - 42
+      - 1.5
+    - - 42
+      - 3.0
+    - - 43
+      - 0.0
+    - - 43
+      - 1.0
+    - - 43
+      - 2.0
+    - - 43
+      - 3.0
+    - - 88
+      - 0.0
+    - - 89
+      - 0.0
+    - - 89
+      - 2.5
+    - - 90
+      - 0.0
+    - - 90
+      - 1.5
+    - - 90
+      - 3.0
+    - - 91
+      - 0.0
+    - - 91
+      - 1.0
+    - - 91
+      - 2.0
+    - - 91
+      - 3.0
+    - - 111
+      - 3.0
+    duration_beats: 0.38
+    velocity: 48
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.0
+    humanize_velocity_pct: 4
+    dynamics:
+    - start_bar: 40
+      bars: 4
+      from: 0.62
+      to: 1.0
+      curve: smooth
+    - start_bar: 88
+      bars: 4
+      from: 0.66
+      to: 1.0
+      curve: smooth
+  macro_drums:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.4
+    events:
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      - 3.5
+      bars: *id003
+      velocity: 58
+      duration_beats: 0.14
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      bars: *id003
+      velocity: 55
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      bars: *id003
+      velocity: 38
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.0
+      - 3.5
+      bars: *id005
+      velocity: 55
+      duration_beats: 0.14
+    - drum: snare
+      beats:
+      - 1.0
+      - 3.0
+      bars: *id005
+      velocity: 53
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      bars: *id005
+      velocity: 35
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 2.5
+      bars:
+      - 18
+      - 19
+      - 66
+      - 67
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 27
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 35
+      - 36
+      - 37
+      - 38
+      - 39
+      - 68
+      - 69
+      - 70
+      - 71
+      - 72
+      - 73
+      - 74
+      - 75
+      - 76
+      - 77
+      - 78
+      - 79
+      - 80
+      - 81
+      - 82
+      - 83
+      - 84
+      - 85
+      - 86
+      - 87
+      velocity: 52
+      duration_beats: 0.14
+    - drum: snare
+      beat: 2.0
+      bars:
+      - 18
+      - 19
+      - 66
+      - 67
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 27
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 35
+      - 36
+      - 37
+      - 38
+      - 39
+      - 68
+      - 69
+      - 70
+      - 71
+      - 72
+      - 73
+      - 74
+      - 75
+      - 76
+      - 77
+      - 78
+      - 79
+      - 80
+      - 81
+      - 82
+      - 83
+      - 84
+      - 85
+      - 86
+      - 87
+      velocity: 52
+      duration_beats: 0.08
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      bars:
+      - 18
+      - 19
+      - 66
+      - 67
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 27
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 35
+      - 36
+      - 37
+      - 38
+      - 39
+      - 68
+      - 69
+      - 70
+      - 71
+      - 72
+      - 73
+      - 74
+      - 75
+      - 76
+      - 77
+      - 78
+      - 79
+      - 80
+      - 81
+      - 82
+      - 83
+      - 84
+      - 85
+      - 86
+      - 87
+      velocity: 30
+      duration_beats: 0.09
+    - drum: concert_bass_drum
+      beats:
+      - 0.0
+      - 1.5
+      - 3.0
+      bars: *id007
+      velocity: 55
+      duration_beats: 0.14
+    - drum: snare
+      beats:
+      - 2.0
+      - 3.5
+      bars: *id007
+      velocity: 53
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 0.5
+      - 1.0
+      - 1.5
+      - 2.0
+      - 2.5
+      - 3.0
+      - 3.5
+      bars: *id007
+      velocity: 38
+      duration_beats: 0.08
+    - drum: crash
+      beat: 0.0
+      bars:
+      - 0
+      - 44
+      - 92
+      velocity: 82
+      duration_beats: 0.18
+    - drum: open_hat
+      beat: 3.5
+      bars:
+      - 15
+      - 43
+      - 63
+      - 91
+      - 111
+      velocity: 52
+      duration_beats: 0.1
+  guitar_extension_brake_a:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 112
+    - 113
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.35
+      - 0.94
+    - - 12
+      - 2.0
+      - 0.72
+      - 0.76
+    - - 0
+      - 3.25
+      - 0.42
+      - 0.62
+    velocity: 70
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.7
+    humanize_velocity_pct: 2.5
+    min_pitch: 31
+  guitar_extension_brake_b:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 114
+    - 115
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.82
+      - 0.84
+    - - 12
+      - 3.0
+      - 0.48
+      - 0.6
+    velocity: 68
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.9
+    humanize_velocity_pct: 2.5
+    min_pitch: 31
+  guitar_extension_down_open:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 116
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.58
+      - 0.82
+    - - 12
+      - 3.0
+      - 0.5
+      - 0.62
+    velocity: 66
+    gate: 0.95
+    articulation: marcato
+    humanize_ms: 2.4
+    humanize_velocity_pct: 3.0
+    min_pitch: 31
+  guitar_extension_down:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 117
+    - 118
+    - 119
+    - 120
+    - 122
+    - 123
+    - 124
+    - 126
+    - 127
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 1.72
+      - 0.82
+    - - 12
+      - 3.0
+      - 0.5
+      - 0.6
+    velocity: 66
+    gate: 0.95
+    articulation: marcato
+    humanize_ms: 2.5
+    humanize_velocity_pct: 3.5
+    min_pitch: 31
+  guitar_extension_reply:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 121
+    - 125
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.72
+      - 0.76
+    - - 12
+      - 1.5
+      - 0.25
+      - 0.58
+    - - 0
+      - 2.25
+      - 0.28
+      - 0.66
+    - - 12
+      - 3.0
+      - 0.48
+      - 0.72
+    velocity: 67
+    gate: 0.93
+    articulation: marcato
+    humanize_ms: 2.2
+    humanize_velocity_pct: 3.5
+    min_pitch: 31
+  guitar_extension_rise:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 128
+    - 129
+    - 130
+    - 131
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.72
+      - 0.84
+    - - 12
+      - 1.5
+      - 0.42
+      - 0.72
+    - - 0
+      - 3.0
+      - 0.62
+      - 0.94
+    velocity: 71
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.7
+    humanize_velocity_pct: 2.2
+    min_pitch: 31
+  guitar_extension_fast:
+    kind: sampled_chord
+    takes: *id001
+    bars:
+    - 132
+    - 133
+    - 134
+    - 135
+    - 136
+    - 137
+    - 138
+    - 139
+    - 140
+    - 141
+    - 142
+    - 143
+    octave: 2
+    quality: power
+    keyswitches: *id002
+    pattern:
+    - - 0
+      - 0.0
+      - 0.62
+      - 1.0
+    - - 12
+      - 0.75
+      - 0.28
+      - 0.72
+    - - 0
+      - 1.5
+      - 0.65
+      - 0.92
+    - - 0
+      - 2.5
+      - 0.26
+      - 0.68
+    - - 12
+      - 3.0
+      - 0.72
+      - 0.84
+    velocity: 72
+    gate: 0.96
+    articulation: marcato
+    humanize_ms: 1.5
+    humanize_velocity_pct: 2.0
+    min_pitch: 31
+  bass_extension_brake_a:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 112
+    - 113
+    octave: 2
+    velocity: 48
+    articulation: staccato
+    humanize_ms: 2.1
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.55
+    - - 7
+      - 2.0
+      - 0.38
+    - - 12
+      - 3.25
+      - 0.3
+  bass_extension_brake_b:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 114
+    - 115
+    octave: 2
+    velocity: 46
+    articulation: tenuto
+    humanize_ms: 2.9
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 1.35
+    - - 7
+      - 2.75
+      - 0.52
+  bass_extension_down:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 116
+    - 117
+    - 118
+    - 119
+    - 120
+    - 121
+    - 122
+    - 123
+    - 124
+    - 125
+    - 126
+    - 127
+    octave: 2
+    velocity: 45
+    articulation: tenuto
+    humanize_ms: 3.7
+    humanize_velocity_pct: 4
+    pattern:
+    - - 0
+      - 0.0
+      - 1.65
+    - - 7
+      - 2.75
+      - 0.52
+  bass_extension_rise:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 128
+    - 129
+    - 130
+    - 131
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 2.1
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.54
+    - - 7
+      - 1.5
+      - 0.42
+    - - 12
+      - 3.0
+      - 0.38
+  bass_extension_fast:
+    kind: bassline
+    instrument: locked_bass
+    bars:
+    - 132
+    - 133
+    - 134
+    - 135
+    - 136
+    - 137
+    - 138
+    - 139
+    - 140
+    - 141
+    - 142
+    - 143
+    octave: 2
+    velocity: 49
+    articulation: staccato
+    humanize_ms: 1.9
+    humanize_velocity_pct: 3
+    pattern:
+    - - 0
+      - 0.0
+      - 0.34
+    - - 7
+      - 0.75
+      - 0.24
+    - - 12
+      - 1.5
+      - 0.3
+    - - 7
+      - 2.0
+      - 0.28
+    - - 0
+      - 2.75
+      - 0.34
+    - - 7
+      - 3.5
+      - 0.24
+  tenor_extension:
+    kind: notes
+    instrument: tenor_sax_nv
+    articulation: tenuto
+    gate: 0.94
+    humanize_ms: 9.0
+    humanize_velocity_pct: 4
+    notes:
+    - - 112
+      - 0.45
+      - E4
+      - 1.45
+      - 72
+    - - 114
+      - 0.65
+      - B3
+      - 1.55
+      - 67
+    - - 116
+      - 0.7
+      - E4
+      - 1.75
+      - 69
+    - - 118
+      - 0.6
+      - G4
+      - 0.72
+      - 72
+    - - 118
+      - 1.75
+      - D4
+      - 0.58
+      - 67
+    - - 119
+      - 1.05
+      - A#3
+      - 1.15
+      - 64
+    - - 122
+      - 0.55
+      - F#4
+      - 0.68
+      - 72
+    - - 122
+      - 1.65
+      - E4
+      - 0.52
+      - 68
+    - - 123
+      - 1.0
+      - D#4
+      - 0.62
+      - 69
+    - - 123
+      - 2.05
+      - B3
+      - 0.92
+      - 64
+    - - 124
+      - 0.5
+      - E4
+      - 1.55
+      - 70
+    - - 126
+      - 0.4
+      - G4
+      - 0.58
+      - 73
+    - - 126
+      - 1.45
+      - F4
+      - 0.52
+      - 70
+    - - 127
+      - 0.85
+      - D4
+      - 0.62
+      - 67
+    - - 127
+      - 2.0
+      - A#3
+      - 0.82
+      - 63
+    - - 128
+      - 0.35
+      - B3
+      - 0.38
+      - 68
+    - - 128
+      - 1.2
+      - E4
+      - 0.44
+      - 72
+    - - 128
+      - 2.1
+      - G4
+      - 0.52
+      - 76
+    - - 129
+      - 0.25
+      - C4
+      - 0.34
+      - 70
+    - - 129
+      - 1.15
+      - F4
+      - 0.4
+      - 74
+    - - 129
+      - 2.05
+      - A4
+      - 0.42
+      - 78
+    - - 130
+      - 0.2
+      - C#4
+      - 0.34
+      - 72
+    - - 130
+      - 1.0
+      - F#4
+      - 0.4
+      - 76
+    - - 130
+      - 1.8
+      - A#4
+      - 0.46
+      - 80
+    - - 131
+      - 0.15
+      - D#4
+      - 0.34
+      - 73
+    - - 131
+      - 0.95
+      - F#4
+      - 0.4
+      - 77
+    - - 131
+      - 1.75
+      - A4
+      - 0.48
+      - 81
+    - - 132
+      - 0.3
+      - B3
+      - 0.32
+      - 72
+    - - 132
+      - 0.95
+      - D4
+      - 0.28
+      - 75
+    - - 132
+      - 1.55
+      - E4
+      - 0.78
+      - 80
+    - - 132
+      - 2.75
+      - G4
+      - 0.38
+      - 78
+    - - 134
+      - 0.2
+      - C4
+      - 0.32
+      - 72
+    - - 134
+      - 0.9
+      - E4
+      - 0.38
+      - 76
+    - - 134
+      - 1.7
+      - G4
+      - 0.46
+      - 80
+    - - 134
+      - 2.65
+      - B4
+      - 0.58
+      - 82
+    - - 135
+      - 0.55
+      - A#4
+      - 0.34
+      - 79
+    - - 135
+      - 1.3
+      - F4
+      - 0.38
+      - 75
+    - - 135
+      - 2.2
+      - D4
+      - 0.68
+      - 70
+    - - 136
+      - 0.4
+      - B3
+      - 0.34
+      - 71
+    - - 136
+      - 1.05
+      - E4
+      - 0.62
+      - 77
+    - - 136
+      - 2.15
+      - G4
+      - 0.52
+      - 80
+    - - 137
+      - 0.4
+      - D#4
+      - 0.36
+      - 73
+    - - 137
+      - 1.15
+      - F#4
+      - 0.42
+      - 77
+    - - 137
+      - 2.0
+      - B3
+      - 0.75
+      - 68
+    - - 138
+      - 0.25
+      - C4
+      - 0.32
+      - 72
+    - - 138
+      - 0.95
+      - E4
+      - 0.38
+      - 76
+    - - 138
+      - 1.75
+      - G4
+      - 0.42
+      - 79
+    - - 138
+      - 2.55
+      - A#4
+      - 0.58
+      - 81
+    - - 139
+      - 0.45
+      - A3
+      - 0.34
+      - 69
+    - - 139
+      - 1.15
+      - D#4
+      - 0.42
+      - 74
+    - - 139
+      - 2.0
+      - F#4
+      - 0.55
+      - 77
+    - - 140
+      - 0.3
+      - E4
+      - 2.2
+      - 72
+  piano_extension_down:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 116
+      - 0.0
+    - - 120
+      - 0.0
+    - - 124
+      - 0.0
+    duration_beats: 0.68
+    velocity: 38
+    articulation: tenuto
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 5.5
+    humanize_velocity_pct: 5
+  piano_extension_rise:
+    kind: chord_hits
+    instrument: grand_piano
+    octave: 3
+    hits:
+    - - 128
+      - 0.0
+    - - 129
+      - 0.0
+    - - 129
+      - 2.5
+    - - 130
+      - 0.0
+    - - 130
+      - 1.5
+    - - 130
+      - 3.0
+    - - 131
+      - 0.0
+    - - 131
+      - 1.0
+    - - 131
+      - 2.0
+    - - 131
+      - 3.0
+    duration_beats: 0.36
+    velocity: 46
+    articulation: marcato
+    voicing: triad
+    include_slash_bass: false
+    humanize_ms: 3.2
+    humanize_velocity_pct: 4
+  macro_drums_extension:
+    kind: drums
+    instrument: rock_drums
+    humanize_ms: 1.5
+    events:
+    - drum: concert_bass_drum
+      beats: [0.0, 2.0, 3.5]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 57
+      duration_beats: 0.14
+    - drum: snare
+      beats: [1.0, 3.0]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 54
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143]
+      velocity: 37
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats: [0.0, 2.0, 3.5]
+      bars: [112, 113]
+      velocity: 54
+      duration_beats: 0.14
+    - drum: snare
+      beats: [1.0, 3.0]
+      bars: [112, 113]
+      velocity: 52
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [112, 113]
+      velocity: 34
+      duration_beats: 0.08
+    - drum: concert_bass_drum
+      beats: [0.0, 2.5]
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 50
+      duration_beats: 0.14
+    - drum: snare
+      beat: 2.0
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 50
+      duration_beats: 0.08
+    - drum: closed_hat
+      beats: [0.0, 1.0, 2.0, 3.0]
+      bars: [114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127]
+      velocity: 29
+      duration_beats: 0.09
+    - drum: concert_bass_drum
+      beats: [0.0, 1.5, 3.0]
+      bars: [128, 129, 130, 131]
+      velocity: 54
+      duration_beats: 0.14
+    - drum: snare
+      beats: [2.0, 3.5]
+      bars: [128, 129, 130, 131]
+      velocity: 52
+      duration_beats: 0.07
+    - drum: closed_hat
+      beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+      bars: [128, 129, 130, 131]
+      velocity: 37
+      duration_beats: 0.08
+    - drum: crash
+      beat: 0.0
+      bars: [132]
+      velocity: 80
+      duration_beats: 0.18
+    - drum: open_hat
+      beat: 3.5
+      bars: [127, 131]
+      velocity: 50
+      duration_beats: 0.1
+  tenor_drone:
+    kind: notes
+    instrument: tenor_sax_nv
+    articulation: tenuto
+    gate: 0.97
+    humanize_ms: 4.0
+    humanize_velocity_pct: 2
+    notes:
+    - - 2
+      - 0.15
+      - E3
+      - 6.8
+      - 68
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - main_loop
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+  bridge_stems:
+  - keys
+  - melody
+  - percussion
+  - bass
+  - guitars
+  fade_stems: []
+state_map:
+  default:
+    preferred_section: main_loop
+    stems:
+      keys: 1.0
+      melody: 1.0
+      percussion: 0.8
+      bass: 0.92
+      guitars: 0.66
+  flow:
+    preferred_section: main_loop
+    stems:
+      keys: 1.0
+      melody: 1.0
+      percussion: 0.82
+      bass: 0.94
+      guitars: 0.7
+  focus:
+    preferred_section: main_loop
+    stems:
+      keys: 0.92
+      melody: 1.0
+      percussion: 0.76
+      bass: 0.9
+      guitars: 0.62
+  pressure:
+    preferred_section: main_loop
+    stems:
+      keys: 1.0
+      melody: 1.0
+      percussion: 0.86
+      bass: 0.98
+      guitars: 0.74
+sections:
+- id: main_loop
+  kind: loop_component
+  label: Fast I - guitar ignition
+  bars: 144
+  intensity: 0.94
+  density: 0.9
+  loopable: true
+  valid_exit_local_bars:
+  - 144
+  harmony:
+  - Em9
+  - Em9
+  - Em9
+  - Em9
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Em9
+  - F
+  - F#7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - Em9
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Em9
+  - F
+  - F#7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - Em9
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Cmaj7
+  - Cmaj7
+  - B7sus4
+  - B7
+  - Em9
+  - Em9
+  - Gm7
+  - Gm7
+  - Em9
+  - F
+  - F#7
+  - B7
+  - Em9
+  - Em9
+  - Cmaj7
+  - Bb
+  - Em9
+  - B7
+  - C7
+  - B7
+  - Em9
+  - B7
+  - Em9
+  - Em9
+  layers:
+  - guitar_up
+  - guitar_brake_a
+  - guitar_brake_b
+  - guitar_down
+  - guitar_down_open
+  - guitar_down_reply
+  - guitar_rise
+  - bass_up
+  - bass_brake_a
+  - bass_brake_b
+  - bass_down
+  - bass_rise
+  - tenor_drone
+  - tenor_whine_one
+  - tenor_main
+  - tenor_bites
+  - tenor_peak
+  - piano_down
+  - piano_rise
+  - macro_drums
+  - guitar_extension_brake_a
+  - guitar_extension_brake_b
+  - guitar_extension_down_open
+  - guitar_extension_down
+  - guitar_extension_reply
+  - guitar_extension_rise
+  - guitar_extension_fast
+  - bass_extension_brake_a
+  - bass_extension_brake_b
+  - bass_extension_down
+  - bass_extension_rise
+  - bass_extension_fast
+  - tenor_extension
+  - piano_extension_down
+  - piano_extension_rise
+  - macro_drums_extension

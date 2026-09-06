@@ -1,0 +1,650 @@
+schema: ambition.musicir.v1
+id: room_n_plus_one
+title: Room N+1
+seed: 202608160937
+notes: 'Dedicated Hilbert''s Hotel lobby theme: an elegant, faintly impossible chamber waltz led by the reception-desk
+  piano. The desk is the identity of the room; bass, harp, corridor strings, and service bell remain restrained supporting
+  architecture. Instead of a rotating parade of guest soloists, one warm clarinet now makes a brief two-note room-call
+  once per 12-bar circuit. Those four calls move G -> A -> B -> C, quietly suggesting n -> n+1 without interrupting the
+  lobby pulse. The result is intentionally simpler and more architectural: an orderly hotel that can keep making room
+  forever, not a chamber showcase. Sampled SFZ instruments are preferred where installed; every retained role keeps a
+  portable General MIDI fallback.'
+tempo:
+  bpm: 111
+meter:
+  beats_per_bar: 3
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  runtime_stems:
+    target_peak_db: -8.0
+    max_gain_db: 16.0
+  sfizz:
+    library_roots:
+    - /data/audio-tools/sfz
+    - /data/audio-tools
+    fallback_backend: pretty-midi
+  metadata_markers:
+  - id: front_desk
+    label: Front desk - orderly lobby pulse
+    bar: 1
+  - id: shift_everyone
+    label: Room call rises by one
+    bar: 13
+  - id: fully_occupied
+    label: Another room call, still no vacancy crisis
+    bar: 25
+  - id: infinite_corridor
+    label: Infinite corridor - return without arrival
+    bar: 37
+postprocess:
+  gain_db: -0.2
+  highpass_hz: 36
+  lowpass_hz: 13500
+  high_shelf_hz: 6800
+  high_shelf_db: 0.65
+  presence_low_hz: 1600
+  presence_high_hz: 4300
+  presence_db: 1.05
+  eq_bands:
+  - type: low_shelf
+    hz: 125
+    q: 0.8
+    db: -0.65
+  - type: peak
+    hz: 310
+    q: 0.9
+    db: -1.35
+  transient_tame: 0.055
+  transient_lowpass_hz: 7600
+  reverb_wet: 0.115
+  reverb_decay_seconds: 1.68
+  reverb_damping_hz: 5200
+  stereo_width: 0.14
+  compressor_threshold_db: -21.0
+  compressor_ratio: 1.45
+  compressor_attack_ms: 28.0
+  compressor_release_ms: 175.0
+  compressor_makeup_db: 0.25
+  compressor_knee_db: 8.0
+  target_lufs: -19.0
+  true_peak_db: -4.0
+  limiter_drive: 0.86
+stem_postprocess:
+  highpass_hz: 30
+  lowpass_hz: 12000
+  reverb_wet: 0.025
+  reverb_decay_seconds: 0.85
+  reverb_damping_hz: 5000
+  stereo_width: 0.05
+  normalize: false
+  target_peak_db: -3.0
+group_postprocess:
+  desk:
+    gain_db: -1.2
+    lowpass_hz: 10400
+    transient_tame: 0.05
+    reverb_wet: 0.016
+  bass:
+    gain_db: -1.0
+    lowpass_hz: 5000
+    compressor_threshold_db: -19.0
+    compressor_ratio: 1.55
+    compressor_attack_ms: 22
+    compressor_release_ms: 135
+  keyrack:
+    gain_db: 6.0
+    lowpass_hz: 11500
+    transient_tame: 0.065
+    reverb_wet: 0.03
+  guests:
+    gain_db: 0.0
+    lowpass_hz: 9800
+    high_shelf_hz: 6200
+    high_shelf_db: -0.8
+    reverb_wet: 0.026
+  corridor:
+    gain_db: 4.0
+    lowpass_hz: 9000
+    reverb_wet: 0.038
+  bell:
+    gain_db: 2.5
+    lowpass_hz: 11800
+    transient_tame: 0.1
+    reverb_wet: 0.045
+instruments:
+- name: reception_piano
+  group: desk
+  program: acoustic_grand_piano
+  volume: 92
+  pan: 63
+  expression: 100
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    prefer:
+    - salamander
+    - grand
+    - piano
+    optional: true
+    fallback_backend: pretty-midi
+- name: lobby_upright
+  group: bass
+  program: acoustic_bass
+  volume: 80
+  pan: 51
+  expression: 92
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - notation
+    - pizzicato
+    - upright
+    - bass
+    optional: true
+    fallback_backend: pretty-midi
+- name: keyrack_harp
+  group: keyrack
+  program: orchestral_harp
+  volume: 74
+  pan: 72
+  expression: 90
+  instrument_backend:
+    kind: sfz
+    library_ref: folk.harp
+    prefer:
+    - harp
+    - normal
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: guest_clarinet
+  group: guests
+  program: clarinet
+  volume: 74
+  pan: 60
+  expression: 82
+  modulation: 3
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.clarinet_solo_perf
+    prefer:
+    - clarinet
+    - solo
+    - perf
+    optional: true
+    fallback_backend: pretty-midi
+- name: corridor_violas
+  group: corridor
+  program: viola
+  volume: 62
+  pan: 59
+  expression: 78
+  modulation: 5
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.violas
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: corridor_celli
+  group: corridor
+  program: cello
+  volume: 60
+  pan: 52
+  expression: 76
+  modulation: 4
+  instrument_backend:
+    kind: sfz
+    library_ref: strings.celli
+    prefer:
+    - notation
+    - sustain
+    optional: true
+    fallback_backend: pretty-midi
+- name: service_bell
+  group: bell
+  program: celesta
+  volume: 62
+  pan: 70
+  expression: 80
+motifs:
+- id: room_call
+  root: G4
+  intervals:
+  - 0
+  - 12
+  rhythm:
+  - 0.75
+  - 2.25
+  velocities:
+  - 0.44
+  - 0.4
+- id: vacancy_bell
+  root: D6
+  intervals:
+  - 0
+  - 7
+  - 12
+  rhythm:
+  - 0.5
+  - 0.5
+  - 2.0
+  velocities:
+  - 0.42
+  - 0.5
+  - 0.58
+layer_templates:
+  lobby_bass:
+    kind: bassline
+    instrument: lobby_upright
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.86
+    velocity: 47
+    articulation: tenuto
+    humanize_ms: 7
+    humanize_velocity_pct: 5
+  reception_waltz:
+    kind: chord_hits
+    instrument: reception_piano
+    octave: 3
+    hits:
+    - - 0
+      - 1.0
+    - - 0
+      - 2.0
+    - - 1
+      - 1.0
+    - - 1
+      - 2.0
+    - - 2
+      - 1.0
+    - - 2
+      - 2.0
+    - - 3
+      - 1.0
+    - - 3
+      - 2.0
+    - - 4
+      - 1.0
+    - - 4
+      - 2.0
+    - - 5
+      - 1.0
+    - - 5
+      - 2.0
+    - - 6
+      - 1.0
+    - - 6
+      - 2.0
+    - - 7
+      - 1.0
+    - - 7
+      - 2.0
+    - - 8
+      - 1.0
+    - - 8
+      - 2.0
+    - - 9
+      - 1.0
+    - - 9
+      - 2.0
+    - - 10
+      - 1.0
+    - - 10
+      - 2.0
+    - - 11
+      - 1.0
+    - - 11
+      - 2.0
+    - - 12
+      - 1.0
+    - - 12
+      - 2.0
+    - - 13
+      - 1.0
+    - - 13
+      - 2.0
+    - - 14
+      - 1.0
+    - - 14
+      - 2.0
+    - - 15
+      - 1.0
+    - - 15
+      - 2.0
+    - - 16
+      - 1.0
+    - - 16
+      - 2.0
+    - - 17
+      - 1.0
+    - - 17
+      - 2.0
+    - - 18
+      - 1.0
+    - - 18
+      - 2.0
+    - - 19
+      - 1.0
+    - - 19
+      - 2.0
+    - - 20
+      - 1.0
+    - - 20
+      - 2.0
+    - - 21
+      - 1.0
+    - - 21
+      - 2.0
+    - - 22
+      - 1.0
+    - - 22
+      - 2.0
+    - - 23
+      - 1.0
+    - - 23
+      - 2.0
+    - - 24
+      - 1.0
+    - - 24
+      - 2.0
+    - - 25
+      - 1.0
+    - - 25
+      - 2.0
+    - - 26
+      - 1.0
+    - - 26
+      - 2.0
+    - - 27
+      - 1.0
+    - - 27
+      - 2.0
+    - - 28
+      - 1.0
+    - - 28
+      - 2.0
+    - - 29
+      - 1.0
+    - - 29
+      - 2.0
+    - - 30
+      - 1.0
+    - - 30
+      - 2.0
+    - - 31
+      - 1.0
+    - - 31
+      - 2.0
+    - - 32
+      - 1.0
+    - - 32
+      - 2.0
+    - - 33
+      - 1.0
+    - - 33
+      - 2.0
+    - - 34
+      - 1.0
+    - - 34
+      - 2.0
+    - - 35
+      - 1.0
+    - - 35
+      - 2.0
+    - - 36
+      - 1.0
+    - - 36
+      - 2.0
+    - - 37
+      - 1.0
+    - - 37
+      - 2.0
+    - - 38
+      - 1.0
+    - - 38
+      - 2.0
+    - - 39
+      - 1.0
+    - - 39
+      - 2.0
+    - - 40
+      - 1.0
+    - - 40
+      - 2.0
+    - - 41
+      - 1.0
+    - - 41
+      - 2.0
+    - - 42
+      - 1.0
+    - - 42
+      - 2.0
+    - - 43
+      - 1.0
+    - - 43
+      - 2.0
+    - - 44
+      - 1.0
+    - - 44
+      - 2.0
+    - - 45
+      - 1.0
+    - - 45
+      - 2.0
+    - - 46
+      - 1.0
+    - - 46
+      - 2.0
+    - - 47
+      - 1.0
+    - - 47
+      - 2.0
+    duration_beats: 0.92
+    velocity: 46
+    articulation: tenuto
+    voicing: open
+    constraints:
+      max_notes: 3
+    humanize_ms: 9
+    humanize_velocity_pct: 5
+  keyrack_pattern:
+    kind: arpeggio
+    instrument: keyrack_harp
+    octave: 4
+    pattern:
+    - 0
+    - 2
+    - 4
+    - 7
+    - 4
+    - 2
+    step: 0.5
+    duration_beats: 0.32
+    velocity: 33
+    density: 0.72
+    articulation: bell
+    voicing: open
+    humanize_ms: 11
+    humanize_velocity_pct: 7
+  corridor_pad:
+    kind: pad_chords
+    instruments:
+    - corridor_violas
+    - corridor_celli
+    octave: 3
+    every_bars: 5
+    duration_beats: 3.0
+    velocity: 27
+    articulation: pad
+    voicing: shell
+    constraints:
+      max_notes: 3
+    instrument_velocity_offsets:
+      corridor_violas: 0
+      corridor_celli: -4
+    instrument_octave_offsets:
+      corridor_violas: 0
+      corridor_celli: 0
+    humanize_ms: 14
+    humanize_velocity_pct: 3
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - hotel_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems:
+    - desk
+    - bass
+    - corridor
+    fade_stems:
+    - keyrack
+    - guests
+    - bell
+state_map:
+  default:
+    section: hotel_loop
+    stems:
+      desk: 0.84
+      bass: 0.62
+      keyrack: 0.68
+      guests: 0.28
+      corridor: 0.48
+      bell: 0.48
+  quiet:
+    section: hotel_loop
+    stems:
+      desk: 0.54
+      bass: 0.46
+      keyrack: 0.46
+      guests: 0.12
+      corridor: 0.38
+      bell: 0.22
+  busy:
+    section: hotel_loop
+    stems:
+      desk: 0.92
+      bass: 0.68
+      keyrack: 0.78
+      guests: 0.38
+      corridor: 0.6
+      bell: 0.58
+sections:
+- id: hotel_loop
+  kind: loop_component
+  label: Hilbert's Hotel - Room N+1
+  bars: 48
+  intensity: 0.54
+  density: 0.6
+  loopable: true
+  valid_exit_local_bars:
+  - 12
+  - 24
+  - 36
+  - 48
+  harmony:
+  - Gmaj9
+  - Gmaj9
+  - D13
+  - Am9
+  - Am9
+  - D13
+  - Cmaj9(#11)
+  - Bm7
+  - D13
+  - D13
+  - Cmaj9(#11)
+  - D13
+  - Am9
+  - Am9
+  - D13
+  - Cmaj9(#11)
+  - Bm7
+  - D13
+  - D13
+  - Cmaj9(#11)
+  - D13
+  - D13
+  - D13
+  - Gmaj9
+  - Cmaj9(#11)
+  - Bm7
+  - D13
+  - D13
+  - Cmaj9(#11)
+  - D13
+  - D13
+  - D13
+  - Gmaj9
+  - Cmaj9(#11)
+  - Em9
+  - D13
+  - D13
+  - Cmaj9(#11)
+  - D13
+  - D13
+  - D13
+  - Gmaj9
+  - Cmaj9(#11)
+  - Em9
+  - D13
+  - D13
+  - D13
+  - Gmaj9
+  layers:
+  - lobby_bass
+  - reception_waltz
+  - keyrack_pattern
+  - corridor_pad
+  - kind: motif
+    instrument: guest_clarinet
+    motif: room_call
+    roots:
+    - G4
+    - A4
+    - B4
+    - C5
+    starts:
+    - - 9
+      - 0.0
+    velocity: 38
+    articulation: tenuto
+    humanize_ms: 7
+    humanize_velocity_pct: 3
+    repeats: 4
+    every_bars: 12
+  - kind: motif
+    instrument: service_bell
+    motif: vacancy_bell
+    roots:
+    - D6
+    - E6
+    - D6
+    - G6
+    starts:
+    - - 2
+      - 0.0
+    - - 14
+      - 0.0
+    - - 26
+      - 0.0
+    - - 38
+      - 0.0
+    velocity: 29
+    articulation: bell
+    humanize_ms: 3
+    humanize_velocity_pct: 2

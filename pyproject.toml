@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ambition-music-renderer"
+version = "0.4.0"
+description = "Data-driven adaptive music renderer for Ambition MusicIR YAML scores"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "scipy",
+  "numba>=0.61.0",
+  "pretty_midi",
+  "pyfluidsynth",
+  "soundfile",
+  "PyYAML",
+  "mido",
+  "ubelt",
+  "kwconf>=0.10.0",
+  "rich",
+  "pyloudnorm",
+  # librosa is unused by the package itself but the agent/ studio tooling
+  # (song_studio, instrument_browser) leans on it for spectral checks.
+  "librosa",
+  "lazy_loader",
+]
+
+[project.optional-dependencies]
+
+optional = [
+    "pedalboard",
+    "dawdreamer",
+]
+dev = ["pytest", "ruff", "line_profiler"]
+all = [
+    "ambition-music-renderer[optional]",
+    "ambition-music-renderer[dev]",
+]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "line_profiler"]
+
+# sfizz_render, lv2proc, Guitarix, and NAM are external command/plugin installs,
+# not Python package dependencies. The renderer probes for them only when YAML
+# explicitly requests those optional backends.
+
+[project.scripts]
+ambition-music-renderer = "ambition_music_renderer.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["ambition_music_renderer*"]
+exclude = ["scores*", "tests*"]
+
+
+[tool.setuptools.package-data]
+ambition_music_renderer = ["data/*.yaml", "data/*.json"]

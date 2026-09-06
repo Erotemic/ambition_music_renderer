@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pirates_guild_black_flag_jig
+  title: Black Flag Jig - Pirates Guild Theme
+  version_id: e8095dd187a3accd:75a33309aa2b
+  render_hash: e8095dd187a3accd
+  preview_sha256: 75a33309aa2b57b8a2970b5b2f5b0e9ab17cf19fbe7bcf7a3cb2348483573d7e
+  preview_path: generated/pirates_guild_black_flag_jig/.versioned/e8095dd187a3accd/preview/pirates_guild_black_flag_jig_e8095dd187a3accd.full_soundtrack_preview.ogg
+  manifest_path: generated/pirates_guild_black_flag_jig/.versioned/e8095dd187a3accd/pirates_guild_black_flag_jig_e8095dd187a3accd.adaptive_manifest.json
+  manifest_sha256: 1f8044a8c6d5824a72abacf87102d8286d0a3bd3875b194c5aca1a94abf8c1ae
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/pirates_guild_black_flag_jig.music.yaml
+  score_sha256_at_review: 6d8fa0c23b794cdd632ac30fa778fbdd5286719656b4b05494c94d1f4f7c3555
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.8
+  label: Acceptable
+  notes: Hey its a pirate jig. It does its job. Nothing inspiring though.
+  issues: []
+  furthest_played_seconds: 36.87
+  furthest_played_fraction: 0.3585
+  created_at: '2026-08-16T15:32:13Z'
+  updated_at: '2026-08-16T15:32:13Z'
+  reviewed_at: '2026-08-16T15:32:13Z'
+history: []

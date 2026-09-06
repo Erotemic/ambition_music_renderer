@@ -1,0 +1,312 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+_sudo_prefix(){
+    if [ "$(whoami)" != "root" ]; then
+        printf 'sudo'
+    fi
+}
+
+apt_ensure(){
+    ARGS=("$@")
+    MISS_PKGS=()
+    HIT_PKGS=()
+    _SUDO="$(_sudo_prefix)"
+
+    for PKG_NAME in "${ARGS[@]}"; do
+        if dpkg-query -W -f='${Status}' "$PKG_NAME" 2>/dev/null | grep -q "install ok installed"; then
+            echo "Already have PKG_NAME='$PKG_NAME'"
+            HIT_PKGS+=("$PKG_NAME")
+        else
+            echo "Do not have PKG_NAME='$PKG_NAME'"
+            MISS_PKGS+=("$PKG_NAME")
+        fi
+    done
+
+    if [ "${#MISS_PKGS[@]}" -gt 0 ]; then
+        if [ "${UPDATE:-}" != "" ]; then
+            ${_SUDO:+$_SUDO} apt update -y
+        fi
+        DEBIAN_FRONTEND=noninteractive ${_SUDO:+$_SUDO} apt install -y "${MISS_PKGS[@]}"
+    else
+        echo "No missing packages"
+    fi
+}
+
+apt_ensure_if_available(){
+    MISS_PKGS=()
+    for PKG_NAME in "$@"; do
+        if apt-cache show "$PKG_NAME" >/dev/null 2>&1; then
+            MISS_PKGS+=("$PKG_NAME")
+        else
+            echo "Apt package not available here: $PKG_NAME"
+        fi
+    done
+
+    if [ "${#MISS_PKGS[@]}" -gt 0 ]; then
+        apt_ensure "${MISS_PKGS[@]}"
+    fi
+}
+
+preseed_jack_no_realtime(){
+    _SUDO="$(_sudo_prefix)"
+
+    # Offline rendering does not need JACK realtime privileges. This avoids the
+    # interactive jackd2 debconf prompt when JACK arrives as a transitive dep.
+    echo "jackd2 jackd/tweak_rt_limits boolean false" | ${_SUDO:+$_SUDO} debconf-set-selections || true
+}
+
+# The renderer invokes the SFZ player BY NAME: `audio_plugins.py` and
+# `backends/sfizz_backend.py` both default to `sfizz_render`, and the backend
+# raises "not found. Install sfizz_render or choose another backend" when that
+# exact name is not on PATH.
+#
+# Which binary a machine actually ends up with depends on where sfizz came from.
+# The sfztools OBS packages ship `sfizz_render`; other builds and distro
+# packagings have shipped the hyphenated `sfizz-render`; and either may land
+# outside PATH. That is enough variation that a fresh machine can finish this
+# script with a perfectly working sfizz the renderer still cannot find, and then
+# silently render every sampled instrument through the General-MIDI fallback.
+#
+# So: normalize to the name the renderer asks for. Only ever ADD a link for a
+# missing name — never replace a real `sfizz_render` that is already present.
+ensure_sfizz_render_compat_shim(){
+    _SUDO="$(_sudo_prefix)"
+    SHIM_DIR="${SFIZZ_SHIM_DIR:-/usr/local/bin}"
+    SFIZZ_TARGET=""
+
+    if command -v sfizz_render >/dev/null 2>&1; then
+        echo "[setup] Have sfizz_render: $(command -v sfizz_render)"
+        return 0
+    fi
+
+    # PATH first, then the package manifests: a package can install into a
+    # directory that is not on this shell's PATH.
+    if command -v sfizz-render >/dev/null 2>&1; then
+        SFIZZ_TARGET="$(command -v sfizz-render)"
+    else
+        for PKG in sfizz sfizz-tools; do
+            [ -n "$SFIZZ_TARGET" ] && break
+            while IFS= read -r CANDIDATE; do
+                if [ -x "$CANDIDATE" ]; then
+                    SFIZZ_TARGET="$CANDIDATE"
+                    break
+                fi
+            done < <(dpkg -L "$PKG" 2>/dev/null | grep -E '/sfizz[-_]render$' || true)
+        done
+    fi
+
+    if [ -z "$SFIZZ_TARGET" ]; then
+        # Nothing to link. The caller reports this; do not fail the whole setup
+        # over an optional backend.
+        return 0
+    fi
+
+    echo "[setup] Linking sfizz_render -> $SFIZZ_TARGET in $SHIM_DIR"
+    ${_SUDO:+$_SUDO} mkdir -p "$SHIM_DIR"
+    ${_SUDO:+$_SUDO} ln -sfn "$SFIZZ_TARGET" "$SHIM_DIR/sfizz_render"
+}
+
+install_sfizz_obs_repo(){
+    _SUDO="$(_sudo_prefix)"
+    UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-}")"
+
+    case "$UBUNTU_CODENAME" in
+        noble)
+            SFIZZ_OBS_DIST="xUbuntu_24.04"
+            ;;
+        jammy)
+            SFIZZ_OBS_DIST="xUbuntu_22.04"
+            ;;
+        focal)
+            SFIZZ_OBS_DIST="xUbuntu_20.04"
+            ;;
+        *)
+            echo "[setup] ERROR: No known sfizz OBS mapping for UBUNTU_CODENAME='$UBUNTU_CODENAME'" >&2
+            echo "[setup] Install sfizz manually or set INSTALL_SFIZZ_OBS=0 to skip." >&2
+            return 1
+            ;;
+    esac
+
+    REPO_URL="https://download.opensuse.org/repositories/home:/sfztools:/sfizz/${SFIZZ_OBS_DIST}/"
+    KEY_URL="https://download.opensuse.org/repositories/home:sfztools:sfizz/${SFIZZ_OBS_DIST}/Release.key"
+    KEYRING="/usr/share/keyrings/home_sfztools_sfizz.gpg"
+    LIST_FILE="/etc/apt/sources.list.d/home_sfztools_sfizz.list"
+
+    apt_ensure curl gpg ca-certificates p7zip-full
+
+    if [ ! -f "$KEYRING" ]; then
+        echo "[setup] Installing sfizz OBS keyring: $KEYRING"
+        curl -fsSL "$KEY_URL" | gpg --dearmor | ${_SUDO:+$_SUDO} tee "$KEYRING" >/dev/null
+    else
+        echo "[setup] Already have sfizz OBS keyring: $KEYRING"
+    fi
+
+    DESIRED_LINE="deb [signed-by=$KEYRING] $REPO_URL /"
+
+    if [ ! -f "$LIST_FILE" ] || ! grep -Fxq "$DESIRED_LINE" "$LIST_FILE"; then
+        echo "[setup] Installing sfizz OBS apt source: $LIST_FILE"
+        echo "$DESIRED_LINE" | ${_SUDO:+$_SUDO} tee "$LIST_FILE" >/dev/null
+    else
+        echo "[setup] Already have sfizz OBS apt source: $LIST_FILE"
+    fi
+
+    # ⚠ `|| true`: an unusable OBS repo must fall through to the source build
+    # below, not abort setup. `apt_ensure` runs under `set -e`.
+    UPDATE=1 apt_ensure sfizz || true
+    ensure_sfizz_render_compat_shim
+
+    if ! command -v sfizz_render >/dev/null 2>&1; then
+        echo "[setup] sfizz did not install from OBS; building it from source" >&2
+        build_sfizz_from_source || {
+            echo "[setup] ERROR: could not obtain sfizz_render." >&2
+            echo "[setup] Every sampled instrument would fall back to General MIDI." >&2
+            return 1
+        }
+    fi
+}
+
+# ⛔⛔ THE OBS REPOSITORY IS NOT A DEPENDABLE SOURCE, AND ITS FAILURE IS SILENT
+# WHERE IT HURTS. Ubuntu packages no `sfizz` at all and upstream ships no Linux
+# binary, so the OBS build was the only path — and on 2026-09-02 its signing key
+# EXPIRED (`EXPKEYSIG 1DCC29D5F18761E8`, expiry 2026-08-31). `apt` then refuses
+# the repo, sfizz never installs, and every sampled instrument in the catalogue
+# quietly renders as a General-MIDI stand-in that is indistinguishable from the
+# real cue once it is an .ogg on disk.
+#
+# ⭐ SO THE FALLBACK IS THE SOURCE RELEASE, which depends on nothing that can
+# expire. ~5 minutes on 8 cores, and only when the package path failed.
+build_sfizz_from_source() {
+    local version="${SFIZZ_SOURCE_VERSION:-1.2.3}"
+    local workdir tarball
+    apt_ensure build-essential cmake ninja-build pkg-config libsndfile1-dev curl || return 1
+
+    workdir="$(mktemp -d)"
+    tarball="$workdir/sfizz-${version}.tar.gz"
+    echo "[setup] Downloading sfizz ${version} source"
+    curl -fsSL -o "$tarball" \
+        "https://github.com/sfztools/sfizz/releases/download/${version}/sfizz-${version}.tar.gz" \
+        || { rm -rf "$workdir"; return 1; }
+    tar xzf "$tarball" -C "$workdir" || { rm -rf "$workdir"; return 1; }
+
+    # Only the offline renderer is wanted here: the GUI/plugin targets pull a
+    # far larger dependency set and nothing in this repository loads them.
+    cmake -S "$workdir/sfizz-${version}" -B "$workdir/build" -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DSFIZZ_RENDER=ON -DSFIZZ_JACK=OFF -DSFIZZ_TESTS=OFF \
+        -DSFIZZ_DEMOS=OFF -DSFIZZ_BENCHMARKS=OFF \
+        || { rm -rf "$workdir"; return 1; }
+    cmake --build "$workdir/build" -j "$(nproc)" || { rm -rf "$workdir"; return 1; }
+    ${_SUDO:+$_SUDO} cmake --install "$workdir/build" || { rm -rf "$workdir"; return 1; }
+    ${_SUDO:+$_SUDO} ldconfig || true
+    rm -rf "$workdir"
+
+    command -v sfizz_render >/dev/null 2>&1
+}
+
+echo "[setup] Installing baseline native audio tools"
+UPDATE="${UPDATE:-1}" apt_ensure \
+    ffmpeg \
+    fluidsynth \
+    fluid-soundfont-gm \
+    fluid-soundfont-gs \
+    timgm6mb-soundfont \
+    libsndfile1 \
+    sox \
+    rubberband-cli
+
+echo "[setup] Installing optional LV2/plugin-host tooling"
+preseed_jack_no_realtime
+
+# These vary by Ubuntu release / enabled repositories, so skip gracefully.
+UPDATE="${UPDATE:-1}" apt_ensure_if_available \
+    lilv-utils \
+    lv2proc \
+    jalv \
+    carla \
+    guitarix \
+    guitarix-lv2 \
+    lsp-plugins \
+    lsp-plugins-lv2 \
+    x42-plugins \
+    calf-plugins \
+    zam-plugins \
+    mda-lv2 \
+    swh-lv2
+
+if [ "${INSTALL_SFIZZ_OBS:-0}" = "1" ]; then
+    echo "[setup] Installing sfizz from OBS apt repository"
+    install_sfizz_obs_repo
+else
+    echo "[setup] Skipping sfizz OBS repo. Set INSTALL_SFIZZ_OBS=1 to enable it."
+    echo "[setup] Trying distro sfizz package if already available."
+    apt_ensure_if_available sfizz sfizz-tools
+    # The name mismatch is not specific to the OBS packages, so this path needs
+    # the same normalization. Ubuntu does not ship sfizz in the main archive at
+    # all, so reaching here usually means no SFZ player: say so plainly, because
+    # the consequence downstream is a quiet quality drop, not an error.
+    ensure_sfizz_render_compat_shim
+    if ! command -v sfizz_render >/dev/null 2>&1; then
+        echo "[setup] NOTE: no sfizz_render on this machine." >&2
+        echo "[setup] Sampled SFZ instruments will fall back to General MIDI." >&2
+        echo "[setup] Re-run with INSTALL_SFIZZ_OBS=1 to install it from the sfztools repo." >&2
+    fi
+fi
+
+# Local developer setup. Assumes uv is installed.
+# Local developer setup. Assumes uv is installed.
+PYTHON_VERSION="${PYTHON_VERSION:-3.12}"
+VENV_DIR="${VENV_DIR:-.venv}"
+
+python_major_minor(){
+    "$1" - <<'PY'
+import sys
+print(f"{sys.version_info.major}.{sys.version_info.minor}")
+PY
+}
+
+ensure_uv(){
+    if ! command -v uv >/dev/null 2>&1; then
+        echo "[setup] ERROR: uv is required but was not found on PATH." >&2
+        echo "[setup] Install uv first, then rerun this setup script." >&2
+        exit 1
+    fi
+}
+
+ensure_venv(){
+    ensure_uv
+
+    if [ -d "$VENV_DIR" ]; then
+        if [ ! -x "$VENV_DIR/bin/python" ]; then
+            echo "[setup] ERROR: Found '$VENV_DIR', but '$VENV_DIR/bin/python' is missing or not executable." >&2
+            echo "[setup] Refusing to repair it automatically. Remove '$VENV_DIR' yourself if you want it recreated." >&2
+            exit 1
+        fi
+
+        HAVE_PYTHON_VERSION="$(python_major_minor "$VENV_DIR/bin/python")"
+
+        if [ "$HAVE_PYTHON_VERSION" != "$PYTHON_VERSION" ]; then
+            echo "[setup] ERROR: Existing '$VENV_DIR' uses Python $HAVE_PYTHON_VERSION, but this renderer requires Python $PYTHON_VERSION." >&2
+            echo "[setup] Refusing to recreate it automatically." >&2
+            echo "[setup] To fix intentionally: rm -rf '$VENV_DIR' && ./setup.sh" >&2
+            exit 1
+        fi
+
+        echo "[setup] Reusing '$VENV_DIR' with Python $HAVE_PYTHON_VERSION"
+    else
+        echo "[setup] Creating '$VENV_DIR' with Python $PYTHON_VERSION"
+        UV_LINK_MODE=copy uv venv --python "$PYTHON_VERSION" "$VENV_DIR"
+    fi
+}
+
+ensure_venv
+source "$VENV_DIR/bin/activate"
+
+echo "[setup] Installing Python renderer extras"
+UV_LINK_MODE=copy uv pip install -e ".[all]"
+
+echo
+echo "[setup] final plugin/tool status:"
+python -m ambition_music_renderer plugins doctor --fast || true

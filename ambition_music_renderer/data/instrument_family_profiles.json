@@ -1,0 +1,523 @@
+{
+  "families": {
+    "bass": {
+      "audition": {
+        "base": "E2",
+        "chord": [
+          0,
+          7,
+          12
+        ],
+        "durations": [
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.6,
+          0.35,
+          0.8
+        ],
+        "intervals": [
+          0,
+          3,
+          5,
+          7,
+          10,
+          12,
+          7,
+          5
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "staccato",
+        "palm_mute"
+      ],
+      "recommended_midi_range": [
+        28,
+        60
+      ],
+      "summary": "Bass instruments intended primarily for low-register monophonic/groove support.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Coordinate bass rhythm with kick placement before adding fills.",
+        "Use upper-register notes sparingly unless the bass becomes a foreground voice."
+      ]
+    },
+    "brass": {
+      "audition": {
+        "base": "Bb2",
+        "chord": [
+          0,
+          7,
+          12
+        ],
+        "durations": [
+          0.5,
+          0.5,
+          0.5,
+          0.8,
+          0.5,
+          0.5,
+          0.5,
+          1.2
+        ],
+        "intervals": [
+          0,
+          5,
+          7,
+          12,
+          10,
+          7,
+          5,
+          0
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "staccato",
+        "marcato"
+      ],
+      "recommended_midi_range": [
+        46,
+        82
+      ],
+      "summary": "Brass solo/section instruments.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Use velocity/expression arcs for sustained brass and reserve repeated high attacks for deliberate intensity."
+      ]
+    },
+    "drums": {
+      "audition": {
+        "drums": [
+          [
+            0.0,
+            "kick",
+            96
+          ],
+          [
+            0.5,
+            "closed_hat",
+            70
+          ],
+          [
+            1.0,
+            "snare",
+            100
+          ],
+          [
+            1.5,
+            "closed_hat",
+            68
+          ],
+          [
+            2.0,
+            "kick",
+            92
+          ],
+          [
+            2.5,
+            "closed_hat",
+            72
+          ],
+          [
+            3.0,
+            "snare",
+            104
+          ],
+          [
+            3.5,
+            "open_hat",
+            76
+          ],
+          [
+            4.0,
+            "crash",
+            105
+          ],
+          [
+            4.0,
+            "kick",
+            98
+          ],
+          [
+            5.0,
+            "snare",
+            102
+          ],
+          [
+            5.5,
+            "low_tom",
+            82
+          ],
+          [
+            6.0,
+            "high_mid_tom",
+            88
+          ],
+          [
+            6.5,
+            "high_tom",
+            92
+          ],
+          [
+            7.0,
+            "snare",
+            108
+          ]
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "hit"
+      ],
+      "recommended_midi_range": [
+        35,
+        59
+      ],
+      "summary": "Drum kits and percussion mappings.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Treat velocity as part of the groove, not just loudness.",
+        "Use fills and cymbal changes to articulate form rather than repeating an unchanged bar indefinitely."
+      ]
+    },
+    "folk": {
+      "audition": {
+        "base": "D3",
+        "chord": [
+          0,
+          7,
+          12
+        ],
+        "durations": [
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.9
+        ],
+        "intervals": [
+          0,
+          2,
+          3,
+          5,
+          7,
+          9,
+          10,
+          12
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "staccato",
+        "pluck"
+      ],
+      "recommended_midi_range": [
+        45,
+        80
+      ],
+      "summary": "Folk/ethnic sampled instruments with patch-specific playing behavior.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Inspect the instrument-specific usage notes and observed range before exposed writing."
+      ]
+    },
+    "guitar": {
+      "audition": {
+        "base": "E3",
+        "chord": [
+          0,
+          7,
+          12,
+          15
+        ],
+        "durations": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.75
+        ],
+        "intervals": [
+          0,
+          3,
+          5,
+          7,
+          10,
+          12
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "staccato",
+        "palm_mute",
+        "legato"
+      ],
+      "recommended_midi_range": [
+        40,
+        84
+      ],
+      "summary": "Guitar-family sampled instruments; prefer guitar-aware generators for rhythm and lead phrasing.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Use guitar.strum/chug/shape_pick for chordal rhythm instead of keyboard block voicings.",
+        "Use technique/articulation intent such as palm_mute or staccato when the realization supports it."
+      ]
+    },
+    "keys": {
+      "audition": {
+        "base": "C4",
+        "chord": [
+          0,
+          4,
+          7,
+          11
+        ],
+        "durations": [
+          0.3,
+          0.3,
+          0.3,
+          0.6,
+          0.3,
+          0.3,
+          0.8
+        ],
+        "intervals": [
+          0,
+          4,
+          7,
+          12,
+          7,
+          4,
+          0
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "legato",
+        "staccato",
+        "pad"
+      ],
+      "recommended_midi_range": [
+        40,
+        88
+      ],
+      "summary": "Electric/electronic keyboard material.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Audition sustained and percussive behavior separately; keyboard patches vary widely in release."
+      ]
+    },
+    "orchestra": {
+      "audition": {
+        "base": "C4",
+        "chord": [
+          0,
+          4,
+          7,
+          12
+        ],
+        "durations": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          1.5
+        ],
+        "intervals": [
+          0,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          12
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "legato",
+        "staccato",
+        "marcato"
+      ],
+      "recommended_midi_range": [
+        48,
+        84
+      ],
+      "summary": "General orchestral-section/sample-library identities.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Check the specific role and observed patch range before writing exposed extremes.",
+        "Prefer section-appropriate register and articulation over relying on octave folding."
+      ]
+    },
+    "piano": {
+      "audition": {
+        "base": "C4",
+        "chord": [
+          0,
+          4,
+          7,
+          12
+        ],
+        "durations": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.75
+        ],
+        "intervals": [
+          0,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          12
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "legato",
+        "staccato",
+        "tenuto",
+        "marcato"
+      ],
+      "recommended_midi_range": [
+        36,
+        96
+      ],
+      "summary": "Piano/keyboard material with broad polyphonic range.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Keep dense left-hand voicings above the muddiest octave unless the bass is exposed.",
+        "Use velocity shape and sustain/expression deliberately rather than repeating one velocity."
+      ]
+    },
+    "strings": {
+      "audition": {
+        "base": "G3",
+        "chord": [
+          0,
+          7,
+          12,
+          16
+        ],
+        "durations": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          1.5
+        ],
+        "intervals": [
+          0,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          12
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "legato",
+        "staccato",
+        "spiccato",
+        "pizzicato",
+        "tremolo"
+      ],
+      "recommended_midi_range": [
+        48,
+        88
+      ],
+      "summary": "Bowed/plucked strings and string sections.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Use sustained lines and voice leading instead of retriggering every chord tone at every beat.",
+        "Route pizzicato/tremolo/staccato to dedicated articulations when available."
+      ]
+    },
+    "woodwinds": {
+      "audition": {
+        "base": "C4",
+        "chord": [
+          0,
+          4,
+          7
+        ],
+        "durations": [
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.7,
+          0.35,
+          0.8
+        ],
+        "intervals": [
+          0,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          12,
+          7,
+          4
+        ]
+      },
+      "composition_techniques": [
+        "normal",
+        "sustain",
+        "legato",
+        "staccato"
+      ],
+      "recommended_midi_range": [
+        55,
+        88
+      ],
+      "summary": "Woodwind solo/section instruments.",
+      "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+      "writing_tips": [
+        "Prefer singable monophonic contours and leave room for breath-like phrase breaks."
+      ]
+    }
+  },
+  "policy": {
+    "purpose": "Family-level composing guidance and canonical audition phrases. Instrument-specific catalog usage and observed workstation census remain more specific when available.",
+    "range_semantics": "recommended_midi_range is a conservative writing register, not a claim about every patch's hard playable range."
+  },
+  "schema": "ambition.instrument_family_profiles.v1"
+}

@@ -1,0 +1,425 @@
+schema: ambition.musicir.v1
+id: velocity
+title: Velocity - The Joy of Building
+seed: 14920577
+notes: >-
+  A bright, euphoric motorik cue — the FLOW STATE of building something, not the
+  panic of breaking it. A Mixolydian at 150 BPM, 4/4, on a relentless krautrock
+  pulse (kick on every beat, even hats, no fills, no breakdown). Where the
+  Disruption family rides a quiet->build->drop arc, this one deliberately has NO
+  arc: it locks into a forward groove at bar one and stays there, evolving only
+  by accretion (riff -> hook -> counter-melody -> shimmer). The mood is sincere
+  and major-key; the b7 (G) gives it lift without a hint of menace. Distinct
+  pacing and emotion from every other cue in the set.
+
+  Stem groups (electronic palette, but here the choir_pad group is AIR, not dread):
+    strings    -> pedal sub-bass + warm pad (synth_bass_1, pad_warm, pad_poly)
+    winds      -> the bright hook + a lower counter-melody (lead_saw, lead_calliope)
+    brass      -> light synth-brass lifts (never stabs)
+    mallets    -> rolling 16th arp (synth_bass_2) + fx_crystal shimmer
+    percussion -> motorik kit: four-on-the-floor, even hats, no drama
+    choir_pad  -> bright air (pad_halo + fx_brightness)
+  Form: ignition -> flow_a -> flow_b -> flow_c -> flow_d -> coast. Energy stays
+  high and even the whole way; it just keeps moving and then coasts out.
+
+tempo:
+  bpm: 150
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.028
+  reverb_decay_seconds: 0.70
+  reverb_damping_hz: 8000
+  stereo_width: 0.08
+  compressor_threshold_db: -17.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 12.0
+  compressor_release_ms: 110.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 6.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.0
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 32
+  reverb_wet: 0.004
+  reverb_decay_seconds: 0.36
+  reverb_damping_hz: 8000
+  stereo_width: 0.045
+  limiter_drive: 0.92
+  normalize: false
+  target_peak_db: -3.0
+
+instruments:
+  - {name: pad_warm,    group: strings,    program: pad_warm,         volume: 76, pan: 64, expression: 88, modulation: 4}
+  - {name: pad_poly,    group: strings,    program: pad_poly,         volume: 70, pan: 56, expression: 84, modulation: 4}
+  - {name: sub_bass,    group: strings,    program: synth_bass_1,     volume: 96, pan: 64, expression: 100}
+
+  - {name: lead_hook,   group: winds,      program: lead_saw,         volume: 92, pan: 66, expression: 100, modulation: 5}
+  - {name: lead_counter,group: winds,      program: lead_calliope,    volume: 80, pan: 50, expression: 94,  modulation: 4}
+
+  - {name: brass_lift_a, group: brass,     program: synth_brass_1,    volume: 80, pan: 70, expression: 92, modulation: 3}
+  - {name: brass_lift_b, group: brass,     program: synth_brass_2,    volume: 74, pan: 52, expression: 88, modulation: 3}
+
+  - {name: arp_synth,   group: mallets,    program: synth_bass_2,     volume: 86, pan: 60, expression: 96}
+  - {name: shimmer,     group: mallets,    program: fx_crystal,       volume: 66, pan: 82, expression: 82}
+
+  - {name: pad_halo,    group: choir_pad,  program: pad_halo,         volume: 60, pan: 64, expression: 82, modulation: 4}
+  - {name: air,         group: choir_pad,  program: fx_brightness,    volume: 50, pan: 64, expression: 76, modulation: 4}
+
+  - {name: kit,         group: percussion, is_drum: true,             volume: 100, pan: 64, expression: 108}
+
+motifs:
+  # The riff — propulsive, diatonic A-Mixolydian, mid register A4..E5.
+  # A4 B4 C#5 E5 D5 C#5 B4 A4
+  - id: riff
+    root: A4
+    intervals: [0, 2, 4, 7, 5, 4, 2, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.96, 0.84, 0.90, 0.94, 0.86, 0.90, 0.84, 0.92]
+
+  # The hook — singing, bright, tops at E5 (no shriek). A4 C#5 E5 D5 C#5 B4 C#5 A4
+  - id: hook
+    root: A4
+    intervals: [0, 4, 7, 5, 4, 2, 4, 0]
+    rhythm:    [0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 0.5, 0.5]
+    velocities: [0.92, 0.88, 0.96, 0.84, 0.88, 0.84, 0.90, 0.94]
+
+  # The counter-melody — a lower descending line, A3..E4, for register contrast.
+  # E4 D4 C#4 B3 A3 B3 C#4 E4
+  - id: counter
+    root: E4
+    intervals: [0, -2, -4, -5, -7, -5, -4, 0]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5]
+    velocities: [0.82, 0.78, 0.80, 0.76, 0.80, 0.76, 0.78, 0.84]
+
+  # Pedal bass cell — root with octave pops, straight eighths.
+  # (rendered via bassline so it follows the chord roots, an A-heavy progression)
+  - id: bass_drive
+    root: A1
+    intervals: [0, 0, 12, 0, 0, 0, 12, 7]
+    rhythm:    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocities: [1.00, 0.86, 0.84, 0.86, 0.92, 0.84, 0.86, 0.88]
+
+layer_templates:
+  expression_swell:
+    kind: automation
+    automation:
+      - {group: winds,     cc: expression, from: 80, to: 104, curve: smooth, points: 12}
+      - {group: mallets,   cc: expression, from: 78, to: 104, curve: smooth, points: 12}
+      - {group: strings,   cc: expression, from: 80, to: 102, curve: smooth, points: 12}
+      - {group: choir_pad, cc: expression, from: 60, to: 84,  curve: smooth, points: 10}
+
+  bass_voice:
+    kind: motif
+    instrument: sub_bass
+    motif: bass_drive
+    velocity: 92
+    articulation: tenuto
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+    starts: [[0, 0.0]]
+    repeats: 24
+    every_bars: 1
+
+  # Rolling 16th arp — even and forward, never busy-frantic.
+  arp_16th:
+    kind: arpeggio
+    instrument: arp_synth
+    octave: 3
+    pattern: [0, 1, 2, 3, 2, 3, 2, 1]
+    step: 0.25
+    duration_beats: 0.22
+    velocity: 74
+    density: 1.0
+    voicing: closed
+    articulation: pluck
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+
+  warm_pad:
+    kind: pad_chords
+    instruments: [pad_warm, pad_poly]
+    instrument_octave_offsets: {pad_warm: 0, pad_poly: 1}
+    instrument_velocity_offsets: {pad_warm: 0, pad_poly: -8}
+    octave: 3
+    duration_beats: 4.0
+    velocity: 60
+    articulation: pad
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 2
+
+  riff_voice:
+    kind: motif
+    instrument: lead_hook
+    motif: riff
+    velocity: 84
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  hook_voice:
+    kind: motif
+    instrument: lead_hook
+    motif: hook
+    velocity: 90
+    articulation: tenuto
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+
+  counter_voice:
+    kind: motif
+    instrument: lead_counter
+    motif: counter
+    velocity: 78
+    articulation: legato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+
+  brass_lift:
+    kind: pad_chords
+    instruments: [brass_lift_a, brass_lift_b]
+    instrument_octave_offsets: {brass_lift_a: 0, brass_lift_b: -1}
+    octave: 3
+    every_bars: 2
+    duration_beats: 8.0
+    velocity: 56
+    articulation: legato
+    voicing: open
+    humanize_ms: 4
+    humanize_velocity_pct: 3
+
+  shimmer_drops:
+    kind: chord_hits
+    instrument: shimmer
+    octave: 5
+    velocity: 62
+    duration_beats: 4.0
+    articulation: bell
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 3
+
+  halo_wash:
+    kind: pad_chords
+    instrument: pad_halo
+    octave: 4
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 52
+    articulation: pad
+    voicing: open
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+
+  air_wash:
+    kind: pad_chords
+    instrument: air
+    octave: 4
+    every_bars: 4
+    duration_beats: 16.0
+    velocity: 40
+    articulation: pad
+    voicing: wide
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+
+  # Motorik kit — four-on-the-floor, even hats, light backbeat, no fills.
+  drums_motorik:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,           beats: [0.0, 1.0, 2.0, 3.0],                       velocity: 84}
+      - {drum: electric_snare, beats: [1.0, 3.0],                                 velocity: 58}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],   velocity: 30}
+      - {drum: shaker,         beats: [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75], velocity: 22}
+
+  # Motorik kit with a ride sheen for the fuller sections (still no fills).
+  drums_motorik_ride:
+    kind: drums
+    instrument: kit
+    humanize_ms: 0
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick,           beats: [0.0, 1.0, 2.0, 3.0],                       velocity: 86}
+      - {drum: electric_snare, beats: [1.0, 3.0],                                 velocity: 62}
+      - {drum: hand_clap,      beats: [1.0, 3.0],                                 velocity: 40}
+      - {drum: closed_hat,     beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],   velocity: 32}
+      - {drum: ride,           beats: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],   velocity: 18}
+      - {drum: shaker,         beats: [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75], velocity: 24}
+
+playback:
+  mode: section_stem_matrix
+  intro: ignition
+  loop_components: [flow_a, flow_b, flow_c, flow_d]
+  outro: coast
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [strings, mallets]
+    fade_stems: [winds, brass, percussion, choir_pad]
+
+state_map:
+  starting: {section: ignition}
+
+  exploring:
+    preferred_section: flow_a
+    stems: {strings: 1.0, mallets: 0.90, percussion: 0.80, winds: 0.55, brass: 0.0, choir_pad: 0.55}
+
+  hacking:
+    preferred_section: flow_b
+    stems: {strings: 1.0, mallets: 1.0, percussion: 0.90, winds: 0.85, brass: 0.20, choir_pad: 0.55}
+
+  ambushed:
+    preferred_section: flow_c
+    stems: {strings: 1.0, mallets: 0.85, percussion: 0.75, winds: 0.70, brass: 0.0, choir_pad: 0.65}
+
+  confrontation:
+    preferred_section: flow_d
+    stems: {strings: 1.0, mallets: 1.0, percussion: 1.0, winds: 1.0, brass: 0.85, choir_pad: 0.60}
+
+  retreating:
+    transition: outro_at_next_valid_exit_bar
+    outro: coast
+
+sections:
+  - id: ignition
+    kind: intro
+    label: ignition - the pulse is already moving
+    bars: 4
+    intensity: 0.66
+    density: 0.62
+    loopable: false
+    harmony: ["A", "A", "G", "D"]
+    layers:
+      - expression_swell
+      - {template: bass_voice, repeats: 4, velocity: 86}
+      - {template: arp_16th, density: 1.0, velocity: 70}
+      - {template: warm_pad, velocity: 56}
+      - {template: halo_wash, velocity: 46}
+      - {template: air_wash, velocity: 36}
+      - drums_motorik
+
+  - id: flow_a
+    kind: loop_component
+    label: flow - the riff locks in
+    bars: 8
+    intensity: 0.74
+    density: 0.70
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "A", "G", "D", "A", "Em", "G", "D"]
+    layers:
+      - {template: riff_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 84}
+      - {template: arp_16th, density: 1.0, velocity: 74}
+      - {template: bass_voice, repeats: 8, velocity: 90}
+      - {template: warm_pad, velocity: 58}
+      - drums_motorik
+      - {template: halo_wash, velocity: 50}
+      - {template: air_wash, velocity: 40}
+
+  - id: flow_b
+    kind: loop_component
+    label: flow - the hook sings over the riff
+    bars: 8
+    intensity: 0.80
+    density: 0.76
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "G", "D", "A", "Bm", "Em", "G", "D"]
+    layers:
+      - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 90}
+      - {template: riff_voice, starts: [[1, 0.0], [3, 0.0], [5, 0.0], [7, 0.0]], velocity: 72}
+      - {template: arp_16th, density: 1.0, velocity: 76}
+      - {template: bass_voice, repeats: 8, velocity: 90}
+      - {template: warm_pad, velocity: 60}
+      - {template: brass_lift, velocity: 52}
+      - drums_motorik
+      - {template: shimmer_drops, hits: [[0, 0.0], [4, 0.0]], velocity: 58}
+      - {template: halo_wash, velocity: 50}
+      - {template: air_wash, velocity: 40}
+
+  - id: flow_c
+    kind: loop_component
+    label: flow - the counter-melody threads underneath
+    bars: 8
+    intensity: 0.80
+    density: 0.78
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "Em", "G", "D", "A", "Bm", "D", "A"]
+    layers:
+      - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 88}
+      - {template: counter_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 78}
+      - {template: arp_16th, density: 1.0, velocity: 76}
+      - {template: bass_voice, repeats: 8, velocity: 90}
+      - {template: warm_pad, velocity: 60}
+      - drums_motorik
+      - {template: halo_wash, velocity: 52}
+      - {template: air_wash, velocity: 42}
+
+  - id: flow_d
+    kind: loop_component
+    label: flow - everything shimmering, full forward
+    bars: 8
+    intensity: 0.86
+    density: 0.84
+    loopable: true
+    valid_exit_local_bars: [4, 8]
+    harmony: ["A", "G", "D", "A", "Bm", "Em", "G", "A"]
+    layers:
+      - {template: hook_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 92}
+      - {template: counter_voice, starts: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 80}
+      - {template: riff_voice, starts: [[1, 0.0], [3, 0.0], [5, 0.0], [7, 0.0]], velocity: 74}
+      - {template: arp_16th, density: 1.0, velocity: 78}
+      - {template: bass_voice, repeats: 8, velocity: 92}
+      - {template: warm_pad, velocity: 62}
+      - {template: brass_lift, velocity: 58}
+      - drums_motorik_ride
+      - {template: shimmer_drops, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0]], velocity: 62}
+      - {template: halo_wash, velocity: 54}
+      - {template: air_wash, velocity: 44}
+
+  - id: coast
+    kind: outro
+    label: coast - it keeps moving as it fades
+    bars: 4
+    intensity: 0.74
+    density: 0.66
+    loopable: false
+    harmony: ["A", "G", "D", "A"]
+    layers:
+      - {template: hook_voice, starts: [[0, 0.0], [2, 0.0]], velocity: 82}
+      - {template: arp_16th, density: 0.85, velocity: 66}
+      - {template: bass_voice, repeats: 4, velocity: 84}
+      - {template: warm_pad, velocity: 56}
+      - drums_motorik
+      - {template: shimmer_drops, hits: [[0, 0.0]], velocity: 56}
+      - {template: halo_wash, velocity: 48}
+      - {template: air_wash, velocity: 38}
+
+group_postprocess:
+  strings:    {gain_db: 0.0,  lowpass_hz: 14000, high_shelf_hz: 5600, high_shelf_db: 0.4, transient_tame: 0.03, reverb_wet: 0.004}
+  winds:      {gain_db: 0.5,  lowpass_hz: 14500, high_shelf_hz: 5400, high_shelf_db: 0.8, presence_low_hz: 1500, presence_high_hz: 5600, presence_db: 0.8, transient_tame: 0.02, reverb_wet: 0.005}
+  brass:      {gain_db: -0.5, lowpass_hz: 12500, high_shelf_hz: 5200, high_shelf_db: 0.2, transient_tame: 0.04, reverb_wet: 0.005}
+  mallets:    {gain_db: 0.0,  lowpass_hz: 14000, high_shelf_hz: 5800, high_shelf_db: 0.6, transient_tame: 0.03, reverb_wet: 0.006}
+  percussion: {gain_db: -1.0, lowpass_hz: 12000, high_shelf_hz: 5600, high_shelf_db: 0.0, transient_tame: 0.03, reverb_wet: 0.003}
+  choir_pad:  {gain_db: -2.5, lowpass_hz: 12000, high_shelf_hz: 5600, high_shelf_db: 0.0, transient_tame: 0.04, reverb_wet: 0.012}

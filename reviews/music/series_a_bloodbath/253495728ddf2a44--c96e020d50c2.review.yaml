@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: series_a_bloodbath
+  title: Series A Bloodbath - The Term Sheet Has Teeth
+  version_id: 253495728ddf2a44:c96e020d50c2
+  render_hash: 253495728ddf2a44
+  preview_sha256: c96e020d50c29e119e95685fe723c17458dac38cb8be7e909363ccca6e7837da
+  preview_path: generated/series_a_bloodbath/.versioned/253495728ddf2a44/preview/series_a_bloodbath_253495728ddf2a44.full_soundtrack_preview.ogg
+  manifest_path: generated/series_a_bloodbath/.versioned/253495728ddf2a44/series_a_bloodbath_253495728ddf2a44.adaptive_manifest.json
+  manifest_sha256: d96fb0f99c48421ff4c834b636bf67dec22d4dc4cdaad0bc60b4a974b2ad83ff
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/series_a_bloodbath.music.yaml
+  score_sha256_at_review: f29e3dcfb18bac50b4295ea01ab1e63f49ce3f2b4c1ccdf1a1ef5efbb9dec159
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 2.9
+  label: Replace
+  notes: ''
+  issues: []
+  furthest_played_seconds: 38.297
+  furthest_played_fraction: 0.6453
+  created_at: '2026-08-16T15:58:43Z'
+  updated_at: '2026-08-16T15:58:43Z'
+  reviewed_at: '2026-08-16T15:58:43Z'
+history: []

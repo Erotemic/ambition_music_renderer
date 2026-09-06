@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: physicists_guild_event_horizon_waltz
+  title: Event Horizon Waltz - Physicists Guild Theme
+  version_id: e15b2df99304f2fd:fc83b36443d8
+  render_hash: e15b2df99304f2fd
+  preview_sha256: fc83b36443d82b179f6216a02c7bc373d5b9f5defa51655f3dc0c50a651031ce
+  preview_path: generated/physicists_guild_event_horizon_waltz/.versioned/e15b2df99304f2fd/preview/physicists_guild_event_horizon_waltz_e15b2df99304f2fd.full_soundtrack_preview.ogg
+  manifest_path: generated/physicists_guild_event_horizon_waltz/.versioned/e15b2df99304f2fd/physicists_guild_event_horizon_waltz_e15b2df99304f2fd.adaptive_manifest.json
+  manifest_sha256: 212c7b4177a6753b1623bd8d2763ec7745f53c24c7e2c18b003a393ec8289750
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/physicists_guild_event_horizon_waltz.music.yaml
+  score_sha256_at_review: 743ffecae78630a75a449e3c023085489254f29eee4a6715c8a12353e4d28302
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.6
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 50.036
+  furthest_played_fraction: 0.417
+  created_at: '2026-08-16T16:01:59Z'
+  updated_at: '2026-08-16T16:01:59Z'
+  reviewed_at: '2026-08-16T16:01:59Z'
+history: []

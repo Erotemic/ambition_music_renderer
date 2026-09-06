@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: military_iron_resolve
+  title: Iron Resolve - Military Faction Stronghold
+  version_id: 77c0b067f0987519:a5892c23da6c
+  render_hash: 77c0b067f0987519
+  preview_sha256: a5892c23da6c728c873955857051ac3437dfa0604935b16d963910f2759d380f
+  preview_path: generated/military_iron_resolve/.versioned/77c0b067f0987519/preview/military_iron_resolve_77c0b067f0987519.full_soundtrack_preview.ogg
+  manifest_path: generated/military_iron_resolve/.versioned/77c0b067f0987519/military_iron_resolve_77c0b067f0987519.adaptive_manifest.json
+  manifest_sha256: e2fd68c4ace94021f1ef5055694ad8363d07ad665f5ca69abe334ca6b6150fb8
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/examples/military_iron_resolve.music.yaml
+  score_sha256_at_review: 0d650bc87b51af764fd534b61e1441c0c90365078786854b7dcff23cbb6f6b21
+  score_scope: examples
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.5
+  label: Acceptable
+  notes: Love the backing, but its unpolished.
+  issues:
+  - mix-master
+  furthest_played_seconds: 80.46
+  furthest_played_fraction: 0.5029
+  created_at: '2026-08-16T15:26:41Z'
+  updated_at: '2026-08-16T15:26:41Z'
+  reviewed_at: '2026-08-16T15:26:41Z'
+history: []

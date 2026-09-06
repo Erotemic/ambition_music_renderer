@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: long_lofi_drift
+  title: Long Lofi Drift
+  version_id: 96d00d068e3c246b:040c45cd7d94
+  render_hash: 96d00d068e3c246b
+  preview_sha256: 040c45cd7d946664f288e41721a745f126eddf1a137f714f232a63dbc9a95e8b
+  preview_path: generated/long_lofi_drift/.versioned/96d00d068e3c246b/preview/long_lofi_drift_96d00d068e3c246b.full_soundtrack_preview.ogg
+  manifest_path: generated/long_lofi_drift/.versioned/96d00d068e3c246b/long_lofi_drift_96d00d068e3c246b.adaptive_manifest.json
+  manifest_sha256: 505d684d6de208a5dc4fa59894f11625fcf91107d076a2611a900a6bfe5624b0
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/long_lofi_drift.music.yaml
+  score_sha256_at_review: 5fcd378206c0c970c956fff817ec8ad32d5d89f5be16a3f85e8fcc9b20e2f18e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.0
+  label: Acceptable
+  notes: Not as good as the other lofi songs.
+  issues: []
+  furthest_played_seconds: 191.574
+  furthest_played_fraction: 0.8731
+  created_at: '2026-08-16T15:56:47Z'
+  updated_at: '2026-08-16T15:56:47Z'
+  reviewed_at: '2026-08-16T15:56:47Z'
+history: []

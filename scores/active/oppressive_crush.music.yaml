@@ -1,0 +1,193 @@
+schema: ambition.musicir.v1
+id: oppressive_crush
+title: Oppressive Crush - Authoritarian Faction Theme
+seed: 2026051005
+notes: >-
+  Authoritarian faction loop. A heavy, grinding state-machine march: low brass,
+  contrabass, timpani, metallic hits, and a short hook that feels memorable but
+  coercive. The meter presses forward like boots and factory pistons.
+tempo:
+  bpm: 92
+meter:
+  beats_per_bar: 5
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 28
+  lowpass_hz: 9000
+  presence_low_hz: 1200
+  presence_high_hz: 3300
+  presence_db: 0.9
+  reverb_wet: 0.09
+  reverb_decay_seconds: 1.05
+  reverb_damping_hz: 4300
+  stereo_width: 0.08
+  compressor_threshold_db: -15.0
+  compressor_ratio: 4.2
+  compressor_attack_ms: 6.0
+  compressor_release_ms: 120.0
+  compressor_makeup_db: 1.5
+  compressor_knee_db: 4.0
+  limiter_drive: 1.08
+  normalize: true
+  target_peak_db: -6.3
+stem_postprocess:
+  highpass_hz: 26
+  reverb_wet: 0.026
+  reverb_decay_seconds: 0.62
+  reverb_damping_hz: 4300
+  stereo_width: 0.04
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: low_brass, group: brass, program: brass_section, volume: 68, pan: 48, expression: 78}
+  - {name: trombones, group: brass, program: trombone, volume: 62, pan: 38, expression: 74}
+  - {name: tuba, group: bass, program: tuba, volume: 66, pan: 32, expression: 78}
+  - {name: contrabass, group: bass, program: contrabass, volume: 60, pan: 42, expression: 74}
+  - {name: strings, group: strings, program: string_ensemble_1, volume: 56, pan: 68, expression: 70}
+  - {name: choir, group: choir_pad, program: choir_aahs, volume: 52, pan: 62, expression: 68}
+  - {name: synth_metal, group: metal, program: synth_drum, volume: 50, pan: 82, expression: 68}
+  - {name: crusher_drums, group: percussion, is_drum: true, volume: 68, pan: 58, expression: 92}
+motifs:
+  - id: crush_order
+    root: D3
+    intervals: [0, 1, 5, 4, 1, 0, -2]
+    rhythm: [0.75, 0.25, 0.75, 0.25, 0.5, 0.5, 2.0]
+    velocities: [0.78, 0.70, 0.88, 0.72, 0.70, 0.66, 0.50]
+  - id: decree_signal
+    root: A3
+    intervals: [0, 6, 5, 3, 1, 0]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 0.5, 2.5]
+    velocities: [0.64, 0.84, 0.66, 0.58, 0.52, 0.42]
+layer_templates:
+  iron_pad:
+    kind: pad_chords
+    instruments: [low_brass, choir]
+    instrument_velocity_offsets: {low_brass: 0, choir: -14}
+    octave: 2
+    every_bars: 1
+    duration_beats: 5.0
+    velocity: 44
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  piston_strings:
+    kind: ostinato
+    instruments: [strings]
+    octave: 3
+    intervals: [0, 0, 7, 0, 6, 0, 5, 0, 1, 0]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 42
+    articulation: spiccato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  tuba_crush:
+    kind: bassline
+    instrument: tuba
+    octave: 1
+    pattern: [[0, 0.0, 0.65], [0, 1.0, 0.45], [7, 2.0, 0.65], [1, 3.0, 0.45], [0, 4.0, 0.65]]
+    velocity: 62
+    articulation: marcato
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  brass_order:
+    kind: motif
+    instruments: [trombones, low_brass]
+    motif: crush_order
+    root: D3
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 64
+    articulation: marcato
+    instrument_velocity_offsets: {trombones: 0, low_brass: -4}
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  metal_decree:
+    kind: motif
+    instruments: [synth_metal, contrabass]
+    motif: decree_signal
+    root: A3
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 52
+    articulation: hit
+    instrument_velocity_offsets: {synth_metal: 0, contrabass: -8}
+    instrument_octave_offsets: {synth_metal: 1, contrabass: -1}
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  crusher_march:
+    kind: drums
+    instrument: crusher_drums
+    velocity: 54
+    humanize_ms: 3
+    humanize_velocity_pct: 5
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 2.0, 4.0], velocity: 58}
+      - {drum: floor_tom, beats: [1.0, 3.0], velocity: 44}
+      - {drum: snare, beats: [4.5], velocity: 38}
+      - {drum: china, beats: [0.0], velocity: 28, every: 8}
+playback:
+  mode: section_stem_matrix
+  loop_components: [crush_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 5
+    bridge_stems: [brass, bass]
+    fade_stems: [strings, choir_pad, metal, percussion]
+state_map:
+  default:
+    section: crush_loop
+    stems: {brass: 0.82, bass: 0.80, strings: 0.58, choir_pad: 0.45, metal: 0.50, percussion: 0.62}
+sections:
+  - id: crush_loop
+    kind: loop_component
+    label: authoritarian oppressive crush
+    bars: 32
+    intensity: 0.78
+    density: 0.76
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - Dm
+      - Eb
+      - Dm
+      - C#dim
+      - Dm
+      - Bb
+      - A7
+      - Dm
+      - Gm
+      - Dm/A
+      - Eb
+      - A7
+      - Dm
+      - C#dim
+      - Dm
+      - A7
+      - Dm
+      - Fm
+      - Eb
+      - Dm
+      - Bb
+      - Gm
+      - A7
+      - Dm
+      - Dm
+      - Eb
+      - Fm
+      - Eb
+      - Dm
+      - Bb
+      - A7
+      - Dm
+    layers: [iron_pad, piston_strings, tuba_crush, brass_order, metal_decree, crusher_march]

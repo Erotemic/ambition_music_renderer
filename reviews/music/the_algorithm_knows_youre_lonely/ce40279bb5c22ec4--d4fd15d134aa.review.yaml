@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: the_algorithm_knows_youre_lonely
+  title: The Algorithm Knows You're Lonely - 3AM in the Server Farm
+  version_id: ce40279bb5c22ec4:d4fd15d134aa
+  render_hash: ce40279bb5c22ec4
+  preview_sha256: d4fd15d134aa7cc77d3d906f8d5a262e7d68eb0b55d65c8a75c505eff05cb324
+  preview_path: generated/the_algorithm_knows_youre_lonely/.versioned/ce40279bb5c22ec4/preview/the_algorithm_knows_youre_lonely_ce40279bb5c22ec4.full_soundtrack_preview.ogg
+  manifest_path: generated/the_algorithm_knows_youre_lonely/.versioned/ce40279bb5c22ec4/the_algorithm_knows_youre_lonely_ce40279bb5c22ec4.adaptive_manifest.json
+  manifest_sha256: bc208cdf3d25b8a6069886279014324c3d37ee792124653bbc30c721911fd730
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/the_algorithm_knows_youre_lonely.music.yaml
+  score_sha256_at_review: e6475b3d5dd467b605aa136b1759ae25a0830caaaefc47fb1a1d71fc13c1d678
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.4
+  label: Acceptable
+  notes: Not sure exactly where I would use this, but maybe it fits somewhere.
+  issues: []
+  furthest_played_seconds: 52.39
+  furthest_played_fraction: 0.8441
+  created_at: '2026-08-16T15:48:01Z'
+  updated_at: '2026-08-16T15:48:01Z'
+  reviewed_at: '2026-08-16T15:48:01Z'
+history: []

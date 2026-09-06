@@ -1,0 +1,44 @@
+schema: ambition.musicir.v3
+id: musicir_v3_adaptive_showcase
+title: MusicIR v3 canonical mastering and adaptive sections
+seed: 43
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 124
+key: C minor
+end: {bar: 9, beat: 1}
+form:
+  - {id: intro, from: {bar: 1, beat: 1}, to: {bar: 3, beat: 1}, energy: 0.45, density: 0.55}
+  - {id: loop, from: {bar: 3, beat: 1}, to: {bar: 9, beat: 1}, energy: 0.82, density: 0.85, loopable: true}
+harmony:
+  progression: [Cm, Ab, Eb, Bb]
+  cycle: true
+instruments:
+  - {name: keys, group: harmony, program: synth_strings_1, volume: 90, pan: 64}
+processing:
+  sections:
+    intro:
+      chain:
+        - {processor: lowpass, cutoff_hz: 6500}
+        - {processor: gain, gain_db: -1.5}
+  master:
+    chain:
+      - {processor: compressor, threshold_db: -21, ratio: 2.1, attack_ms: 16, release_ms: 120}
+      - {processor: limiter, target_peak_db: -1.0, drive: 1.03, normalize: true}
+  adaptive_sections: {mode: composition_master}
+parts:
+  - id: keys_part
+    instrument: keys
+    voices:
+      - id: pad
+        clips:
+          - id: full_form_pad
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            technique: pad
+            generate:
+              kind: harmony.pad
+              octave: 4
+              voicing: open
+              duration_beats: 3.8
+              velocity: 60

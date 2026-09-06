@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: artists_guild_chiaroscuro
+  title: Chiaroscuro Atelier - Artists Guild Theme
+  version_id: 43841336f68345ee:594b47e843ec
+  render_hash: 43841336f68345ee
+  preview_sha256: 594b47e843eceb65082096fe1efcff1311c1c93a02f9d207472f5802ab07654f
+  preview_path: generated/artists_guild_chiaroscuro/.versioned/43841336f68345ee/preview/artists_guild_chiaroscuro_43841336f68345ee.full_soundtrack_preview.ogg
+  manifest_path: generated/artists_guild_chiaroscuro/.versioned/43841336f68345ee/artists_guild_chiaroscuro_43841336f68345ee.adaptive_manifest.json
+  manifest_sha256: d156e1d50501c6f664568ee532759133c9d80846ce0747c7d4de61b625298ca2
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/artists_guild_chiaroscuro.music.yaml
+  score_sha256_at_review: 29e92085a2ffc99a597f17ee7549c55853f8357979bf0132828036d8c5700a01
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: ''
+  issues: []
+  furthest_played_seconds: 49.276
+  furthest_played_fraction: 0.4106
+  created_at: '2026-08-16T15:51:38Z'
+  updated_at: '2026-08-16T15:51:38Z'
+  reviewed_at: '2026-08-16T15:51:38Z'
+history: []

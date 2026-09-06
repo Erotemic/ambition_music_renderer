@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: raid_enforcer_theme
+  title: Black Pennant March - Raid Enforcer Theme
+  version_id: f9562e46241ac0d9:163e57df3a9f
+  render_hash: f9562e46241ac0d9
+  preview_sha256: 163e57df3a9fdfcabf01f85d88d991b964b2e01cdf1af120a643393cb9f0fb4f
+  preview_path: generated/raid_enforcer_theme/.versioned/f9562e46241ac0d9/preview/raid_enforcer_theme_f9562e46241ac0d9.full_soundtrack_preview.ogg
+  manifest_path: generated/raid_enforcer_theme/.versioned/f9562e46241ac0d9/raid_enforcer_theme_f9562e46241ac0d9.adaptive_manifest.json
+  manifest_sha256: 7b7e68962209b55188af651600a42f5c076949bdd7e007f6ca59d115723e20fe
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/raid_enforcer_theme.music.yaml
+  score_sha256_at_review: 14d3f2e90c755f7964ed763f039beb3201b2e41cee3e89abe131c3020fe2de12
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.7
+  label: Acceptable
+  notes: There's somehing very good here. The locrian works well. Needs major polish.
+  issues:
+  - composition
+  - mix-master
+  furthest_played_seconds: 34.166
+  furthest_played_fraction: 0.4627
+  created_at: '2026-08-16T15:33:08Z'
+  updated_at: '2026-08-16T15:33:08Z'
+  reviewed_at: '2026-08-16T15:33:08Z'
+history: []

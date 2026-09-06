@@ -1,0 +1,193 @@
+schema: ambition.musicir.v1
+id: hawks_of_the_high_aerie
+title: Hawks of the High Aerie - Right Faction Theme
+seed: 2026051003
+notes: >-
+  Right faction loop. A confident hawk-themed brass march with clipped strings,
+  trumpet fanfares, and snare discipline. Coal Bear can lead this faction
+  without needing a separate cue.
+tempo:
+  bpm: 118
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.7
+  highpass_hz: 36
+  lowpass_hz: 10800
+  presence_low_hz: 1800
+  presence_high_hz: 4300
+  presence_db: 0.7
+  reverb_wet: 0.12
+  reverb_decay_seconds: 1.15
+  reverb_damping_hz: 5600
+  stereo_width: 0.12
+  compressor_threshold_db: -16.5
+  compressor_ratio: 3.2
+  compressor_attack_ms: 8.0
+  compressor_release_ms: 95.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 5.0
+  limiter_drive: 1.02
+  normalize: true
+  target_peak_db: -6.8
+stem_postprocess:
+  highpass_hz: 34
+  reverb_wet: 0.038
+  reverb_decay_seconds: 0.75
+  reverb_damping_hz: 5600
+  stereo_width: 0.07
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: trumpets, group: brass, program: trumpet, volume: 66, pan: 76, expression: 80}
+  - {name: horns, group: brass, program: french_horn, volume: 62, pan: 50, expression: 76}
+  - {name: trombones, group: brass_low, program: trombone, volume: 58, pan: 38, expression: 72}
+  - {name: violins, group: strings, program: string_ensemble_1, volume: 58, pan: 72, expression: 72}
+  - {name: celli, group: strings, program: cello, volume: 54, pan: 40, expression: 70}
+  - {name: tuba, group: bass, program: tuba, volume: 58, pan: 32, expression: 72}
+  - {name: snare_line, group: percussion, is_drum: true, volume: 54, pan: 60, expression: 86}
+motifs:
+  - id: hawk_fanfare
+    root: C5
+    intervals: [0, 7, 12, 11, 7, 4, 7, 12]
+    rhythm: [0.5, 0.5, 0.75, 0.25, 0.5, 0.5, 0.5, 1.5]
+    velocities: [0.72, 0.62, 0.88, 0.70, 0.60, 0.56, 0.72, 0.50]
+  - id: aerie_answer
+    root: G4
+    intervals: [0, 2, 4, 7, 9, 7, 4, 2]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.5, 1.5]
+    velocities: [0.58, 0.50, 0.54, 0.70, 0.76, 0.58, 0.52, 0.40]
+layer_templates:
+  brass_standard:
+    kind: pad_chords
+    instruments: [horns, trombones]
+    instrument_velocity_offsets: {horns: 0, trombones: -8}
+    octave: 3
+    every_bars: 2
+    duration_beats: 8.0
+    velocity: 38
+    articulation: tenuto
+    voicing: open
+    humanize_ms: 5
+    humanize_velocity_pct: 3
+  string_march:
+    kind: ostinato
+    instruments: [violins, celli]
+    instrument_octave_offsets: {violins: 1, celli: -1}
+    octave: 3
+    intervals: [0, 7, 12, 7, 0, 7, 12, 7]
+    rhythm: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    velocity: 38
+    articulation: spiccato
+    humanize_ms: 4
+    humanize_velocity_pct: 4
+  tuba_stride:
+    kind: bassline
+    instrument: tuba
+    octave: 2
+    pattern: [[0, 0.0, 0.75], [7, 1.0, 0.40], [0, 2.0, 0.75], [12, 3.0, 0.40]]
+    velocity: 52
+    articulation: marcato
+    humanize_ms: 3
+    humanize_velocity_pct: 3
+  trumpet_hawk:
+    kind: motif
+    instruments: [trumpets, horns]
+    motif: hawk_fanfare
+    root: C5
+    every_bars: 8
+    repeats: 4
+    starts: [[0, 0.0]]
+    velocity: 62
+    articulation: marcato
+    instrument_velocity_offsets: {trumpets: 0, horns: -8}
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  horn_answer:
+    kind: motif
+    instruments: [horns, violins]
+    motif: aerie_answer
+    root: G4
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 50
+    articulation: tenuto
+    instrument_velocity_offsets: {horns: 0, violins: -10}
+    instrument_octave_offsets: {horns: 0, violins: 1}
+    humanize_ms: 5
+    humanize_velocity_pct: 4
+  parade_drums:
+    kind: drums
+    instrument: snare_line
+    velocity: 42
+    humanize_ms: 5
+    humanize_velocity_pct: 6
+    events:
+      - {drum: concert_bass_drum, beats: [0.0, 2.0], velocity: 42}
+      - {drum: snare, beats: [1.0, 1.5, 3.0, 3.5], velocity: 34}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 18, probability: 0.75}
+      - {drum: crash, beats: [0.0], velocity: 28, every: 8}
+playback:
+  mode: section_stem_matrix
+  loop_components: [aerie_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems: [brass, bass, strings]
+    fade_stems: [brass_low, percussion]
+state_map:
+  default:
+    section: aerie_loop
+    stems: {brass: 0.78, brass_low: 0.60, strings: 0.62, bass: 0.68, percussion: 0.50}
+sections:
+  - id: aerie_loop
+    kind: loop_component
+    label: right faction hawk aerie
+    bars: 32
+    intensity: 0.72
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - C
+      - G/B
+      - Am
+      - F
+      - C/E
+      - Dm
+      - G
+      - C
+      - F
+      - C/E
+      - Dm
+      - G
+      - Am
+      - F
+      - G
+      - C
+      - C
+      - Bb
+      - F/A
+      - G
+      - C
+      - G/B
+      - Am
+      - D7
+      - F
+      - C/E
+      - Dm
+      - G
+      - Am
+      - F
+      - G
+      - C
+    layers: [brass_standard, string_march, tuba_stride, trumpet_hawk, horn_answer, parade_drums]

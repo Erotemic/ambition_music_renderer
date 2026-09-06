@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: oppressive_crush
+  title: Oppressive Crush - Authoritarian Faction Theme
+  version_id: 5b0ebdc6827e634e:7b25dbcec7c4
+  render_hash: 5b0ebdc6827e634e
+  preview_sha256: 7b25dbcec7c464198280de8e4a6e97788b179e04e74adfe8f03594be87644494
+  preview_path: generated/oppressive_crush/.versioned/5b0ebdc6827e634e/preview/oppressive_crush_5b0ebdc6827e634e.full_soundtrack_preview.ogg
+  manifest_path: generated/oppressive_crush/.versioned/5b0ebdc6827e634e/oppressive_crush_5b0ebdc6827e634e.adaptive_manifest.json
+  manifest_sha256: 6d34d0494d506a0c3ab6b4d3214d7f63551593df7ee5873136fc54aa64f53aef
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.9.0-pro-render-backends-guitar-v1
+  score_path: scores/active/oppressive_crush.music.yaml
+  score_sha256_at_review: 5fba1f0c812df90a95b22a0b5f885a52b7a272cfe529c22b7ecb0335d27ccf2d
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.0
+  label: Acceptable
+  notes: I think this is probably the better version of the raid enforcer theme. Polishable, but it has a good oppressive
+    shape.
+  issues: []
+  furthest_played_seconds: 46.057
+  furthest_played_fraction: 0.4414
+  created_at: '2026-08-16T15:44:02Z'
+  updated_at: '2026-08-16T15:44:02Z'
+  reviewed_at: '2026-08-16T15:44:02Z'
+history: []

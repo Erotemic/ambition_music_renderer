@@ -1,0 +1,424 @@
+schema: ambition.musicir.v1
+id: minimum_viable_apocalypse
+title: Minimum Viable Apocalypse
+seed: 2026062032
+notes: 'Rewritten as slow 6/8 industrial sludge-funk: low organ, doom bass, tom ritual, sparse guitar. It avoids
+  the prior sprint-punk arc; the emotion is heavy, procedural, and exhausted.'
+tempo:
+  bpm: 78
+meter:
+  beats_per_bar: 6
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+postprocess:
+  gain_db: -0.4
+  highpass_hz: 28
+  lowpass_hz: 9800
+  presence_low_hz: 1200
+  presence_high_hz: 5200
+  presence_db: -0.2
+  reverb_wet: 0.075
+  reverb_decay_seconds: 1.25
+  reverb_damping_hz: 6500
+  stereo_width: 0.07
+  compressor_threshold_db: -17.5
+  compressor_ratio: 3.1
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 105.0
+  compressor_makeup_db: 1.4
+  compressor_knee_db: 5.5
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.8
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.4
+  reverb_damping_hz: 6500
+  stereo_width: 0.04
+  limiter_drive: 0.9
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: doom_bass
+  group: strings
+  program: synth_bass_1
+  volume: 100
+  pan: 62
+  expression: 108
+- name: sub_shadow
+  group: strings
+  program: fretless_bass
+  volume: 74
+  pan: 46
+  expression: 88
+- name: organ_low
+  group: choir_pad
+  program: drawbar_organ
+  volume: 64
+  pan: 66
+  expression: 78
+  modulation: 3
+- name: smoke_pad
+  group: choir_pad
+  program: pad_bowed
+  volume: 46
+  pan: 58
+  expression: 64
+  modulation: 5
+- name: rust_guitar
+  group: brass
+  program: overdrive_guitar
+  volume: 72
+  pan: 74
+  expression: 86
+- name: warning_horn
+  group: winds
+  program: baritone_sax
+  volume: 58
+  pan: 48
+  expression: 72
+- name: chain_bell
+  group: mallets
+  program: tubular_bells
+  volume: 42
+  pan: 78
+  expression: 60
+- name: kit
+  group: percussion
+  is_drum: true
+  volume: 96
+  pan: 64
+  expression: 108
+motifs:
+- id: warning_call
+  root: C4
+  intervals:
+  - 0
+  - 3
+  - 5
+  - 3
+  - 0
+  - -2
+  - 0
+  rhythm:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0.5
+  - 0.5
+  - 1
+  velocities:
+  - 0.74
+  - 0.68
+  - 0.72
+  - 0.64
+  - 0.58
+  - 0.52
+  - 0.7
+- id: chain_answer
+  root: G4
+  intervals:
+  - 0
+  - 7
+  - 5
+  - 3
+  - 0
+  rhythm:
+  - 1.5
+  - 0.5
+  - 1.0
+  - 1.0
+  - 2.0
+  velocities:
+  - 0.56
+  - 0.46
+  - 0.5
+  - 0.48
+  - 0.58
+layer_templates:
+  doom_pulse:
+    kind: bassline
+    instrument: doom_bass
+    octave: 1
+    pattern:
+    - - 0
+      - 0.0
+      - 1.6
+    - - 0
+      - 3.0
+      - 0.8
+    - - 7
+      - 4.5
+      - 0.6
+    velocity: 82
+    articulation: tenuto
+    humanize_ms: 4
+  shadow_walk:
+    kind: bassline
+    instrument: sub_shadow
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.8
+    - - 3
+      - 2.0
+      - 0.5
+    - - 5
+      - 3.0
+      - 0.5
+    - - 7
+      - 5.0
+      - 0.55
+    velocity: 48
+    articulation: normal
+    humanize_ms: 10
+  organ_floor:
+    kind: pad_chords
+    instruments:
+    - organ_low
+    - smoke_pad
+    octave: 3
+    duration_beats: 6
+    velocity: 48
+    articulation: pad
+    voicing: wide
+    humanize_ms: 10
+  slow_machine:
+    kind: drums
+    instrument: kit
+    humanize_ms: 7
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 3.0
+      velocity: 82
+    - drum: floor_tom
+      beats:
+      - 1.5
+      - 4.5
+      velocity: 62
+    - drum: snare
+      beats:
+      - 3.0
+      velocity: 52
+      probability: 0.65
+    - drum: closed_hat
+      beats:
+      - 0.0
+      - 1.0
+      - 2.0
+      - 3.0
+      - 4.0
+      - 5.0
+      velocity: 22
+      probability: 0.65
+    - drum: crash
+      beats:
+      - 0.0
+      velocity: 50
+      every: 4
+  guitar_slab:
+    kind: chord_hits
+    instruments:
+    - rust_guitar
+    octave: 2
+    hits:
+    - - 0
+      - 0.0
+    - - 1
+      - 3.0
+    - - 4
+      - 0.0
+    - - 5
+      - 3.0
+    duration_beats: 0.8
+    velocity: 70
+    articulation: marcato
+    voicing: wide
+  horn_warning:
+    kind: motif
+    instrument: warning_horn
+    motif: warning_call
+    velocity: 54
+    articulation: tenuto
+    starts:
+    - - 0
+      - 0.0
+    repeats: 2
+    every_bars: 4
+    humanize_ms: 12
+  chain_bells:
+    kind: motif
+    instrument: chain_bell
+    motif: chain_answer
+    velocity: 34
+    articulation: bell
+    starts:
+    - - 2
+      - 0.0
+    repeats: 2
+    every_bars: 4
+    humanize_ms: 22
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - slag_loop
+  - debt_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 6
+    bridge_stems:
+    - strings
+    - choir_pad
+    fade_stems:
+    - winds
+    - brass
+    - mallets
+    - percussion
+state_map:
+  explore:
+    section: slag_intro
+    stems:
+      strings: 0.65
+      choir_pad: 0.6
+  threat:
+    section: slag_loop
+    stems:
+      strings: 0.85
+      choir_pad: 0.7
+      percussion: 0.45
+      brass: 0.35
+  combat:
+    section: debt_loop
+    stems:
+      strings: 0.95
+      choir_pad: 0.75
+      percussion: 0.85
+      brass: 0.75
+      winds: 0.6
+      mallets: 0.35
+sections:
+- id: slag_intro
+  kind: intro
+  bars: 4
+  intensity: 0.42
+  harmony:
+  - Cm
+  - Ab
+  - Fm
+  - G7
+  layers:
+  - organ_floor
+  - doom_pulse
+- id: slag_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.62
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Cm
+  - Cm
+  - Ab
+  - G7
+  - Fm
+  - Ab
+  - Cm
+  - G7
+  layers:
+  - organ_floor
+  - doom_pulse
+  - shadow_walk
+  - slow_machine
+  - guitar_slab
+- id: debt_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.8
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Cm
+  - Eb
+  - Ab
+  - G7
+  - Cm
+  - Fm
+  - Ab
+  - G7
+  layers:
+  - organ_floor
+  - doom_pulse
+  - shadow_walk
+  - slow_machine
+  - guitar_slab
+  - horn_warning
+  - chain_bells
+- id: airless_break
+  kind: bridge
+  bars: 8
+  intensity: 0.46
+  harmony:
+  - Abmaj7
+  - Fm
+  - Cm
+  - G7
+  - Abmaj7
+  - Fm
+  - G7
+  - G7
+  layers:
+  - organ_floor
+  - doom_pulse
+  - chain_bells
+- id: furnace
+  kind: loop_component
+  bars: 8
+  intensity: 0.88
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - Cm
+  - Bb
+  - Ab
+  - G7
+  - Cm
+  - Fm
+  - G7
+  - Cm
+  layers:
+  - organ_floor
+  - doom_pulse
+  - shadow_walk
+  - slow_machine
+  - guitar_slab
+  - horn_warning
+- id: ash_out
+  kind: outro
+  bars: 4
+  intensity: 0.4
+  harmony:
+  - Ab
+  - G7
+  - Cm
+  - Cm
+  layers:
+  - organ_floor
+  - doom_pulse

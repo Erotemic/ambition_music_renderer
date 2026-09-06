@@ -1,0 +1,513 @@
+schema: ambition.musicir.v1
+id: pivot_protocol
+title: Pivot Protocol
+seed: 2026062031
+notes: 'Rewritten as angular 7-beat electroclash: dry tick percussion, clipped bass, and call/answer leads. It is
+  related to tech_bros_disruption by satire and synth palette, but its odd-meter pacing and stop-start shape should
+  feel like product strategy collapsing in real time rather than another synthwave banger.'
+tempo:
+  bpm: 146
+meter:
+  beats_per_bar: 7
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: fallback
+postprocess:
+  gain_db: -0.2
+  highpass_hz: 28
+  lowpass_hz: 11800
+  presence_low_hz: 1200
+  presence_high_hz: 5200
+  presence_db: 0.2
+  reverb_wet: 0.035
+  reverb_decay_seconds: 0.95
+  reverb_damping_hz: 6500
+  stereo_width: 0.05
+  compressor_threshold_db: -17.5
+  compressor_ratio: 3.1
+  compressor_attack_ms: 10.0
+  compressor_release_ms: 105.0
+  compressor_makeup_db: 1.4
+  compressor_knee_db: 5.5
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -2.6
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 28
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.4
+  reverb_damping_hz: 6500
+  stereo_width: 0.04
+  limiter_drive: 0.9
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: sub_pin
+  group: strings
+  program: synth_bass_1
+  volume: 92
+  pan: 64
+  expression: 104
+- name: rubber_bass
+  group: strings
+  program: synth_bass_2
+  volume: 82
+  pan: 50
+  expression: 96
+- name: dry_pluck
+  group: mallets
+  program: clavinet
+  volume: 72
+  pan: 42
+  expression: 86
+- name: glass_tick
+  group: mallets
+  program: glockenspiel
+  volume: 48
+  pan: 80
+  expression: 60
+- name: memo_pad
+  group: choir_pad
+  program: pad_warm
+  volume: 52
+  pan: 66
+  expression: 70
+  modulation: 5
+- name: audit_square
+  group: winds
+  program: lead_square
+  volume: 78
+  pan: 76
+  expression: 94
+  modulation: 3
+- name: calendar_saw
+  group: winds
+  program: lead_saw
+  volume: 66
+  pan: 48
+  expression: 82
+  modulation: 4
+- name: synth_brass
+  group: brass
+  program: synth_brass_1
+  volume: 76
+  pan: 58
+  expression: 88
+- name: kit
+  group: percussion
+  is_drum: true
+  volume: 90
+  pan: 64
+  expression: 105
+motifs:
+- id: pivot_cell
+  root: C#5
+  intervals:
+  - 0
+  - 2
+  - 0
+  - -3
+  - 0
+  - 5
+  - 2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.82
+  - 0.64
+  - 0.74
+  - 0.62
+  - 0.88
+  - 0.7
+  - 0.72
+- id: calendar_answer
+  root: A4
+  intervals:
+  - 0
+  - 4
+  - 7
+  - 4
+  - 2
+  - -1
+  - 0
+  rhythm:
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.7
+  - 0.68
+  - 0.76
+  - 0.66
+  - 0.62
+  - 0.58
+  - 0.7
+- id: board_alarm
+  root: C#5
+  intervals:
+  - 0
+  - 7
+  - 0
+  - 10
+  - 7
+  - 5
+  - 2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 1.0
+  velocities:
+  - 0.78
+  - 0.72
+  - 0.8
+  - 0.86
+  - 0.74
+  - 0.68
+  - 0.72
+layer_templates:
+  dry_clock_kit:
+    kind: drums
+    instrument: kit
+    humanize_ms: 3
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 3.0
+      velocity: 78
+    - drum: side_stick
+      beats:
+      - 2.0
+      - 5.0
+      velocity: 56
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      - 4.5
+      - 5.5
+      - 6.5
+      velocity: 34
+    - drum: open_hat
+      beats:
+      - 6.0
+      velocity: 44
+      probability: 0.55
+    - drum: claves
+      beats:
+      - 1.0
+      - 4.0
+      velocity: 40
+      probability: 0.7
+  narrow_bass:
+    kind: bassline
+    instrument: sub_pin
+    octave: 2
+    pattern:
+    - - 0
+      - 0.0
+      - 0.38
+    - - 0
+      - 1.0
+      - 0.22
+    - - 7
+      - 3.0
+      - 0.32
+    - - -3
+      - 4.5
+      - 0.28
+    - - 0
+      - 6.0
+      - 0.38
+    velocity: 72
+    articulation: staccato
+    humanize_ms: 2
+  rubber_offbeats:
+    kind: bassline
+    instrument: rubber_bass
+    octave: 2
+    pattern:
+    - - 0
+      - 0.5
+      - 0.22
+    - - 10
+      - 2.5
+      - 0.22
+    - - 7
+      - 5.5
+      - 0.28
+    velocity: 58
+    articulation: pluck
+    humanize_ms: 2
+  memo_pad:
+    kind: pad_chords
+    instruments:
+    - memo_pad
+    octave: 3
+    duration_beats: 7
+    velocity: 44
+    articulation: pad
+    voicing: wide
+    humanize_ms: 8
+  pluck_grid:
+    kind: arpeggio
+    instrument: dry_pluck
+    octave: 3
+    pattern:
+    - 0
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    - 2
+    step: 0.5
+    duration_beats: 0.18
+    velocity: 54
+    density: 0.78
+    articulation: pluck
+    humanize_ms: 1
+  pivot_call:
+    kind: motif
+    instrument: audit_square
+    motif: pivot_cell
+    velocity: 68
+    articulation: staccato
+    starts:
+    - - 0
+      - 0.0
+    repeats: 4
+    every_bars: 2
+    humanize_ms: 3
+  answer:
+    kind: motif
+    instrument: calendar_saw
+    motif: calendar_answer
+    velocity: 58
+    articulation: tenuto
+    starts:
+    - - 1
+      - 0.0
+    repeats: 3
+    every_bars: 2
+    humanize_ms: 5
+  brass_approvals:
+    kind: chord_hits
+    instruments:
+    - synth_brass
+    octave: 3
+    hits:
+    - - 0
+      - 0.0
+    - - 2
+      - 3.0
+    - - 4
+      - 0.0
+    - - 6
+      - 5.0
+    duration_beats: 0.36
+    velocity: 72
+    articulation: marcato
+  bell_errors:
+    kind: texture
+    instruments:
+    - glass_tick
+    root: C#6
+    scale:
+    - 0
+    - 2
+    - 4
+    - 7
+    - 9
+    - 12
+    events_per_bar: 0.7
+    duration_beats: 0.16
+    velocity: 28
+    humanize_ms: 8
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - uneasy_loop
+  - panic_loop
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems:
+    - strings
+    - choir_pad
+    fade_stems:
+    - winds
+    - brass
+    - mallets
+    - percussion
+state_map:
+  explore:
+    section: intro
+    stems:
+      strings: 0.7
+      choir_pad: 0.5
+      mallets: 0.45
+      percussion: 0.25
+  puzzle:
+    section: uneasy_loop
+    stems:
+      strings: 0.75
+      choir_pad: 0.55
+      mallets: 0.75
+      percussion: 0.45
+  chase:
+    section: panic_loop
+    stems:
+      strings: 0.9
+      choir_pad: 0.55
+      mallets: 0.85
+      percussion: 0.78
+      winds: 0.72
+  combat:
+    section: hostile_review
+    stems:
+      strings: 0.95
+      mallets: 0.9
+      percussion: 0.9
+      winds: 0.9
+      brass: 0.85
+      choir_pad: 0.6
+sections:
+- id: intro
+  kind: intro
+  bars: 4
+  intensity: 0.45
+  harmony:
+  - C#m
+  - A
+  - E
+  - B
+  layers:
+  - memo_pad
+  - narrow_bass
+  - bell_errors
+- id: uneasy_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.58
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - C#m
+  - A
+  - E
+  - B
+  - C#m
+  - F#m
+  - A
+  - G#7
+  layers:
+  - memo_pad
+  - narrow_bass
+  - dry_clock_kit
+  - pluck_grid
+  - pivot_call
+- id: panic_loop
+  kind: loop_component
+  bars: 8
+  intensity: 0.76
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - C#m
+  - E
+  - B
+  - A
+  - F#m
+  - A
+  - G#7
+  - G#7
+  layers:
+  - memo_pad
+  - narrow_bass
+  - rubber_offbeats
+  - dry_clock_kit
+  - pluck_grid
+  - pivot_call
+  - answer
+- id: compliance_break
+  kind: bridge
+  bars: 8
+  intensity: 0.5
+  harmony:
+  - Amaj7
+  - E
+  - B
+  - C#m
+  - Amaj7
+  - F#m
+  - G#sus4
+  - G#7
+  layers:
+  - memo_pad
+  - narrow_bass
+  - bell_errors
+- id: hostile_review
+  kind: loop_component
+  bars: 8
+  intensity: 0.88
+  loopable: true
+  valid_exit_local_bars:
+  - 4
+  - 8
+  harmony:
+  - C#m
+  - A
+  - B
+  - G#7
+  - C#m
+  - E
+  - F#m
+  - G#7
+  layers:
+  - memo_pad
+  - narrow_bass
+  - rubber_offbeats
+  - dry_clock_kit
+  - pluck_grid
+  - pivot_call
+  - answer
+  - brass_approvals
+- id: outro
+  kind: outro
+  bars: 4
+  intensity: 0.44
+  harmony:
+  - A
+  - B
+  - C#m
+  - C#m
+  layers:
+  - memo_pad
+  - narrow_bass

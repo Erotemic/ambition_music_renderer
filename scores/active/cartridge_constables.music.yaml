@@ -1,0 +1,195 @@
+schema: ambition.musicir.v1
+id: cartridge_constables
+title: Cartridge Constables - Platform Enforcement Theme
+seed: 2026051006
+notes: >-
+  Platform-enforcement antagonist loop. A strict but goofy chiptune patrol cue
+  with square leads, blippy bass, whistle-like calls, and toy-soldier drums.
+  It deliberately avoids naming any real-world company.
+tempo:
+  bpm: 132
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+render:
+  sample_rate: 48000
+  ogg_quality: 5
+  backend: fallback
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 40
+  lowpass_hz: 11800
+  presence_low_hz: 1900
+  presence_high_hz: 5400
+  presence_db: 0.9
+  reverb_wet: 0.08
+  reverb_decay_seconds: 0.7
+  reverb_damping_hz: 6000
+  stereo_width: 0.11
+  compressor_threshold_db: -17.0
+  compressor_ratio: 3.0
+  compressor_attack_ms: 6.0
+  compressor_release_ms: 75.0
+  compressor_makeup_db: 1.1
+  compressor_knee_db: 5.0
+  limiter_drive: 1.00
+  normalize: true
+  target_peak_db: -7.0
+stem_postprocess:
+  highpass_hz: 38
+  reverb_wet: 0.018
+  reverb_decay_seconds: 0.35
+  reverb_damping_hz: 6000
+  stereo_width: 0.05
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+  - {name: square_lead, group: chip, program: lead_square, volume: 58, pan: 80, expression: 76}
+  - {name: calliope_reply, group: chip, program: lead_calliope, volume: 48, pan: 52, expression: 68}
+  - {name: pluck_keys, group: keys, program: music_box, volume: 46, pan: 76, expression: 62}
+  - {name: synth_bass, group: bass, program: synth_bass_1, volume: 62, pan: 42, expression: 78}
+  - {name: whistle, group: whistle, program: whistle, volume: 45, pan: 86, expression: 65}
+  - {name: patrol_kit, group: percussion, is_drum: true, volume: 50, pan: 60, expression: 82}
+motifs:
+  - id: ticket_hook
+    root: C5
+    intervals: [0, 4, 7, 12, 7, 4, 1, 0]
+    rhythm: [0.25, 0.25, 0.5, 0.75, 0.25, 0.5, 0.5, 1.0]
+    velocities: [0.72, 0.58, 0.66, 0.88, 0.62, 0.54, 0.70, 0.42]
+  - id: cease_desist_reply
+    root: G4
+    intervals: [0, 1, 0, -2, 0, 4, 7, 4]
+    rhythm: [0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0]
+    velocities: [0.62, 0.76, 0.56, 0.48, 0.56, 0.68, 0.74, 0.38]
+layer_templates:
+  chip_chords:
+    kind: arpeggio
+    instruments: [square_lead, calliope_reply]
+    instrument_velocity_offsets: {square_lead: 0, calliope_reply: -12}
+    octave: 4
+    pattern: [0, 1, 2, 1, 3, 2, 1, 2]
+    step: 0.25
+    duration_beats: 0.18
+    velocity: 34
+    density: 0.55
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+  musicbox_ticks:
+    kind: arpeggio
+    instrument: pluck_keys
+    octave: 5
+    pattern: [0, 2, 1, 3]
+    step: 0.5
+    duration_beats: 0.20
+    velocity: 30
+    density: 0.50
+    articulation: bell
+    humanize_ms: 2
+    humanize_velocity_pct: 3
+  bass_blip:
+    kind: bassline
+    instrument: synth_bass
+    octave: 2
+    pattern: [[0, 0.0, 0.28], [0, 0.5, 0.22], [7, 1.0, 0.28], [0, 1.5, 0.22], [0, 2.0, 0.28], [12, 2.5, 0.22], [7, 3.0, 0.28], [0, 3.5, 0.22]]
+    velocity: 48
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+  square_ticket:
+    kind: motif
+    instruments: [square_lead, whistle]
+    motif: ticket_hook
+    root: C5
+    every_bars: 4
+    repeats: 8
+    starts: [[0, 0.0]]
+    velocity: 54
+    articulation: staccato
+    instrument_velocity_offsets: {square_lead: 0, whistle: -12}
+    instrument_octave_offsets: {square_lead: 0, whistle: 1}
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+  calliope_notice:
+    kind: motif
+    instruments: [calliope_reply, pluck_keys]
+    motif: cease_desist_reply
+    root: G4
+    every_bars: 8
+    repeats: 4
+    starts: [[4, 0.0]]
+    velocity: 46
+    articulation: staccato
+    instrument_velocity_offsets: {calliope_reply: 0, pluck_keys: -8}
+    instrument_octave_offsets: {calliope_reply: 0, pluck_keys: 1}
+    humanize_ms: 2
+    humanize_velocity_pct: 2
+  patrol_drums:
+    kind: drums
+    instrument: patrol_kit
+    velocity: 36
+    humanize_ms: 3
+    humanize_velocity_pct: 5
+    events:
+      - {drum: kick, beats: [0.0, 2.0], velocity: 38}
+      - {drum: side_stick, beats: [1.0, 3.0], velocity: 34}
+      - {drum: closed_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 18, probability: 0.80}
+      - {drum: woodblock_hi, beats: [3.75], velocity: 22, probability: 0.55}
+playback:
+  mode: section_stem_matrix
+  loop_components: [constables_loop]
+  exit_policy:
+    request_outro: next_valid_exit_bar
+    fade_aggressive_stems_beats: 4
+    bridge_stems: [chip, bass]
+    fade_stems: [keys, whistle, percussion]
+state_map:
+  default:
+    section: constables_loop
+    stems: {chip: 0.78, keys: 0.50, bass: 0.72, whistle: 0.50, percussion: 0.46}
+sections:
+  - id: constables_loop
+    kind: loop_component
+    label: cartridge constables platform patrol
+    bars: 32
+    intensity: 0.72
+    density: 0.74
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32]
+    harmony:
+      - C
+      - G/B
+      - Am
+      - E7
+      - F
+      - C/E
+      - Dm
+      - G
+      - C
+      - Bb
+      - F/A
+      - G
+      - C
+      - E7
+      - Am
+      - G
+      - F
+      - C/E
+      - Dm
+      - G
+      - C
+      - G/B
+      - Am
+      - F
+      - Dm
+      - C/E
+      - F
+      - G
+      - C
+      - Am
+      - G
+      - C
+    layers: [chip_chords, musicbox_ticks, bass_blip, square_ticket, calliope_notice, patrol_drums]

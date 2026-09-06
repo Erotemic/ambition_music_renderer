@@ -1,0 +1,1446 @@
+schema: ambition.musicir.v1
+id: support_theme
+title: Support Theme
+seed: 2026070610
+notes: Bass-context polish pass for the 8-bit platformer support cue. The rewritten lead, drum feel, and loop structure are
+  retained; the reused return bass line is split into bridge-return and final-return variants so the same bass rhythm supports
+  the actual chord grid without avoidable sour notes.
+tempo:
+  bpm: 124
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  runtime_stems:
+    max_gain_db: 18.0
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 38
+  lowpass_hz: 9400
+  presence_low_hz: 1250
+  presence_high_hz: 5000
+  presence_db: 0.9
+  reverb_wet: 0.003
+  reverb_decay_seconds: 0.1
+  reverb_damping_hz: 6200
+  stereo_width: 0.01
+  compressor_threshold_db: -18.0
+  compressor_ratio: 2.0
+  compressor_attack_ms: 3.0
+  compressor_release_ms: 60.0
+  compressor_makeup_db: 0.8
+  compressor_knee_db: 2.0
+  limiter_drive: 0.88
+  normalize: true
+  target_peak_db: -2.4
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 38
+  lowpass_hz: 9400
+  reverb_wet: 0.001
+  reverb_decay_seconds: 0.06
+  reverb_damping_hz: 6200
+  stereo_width: 0.004
+  limiter_drive: 0.84
+  normalize: false
+  target_peak_db: -3.0
+instruments:
+- name: square_motto
+  group: lead
+  program: lead_square
+  volume: 94
+  pan: 58
+  expression: 112
+- name: square_reply
+  group: answer
+  program: lead_square
+  volume: 96
+  pan: 72
+  expression: 114
+- name: tri_bass
+  group: bass
+  program: synth_bass_1
+  volume: 98
+  pan: 64
+  expression: 108
+- name: coin_ping
+  group: blip
+  program: celesta
+  volume: 88
+  pan: 78
+  expression: 102
+- name: noise_kit
+  group: percussion
+  is_drum: true
+  volume: 86
+  pan: 64
+  expression: 98
+motifs:
+- id: motto_a
+  notes:
+  - C5
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - C5
+  - E5
+  - G5
+  - E5
+  - C5
+  - G4
+  - C5
+  - E5
+  - G5
+  - C6
+  rhythm: &id001
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.75
+  - 0.25
+  - 0.25
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.75
+  - 0.75
+  velocities: &id003
+  - 0.92
+  - 0.68
+  - 0.82
+  - 0.98
+  - 0.64
+  - 0.7
+  - 0.76
+  - 0.58
+  - 0.78
+  - 0.62
+  - 0.82
+  - 0.66
+  - 0.72
+  - 0.84
+  - 0.62
+  - 0.88
+- id: answer_a
+  notes:
+  - A5
+  - F5
+  - C6
+  - A5
+  - F5
+  - C5
+  - A4
+  - C5
+  - B4
+  - D5
+  - G5
+  - B5
+  - D6
+  - B5
+  - G5
+  - D5
+  rhythm: *id001
+  velocities: &id002
+  - 0.78
+  - 0.64
+  - 0.74
+  - 0.86
+  - 0.62
+  - 0.68
+  - 0.74
+  - 0.56
+  - 0.74
+  - 0.6
+  - 0.78
+  - 0.64
+  - 0.7
+  - 0.82
+  - 0.6
+  - 0.86
+- id: tail_a
+  notes:
+  - G5
+  - E5
+  - C5
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - A5
+  - E5
+  - C5
+  - A4
+  - C5
+  - E5
+  - A5
+  - E5
+  rhythm: *id001
+  velocities: *id002
+- id: turn_a
+  notes:
+  - C5
+  - F5
+  - A5
+  - C6
+  - A5
+  - F5
+  - C5
+  - A4
+  - B4
+  - D5
+  - G5
+  - B5
+  - D6
+  - B5
+  - G5
+  - D5
+  rhythm: *id001
+  velocities: *id002
+- id: bridge_call
+  notes:
+  - C6
+  - A5
+  - F5
+  - A5
+  - C6
+  - F5
+  - A5
+  - C6
+  - A5
+  - F5
+  - C5
+  - F5
+  - A5
+  - C6
+  - A5
+  - F5
+  rhythm: *id001
+  velocities: &id004
+  - 0.76
+  - 0.68
+  - 0.84
+  - 0.94
+  - 0.62
+  - 0.68
+  - 0.74
+  - 0.54
+  - 0.72
+  - 0.58
+  - 0.76
+  - 0.62
+  - 0.68
+  - 0.8
+  - 0.58
+  - 0.84
+- id: bridge_echo
+  notes:
+  - D5
+  - F5
+  - A5
+  - D6
+  - A5
+  - F5
+  - D5
+  - A4
+  - F5
+  - A5
+  - D6
+  - A5
+  - F5
+  - D5
+  - A4
+  - D5
+  rhythm: *id001
+  velocities: *id002
+- id: motto_return
+  notes:
+  - C5
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - C5
+  - E5
+  - A5
+  - E5
+  - C5
+  - A4
+  - C5
+  - E5
+  - A5
+  - E5
+  rhythm: *id001
+  velocities: *id003
+- id: tail_return
+  notes:
+  - G5
+  - E5
+  - C5
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - C5
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - C5
+  - G4
+  rhythm: *id001
+  velocities: *id002
+- id: bridge_g_call
+  notes:
+  - D5
+  - G5
+  - B5
+  - D6
+  - B5
+  - G5
+  - D5
+  - B4
+  - D5
+  - B4
+  - G4
+  - B4
+  - D5
+  - G5
+  - B5
+  - G5
+  rhythm: *id001
+  velocities: *id004
+- id: bridge_c_echo
+  notes:
+  - E5
+  - G5
+  - C6
+  - G5
+  - E5
+  - C5
+  - G4
+  - C5
+  - E5
+  - G5
+  - E5
+  - C5
+  - G4
+  - C5
+  - E5
+  - C5
+  rhythm: *id001
+  velocities: *id002
+- id: top_pickup
+  notes:
+  - D5
+  - G5
+  - B5
+  - D6
+  - B5
+  - G5
+  - D5
+  - G4
+  rhythm:
+  - 0.125
+  - 0.125
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.25
+  - 0.75
+  velocities:
+  - 0.58
+  - 0.72
+  - 0.9
+  - 0.68
+  - 0.6
+  - 0.56
+  - 0.48
+  - 0.3
+- id: bass_a
+  notes:
+  - C2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C2
+  - E2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C3
+  - G2
+  - F2
+  - C3
+  - F2
+  - A2
+  - C3
+  - A2
+  - F2
+  - C3
+  - G1
+  - D2
+  - G2
+  - D2
+  - G2
+  - B2
+  - G2
+  - D2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.86
+  - 0.62
+  - 0.72
+  - 0.6
+  - 0.7
+  - 0.8
+  - 0.58
+  - 0.64
+  - 0.82
+  - 0.6
+  - 0.7
+  - 0.78
+  - 0.58
+  - 0.66
+  - 0.76
+  - 0.6
+  - 0.84
+  - 0.62
+  - 0.72
+  - 0.76
+  - 0.66
+  - 0.7
+  - 0.58
+  - 0.72
+  - 0.92
+  - 0.62
+  - 0.74
+  - 0.56
+  - 0.76
+  - 0.66
+  - 0.72
+  - 0.58
+- id: bass_a_lift
+  notes:
+  - C2
+  - E2
+  - G2
+  - C3
+  - G2
+  - E2
+  - C2
+  - E2
+  - A1
+  - E2
+  - A2
+  - C3
+  - E2
+  - A2
+  - C3
+  - A2
+  - F2
+  - A2
+  - C3
+  - A2
+  - F2
+  - C3
+  - A2
+  - F2
+  - G1
+  - D2
+  - G2
+  - D2
+  - B1
+  - D2
+  - G2
+  - D2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.88
+  - 0.62
+  - 0.74
+  - 0.82
+  - 0.6
+  - 0.66
+  - 0.54
+  - 0.62
+  - 0.84
+  - 0.58
+  - 0.72
+  - 0.74
+  - 0.58
+  - 0.68
+  - 0.76
+  - 0.6
+  - 0.82
+  - 0.6
+  - 0.76
+  - 0.64
+  - 0.56
+  - 0.7
+  - 0.62
+  - 0.54
+  - 0.94
+  - 0.58
+  - 0.72
+  - 0.56
+  - 0.76
+  - 0.6
+  - 0.86
+  - 0.58
+- id: bass_bridge
+  notes:
+  - F2
+  - C3
+  - A2
+  - F2
+  - C3
+  - A2
+  - F2
+  - C3
+  - F2
+  - C3
+  - A2
+  - C3
+  - F2
+  - A2
+  - C3
+  - A2
+  - D2
+  - A2
+  - F2
+  - D2
+  - A2
+  - F2
+  - D2
+  - A2
+  - G1
+  - D2
+  - G2
+  - D2
+  - G2
+  - B2
+  - G2
+  - D2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.82
+  - 0.66
+  - 0.74
+  - 0.58
+  - 0.7
+  - 0.62
+  - 0.56
+  - 0.68
+  - 0.78
+  - 0.64
+  - 0.72
+  - 0.6
+  - 0.66
+  - 0.7
+  - 0.76
+  - 0.58
+  - 0.78
+  - 0.6
+  - 0.7
+  - 0.56
+  - 0.66
+  - 0.62
+  - 0.54
+  - 0.6
+  - 0.92
+  - 0.62
+  - 0.76
+  - 0.56
+  - 0.7
+  - 0.64
+  - 0.76
+  - 0.58
+- id: bass_bridge_return
+  notes:
+  - G1
+  - D2
+  - G2
+  - B1
+  - D2
+  - G2
+  - B2
+  - G2
+  - G1
+  - B1
+  - D2
+  - G2
+  - D2
+  - B1
+  - G1
+  - D2
+  - C2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C2
+  - E2
+  - G2
+  - C3
+  - G2
+  - E2
+  - C2
+  - G2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.92
+  - 0.6
+  - 0.74
+  - 0.54
+  - 0.66
+  - 0.58
+  - 0.7
+  - 0.52
+  - 0.86
+  - 0.6
+  - 0.72
+  - 0.58
+  - 0.68
+  - 0.76
+  - 0.56
+  - 0.62
+  - 0.8
+  - 0.58
+  - 0.7
+  - 0.76
+  - 0.58
+  - 0.64
+  - 0.54
+  - 0.6
+  - 0.82
+  - 0.6
+  - 0.72
+  - 0.56
+  - 0.92
+  - 0.58
+  - 0.76
+  - 0.54
+- id: bass_final_return
+  notes:
+  - C2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C3
+  - E2
+  - G2
+  - C2
+  - E2
+  - G2
+  - C3
+  - G2
+  - E2
+  - C2
+  - G2
+  - F2
+  - C3
+  - A2
+  - C3
+  - F2
+  - A2
+  - C3
+  - A2
+  - G1
+  - D2
+  - G2
+  - D2
+  - G2
+  - B2
+  - G2
+  - D2
+  rhythm:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  velocities:
+  - 0.92
+  - 0.6
+  - 0.74
+  - 0.54
+  - 0.66
+  - 0.58
+  - 0.7
+  - 0.52
+  - 0.86
+  - 0.6
+  - 0.72
+  - 0.58
+  - 0.68
+  - 0.76
+  - 0.56
+  - 0.62
+  - 0.8
+  - 0.58
+  - 0.7
+  - 0.76
+  - 0.58
+  - 0.64
+  - 0.54
+  - 0.6
+  - 0.82
+  - 0.6
+  - 0.72
+  - 0.56
+  - 0.92
+  - 0.58
+  - 0.76
+  - 0.54
+layer_templates:
+  lead_motto:
+    kind: motif
+    instrument: square_motto
+    motif: motto_a
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 86
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  lead_answer:
+    kind: motif
+    instrument: square_motto
+    motif: answer_a
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 80
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  lead_tail:
+    kind: motif
+    instrument: square_motto
+    motif: tail_a
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 80
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  lead_turn:
+    kind: motif
+    instrument: square_reply
+    motif: turn_a
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 72
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bridge_lead:
+    kind: motif
+    instrument: square_motto
+    motif: bridge_call
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 80
+    articulation: staccato
+    gate: 0.5
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bridge_answer:
+    kind: motif
+    instrument: square_reply
+    motif: bridge_echo
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 76
+    articulation: staccato
+    gate: 0.5
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bass_a_phrase:
+    kind: motif
+    instrument: tri_bass
+    motif: bass_a
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 84
+    articulation: staccato
+    gate: 0.6
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bass_lift_phrase:
+    kind: motif
+    instrument: tri_bass
+    motif: bass_a_lift
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 86
+    articulation: staccato
+    gate: 0.6
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bass_bridge_phrase:
+    kind: motif
+    instrument: tri_bass
+    motif: bass_bridge
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 84
+    articulation: staccato
+    gate: 0.62
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bass_return_phrase:
+    kind: motif
+    instrument: tri_bass
+    motif: bass_bridge_return
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 88
+    articulation: staccato
+    gate: 0.6
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  pickup_blip:
+    kind: motif
+    instrument: coin_ping
+    motif: top_pickup
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 58
+    articulation: bell
+    gate: 0.72
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  kit_anchors:
+    kind: drums
+    instrument: noise_kit
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+    events:
+    - drum: kick
+      beats:
+      - 0.0
+      - 2.0
+      velocity: 42
+      duration_beats: 0.06
+    - drum: side_stick
+      beats:
+      - 1.0
+      - 3.0
+      velocity: 34
+      duration_beats: 0.05
+    - drum: closed_hat
+      beats:
+      - 0.5
+      - 1.5
+      - 2.5
+      - 3.5
+      velocity: 24
+      duration_beats: 0.035
+    - drum: closed_hat
+      beats:
+      - 3.25
+      - 3.5
+      - 3.75
+      velocity: 30
+      duration_beats: 0.03
+      every: 4
+      offset: 3
+    - drum: side_stick
+      beats:
+      - 3.75
+      velocity: 40
+      duration_beats: 0.05
+      every: 8
+      offset: 7
+    - drum: closed_hat
+      beats:
+      - 0.25
+      - 0.75
+      - 2.25
+      - 2.75
+      velocity: 26
+      duration_beats: 0.03
+      every: 8
+      offset: 8
+    - drum: claves
+      beats:
+      - 1.75
+      - 3.75
+      velocity: 34
+      duration_beats: 0.05
+      every: 8
+      offset: 12
+    - drum: kick
+      beats:
+      - 0.0
+      velocity: 38
+      duration_beats: 0.06
+      every: 4
+      offset: 16
+    - drum: side_stick
+      beats:
+      - 2.0
+      - 3.5
+      velocity: 36
+      duration_beats: 0.05
+      every: 4
+      offset: 16
+    - drum: closed_hat
+      beats:
+      - 1.5
+      - 3.0
+      velocity: 22
+      duration_beats: 0.03
+      every: 4
+      offset: 16
+    - drum: closed_hat
+      beats:
+      - 2.75
+      - 3.0
+      - 3.25
+      - 3.5
+      velocity: 34
+      duration_beats: 0.03
+      every: 8
+      offset: 24
+    - drum: side_stick
+      beats:
+      - 3.0
+      - 3.5
+      - 3.75
+      velocity: 42
+      duration_beats: 0.05
+      every: 32
+      offset: 31
+  lead_motto_return:
+    kind: motif
+    instrument: square_motto
+    motif: motto_return
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 84
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  lead_tail_return:
+    kind: motif
+    instrument: square_motto
+    motif: tail_return
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 80
+    articulation: staccato
+    gate: 0.48
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bridge_g_lead:
+    kind: motif
+    instrument: square_motto
+    motif: bridge_g_call
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 80
+    articulation: staccato
+    gate: 0.5
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bridge_c_answer:
+    kind: motif
+    instrument: square_reply
+    motif: bridge_c_echo
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 76
+    articulation: staccato
+    gate: 0.5
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+  bass_final_return_phrase:
+    kind: motif
+    instrument: tri_bass
+    motif: bass_final_return
+    starts:
+    - - 0
+      - 0.0
+    repeats: 1
+    velocity: 88
+    articulation: staccato
+    gate: 0.6
+    humanize_ms: 0
+    humanize_velocity_pct: 0
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - main_loop
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+    bridge_stems:
+    - lead
+    - answer
+    - bass
+    - percussion
+    fade_stems: []
+state_map:
+  default:
+    section: main_loop
+    stems:
+      lead: 1.0
+      answer: 0.88
+      bass: 0.98
+      blip: 0.72
+      percussion: 0.82
+  exploring:
+    preferred_section: main_loop
+    stems:
+      lead: 0.94
+      answer: 0.82
+      bass: 0.98
+      blip: 0.62
+      percussion: 0.78
+  moving:
+    preferred_section: main_loop
+    stems:
+      lead: 1.0
+      answer: 0.82
+      bass: 1.0
+      blip: 0.68
+      percussion: 0.82
+  busy:
+    preferred_section: main_loop
+    stems:
+      lead: 1.0
+      answer: 0.94
+      bass: 1.0
+      blip: 0.72
+      percussion: 0.82
+sections:
+- id: main_loop
+  kind: loop_component
+  label: support theme - composed A A bridge return loop
+  bars: 32
+  intensity: 0.82
+  density: 0.7
+  loopable: true
+  valid_exit_local_bars:
+  - 8
+  - 16
+  - 24
+  - 32
+  harmony:
+  - C
+  - C
+  - F
+  - G
+  - C
+  - Am
+  - F
+  - G
+  - C
+  - C
+  - F
+  - G
+  - C
+  - Am
+  - F
+  - G
+  - F
+  - F
+  - Dm
+  - Dm
+  - G
+  - G
+  - C
+  - C
+  - C
+  - Am
+  - F
+  - G
+  - C
+  - C
+  - F
+  - G
+  layers:
+  - template: lead_motto
+    starts:
+    - - 0
+      - 0.0
+    velocity: 86
+  - template: lead_answer
+    starts:
+    - - 2
+      - 0.0
+    velocity: 80
+  - template: lead_tail
+    starts:
+    - - 4
+      - 0.0
+    velocity: 78
+  - template: lead_turn
+    starts:
+    - - 6
+      - 0.0
+    velocity: 70
+  - template: bass_a_phrase
+    starts:
+    - - 0
+      - 0.0
+    velocity: 82
+  - template: bass_lift_phrase
+    starts:
+    - - 4
+      - 0.0
+    velocity: 82
+  - template: lead_motto
+    starts:
+    - - 8
+      - 0.0
+    velocity: 88
+  - template: lead_answer
+    starts:
+    - - 10
+      - 0.0
+    velocity: 82
+  - template: lead_tail
+    starts:
+    - - 12
+      - 0.0
+    velocity: 82
+  - template: lead_turn
+    starts:
+    - - 14
+      - 0.0
+    velocity: 72
+  - template: bass_a_phrase
+    starts:
+    - - 8
+      - 0.0
+    velocity: 82
+  - template: bass_lift_phrase
+    starts:
+    - - 12
+      - 0.0
+    velocity: 84
+  - template: bridge_lead
+    starts:
+    - - 16
+      - 0.0
+    velocity: 82
+  - template: bridge_answer
+    starts:
+    - - 18
+      - 0.0
+    velocity: 78
+  - template: bridge_g_lead
+    starts:
+    - - 20
+      - 0.0
+    velocity: 80
+  - template: bridge_c_answer
+    starts:
+    - - 22
+      - 0.0
+    velocity: 76
+  - template: bass_bridge_phrase
+    starts:
+    - - 16
+      - 0.0
+    velocity: 82
+  - template: bass_return_phrase
+    starts:
+    - - 20
+      - 0.0
+    velocity: 84
+  - template: lead_motto_return
+    starts:
+    - - 24
+      - 0.0
+    velocity: 88
+  - template: lead_answer
+    starts:
+    - - 26
+      - 0.0
+    velocity: 82
+  - template: lead_tail_return
+    starts:
+    - - 28
+      - 0.0
+    velocity: 82
+  - template: lead_turn
+    starts:
+    - - 30
+      - 0.0
+    velocity: 74
+  - template: bass_a_phrase
+    starts:
+    - - 24
+      - 0.0
+    velocity: 84
+  - template: bass_final_return_phrase
+    starts:
+    - - 28
+      - 0.0
+    velocity: 84
+  - template: pickup_blip
+    starts:
+    - - 7
+      - 3.0
+    - - 31
+      - 3.0
+    velocity: 60
+  - kit_anchors
+group_postprocess:
+  lead:
+    gain_db: 1.2
+    lowpass_hz: 9200
+    high_shelf_hz: 5000
+    high_shelf_db: 0.7
+    presence_low_hz: 1400
+    presence_high_hz: 5000
+    presence_db: 0.7
+    transient_tame: 0.01
+    reverb_wet: 0.001
+  answer:
+    gain_db: 3.0
+    lowpass_hz: 9000
+    high_shelf_hz: 5000
+    high_shelf_db: 0.4
+    transient_tame: 0.01
+    reverb_wet: 0.001
+  bass:
+    gain_db: 0.6
+    lowpass_hz: 7200
+    high_shelf_hz: 4600
+    high_shelf_db: -0.3
+    transient_tame: 0.01
+    reverb_wet: 0.0
+  blip:
+    gain_db: 4.8
+    lowpass_hz: 9400
+    high_shelf_hz: 5600
+    high_shelf_db: 0.2
+    transient_tame: 0.01
+    reverb_wet: 0.001
+  percussion:
+    gain_db: 4.6
+    lowpass_hz: 8400
+    high_shelf_hz: 5000
+    high_shelf_db: -0.2
+    transient_tame: 0.01
+    reverb_wet: 0.0

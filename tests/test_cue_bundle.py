@@ -1,0 +1,1062 @@
+from __future__ import annotations
+
+import json
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import pytest
+import soundfile as sf
+
+from ambition_music_renderer.cli import (
+    BundleCommand,
+    RenderCommand,
+    _single_bundle_config,
+)
+from ambition_music_renderer.render.bundle_adaptive_reports import (
+    write_adaptive_composition_mastering_report,
+    write_adaptive_section_report,
+)
+from ambition_music_renderer.render.bundle_archive import make_zip, should_include_in_report_zip
+from ambition_music_renderer.render.bundle_audio_reports import (
+    summarize_mix_diagnostics,
+    write_manifest_audio_level_report,
+    write_state_mix_report,
+    write_stem_export_report,
+)
+from ambition_music_renderer.render.bundle_base import (
+    CueBundleConfig,
+    copy_manifest_referenced_files,
+    manifest_audio_entries,
+    prepare_manifest_analysis_root,
+)
+from ambition_music_renderer.render.bundle_spectral_reports import (
+    write_spectral_fingerprint,
+    write_stem_amplitude_report,
+    write_stem_loudness_report,
+)
+from ambition_music_renderer.audit.arrangement_audit import audit_spec as audit_arrangement_spec
+from ambition_music_renderer.audit.arrangement_audit import write_reports as write_arrangement_reports
+from ambition_music_renderer.audit.dissonance_audit import audit_spec, write_reports as write_dissonance_reports
+from ambition_music_renderer.render.group_worker import RenderGroupWorkerConfig
+from ambition_music_renderer.render.isolated import RenderIsolatedConfig
+from ambition_music_renderer.audit.reference_audio_audit import analyze_audio as analyze_reference_audio, write_reports as write_reference_audio_reports
+from ambition_music_renderer.audit.sour_note_audit import audit_spec as audit_sour_note_spec
+from ambition_music_renderer.audit.sour_note_audit import write_reports as write_sour_note_reports
+from ambition_music_renderer.audit.shrill_note_audit import audit_spec as audit_shrill_note_spec
+from ambition_music_renderer.audit.shrill_note_audit import write_reports as write_shrill_note_reports
+from ambition_music_renderer.render.score_theory import chord_intervals
+from ambition_music_renderer.render.export import timeline_markers_from_spec
+
+
+def test_backend_defaults_prefer_pretty_midi():
+    assert RenderIsolatedConfig.cli(argv=["cue.music.yaml"]).backend == "pretty-midi"
+    assert RenderGroupWorkerConfig.cli(
+        argv=["cue.music.yaml", "--outdir=out", "--group=keys"]
+    ).backend == "pretty-midi"
+    assert RenderCommand.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
+    assert CueBundleConfig.cli(argv=["lofi_study_loop"]).backend == "pretty-midi"
+    adaptive_args = RenderCommand.cli(argv=["first_goblin_tune_v2", "--full_mix_only", "--publish"])
+    assert adaptive_args.full_mix_only is True
+    assert adaptive_args.publish is True
+    shared_args = RenderIsolatedConfig.cli(argv=[
+        "cue.music.yaml",
+        "--runtime_stem_gain_mode=shared",
+        "--runtime_stem_max_gain_db=18",
+    ])
+    assert shared_args.runtime_stem_gain_mode == "shared"
+    assert shared_args.runtime_stem_max_gain_db == 18.0
+    audition_args = RenderIsolatedConfig.cli(argv=[
+        "cue.music.yaml",
+        "--simple_mix",
+        "--audition_stems",
+    ])
+    assert audition_args.simple_mix is True
+    assert audition_args.audition_stems is True
+
+
+def test_bundle_parser_exposes_publish_and_zip_flags():
+    args = CueBundleConfig.cli(
+        argv=[
+            "for_emmy_forever_ago",
+            "--publish",
+            "--zip",
+            "--jobs",
+            "2",
+            "--runtime_stem_gain_mode=shared",
+            "--runtime_stem_max_gain_db=18",
+            "--zip_report_bundle",
+            "--plot_format=jpg",
+            "--audition_stems",
+        ]
+    )
+    assert args.cue == "for_emmy_forever_ago"
+    assert args.publish is True
+    assert args.zip_bundle is True
+    assert args.jobs == 2
+    assert args.runtime_stem_gain_mode == "shared"
+    assert args.runtime_stem_max_gain_db == 18.0
+    assert args.zip_report_bundle is True
+    assert args.plot_format == "jpg"
+    assert args.audition_stems is True
+
+
+def test_stem_export_report_compares_scratch_adaptive_and_preview_audio():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 10, dtype="float32") / sr
+        tone = 0.1 * np.sin(2 * np.pi * 440.0 * t)
+        stereo = np.stack([tone, tone], axis=1).astype("float32")
+
+        scratch = root / "scratch_stems"
+        scratch.mkdir()
+        np.save(scratch / "testcue_deadbeef.keys.npy", stereo)
+
+        adaptive = root / "adaptive" / "loop"
+        adaptive.mkdir(parents=True)
+        sf.write(adaptive / "testcue_deadbeef.loop.keys.wav", stereo, sr)
+        sf.write(adaptive / "testcue_deadbeef.loop.full.wav", stereo, sr)
+
+        preview = root / "preview"
+        preview.mkdir()
+        sf.write(preview / "testcue_deadbeef.full_soundtrack_preview.wav", stereo, sr)
+
+        manifest = {
+            "id": "testcue",
+            "sample_rate": sr,
+            "files": {
+                "adaptive": {
+                    "loop": {
+                        "keys": "adaptive/loop/testcue_deadbeef.loop.keys.wav",
+                        "full": "adaptive/loop/testcue_deadbeef.loop.full.wav",
+                    }
+                },
+                "preview": {
+                    "full_soundtrack": "preview/testcue_deadbeef.full_soundtrack_preview.wav"
+                },
+            },
+        }
+
+        report_path = write_stem_export_report(root, manifest, root / "reports")
+        text = report_path.read_text()
+        assert "scratch_npy" in text
+        assert "adaptive_audio" in text
+        assert "preview_audio" in text
+        assert "keys" in text
+        data = json.loads((root / "reports" / "stem_export_report.json").read_text())
+        assert data["cue_id"] == "testcue"
+        assert len(data["rows"]) == 4
+
+
+def test_make_zip_contains_bundle_files():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        bundle = root / "mycue_hash_bundle"
+        (bundle / "reports").mkdir(parents=True)
+        (bundle / "reports" / "report.txt").write_text("ok", encoding="utf8")
+        zip_path = make_zip(bundle, root / "mycue_hash_bundle.zip")
+        assert zip_path.exists()
+        import zipfile
+
+        with zipfile.ZipFile(zip_path) as zf:
+            names = set(zf.namelist())
+        assert "mycue_hash_bundle/reports/report.txt" in names
+
+
+def test_report_zip_excludes_large_binary_artifacts():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        bundle = root / "mycue_hash_bundle"
+        (bundle / "reports").mkdir(parents=True)
+        (bundle / "adaptive" / "loop").mkdir(parents=True)
+        (bundle / "plots").mkdir(parents=True)
+        (bundle / "reports" / "report.txt").write_text("ok", encoding="utf8")
+        (bundle / "source.music.yaml").write_text("id: mycue", encoding="utf8")
+        (bundle / "plots" / "stem.spectrogram.jpg").write_bytes(b"jpeg")
+        (bundle / "adaptive" / "loop" / "mycue.loop.full.ogg").write_bytes(b"ogg")
+        (bundle / "scratch_stems").mkdir()
+        (bundle / "scratch_stems" / "mycue.keys.npy").write_bytes(b"npy")
+
+        assert should_include_in_report_zip(bundle / "reports" / "report.txt")
+        assert should_include_in_report_zip(bundle / "plots" / "stem.spectrogram.jpg")
+        assert not should_include_in_report_zip(bundle / "adaptive" / "loop" / "mycue.loop.full.ogg")
+        assert not should_include_in_report_zip(bundle / "scratch_stems" / "mycue.keys.npy")
+
+        zip_path = make_zip(bundle, root / "mycue_hash_bundle_report.zip", report_only=True)
+        import zipfile
+
+        with zipfile.ZipFile(zip_path) as zf:
+            names = set(zf.namelist())
+        assert "mycue_hash_bundle/reports/report.txt" in names
+        assert "mycue_hash_bundle/plots/stem.spectrogram.jpg" in names
+        assert "mycue_hash_bundle/adaptive/loop/mycue.loop.full.ogg" not in names
+        assert "mycue_hash_bundle/scratch_stems/mycue.keys.npy" not in names
+
+
+def test_manifest_audio_entries_and_bundle_copy_are_manifest_scoped():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        current = root / "preview" / "cue_hash.full_soundtrack_preview.ogg"
+        stale = root / "preview" / "cue_old.full_soundtrack_preview.ogg"
+        adaptive = root / "adaptive" / "loop" / "cue_hash.loop.full.ogg"
+        current.parent.mkdir(parents=True)
+        adaptive.parent.mkdir(parents=True)
+        current.write_bytes(b"current")
+        stale.write_bytes(b"stale")
+        adaptive.write_bytes(b"adaptive")
+        (current.with_name(current.name + ".metadata.json")).write_text("{}", encoding="utf8")
+        manifest = {
+            "files": {
+                "preview": {"full_soundtrack": "preview/cue_hash.full_soundtrack_preview.ogg"},
+                "adaptive": {"loop": {"full": "adaptive/loop/cue_hash.loop.full.ogg"}},
+            }
+        }
+        entries = manifest_audio_entries(manifest)
+        assert {e["path"] for e in entries} == {
+            "preview/cue_hash.full_soundtrack_preview.ogg",
+            "adaptive/loop/cue_hash.loop.full.ogg",
+        }
+        bundle = root / "bundle"
+        copied = copy_manifest_referenced_files(root, manifest, bundle)
+        assert sorted(copied) == [
+            "adaptive/loop/cue_hash.loop.full.ogg",
+            "preview/cue_hash.full_soundtrack_preview.ogg",
+            "preview/cue_hash.full_soundtrack_preview.ogg.metadata.json",
+        ]
+        assert (bundle / "preview" / current.name).exists()
+        assert (bundle / "preview" / (current.name + ".metadata.json")).exists()
+        assert not (bundle / "preview" / stale.name).exists()
+
+
+def test_manifest_audio_level_report_ignores_stale_audio():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 20, dtype="float32") / sr
+        tone = 0.05 * np.sin(2 * np.pi * 220.0 * t)
+        stereo = np.stack([tone, tone], axis=1).astype("float32")
+        preview = root / "preview"
+        preview.mkdir()
+        sf.write(preview / "cue_hash.full_soundtrack_preview.wav", stereo, sr)
+        sf.write(preview / "cue_old.full_soundtrack_preview.wav", stereo, sr)
+        manifest = {
+            "files": {
+                "preview": {"full_soundtrack": "preview/cue_hash.full_soundtrack_preview.wav"},
+                "adaptive": {},
+            }
+        }
+        report = write_manifest_audio_level_report(root, manifest, root / "reports")
+        text = report.read_text()
+        assert "cue_hash.full_soundtrack_preview.wav" in text
+        assert "cue_old.full_soundtrack_preview.wav" not in text
+
+
+def test_mix_diagnostics_surfaces_renderer_warnings():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        manifest = {
+            "id": "cue",
+            "hash": "abc123",
+            "runtime_stem_gain_mode": "native",
+            "diagnostics": {
+                "raw_full": {"rms_dbfs": -75.0, "peak_dbfs": -55.0},
+                "mastered_full": {"rms_dbfs": -24.0, "peak_dbfs": -8.0},
+                "master_rms_lift_db": 51.0,
+                "runtime_gain_db": 0.0,
+                "runtime_gain_reason": "native",
+                "native_stems": {"keys": {"rms_dbfs": -75.0, "peak_dbfs": -55.0}},
+                "runtime_stems": {"keys": {"rms_dbfs": -75.0, "peak_dbfs": -55.0}},
+                "warnings": ["native runtime stems are very quiet"],
+            },
+        }
+        report, warnings = summarize_mix_diagnostics(manifest, root / "reports")
+        text = report.read_text()
+        assert "master_rms_lift_db" in text
+        assert "native runtime stems are very quiet" in text
+        assert warnings == ["native runtime stems are very quiet"]
+
+
+
+def test_analysis_root_copies_only_current_hash_scratch_stems():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        audio = np.zeros((128, 2), dtype="float32")
+        scratch = root / "scratch_stems"
+        scratch.mkdir()
+        np.save(scratch / "cue_current.keys.npy", audio)
+        np.save(scratch / "cue_old.keys.npy", audio)
+        preview = root / "preview"
+        preview.mkdir()
+        sf.write(preview / "cue_current.full_soundtrack_preview.wav", audio, sr)
+        sf.write(preview / "cue_old.full_soundtrack_preview.wav", audio, sr)
+        manifest = {
+            "id": "cue",
+            "hash": "current",
+            "files": {
+                "preview": {"full_soundtrack": "preview/cue_current.full_soundtrack_preview.wav"},
+                "adaptive": {},
+            },
+        }
+        analysis = prepare_manifest_analysis_root(root, manifest, root / "analysis")
+        assert (analysis / "scratch_stems" / "cue_current.keys.npy").exists()
+        assert not (analysis / "scratch_stems" / "cue_old.keys.npy").exists()
+        assert (analysis / "preview" / "cue_current.full_soundtrack_preview.wav").exists()
+        assert not (analysis / "preview" / "cue_old.full_soundtrack_preview.wav").exists()
+
+
+
+def test_spectral_fingerprint_is_llm_friendly_json_and_tsv():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        duration = 0.25
+        t = np.arange(int(sr * duration), dtype="float32") / sr
+        low = 0.1 * np.sin(2 * np.pi * 120.0 * t)
+        high = 0.1 * np.sin(2 * np.pi * 4200.0 * t)
+        scratch = root / "scratch_stems"
+        scratch.mkdir()
+        np.save(scratch / "cue_hash.low_keys.npy", np.stack([low, low], axis=1).astype("float32"))
+        np.save(scratch / "cue_hash.pluck.npy", np.stack([high, high], axis=1).astype("float32"))
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [{"end_seconds": duration}],
+        }
+        report = write_spectral_fingerprint(root, manifest, root / "reports", bucket_seconds=0.25)
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.music_spectral_fingerprint.v1"
+        assert payload["mean_band_fraction_by_group"]["low"]["low_keys"] > 0.9
+        assert payload["mean_band_fraction_by_group"]["vhigh"]["pluck"] > 0.9
+        assert (root / "reports" / "spectral_fingerprint.tsv").exists()
+        assert (root / "reports" / "spectral_fingerprint_summary.txt").exists()
+
+
+def test_state_mix_report_flags_similar_states():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        spec = {
+            "id": "cue",
+            "instruments": [
+                {"name": "piano", "group": "keys"},
+                {"name": "bass", "group": "bass"},
+            ],
+            "state_map": {
+                "default": {"section": "loop", "stems": {"keys": 0.8, "bass": 0.6}},
+                "quiet": {"section": "loop", "stems": {"keys": 0.7, "bass": 0.5}},
+            },
+        }
+        manifest = {"diagnostics": {"runtime_previews": {}}}
+        report = write_state_mix_report(spec, manifest, root / "reports")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.music_state_mix_report.v1"
+        text = (root / "reports" / "state_mix_report_summary.txt").read_text()
+        assert "state distances from default" in text
+        assert "warning: state maps are close together" in text
+
+
+def test_dissonance_audit_identifies_close_layer_clash():
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "clash_test",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [
+            {"name": "a", "group": "keys", "program": "acoustic_grand_piano"},
+            {"name": "b", "group": "lead", "program": "acoustic_grand_piano"},
+        ],
+        "layer_templates": {
+            "a_note": {
+                "kind": "motif",
+                "instrument": "a",
+                "motif": "a_motif",
+                "root": "C4",
+                "starts": [[0, 0.0]],
+                "repeats": 1,
+                "velocity": 90,
+            },
+            "b_note": {
+                "kind": "motif",
+                "instrument": "b",
+                "motif": "b_motif",
+                "root": "C#4",
+                "starts": [[0, 0.0]],
+                "repeats": 1,
+                "velocity": 90,
+            },
+        },
+        "motifs": [
+            {"id": "a_motif", "root": "C4", "intervals": [0], "rhythm": [1.0], "velocities": [1.0]},
+            {"id": "b_motif", "root": "C#4", "intervals": [0], "rhythm": [1.0], "velocities": [1.0]},
+        ],
+        "sections": [
+            {"id": "loop", "bars": 1, "harmony": ["C"], "layers": ["a_note", "b_note"]}
+        ],
+    }
+    payload = audit_spec(spec)
+    assert payload["hotspots"]
+    top = payload["hotspots"][0]
+    assert top["worst_pairs"][0]["interval_class"] == 1
+    assert top["worst_pairs"][0]["layers"] == ["a_note", "b_note"]
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        paths = write_dissonance_reports(payload, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        assert Path(paths["summary"]).exists()
+        assert Path(paths["markdown"]).exists()
+        assert "minor second" in Path(paths["summary"]).read_text()
+        assert "Top Hotspots" in Path(paths["markdown"]).read_text()
+        if "timeline_plot" in paths:
+            assert Path(paths["timeline_plot"]).exists()
+        if "layer_pair_plot" in paths:
+            assert Path(paths["layer_pair_plot"]).exists()
+
+
+def test_arrangement_audit_reports_group_prominence_and_bass_collisions():
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "arrangement_test",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [
+            {"name": "bass", "group": "low_keys", "program": "acoustic_grand_piano"},
+            {"name": "horn", "group": "horns", "program": "french_horn"},
+            {"name": "lead", "group": "keys", "program": "acoustic_grand_piano"},
+        ],
+        "state_map": {
+            "default": {"section": "loop", "stems": {"low_keys": 0.4, "horns": 0.7, "keys": 0.7}}
+        },
+        "layer_templates": {
+            "bass_note": {
+                "kind": "motif",
+                "instrument": "bass",
+                "motif": "bass_motif",
+                "root": "C2",
+                "starts": [[0, 0.0]],
+                "velocity": 80,
+            },
+            "horn_note": {
+                "kind": "motif",
+                "instrument": "horn",
+                "motif": "horn_motif",
+                "root": "G3",
+                "starts": [[0, 0.0]],
+                "velocity": 80,
+            },
+            "lead_note": {
+                "kind": "motif",
+                "instrument": "lead",
+                "motif": "lead_motif",
+                "root": "C5",
+                "starts": [[0, 0.0]],
+                "velocity": 80,
+            },
+        },
+        "motifs": [
+            {"id": "bass_motif", "root": "C2", "intervals": [0], "rhythm": [2.0], "velocities": [1.0]},
+            {"id": "horn_motif", "root": "G3", "intervals": [0], "rhythm": [2.0], "velocities": [1.0]},
+            {"id": "lead_motif", "root": "C5", "intervals": [1], "rhythm": [2.0], "velocities": [1.0]},
+        ],
+        "sections": [{"id": "loop", "bars": 1, "harmony": ["C"], "layers": ["bass_note", "horn_note", "lead_note"]}],
+    }
+    payload = audit_arrangement_spec(spec)
+    assert payload["schema"] == "ambition.music_arrangement_audit.v1"
+    assert any(row["group"] == "horns" for row in payload["groups"])
+    assert payload["bass_collision_candidates"]
+    with tempfile.TemporaryDirectory() as td:
+        paths = write_arrangement_reports(payload, Path(td))
+        assert Path(paths["summary"]).exists()
+        assert Path(paths["markdown"]).exists()
+        assert "Default-state group presence" in Path(paths["markdown"]).read_text()
+
+
+
+def test_sour_note_audit_points_to_motif_root_sources():
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "sour_note_test",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [
+            {"name": "piano", "group": "keys", "program": "acoustic_grand_piano"},
+        ],
+        "state_map": {"default": {"section": "loop", "stems": {"keys": 1.0}}},
+        "motifs": [
+            {"id": "bad_turn", "root": "C4", "intervals": [0], "rhythm": [1.5], "velocities": [1.0]},
+        ],
+        "layer_templates": {
+            "bad_motif": {
+                "kind": "motif",
+                "instrument": "piano",
+                "motif": "bad_turn",
+                "roots": ["F#4"],
+                "starts": [[0, 0.0]],
+                "repeats": 1,
+                "velocity": 90,
+            },
+        },
+        "sections": [{"id": "loop", "bars": 1, "harmony": ["C"], "layers": ["bad_motif"]}],
+    }
+    payload = audit_sour_note_spec(spec, min_score=0.1)
+    assert payload["schema"] == "ambition.music_sour_note_audit.v1"
+    assert payload["candidates"]
+    top = payload["candidates"][0]
+    assert top["note"] == "F#4"
+    assert "layer_templates.bad_motif.roots[0]" in top["source_hint"]
+    assert "motifs.bad_turn.intervals[0]" in top["source_hint"]
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        paths = write_sour_note_reports(payload, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        assert Path(paths["summary"]).exists()
+        assert Path(paths["markdown"]).exists()
+        assert "Top Candidates" in Path(paths["markdown"]).read_text()
+
+
+
+def test_stem_amplitude_report_shows_default_weighted_balance():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 4, dtype="float32") / sr
+        loud = 0.10 * np.sin(2 * np.pi * 220.0 * t)
+        soft = 0.025 * np.sin(2 * np.pi * 440.0 * t)
+        adaptive = root / "adaptive" / "loop"
+        adaptive.mkdir(parents=True)
+        sf.write(adaptive / "cue_hash.loop.keys.wav", np.stack([loud, loud], axis=1), sr)
+        sf.write(adaptive / "cue_hash.loop.horns.wav", np.stack([soft, soft], axis=1), sr)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "files": {
+                "adaptive": {
+                    "loop": {
+                        "keys": "adaptive/loop/cue_hash.loop.keys.wav",
+                        "horns": "adaptive/loop/cue_hash.loop.horns.wav",
+                    }
+                },
+                "preview": {},
+            },
+        }
+        spec = {
+            "id": "cue",
+            "state_map": {"default": {"section": "loop", "stems": {"keys": 0.5, "horns": 1.0}}},
+        }
+        report = write_stem_amplitude_report(root, spec, manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.music_stem_amplitude.v1"
+        by_group = {row["group"]: row for row in payload["groups"]}
+        assert "keys" in by_group and "horns" in by_group
+        assert by_group["keys"]["weighted_default_rms_dbfs"] > by_group["horns"]["weighted_default_rms_dbfs"]
+        assert (root / "reports" / "stem_amplitude_summary.txt").exists()
+        assert (root / "reports" / "stem_amplitude_envelope.tsv").exists()
+        if (root / "plots" / "stem_amplitude_balance.jpg").exists():
+            assert (root / "plots" / "stem_amplitude_timeline.jpg").exists()
+            assert (root / "plots" / "stem_loudness_timeline.jpg").exists()
+
+
+def test_stem_amplitude_report_falls_back_to_scratch_stems_for_full_mix_only():
+    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
+    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
+    # not installed, write a clear note and let the rest of the bundle
+    # succeed" -- so on a machine set up exactly as `python_tools.sh`
+    # intends, this failed on a missing FILE and read as a renderer bug.
+    # The suite already skips for librosa, pyloudnorm, PySide6 and
+    # pedalboard; this is the same move, and the fallback the docstring
+    # promises has its own test below.
+    pytest.importorskip("matplotlib")
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 2, dtype="float32") / sr
+        rhythm = 0.08 * np.sin(2 * np.pi * 110.0 * t)
+        lead = 0.03 * np.sin(2 * np.pi * 440.0 * t)
+        scratch = root / "scratch_stems"
+        scratch.mkdir(parents=True)
+        np.save(scratch / "cue_hash.rhythm_guitars.npy", np.stack([rhythm, rhythm], axis=1).astype("float32"))
+        np.save(scratch / "cue_hash.lead_guitars.npy", np.stack([lead, lead], axis=1).astype("float32"))
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [
+                {"id": "solo", "start_seconds": 0.0, "end_seconds": 0.5, "duration_seconds": 0.5},
+            ],
+            "files": {
+                "adaptive": {"solo": {"full": "adaptive/solo/cue_hash.solo.full.wav"}},
+                "preview": {},
+            },
+        }
+        spec = {"id": "cue", "state_map": {}}
+        report = write_stem_amplitude_report(root, spec, manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        groups = {row["group"] for row in payload["groups"]}
+        assert {"rhythm_guitars", "lead_guitars"}.issubset(groups)
+        assert payload["envelope_rows"]
+        assert (root / "plots" / "stem_loudness_timeline.jpg").exists()
+
+
+def test_stem_loudness_report_writes_tables_and_plot():
+    # ⛔ MATPLOTLIB IS INTENTIONALLY OPTIONAL, AND THIS TEST ASSERTS A PLOT
+    # FILE. `write_spectrograms` says so in its own docstring -- "if it is
+    # not installed, write a clear note and let the rest of the bundle
+    # succeed" -- so on a machine set up exactly as `python_tools.sh`
+    # intends, this failed on a missing FILE and read as a renderer bug.
+    # The suite already skips for librosa, pyloudnorm, PySide6 and
+    # pedalboard; this is the same move, and the fallback the docstring
+    # promises has its own test below.
+    pytest.importorskip("matplotlib")
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "runtime_stem_gain_mode": "shared",
+            "diagnostics": {
+                "native_stems": {
+                    "rhythm_guitars": {"rms_dbfs": -55.0, "peak_dbfs": -20.0},
+                    "lead_guitars": {"rms_dbfs": -40.0, "peak_dbfs": -12.0},
+                },
+                "runtime_stems": {
+                    "rhythm_guitars": {"rms_dbfs": -49.0, "peak_dbfs": -14.0},
+                    "lead_guitars": {"rms_dbfs": -34.0, "peak_dbfs": -6.0},
+                },
+            },
+        }
+        report = write_stem_loudness_report(manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.music_stem_loudness.v1"
+        assert (root / "reports" / "stem_loudness.tsv").exists()
+        assert (root / "reports" / "stem_loudness_summary.txt").exists()
+        assert (root / "plots" / "stem_loudness.jpg").exists()
+
+
+
+def test_adaptive_section_report_draws_per_section_noise_views():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 2, dtype="float32") / sr
+        low = 0.12 * np.sin(2 * np.pi * 110.0 * t)
+        hissy = 0.04 * np.sin(2 * np.pi * 7000.0 * t)
+        stereo_low = np.stack([low, low], axis=1).astype("float32")
+        stereo_hissy = np.stack([hissy, hissy], axis=1).astype("float32")
+        for section, audio in [("intro", stereo_hissy), ("wave1", stereo_low)]:
+            d = root / "adaptive" / section
+            d.mkdir(parents=True)
+            sf.write(d / f"cue_hash.{section}.full.wav", audio, sr)
+            sf.write(d / f"cue_hash.{section}.strings.wav", audio, sr)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [
+                {"id": "intro", "start_seconds": 0.0, "end_seconds": 0.5, "duration_seconds": 0.5},
+                {"id": "wave1", "start_seconds": 0.5, "end_seconds": 1.0, "duration_seconds": 0.5},
+            ],
+            "files": {
+                "adaptive": {
+                    "intro": {"full": "adaptive/intro/cue_hash.intro.full.wav", "strings": "adaptive/intro/cue_hash.intro.strings.wav"},
+                    "wave1": {"full": "adaptive/wave1/cue_hash.wave1.full.wav", "strings": "adaptive/wave1/cue_hash.wave1.strings.wav"},
+                },
+                "preview": {},
+            },
+        }
+        spec = {"id": "cue", "state_map": {"intro": {"section": "intro"}, "wave1": {"preferred_section": "wave1", "stems": {"strings": 1.0}}}}
+        report = write_adaptive_section_report(root, spec, manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.adaptive_section_audit.v1"
+        by_section = {row["section"]: row for row in payload["rows"] if row["kind"] == "full"}
+        assert by_section["intro"]["high_band_ratio"] > by_section["wave1"]["high_band_ratio"]
+        assert (root / "reports" / "adaptive_section_audit_summary.txt").exists()
+        assert (root / "reports" / "adaptive_section_audit.tsv").exists()
+        if (root / "plots" / "adaptive_section_full_levels.jpg").exists():
+            assert (root / "plots" / "adaptive_section_full_highband.jpg").exists()
+            assert (root / "plots" / "adaptive_section_stack_intro.jpg").exists()
+
+
+def test_publish_cue_copies_adaptive_full_sections_to_stable_runtime_paths():
+    from ambition_music_renderer.cli import publish_cue
+
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        outdir = root / "generated" / "cue"
+        preview = outdir / "preview"
+        intro = outdir / "adaptive" / "intro"
+        wave1 = outdir / "adaptive" / "wave1"
+        preview.mkdir(parents=True)
+        intro.mkdir(parents=True)
+        wave1.mkdir(parents=True)
+        (preview / "cue_hash.full_soundtrack_preview.ogg").write_bytes(b"full")
+        (intro / "cue_hash.intro.full.ogg").write_bytes(b"intro")
+        (wave1 / "cue_hash.wave1.full.ogg").write_bytes(b"wave1")
+        (outdir / "cue_hash.adaptive_manifest.json").write_text(
+            json.dumps(
+                {
+                    "id": "cue",
+                    "hash": "hash",
+                    "files": {
+                        "preview": {
+                            "full_soundtrack": "preview/cue_hash.full_soundtrack_preview.ogg"
+                        },
+                        "adaptive": {
+                            "intro": {"full": "adaptive/intro/cue_hash.intro.full.ogg"},
+                            "wave1": {"full": "adaptive/wave1/cue_hash.wave1.full.ogg"},
+                        },
+                    },
+                }
+            ),
+            encoding="utf8",
+        )
+        dest = root / "assets" / "audio" / "music" / "generated"
+
+        assert publish_cue("cue", outdir, dest)
+        assert (dest / "cue" / "full.ogg").read_bytes() == b"full"
+        assert (dest / "cue" / "adaptive" / "intro" / "intro.full.ogg").read_bytes() == b"intro"
+        assert (dest / "cue" / "adaptive" / "wave1" / "wave1.full.ogg").read_bytes() == b"wave1"
+        assert (dest / "cue" / "cue.adaptive_manifest.json").exists()
+
+
+def test_publish_adaptive_cue_fails_without_section_fulls():
+    from ambition_music_renderer.cli import publish_cue
+
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        outdir = root / "generated" / "first_goblin_tune_v2"
+        preview = outdir / "preview"
+        preview.mkdir(parents=True)
+        (preview / "first_goblin_tune_v2_hash.full_soundtrack_preview.ogg").write_bytes(b"full")
+        (outdir / "first_goblin_tune_v2_hash.adaptive_manifest.json").write_text(
+            json.dumps(
+                {
+                    "id": "first_goblin_tune_v2",
+                    "hash": "hash",
+                    "files": {
+                        "preview": {
+                            "full_soundtrack": "preview/first_goblin_tune_v2_hash.full_soundtrack_preview.ogg"
+                        },
+                        "adaptive": {},
+                    },
+                }
+            ),
+            encoding="utf8",
+        )
+        dest = root / "assets" / "audio" / "music" / "generated"
+
+        assert not publish_cue("first_goblin_tune_v2", outdir, dest)
+        assert not (dest / "first_goblin_tune_v2" / "full.ogg").exists()
+        assert not (dest / "first_goblin_tune_v2" / "adaptive").exists()
+
+
+def test_top_level_adaptive_render_defaults_to_full_mix_sections():
+    from ambition_music_renderer.cli import render_mode_for_cue
+
+    args = RenderCommand.cli(argv=["first_goblin_tune_v2"])
+    assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, True)
+
+    args = RenderCommand.cli(argv=["first_goblin_tune_v2", "--no-simple_mix"])
+    assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, False)
+
+    args = RenderCommand.cli(argv=["lofi_study_loop"])
+    assert render_mode_for_cue("lofi_study_loop", args) == (True, False)
+
+
+def test_reference_audio_audit_reports_surface_features():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 2, dtype="float32") / sr
+        audio = 0.1 * np.sin(2 * np.pi * 440.0 * t)
+        wav = root / "reference.wav"
+        sf.write(wav, np.stack([audio, audio], axis=1), sr)
+        payload = analyze_reference_audio(wav, frame_seconds=0.1)
+        assert payload["schema"] == "ambition.reference_audio_audit.v1"
+        assert payload["duration_s"] > 0.49
+        assert payload["overall"]["spectral_centroid_mean_hz"] > 100
+        paths = write_reference_audio_reports(payload, root / "reports")
+        assert Path(paths["summary"]).exists()
+        assert Path(paths["envelope"]).exists()
+
+
+def test_adaptive_composition_mastering_report_prefers_global_slices():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        sr = 48_000
+        t = np.arange(sr // 2, dtype="float32") / sr
+        quiet_hiss = 0.01 * np.sin(2 * np.pi * 9000.0 * t)
+        loud_low = 0.12 * np.sin(2 * np.pi * 110.0 * t)
+        for section, audio in [("intro", quiet_hiss), ("wave1", loud_low)]:
+            d = root / "adaptive" / section
+            d.mkdir(parents=True)
+            sf.write(d / f"cue_hash.{section}.full.wav", np.stack([audio, audio], axis=1), sr)
+        manifest = {
+            "id": "cue",
+            "hash": "hash",
+            "sample_rate": sr,
+            "sections": [
+                {"id": "intro", "start_seconds": 0.0, "end_seconds": 0.5, "duration_seconds": 0.5},
+                {"id": "wave1", "start_seconds": 0.5, "end_seconds": 1.0, "duration_seconds": 0.5},
+            ],
+            "files": {
+                "adaptive": {
+                    "intro": {"full": "adaptive/intro/cue_hash.intro.full.wav"},
+                    "wave1": {"full": "adaptive/wave1/cue_hash.wave1.full.wav"},
+                },
+                "preview": {},
+            },
+        }
+        spec = {
+            "id": "cue",
+            "render": {"adaptive_section_mastering": {"mode": "global_master_slices"}},
+            "sections": [
+                {"id": "intro", "kind": "intro", "intensity": 0.35, "density": 0.1},
+                {"id": "wave1", "kind": "loop_component", "intensity": 0.6, "density": 0.4},
+            ],
+        }
+        report = write_adaptive_composition_mastering_report(root, spec, manifest, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        payload = json.loads(report.read_text())
+        assert payload["schema"] == "ambition.adaptive_composition_mastering.v1"
+        assert payload["mastering"]["mode"] == "global_master_slices"
+        text = (root / "reports" / "adaptive_composition_mastering_summary.txt").read_text()
+        assert "mastering mode: global_master_slices" in text
+        assert (root / "reports" / "adaptive_composition_mastering.tsv").exists()
+        if (root / "plots" / "adaptive_composition_mastering_levels.jpg").exists():
+            assert (root / "plots" / "adaptive_composition_noise_floor.jpg").exists()
+
+
+def test_shrill_note_audit_flags_whistle_register_sources():
+    spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "shrill_test",
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "instruments": [
+            {"name": "guitar", "group": "guitars", "program": "distortion_guitar"},
+            {"name": "kit", "group": "drums", "is_drum": True},
+        ],
+        "state_map": {"default": {"section": "loop", "stems": {"guitars": 1.0}}},
+        "motifs": [
+            {"id": "bad_whistle", "root": "C4", "intervals": [0], "rhythm": [1.0], "velocities": [1.0]},
+        ],
+        "layer_templates": {
+            "bad_guitar": {
+                "kind": "motif",
+                "instrument": "guitar",
+                "motif": "bad_whistle",
+                "root": "C9",
+                "starts": [[0, 0.0]],
+                "velocity": 100,
+            },
+            "kit_noise": {
+                "kind": "drums",
+                "instrument": "kit",
+                "events": [{"drum": "crash", "beat": 0.0, "velocity": 120}],
+            },
+        },
+        "sections": [{"id": "loop", "bars": 1, "harmony": ["C"], "layers": ["bad_guitar", "kit_noise"]}],
+    }
+    payload = audit_shrill_note_spec(spec, min_frequency_hz=4000.0)
+    assert payload["schema"] == "ambition.music_shrill_note_audit.v1"
+    assert payload["candidates"]
+    top = payload["candidates"][0]
+    assert top["note"] == "C9"
+    assert top["group"] == "guitars"
+    assert top["severity"] in {"whistle_8k_plus", "extreme_10k_plus"}
+    assert "layer_templates.bad_guitar.root=C9" in top["source_hint"]
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        paths = write_shrill_note_reports(payload, root / "reports", plots_dir=root / "plots", plot_format="jpg")
+        assert Path(paths["summary"]).exists()
+        assert Path(paths["markdown"]).exists()
+        assert "Top Candidates" in Path(paths["markdown"]).read_text()
+
+
+def test_single_bundle_jobs_control_stem_group_workers():
+    args = BundleCommand.cli(argv=["tech_bros_disruption", "--jobs", "6"])
+    config = _single_bundle_config(args, "tech_bros_disruption")
+    assert config.jobs == 6
+    assert args.render_jobs is None
+
+
+def test_single_bundle_render_jobs_can_explicitly_override_jobs():
+    args = BundleCommand.cli(
+        argv=["tech_bros_disruption", "--jobs", "6", "--render_jobs", "3"]
+    )
+    config = _single_bundle_config(args, "tech_bros_disruption")
+    assert config.jobs == 3
+
+
+def test_bundle_many_parser_accepts_parallel_flags():
+    args = BundleCommand.cli(argv=[
+
+        "lofi_study_loop",
+        "tech_bros_disruption",
+        "--jobs",
+        "3",
+        "--render_jobs",
+        "1",
+        "--force",
+        "--zip_report",
+    ])
+    assert args.jobs == 3
+    assert args.render_jobs == 1
+    assert args.cues == ["lofi_study_loop", "tech_bros_disruption"]
+
+
+def test_chord_intervals_does_not_treat_d6_over_9_as_slash_bass():
+    root, intervals, slash = chord_intervals("D6/9")
+    assert root == "D"
+    assert slash is None
+    assert 9 in intervals
+    assert 14 in intervals
+
+
+def test_timeline_markers_include_explicit_form_markers():
+    spec = {
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4},
+        "render": {"metadata_markers": [{"id": "bloom", "label": "Bloom", "bar": 9}]},
+    }
+    sections = [{"id": "loop", "label": "Loop", "kind": "loop_component", "start_seconds": 0.0}]
+    markers = timeline_markers_from_spec(spec, sections)
+    assert [m["id"] for m in markers] == ["loop", "bloom"]
+    assert markers[1]["start_seconds"] == 16.0
+
+
+def test_add9_and_six_nine_do_not_imply_dominant_seventh():
+    assert chord_intervals("Gadd9")[1] == [0, 4, 7, 14]
+    assert chord_intervals("D(add9)")[1] == [0, 4, 7, 14]
+    assert chord_intervals("D6/9")[1] == [0, 4, 7, 9, 14]
+    assert chord_intervals("A9")[1] == [0, 4, 7, 10, 14]
+    assert chord_intervals("Cmaj9")[1] == [0, 4, 7, 11, 14]
+
+
+def test_versioned_generated_layout_latest_manifest_lookup():
+    from ambition_music_renderer.render.generated_layout import GeneratedRunLayout
+    from ambition_music_renderer.render.generated_layout import begin_generated_run
+    from ambition_music_renderer.render.generated_layout import generated_manifest_search_roots
+    from ambition_music_renderer.render.generated_layout import latest_manifest_in_roots
+    from ambition_music_renderer.render.generated_layout import mark_generated_run_latest
+    from ambition_music_renderer.render.generated_layout import resolve_latest_generated_dir
+
+    with tempfile.TemporaryDirectory() as td:
+        cue_dir = Path(td) / "generated" / "cue"
+        old_layout = GeneratedRunLayout(cue_dir=cue_dir, hash_id="oldhash")
+        begin_generated_run(old_layout)
+        (old_layout.run_dir / "cue_oldhash.adaptive_manifest.json").write_text('{"hash":"oldhash"}', encoding="utf8")
+        new_layout = GeneratedRunLayout(cue_dir=cue_dir, hash_id="newhash")
+        begin_generated_run(new_layout)
+        (new_layout.run_dir / "cue_newhash.adaptive_manifest.json").write_text('{"hash":"newhash"}', encoding="utf8")
+        mark_generated_run_latest(new_layout)
+
+        assert resolve_latest_generated_dir(cue_dir).resolve() == new_layout.run_dir.resolve()
+        manifest = latest_manifest_in_roots(generated_manifest_search_roots(cue_dir), "cue")
+        assert manifest is not None
+        assert manifest.name == "cue_newhash.adaptive_manifest.json"
+
+
+def test_cue_bundle_positive_audit_flags_parse():
+    args = CueBundleConfig.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
+    assert args.spectrograms is True
+    assert args.all_audits is True
+
+
+def test_bundle_many_positive_audit_flags_parse():
+    args = BundleCommand.cli(argv=["solo_soar", "--spectrograms", "--all_audits"])
+    assert args.spectrograms is True
+    assert args.all_audits is True
+
+
+def test_analysis_audio_capabilities_simple_mix_preview_only(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    preview = tmp_path / "preview" / "cue.full_soundtrack_preview.ogg"
+    preview.parent.mkdir(parents=True)
+    preview.write_bytes(b"ogg")
+    manifest = {
+        "files": {
+            "preview": {"full_soundtrack_preview": "preview/cue.full_soundtrack_preview.ogg"},
+            "adaptive": {},
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps == {
+        "adaptive_audio": False,
+        "adaptive_full_audio": False,
+        "adaptive_stem_audio": False,
+        "scratch_stems": False,
+    }
+
+
+def test_analysis_audio_capabilities_full_mix_only(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    full = tmp_path / "adaptive" / "verse" / "cue.verse.full.ogg"
+    full.parent.mkdir(parents=True)
+    full.write_bytes(b"ogg")
+    manifest = {
+        "files": {
+            "preview": {},
+            "adaptive": {"verse": {"full": "adaptive/verse/cue.verse.full.ogg"}},
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps["adaptive_audio"] is True
+    assert caps["adaptive_full_audio"] is True
+    assert caps["adaptive_stem_audio"] is False
+
+
+def test_analysis_audio_capabilities_full_adaptive_with_scratch(tmp_path):
+    from ambition_music_renderer.render.bundle import _analysis_audio_capabilities
+
+    full = tmp_path / "adaptive" / "verse" / "cue.verse.full.ogg"
+    stem = tmp_path / "adaptive" / "verse" / "cue.verse.guitar.ogg"
+    full.parent.mkdir(parents=True)
+    full.write_bytes(b"ogg")
+    stem.write_bytes(b"ogg")
+    (tmp_path / "scratch_stems").mkdir()
+    manifest = {
+        "files": {
+            "preview": {},
+            "adaptive": {
+                "verse": {
+                    "full": "adaptive/verse/cue.verse.full.ogg",
+                    "guitar": "adaptive/verse/cue.verse.guitar.ogg",
+                }
+            },
+        }
+    }
+    caps = _analysis_audio_capabilities(tmp_path, manifest)
+    assert caps == {
+        "adaptive_audio": True,
+        "adaptive_full_audio": True,
+        "adaptive_stem_audio": True,
+        "scratch_stems": True,
+    }
+
+
+def test_audit_coverage_report_records_intentional_skips(tmp_path):
+    import json
+
+    from ambition_music_renderer.render.bundle import _write_audit_coverage_report
+
+    path = _write_audit_coverage_report(
+        tmp_path,
+        render_audio_mode="simple-mix",
+        capabilities={
+            "adaptive_audio": False,
+            "adaptive_full_audio": False,
+            "adaptive_stem_audio": False,
+            "scratch_stems": True,
+        },
+        skipped=["transition_audit: no per-section full mixes were exported"],
+    )
+    payload = json.loads(path.read_text(encoding="utf8"))
+    assert payload["render_audio_mode"] == "simple-mix"
+    assert payload["capabilities"]["scratch_stems"] is True
+    assert payload["skipped"] == [
+        "transition_audit: no per-section full mixes were exported"
+    ]
+    text = (tmp_path / "audit_coverage.txt").read_text(encoding="utf8")
+    assert "transition_audit" in text

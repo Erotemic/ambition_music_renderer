@@ -1,0 +1,795 @@
+{
+  "inspector_templates": {
+    "Command / Guitarix / NAM": {
+      "command": [
+        "REPLACE_WITH_COMMAND",
+        "{input}",
+        "{output}"
+      ],
+      "processor": "command",
+      "wet_mix": 1.0
+    },
+    "Compressor": {
+      "effects": [
+        {
+          "attack_ms": 10.0,
+          "effect": "compressor",
+          "ratio": 3.0,
+          "release_ms": 100.0,
+          "threshold_db": -20.0
+        }
+      ],
+      "processor": "pedalboard"
+    },
+    "Delay": {
+      "effects": [
+        {
+          "delay_ms": 120.0,
+          "effect": "delay",
+          "feedback": 0.25,
+          "mix": 0.18
+        }
+      ],
+      "processor": "pedalboard"
+    },
+    "Distortion": {
+      "effects": [
+        {
+          "drive_db": 12.0,
+          "effect": "distortion"
+        }
+      ],
+      "processor": "pedalboard"
+    },
+    "Gain": {
+      "effects": [
+        {
+          "effect": "gain",
+          "gain_db": 3.0
+        }
+      ],
+      "processor": "pedalboard"
+    },
+    "LV2": {
+      "params": {},
+      "plugin_uri": "REPLACE_WITH_LV2_URI",
+      "processor": "lv2",
+      "wet_mix": 1.0
+    },
+    "Reverb": {
+      "effects": [
+        {
+          "dry_level": 0.75,
+          "effect": "reverb",
+          "room_size": 0.5,
+          "wet_level": 0.25
+        }
+      ],
+      "processor": "pedalboard"
+    },
+    "VST3": {
+      "parameters": {},
+      "plugin": "REPLACE_WITH_PLUGIN.vst3",
+      "processor": "vst3",
+      "wet_mix": 1.0
+    }
+  },
+  "pedalboard_effects": {
+    "bitcrush": {
+      "aliases": [
+        "bit_crush",
+        "crusher"
+      ],
+      "parameters": {
+        "bit_depth": {
+          "default": 8.0,
+          "minimum": 1.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "bit_depth": 8.0,
+        "effect": "bitcrush"
+      }
+    },
+    "chorus": {
+      "aliases": [],
+      "parameters": {
+        "centre_delay_ms": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        },
+        "feedback": {
+          "type": "number"
+        },
+        "mix": {
+          "type": "number"
+        },
+        "rate_hz": {
+          "type": "number"
+        }
+      },
+      "template": {
+        "depth": 0.25,
+        "effect": "chorus",
+        "mix": 0.2,
+        "rate_hz": 1.0
+      }
+    },
+    "clipping": {
+      "aliases": [
+        "clip",
+        "hard_clip"
+      ],
+      "parameters": {
+        "threshold_db": {
+          "default": -6.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "effect": "clipping",
+        "threshold_db": -6.0
+      }
+    },
+    "compressor": {
+      "aliases": [
+        "compress"
+      ],
+      "parameters": {
+        "attack_ms": {
+          "default": 10.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "ratio": {
+          "default": 3.0,
+          "minimum": 1.0,
+          "type": "number"
+        },
+        "release_ms": {
+          "default": 100.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "threshold_db": {
+          "default": -18.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "attack_ms": 10.0,
+        "effect": "compressor",
+        "ratio": 3.0,
+        "release_ms": 100.0,
+        "threshold_db": -20.0
+      }
+    },
+    "delay": {
+      "aliases": [],
+      "parameters": {
+        "delay_ms": {
+          "default": 90.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "feedback": {
+          "default": 0.15,
+          "type": "number"
+        },
+        "mix": {
+          "default": 0.18,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "delay_ms": 120.0,
+        "effect": "delay",
+        "feedback": 0.25,
+        "mix": 0.18
+      }
+    },
+    "distortion": {
+      "aliases": [
+        "distort",
+        "drive"
+      ],
+      "parameters": {
+        "drive_db": {
+          "default": 12.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "drive_db": 12.0,
+        "effect": "distortion"
+      }
+    },
+    "gain": {
+      "aliases": [
+        "volume",
+        "level"
+      ],
+      "parameters": {
+        "gain_db": {
+          "default": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "effect": "gain",
+        "gain_db": 3.0
+      }
+    },
+    "highpass": {
+      "aliases": [
+        "highpass_filter",
+        "hp"
+      ],
+      "parameters": {
+        "cutoff_hz": {
+          "default": 80.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "cutoff_hz": 80.0,
+        "effect": "highpass"
+      }
+    },
+    "limiter": {
+      "aliases": [
+        "limit"
+      ],
+      "parameters": {
+        "release_ms": {
+          "default": 50.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "threshold_db": {
+          "default": -1.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "effect": "limiter",
+        "release_ms": 50.0,
+        "threshold_db": -1.0
+      }
+    },
+    "lowpass": {
+      "aliases": [
+        "lowpass_filter",
+        "lp"
+      ],
+      "parameters": {
+        "cutoff_hz": {
+          "default": 9000.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "cutoff_hz": 9000.0,
+        "effect": "lowpass"
+      }
+    },
+    "phaser": {
+      "aliases": [],
+      "parameters": {
+        "centre_frequency_hz": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        },
+        "feedback": {
+          "type": "number"
+        },
+        "mix": {
+          "type": "number"
+        },
+        "rate_hz": {
+          "type": "number"
+        }
+      },
+      "template": {
+        "depth": 0.5,
+        "effect": "phaser",
+        "mix": 0.2,
+        "rate_hz": 1.0
+      }
+    },
+    "pitch_shift": {
+      "aliases": [
+        "pitchshift"
+      ],
+      "parameters": {
+        "semitones": {
+          "default": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "effect": "pitch_shift",
+        "semitones": 0.0
+      }
+    },
+    "resample": {
+      "aliases": [
+        "downsample",
+        "sample_rate_reduce"
+      ],
+      "parameters": {
+        "target_sample_rate": {
+          "default": 12000.0,
+          "minimum": 1.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "effect": "resample",
+        "target_sample_rate": 12000.0
+      }
+    },
+    "reverb": {
+      "aliases": [],
+      "parameters": {
+        "damping": {
+          "default": 0.65,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "dry_level": {
+          "default": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "freeze_mode": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "room_size": {
+          "default": 0.25,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "wet_level": {
+          "default": 0.1,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "width": {
+          "default": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "template": {
+        "dry_level": 0.75,
+        "effect": "reverb",
+        "room_size": 0.5,
+        "wet_level": 0.25
+      }
+    },
+    "vst3": {
+      "aliases": [
+        "vst",
+        "plugin"
+      ],
+      "parameters": {
+        "parameters": {
+          "default": {},
+          "type": "object"
+        },
+        "path": {
+          "type": "string"
+        },
+        "plugin": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "processors": {
+    "band_gain": {
+      "aliases": [
+        "presence"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "gain_db": {
+          "default": 0.0,
+          "type": "number"
+        },
+        "high_hz": {
+          "default": 4500.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "low_hz": {
+          "default": 2000.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Apply gain to a frequency band."
+    },
+    "command": {
+      "aliases": [
+        "external",
+        "nam",
+        "guitarix"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "external",
+      "parameters": {
+        "command": {
+          "type": "array"
+        },
+        "optional": {
+          "default": false,
+          "type": "boolean"
+        },
+        "wet_mix": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Explicit external file-command processor."
+    },
+    "compressor": {
+      "aliases": [
+        "compress"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "attack_ms": {
+          "default": 10.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "knee_db": {
+          "default": 6.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "makeup_db": {
+          "default": 0.0,
+          "type": "number"
+        },
+        "ratio": {
+          "default": 3.0,
+          "minimum": 1.0,
+          "type": "number"
+        },
+        "release_ms": {
+          "default": 100.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "threshold_db": {
+          "default": -18.0,
+          "type": "number"
+        }
+      },
+      "summary": "Bus compressor with soft knee."
+    },
+    "gain": {
+      "aliases": [
+        "volume",
+        "level"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "gain_db": {
+          "default": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Linear gain in decibels."
+    },
+    "high_shelf": {
+      "aliases": [],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "gain_db": {
+          "default": 0.0,
+          "type": "number"
+        },
+        "hz": {
+          "default": 4500.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "High-shelf EQ."
+    },
+    "highpass": {
+      "aliases": [
+        "highpass_filter",
+        "hp"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "cutoff_hz": {
+          "aliases": [
+            "hz"
+          ],
+          "default": 80.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "High-pass filter."
+    },
+    "limiter": {
+      "aliases": [
+        "limit"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "drive": {
+          "default": 1.08,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "normalize": {
+          "default": true,
+          "type": "boolean"
+        },
+        "target_peak_db": {
+          "default": -1.0,
+          "type": "number"
+        }
+      },
+      "summary": "Built-in soft limiter/peak normalizer."
+    },
+    "loudness": {
+      "aliases": [
+        "lufs"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "target_lufs": {
+          "default": -14.0,
+          "type": "number"
+        },
+        "true_peak_db": {
+          "default": -1.0,
+          "type": "number"
+        }
+      },
+      "summary": "Integrated loudness normalization."
+    },
+    "lowpass": {
+      "aliases": [
+        "lowpass_filter",
+        "lp"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "cutoff_hz": {
+          "aliases": [
+            "hz"
+          ],
+          "default": 9000.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Low-pass filter."
+    },
+    "lv2": {
+      "aliases": [
+        "lv2proc",
+        "nam_lv2",
+        "neural_amp_modeler"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "lv2",
+      "parameters": {
+        "optional": {
+          "default": false,
+          "type": "boolean"
+        },
+        "params": {
+          "default": {},
+          "type": "object"
+        },
+        "plugin_uri": {
+          "type": "string"
+        },
+        "wet_mix": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "LV2 plugin step hosted by lv2proc."
+    },
+    "parametric_eq": {
+      "aliases": [
+        "eq"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "bands": {
+          "default": [],
+          "type": "array"
+        }
+      },
+      "summary": "Ordered parametric EQ bands."
+    },
+    "pedalboard": {
+      "aliases": [
+        "pb"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "pedalboard",
+      "parameters": {
+        "effects": {
+          "default": [],
+          "type": "array"
+        },
+        "optional": {
+          "default": false,
+          "type": "boolean"
+        },
+        "wet_mix": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Ordered Pedalboard-native effect chain."
+    },
+    "reverb": {
+      "aliases": [],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "damping_hz": {
+          "default": 6000.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "decay_seconds": {
+          "default": 1.4,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "wet": {
+          "default": 0.18,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Dependency-free room reverb."
+    },
+    "stereo_width": {
+      "aliases": [
+        "widen"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "amount": {
+          "default": 0.1,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Mid/side stereo widening."
+    },
+    "transient_tame": {
+      "aliases": [],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "amount": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "lowpass_hz": {
+          "default": 6500.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "Blend fast transients toward a low-passed copy."
+    },
+    "vst3": {
+      "aliases": [
+        "vst",
+        "plugin"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "pedalboard",
+      "parameters": {
+        "optional": {
+          "default": false,
+          "type": "boolean"
+        },
+        "parameters": {
+          "default": {},
+          "type": "object"
+        },
+        "path": {
+          "type": "string"
+        },
+        "plugin": {
+          "type": "string"
+        },
+        "wet_mix": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "summary": "VST3 plugin hosted through Pedalboard."
+    }
+  },
+  "schema": "ambition.processing_catalog.v1",
+  "summary": "Canonical static audio-processing vocabulary for MusicIR and renderer plans."
+}
