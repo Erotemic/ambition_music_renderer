@@ -2209,6 +2209,53 @@ instruments:
       nuances:
       - The main keyswitch program uses states 31..36 and startup controller defaults.
 smoke_profiles:
+- name: emily_clean
+  path: Karoryfer/Emilyguitar/Emilyguitar/emily_clean.sfz
+  source: karoryfer.emilyguitar
+  family: guitar
+  articulation: clean-single-note
+  probes:
+  - 48
+  - 55
+  - 60
+  pitch_probe: false
+- name: shiny_electric_four
+  path: Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz
+  source: karoryfer.shinyguitar
+  family: guitar
+  articulation: electric-sustain
+  probes:
+  - 37
+  - 52
+  - 64
+  - 76
+- name: sonatina_harpsichord_full
+  path: Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz
+  source: sonatina
+  family: keys
+  articulation: harpsichord-full
+  probes:
+  - 48
+  - 60
+  - 72
+- name: sonatina_harpsichord_8ft
+  path: "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz"
+  source: sonatina
+  family: keys
+  articulation: harpsichord-8ft
+  probes:
+  - 48
+  - 60
+  - 72
+- name: sonatina_harpsichord_4ft
+  path: "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz"
+  source: sonatina
+  family: keys
+  articulation: harpsichord-4ft
+  probes:
+  - 48
+  - 60
+  - 72
 - name: emily_basic
   path: Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz
   source: karoryfer.emilyguitar
@@ -2296,6 +2343,7 @@ smoke_profiles:
   - 67
 - name: shiny_electric
   path: Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz
+  library_ref: guitar.electric_lead
   source: karoryfer.shinyguitar
   family: guitar
   articulation: electric-sustain

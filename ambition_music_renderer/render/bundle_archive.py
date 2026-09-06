@@ -16,6 +16,31 @@ from .bundle_base import (
     terminal_link,
 )
 
+
+def transition_section_pairs(
+    manifest: dict,
+    *,
+    max_adjacent_pairs: int = 8,
+) -> list[tuple[str, str]]:
+    """Return ordinary handoffs plus every declared self-loop seam.
+
+    ``max_adjacent_pairs`` only limits ordinary adjacent handoffs. Loop seams
+    are never dropped by that cap: a section explicitly marked ``loopable``
+    must always have its tail -> head boundary audited.
+    """
+    pairs = list(adjacent_section_pairs(manifest)[:max_adjacent_pairs])
+    for section in manifest.get("sections") or []:
+        if not isinstance(section, dict) or not bool(section.get("loopable", False)):
+            continue
+        section_id = section.get("id")
+        if section_id is None:
+            continue
+        pair = (str(section_id), str(section_id))
+        if pair not in pairs:
+            pairs.append(pair)
+    return pairs
+
+
 def run_transition_audits(
     analysis_root: Path,
     manifest: dict,
@@ -26,14 +51,17 @@ def run_transition_audits(
     crossfade_seconds: float = 0.65,
     crossfade_shape: str = "ambition_runtime",
 ) -> list[CommandResult]:
-    """Run audio seam diagnostics for adjacent adaptive sections.
+    """Run audio seam diagnostics for adjacent sections and declared loops.
+
+    Every ``loopable`` section gets an explicit tail -> head self-transition
+    audit in addition to the ordinary adjacent-section handoffs.
 
     The generated report zip omits WAV previews, but keeping transition metrics,
     envelopes, and spectrogram PNGs in the bundle makes dynamic encounter cues
     auditable without opening the game.
     """
     results: list[CommandResult] = []
-    pairs = adjacent_section_pairs(manifest)[:max_pairs]
+    pairs = transition_section_pairs(manifest, max_adjacent_pairs=max_pairs)
     if not pairs:
         return results
     section_meta = {str(sec.get("id")): sec for sec in manifest.get("sections") or [] if isinstance(sec, dict)}

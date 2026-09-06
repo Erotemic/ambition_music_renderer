@@ -1,0 +1,4190 @@
+schema: ambition.musicir.v3
+id: pirate_battle_broadside_at_knife_range
+title: Broadside at Knife Range
+description: 'Pirate combat cue: aggressive fiddle-led deck battle music with a 3+3+2 pulse, root/fifth accordion and acoustic-guitar
+  attacks, upright bass, low-brass cannon punctuation, and a final sixteen-bar combat loop.'
+notes:
+- Distinct combat cue; it does not reuse the Salt, Steel, and Starlight shanty melody.
+- Pirate identity comes from fiddle, bellows/accordion color, acoustic attack, upright bass, and deck percussion rather than
+  shanty call-response.
+- The accordion uses root/fifth voicings during the dominant bars so the lead can carry C-sharp/G dominant color without repeatedly
+  stacking the A7 tritone.
+- The final 16 bars are authored as the sustaining combat loop; bar 80 ends on A7 so returning to bar 65 D minor resolves
+  naturally.
+- Lead and shadow fiddle use the VPO performance patch with high CC1/modulation values based on prior rendered balance findings.
+seed: 314159
+timebase:
+  ppq: 960
+meter: 4/4
+tempo: 166
+key: D minor
+end:
+  bar: 81
+  beat: 1
+form:
+- id: boarding_alarm
+  from:
+    bar: 1
+    beat: 1
+  to:
+    bar: 9
+    beat: 1
+  energy: 0.9
+  density: 0.7
+  role: immediate combat entry
+- id: cutlass_drive
+  from:
+    bar: 9
+    beat: 1
+  to:
+    bar: 25
+    beat: 1
+  energy: 0.96
+  density: 0.82
+  role: fiddle-led melee theme
+- id: broadside_exchange
+  from:
+    bar: 25
+    beat: 1
+  to:
+    bar: 41
+    beat: 1
+  energy: 1.0
+  density: 0.86
+  role: cannon punctuation and sustained bellows
+- id: powder_smoke
+  from:
+    bar: 41
+    beat: 1
+  to:
+    bar: 49
+    beat: 1
+  energy: 0.78
+  density: 0.55
+  role: tom and bellows tension break
+- id: boarders_over_rail
+  from:
+    bar: 49
+    beat: 1
+  to:
+    bar: 65
+    beat: 1
+  energy: 1.0
+  density: 0.88
+  role: full ensemble return
+- id: no_quarter_loop
+  from:
+    bar: 65
+    beat: 1
+  to:
+    bar: 81
+    beat: 1
+  energy: 1.0
+  density: 0.9
+  role: sustaining battle loop
+  loopable: true
+harmony:
+  progression:
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  - Dm
+  - C
+  - Bb
+  - A7
+  - Dm
+  - F
+  - C
+  - A7
+  cycle: false
+instruments:
+- name: lead_fiddle
+  group: lead
+  program: violin
+  volume: 118
+  pan: 61
+  expression: 118
+  modulation: 92
+  mix_gain_db: 3.5
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: shadow_fiddle
+  group: fiddle
+  program: violin
+  volume: 108
+  pan: 80
+  expression: 108
+  modulation: 78
+  mix_gain_db: 0.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: battle_accordion
+  group: squeeze
+  program: accordion
+  volume: 100
+  pan: 55
+  expression: 96
+  mix_gain_db: -4.0
+- name: deck_guitar
+  group: rhythm
+  program: steel_guitar
+  volume: 106
+  pan: 39
+  expression: 108
+  controls:
+    100: 64
+  mix_gain_db: -1.0
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.acoustic
+    prefer:
+    - shinyguitar
+    - acoustic
+    settings:
+      fold_to_range: false
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 114
+  pan: 49
+  expression: 110
+  mix_gain_db: 1.5
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - sonatina
+    - basses
+    - pizzicato
+    settings:
+      fold_to_range: false
+- name: low_brass
+  group: brass
+  program: trombone
+  volume: 91
+  pan: 70
+  expression: 96
+  mix_gain_db: -2.0
+- name: deck_kit
+  group: drums
+  program: 0
+  is_drum: true
+  volume: 118
+  pan: 64
+  expression: 116
+  mix_gain_db: 0.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer:
+    - muldjord
+    - stereo
+    - kit
+    settings:
+      fold_to_range: false
+materials:
+  boarding_alarm:
+    kind: events
+    events:
+    - id: alarm_01
+      at:
+        beats: 0
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 116
+    - id: alarm_02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 110
+    - id: alarm_03
+      at:
+        beats: 1
+      dur:
+        beats: 0.9
+      pitch: A5
+      velocity: 118
+    - id: alarm_04
+      at:
+        beats: 2
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: alarm_05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 105
+    - id: alarm_06
+      at:
+        beats: 3
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 104
+    - id: alarm_07
+      at:
+        beats: 4
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 108
+    - id: alarm_08
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 102
+    - id: alarm_09
+      at:
+        beats: 5
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 112
+    - id: alarm_10
+      at:
+        beats: 6
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 105
+    - id: alarm_11
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 102
+    - id: alarm_12
+      at:
+        beats: 7
+      dur:
+        beats: 0.9
+      pitch: G4
+      velocity: 100
+    - id: alarm_13
+      at:
+        beats: 8
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 108
+    - id: alarm_14
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 110
+    - id: alarm_15
+      at:
+        beats: 9
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 114
+    - id: alarm_16
+      at:
+        beats: 10
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 104
+    - id: alarm_17
+      at:
+        beats: 10.5
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 100
+    - id: alarm_18
+      at:
+        beats: 11
+      dur:
+        beats: 0.9
+      pitch: F4
+      velocity: 102
+    - id: alarm_19
+      at:
+        beats: 12
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 108
+    - id: alarm_20
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 110
+    - id: alarm_21
+      at:
+        beats: 13
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 108
+    - id: alarm_22
+      at:
+        beats: 14
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 113
+    - id: alarm_23
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: alarm_24
+      at:
+        beats: 15
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 108
+  boarding_alarm_answer:
+    kind: events
+    events:
+    - id: alarm_answer_01
+      at:
+        beats: 0
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 104
+    - id: alarm_answer_02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 108
+    - id: alarm_answer_03
+      at:
+        beats: 1
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 112
+    - id: alarm_answer_04
+      at:
+        beats: 2
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 106
+    - id: alarm_answer_05
+      at:
+        beats: 3
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 116
+    - id: alarm_answer_06
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 106
+    - id: alarm_answer_07
+      at:
+        beats: 4
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 104
+    - id: alarm_answer_08
+      at:
+        beats: 5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: alarm_answer_09
+      at:
+        beats: 5.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: alarm_answer_10
+      at:
+        beats: 6
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 106
+    - id: alarm_answer_11
+      at:
+        beats: 7
+      dur:
+        beats: 0.45
+      pitch: C6
+      velocity: 116
+    - id: alarm_answer_12
+      at:
+        beats: 7.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 106
+    - id: alarm_answer_13
+      at:
+        beats: 8
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 110
+    - id: alarm_answer_14
+      at:
+        beats: 9
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: alarm_answer_15
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 100
+    - id: alarm_answer_16
+      at:
+        beats: 10
+      dur:
+        beats: 0.9
+      pitch: G4
+      velocity: 98
+    - id: alarm_answer_17
+      at:
+        beats: 11
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 101
+    - id: alarm_answer_18
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 105
+    - id: alarm_answer_19
+      at:
+        beats: 12
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: alarm_answer_20
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 102
+    - id: alarm_answer_21
+      at:
+        beats: 13
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 104
+    - id: alarm_answer_22
+      at:
+        beats: 14
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 107
+    - id: alarm_answer_23
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 110
+    - id: alarm_answer_24
+      at:
+        beats: 15
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 113
+    - id: alarm_answer_25
+      at:
+        beats: 15.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 106
+  blade_theme:
+    kind: events
+    events:
+    - id: blade_01
+      at:
+        beats: 0
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 108
+    - id: blade_02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 103
+    - id: blade_03
+      at:
+        beats: 1
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 112
+    - id: blade_04
+      at:
+        beats: 2
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 116
+    - id: blade_05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 105
+    - id: blade_06
+      at:
+        beats: 3
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 110
+    - id: blade_07
+      at:
+        beats: 4
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 110
+    - id: blade_08
+      at:
+        beats: 5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: blade_09
+      at:
+        beats: 5.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 98
+    - id: blade_10
+      at:
+        beats: 6
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 106
+    - id: blade_11
+      at:
+        beats: 7
+      dur:
+        beats: 0.45
+      pitch: G4
+      velocity: 96
+    - id: blade_12
+      at:
+        beats: 7.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 104
+    - id: blade_13
+      at:
+        beats: 8
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 105
+    - id: blade_14
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 101
+    - id: blade_15
+      at:
+        beats: 9
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 108
+    - id: blade_16
+      at:
+        beats: 10
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 112
+    - id: blade_17
+      at:
+        beats: 11
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 102
+    - id: blade_18
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 100
+    - id: blade_19
+      at:
+        beats: 12
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 108
+    - id: blade_20
+      at:
+        beats: 13
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 105
+    - id: blade_21
+      at:
+        beats: 13.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 108
+    - id: blade_22
+      at:
+        beats: 14
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 113
+    - id: blade_23
+      at:
+        beats: 15
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 102
+    - id: blade_24
+      at:
+        beats: 15.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 104
+    - id: blade_25
+      at:
+        beats: 16
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 104
+    - id: blade_26
+      at:
+        beats: 16.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 108
+    - id: blade_27
+      at:
+        beats: 17
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 112
+    - id: blade_28
+      at:
+        beats: 18
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 106
+    - id: blade_29
+      at:
+        beats: 19
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 116
+    - id: blade_30
+      at:
+        beats: 19.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 106
+    - id: blade_31
+      at:
+        beats: 20
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 104
+    - id: blade_32
+      at:
+        beats: 21
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: blade_33
+      at:
+        beats: 21.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: blade_34
+      at:
+        beats: 22
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 106
+    - id: blade_35
+      at:
+        beats: 23
+      dur:
+        beats: 0.45
+      pitch: C6
+      velocity: 116
+    - id: blade_36
+      at:
+        beats: 23.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 106
+    - id: blade_37
+      at:
+        beats: 24
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 110
+    - id: blade_38
+      at:
+        beats: 25
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: blade_39
+      at:
+        beats: 25.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 100
+    - id: blade_40
+      at:
+        beats: 26
+      dur:
+        beats: 0.9
+      pitch: G4
+      velocity: 98
+    - id: blade_41
+      at:
+        beats: 27
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 101
+    - id: blade_42
+      at:
+        beats: 27.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 105
+    - id: blade_43
+      at:
+        beats: 28
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: blade_44
+      at:
+        beats: 28.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 102
+    - id: blade_45
+      at:
+        beats: 29
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 104
+    - id: blade_46
+      at:
+        beats: 30
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 107
+    - id: blade_47
+      at:
+        beats: 30.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 110
+    - id: blade_48
+      at:
+        beats: 31
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 113
+    - id: blade_49
+      at:
+        beats: 31.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 106
+  broadside_theme:
+    kind: events
+    events:
+    - id: broad_01
+      at:
+        beats: 0
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 112
+    - id: broad_02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 116
+    - id: broad_03
+      at:
+        beats: 1
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 110
+    - id: broad_04
+      at:
+        beats: 2
+      dur:
+        beats: 0.45
+      pitch: D6
+      velocity: 119
+    - id: broad_05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: broad_06
+      at:
+        beats: 3
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 108
+    - id: broad_07
+      at:
+        beats: 4
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 108
+    - id: broad_08
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 111
+    - id: broad_09
+      at:
+        beats: 5
+      dur:
+        beats: 0.9
+      pitch: C6
+      velocity: 116
+    - id: broad_10
+      at:
+        beats: 6
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 108
+    - id: broad_11
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: broad_12
+      at:
+        beats: 7
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 102
+    - id: broad_13
+      at:
+        beats: 8
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 112
+    - id: broad_14
+      at:
+        beats: 9
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 104
+    - id: broad_15
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 100
+    - id: broad_16
+      at:
+        beats: 10
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 106
+    - id: broad_17
+      at:
+        beats: 10.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 110
+    - id: broad_18
+      at:
+        beats: 11
+      dur:
+        beats: 0.9
+      pitch: Bb5
+      velocity: 116
+    - id: broad_19
+      at:
+        beats: 12
+      dur:
+        beats: 0.9
+      pitch: A5
+      velocity: 114
+    - id: broad_20
+      at:
+        beats: 13
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 108
+    - id: broad_21
+      at:
+        beats: 13.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: broad_22
+      at:
+        beats: 14
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 108
+    - id: broad_23
+      at:
+        beats: 15
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: broad_24
+      at:
+        beats: 15.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: broad_25
+      at:
+        beats: 16
+      dur:
+        beats: 0.9
+      pitch: D6
+      velocity: 118
+    - id: broad_26
+      at:
+        beats: 17
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 110
+    - id: broad_27
+      at:
+        beats: 17.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 106
+    - id: broad_28
+      at:
+        beats: 18
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 104
+    - id: broad_29
+      at:
+        beats: 19
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: broad_30
+      at:
+        beats: 19.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: broad_31
+      at:
+        beats: 20
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: broad_32
+      at:
+        beats: 20.5
+      dur:
+        beats: 0.45
+      pitch: C6
+      velocity: 116
+    - id: broad_33
+      at:
+        beats: 21
+      dur:
+        beats: 0.9
+      pitch: F6
+      velocity: 119
+    - id: broad_34
+      at:
+        beats: 22
+      dur:
+        beats: 0.45
+      pitch: C6
+      velocity: 112
+    - id: broad_35
+      at:
+        beats: 22.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 107
+    - id: broad_36
+      at:
+        beats: 23
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 104
+    - id: broad_37
+      at:
+        beats: 24
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 110
+    - id: broad_38
+      at:
+        beats: 25
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 104
+    - id: broad_39
+      at:
+        beats: 25.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 100
+    - id: broad_40
+      at:
+        beats: 26
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 105
+    - id: broad_41
+      at:
+        beats: 26.5
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 110
+    - id: broad_42
+      at:
+        beats: 27
+      dur:
+        beats: 0.9
+      pitch: C6
+      velocity: 116
+    - id: broad_43
+      at:
+        beats: 28
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 114
+    - id: broad_44
+      at:
+        beats: 28.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: broad_45
+      at:
+        beats: 29
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 104
+    - id: broad_46
+      at:
+        beats: 30
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 108
+    - id: broad_47
+      at:
+        beats: 30.5
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 111
+    - id: broad_48
+      at:
+        beats: 31
+      dur:
+        beats: 0.9
+      pitch: A5
+      velocity: 115
+  smoke_call:
+    kind: events
+    events:
+    - id: smoke_01
+      at:
+        beats: 0
+      dur:
+        beats: 1.8
+      pitch: D5
+      velocity: 104
+    - id: smoke_02
+      at:
+        beats: 2
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 98
+    - id: smoke_03
+      at:
+        beats: 3
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 102
+    - id: smoke_04
+      at:
+        beats: 4
+      dur:
+        beats: 1.4
+      pitch: C5
+      velocity: 101
+    - id: smoke_05
+      at:
+        beats: 5.5
+      dur:
+        beats: 0.45
+      pitch: G4
+      velocity: 96
+    - id: smoke_06
+      at:
+        beats: 6
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 104
+    - id: smoke_07
+      at:
+        beats: 7
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 100
+    - id: smoke_08
+      at:
+        beats: 8
+      dur:
+        beats: 1.8
+      pitch: Bb4
+      velocity: 102
+    - id: smoke_09
+      at:
+        beats: 10
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 108
+    - id: smoke_10
+      at:
+        beats: 11
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 100
+    - id: smoke_11
+      at:
+        beats: 12
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 104
+    - id: smoke_12
+      at:
+        beats: 13
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 106
+    - id: smoke_13
+      at:
+        beats: 14
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 108
+    - id: smoke_14
+      at:
+        beats: 15
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 110
+    - id: smoke_15
+      at:
+        beats: 16
+      dur:
+        beats: 0.9
+      pitch: D5
+      velocity: 106
+    - id: smoke_16
+      at:
+        beats: 17
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 108
+    - id: smoke_17
+      at:
+        beats: 18
+      dur:
+        beats: 1.8
+      pitch: A5
+      velocity: 112
+    - id: smoke_18
+      at:
+        beats: 20
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 102
+    - id: smoke_19
+      at:
+        beats: 21
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 108
+    - id: smoke_20
+      at:
+        beats: 22
+      dur:
+        beats: 0.9
+      pitch: A5
+      velocity: 112
+    - id: smoke_21
+      at:
+        beats: 23
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 104
+    - id: smoke_22
+      at:
+        beats: 24
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 104
+    - id: smoke_23
+      at:
+        beats: 25
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 100
+    - id: smoke_24
+      at:
+        beats: 26
+      dur:
+        beats: 1.8
+      pitch: G4
+      velocity: 96
+    - id: smoke_25
+      at:
+        beats: 28
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 102
+    - id: smoke_26
+      at:
+        beats: 29
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 105
+    - id: smoke_27
+      at:
+        beats: 30
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 108
+    - id: smoke_28
+      at:
+        beats: 31
+      dur:
+        beats: 0.9
+      pitch: C#5
+      velocity: 104
+  no_quarter_theme:
+    kind: events
+    events:
+    - id: nq_01
+      at:
+        beats: 0
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 116
+    - id: nq_02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 112
+    - id: nq_03
+      at:
+        beats: 1
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 110
+    - id: nq_04
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 114
+    - id: nq_05
+      at:
+        beats: 2
+      dur:
+        beats: 0.9
+      pitch: A5
+      velocity: 118
+    - id: nq_06
+      at:
+        beats: 3
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: nq_07
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 106
+    - id: nq_08
+      at:
+        beats: 4
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 110
+    - id: nq_09
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 106
+    - id: nq_10
+      at:
+        beats: 5
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 112
+    - id: nq_11
+      at:
+        beats: 6
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 114
+    - id: nq_12
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: nq_13
+      at:
+        beats: 7
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 103
+    - id: nq_14
+      at:
+        beats: 7.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 102
+    - id: nq_15
+      at:
+        beats: 8
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 109
+    - id: nq_16
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.45
+      pitch: Bb4
+      velocity: 105
+    - id: nq_17
+      at:
+        beats: 9
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 109
+    - id: nq_18
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 113
+    - id: nq_19
+      at:
+        beats: 10
+      dur:
+        beats: 0.9
+      pitch: Bb5
+      velocity: 117
+    - id: nq_20
+      at:
+        beats: 11
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: nq_21
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 104
+    - id: nq_22
+      at:
+        beats: 12
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 108
+    - id: nq_23
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 105
+    - id: nq_24
+      at:
+        beats: 13
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 108
+    - id: nq_25
+      at:
+        beats: 13.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 112
+    - id: nq_26
+      at:
+        beats: 14
+      dur:
+        beats: 0.9
+      pitch: G5
+      velocity: 115
+    - id: nq_27
+      at:
+        beats: 15
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: nq_28
+      at:
+        beats: 15.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 105
+    - id: nq_29
+      at:
+        beats: 16
+      dur:
+        beats: 0.45
+      pitch: A4
+      velocity: 104
+    - id: nq_30
+      at:
+        beats: 16.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 109
+    - id: nq_31
+      at:
+        beats: 17
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 112
+    - id: nq_32
+      at:
+        beats: 17.5
+      dur:
+        beats: 0.45
+      pitch: D5
+      velocity: 106
+    - id: nq_33
+      at:
+        beats: 18
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 116
+    - id: nq_34
+      at:
+        beats: 18.5
+      dur:
+        beats: 0.9
+      pitch: D6
+      velocity: 119
+    - id: nq_35
+      at:
+        beats: 19.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 107
+    - id: nq_36
+      at:
+        beats: 20
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 108
+    - id: nq_37
+      at:
+        beats: 20.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 112
+    - id: nq_38
+      at:
+        beats: 21
+      dur:
+        beats: 0.45
+      pitch: C6
+      velocity: 116
+    - id: nq_39
+      at:
+        beats: 21.5
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 110
+    - id: nq_40
+      at:
+        beats: 22
+      dur:
+        beats: 0.9
+      pitch: F5
+      velocity: 106
+    - id: nq_41
+      at:
+        beats: 23
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 100
+    - id: nq_42
+      at:
+        beats: 23.5
+      dur:
+        beats: 0.45
+      pitch: F5
+      velocity: 104
+    - id: nq_43
+      at:
+        beats: 24
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 111
+    - id: nq_44
+      at:
+        beats: 24.5
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 105
+    - id: nq_45
+      at:
+        beats: 25
+      dur:
+        beats: 0.9
+      pitch: C5
+      velocity: 102
+    - id: nq_46
+      at:
+        beats: 26
+      dur:
+        beats: 0.45
+      pitch: G4
+      velocity: 96
+    - id: nq_47
+      at:
+        beats: 26.5
+      dur:
+        beats: 0.45
+      pitch: C5
+      velocity: 101
+    - id: nq_48
+      at:
+        beats: 27
+      dur:
+        beats: 0.9
+      pitch: E5
+      velocity: 108
+    - id: nq_49
+      at:
+        beats: 28
+      dur:
+        beats: 0.45
+      pitch: A5
+      velocity: 114
+    - id: nq_50
+      at:
+        beats: 28.5
+      dur:
+        beats: 0.45
+      pitch: G5
+      velocity: 110
+    - id: nq_51
+      at:
+        beats: 29
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 106
+    - id: nq_52
+      at:
+        beats: 29.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 104
+    - id: nq_53
+      at:
+        beats: 30
+      dur:
+        beats: 0.9
+      pitch: A4
+      velocity: 102
+    - id: nq_54
+      at:
+        beats: 31
+      dur:
+        beats: 0.45
+      pitch: E5
+      velocity: 108
+    - id: nq_55
+      at:
+        beats: 31.5
+      dur:
+        beats: 0.45
+      pitch: C#5
+      velocity: 105
+parts:
+- id: lead_fiddle_part
+  instrument: lead_fiddle
+  voices:
+  - id: battle_lead
+    clips:
+    - id: alarm_1
+      at:
+        bar: 1
+        beat: 1
+      use: boarding_alarm
+      automation:
+      - id: alarm_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 86
+        - - beats: 6
+          - 100
+        - - beats: 12
+          - 92
+        - - beats: 15.5
+          - 104
+        interpolation: smooth
+        resolution: 1/16
+    - id: alarm_5
+      at:
+        bar: 5
+        beat: 1
+      use: boarding_alarm_answer
+      velocity_scale: 1.02
+      automation:
+      - id: alarm2_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 90
+        - - beats: 8
+          - 104
+        - - beats: 15.5
+          - 94
+        interpolation: smooth
+        resolution: 1/16
+    - id: cutlass_9
+      at:
+        bar: 9
+        beat: 1
+      use: blade_theme
+      automation:
+      - id: cutlass_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 88
+        - - beats: 8
+          - 101
+        - - beats: 16
+          - 94
+        - - beats: 24
+          - 106
+        - - beats: 31.5
+          - 94
+        interpolation: smooth
+        resolution: 1/16
+    - id: cutlass_17
+      at:
+        bar: 17
+        beat: 1
+      use: blade_theme
+      velocity_scale: 1.02
+      automation:
+      - id: cutlass2_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 92
+        - - beats: 12
+          - 106
+        - - beats: 24
+          - 98
+        - - beats: 31.5
+          - 108
+        interpolation: smooth
+        resolution: 1/16
+    - id: broadside_25
+      at:
+        bar: 25
+        beat: 1
+      use: broadside_theme
+      velocity_scale: 1.0
+      automation:
+      - id: broad1_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 94
+        - - beats: 8
+          - 108
+        - - beats: 16
+          - 98
+        - - beats: 24
+          - 110
+        - - beats: 31.5
+          - 96
+        interpolation: smooth
+        resolution: 1/16
+    - id: broadside_33
+      at:
+        bar: 33
+        beat: 1
+      use: broadside_theme
+      velocity_scale: 1.03
+      automation:
+      - id: broad2_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 96
+        - - beats: 12
+          - 112
+        - - beats: 24
+          - 102
+        - - beats: 31.5
+          - 110
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_41
+      at:
+        bar: 41
+        beat: 1
+      use: smoke_call
+      velocity_scale: 0.94
+      automation:
+      - id: smoke_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 8
+          - 92
+        - - beats: 16
+          - 84
+        - - beats: 24
+          - 98
+        - - beats: 31.5
+          - 82
+        interpolation: smooth
+        resolution: 1/16
+    - id: board_49
+      at:
+        bar: 49
+        beat: 1
+      use: blade_theme
+      velocity_scale: 1.04
+      automation:
+      - id: board1_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 94
+        - - beats: 12
+          - 110
+        - - beats: 24
+          - 102
+        - - beats: 31.5
+          - 112
+        interpolation: smooth
+        resolution: 1/16
+    - id: board_57
+      at:
+        bar: 57
+        beat: 1
+      use: broadside_theme
+      velocity_scale: 1.03
+      automation:
+      - id: board2_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 96
+        - - beats: 12
+          - 112
+        - - beats: 24
+          - 104
+        - - beats: 31.5
+          - 112
+        interpolation: smooth
+        resolution: 1/16
+    - id: loop_nq_65
+      at:
+        bar: 65
+        beat: 1
+      use: no_quarter_theme
+      velocity_scale: 1.04
+      automation:
+      - id: loop1_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 96
+        - - beats: 12
+          - 112
+        - - beats: 24
+          - 104
+        - - beats: 31.5
+          - 114
+        interpolation: smooth
+        resolution: 1/16
+    - id: loop_blade_73
+      at:
+        bar: 73
+        beat: 1
+      use: blade_theme
+      velocity_scale: 1.05
+      automation:
+      - id: loop2_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 98
+        - - beats: 12
+          - 114
+        - - beats: 24
+          - 106
+        - - beats: 31.5
+          - 112
+        interpolation: smooth
+        resolution: 1/16
+- id: shadow_fiddle_part
+  instrument: shadow_fiddle
+  voices:
+  - id: octave_shadows
+    clips:
+    - id: shadow_cutlass_tail
+      at:
+        bar: 17
+        beat: 1
+      use: blade_theme
+      transpose: -12
+      velocity_scale: 0.72
+      gate: 0.92
+    - id: shadow_broadside_tail
+      at:
+        bar: 33
+        beat: 1
+      use: broadside_theme
+      transpose: -12
+      velocity_scale: 0.74
+      gate: 0.9
+    - id: shadow_boarders
+      at:
+        bar: 57
+        beat: 1
+      use: broadside_theme
+      transpose: -12
+      velocity_scale: 0.76
+      gate: 0.92
+    - id: shadow_loop_nq
+      at:
+        bar: 65
+        beat: 1
+      use: no_quarter_theme
+      transpose: -12
+      velocity_scale: 0.78
+      gate: 0.92
+    - id: shadow_loop_blade
+      at:
+        bar: 73
+        beat: 1
+      use: blade_theme
+      transpose: -12
+      velocity_scale: 0.76
+      gate: 0.92
+- id: accordion_part
+  instrument: battle_accordion
+  voices:
+  - id: melee_and_bellows
+    clips:
+    - id: accordion_intro_chops
+      at:
+        bar: 3
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.32
+        octave: 3
+        voicing: root_fifth
+        velocity: 69
+        directions:
+        - up
+        - down
+        - up
+        spread_ms: 24
+        velocity_slope: 0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 6
+        every:
+          bars: 1
+    - id: accordion_cutlass_chops
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.32
+        octave: 3
+        voicing: root_fifth
+        velocity: 74
+        directions:
+        - up
+        - down
+        - up
+        spread_ms: 24
+        velocity_slope: 0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 16
+        every:
+          bars: 1
+    - id: accordion_board_chops
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.32
+        octave: 3
+        voicing: root_fifth
+        velocity: 78
+        directions:
+        - up
+        - down
+        - up
+        spread_ms: 24
+        velocity_slope: 0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 16
+        every:
+          bars: 1
+    - id: accordion_loop_chops
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.32
+        octave: 3
+        voicing: root_fifth
+        velocity: 80
+        directions:
+        - up
+        - down
+        - up
+        spread_ms: 24
+        velocity_slope: 0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 16
+        every:
+          bars: 1
+    - id: broad_bellows_25
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 75
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_25
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_26
+      at:
+        bar: 26
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_26
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_27
+      at:
+        bar: 27
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_27
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_28
+      at:
+        bar: 28
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_28
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_29
+      at:
+        bar: 29
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 75
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_29
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_30
+      at:
+        bar: 30
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_30
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_31
+      at:
+        bar: 31
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_31
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_32
+      at:
+        bar: 32
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_32
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_33
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 75
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_33
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_34
+      at:
+        bar: 34
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_34
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_35
+      at:
+        bar: 35
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_35
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_36
+      at:
+        bar: 36
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_36
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_37
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 75
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_37
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_38
+      at:
+        bar: 38
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_38
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_39
+      at:
+        bar: 39
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_39
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: broad_bellows_40
+      at:
+        bar: 40
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: broad_pressure_40
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_41
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 70
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_41
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_42
+      at:
+        bar: 42
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_42
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_43
+      at:
+        bar: 43
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_43
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_44
+      at:
+        bar: 44
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_44
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_45
+      at:
+        bar: 45
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 70
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_45
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_46
+      at:
+        bar: 46
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_46
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_47
+      at:
+        bar: 47
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: up
+        spread_ms: 36
+        velocity_slope: 1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_47
+        cc: expression
+        points:
+        - - beats: 0
+          - 72
+        - - beats: 0.5
+          - 86
+        - - beats: 2.4
+          - 114
+        - - beats: 3.65
+          - 80
+        interpolation: smooth
+        resolution: 1/16
+    - id: smoke_bellows_48
+      at:
+        bar: 48
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.04
+        duration_beats: 3.62
+        octave: 3
+        voicing: root_fifth
+        velocity: 67
+        direction: down
+        spread_ms: 36
+        velocity_slope: -1.0
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 4
+        humanize_velocity_pct: 1.5
+        articulation: normal
+      automation:
+      - id: smoke_pressure_48
+        cc: expression
+        points:
+        - - beats: 0
+          - 80
+        - - beats: 0.5
+          - 98
+        - - beats: 2.4
+          - 118
+        - - beats: 3.65
+          - 72
+        interpolation: smooth
+        resolution: 1/16
+- id: guitar_part
+  instrument: deck_guitar
+  voices:
+  - id: deck_pulse
+    clips:
+    - id: guitar_alarm
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.28
+        octave: 3
+        voicing: root_fifth
+        velocity: 72
+        directions:
+        - down
+        - down
+        - up
+        spread_ms: 18
+        velocity_slope: -0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 45
+          max_pitch: 76
+        humanize_ms: 7
+        humanize_velocity_pct: 3.0
+        articulation: marcato
+      repeat:
+        count: 8
+        every:
+          bars: 1
+    - id: guitar_cutlass
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.28
+        octave: 3
+        voicing: root_fifth
+        velocity: 79
+        directions:
+        - down
+        - down
+        - up
+        spread_ms: 18
+        velocity_slope: -0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 45
+          max_pitch: 76
+        humanize_ms: 7
+        humanize_velocity_pct: 3.0
+        articulation: marcato
+      repeat:
+        count: 32
+        every:
+          bars: 1
+    - id: guitar_smoke_pickup
+      at:
+        bar: 45
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.28
+        octave: 3
+        voicing: root_fifth
+        velocity: 65
+        directions:
+        - down
+        - down
+        - up
+        spread_ms: 18
+        velocity_slope: -0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 45
+          max_pitch: 76
+        humanize_ms: 7
+        humanize_velocity_pct: 3.0
+        articulation: marcato
+      repeat:
+        count: 4
+        every:
+          bars: 1
+    - id: guitar_boarders
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.5
+        - - 0
+          - 3.0
+        duration_beats: 0.28
+        octave: 3
+        voicing: root_fifth
+        velocity: 83
+        directions:
+        - down
+        - down
+        - up
+        spread_ms: 18
+        velocity_slope: -0.8
+        include_slash_bass: false
+        constraints:
+          min_pitch: 45
+          max_pitch: 76
+        humanize_ms: 7
+        humanize_velocity_pct: 3.0
+        articulation: marcato
+      repeat:
+        count: 32
+        every:
+          bars: 1
+- id: bass_part
+  instrument: upright_bass
+  voices:
+  - id: keel_bass
+    clips:
+    - id: bass_alarm
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.72
+        - - 7
+          - 1.5
+          - 0.42
+        - - 0
+          - 3.0
+          - 0.62
+        velocity: 88
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.98
+    - id: bass_melee
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 32
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.58
+        - - 7
+          - 0.75
+          - 0.35
+        - - 0
+          - 1.5
+          - 0.48
+        - - 7
+          - 2.25
+          - 0.35
+        - - 12
+          - 3.0
+          - 0.52
+        - - 7
+          - 3.5
+          - 0.32
+        velocity: 92
+        humanize_ms: 4
+        humanize_velocity_pct: 2.5
+        bar_velocity_pattern:
+        - 1.0
+        - 0.98
+        - 1.05
+        - 1.0
+    - id: bass_smoke
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 1.25
+        - - 7
+          - 2.5
+          - 0.78
+        velocity: 84
+        humanize_ms: 3
+        humanize_velocity_pct: 2.0
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+    - id: bass_final
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 32
+      generate:
+        kind: harmony.bass
+        octave: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.54
+        - - 7
+          - 0.75
+          - 0.32
+        - - 0
+          - 1.5
+          - 0.44
+        - - 7
+          - 2.25
+          - 0.32
+        - - 12
+          - 3.0
+          - 0.48
+        - - 7
+          - 3.5
+          - 0.3
+        velocity: 96
+        humanize_ms: 4
+        humanize_velocity_pct: 2.5
+        bar_velocity_pattern:
+        - 1.0
+        - 1.0
+        - 1.06
+        - 1.02
+- id: brass_part
+  instrument: low_brass
+  voices:
+  - id: cannon_brass
+    clips:
+    - id: brass_alarm
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        duration_beats: 0.85
+        octave: 2
+        voicing: root_fifth
+        velocity: 78
+        direction: simultaneous
+        include_slash_bass: false
+        constraints:
+          min_pitch: 40
+          max_pitch: 64
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 2
+        every:
+          bars: 2
+    - id: brass_broadside
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        duration_beats: 0.85
+        octave: 2
+        voicing: root_fifth
+        velocity: 88
+        direction: simultaneous
+        include_slash_bass: false
+        constraints:
+          min_pitch: 40
+          max_pitch: 64
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: brass_boarders
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        duration_beats: 0.85
+        octave: 2
+        voicing: root_fifth
+        velocity: 88
+        direction: simultaneous
+        include_slash_bass: false
+        constraints:
+          min_pitch: 40
+          max_pitch: 64
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: brass_loop
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.0
+        duration_beats: 0.85
+        octave: 2
+        voicing: root_fifth
+        velocity: 92
+        direction: simultaneous
+        include_slash_bass: false
+        constraints:
+          min_pitch: 40
+          max_pitch: 64
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+        articulation: marcato
+      repeat:
+        count: 8
+        every:
+          bars: 2
+- id: drums_part
+  instrument: deck_kit
+  voices:
+  - id: battle_deck
+    clips:
+    - id: drums_alarm
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 106
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 96
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 78
+          probability: 0.82
+        velocity: 106
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 104
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 108
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 112
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_cutlass
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 110
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 99
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 80
+          probability: 0.78
+        - drum: ride
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 76
+          probability: 0.58
+        velocity: 110
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 106
+        - drum: mid_tom
+          beats:
+          - 3.25
+          velocity: 110
+        - drum: high_tom
+          beats:
+          - 3.5
+          velocity: 112
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 118
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_broadside
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 114
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 103
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 84
+          probability: 0.78
+        - drum: ride
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 80
+          probability: 0.58
+        velocity: 114
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 110
+        - drum: mid_tom
+          beats:
+          - 3.25
+          velocity: 114
+        - drum: high_tom
+          beats:
+          - 3.5
+          velocity: 116
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 122
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_smoke
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 3.0
+          velocity: 100
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 86
+        - drum: low_tom
+          beats:
+          - 1.5
+          - 3.5
+          velocity: 92
+          probability: 0.72
+        velocity: 100
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 98
+        - drum: mid_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 102
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_boarders
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 116
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 105
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 86
+          probability: 0.78
+        - drum: ride
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 82
+          probability: 0.58
+        velocity: 116
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 112
+        - drum: mid_tom
+          beats:
+          - 3.25
+          velocity: 116
+        - drum: high_tom
+          beats:
+          - 3.5
+          velocity: 118
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 124
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_loop_a
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 118
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 107
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 88
+          probability: 0.78
+        - drum: ride
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 84
+          probability: 0.58
+        velocity: 118
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 2.75
+          - 3.0
+          velocity: 114
+        - drum: mid_tom
+          beats:
+          - 3.25
+          velocity: 118
+        - drum: high_tom
+          beats:
+          - 3.5
+          velocity: 120
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 126
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+    - id: drums_loop_b
+      at:
+        bar: 73
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 1.5
+          - 3.0
+          velocity: 118
+        - drum: snare
+          beats:
+          - 1.0
+          - 2.5
+          velocity: 107
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 2.0
+          - 3.5
+          velocity: 88
+          probability: 0.78
+        - drum: ride
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 84
+          probability: 0.58
+        velocity: 118
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.99
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 8
+        humanize_velocity_pct: 3.0
+processing:
+  groups:
+    lead:
+      chain:
+      - processor: highpass
+        cutoff_hz: 170
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 4300
+          q: 1.8
+          db: -0.8
+        - type: peak
+          hz: 6500
+          q: 2.5
+          db: -1.8
+      - processor: lowpass
+        cutoff_hz: 11200
+      - processor: compressor
+        threshold_db: -21
+        ratio: 1.35
+        attack_ms: 15
+        release_ms: 95
+    fiddle:
+      chain:
+      - processor: highpass
+        cutoff_hz: 165
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 4400
+          q: 2.0
+          db: -1.2
+        - type: peak
+          hz: 6200
+          q: 2.2
+          db: -1.0
+      - processor: lowpass
+        cutoff_hz: 10600
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.3
+        attack_ms: 17
+        release_ms: 100
+    squeeze:
+      chain:
+      - processor: highpass
+        cutoff_hz: 82
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 4200
+          q: 2.0
+          db: -1.5
+      - processor: high_shelf
+        hz: 6200
+        gain_db: -0.8
+      - processor: lowpass
+        cutoff_hz: 9500
+      - processor: compressor
+        threshold_db: -24
+        ratio: 1.35
+        attack_ms: 20
+        release_ms: 115
+    rhythm:
+      chain:
+      - processor: highpass
+        cutoff_hz: 105
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 6100
+          q: 2.6
+          db: -2.2
+      - processor: lowpass
+        cutoff_hz: 10500
+      - processor: compressor
+        threshold_db: -23
+        ratio: 1.4
+        attack_ms: 17
+        release_ms: 105
+    bass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 31
+      - processor: lowpass
+        cutoff_hz: 3500
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.8
+        attack_ms: 22
+        release_ms: 115
+        makeup_db: 0.5
+    brass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 70
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 2900
+          q: 1.4
+          db: -1.2
+      - processor: lowpass
+        cutoff_hz: 9800
+      - processor: compressor
+        threshold_db: -21
+        ratio: 1.5
+        attack_ms: 18
+        release_ms: 105
+    drums:
+      chain:
+      - processor: highpass
+        cutoff_hz: 28
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 330
+          q: 0.9
+          db: -0.7
+      - processor: high_shelf
+        hz: 7800
+        gain_db: -0.5
+      - processor: lowpass
+        cutoff_hz: 14500
+      - processor: compressor
+        threshold_db: -18
+        ratio: 1.45
+        attack_ms: 20
+        release_ms: 90
+  master:
+    chain:
+    - processor: highpass
+      cutoff_hz: 28
+    - processor: parametric_eq
+      bands:
+      - type: peak
+        hz: 285
+        q: 0.8
+        db: -0.5
+      - type: peak
+        hz: 5900
+        q: 1.3
+        db: -0.5
+    - processor: compressor
+      threshold_db: -14.5
+      ratio: 1.35
+      attack_ms: 22
+      release_ms: 135
+    - processor: reverb
+      wet: 0.025
+      decay_seconds: 0.78
+      damping_hz: 5800
+    - processor: stereo_width
+      amount: 0.07
+    - processor: limiter
+      target_peak_db: -1.4
+      drive: 1.025
+      normalize: true
+  adaptive_sections:
+    mode: composition_master

@@ -16,7 +16,11 @@ from ambition_music_renderer.render.bundle_adaptive_reports import (
     write_adaptive_composition_mastering_report,
     write_adaptive_section_report,
 )
-from ambition_music_renderer.render.bundle_archive import make_zip, should_include_in_report_zip
+from ambition_music_renderer.render.bundle_archive import (
+    make_zip,
+    should_include_in_report_zip,
+    transition_section_pairs,
+)
 from ambition_music_renderer.render.bundle_audio_reports import (
     summarize_mix_diagnostics,
     write_manifest_audio_level_report,
@@ -98,6 +102,22 @@ def test_bundle_parser_exposes_publish_and_zip_flags():
     assert args.zip_report_bundle is True
     assert args.plot_format == "jpg"
     assert args.audition_stems is True
+
+
+def test_transition_section_pairs_always_include_loop_seams():
+    manifest = {
+        "sections": [
+            {"id": "intro"},
+            {"id": "melee"},
+            {"id": "bridge"},
+            {"id": "combat_loop", "loopable": True},
+        ]
+    }
+    assert transition_section_pairs(manifest, max_adjacent_pairs=2) == [
+        ("intro", "melee"),
+        ("melee", "bridge"),
+        ("combat_loop", "combat_loop"),
+    ]
 
 
 def test_stem_export_report_compares_scratch_adaptive_and_preview_audio():

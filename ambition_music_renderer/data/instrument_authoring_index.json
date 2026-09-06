@@ -1,5 +1,5 @@
 {
-  "catalog_semantic_sha256": "127181e802296e880c5e27993bbbacf1007e1cdeafe56deea2200d32663c8837",
+  "catalog_semantic_sha256": "5b852c3dbda625a6da21d9646fdad5022c17a2d44c615d2617b00026ee10b1cc",
   "family_profiles": {
     "bass": {
       "audition": {
@@ -1366,6 +1366,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -3006,6 +3044,20 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
+          "name": "shiny_electric_four",
+          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
+          "probes": [
+            37,
+            52,
+            64,
+            76
+          ],
+          "source": "karoryfer.shinyguitar"
+        },
+        {
+          "articulation": "electric-sustain",
+          "family": "guitar",
+          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3127,6 +3179,20 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
+          "name": "shiny_electric_four",
+          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
+          "probes": [
+            37,
+            52,
+            64,
+            76
+          ],
+          "source": "karoryfer.shinyguitar"
+        },
+        {
+          "articulation": "electric-sustain",
+          "family": "guitar",
+          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3265,6 +3331,20 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
+          "name": "shiny_electric_four",
+          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
+          "probes": [
+            37,
+            52,
+            64,
+            76
+          ],
+          "source": "karoryfer.shinyguitar"
+        },
+        {
+          "articulation": "electric-sustain",
+          "family": "guitar",
+          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3393,6 +3473,20 @@
         {
           "articulation": "electric-sustain",
           "family": "guitar",
+          "name": "shiny_electric_four",
+          "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_four.sfz",
+          "probes": [
+            37,
+            52,
+            64,
+            76
+          ],
+          "source": "karoryfer.shinyguitar"
+        },
+        {
+          "articulation": "electric-sustain",
+          "family": "guitar",
+          "library_ref": "guitar.electric_lead",
           "name": "shiny_electric",
           "path": "Karoryfer/Shinyguitar/Shinyguitar/Programs/electric_five.sfz",
           "probes": [
@@ -3516,6 +3610,19 @@
       "install_profile": "starter",
       "is_drum": false,
       "known_patch_profiles": [
+        {
+          "articulation": "clean-single-note",
+          "family": "guitar",
+          "name": "emily_clean",
+          "path": "Karoryfer/Emilyguitar/Emilyguitar/emily_clean.sfz",
+          "pitch_probe": false,
+          "probes": [
+            48,
+            55,
+            60
+          ],
+          "source": "karoryfer.emilyguitar"
+        },
         {
           "articulation": "basic",
           "family": "guitar",
@@ -3933,6 +4040,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -4136,6 +4281,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -4241,6 +4424,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -4344,6 +4565,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -4559,6 +4818,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5079,6 +5376,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5182,6 +5517,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5286,6 +5659,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5389,6 +5800,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5493,6 +5942,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5781,6 +6268,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5886,6 +6411,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -5991,6 +6554,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6289,6 +6890,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6394,6 +7033,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6500,6 +7177,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6596,6 +7311,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6702,6 +7455,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6795,6 +7586,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -6897,6 +7726,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",
@@ -7003,6 +7870,44 @@
       },
       "install_profile": "pro",
       "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "harpsichord-full",
+          "family": "keys",
+          "name": "sonatina_harpsichord_full",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-8ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_8ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 8'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        },
+        {
+          "articulation": "harpsichord-4ft",
+          "family": "keys",
+          "name": "sonatina_harpsichord_4ft",
+          "path": "Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord 4'.sfz",
+          "probes": [
+            48,
+            60,
+            72
+          ],
+          "source": "sonatina"
+        }
+      ],
       "musicir": {
         "instrument_backend": {
           "kind": "sfz",

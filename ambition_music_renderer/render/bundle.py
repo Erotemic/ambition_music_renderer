@@ -511,7 +511,7 @@ def create_bundle(
             )
 
             if audit_capabilities["adaptive_full_audio"]:
-                progress_line("running adjacent-section transition audits")
+                progress_line("running section transition and loop-seam audits")
                 commands.extend(
                     run_transition_audits(
                         analysis_root, manifest, reports_dir, tools_dir
