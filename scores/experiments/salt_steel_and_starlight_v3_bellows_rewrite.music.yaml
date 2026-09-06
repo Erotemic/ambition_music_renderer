@@ -1,0 +1,3595 @@
+schema: ambition.musicir.v3
+id: salt_steel_and_starlight_v3_bellows_rewrite
+title: "Salt, Steel, and Starlight \u2014 Bellows Crew Shanty (v3)"
+description: Major v3 rewrite centered on a small acoustic crew ensemble, explicit captain/crew call-and-response, and a physically
+  authored accordion bellows cycle. Push and pull use the same accordion timbre; direction comes from sustained pressure envelopes,
+  reversal breaths, and secondary low-to-high/high-to-low attack motion.
+notes:
+- Experimental replacement candidate; earlier G and v3 crew-shanty checkpoints remain unchanged.
+- No trusted sampled accordion exists in the checked-in instrument census, so both bellows directions use the same GM accordion
+  timbre with authored CC11 pressure curves.
+- 'The ensemble is intentionally small: lead fiddle, crew fiddle, bellows accordion, acoustic guitar, upright bass, and deck
+  kit.'
+- VPO performance fiddles are driven with phrase-level CC1 curves; low static CC1 was a concrete cause of the previous inaudible
+  lead.
+seed: 271828
+timebase:
+  ppq: 960
+meter: 4/4
+tempo: 118.76288659793815
+key: E minor
+duration_target_seconds: 194.0
+end:
+  bar: 97
+  beat: 1
+form:
+- id: deck_call
+  from:
+    bar: 1
+    beat: 1
+  to:
+    bar: 9
+    beat: 1
+  energy: 0.86
+  density: 0.68
+  role: immediate stomp and bellows opening
+- id: first_haul
+  from:
+    bar: 9
+    beat: 1
+  to:
+    bar: 25
+    beat: 1
+  energy: 0.76
+  density: 0.58
+  role: captain and crew call-response verse
+- id: crew_refrain_one
+  from:
+    bar: 25
+    beat: 1
+  to:
+    bar: 33
+    beat: 1
+  energy: 0.94
+  density: 0.78
+  role: first full crew refrain
+- id: second_haul
+  from:
+    bar: 33
+    beat: 1
+  to:
+    bar: 49
+    beat: 1
+  energy: 0.8
+  density: 0.61
+  role: second call-response verse
+- id: crew_refrain_two
+  from:
+    bar: 49
+    beat: 1
+  to:
+    bar: 57
+    beat: 1
+  energy: 0.96
+  density: 0.8
+  role: stronger crew refrain
+- id: bellows_break
+  from:
+    bar: 57
+    beat: 1
+  to:
+    bar: 65
+    beat: 1
+  energy: 0.7
+  density: 0.42
+  role: captain then exposed bellows then crew
+- id: storm_haul
+  from:
+    bar: 65
+    beat: 1
+  to:
+    bar: 81
+    beat: 1
+  energy: 0.86
+  density: 0.66
+  role: driving final call-response verse
+- id: broadside_refrain
+  from:
+    bar: 81
+    beat: 1
+  to:
+    bar: 89
+    beat: 1
+  energy: 1.0
+  density: 0.84
+  role: largest crew refrain
+- id: home_refrain
+  from:
+    bar: 89
+    beat: 1
+  to:
+    bar: 97
+    beat: 1
+  energy: 1.0
+  density: 0.8
+  role: final refrain and hard home cadence
+harmony:
+  progression:
+  - Em
+  - D
+  - C
+  - B7
+  - Em
+  - D
+  - B7
+  - Em
+  cycle: true
+instruments:
+- name: lead_fiddle
+  group: lead
+  program: violin
+  volume: 118
+  pan: 62
+  expression: 118
+  modulation: 88
+  mix_gain_db: 4.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: crew_fiddle
+  group: fiddle
+  program: violin
+  volume: 110
+  pan: 78
+  expression: 110
+  modulation: 72
+  mix_gain_db: 0.0
+  instrument_backend:
+    kind: sfz
+    library_ref: vpo.violin_solo_perf
+    prefer:
+    - violin
+    - solo
+    - performance
+    settings:
+      fold_to_range: false
+- name: accordion_push
+  group: squeeze_push
+  program: accordion
+  volume: 103
+  pan: 60
+  expression: 92
+  mix_gain_db: -3.5
+- name: accordion_pull
+  group: squeeze_pull
+  program: accordion
+  volume: 103
+  pan: 60
+  expression: 92
+  mix_gain_db: -3.5
+- name: deck_guitar
+  group: rhythm
+  program: steel_guitar
+  volume: 101
+  pan: 42
+  expression: 104
+  controls:
+    100: 64
+  mix_gain_db: -1.5
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.acoustic
+    prefer:
+    - shinyguitar
+    - acoustic
+    settings:
+      fold_to_range: false
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 110
+  pan: 50
+  expression: 108
+  mix_gain_db: 1.0
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - sonatina
+    - basses
+    - pizzicato
+    settings:
+      fold_to_range: false
+- name: deck_kit
+  group: drums
+  program: 0
+  is_drum: true
+  volume: 114
+  pan: 64
+  expression: 112
+  mix_gain_db: 0.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer:
+    - muldjord
+    - stereo
+    - kit
+materials:
+  captain_a:
+    kind: events
+    events:
+    - id: ca01
+      at:
+        beats: 0
+      dur:
+        ticks: 691
+      pitch: B4
+      velocity: 100
+    - id: ca02
+      at:
+        beats: 1
+      dur:
+        ticks: 634
+      pitch: B4
+      velocity: 95
+    - id: ca03
+      at:
+        beats: 2
+      dur:
+        ticks: 691
+      pitch: G4
+      velocity: 96
+    - id: ca04
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: E4
+      velocity: 92
+    - id: ca05
+      at:
+        beats: 4
+      dur:
+        ticks: 1363
+      pitch: A4
+      velocity: 101
+    - id: ca06
+      at:
+        beats: 6
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 96
+    - id: ca07
+      at:
+        beats: 7
+      dur:
+        ticks: 653
+      pitch: D4
+      velocity: 91
+  captain_b:
+    kind: events
+    events:
+    - id: cb01
+      at:
+        beats: 0
+      dur:
+        ticks: 672
+      pitch: E4
+      velocity: 96
+    - id: cb02
+      at:
+        beats: 1
+      dur:
+        ticks: 634
+      pitch: E4
+      velocity: 93
+    - id: cb03
+      at:
+        beats: 2
+      dur:
+        ticks: 672
+      pitch: G4
+      velocity: 98
+    - id: cb04
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: B4
+      velocity: 101
+    - id: cb05
+      at:
+        beats: 4
+      dur:
+        ticks: 691
+      pitch: A4
+      velocity: 99
+    - id: cb06
+      at:
+        beats: 5
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 95
+    - id: cb07
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 92
+    - id: cb08
+      at:
+        beats: 7
+      dur:
+        ticks: 595
+      pitch: D4
+      velocity: 90
+  captain_c:
+    kind: events
+    events:
+    - id: cc01
+      at:
+        beats: 0
+      dur:
+        ticks: 634
+      pitch: B4
+      velocity: 101
+    - id: cc02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: B4
+      velocity: 95
+    - id: cc03
+      at:
+        beats: 2
+      dur:
+        ticks: 384
+      pitch: B4
+      velocity: 92
+    - id: cc04
+      at:
+        beats: 2.5
+      dur:
+        ticks: 384
+      pitch: G4
+      velocity: 94
+    - id: cc05
+      at:
+        beats: 3
+      dur:
+        ticks: 634
+      pitch: E4
+      velocity: 91
+    - id: cc06
+      at:
+        beats: 4
+      dur:
+        ticks: 1306
+      pitch: A4
+      velocity: 100
+    - id: cc07
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 94
+    - id: cc08
+      at:
+        beats: 7
+      dur:
+        ticks: 634
+      pitch: D4
+      velocity: 90
+  captain_d:
+    kind: events
+    events:
+    - id: cd01
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 97
+    - id: cd02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 93
+    - id: cd03
+      at:
+        beats: 2
+      dur:
+        ticks: 653
+      pitch: B4
+      velocity: 101
+    - id: cd04
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: G4
+      velocity: 94
+    - id: cd05
+      at:
+        beats: 4
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 96
+    - id: cd06
+      at:
+        beats: 5
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 93
+    - id: cd07
+      at:
+        beats: 6
+      dur:
+        ticks: 653
+      pitch: A4
+      velocity: 99
+    - id: cd08
+      at:
+        beats: 7
+      dur:
+        ticks: 595
+      pitch: D4
+      velocity: 91
+  captain_e:
+    kind: events
+    events:
+    - id: ce01
+      at:
+        beats: 0
+      dur:
+        ticks: 1306
+      pitch: E4
+      velocity: 98
+    - id: ce02
+      at:
+        beats: 2
+      dur:
+        ticks: 634
+      pitch: G4
+      velocity: 96
+    - id: ce03
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: B4
+      velocity: 100
+    - id: ce04
+      at:
+        beats: 4
+      dur:
+        ticks: 634
+      pitch: A4
+      velocity: 98
+    - id: ce05
+      at:
+        beats: 5
+      dur:
+        ticks: 614
+      pitch: A4
+      velocity: 94
+    - id: ce06
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 93
+    - id: ce07
+      at:
+        beats: 7
+      dur:
+        ticks: 595
+      pitch: D4
+      velocity: 90
+  captain_f:
+    kind: events
+    events:
+    - id: cf01
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: B4
+      velocity: 100
+    - id: cf02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 95
+    - id: cf03
+      at:
+        beats: 2
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 92
+    - id: cf04
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: G4
+      velocity: 94
+    - id: cf05
+      at:
+        beats: 4
+      dur:
+        ticks: 1286
+      pitch: D4
+      velocity: 96
+    - id: cf06
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 94
+    - id: cf07
+      at:
+        beats: 7
+      dur:
+        ticks: 614
+      pitch: A4
+      velocity: 97
+  crew_cb7_a:
+    kind: events
+    events:
+    - id: r101
+      at:
+        beats: 0
+      dur:
+        ticks: 672
+      pitch: G4
+      velocity: 94
+    - id: r102
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 90
+    - id: r103
+      at:
+        beats: 2
+      dur:
+        ticks: 1286
+      pitch: E4
+      velocity: 96
+    - id: r104
+      at:
+        beats: 4
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 96
+    - id: r105
+      at:
+        beats: 5
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 92
+    - id: r106
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 91
+    - id: r107
+      at:
+        beats: 7
+      dur:
+        ticks: 749
+      pitch: B3
+      velocity: 99
+  crew_cb7_b:
+    kind: events
+    events:
+    - id: r201
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 93
+    - id: r202
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 89
+    - id: r203
+      at:
+        beats: 2
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 96
+    - id: r204
+      at:
+        beats: 3
+      dur:
+        ticks: 576
+      pitch: E4
+      velocity: 91
+    - id: r205
+      at:
+        beats: 4
+      dur:
+        ticks: 1267
+      pitch: F#4
+      velocity: 97
+    - id: r206
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 91
+    - id: r207
+      at:
+        beats: 7
+      dur:
+        ticks: 749
+      pitch: B3
+      velocity: 99
+  crew_cb7_c:
+    kind: events
+    events:
+    - id: r301
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 95
+    - id: r302
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 91
+    - id: r303
+      at:
+        beats: 2
+      dur:
+        ticks: 1248
+      pitch: C4
+      velocity: 93
+    - id: r304
+      at:
+        beats: 4
+      dur:
+        ticks: 595
+      pitch: A4
+      velocity: 96
+    - id: r305
+      at:
+        beats: 5
+      dur:
+        ticks: 595
+      pitch: F#4
+      velocity: 93
+    - id: r306
+      at:
+        beats: 6
+      dur:
+        ticks: 614
+      pitch: D#4
+      velocity: 90
+    - id: r307
+      at:
+        beats: 7
+      dur:
+        ticks: 768
+      pitch: B3
+      velocity: 99
+  crew_b7em_a:
+    kind: events
+    events:
+    - id: r401
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 96
+    - id: r402
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 92
+    - id: r403
+      at:
+        beats: 2
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 91
+    - id: r404
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: B3
+      velocity: 94
+    - id: r405
+      at:
+        beats: 4
+      dur:
+        ticks: 672
+      pitch: G4
+      velocity: 96
+    - id: r406
+      at:
+        beats: 5
+      dur:
+        ticks: 634
+      pitch: E4
+      velocity: 91
+    - id: r407
+      at:
+        beats: 6
+      dur:
+        ticks: 1402
+      pitch: E4
+      velocity: 100
+  crew_b7em_b:
+    kind: events
+    events:
+    - id: r501
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: D#4
+      velocity: 94
+    - id: r502
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: D#4
+      velocity: 90
+    - id: r503
+      at:
+        beats: 2
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 95
+    - id: r504
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: B3
+      velocity: 93
+    - id: r505
+      at:
+        beats: 4
+      dur:
+        ticks: 1306
+      pitch: E4
+      velocity: 98
+    - id: r506
+      at:
+        beats: 6
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 94
+    - id: r507
+      at:
+        beats: 7
+      dur:
+        ticks: 730
+      pitch: E4
+      velocity: 100
+  crew_b7em_c:
+    kind: events
+    events:
+    - id: r601
+      at:
+        beats: 0
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 95
+    - id: r602
+      at:
+        beats: 1
+      dur:
+        ticks: 595
+      pitch: A4
+      velocity: 94
+    - id: r603
+      at:
+        beats: 2
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 91
+    - id: r604
+      at:
+        beats: 3
+      dur:
+        ticks: 595
+      pitch: D#4
+      velocity: 90
+    - id: r605
+      at:
+        beats: 4
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 96
+    - id: r606
+      at:
+        beats: 5
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 92
+    - id: r607
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: G4
+      velocity: 94
+    - id: r608
+      at:
+        beats: 7
+      dur:
+        ticks: 749
+      pitch: E4
+      velocity: 100
+  crew_refrain:
+    kind: events
+    events:
+    - id: rf01
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: B4
+      velocity: 105
+    - id: rf02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: B4
+      velocity: 99
+    - id: rf03
+      at:
+        beats: 2
+      dur:
+        ticks: 384
+      pitch: B4
+      velocity: 102
+    - id: rf04
+      at:
+        beats: 2.5
+      dur:
+        ticks: 365
+      pitch: B4
+      velocity: 99
+    - id: rf05
+      at:
+        beats: 3
+      dur:
+        ticks: 691
+      pitch: E5
+      velocity: 108
+    - id: rf06
+      at:
+        beats: 4
+      dur:
+        ticks: 1363
+      pitch: D5
+      velocity: 105
+    - id: rf07
+      at:
+        beats: 6
+      dur:
+        ticks: 653
+      pitch: A4
+      velocity: 98
+    - id: rf08
+      at:
+        beats: 7
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 94
+    - id: rf09
+      at:
+        beats: 8
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 101
+    - id: rf10
+      at:
+        beats: 9
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 96
+    - id: rf11
+      at:
+        beats: 10
+      dur:
+        ticks: 1286
+      pitch: E4
+      velocity: 100
+    - id: rf12
+      at:
+        beats: 12
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 101
+    - id: rf13
+      at:
+        beats: 13
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 96
+    - id: rf14
+      at:
+        beats: 14
+      dur:
+        ticks: 634
+      pitch: A4
+      velocity: 99
+    - id: rf15
+      at:
+        beats: 15
+      dur:
+        ticks: 672
+      pitch: D#4
+      velocity: 96
+    - id: rf16
+      at:
+        beats: 16
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 101
+    - id: rf17
+      at:
+        beats: 17
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 96
+    - id: rf18
+      at:
+        beats: 18
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 100
+    - id: rf19
+      at:
+        beats: 19
+      dur:
+        ticks: 691
+      pitch: B4
+      velocity: 104
+    - id: rf20
+      at:
+        beats: 20
+      dur:
+        ticks: 1325
+      pitch: A4
+      velocity: 102
+    - id: rf21
+      at:
+        beats: 22
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 96
+    - id: rf22
+      at:
+        beats: 23
+      dur:
+        ticks: 614
+      pitch: D4
+      velocity: 92
+    - id: rf23
+      at:
+        beats: 24
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 101
+    - id: rf24
+      at:
+        beats: 25
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 96
+    - id: rf25
+      at:
+        beats: 26
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 94
+    - id: rf26
+      at:
+        beats: 27
+      dur:
+        ticks: 653
+      pitch: B3
+      velocity: 94
+    - id: rf27
+      at:
+        beats: 28
+      dur:
+        ticks: 1843
+      pitch: E4
+      velocity: 106
+    - id: rf28
+      at:
+        beats: 30.25
+      dur:
+        ticks: 403
+      pitch: G4
+      velocity: 96
+    - id: rf29
+      at:
+        beats: 31
+      dur:
+        ticks: 787
+      pitch: E4
+      velocity: 109
+  crew_refrain_final:
+    kind: events
+    events:
+    - id: ff01
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: B4
+      velocity: 105
+    - id: ff02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: B4
+      velocity: 99
+    - id: ff03
+      at:
+        beats: 2
+      dur:
+        ticks: 384
+      pitch: B4
+      velocity: 102
+    - id: ff04
+      at:
+        beats: 2.5
+      dur:
+        ticks: 365
+      pitch: B4
+      velocity: 99
+    - id: ff05
+      at:
+        beats: 3
+      dur:
+        ticks: 691
+      pitch: E5
+      velocity: 108
+    - id: ff06
+      at:
+        beats: 4
+      dur:
+        ticks: 1363
+      pitch: D5
+      velocity: 105
+    - id: ff07
+      at:
+        beats: 6
+      dur:
+        ticks: 653
+      pitch: A4
+      velocity: 98
+    - id: ff08
+      at:
+        beats: 7
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 94
+    - id: ff09
+      at:
+        beats: 8
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 101
+    - id: ff10
+      at:
+        beats: 9
+      dur:
+        ticks: 614
+      pitch: G4
+      velocity: 96
+    - id: ff11
+      at:
+        beats: 10
+      dur:
+        ticks: 1286
+      pitch: E4
+      velocity: 100
+    - id: ff12
+      at:
+        beats: 12
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 101
+    - id: ff13
+      at:
+        beats: 13
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 96
+    - id: ff14
+      at:
+        beats: 14
+      dur:
+        ticks: 634
+      pitch: A4
+      velocity: 99
+    - id: ff15
+      at:
+        beats: 15
+      dur:
+        ticks: 672
+      pitch: D#4
+      velocity: 96
+    - id: ff16
+      at:
+        beats: 16
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 101
+    - id: ff17
+      at:
+        beats: 17
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 96
+    - id: ff18
+      at:
+        beats: 18
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 100
+    - id: ff19
+      at:
+        beats: 19
+      dur:
+        ticks: 691
+      pitch: B4
+      velocity: 104
+    - id: ff20
+      at:
+        beats: 20
+      dur:
+        ticks: 1325
+      pitch: A4
+      velocity: 102
+    - id: ff21
+      at:
+        beats: 22
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 96
+    - id: ff22
+      at:
+        beats: 23
+      dur:
+        ticks: 614
+      pitch: D4
+      velocity: 92
+    - id: ff23
+      at:
+        beats: 24
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 101
+    - id: ff24
+      at:
+        beats: 25
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 96
+    - id: ff25
+      at:
+        beats: 26
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 94
+    - id: ff26
+      at:
+        beats: 27
+      dur:
+        ticks: 653
+      pitch: B3
+      velocity: 94
+    - id: ff27
+      at:
+        beats: 28
+      dur:
+        ticks: 3840
+      pitch: E4
+      velocity: 112
+  opening_tail:
+    kind: events
+    events:
+    - id: oh01
+      at:
+        beats: 0
+      dur:
+        ticks: 653
+      pitch: E4
+      velocity: 101
+    - id: oh02
+      at:
+        beats: 1
+      dur:
+        ticks: 614
+      pitch: E4
+      velocity: 96
+    - id: oh03
+      at:
+        beats: 2
+      dur:
+        ticks: 653
+      pitch: G4
+      velocity: 100
+    - id: oh04
+      at:
+        beats: 3
+      dur:
+        ticks: 691
+      pitch: B4
+      velocity: 104
+    - id: oh05
+      at:
+        beats: 4
+      dur:
+        ticks: 1325
+      pitch: A4
+      velocity: 102
+    - id: oh06
+      at:
+        beats: 6
+      dur:
+        ticks: 634
+      pitch: F#4
+      velocity: 96
+    - id: oh07
+      at:
+        beats: 7
+      dur:
+        ticks: 614
+      pitch: D4
+      velocity: 92
+    - id: oh08
+      at:
+        beats: 8
+      dur:
+        ticks: 653
+      pitch: F#4
+      velocity: 101
+    - id: oh09
+      at:
+        beats: 9
+      dur:
+        ticks: 614
+      pitch: F#4
+      velocity: 96
+    - id: oh10
+      at:
+        beats: 10
+      dur:
+        ticks: 634
+      pitch: D#4
+      velocity: 94
+    - id: oh11
+      at:
+        beats: 11
+      dur:
+        ticks: 653
+      pitch: B3
+      velocity: 94
+    - id: oh12
+      at:
+        beats: 12
+      dur:
+        ticks: 2016
+      pitch: E4
+      velocity: 108
+    - id: oh13
+      at:
+        beats: 15
+      dur:
+        ticks: 787
+      pitch: E4
+      velocity: 104
+parts:
+- id: lead_part
+  instrument: lead_fiddle
+  voices:
+  - id: captain_voice
+    clips:
+    - id: opening_hook
+      at:
+        bar: 5
+        beat: 1
+      use: opening_tail
+      automation:
+      - id: opening_hook_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 84
+        - - beats: 7.5
+          - 96
+        - - beats: 15.75
+          - 88
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1a_captain
+      at:
+        bar: 9
+        beat: 1
+      use: captain_a
+      automation:
+      - id: v1a_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1b_captain
+      at:
+        bar: 13
+        beat: 1
+      use: captain_b
+      automation:
+      - id: v1b_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1c_captain
+      at:
+        bar: 17
+        beat: 1
+      use: captain_c
+      automation:
+      - id: v1c_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1d_captain
+      at:
+        bar: 21
+        beat: 1
+      use: captain_d
+      automation:
+      - id: v1d_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: refrain_one
+      at:
+        bar: 25
+        beat: 1
+      use: crew_refrain
+      automation:
+      - id: refrain_one_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 86
+        - - beats: 7.5
+          - 96
+        - - beats: 15.5
+          - 102
+        - - beats: 23.5
+          - 98
+        - - beats: 31.75
+          - 90
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2a_captain
+      at:
+        bar: 33
+        beat: 1
+      use: captain_d
+      velocity_scale: 0.98
+      automation:
+      - id: v2a_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2b_captain
+      at:
+        bar: 37
+        beat: 1
+      use: captain_e
+      velocity_scale: 0.98
+      automation:
+      - id: v2b_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2c_captain
+      at:
+        bar: 41
+        beat: 1
+      use: captain_a
+      velocity_scale: 0.98
+      automation:
+      - id: v2c_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2d_captain
+      at:
+        bar: 45
+        beat: 1
+      use: captain_f
+      velocity_scale: 0.98
+      automation:
+      - id: v2d_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: refrain_two
+      at:
+        bar: 49
+        beat: 1
+      use: crew_refrain
+      velocity_scale: 1.02
+      automation:
+      - id: refrain_two_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 86
+        - - beats: 7.5
+          - 96
+        - - beats: 15.5
+          - 102
+        - - beats: 23.5
+          - 98
+        - - beats: 31.75
+          - 90
+        interpolation: smooth
+        resolution: 1/16
+    - id: break_captain_one
+      at:
+        bar: 57
+        beat: 1
+      use: captain_e
+      velocity_scale: 0.9
+      automation:
+      - id: break_captain_one_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: break_captain_two
+      at:
+        bar: 61
+        beat: 1
+      use: captain_c
+      velocity_scale: 0.92
+      automation:
+      - id: break_captain_two_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3a_captain
+      at:
+        bar: 65
+        beat: 1
+      use: captain_c
+      velocity_scale: 1.02
+      automation:
+      - id: v3a_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3b_captain
+      at:
+        bar: 69
+        beat: 1
+      use: captain_f
+      velocity_scale: 1.02
+      automation:
+      - id: v3b_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3c_captain
+      at:
+        bar: 73
+        beat: 1
+      use: captain_b
+      velocity_scale: 1.02
+      automation:
+      - id: v3c_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3d_captain
+      at:
+        bar: 77
+        beat: 1
+      use: captain_e
+      velocity_scale: 1.02
+      automation:
+      - id: v3d_captain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 82
+        - - beats: 2.5
+          - 94
+        - - beats: 5.0
+          - 99
+        - - beats: 7.5
+          - 84
+        interpolation: smooth
+        resolution: 1/16
+    - id: broadside_refrain
+      at:
+        bar: 81
+        beat: 1
+      use: crew_refrain
+      velocity_scale: 1.04
+      automation:
+      - id: broadside_refrain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 86
+        - - beats: 7.5
+          - 96
+        - - beats: 15.5
+          - 102
+        - - beats: 23.5
+          - 98
+        - - beats: 31.75
+          - 90
+        interpolation: smooth
+        resolution: 1/16
+    - id: home_refrain
+      at:
+        bar: 89
+        beat: 1
+      use: crew_refrain_final
+      velocity_scale: 1.05
+      automation:
+      - id: home_refrain_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 86
+        - - beats: 7.5
+          - 96
+        - - beats: 15.5
+          - 102
+        - - beats: 23.5
+          - 98
+        - - beats: 31.75
+          - 90
+        interpolation: smooth
+        resolution: 1/16
+- id: crew_part
+  instrument: crew_fiddle
+  voices:
+  - id: crew_voice
+    clips:
+    - id: v1a_crew
+      at:
+        bar: 11
+        beat: 1
+      use: crew_cb7_a
+      automation:
+      - id: v1a_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1b_crew
+      at:
+        bar: 15
+        beat: 1
+      use: crew_b7em_a
+      automation:
+      - id: v1b_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1c_crew
+      at:
+        bar: 19
+        beat: 1
+      use: crew_cb7_b
+      automation:
+      - id: v1c_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v1d_crew
+      at:
+        bar: 23
+        beat: 1
+      use: crew_b7em_b
+      automation:
+      - id: v1d_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2a_crew
+      at:
+        bar: 35
+        beat: 1
+      use: crew_cb7_c
+      velocity_scale: 0.98
+      automation:
+      - id: v2a_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2b_crew
+      at:
+        bar: 39
+        beat: 1
+      use: crew_b7em_c
+      velocity_scale: 0.98
+      automation:
+      - id: v2b_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2c_crew
+      at:
+        bar: 43
+        beat: 1
+      use: crew_cb7_a
+      velocity_scale: 0.98
+      automation:
+      - id: v2c_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v2d_crew
+      at:
+        bar: 47
+        beat: 1
+      use: crew_b7em_b
+      velocity_scale: 0.98
+      automation:
+      - id: v2d_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: break_crew_answer
+      at:
+        bar: 63
+        beat: 1
+      use: crew_b7em_a
+      velocity_scale: 0.94
+      automation:
+      - id: break_crew_answer_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3a_crew
+      at:
+        bar: 67
+        beat: 1
+      use: crew_cb7_b
+      velocity_scale: 1.02
+      automation:
+      - id: v3a_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3b_crew
+      at:
+        bar: 71
+        beat: 1
+      use: crew_b7em_c
+      velocity_scale: 1.02
+      automation:
+      - id: v3b_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3c_crew
+      at:
+        bar: 75
+        beat: 1
+      use: crew_cb7_c
+      velocity_scale: 1.02
+      automation:
+      - id: v3c_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+    - id: v3d_crew
+      at:
+        bar: 79
+        beat: 1
+      use: crew_b7em_a
+      velocity_scale: 1.02
+      automation:
+      - id: v3d_crew_cc1
+        cc: modulation
+        points:
+        - - beats: 0
+          - 68
+        - - beats: 2.5
+          - 80
+        - - beats: 5.0
+          - 84
+        - - beats: 7.5
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+- id: accordion_push_part
+  instrument: accordion_push
+  voices:
+  - id: bellows_push
+    clips:
+    - id: push_1
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_1_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 116
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: push_9
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 69
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_9_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 113
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: push_25
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_25_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 116
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: push_33
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 70
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_33_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 114
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: push_49
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 80
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_49_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 117
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: push_65
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 73
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_65_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 115
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: push_81
+      at:
+        bar: 81
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_81_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 118
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: push_89
+      at:
+        bar: 89
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 83
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: push_89_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 118
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: break_push_59
+      at:
+        bar: 59
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.72
+        octave: 3
+        voicing: triad
+        velocity: 76
+        direction: up
+        spread_ms: 42
+        velocity_slope: 1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: break_push_59_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 70
+        - - beats: 0.45
+          - 82
+        - - beats: 2.45
+          - 116
+        - - beats: 3.7
+          - 78
+        interpolation: smooth
+        resolution: 1/16
+- id: accordion_pull_part
+  instrument: accordion_pull
+  voices:
+  - id: bellows_pull
+    clips:
+    - id: pull_2
+      at:
+        bar: 2
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_2_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 117
+        - - beats: 3.05
+          - 110
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: pull_10
+      at:
+        bar: 10
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 69
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_10_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 115
+        - - beats: 3.05
+          - 108
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: pull_26
+      at:
+        bar: 26
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 78
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_26_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 118
+        - - beats: 3.05
+          - 111
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: pull_34
+      at:
+        bar: 34
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 70
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_34_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 115
+        - - beats: 3.05
+          - 108
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: pull_50
+      at:
+        bar: 50
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 80
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_50_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 118
+        - - beats: 3.05
+          - 111
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: pull_66
+      at:
+        bar: 66
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 73
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_66_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 116
+        - - beats: 3.05
+          - 109
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 8
+        every:
+          bars: 2
+    - id: pull_82
+      at:
+        bar: 82
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 82
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_82_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 119
+        - - beats: 3.05
+          - 112
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: pull_90
+      at:
+        bar: 90
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.68
+        octave: 3
+        voicing: triad
+        velocity: 83
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: pull_90_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 119
+        - - beats: 3.05
+          - 112
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+      repeat:
+        count: 4
+        every:
+          bars: 2
+    - id: break_pull_60
+      at:
+        bar: 60
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: harmony.chord_hits
+        hits:
+        - - 0
+          - 0.06
+        duration_beats: 3.72
+        octave: 3
+        voicing: triad
+        velocity: 77
+        direction: down
+        spread_ms: 46
+        velocity_slope: -1.1
+        include_slash_bass: false
+        constraints:
+          min_pitch: 48
+          max_pitch: 72
+        humanize_ms: 5
+        humanize_velocity_pct: 2.0
+        articulation: normal
+      automation:
+      - id: break_pull_60_pressure
+        cc: expression
+        points:
+        - - beats: 0
+          - 78
+        - - beats: 0.55
+          - 96
+        - - beats: 1.95
+          - 118
+        - - beats: 3.05
+          - 111
+        - - beats: 3.7
+          - 70
+        interpolation: smooth
+        resolution: 1/16
+- id: deck_guitar_part
+  instrument: deck_guitar
+  voices:
+  - id: broad_strum
+    clips:
+    - id: guitar_opening
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 2.0
+        velocity: 76
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.45
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+    - id: guitar_verse1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 2.5
+        velocity: 67
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.45
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+    - id: guitar_chorus1
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 1.75
+        - 3.0
+        velocity: 76
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.15
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+        - down
+    - id: guitar_verse2
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 2.5
+        velocity: 68
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.45
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+    - id: guitar_chorus2
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 1.75
+        - 3.0
+        velocity: 78
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.15
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+        - down
+    - id: guitar_break
+      at:
+        bar: 57
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        velocity: 61
+        direction: down
+        spread_ms: 34
+        dur_beats: 2.2
+        voicing: open
+        max_notes: 5
+        humanize_ms: 14
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+    - id: guitar_storm
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 2.0
+        - 3.5
+        velocity: 71
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.0
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+        - up
+    - id: guitar_broadside
+      at:
+        bar: 81
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 1.75
+        - 3.0
+        velocity: 80
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.15
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+        - down
+    - id: guitar_home
+      at:
+        bar: 89
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: guitar.strum
+        beats:
+        - 0.0
+        - 1.75
+        - 3.0
+        velocity: 82
+        direction: down
+        spread_ms: 34
+        dur_beats: 1.15
+        voicing: open
+        max_notes: 5
+        humanize_ms: 12
+        humanize_velocity_pct: 3.0
+        articulation: pluck
+        directions:
+        - down
+        - up
+        - down
+- id: upright_bass_part
+  instrument: upright_bass
+  voices:
+  - id: root_fifth_pulse
+    clips:
+    - id: bass_opening
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern: &id001
+        - - 0
+          - 0.0
+          - 1.35
+        - - 7
+          - 2.0
+          - 1.05
+        octave: 2
+        velocity: 79
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+    - id: bass_verse1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: harmony.bass
+        pattern: *id001
+        octave: 2
+        velocity: 73
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.92
+        - 0.98
+        - 0.88
+    - id: bass_chorus1
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern: &id002
+        - - 0
+          - 0.0
+          - 1.25
+        - - 7
+          - 2.0
+          - 0.82
+        - - 0
+          - 3.5
+          - 0.34
+        octave: 2
+        velocity: 80
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.04
+        - 0.98
+    - id: bass_verse2
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: harmony.bass
+        pattern: *id001
+        octave: 2
+        velocity: 74
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 0.98
+        - 0.9
+    - id: bass_chorus2
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern: *id002
+        octave: 2
+        velocity: 81
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.05
+        - 0.99
+    - id: bass_break
+      at:
+        bar: 57
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern:
+        - - 0
+          - 0.0
+          - 2.7
+        octave: 2
+        velocity: 67
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.88
+        - 0.94
+        - 0.86
+    - id: bass_storm
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: harmony.bass
+        pattern: *id002
+        octave: 2
+        velocity: 77
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.03
+        - 0.91
+    - id: bass_broadside
+      at:
+        bar: 81
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern: *id002
+        octave: 2
+        velocity: 82
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.98
+        - 1.06
+        - 1.0
+    - id: bass_home
+      at:
+        bar: 89
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        pattern: *id002
+        octave: 2
+        velocity: 83
+        humanize_ms: 0
+        humanize_velocity_pct: 3.0
+        articulation: normal
+        bar_velocity_pattern:
+        - 1.0
+        - 0.98
+        - 1.07
+        - 1.0
+- id: deck_kit_part
+  instrument: deck_kit
+  voices:
+  - id: stomp_kit
+    clips:
+    - id: drums_opening
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 91
+        velocity: 104
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 89
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 95
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_verse1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 94
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 81
+        velocity: 94
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 79
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 85
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_chorus1
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 106
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 93
+        velocity: 106
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 97
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 106
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_verse2
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 95
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 82
+        velocity: 95
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 80
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 86
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_chorus2
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 108
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 95
+        velocity: 108
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 93
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 99
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 108
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_break
+      at:
+        bar: 57
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 84
+        - drum: snare
+          beats:
+          - 3.0
+          velocity: 71
+        velocity: 84
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 0
+        fill_mode: overlay
+        fill_events: []
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_storm
+      at:
+        bar: 65
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 100
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 87
+        velocity: 100
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 8
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 85
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 91
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_broadside
+      at:
+        bar: 81
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 110
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 97
+        velocity: 110
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 95
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 101
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 110
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
+    - id: drums_home
+      at:
+        bar: 89
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          - 2.75
+          velocity: 111
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 98
+        velocity: 111
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.02
+        - 0.96
+        fill_every_bars: 4
+        fill_mode: overlay
+        fill_events:
+        - drum: low_tom
+          beats:
+          - 3.0
+          - 3.25
+          velocity: 96
+        - drum: mid_tom
+          beats:
+          - 3.5
+          velocity: 102
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 111
+        humanize_ms: 10
+        humanize_velocity_pct: 3.0
