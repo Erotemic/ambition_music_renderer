@@ -4310,6 +4310,18 @@ sections:
     instrument_octave_offsets:
       organ_scholar_stopped: 0
       harpsichord_voice: 0
+  - kind: chord_hits
+    instruments:
+    - harpsichord_voice
+    hits:
+    - - 0
+      - 2.0
+    duration_beats: 1.1
+    octave: 4
+    velocity: 86
+    articulation: tenuto
+    voicing: triad
+    humanize_ms: 1.0
   - template: brass_hit
     hits:
     - - 0
@@ -4718,6 +4730,18 @@ sections:
     instrument_octave_offsets:
       organ_scholar_stopped: 0
       harpsichord_voice: 0
+  - kind: chord_hits
+    instruments:
+    - harpsichord_voice
+    hits:
+    - - 4
+      - 2.0
+    duration_beats: 1.1
+    octave: 4
+    velocity: 88
+    articulation: tenuto
+    voicing: triad
+    humanize_ms: 1.0
   - kind: motif
     instruments:
     - brass_pompous
