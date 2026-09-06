@@ -617,6 +617,27 @@ def _expand_generator_clips(
 ) -> int:
     instrument_map = {str(inst.name): inst for inst in compiled.pm.instruments}
     max_end_tick = int((compiled.exact_metadata or {}).get("end_tick", 0) or 0)
+    # ⛔⛔ ONE VOICING STATE FOR THE WHOLE SCORE, because `voice_leading:
+    # minimize_motion` is STATEFUL. It voices each chord to minimise motion from
+    # the previous one, remembered per `(layer, instrument)`. A v1 score compiles
+    # in ONE `RenderContext`, so that memory spans the piece; this bridge compiles
+    # every generator clip as its OWN synthetic single-section score, which built a
+    # fresh context each time. ⇒ `minimize_motion` silently meant "minimise motion
+    # inside this clip" instead of "through this voice", and every clip boundary
+    # restarted the voicing.
+    #
+    # ⚠ COPYING THE CONSTRAINTS IN WAS NOT ENOUGH, and that is the instructive
+    # part: it repaired the STATELESS ones (pitch limits and the like), which need
+    # no memory — which is exactly why a test over a single clip could not witness
+    # this. Raised by a GPT review 2026-09-06 with a concrete witness: the reviewed
+    # v1 strings open `the_weight_of_knowledge` on E4-G4-B5 where this bridge gave
+    # E4-G4-B4, because v1 still held the previous section's voicing and the
+    # independently compiled clip did not.
+    #
+    # ⇒ Score-scoped rather than part-scoped: the key already carries
+    # `(layer, instrument)`, so one dict reproduces v1's own scope exactly, and a
+    # narrower one would re-introduce the same seam at a different boundary.
+    voicing_state: dict[str, list[int]] = {}
     form_ranges = [
         (int(row.get("start_tick", 0)), int(row.get("end_tick", 0)), str(row["id"]))
         for row in compiled.sections
@@ -679,7 +700,9 @@ def _expand_generator_clips(
                     constraints = graph.source_spec.get("constraints")
                     if constraints:
                         synthetic["constraints"] = copy.deepcopy(constraints)
-                    generated = compile_procedural_score(synthetic)
+                    generated = compile_procedural_score(
+                        synthetic, voicing_state=voicing_state
+                    )
                     _copy_generator_controls(
                         generated=generated,
                         target_instruments=instrument_map,

@@ -1380,8 +1380,30 @@ def compile_procedural_score(
     *,
     source_schema: str | None = MUSICIR_V1_SCHEMA,
     normalization_warnings: tuple[str, ...] = (),
+    voicing_state: dict[str, list[int]] | None = None,
 ) -> CompiledScore:
-    """Compile canonical MusicIR v1 into the shared semantic representation."""
+    """Compile canonical MusicIR v1 into the shared semantic representation.
+
+    ``voicing_state`` lets a caller carry STATEFUL constraint state across
+    several compiles.
+
+    ⛔⛔ WHY IT EXISTS. ``voice_leading: minimize_motion`` is stateful: it voices
+    each chord to minimise motion from the PREVIOUS one, remembered in
+    ``RenderContext.last_voicing`` keyed by ``(layer, instrument)``. A v1 score
+    compiles in ONE context, so that state spans the whole piece. The MusicIR v3
+    bridge compiles each generator clip as its own synthetic single-section score,
+    which built a FRESH context every time -- so ``minimize_motion`` silently
+    meant *"minimise motion inside this clip"* rather than *"through this voice"*,
+    and every clip boundary restarted the voicing.
+
+    ⇒ Passing the same dict to consecutive compiles makes them behave as one
+    context for this purpose. It is MUTATED IN PLACE and is the context's own
+    store, not a copy, so the caller needs no write-back step to forget.
+
+    ⚠ Copying stateless constraints (pitch limits and the like) into the
+    synthetic score was already done and is NOT sufficient: those need no memory,
+    which is exactly why their repair could not witness this one.
+    """
 
     if spec.get("schema") != MUSICIR_V1_SCHEMA:
         raise ValueError(
@@ -1407,6 +1429,10 @@ def compile_procedural_score(
         instrument_specs={},
         tempo=tempo_map,
     )
+    if voicing_state is not None:
+        # THE CALLER'S DICT, not a copy: the context mutates it as it voices, so
+        # the next compile in the sequence sees this one's final voicings.
+        ctx.last_voicing = voicing_state
     if tempo_map is not None:
         # A tempo ramp inside a loopable section makes the loop seam jump
         # tempo audibly; ramps belong in intros/outros/transitions.

@@ -578,3 +578,108 @@ def test_v3_guitar_lead_preserves_authored_pitch_octaves():
     compiled = compile_score(spec)
     pitches = [note.pitch for note in compiled.pm.instruments[0].notes]
     assert pitches == [47, 45, 43, 40]
+
+
+def test_v3_generator_bridge_carries_stateful_voice_leading_across_clips():
+    """⛔⛔ `voice_leading: minimize_motion` IS STATEFUL, and the bridge forgot it.
+
+    It voices each chord to minimise motion from the PREVIOUS one, remembered in
+    `RenderContext.last_voicing` per `(layer, instrument)`. A v1 score compiles in
+    ONE context so that memory spans the piece; the v3 bridge compiles every
+    generator clip as its own synthetic single-section score, so a fresh context
+    was built per clip. ⇒ `minimize_motion` silently meant "minimise motion inside
+    this clip" rather than "through this voice", and every clip boundary restarted
+    the voicing.
+
+    ⚠ COPYING THE CONSTRAINTS INTO EACH SYNTHETIC SCORE DOES NOT FIX THIS, which
+    is why it needed its own test: that repaired the STATELESS constraints (pitch
+    limits and the like), which have no memory to lose. Raised by a GPT review
+    2026-09-06.
+
+    ⭐ TWO CONSECUTIVE CLIPS ARE THE MINIMUM THAT CAN WITNESS IT — one clip has no
+    previous chord, so the existing single-clip constraint test passes either way.
+    The chords differ so a voicing decision actually exists to carry.
+    """
+    harmony = ["C", "Am"]
+    layer = {
+        "kind": "pad_chords",
+        "instrument": "keys",
+        "duration_beats": 3.5,
+        "octave": 4,
+        "velocity": 72,
+        "humanize_ms": 0,
+    }
+    v1_spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "v1_voice_leading_contract",
+        "seed": 1,
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "constraints": {"voice_leading": "minimize_motion"},
+        "instruments": [_instrument()],
+        "sections": [
+            {"id": "one", "bars": 1, "harmony": [harmony[0]], "layers": [copy.deepcopy(layer)]},
+            {"id": "two", "bars": 1, "harmony": [harmony[1]], "layers": [copy.deepcopy(layer)]},
+        ],
+    }
+    generate = {
+        "kind": "harmony.pad",
+        "duration_beats": 3.5,
+        "octave": 4,
+        "velocity": 72,
+        "humanize_ms": 0,
+    }
+    v3_spec = {
+        "schema": MUSICIR_V3_SCHEMA,
+        "id": "v3_voice_leading_contract",
+        "seed": 1,
+        "timebase": {"ppq": 220},
+        "meter": "4/4",
+        "tempo": 120,
+        "harmony": harmony,
+        "constraints": {"voice_leading": "minimize_motion"},
+        "end": {"bar": 3, "beat": 1},
+        "instruments": [_instrument()],
+        "parts": [
+            {
+                "id": "keys_part",
+                "instrument": "keys",
+                "voices": [
+                    {
+                        "id": "pad",
+                        "clips": [
+                            {
+                                "id": "pad-a",
+                                "at": {"bar": 1, "beat": 1},
+                                "duration": {"bars": 1},
+                                "generate": copy.deepcopy(generate),
+                            },
+                            {
+                                "id": "pad-b",
+                                "at": {"bar": 2, "beat": 1},
+                                "duration": {"bars": 1},
+                                "generate": copy.deepcopy(generate),
+                            },
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+    v1 = compile_score(v1_spec)
+    v3 = compile_score(v3_spec)
+
+    v1_pitches = [note.pitch for note in v1.pm.instruments[0].notes]
+    v3_pitches = [note.pitch for note in v3.pm.instruments[0].notes]
+
+    # ⚠ ANTI-VACUITY: the two chords must actually voice differently, or "v3
+    # matches v1" would hold for a bridge that carried nothing at all.
+    assert len(set(v1_pitches)) > 1, (
+        "the fixture produced one repeated pitch, so nothing here depends on "
+        "voice leading and the assertion below proves nothing"
+    )
+    assert v3_pitches == v1_pitches, (
+        "the v3 generator bridge restarted its voicing at the clip boundary, so "
+        "`minimize_motion` means 'within this clip' rather than 'through this "
+        "voice'"
+    )
