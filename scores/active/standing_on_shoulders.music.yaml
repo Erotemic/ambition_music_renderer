@@ -1,718 +1,1635 @@
+# Parity-first v3 source. The reviewed v1 score is the musical authority.
+# Keep its historical processing fields until an explicit audio A/B proves a
+# canonical-processing rewrite preserves the reviewed render.
 schema: ambition.musicir.v3
 id: standing_on_shoulders
 title: Standing on Shoulders
-seed: 2026090501
-description: >-
-  New MusicIR v3 rendition of the extended GNU-ton boss theme, using
-  scores/experiments/standing_on_shoulders_v_census_hifi.music.yaml as the
-  musical reference. Preserve its 44-bar scholar-versus-giant form, harmony,
-  grounded recursive motif, brass declaration, giant tread, and final charge,
-  while improving contrast, sampled rhythm-section realization, transitions,
-  and composition-level mastering. The previous active v1 cue is preserved at
-  scores/archive/standing_on_shoulders_v1.music.yaml, and the census-hi-fi
-  experiment remains unchanged for direct A/B regeneration.
-
-timebase: {ppq: 960}
+seed: 2026051802
+description: MusicIR v3 parity port of the reviewed 9.1 arrangement. Preserve the reviewed composition, orchestration, MIDI
+  programs, dynamics, and mastering before making any new sound-design changes.
+timebase:
+  ppq: 220
 meter: 4/4
-tempo: 88
+tempo: 88.0
 key: E minor
-end: {bar: 45, beat: 1}
-
-# Keep the historical adaptive/game section identities and 44-bar form.
+end:
+  bar: 45
+  beat: 1
 form:
-  - id: the_giant_approaches
-    from: {bar: 1, beat: 1}
-    to: {bar: 5, beat: 1}
-    energy: 0.72
-    density: 0.64
-    notes: The giant arrives first; scholar voice withheld.
-  - id: hands_of_gnu
-    from: {bar: 5, beat: 1}
-    to: {bar: 17, beat: 1}
-    energy: 0.84
-    density: 0.80
-    notes: Main thesis; scholar and giant compete without maxing out the mix.
-  - id: head_descends
-    from: {bar: 17, beat: 1}
-    to: {bar: 25, beat: 1}
-    energy: 0.76
-    density: 0.68
-    notes: Vulnerability window; rhythm guitars fall away before rebuilding.
-  - id: the_weight_of_knowledge
-    from: {bar: 25, beat: 1}
-    to: {bar: 37, beat: 1}
-    energy: 0.94
-    density: 0.92
-    notes: Full confrontation, with guitar answers and stronger four-bar motion.
-  - id: recursive_crescendo
-    from: {bar: 37, beat: 1}
-    to: {bar: 41, beat: 1}
-    energy: 1.00
-    density: 1.00
-    notes: Compression of the recursive idea into two-bar statements.
-  - id: final_footnote
-    from: {bar: 41, beat: 1}
-    to: {bar: 45, beat: 1}
-    energy: 0.98
-    density: 0.96
-    notes: Fanfare, hard-stop cadence, final giant footfall.
-
-# Historical harmony, preserved exactly so the recognizable theme still lands.
+- id: the_giant_approaches
+  from:
+    bar: 1
+    beat: 1
+  to:
+    bar: 5
+    beat: 1
+  intensity: 0.88
+- id: hands_of_gnu
+  from:
+    bar: 5
+    beat: 1
+  to:
+    bar: 17
+    beat: 1
+  intensity: 1.0
+- id: head_descends
+  from:
+    bar: 17
+    beat: 1
+  to:
+    bar: 25
+    beat: 1
+  intensity: 1.1
+- id: the_weight_of_knowledge
+  from:
+    bar: 25
+    beat: 1
+  to:
+    bar: 37
+    beat: 1
+  intensity: 1.14
+- id: recursive_crescendo
+  from:
+    bar: 37
+    beat: 1
+  to:
+    bar: 41
+    beat: 1
+  intensity: 1.24
+- id: final_footnote
+  from:
+    bar: 41
+    beat: 1
+  to:
+    bar: 45
+    beat: 1
+  intensity: 1.2
 harmony:
   progression:
-    [Em, Em, G, D,
-     Em, G, D, Em, Em, G, Bm, Em, Em, G, Am, Em,
-     Am, G, Em, Bm, C, G, D, Em,
-     Em, D, G, Bm, Em, D, Am, Em, Em, G, D, Em,
-     Em, Bm, G, Em,
-     Em, G, D, Em]
+  - Em
+  - Em
+  - G
+  - D
+  - Em
+  - G
+  - D
+  - Em
+  - Em
+  - G
+  - Bm
+  - Em
+  - Em
+  - G
+  - Am
+  - Em
+  - Am
+  - G
+  - Em
+  - Bm
+  - C
+  - G
+  - D
+  - Em
+  - Em
+  - D
+  - G
+  - Bm
+  - Em
+  - D
+  - Am
+  - Em
+  - Em
+  - G
+  - D
+  - Em
+  - Em
+  - Bm
+  - G
+  - Em
+  - Em
+  - G
+  - D
+  - Em
   cycle: false
-
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+provenance:
+  parity_source: scores/archive/standing_on_shoulders_v1.music.yaml
+  parity_source_sha256: e23b484644884a00e1376ed7cde9db6aa082c1cd463e95c2a653d7fb4a1d2b15
+  reviewed_version: 360ee14d0fd35511:f2d21dfe59b1
+  review_score: 9.1
 render:
   sample_rate: 48000
   ogg_quality: 6
   backend: pretty-midi
-
-# V3 uses the canonical processing authority. Sampled instruments are selected
-# by stable checked-in library_ref identities rather than workstation paths.
-processing:
-  groups:
-    giant_guitars:
-      chain:
-        - {processor: highpass, cutoff_hz: 68}
-        - processor: pedalboard
-          wet_mix: 1.0
-          effects:
-            - {effect: gain, gain_db: 4.0}
-            - {effect: distortion, drive_db: 10.5}
-            - {effect: compressor, threshold_db: -20.0, ratio: 2.2, attack_ms: 8.0, release_ms: 95.0}
-            - {effect: gain, gain_db: -4.0}
-        - {processor: lowpass, cutoff_hz: 10200}
-        - {processor: transient_tame, amount: 0.025, lowpass_hz: 6200}
-    giant_lead:
-      chain:
-        - {processor: highpass, cutoff_hz: 88}
-        - processor: pedalboard
-          effects:
-            - {effect: gain, gain_db: 3.0}
-            - {effect: distortion, drive_db: 8.0}
-            - {effect: compressor, threshold_db: -21.0, ratio: 2.0, attack_ms: 10.0, release_ms: 110.0}
-            - {effect: gain, gain_db: -2.5}
-        - {processor: lowpass, cutoff_hz: 10800}
-        - {processor: reverb, wet: 0.025, decay_seconds: 0.85, damping_hz: 6200}
-    bass:
-      chain:
-        - {processor: highpass, cutoff_hz: 29}
-        - {processor: lowpass, cutoff_hz: 5200}
-        - {processor: compressor, threshold_db: -23.0, ratio: 2.4, attack_ms: 18.0, release_ms: 110.0, makeup_db: 1.0}
-        - {processor: gain, gain_db: 1.2}
-    drums:
-      chain:
-        - {processor: highpass, cutoff_hz: 29}
-        - {processor: transient_tame, amount: 0.012, lowpass_hz: 7600}
-        - {processor: gain, gain_db: -1.0}
-    scholar:
-      chain:
-        - {processor: highpass, cutoff_hz: 118}
-        - {processor: lowpass, cutoff_hz: 10800}
-        - {processor: reverb, wet: 0.018, decay_seconds: 0.9, damping_hz: 6100}
-        - {processor: gain, gain_db: 1.3}
-    brass:
-      chain:
-        - {processor: highpass, cutoff_hz: 95}
-        - {processor: lowpass, cutoff_hz: 11000}
-        - {processor: reverb, wet: 0.022, decay_seconds: 1.0, damping_hz: 6200}
-        - {processor: gain, gain_db: 1.0}
-    strings:
-      chain:
-        - {processor: highpass, cutoff_hz: 72}
-        - {processor: lowpass, cutoff_hz: 11200}
-        - {processor: reverb, wet: 0.035, decay_seconds: 1.25, damping_hz: 5600}
-        - {processor: stereo_width, amount: 0.07}
-  master:
-    chain:
-      - {processor: highpass, cutoff_hz: 31}
-      - {processor: compressor, threshold_db: -18.5, ratio: 3.0, attack_ms: 13.0, release_ms: 105.0, makeup_db: 2.0, knee_db: 6.0}
-      - {processor: reverb, wet: 0.040, decay_seconds: 1.25, damping_hz: 5400}
-      - {processor: stereo_width, amount: 0.075}
-      - {processor: limiter, target_peak_db: -2.0, drive: 1.02, normalize: true}
-  adaptive_sections: {mode: composition_master}
-
+  adaptive_section_mastering:
+    mode: global_master_slices
+postprocess:
+  gain_db: 0.0
+  highpass_hz: 38
+  reverb_wet: 0.055
+  reverb_decay_seconds: 1.35
+  reverb_damping_hz: 5200
+  stereo_width: 0.085
+  compressor_threshold_db: -17.0
+  compressor_ratio: 4.5
+  compressor_attack_ms: 11.0
+  compressor_release_ms: 90.0
+  compressor_makeup_db: 3.2
+  compressor_knee_db: 6.0
+  limiter_drive: 0.91
+  normalize: true
+  target_peak_db: -2.6
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 36
+  reverb_wet: 0.008
+  reverb_decay_seconds: 0.55
+  reverb_damping_hz: 5800
+  stereo_width: 0.04
+  limiter_drive: 0.88
+  normalize: false
+  target_peak_db: -3.0
 instruments:
-  # Scholar: preserve the recognizable organ/harpsichord identity. No stable
-  # sampled refs are currently catalogued for these roles, so their GM voices
-  # intentionally remain the portable realization.
-  - {name: organ_scholar, group: scholar, program: drawbar_organ, volume: 88, pan: 70, expression: 98, modulation: 4, chorus: 8, reverb: 16}
-  - {name: harpsichord_voice, group: scholar, program: harpsichord, volume: 70, pan: 84, expression: 88, reverb: 12}
-
-  # Giant rhythm: two sampled single-note electric-guitar takes, then canonical
-  # group processing supplies the distorted amplifier character.
-  - name: giant_guitar_left
-    group: giant_guitars
-    program: clean_guitar
-    volume: 100
-    pan: 28
-    expression: 108
-    instrument_backend: {kind: sfz, library_ref: guitar.clean, prefer: [shinyguitar, electric_five]}
-  - name: giant_guitar_right
-    group: giant_guitars
-    program: clean_guitar
-    volume: 96
-    pan: 100
-    expression: 104
-    instrument_backend: {kind: sfz, library_ref: guitar.clean, prefer: [shinyguitar, electric_four]}
-  - name: giant_lead
-    group: giant_lead
-    program: clean_guitar
-    volume: 91
-    pan: 70
-    expression: 106
-    # The census-hi-fi reference used Emilyguitar's single-note program.
-    # Keep the stable Emily source identity and strongly prefer its basic patch
-    # over the chord/keyswitch programs for this monophonic tread voice.
-    instrument_backend: {kind: sfz, library_ref: guitar.emily, prefer: [emily_basic, basic, single_note]}
-
-  - name: giant_bass
-    group: bass
-    program: fingered_bass
-    volume: 112
-    pan: 62
-    expression: 112
-    instrument_backend: {kind: sfz, library_ref: bass.swag}
-
-  - name: stomp_kit
-    group: drums
-    is_drum: true
-    volume: 122
-    pan: 64
-    expression: 120
-    instrument_backend: {kind: sfz, library_ref: drums.big_rusty}
-
-  - name: horn_hits
-    group: brass
-    program: french_horn
-    volume: 94
-    pan: 62
-    expression: 102
-    instrument_backend: {kind: sfz, library_ref: orchestra.horns_staccato}
-  - name: brass_bed
-    group: brass
-    program: brass_section
-    volume: 82
-    pan: 68
-    expression: 94
-    instrument_backend: {kind: sfz, library_ref: vpo.brass}
-
-  - name: strings_academic
-    group: strings
-    program: string_ensemble_1
-    volume: 78
-    pan: 64
-    expression: 88
-    instrument_backend: {kind: sfz, library_ref: vpo.strings}
-
+- name: organ_scholar
+  group: scholar
+  program: drawbar_organ
+  volume: 84
+  pan: 68
+  expression: 96
+  modulation: 5
+  chorus: 10
+  reverb: 22
+- name: harpsichord_voice
+  group: scholar
+  program: harpsichord
+  volume: 70
+  pan: 78
+  expression: 88
+  reverb: 18
+- name: heavy_distortion
+  group: giant
+  program: distortion_guitar
+  volume: 112
+  pan: 42
+  expression: 114
+  chorus: 5
+- name: low_guitar
+  group: giant
+  program: overdrive_guitar
+  volume: 94
+  pan: 56
+  expression: 102
+  chorus: 4
+- name: giant_bass
+  group: bass
+  program: picked_bass
+  volume: 110
+  pan: 50
+  expression: 112
+- name: synth_low
+  group: bass
+  program: synth_bass_2
+  volume: 88
+  pan: 46
+  expression: 98
+- name: brass_pompous
+  group: brass
+  program: brass_section
+  volume: 90
+  pan: 64
+  expression: 98
+  reverb: 14
+- name: strings_academic
+  group: strings
+  program: string_ensemble_1
+  volume: 68
+  pan: 64
+  expression: 84
+  modulation: 6
+  reverb: 24
+- name: stomp_kit
+  group: drums
+  is_drum: true
+  volume: 124
+  pan: 64
+  expression: 120
 materials:
-  # The defining recursive scholar statement. This grounded variant keeps the
-  # recognizable ascent/return while avoiding the old exposed high F# sustain.
   scholar_recursive:
-    kind: motif
     root: E4
-    intervals: [0, 2, 3, 5, 7, 10, 12, 10, 7, 5, 3, 2, 0, -2, 3, 0]
-    rhythm: [0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 1.0, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.5, 1.5, 2.0]
-    durations: [0.25, 0.10, 0.25, 0.25, 0.5, 0.5, 1.0, 0.5, 0.5, 0.25, 0.25, 0.10, 0.25, 0.5, 0.5, 1.0]
-    velocities: [0.88, 0.78, 0.82, 0.86, 0.90, 0.94, 1.00, 0.90, 0.86, 0.80, 0.78, 0.80, 0.84, 0.88, 0.90, 0.78]
-
+    intervals:
+    - 0
+    - 2
+    - 3
+    - 5
+    - 7
+    - 10
+    - 12
+    - 10
+    - 7
+    - 5
+    - 3
+    - 2
+    - 0
+    - 2
+    - 3
+    - 0
+    rhythm:
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.5
+    - 0.5
+    - 1.0
+    - 0.5
+    - 0.5
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.5
+    - 0.5
+    - 2.0
+    velocities:
+    - 0.88
+    - 0.78
+    - 0.82
+    - 0.86
+    - 0.9
+    - 0.94
+    - 1.0
+    - 0.9
+    - 0.86
+    - 0.8
+    - 0.78
+    - 0.8
+    - 0.84
+    - 0.88
+    - 0.9
+    - 0.78
+    kind: motif
   scholar_quip:
-    kind: motif
     root: E5
-    intervals: [0, 3, 5, 7, 5, 3, 0, 3]
-    rhythm: [0.25, 0.25, 0.25, 0.5, 0.25, 0.5, 0.5, 1.5]
-    velocities: [0.90, 0.80, 0.86, 0.96, 0.86, 0.80, 0.84, 0.72]
-
+    intervals:
+    - 0
+    - 3
+    - 5
+    - 7
+    - 5
+    - 3
+    - 0
+    - 3
+    rhythm:
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.5
+    - 0.25
+    - 0.5
+    - 0.5
+    - 1.5
+    velocities:
+    - 0.9
+    - 0.8
+    - 0.86
+    - 0.96
+    - 0.86
+    - 0.8
+    - 0.84
+    - 0.72
+    kind: motif
   brass_declaration:
-    kind: motif
     root: E4
-    intervals: [0, 0, 7, 5, 3, 0, 12, 7]
-    rhythm: [0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0, 3.0]
-    velocities: [0.90, 0.88, 1.00, 0.92, 0.86, 0.90, 1.00, 0.82]
-
-  giant_tread:
+    intervals:
+    - 0
+    - 0
+    - 7
+    - 5
+    - 3
+    - 0
+    - 12
+    - 7
+    rhythm:
+    - 0.5
+    - 0.5
+    - 1.0
+    - 0.5
+    - 0.5
+    - 1.0
+    - 1.0
+    - 3.0
+    velocities:
+    - 0.9
+    - 0.88
+    - 1.0
+    - 0.92
+    - 0.86
+    - 0.9
+    - 1.0
+    - 0.82
     kind: motif
+  giant_tread_lead:
     root: B3
-    intervals: [0, -2, -4, -7]
-    rhythm: [1.5, 1.0, 1.0, 0.5]
-    durations: [1.25, 0.4, 0.4, 0.4]
-    velocities: [1.00, 0.84, 0.96, 0.80]
-
-  final_charge:
+    intervals:
+    - 0
+    - 10
+    - 7
+    - 3
+    - 0
+    - 10
+    - 7
+    - 3
+    rhythm:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    velocities:
+    - 1.0
+    - 0.84
+    - 0.96
+    - 0.8
+    - 0.98
+    - 0.82
+    - 0.94
+    - 0.78
     kind: motif
+  final_charge:
     root: E4
-    intervals: [0, 3, 7, 10, 12, 15, 12, 10, 7, 5, 3, 0]
-    rhythm: [0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0]
-    velocities: [0.86, 0.90, 0.94, 0.98, 1.00, 1.00, 0.92, 0.88, 0.86, 0.84, 0.90, 0.96]
-
+    intervals:
+    - 0
+    - 3
+    - 7
+    - 10
+    - 12
+    - 15
+    - 12
+    - 10
+    - 7
+    - 5
+    - 3
+    - 0
+    rhythm:
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 1.0
+    - 1.0
+    - 0.5
+    - 0.5
+    - 0.5
+    - 0.5
+    - 1.0
+    - 1.0
+    velocities:
+    - 0.86
+    - 0.9
+    - 0.94
+    - 0.98
+    - 1.0
+    - 1.0
+    - 0.92
+    - 0.88
+    - 0.86
+    - 0.84
+    - 0.9
+    - 0.96
+    kind: motif
 parts:
-  - id: drums_part
-    instrument: stomp_kit
-    voices:
-      - id: kit
-        clips:
-          # Preserve the crash that defined the original opening, then use
-          # section-boundary crashes as form punctuation rather than every bar.
-          - id: section_crashes
-            at: {bar: 1, beat: 1}
-            events:
-              - {id: opening_crash, at: {beats: 0}, dur: 1/4, pitch: {kind: drum, name: crash}, velocity: 122}
-              - {id: hands_crash, at: {beats: 16}, dur: 1/4, pitch: {kind: drum, name: crash}, velocity: 112}
-              - {id: head_crash, at: {beats: 64}, dur: 1/4, pitch: {kind: drum, name: crash_2}, velocity: 108}
-              - {id: weight_crash, at: {beats: 96}, dur: 1/4, pitch: {kind: drum, name: crash}, velocity: 116}
-              - {id: crescendo_crash, at: {beats: 144}, dur: 1/4, pitch: {kind: drum, name: china}, velocity: 116}
-              - {id: final_crash, at: {beats: 160}, dur: 1/4, pitch: {kind: drum, name: crash_2}, velocity: 122}
-
-          - id: giant_stomp_intro
-            at: {bar: 1, beat: 1}
-            duration: {bars: 4}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.5
-              bar_velocity_pattern: [1.00, 0.90, 0.94, 1.02]
-              fill_every_bars: 4
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 2], velocity: 116, duration_beats: 0.14}
-                - {drum: snare, beats: [1, 3], velocity: 108, duration_beats: 0.14}
-                - {drum: closed_hat, beats: [0, 1, 2, 3], velocity: 58, duration_beats: 0.07}
-              fill_events:
-                - {drum: low_tom, beats: [3.0, 3.5], velocity: 90}
-
-          - id: hands_stomp
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.4
-              bar_velocity_pattern: [0.92, 0.96, 1.00, 1.04]
-              fill_every_bars: 4
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 2, 2.75], velocity: 112}
-                - {drum: snare, beats: [1, 3], velocity: 112}
-                - {drum: closed_hat, beats: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], velocity: 62}
-              fill_events:
-                - {drum: low_tom, beats: [3.0], velocity: 82}
-                - {drum: mid_tom, beats: [3.5], velocity: 90}
-                - {drum: open_hat, beats: [3.75], velocity: 80}
-
-          - id: head_descends_stomp
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 3.0
-              bar_velocity_pattern: [0.82, 0.86, 0.90, 0.96]
-              fill_every_bars: 4
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 2], velocity: 104}
-                - {drum: snare, beats: [1, 3], velocity: 104}
-                - {drum: closed_hat, beats: [0, 1, 2, 3], velocity: 50}
-              fill_events:
-                - {drum: low_tom, beats: [2.5, 3.0], velocity: 84}
-                - {drum: high_tom, beats: [3.5], velocity: 94}
-
-          - id: weight_stomp
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.1
-              bar_velocity_pattern: [0.94, 0.98, 1.02, 1.08]
-              fill_every_bars: 4
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 0.75, 2, 2.75], velocity: 114}
-                - {drum: snare, beats: [1, 3], velocity: 116}
-                - {drum: closed_hat, beats: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], velocity: 64}
-                - {drum: open_hat, beats: [1.75, 3.75], velocity: 74}
-              fill_events:
-                - {drum: low_tom, beats: [2.75, 3.0], velocity: 88}
-                - {drum: mid_tom, beats: [3.25, 3.5], velocity: 94}
-                - {drum: crash, beats: [3.75], velocity: 104}
-
-          - id: recursive_stomp
-            at: {bar: 37, beat: 1}
-            duration: {bars: 4}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 1.8
-              bar_velocity_pattern: [1.00, 1.04, 1.07, 1.10]
-              fill_every_bars: 2
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 0.75, 2, 2.75], velocity: 118}
-                - {drum: snare, beats: [1, 3], velocity: 120}
-                - {drum: closed_hat, beats: [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75], velocity: 57}
-              fill_events:
-                - {drum: low_tom, beats: [3.0], velocity: 94}
-                - {drum: mid_tom, beats: [3.25], velocity: 100}
-                - {drum: high_tom, beats: [3.5], velocity: 106}
-                - {drum: china, beats: [3.75], velocity: 110}
-
-          - id: final_stomp
-            at: {bar: 41, beat: 1}
-            duration: {bars: 4}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 1.8
-              bar_velocity_pattern: [1.04, 1.00, 1.08, 1.12]
-              fill_every_bars: 2
-              fill_mode: overlay
-              events:
-                - {drum: kick, beats: [0, 0.75, 2, 2.75], velocity: 120}
-                - {drum: snare, beats: [1, 3], velocity: 120}
-                - {drum: closed_hat, beats: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], velocity: 62}
-                - {drum: open_hat, beats: [1.75, 3.75], velocity: 82}
-              fill_events:
-                - {drum: low_tom, beats: [2.75, 3.0], velocity: 96}
-                - {drum: high_tom, beats: [3.25, 3.5], velocity: 106}
-                - {drum: crash, beats: [3.75], velocity: 118}
-
-  - id: bass_part
-    instrument: giant_bass
-    voices:
-      - id: foundation
-        clips:
-          - id: giant_bass_intro
-            at: {bar: 1, beat: 1}
-            duration: {bars: 4}
-            technique: marcato
-            generate:
-              kind: harmony.bass
-              octave: 2
-              velocity: 86
-              pattern: [[0, 0.0, 0.75], [0, 1.0, 0.75], [7, 2.0, 0.75], [0, 3.0, 0.75]]
-              velocity_pattern: [1.0, 0.82, 0.95, 0.82]
-              bar_velocity_pattern: [1.0, 0.92, 0.96, 1.02]
-              humanize_ms: 2.5
-          - id: giant_bass_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            technique: marcato
-            generate:
-              kind: harmony.bass
-              octave: 2
-              velocity: 88
-              pattern: [[0, 0.0, 0.75], [0, 1.0, 0.75], [7, 2.0, 0.75], [0, 3.0, 0.75]]
-              velocity_pattern: [1.0, 0.80, 0.96, 0.84]
-              bar_velocity_pattern: [0.94, 0.98, 1.00, 1.04]
-              humanize_ms: 2.2
-          - id: giant_bass_head
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            technique: sustain
-            generate:
-              kind: harmony.bass
-              octave: 2
-              velocity: 82
-              pattern: [[0, 0.0, 1.5], [7, 2.0, 1.25]]
-              velocity_pattern: [1.0, 0.88]
-              bar_velocity_pattern: [0.88, 0.92, 0.96, 1.00]
-              humanize_ms: 3.0
-          - id: giant_bass_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            technique: marcato
-            generate:
-              kind: harmony.bass
-              octave: 2
-              velocity: 92
-              pattern: [[0, 0.0, 0.75], [0, 1.0, 0.60], [7, 2.0, 0.75], [0, 3.0, 0.60]]
-              velocity_pattern: [1.0, 0.80, 0.98, 0.86]
-              bar_velocity_pattern: [0.96, 1.0, 1.03, 1.08]
-              humanize_ms: 2.0
-          - id: giant_bass_endgame
-            at: {bar: 37, beat: 1}
-            duration: {bars: 8}
-            technique: marcato
-            generate:
-              kind: harmony.bass
-              octave: 2
-              velocity: 96
-              pattern: [[0, 0.0, 0.55], [0, 0.75, 0.40], [7, 2.0, 0.55], [0, 2.75, 0.40]]
-              velocity_pattern: [1.0, 0.84, 0.98, 0.86]
-              bar_velocity_pattern: [1.0, 1.04, 1.06, 1.10]
-              humanize_ms: 1.8
-
-  - id: giant_rhythm_part
-    instrument: giant_guitar_left
-    voices:
-      - id: chugs
-        clips:
-          - id: giant_chug_intro
-            at: {bar: 1, beat: 1}
-            duration: {bars: 4}
-            technique: palm_mute
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.55, 1.05], [0, 1.0, 0.42, 0.82], [7, 2.0, 0.55, 1.00], [0, 3.0, 0.42, 0.84]]
-              velocity: 84
-              spread_ms: 7
-              humanize_ms: 2.5
-          - id: giant_chug_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            technique: palm_mute
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.5, 1.05], [0, 0.5, 0.38, 0.80], [7, 1.5, 0.5, 0.98], [0, 2.0, 0.5, 1.00], [7, 3.0, 0.45, 0.88]]
-              velocity: 86
-              spread_ms: 7
-              humanize_ms: 2.3
-          # The first four bars of head_descends intentionally omit rhythm
-          # guitar. The second half rebuilds underneath the scholar.
-          - id: giant_chug_head_rebuild
-            at: {bar: 21, beat: 1}
-            duration: {bars: 4}
-            technique: palm_mute
-            velocity_scale: 0.88
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.55, 1.0], [7, 2.0, 0.55, 0.94], [0, 3.0, 0.40, 0.82]]
-              velocity: 82
-              spread_ms: 8
-              humanize_ms: 2.8
-          - id: giant_chug_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            technique: palm_mute
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.48, 1.08], [0, 0.5, 0.34, 0.82], [7, 1.0, 0.48, 0.94], [0, 1.5, 0.34, 0.80], [7, 2.0, 0.48, 1.02], [0, 2.75, 0.34, 0.84], [7, 3.5, 0.30, 0.82]]
-              velocity: 88
-              spread_ms: 7
-              humanize_ms: 2.0
-          - id: giant_chug_crescendo
-            at: {bar: 37, beat: 1}
-            duration: {bars: 4}
-            technique: palm_mute
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.38, 1.08], [0, 0.5, 0.30, 0.86], [7, 1.0, 0.38, 1.00], [0, 1.5, 0.30, 0.86], [7, 2.0, 0.38, 1.04], [0, 2.5, 0.30, 0.86], [7, 3.0, 0.38, 1.00], [0, 3.5, 0.30, 0.88]]
-              velocity: 91
-              spread_ms: 6
-              humanize_ms: 1.8
-          - id: giant_chug_final
-            at: {bar: 41, beat: 1}
-            duration: {bars: 4}
-            technique: marcato
-            generate:
-              kind: guitar.chug
-              instruments: [giant_guitar_left, giant_guitar_right]
-              octave: 2
-              shape: fifth_octave
-              min_pitch: 40
-              pattern: [[0, 0.0, 0.78, 1.08], [0, 1.0, 0.45, 0.88], [7, 2.0, 0.78, 1.02], [0, 3.0, 0.45, 0.92]]
-              velocity: 93
-              spread_ms: 8
-              humanize_ms: 1.8
-
-  - id: strings_part
-    instrument: strings_academic
-    voices:
-      - id: bed
-        clips:
-          - id: strings_intro
-            at: {bar: 1, beat: 1}
-            duration: {bars: 4}
-            technique: sustain
-            velocity_scale: 0.78
-            generate: {kind: harmony.pad, octave: 3, voicing: power, duration_beats: 3.7, velocity: 48}
-          - id: strings_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            technique: sustain
-            generate: {kind: harmony.pad, octave: 3, voicing: open, duration_beats: 3.7, velocity: 46}
-            automation:
-              - id: hands_strings_expression
-                cc: expression
-                points: [[0, 70], [{beats: 24}, 86], [{beats: 48}, 76]]
-                interpolation: smooth
-                resolution: 1/8
-          - id: strings_head
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            technique: sustain
-            generate: {kind: harmony.pad, octave: 3, voicing: open, duration_beats: 3.8, velocity: 50}
-            automation:
-              - id: head_strings_expression
-                cc: expression
-                points: [[0, 68], [{beats: 16}, 106], [{beats: 32}, 88]]
-                interpolation: smooth
-                resolution: 1/8
-          - id: strings_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            technique: sustain
-            generate: {kind: harmony.pad, octave: 3, voicing: power, duration_beats: 3.65, velocity: 50}
-          - id: strings_endgame
-            at: {bar: 37, beat: 1}
-            duration: {bars: 8}
-            technique: sustain
-            generate: {kind: harmony.pad, octave: 3, voicing: power, duration_beats: 3.75, velocity: 55}
-
-  - id: organ_part
-    instrument: organ_scholar
-    voices:
-      - id: recursive_voice
-        clips:
-          - id: organ_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            technique: tenuto
-            generate: {kind: melody.motif, material: scholar_recursive, repeats: 3, every_bars: 4, velocity: 86, humanize_ms: 2.2, humanize_velocity_pct: 2}
-          - id: organ_head
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            technique: tenuto
-            generate: {kind: melody.motif, material: scholar_recursive, repeats: 2, every_bars: 4, velocity: 92, humanize_ms: 2.0, humanize_velocity_pct: 2}
-            automation:
-              - id: organ_head_expression
-                cc: expression
-                points: [[0, 82], [{beats: 16}, 110], [{beats: 32}, 94]]
-                interpolation: smooth
-                resolution: 1/8
-          - id: organ_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            technique: tenuto
-            generate: {kind: melody.motif, material: scholar_recursive, repeats: 3, every_bars: 4, velocity: 94, note_velocity_pattern: [1.0, 0.96, 1.0, 1.03], humanize_ms: 1.8}
-          - id: organ_recursive_crescendo
-            at: {bar: 37, beat: 1}
-            duration: {bars: 4}
-            technique: tenuto
-            generate: {kind: melody.motif, material: scholar_recursive, repeats: 2, every_bars: 2, rhythm_scale: 0.92, velocity: 101, humanize_ms: 1.5}
-          - id: organ_final_charge
-            at: {bar: 41, beat: 1}
-            duration: {bars: 4}
-            technique: marcato
-            generate: {kind: melody.motif, material: final_charge, repeats: 1, every_bars: 4, velocity: 104, humanize_ms: 1.5}
-
-  - id: harpsichord_part
-    instrument: harpsichord_voice
-    voices:
-      - id: quips
-        clips:
-          - id: harpsichord_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            octave: 1
-            velocity_scale: 0.82
-            technique: staccato
-            generate: {kind: melody.motif, material: scholar_quip, starts: [[2, 0.0]], repeats: 3, every_bars: 4, velocity: 76, humanize_ms: 1.8, humanize_velocity_pct: 3}
-          - id: harpsichord_head
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            octave: 1
-            velocity_scale: 0.86
-            technique: staccato
-            generate: {kind: melody.motif, material: scholar_quip, starts: [[2, 0.0]], repeats: 2, every_bars: 4, velocity: 80, humanize_ms: 1.8}
-          - id: harpsichord_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            octave: 1
-            velocity_scale: 0.86
-            technique: staccato
-            generate: {kind: melody.motif, material: scholar_quip, starts: [[2, 0.0]], repeats: 3, every_bars: 4, velocity: 82, humanize_ms: 1.6}
-          - id: harpsichord_final
-            at: {bar: 41, beat: 1}
-            duration: {bars: 4}
-            octave: 1
-            velocity_scale: 0.78
-            technique: marcato
-            generate: {kind: melody.motif, material: final_charge, repeats: 1, every_bars: 4, velocity: 94, humanize_ms: 1.5}
-
-  - id: brass_part
-    instrument: horn_hits
-    voices:
-      - id: declarations
-        clips:
-          - id: brass_hands_hits
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            technique: marcato
-            generate: {kind: harmony.chord_hits, hits: [[0, 0.0], [4, 0.0], [8, 0.0]], duration_beats: 0.55, octave: 3, velocity: 82, voicing: power, humanize_ms: 3.0}
-          - id: brass_head_declaration
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            technique: marcato
-            generate: {kind: melody.motif, material: brass_declaration, starts: [[0, 0.0], [4, 0.0]], repeats: 1, every_bars: 4, velocity: 92, humanize_ms: 3.0}
-          - id: brass_weight_hits
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            technique: marcato
-            generate: {kind: harmony.chord_hits, hits: [[0, 0.0], [2, 0.0], [4, 0.0], [6, 0.0], [8, 0.0], [10, 0.0]], duration_beats: 0.55, octave: 3, velocity: 86, voicing: power, humanize_ms: 2.5}
-          - id: brass_recursive_hits
-            at: {bar: 37, beat: 1}
-            duration: {bars: 4}
-            technique: marcato
-            generate: {kind: harmony.chord_hits, hits: [[0, 0.0], [1, 0.0], [2, 0.0], [3, 0.0]], duration_beats: 0.48, octave: 3, velocity: 91, voicing: power, humanize_ms: 2.0}
-          - id: brass_final_hits
-            at: {bar: 41, beat: 1}
-            duration: {bars: 4}
-            technique: marcato
-            generate: {kind: harmony.chord_hits, hits: [[0, 0.0], [1, 0.0], [2, 0.0], [2, 2.0], [3, 0.0], [3, 2.0], [3, 3.0]], duration_beats: 0.72, octave: 3, velocity: 96, voicing: wide, humanize_ms: 2.0}
-
-      - id: brass_sustain
-        clips:
-          - id: brass_head_bed
-            at: {bar: 17, beat: 1}
-            duration: {bars: 8}
-            instrument: brass_bed
-            technique: sustain
-            velocity_scale: 0.72
-            generate: {kind: harmony.pad, instrument: brass_bed, octave: 3, voicing: open, duration_beats: 3.6, velocity: 42}
-
-  - id: giant_lead_part
-    instrument: giant_lead
-    voices:
-      - id: tread_and_answers
-        clips:
-          - id: giant_tread_hands
-            at: {bar: 5, beat: 1}
-            duration: {bars: 12}
-            transpose: -12
-            velocity_scale: 0.82
-            technique: legato
-            generate: {kind: guitar.lead, material: giant_tread, starts: [[3, 0.0]], repeats: 3, every_bars: 4, velocity: 78, vibrato_cents: 8, pitch_scoop_cents: 7, humanize_ms: 3.2}
-          - id: giant_tread_weight
-            at: {bar: 25, beat: 1}
-            duration: {bars: 12}
-            transpose: -12
-            technique: legato
-            generate: {kind: guitar.lead, material: giant_tread, starts: [[3, 0.0]], repeats: 3, every_bars: 4, velocity: 84, vibrato_cents: 10, pitch_scoop_cents: 9, humanize_ms: 2.6}
-          - id: giant_tread_crescendo
-            at: {bar: 37, beat: 1}
-            duration: {bars: 4}
-            transpose: -12
-            technique: marcato
-            generate: {kind: guitar.lead, material: giant_tread, starts: [[1, 0.0], [3, 0.0]], repeats: 1, every_bars: 4, velocity: 88, vibrato_cents: 12, pitch_scoop_cents: 10, humanize_ms: 2.0}
+- id: reviewed_arrangement
+  instrument: organ_scholar
+  voices:
+  - id: the_giant_approaches
+    clips:
+    - id: the_giant_approaches__stomp_beat
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 3.0
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 122
+          duration_beats: 0.14
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 118
+          duration_beats: 0.14
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.5
+          - 1.0
+          - 1.5
+          - 2.0
+          - 2.5
+          - 3.0
+          - 3.5
+          velocity: 64
+          duration_beats: 0.07
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 108
+          duration_beats: 0.4
+    - id: the_giant_approaches__giant_bassline
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: the_giant_approaches__giant_riff
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: rhythm.ostinato
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        octave: 2
+        intervals:
+        - 0
+        - 0
+        - 7
+        - 0
+        - 7
+        - 0
+        - 0
+        - 7
+        rhythm:
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        velocity: 92
+        articulation: staccato
+        humanize_ms: 3.5
+        humanize_velocity_pct: 3
+    - id: the_giant_approaches__strings_sustain
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.pad
+        instruments:
+        - strings_academic
+        every_bars: 2
+        duration_beats: 7.35
+        octave: 4
+        velocity: 58
+        articulation: pad
+        voicing: open
+        constraints:
+          max_pitch: 84
+        humanize_ms: 18
+    - id: the_giant_approaches__chord_hits
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 2.0
+        - - 2
+          - 0.0
+        - - 3
+          - 2.0
+        duration_beats: 0.8
+        octave: 2
+        velocity: 96
+        articulation: marcato
+        voicing: power
+  - id: hands_of_gnu
+    clips:
+    - id: hands_of_gnu__stomp_beat
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 3.0
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 122
+          duration_beats: 0.14
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 118
+          duration_beats: 0.14
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.5
+          - 1.0
+          - 1.5
+          - 2.0
+          - 2.5
+          - 3.0
+          - 3.5
+          velocity: 64
+          duration_beats: 0.07
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 108
+          duration_beats: 0.4
+    - id: hands_of_gnu__giant_bassline
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: hands_of_gnu__giant_riff
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: rhythm.ostinato
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        octave: 2
+        intervals:
+        - 0
+        - 0
+        - 7
+        - 0
+        - 7
+        - 0
+        - 0
+        - 7
+        rhythm:
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        velocity: 92
+        articulation: staccato
+        humanize_ms: 3.5
+        humanize_velocity_pct: 3
+    - id: hands_of_gnu__strings_sustain
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.pad
+        instruments:
+        - strings_academic
+        every_bars: 2
+        duration_beats: 7.35
+        octave: 4
+        velocity: 58
+        articulation: pad
+        voicing: open
+        constraints:
+          max_pitch: 84
+        humanize_ms: 18
+    - id: hands_of_gnu__scholar_voice
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instruments:
+        - organ_scholar
+        - harpsichord_voice
+        material: scholar_recursive
+        starts:
+        - - 0
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 90
+        articulation: tenuto
+        humanize_ms: 2.5
+        humanize_velocity_pct: 3
+        instrument_velocity_offsets:
+          organ_scholar: 0
+          harpsichord_voice: -14
+        instrument_octave_offsets:
+          organ_scholar: 0
+          harpsichord_voice: 1
+    - id: hands_of_gnu__harpsichord_quip
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instrument: harpsichord_voice
+        material: scholar_quip
+        starts:
+        - - 0
+          - 0.0
+        - - 2
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 78
+        articulation: staccato
+        humanize_ms: 2.0
+        humanize_velocity_pct: 4
+    - id: hands_of_gnu__brass_hit
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - brass_pompous
+        hits:
+        - - 0
+          - 0.0
+        - - 4
+          - 0.0
+        - - 8
+          - 0.0
+        duration_beats: 0.6
+        octave: 3
+        velocity: 86
+        articulation: marcato
+        voicing: power
+    - id: hands_of_gnu__tread_voice
+      at:
+        bar: 5
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instrument: low_guitar
+        material: giant_tread_lead
+        starts:
+        - - 0
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 86
+        articulation: legato
+        transpose: -12
+        humanize_ms: 4.0
+        humanize_velocity_pct: 3
+  - id: head_descends
+    clips:
+    - id: head_descends__stomp_beat
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 3.0
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 122
+          duration_beats: 0.14
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 118
+          duration_beats: 0.14
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.5
+          - 1.0
+          - 1.5
+          - 2.0
+          - 2.5
+          - 3.0
+          - 3.5
+          velocity: 64
+          duration_beats: 0.07
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 108
+          duration_beats: 0.4
+    - id: head_descends__giant_bassline
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: head_descends__strings_sustain
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: harmony.pad
+        instruments:
+        - strings_academic
+        every_bars: 2
+        duration_beats: 7.35
+        octave: 4
+        velocity: 58
+        articulation: pad
+        voicing: open
+        constraints:
+          max_pitch: 84
+        humanize_ms: 18
+    - id: head_descends__scholar_voice
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: melody.motif
+        instruments:
+        - organ_scholar
+        - harpsichord_voice
+        material: scholar_recursive
+        starts:
+        - - 0
+          - 0.0
+        repeats: 2
+        every_bars: 4
+        velocity: 96
+        articulation: tenuto
+        humanize_ms: 2.5
+        humanize_velocity_pct: 3
+        instrument_velocity_offsets:
+          organ_scholar: 0
+          harpsichord_voice: -14
+        instrument_octave_offsets:
+          organ_scholar: 0
+          harpsichord_voice: 1
+    - id: head_descends__motif
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: melody.motif
+        instruments:
+        - brass_pompous
+        - strings_academic
+        material: brass_declaration
+        starts:
+        - - 0
+          - 0.0
+        - - 4
+          - 0.0
+        repeats: 1
+        every_bars: 4
+        velocity: 96
+        articulation: marcato
+        instrument_velocity_offsets:
+          brass_pompous: 0
+          strings_academic: -20
+        humanize_ms: 4
+    - id: head_descends__automation
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: midi.automation
+        group: strings
+        automation:
+        - group: strings
+          cc: expression
+          from: 72
+          to: 104
+          curve: smooth
+          points: 16
+  - id: the_weight_of_knowledge
+    clips:
+    - id: the_weight_of_knowledge__stomp_beat
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 3.0
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 2.0
+          velocity: 122
+          duration_beats: 0.14
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 118
+          duration_beats: 0.14
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.5
+          - 1.0
+          - 1.5
+          - 2.0
+          - 2.5
+          - 3.0
+          - 3.5
+          velocity: 64
+          duration_beats: 0.07
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 108
+          duration_beats: 0.4
+    - id: the_weight_of_knowledge__giant_bassline
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: the_weight_of_knowledge__giant_riff
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: rhythm.ostinato
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        octave: 2
+        intervals:
+        - 0
+        - 0
+        - 7
+        - 0
+        - 7
+        - 0
+        - 0
+        - 7
+        rhythm:
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        velocity: 92
+        articulation: staccato
+        humanize_ms: 3.5
+        humanize_velocity_pct: 3
+    - id: the_weight_of_knowledge__strings_sustain
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.pad
+        instruments:
+        - strings_academic
+        every_bars: 2
+        duration_beats: 7.35
+        octave: 4
+        velocity: 58
+        articulation: pad
+        voicing: open
+        constraints:
+          max_pitch: 84
+        humanize_ms: 18
+    - id: the_weight_of_knowledge__scholar_voice
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instruments:
+        - organ_scholar
+        - harpsichord_voice
+        material: scholar_recursive
+        starts:
+        - - 0
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 96
+        articulation: tenuto
+        humanize_ms: 2.5
+        humanize_velocity_pct: 3
+        instrument_velocity_offsets:
+          organ_scholar: 0
+          harpsichord_voice: -14
+        instrument_octave_offsets:
+          organ_scholar: 0
+          harpsichord_voice: 1
+    - id: the_weight_of_knowledge__harpsichord_quip
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instrument: harpsichord_voice
+        material: scholar_quip
+        starts:
+        - - 0
+          - 0.0
+        - - 2
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 84
+        articulation: staccato
+        humanize_ms: 2.0
+        humanize_velocity_pct: 4
+    - id: the_weight_of_knowledge__brass_hit
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - brass_pompous
+        hits:
+        - - 0
+          - 0.0
+        - - 2
+          - 0.0
+        - - 4
+          - 0.0
+        - - 6
+          - 0.0
+        - - 8
+          - 0.0
+        - - 10
+          - 0.0
+        duration_beats: 0.6
+        octave: 3
+        velocity: 94
+        articulation: marcato
+        voicing: power
+    - id: the_weight_of_knowledge__tread_voice
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: melody.motif
+        instrument: low_guitar
+        material: giant_tread_lead
+        starts:
+        - - 0
+          - 0.0
+        repeats: 3
+        every_bars: 4
+        velocity: 92
+        articulation: legato
+        transpose: -12
+        humanize_ms: 4.0
+        humanize_velocity_pct: 3
+    - id: the_weight_of_knowledge__chord_hits
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 12
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        hits:
+        - - 0
+          - 0.0
+        - - 1
+          - 0.0
+        - - 2
+          - 0.0
+        - - 4
+          - 0.0
+        - - 5
+          - 0.0
+        - - 6
+          - 0.0
+        - - 8
+          - 0.0
+        - - 9
+          - 0.0
+        - - 10
+          - 0.0
+        duration_beats: 0.55
+        octave: 2
+        velocity: 104
+        articulation: marcato
+        voicing: power
+  - id: recursive_crescendo
+    clips:
+    - id: recursive_crescendo__stomp_beat_enrage
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 2.5
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 0.75
+          - 2.0
+          - 2.75
+          velocity: 124
+          duration_beats: 0.12
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 120
+          duration_beats: 0.12
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.25
+          - 0.5
+          - 0.75
+          - 1.0
+          - 1.25
+          - 1.5
+          - 1.75
+          - 2.0
+          - 2.25
+          - 2.5
+          - 2.75
+          - 3.0
+          - 3.25
+          - 3.5
+          - 3.75
+          velocity: 58
+          duration_beats: 0.05
+        - drum: open_hat
+          beats:
+          - 1.75
+          - 3.75
+          velocity: 80
+          duration_beats: 0.09
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 112
+          duration_beats: 0.4
+        - drum: china
+          beat: 2.0
+          every: 4
+          velocity: 90
+          duration_beats: 0.22
+    - id: recursive_crescendo__giant_bassline
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: recursive_crescendo__giant_riff
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: rhythm.ostinato
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        octave: 2
+        intervals:
+        - 0
+        - 0
+        - 7
+        - 0
+        - 7
+        - 0
+        - 0
+        - 7
+        rhythm:
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        velocity: 92
+        articulation: staccato
+        humanize_ms: 3.5
+        humanize_velocity_pct: 3
+    - id: recursive_crescendo__strings_sustain
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.pad
+        instruments:
+        - strings_academic
+        every_bars: 2
+        duration_beats: 7.35
+        octave: 4
+        velocity: 58
+        articulation: pad
+        voicing: open
+        constraints:
+          max_pitch: 84
+        humanize_ms: 18
+    - id: recursive_crescendo__motif
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: melody.motif
+        instruments:
+        - organ_scholar
+        - harpsichord_voice
+        - brass_pompous
+        material: scholar_recursive
+        starts:
+        - - 0
+          - 0.0
+        - - 2
+          - 0.0
+        repeats: 1
+        every_bars: 2
+        velocity: 106
+        articulation: tenuto
+        instrument_velocity_offsets:
+          organ_scholar: 0
+          harpsichord_voice: -12
+          brass_pompous: -10
+        instrument_octave_offsets:
+          organ_scholar: 0
+          harpsichord_voice: 1
+          brass_pompous: -1
+        humanize_ms: 2.0
+        humanize_velocity_pct: 2
+    - id: recursive_crescendo__chord_hits
+      at:
+        bar: 37
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        - brass_pompous
+        hits:
+        - - 0
+          - 0.0
+        - - 0
+          - 1.0
+        - - 0
+          - 2.0
+        - - 0
+          - 3.0
+        - - 1
+          - 0.0
+        - - 1
+          - 1.0
+        - - 1
+          - 2.0
+        - - 1
+          - 3.0
+        - - 2
+          - 0.0
+        - - 2
+          - 1.0
+        - - 2
+          - 2.0
+        - - 2
+          - 3.0
+        - - 3
+          - 0.0
+        - - 3
+          - 1.0
+        - - 3
+          - 2.0
+        - - 3
+          - 3.0
+        duration_beats: 0.45
+        octave: 2
+        velocity: 112
+        articulation: marcato
+        voicing: power
+        instrument_velocity_offsets:
+          heavy_distortion: 0
+          low_guitar: -8
+          brass_pompous: -16
+  - id: final_footnote
+    clips:
+    - id: final_footnote__stomp_beat_enrage
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: drums.pattern
+        instrument: stomp_kit
+        humanize_ms: 2.5
+        events:
+        - drum: kick
+          beats:
+          - 0.0
+          - 0.75
+          - 2.0
+          - 2.75
+          velocity: 124
+          duration_beats: 0.12
+        - drum: snare
+          beats:
+          - 1.0
+          - 3.0
+          velocity: 120
+          duration_beats: 0.12
+        - drum: closed_hat
+          beats:
+          - 0.0
+          - 0.25
+          - 0.5
+          - 0.75
+          - 1.0
+          - 1.25
+          - 1.5
+          - 1.75
+          - 2.0
+          - 2.25
+          - 2.5
+          - 2.75
+          - 3.0
+          - 3.25
+          - 3.5
+          - 3.75
+          velocity: 58
+          duration_beats: 0.05
+        - drum: open_hat
+          beats:
+          - 1.75
+          - 3.75
+          velocity: 80
+          duration_beats: 0.09
+        - drum: crash
+          beat: 0.0
+          every: 4
+          velocity: 112
+          duration_beats: 0.4
+        - drum: china
+          beat: 2.0
+          every: 4
+          velocity: 90
+          duration_beats: 0.22
+    - id: final_footnote__giant_bassline
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.bass
+        instruments:
+        - giant_bass
+        - synth_low
+        octave: 2
+        velocity: 98
+        articulation: marcato
+        humanize_ms: 3.0
+        humanize_velocity_pct: 2
+        pattern:
+        - - 0
+          - 0.0
+          - 0.75
+        - - 0
+          - 1.0
+          - 0.75
+        - - 7
+          - 2.0
+          - 0.75
+        - - 0
+          - 3.0
+          - 0.75
+    - id: final_footnote__giant_riff
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: rhythm.ostinato
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        octave: 2
+        intervals:
+        - 0
+        - 0
+        - 7
+        - 0
+        - 7
+        - 0
+        - 0
+        - 7
+        rhythm:
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        - 0.5
+        velocity: 92
+        articulation: staccato
+        humanize_ms: 3.5
+        humanize_velocity_pct: 3
+    - id: final_footnote__motif
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: melody.motif
+        instruments:
+        - organ_scholar
+        - harpsichord_voice
+        - strings_academic
+        material: final_charge
+        starts:
+        - - 0
+          - 0.0
+        repeats: 1
+        every_bars: 4
+        velocity: 112
+        articulation: marcato
+        instrument_velocity_offsets:
+          organ_scholar: 0
+          harpsichord_voice: -8
+          strings_academic: -22
+        instrument_octave_offsets:
+          organ_scholar: 0
+          harpsichord_voice: 1
+          strings_academic: -1
+        humanize_ms: 2.5
+        humanize_velocity_pct: 2
+    - id: final_footnote__chord_hits
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.chord_hits
+        instruments:
+        - heavy_distortion
+        - low_guitar
+        - brass_pompous
+        - strings_academic
+        hits:
+        - - 0
+          - 0.0
+        - - 1
+          - 0.0
+        - - 2
+          - 0.0
+        - - 2
+          - 2.0
+        - - 3
+          - 0.0
+        - - 3
+          - 2.0
+        - - 3
+          - 3.0
+        duration_beats: 0.9
+        octave: 2
+        velocity: 116
+        articulation: marcato
+        voicing: wide
+        instrument_velocity_offsets:
+          heavy_distortion: 0
+          low_guitar: -8
+          brass_pompous: -14
+          strings_academic: -28
+        instrument_octave_offsets:
+          heavy_distortion: 0
+          low_guitar: 0
+          brass_pompous: 0
+          strings_academic: -1
+        constraints:
+          max_pitch: 84
+    - id: final_footnote__root_hits
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 4
+      generate:
+        kind: harmony.root_hits
+        instruments:
+        - giant_bass
+        - synth_low
+        hits:
+        - - 3
+          - 3.5
+          - 0
+          - 0.75
+        octave: 2
+        velocity: 120
+        articulation: hit

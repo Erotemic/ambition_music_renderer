@@ -252,6 +252,100 @@ def test_v3_generator_bridge_preserves_existing_arpeggio_behavior():
     assert all(event.get("source_ref", {}).get("generator_kind") == "harmony.arpeggio" for event in v3.note_events)
 
 
+def test_v3_generator_bridge_inherits_score_constraints():
+    v1_spec = {
+        "schema": "ambition.musicir.v1",
+        "id": "v1_constraint_contract",
+        "seed": 1,
+        "tempo": {"bpm": 120},
+        "meter": {"beats_per_bar": 4, "beat_unit": 4},
+        "constraints": {"max_pitch": 60},
+        "instruments": [_instrument()],
+        "sections": [
+            {
+                "id": "main",
+                "bars": 1,
+                "harmony": ["C"],
+                "layers": [
+                    {
+                        "kind": "pad_chords",
+                        "instrument": "keys",
+                        "duration_beats": 3.5,
+                        "octave": 5,
+                        "velocity": 72,
+                        "humanize_ms": 0,
+                    }
+                ],
+            }
+        ],
+    }
+    v3_spec = {
+        "schema": MUSICIR_V3_SCHEMA,
+        "id": "v3_constraint_contract",
+        "seed": 1,
+        "timebase": {"ppq": 220},
+        "meter": "4/4",
+        "tempo": 120,
+        "harmony": ["C"],
+        "constraints": {"max_pitch": 60},
+        "end": {"bar": 2, "beat": 1},
+        "instruments": [_instrument()],
+        "parts": [
+            {
+                "id": "keys_part",
+                "instrument": "keys",
+                "voices": [
+                    {
+                        "id": "pad",
+                        "clips": [
+                            {
+                                "id": "pad-a",
+                                "at": {"bar": 1, "beat": 1},
+                                "duration": {"bars": 1},
+                                "generate": {
+                                    "kind": "harmony.pad",
+                                    "duration_beats": 3.5,
+                                    "octave": 5,
+                                    "velocity": 72,
+                                    "humanize_ms": 0,
+                                },
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+    v1 = compile_score(v1_spec)
+    v3 = compile_score(v3_spec)
+    assert [note.pitch for note in v3.pm.instruments[0].notes] == [
+        note.pitch for note in v1.pm.instruments[0].notes
+    ]
+    assert [note.velocity for note in v3.pm.instruments[0].notes] == [
+        note.velocity for note in v1.pm.instruments[0].notes
+    ]
+    assert max(note.pitch for note in v3.pm.instruments[0].notes) <= 60
+
+
+def test_v3_validation_accepts_clip_harmony_and_intensity_gain():
+    from ambition_music_renderer.validation.musicir import validate_musicir_spec
+
+    spec = _generator_v3()
+    spec["form"] = [
+        {
+            "id": "main",
+            "from": {"bar": 1, "beat": 1},
+            "to": {"bar": 2, "beat": 1},
+            "intensity": 1.2,
+        }
+    ]
+    spec["parts"][0]["voices"][0]["clips"][0]["harmony"] = ["Dm"]
+    report = validate_musicir_spec(spec, strict_schema=True)
+    assert report["canonical_schema"] == MUSICIR_V3_SCHEMA
+    compiled = compile_score(spec)
+    assert compiled.pm.instruments[0].notes[0].pitch == 62
+
+
 def test_v3_generator_clip_rename_does_not_change_music_or_random_seed():
     a = compile_score(_generator_v3("arp-a"))
     b = compile_score(_generator_v3("renamed-arp"))

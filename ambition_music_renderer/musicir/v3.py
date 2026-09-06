@@ -676,6 +676,9 @@ def _expand_generator_clips(
                         "motifs": motifs,
                         "sections": [synthetic_section],
                     }
+                    constraints = graph.source_spec.get("constraints")
+                    if constraints:
+                        synthetic["constraints"] = copy.deepcopy(constraints)
                     generated = compile_procedural_score(synthetic)
                     _copy_generator_controls(
                         generated=generated,

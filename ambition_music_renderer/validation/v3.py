@@ -81,6 +81,7 @@ CLIP_FIELDS = {
     "technique",
     "articulation",
     "instrument",
+    "harmony",
 }
 EVENT_FIELDS = {
     "id",
@@ -1249,7 +1250,7 @@ def diagnose_v3_spec(
         for idx, row in enumerate(form):
             if _mapping(row):
                 result.extend(_unknown_fields(row, FORM_FIELDS, path=("form", idx), locations=locations, code="V3_FORM_FIELD", subject="form region"))
-                for field in ("energy", "intensity", "density", "variation"):
+                for field in ("energy", "density", "variation"):
                     if field in row:
                         try:
                             value = float(row[field])
@@ -1257,6 +1258,13 @@ def diagnose_v3_spec(
                                 raise ValueError
                         except Exception:
                             result.append(diagnostic("V3_FORM_INTENT", f"form `{field}` must be in 0..1", path=("form", idx, field), locations=locations))
+                if "intensity" in row:
+                    try:
+                        value = float(row["intensity"])
+                        if value <= 0.0:
+                            raise ValueError
+                    except Exception:
+                        result.append(diagnostic("V3_FORM_INTENT", "form `intensity` must be > 0", path=("form", idx, "intensity"), locations=locations))
 
     parts = spec.get("parts") or []
     if not _list(parts):
