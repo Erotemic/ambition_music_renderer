@@ -65,3 +65,26 @@ cd ~/code/ardour/gtk2_ardour
 
 
 sudo dpkg-reconfigure -p high jackd2
+
+## Ambition MusicIR round trip
+
+Ardour is the primary DAW target for the renderer round trip. Keep the neutral
+MIDI + sidecar boundary intact; do not make `.ardour` XML a MusicIR authority.
+
+```bash
+python -m ambition_music_renderer cue daw_export <cue> --destination /tmp/<cue>-daw
+# Import /tmp/<cue>-daw/<cue>.mid into Ardour and edit MIDI.
+# Export the edited MIDI from Ardour to /tmp/<cue>-edited.mid.
+python -m ambition_music_renderer cue daw_reconcile <cue> \
+    --midi /tmp/<cue>-edited.mid \
+    --manifest /tmp/<cue>-daw/<cue>.musicir-interchange.json \
+    --output /tmp/<cue>-reconciliation.json
+python -m ambition_music_renderer cue daw_apply <cue> \
+    --midi /tmp/<cue>-edited.mid \
+    --manifest /tmp/<cue>-daw/<cue>.musicir-interchange.json \
+    --output /tmp/<cue>.daw.music.yaml \
+    --report /tmp/<cue>-apply.json
+```
+
+Current apply supports note edits and clip-owned CC/pitch-bend edits. Conductor
+changes are detected and rejected until the conductor stage lands.

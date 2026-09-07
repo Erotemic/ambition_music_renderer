@@ -1,26 +1,133 @@
-# DAW interchange direction
+# DAW interchange and round trip
 
-The renderer now has a DAW-neutral interchange boundary intended for Ardour,
-REAPER, and other mature MIDI editors. The design deliberately does not make a
-DAW project file a second source of musical authority.
+MusicIR remains the source of musical authority. Standard MIDI is the editable
+transport used by Ardour, REAPER, and other DAWs; the adjacent JSON sidecar is
+the reconciliation baseline that preserves MusicIR identities MIDI cannot carry
+portably.
 
-## Current export
+Ardour is the primary DAW target. REAPER remains a secondary interoperability
+target through the same DAW-neutral MIDI/sidecar boundary. DAW-specific project
+adapters come after the generic reverse path is reliable.
+
+## Current workflow
+
+Export a v3 cue:
 
 ```bash
-python -m ambition_music_renderer cue daw_export <cue> --destination /tmp/daw
+python -m ambition_music_renderer cue daw_export <cue> --destination /tmp/<cue>-daw
 ```
 
-writes:
+This writes:
 
 ```text
 <cue>.mid
 <cue>.musicir-interchange.json
 ```
 
-The MIDI file is the editable transport. The JSON file is the MusicIR provenance
-sidecar.
+Import `<cue>.mid` into Ardour, make MIDI performance edits, then export the
+edited MIDI from Ardour. Keep the original interchange JSON; it describes the
+baseline that the edited MIDI came from.
 
-For MusicIR v2/v3, the MIDI writer uses the exact score tick clock directly. It
+Inspect the edit without changing MusicIR:
+
+```bash
+python -m ambition_music_renderer cue daw_reconcile <cue> \
+    --midi /tmp/<cue>-edited.mid \
+    --manifest /tmp/<cue>-daw/<cue>.musicir-interchange.json \
+    --output /tmp/<cue>-reconciliation.json
+```
+
+For a supported reconciliation, write a new MusicIR source:
+
+```bash
+python -m ambition_music_renderer cue daw_apply <cue> \
+    --midi /tmp/<cue>-edited.mid \
+    --manifest /tmp/<cue>-daw/<cue>.musicir-interchange.json \
+    --output /tmp/<cue>.daw.music.yaml \
+    --report /tmp/<cue>-apply.json
+```
+
+Use `--in-place` only after reviewing reconciliation evidence. `daw_apply`
+recompiles the proposed MusicIR and verifies that the resulting note events
+reproduce the edited MIDI before it writes the YAML.
+
+If the MusicIR source changed after the DAW export, reconciliation refuses the
+stale baseline and asks for a fresh export. The comparison checks both the
+compiled-score fingerprint and v3 authoring-graph fingerprint.
+
+## Landed reverse-path stages
+
+### Stage 1: note reconciliation and clip lowering
+
+`daw_reconcile` classifies note events as:
+
+- unchanged;
+- moved;
+- resized;
+- repitched;
+- velocity changed;
+- deleted; or
+- added.
+
+DAWs may rewrite the MIDI PPQ. Imported coordinates are therefore rescaled onto
+the sidecar's original PPQ before matching. Non-integral rescaling is reported
+as quantization evidence instead of being hidden.
+
+The sidecar includes source regions for v3 clips. Existing notes retain stable
+`event_id` / `source_ref` mappings. A newly drawn note can be assigned to a clip
+when exactly one source region owns its coordinate, or when the track contains
+only one source region. Ambiguous additions stop automatic apply.
+
+When an edit is applied, the smallest currently supported mutation unit is one
+v3 clip. An affected exact/material/generated clip is lowered to explicit exact
+events containing the final DAW pitches, ticks, durations, and velocities.
+Unedited clips and reusable materials remain unchanged. A repeated or generated
+clip is expanded only when that clip has actually been hand-edited.
+
+This is intentionally preferable to storing a permanent DAW override layer: the
+MusicIR file remains sufficient to regenerate the result.
+
+### Stage 2: clip-owned CC and pitch-bend reconciliation
+
+Clip automation exported with stable v3 provenance can now be moved, changed,
+deleted, or added through the same reconciliation path. When the owning clip is
+lowered, its final automation is emitted as literal v3 automation points.
+
+Renderer initialization CCs that have no MusicIR source identity are reported as
+transport-level changes but are not mistaken for authored automation. A
+controller edit with no unique v3 clip owner blocks source application rather
+than being discarded.
+
+## Next large stages
+
+### Stage 3: conductor reconciliation
+
+Tempo, meter, and form-marker changes are detected now, but `daw_apply` refuses
+them. This stage needs an explicit policy for converting ordinary SMF tempo
+events back into MusicIR's step/ramp model, and must keep MusicIR holds exact even
+though SMF has no native hold event.
+
+### Stage 4: Ardour session adapter
+
+Once conductor reconciliation is dependable, add an Ardour-first convenience
+adapter around the neutral interchange core. The intended job is session setup,
+not new musical authority. Likely outputs are an Ardour session scaffold,
+reference full mix/stems, track naming/routing, and a scripted export location
+that points back to `daw_reconcile` / `daw_apply`.
+
+REAPER support should consume the same interchange/reconciliation objects and
+receive a thinner adapter after the Ardour workflow has been exercised.
+
+### Stage 5: source-preserving patch quality
+
+The current apply writer emits clean YAML from the structural MusicIR mapping.
+A later source-location-aware writer can minimize textual diffs and preserve
+comments/formatting while retaining the same reconciliation semantics. It must
+not become a second parser or change compilation behavior.
+
+## Exact MIDI export
+
+For MusicIR v2/v3, the writer uses the exact score tick clock directly. It
 writes:
 
 - one conductor track;
@@ -31,84 +138,37 @@ writes:
 - one named track per compiled instrument;
 - program changes, CCs, pitch bends, and notes.
 
-This fixes an important interoperability limitation of writing exact scores back
-through PrettyMIDI's seconds-domain clock.
-
 V1 continues to use the historical marked-MIDI preview because its source clock
-is not tick-authoritative.
+is not tick-authoritative. V1/v2 can be reconciled for inspection, but automatic
+source application currently requires v3 provenance.
 
-## Why a sidecar is required
+## Why the sidecar is required
 
-Standard MIDI can preserve musical events and track names well, but it has no
+Standard MIDI can preserve musical events and track names, but it has no
 portable mechanism that Ardour and REAPER can both be expected to preserve for
-MusicIR source identities on every note. MusicIR v3 therefore emits stable
-`event_id` / `source_ref` information in the sidecar.
-
-The sidecar records:
+MusicIR source identities on every note. The sidecar records:
 
 - source and canonical MusicIR schema;
 - `CompiledScore` fingerprint;
-- v3 authoring-graph fingerprint when available;
-- track/instrument/group identity;
+- v3 authoring-graph fingerprint;
+- MIDI PPQ and exact-clock status;
+- conductor baseline;
+- track/instrument/group identity and MIDI track index;
 - exact baseline note ticks and velocities;
-- stable v3 source mappings;
+- stable v3 note/controller source mappings;
+- v3 clip source regions used to classify additions;
 - compiled form metadata; and
-- MIDI representability notes.
+- representability notes for tempo ramps and holds.
 
-The sidecar is not generated music authority. It is a reconciliation baseline
-for a future importer.
-
-## Round trip status
-
-The current direction is:
-
-```text
-MusicIR
-  -> CompiledScore
-  -> exact MIDI + provenance sidecar
-  -> Ardour / REAPER editing
-```
-
-Automatic edited-MIDI-to-MusicIR reconciliation is intentionally not implemented
-yet. The next stage can compare the returned MIDI against the sidecar baseline
-and classify edits such as:
-
-- unchanged source event;
-- moved/resized note;
-- velocity edit;
-- pitch edit;
-- deleted source event;
-- newly added DAW event; and
-- controller/automation changes.
-
-V3's clip/material/event provenance gives that importer somewhere stable to
-apply edits. If a DAW edit destroys the higher-level intent of a generated clip,
-the importer can lower only that clip to explicit events rather than flattening
-the whole composition.
-
-That is the intended escape hatch: generated structure remains generated when
-possible; edited passages can become literal notation when necessary.
+The sidecar is reconciliation evidence, not generated-music authority.
 
 ## Holds and tempo ramps
 
 MusicIR's exact clock can express timing that ordinary SMF cannot encode as one
-native event. Tempo ramps are sampled into sufficiently dense `set_tempo`
-events for DAW playback, while the exact MusicIR timing remains in the source
-and interchange metadata. Score holds are marked in the MIDI conductor track;
-the sidecar remains authoritative because SMF has no direct "pause score time
-for N seconds" event.
+native event. Tempo ramps are sampled into dense `set_tempo` events for DAW
+playback, while the exact MusicIR timing remains in source and interchange
+metadata. Score holds are marked in the MIDI conductor track; the sidecar remains
+authoritative because SMF has no direct "pause score time for N seconds" event.
 
-A future DAW-specific adapter may use richer automation features, but that should
-sit outside the DAW-neutral interchange model.
-
-## Controller provenance
-
-MusicIR v3 clip automation points are included in the interchange sidecar as
-baseline `controls` and `pitch_bends` on their instrument track. Authored points
-carry the same stable source coordinates used by notes, so a future importer can
-distinguish a DAW edit to an authored expression/pitch-bend point from an
-instrument's implicit t=0 controller initialization.
-
-The sidecar reports `roundtrip.controller_source_mapping` independently from
-note mapping because v1/v2 and backend initialization can legitimately contain
-controller events with no v3 source id.
+This is why conductor import is its own stage rather than being inferred from a
+naive MIDI diff.

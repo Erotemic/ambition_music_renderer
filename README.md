@@ -174,6 +174,8 @@ MusicIR provenance sidecar:
 ```bash
 uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer cue daw_export <cue_id> --destination /tmp/<cue_id>-daw
+  python -m ambition_music_renderer cue daw_reconcile <cue_id> --midi /tmp/<cue_id>-edited.mid --manifest /tmp/<cue_id>-daw/<cue_id>.musicir-interchange.json
+  python -m ambition_music_renderer cue daw_apply <cue_id> --midi /tmp/<cue_id>-edited.mid --manifest /tmp/<cue_id>-daw/<cue_id>.musicir-interchange.json --output /tmp/<cue_id>.daw.music.yaml
 ```
 
 See `docs/daw_interchange.md`. Automatic edited-MIDI import/reconciliation is

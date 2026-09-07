@@ -3,8 +3,8 @@
 The interchange format is deliberately DAW-neutral.  Ardour and REAPER both
 understand Standard MIDI Files, while the JSON sidecar preserves MusicIR-only
 identity/provenance that SMF cannot represent reliably.  Export is useful now;
-source reconciliation/import is intentionally a later step built on this stable
-contract rather than on DAW-specific project XML.
+source reconciliation/import is implemented against this stable contract rather
+than against DAW-specific project XML.
 """
 
 from __future__ import annotations
@@ -223,7 +223,12 @@ def write_compiled_midi(compiled: CompiledScore, midi_path: str | Path) -> Path:
             stop = max(start + 1, stop)
             # note_off sorts before a new note_on at the same coordinate.
             events.append(
-                (stop, 30, local_order, mido.Message("note_off", channel=channel, note=int(note.pitch), velocity=0, time=0))
+                (
+                    stop,
+                    30,
+                    local_order,
+                    mido.Message("note_off", channel=channel, note=int(note.pitch), velocity=0, time=0),
+                )
             )
             local_order += 1
             events.append(
@@ -249,10 +254,20 @@ def write_compiled_midi(compiled: CompiledScore, midi_path: str | Path) -> Path:
 
 
 def read_midi_snapshot(midi_path: str | Path) -> dict[str, Any]:
-    """Read the stable subset of an SMF needed for interchange regression tests."""
+    """Read the stable SMF subset used by DAW reconciliation.
+
+    Notes/controllers are kept per track while conductor data is normalized into
+    one top-level record. This accepts Ardour/Reaper exports that change SMF PPQ;
+    the reconciler rescales coordinates back onto the interchange baseline.
+    """
 
     mid = mido.MidiFile(str(midi_path))
     tracks: list[dict[str, Any]] = []
+    conductor: dict[str, list[dict[str, Any]]] = {
+        "tempos": [],
+        "time_signatures": [],
+        "markers": [],
+    }
     for track_index, track in enumerate(mid.tracks):
         tick = 0
         name = f"track_{track_index}"
@@ -260,6 +275,7 @@ def read_midi_snapshot(midi_path: str | Path) -> dict[str, Any]:
         notes: list[dict[str, int]] = []
         controls: list[dict[str, int]] = []
         bends: list[dict[str, int]] = []
+        programs: list[dict[str, int]] = []
         for msg in track:
             tick += int(msg.time)
             if msg.type == "track_name":
@@ -290,6 +306,20 @@ def read_midi_snapshot(midi_path: str | Path) -> dict[str, Any]:
                 )
             elif msg.type == "pitchwheel":
                 bends.append({"tick": tick, "pitch": int(msg.pitch), "channel": int(msg.channel)})
+            elif msg.type == "program_change":
+                programs.append({"tick": tick, "program": int(msg.program), "channel": int(msg.channel)})
+            elif msg.type == "set_tempo":
+                conductor["tempos"].append({"tick": tick, "tempo": int(msg.tempo)})
+            elif msg.type == "time_signature":
+                conductor["time_signatures"].append(
+                    {
+                        "tick": tick,
+                        "numerator": int(msg.numerator),
+                        "denominator": int(msg.denominator),
+                    }
+                )
+            elif msg.type == "marker":
+                conductor["markers"].append({"tick": tick, "text": str(msg.text)})
         tracks.append(
             {
                 "index": track_index,
@@ -297,9 +327,16 @@ def read_midi_snapshot(midi_path: str | Path) -> dict[str, Any]:
                 "notes": sorted(notes, key=lambda row: (row["start_tick"], row["pitch"], row["end_tick"])),
                 "controls": controls,
                 "pitch_bends": bends,
+                "program_changes": programs,
             }
         )
-    return {"ticks_per_beat": int(mid.ticks_per_beat), "tracks": tracks}
+    for rows in conductor.values():
+        rows.sort(key=lambda row: (int(row["tick"]), tuple(sorted(row.items()))))
+    return {
+        "ticks_per_beat": int(mid.ticks_per_beat),
+        "tracks": tracks,
+        "conductor": conductor,
+    }
 
 
 def _event_lookup(compiled: CompiledScore) -> dict[tuple[str, int, int], list[dict[str, Any]]]:
@@ -343,6 +380,83 @@ def _controller_event_lookup(
             continue
         lookup[key].append(event)
     return lookup
+
+
+def _source_regions_from_tracks(tracks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Summarize v3 clip-owned MIDI spans for assigning newly drawn DAW notes."""
+
+    grouped: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    for track in tracks:
+        instrument = str(track.get("instrument", ""))
+        for kind in ("notes", "controls", "pitch_bends"):
+            for event in track.get(kind, []) or []:
+                ref = event.get("source_ref") or {}
+                if not ref.get("clip_id"):
+                    continue
+                key = (
+                    str(ref.get("part_id", "")),
+                    str(ref.get("voice_id", "")),
+                    str(ref.get("clip_id", "")),
+                    instrument,
+                )
+                start = int(event.get("start_tick", event.get("tick", 0)))
+                end = int(event.get("end_tick", start + 1))
+                source_kind = (
+                    f"generator:{ref['generator_kind']}"
+                    if ref.get("generator_kind")
+                    else "material" if ref.get("material_id")
+                    else "events"
+                )
+                row = grouped.setdefault(
+                    key,
+                    {
+                        "part_id": key[0],
+                        "voice_id": key[1],
+                        "clip_id": key[2],
+                        "instrument": key[3],
+                        "source_kind": source_kind,
+                        "start_tick": start,
+                        "end_tick": max(start + 1, end),
+                    },
+                )
+                row["start_tick"] = min(int(row["start_tick"]), start)
+                row["end_tick"] = max(int(row["end_tick"]), max(start + 1, end))
+    return sorted(
+        grouped.values(),
+        key=lambda row: (row["instrument"], row["start_tick"], row["clip_id"]),
+    )
+
+
+def _baseline_conductor(compiled: CompiledScore, timing: dict[str, Any] | None) -> dict[str, Any] | None:
+    if timing is None:
+        return None
+    clock = ScoreClock(timing)
+    tempo = ExactTempoMap(timing, clock).bind_ppq(clock.ppq)
+    end_tick = int((compiled.exact_metadata or {}).get("end_tick", 0) or 0)
+    tempos: list[dict[str, int]] = []
+    last_tempo: int | None = None
+    for tick, bpm in _tempo_points(tempo, ppq=clock.ppq, end_tick=end_tick):
+        micros = int(mido.bpm2tempo(float(bpm)))
+        if micros == last_tempo:
+            continue
+        tempos.append({"tick": int(tick), "tempo": micros})
+        last_tempo = micros
+    time_signatures = [
+        {
+            "tick": int(change.start_tick),
+            "numerator": int(change.numerator),
+            "denominator": int(change.denominator),
+        }
+        for change in clock.meter_changes
+    ]
+    markers = [
+        {
+            "tick": int(section.get("start_tick", 0)),
+            "text": str(section.get("label", section.get("id", "section"))),
+        }
+        for section in compiled.sections
+    ]
+    return {"tempos": tempos, "time_signatures": time_signatures, "markers": markers}
 
 
 def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -> dict[str, Any]:
@@ -402,6 +516,8 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
                 "controller": int(cc.number),
                 "value": int(cc.value),
             }
+            if source is not None:
+                row["compiled_source"] = True
             if source and source.get("event_id"):
                 row["event_id"] = str(source["event_id"])
                 row["source_ref"] = copy.deepcopy(source.get("source_ref"))
@@ -417,6 +533,8 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
             key = (str(inst.name), "pitch_bend", int(tick), int(bend.pitch))
             source = controller_lookup[key].pop(0) if controller_lookup.get(key) else None
             row = {"ordinal": ordinal, "tick": int(tick), "pitch": int(bend.pitch)}
+            if source is not None:
+                row["compiled_source"] = True
             if source and source.get("event_id"):
                 row["event_id"] = str(source["event_id"])
                 row["source_ref"] = copy.deepcopy(source.get("source_ref"))
@@ -426,6 +544,7 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
         tracks.append(
             {
                 "track_id": str(inst.name),
+                "midi_track_index": len(tracks) + 1,
                 "instrument": str(inst.name),
                 "group": compiled.groups.get(str(inst.name), str(inst.name)),
                 "program": int(inst.program),
@@ -455,8 +574,10 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
                 )
             ),
             "holds_sidecar_authoritative": bool(holds),
+            "conductor": _baseline_conductor(compiled, timing),
         },
         "tracks": tracks,
+        "source_regions": _source_regions_from_tracks(tracks),
         "form": copy.deepcopy(compiled.sections),
         "roundtrip": {
             "source_mapping": "stable" if all_source_mapped else "compiled-event",
@@ -465,10 +586,11 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
                 if authored_controllers and source_mapped_controllers == authored_controllers
                 else "none" if not authored_controllers else "partial"
             ),
-            "automatic_musicir_import": False,
+            "automatic_musicir_import": True,
             "notes": (
                 "V3 clip/event provenance is preserved in this sidecar. MIDI cannot carry these ids "
-                "portably, so a future importer will reconcile the edited MIDI against this baseline."
+                "portably, so the importer reconciles edited MIDI against this saved baseline and "
+                "lowers only affected v3 clips when applying note edits."
             ),
         },
     }

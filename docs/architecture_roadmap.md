@@ -13,8 +13,10 @@ The project has two immediate product goals:
    combine concise musical intent with an exact-event escape hatch, checked-in
    knowledge of the expected audio environment, and objective review evidence.
 
-DAW round-trip work is deliberately deferred. The existing exact-MIDI/provenance
-export seam should remain intact, but it is not on the active non-DAW campaign.
+DAW round-trip work was reprioritized on 2026-09-07. The active order is a
+DAW-neutral reconciliation core first, then Ardour-first workflow integration;
+REAPER is the secondary DAW target. MusicIR remains the sole musical source of
+truth throughout the round trip.
 
 A future polished replacement for a v1/v2 tune is expected to be a new v3
 composition, potentially with a different arrangement and sonic realization.
@@ -242,16 +244,18 @@ Do not return to a manually incremented renderer-version string as the cache
 correctness mechanism. Do not hash all of `/data/audio-tools` as a shortcut;
 only dependencies used by the cue should invalidate that cue/stem.
 
-### DAW interchange (deferred)
+### DAW interchange (active staged round trip)
 
-`musicir.interchange` owns the existing export boundary. Exact-clock Standard
-MIDI is editable transport; the `.musicir-interchange.json` sidecar preserves
-MusicIR source/provenance that MIDI cannot represent portably.
+`musicir.interchange` owns exact-MIDI export and sidecar construction;
+`musicir.interchange_reconcile` owns the reverse comparison/apply path. Exact
+Standard MIDI is editable transport and the `.musicir-interchange.json` sidecar
+preserves MusicIR source/provenance that MIDI cannot carry portably.
 
-Keep this seam healthy, but do not expand it during the active non-DAW campaign.
-DAW files are not another source of truth. If DAW import is prioritized later,
-reconcile edited performance against the exported baseline and update the
-smallest v3 source region that no longer explains it.
+The reverse path compares edited performance against the saved baseline, rescales
+DAW PPQ changes, and updates the smallest currently supported v3 source region:
+one affected clip. Material/generated clips are lowered to exact events only when
+that clip was hand-edited. DAW project files remain convenience surfaces rather
+than another source of truth.
 
 ## V3 authoring model: current status
 
@@ -326,9 +330,13 @@ line up as follows:
     corpus is compiled as a smoke gate; generic frozen migration fixtures plus
     explicit pre/post corpus reports protect semantic behavior without checking
     named-song snapshots into the test suite.
-13+. **Real cue authoring, generator/instrument improvement, legacy-internal
-    isolation, and module decomposition** remain active non-DAW work. DAW import
-    and reconciliation are explicitly deferred.
+13. **DAW note/controller round trip** — edited MIDI can be reconciled against
+    an exact export baseline; note and clip-owned CC/pitch-bend edits can be
+    applied by lowering only affected v3 clips, with recompilation verification.
+14+. **Conductor round trip, Ardour integration, real cue authoring,
+    generator/instrument improvement, legacy-internal isolation, and module
+    decomposition** remain active work. Ardour is the primary DAW target; REAPER
+    is secondary.
 
 ### Phase A — Permanent legacy regeneration gate
 
@@ -508,34 +516,6 @@ the generic test suite compiles all 73 auditions. Source-only readers can join
 normative catalog knowledge with the observational workstation snapshot without
 merging their authorities.
 
-Stem Lab now also consumes score-authored instrument candidate banks. The active
-`instruments` row remains the sole normal-render authority;
-`authoring.instrument_candidates` records a bounded A/B set and marks the primary
-baseline. Alternative rows are realized only through scratch variants on explicit
-request, then routed from pre-rendered group stems. This avoids turning catalog
-discovery into implicit combinatorial rendering while keeping candidate intent in
-the score rather than in GUI state.
-
-Instrument Inspector also owns a machine-local **measured tuning audit**. It
-renders an isolated dry range sweep through the selected real backend and compares
-each known MIDI pitch against A4=440 Hz / 12-TET. The primary normalized-
-autocorrelation estimate is independently checked by a harmonic spectral-peak
-estimator before any correction proposal is emitted. The resulting JSON under
-`agent/instrument_inspector/tuning/` is observational evidence, like the workstation
-snapshot and usage census: it may identify a global cents offset, range-dependent
-drift, or local outliers, but it does not mutate `instrument_catalog.yaml` or
-MusicIR automatically.
-
-A score may explicitly author `tuning_correction` on an instrument realization.
-This is **pre-processing synthesis calibration**, not an EQ/plugin effect and not a
-change to semantic score pitch. Global corrections use one MIDI pitch-bend lane;
-per-note curves interpolate measured cents offsets and split only overlapping notes
-that require incompatible offsets into independent render lanes before summing.
-That keeps monophonic bass/lead correction to one synthesis pass while remaining
-polyphony-safe for chords. `cue tuning-audit` writes a conservative
-`corrections.yaml` snippet only when the autocorrelation and spectral estimators
-agree; applying that snippet remains an explicit authoring decision.
-
 Continue by adding patch-specific reliable ranges, articulation realization,
 weak/silent zones, and family audition phrases only when supported by census,
 smoke-test, or listening evidence.
@@ -585,41 +565,32 @@ consumers are migrated and the whole-corpus legacy regeneration gate stays green
 Do not prioritize module motion over authoring capability or real composition
 feedback.
 
+### Active — DAW round trip
 
-### Tuning evidence and correction authority
+Status: stages 1 and 2 established on 2026-09-07.
 
-Instrument tuning correction is a synthesis authority, but tuning *evidence* remains
-observational and machine-local. Keep three layers distinct:
+Established:
 
-1. raw estimator evidence, including disagreements and measurement quality;
-2. dual-estimator consensus plus explicit coverage metrics;
-3. an opt-in MusicIR `tuning_correction` profile accepted by a human or authoring
-   workflow.
+1. exact MIDI + provenance sidecar export, including instrument identities,
+   source mappings, conductor baseline, and v3 clip source regions;
+2. edited-MIDI ingestion against the saved baseline with PPQ normalization;
+3. note classification for unchanged/moved/resized/repitched/velocity-changed,
+   deleted, and added notes;
+4. clip-owned CC/pitch-bend reconciliation, while renderer initialization CCs
+   remain transport evidence rather than authored source;
+5. source apply by lowering only affected v3 clips to literal events/automation;
+6. stale-baseline refusal and post-apply recompilation verification before write.
 
-Do not infer correction authority from a raw `global_offset`/`range_dependent` label
-alone. Proposal generation must be consensus- and coverage-gated, and should reject
-mixed behavior or large unvalidated pitch regions rather than extrapolating a smooth
-model through them. Very-low-frequency audit notes should receive enough steady-state
-cycles for both estimators to make an independent claim.
+Next large stages:
 
-### Deferred — DAW round trip
-
-Status: deferred by product decision. Exact MIDI + provenance sidecar export
-exists and should remain tested, but no additional DAW work is part of the active
-campaign.
-
-If reprioritized later:
-
-1. enrich export with controller/source provenance, instrument identities and
-   optional reference stems/audio;
-2. ingest edited MIDI against the saved baseline;
-3. classify note/controller changes (unchanged, moved, resized, repitched,
-   velocity/value changed, deleted, added);
-4. reconcile edits into the smallest v3 source region possible;
-5. if a generated clip has been substantially hand-edited, lower that clip to
-   exact events rather than flattening unrelated music;
-6. evaluate Ardour/Reaper-specific session adapters only after generic MIDI
-   reconciliation is reliable.
+1. conductor reconciliation: tempo/meter/form-marker edits with an explicit
+   policy for sampled SMF tempo ramps and sidecar-authoritative holds;
+2. Ardour-first session/setup adapter around the neutral interchange core,
+   including useful reference audio/stems and a deterministic edited-MIDI export
+   handoff;
+3. REAPER adapter after the Ardour workflow is exercised;
+4. source-location-aware YAML patching to reduce textual diff without changing
+   the structural reconciliation model.
 
 Sparse generator-event override layers should be added only if real round-trip
 experience shows they are easier to reason about than lowering an edited clip
