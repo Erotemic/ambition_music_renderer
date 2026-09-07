@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Sequence
 
 from ._paths import project_root as default_project_root
-from .music_instrument_inspector_model import render_probe_request_file
+from .music_instrument_inspector_model import render_probe_request_file, render_tuning_audit_request_file
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -17,6 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--project-root", type=Path, help="music-renderer project root; normally auto-detected")
     parser.add_argument("--render-request", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--tuning-request", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--check", action="store_true", help="validate imports/catalog model without opening Qt")
     return parser
 
@@ -26,6 +27,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     root = Path(args.project_root or default_project_root()).resolve()
     if args.render_request:
         result = render_probe_request_file(args.render_request)
+        print(json.dumps(result.report, sort_keys=True))
+        return 0
+    if args.tuning_request:
+        result = render_tuning_audit_request_file(args.tuning_request)
         print(json.dumps(result.report, sort_keys=True))
         return 0
     if args.check:

@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
+    QProgressBar,
     QPushButton,
     QSpinBox,
     QSplitter,
@@ -42,7 +43,9 @@ from .music_instrument_inspector_model import (
     apply_library_entry,
     apply_probe_control_suggestions,
     build_probe_request,
+    build_tuning_audit_request,
     format_probe_diagnostics,
+    format_tuning_audit_report,
     default_instrument_document,
     default_processing_document,
     gm_library_entries,
@@ -54,6 +57,7 @@ from .music_instrument_inspector_model import (
     resolved_backend_path,
     score_instrument_names,
     sfz_probe_preflight_from_census,
+    tuning_audit_request_hash,
     write_export_document,
     yaml_text,
 )
@@ -71,9 +75,12 @@ class InstrumentInspectorWindow(QMainWindow):
         super().__init__(parent)
         self.project_root = Path(project_root).resolve()
         self._render_process: QProcess | None = None
+        self._tuning_process: QProcess | None = None
         self._render_request_path: Path | None = None
         self._render_request_hash: str | None = None
         self._rendered_request_hash: str | None = None
+        self._tuning_request_hash: str | None = None
+        self._rendered_tuning_hash: str | None = None
         self._play_after_render = False
         self._last_preflight: dict = {}
         self._usage_census = load_usage_census()
@@ -263,6 +270,15 @@ class InstrumentInspectorWindow(QMainWindow):
         self.render_button = QPushButton("Render probe")
         self.render_button.clicked.connect(lambda _checked=False: self._render_probe(auto_play=False))
         probe_buttons.addWidget(self.render_button)
+        self.tuning_button = QPushButton("Audit tuning")
+        self.tuning_button.setToolTip("Render a dry chromatic/range sweep and measure cents error against A4=440 Hz")
+        self.tuning_button.clicked.connect(self._render_tuning_audit)
+        probe_buttons.addWidget(self.tuning_button)
+        self.tuning_progress = QProgressBar()
+        self.tuning_progress.setRange(0, 0)
+        self.tuning_progress.setMaximumWidth(160)
+        self.tuning_progress.setVisible(False)
+        probe_buttons.addWidget(self.tuning_progress)
         probe_buttons.addStretch(1)
         self.resolution_label = QLabel("Backend: GM / SoundFont")
         self.resolution_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -286,6 +302,19 @@ class InstrumentInspectorWindow(QMainWindow):
         diagnostics_actions.addStretch(1)
         diagnostics_layout.addLayout(diagnostics_actions)
         layout.addWidget(diagnostics_box)
+
+        tuning_box = QGroupBox("Measured tuning")
+        tuning_layout = QVBoxLayout(tuning_box)
+        self.tuning_report = QPlainTextEdit()
+        self.tuning_report.setReadOnly(True)
+        self.tuning_report.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.tuning_report.setMaximumHeight(190)
+        self.tuning_report.setPlainText(
+            "Audit tuning renders the selected pitched instrument dry, compares each requested MIDI note to A4=440 / 12-TET, "
+            "and reports measured cents error. Results are observational and do not retune the score."
+        )
+        tuning_layout.addWidget(self.tuning_report)
+        layout.addWidget(tuning_box)
         return panel
 
     def _set_documents(self, instrument: dict, processing: dict) -> None:
@@ -296,6 +325,7 @@ class InstrumentInspectorWindow(QMainWindow):
         self.instrument_yaml.blockSignals(False)
         self.processing_yaml.blockSignals(False)
         self._invalidate_probe()
+        self._invalidate_tuning_audit()
         if hasattr(self, "_validation_timer"):
             self._refresh_document_state()
 
@@ -305,6 +335,7 @@ class InstrumentInspectorWindow(QMainWindow):
         self.instrument_yaml.setPlainText(yaml_text(instrument))
         self.instrument_yaml.blockSignals(False)
         self._invalidate_probe()
+        self._invalidate_tuning_audit()
         if refresh and hasattr(self, "_validation_timer"):
             self._refresh_document_state()
 
@@ -319,15 +350,29 @@ class InstrumentInspectorWindow(QMainWindow):
             self.transport.set_play_request_available(False)
             self.transport.clear_sources()
 
+    def _invalidate_tuning_audit(self) -> None:
+        self._rendered_tuning_hash = None
+        if hasattr(self, "tuning_report") and self._tuning_process is None:
+            self.tuning_report.setPlainText(
+                "Tuning audit is not current for this instrument definition. Press Audit tuning to measure the dry rendered patch."
+            )
+
     def _schedule_validation(self) -> None:
-        # Manual YAML edits make the editor authoritative and invalidate the
-        # rendered probe for the previous definition.
+        # Any YAML edit invalidates the processed audition probe. The tuning
+        # audit is dry-instrument evidence, so processing-only edits leave it
+        # current; instrument-definition edits invalidate it.
         self._invalidate_probe()
+        if self.sender() is self.instrument_yaml:
+            self._invalidate_tuning_audit()
         if hasattr(self, "_validation_timer"):
             self._validation_timer.start()
 
     def _probe_settings_changed(self, *_args) -> None:
         self._invalidate_probe()
+        # Only settings that are inputs to build_tuning_audit_request invalidate
+        # measured tuning. Phrase tempo/gate/root do not affect the dry audit.
+        if self.sender() is self.velocity or self.sender() is self.backend:
+            self._invalidate_tuning_audit()
         if hasattr(self, "_validation_timer"):
             self._validation_timer.start()
 
@@ -356,6 +401,14 @@ class InstrumentInspectorWindow(QMainWindow):
             velocity=self.velocity.value(),
             duration_seconds=self.duration.value(),
             tempo_bpm=self.tempo.value(),
+            backend=str(self.backend.currentData()),
+        )
+
+    def _current_tuning_request(self) -> dict:
+        instrument, _processing = self._documents()
+        return build_tuning_audit_request(
+            instrument=instrument,
+            velocity=self.velocity.value(),
             backend=str(self.backend.currentData()),
         )
 
@@ -442,6 +495,7 @@ class InstrumentInspectorWindow(QMainWindow):
             self.apply_controls_button.setEnabled(False)
             self.status.setText(f"YAML error: {exc}")
             self.render_button.setEnabled(False)
+            self.tuning_button.setEnabled(False)
             self.transport.set_play_request_available(False)
             return
         is_drum = bool(instrument.get("is_drum"))
@@ -465,10 +519,13 @@ class InstrumentInspectorWindow(QMainWindow):
         else:
             self.diagnostics.setPlainText("Backend unavailable; no region diagnostics can be computed.")
         self._last_preflight = preflight
-        self.apply_controls_button.setEnabled(bool(preflight.get("suggested_controls")) and self._render_process is None)
+        busy = self._render_process is not None or self._tuning_process is not None
+        self.apply_controls_button.setEnabled(bool(preflight.get("suggested_controls")) and not busy)
 
-        can_render = available and not preflight_blocks_render and self._render_process is None
+        can_render = available and not preflight_blocks_render and not busy
+        can_tune = available and not is_drum and not busy
         self.render_button.setEnabled(can_render)
+        self.tuning_button.setEnabled(can_tune)
         self.transport.set_play_request_available(can_render)
         if not available:
             self.status.setText("The selected instrument backend is not available on this machine. Render and Play are disabled.")
@@ -477,6 +534,8 @@ class InstrumentInspectorWindow(QMainWindow):
                 "The current SFZ probe cannot trigger an active region. See SFZ diagnostics below; "
                 "apply the suggested controller defaults when offered."
             )
+        elif self._tuning_process is not None:
+            self.status.setText("Measuring dry instrument tuning across the selected playable range…")
         elif self._render_process is not None:
             self.status.setText("Rendering the current audition phrase…")
         elif self._rendered_request_hash is None:
@@ -697,7 +756,100 @@ class InstrumentInspectorWindow(QMainWindow):
             return
         self._set_documents(instrument, processing)
 
+    def _render_tuning_audit(self) -> None:
+        if self._tuning_process is not None:
+            self.status.setText("A tuning audit is already running.")
+            return
+        if self._render_process is not None:
+            self.status.setText("Finish the current probe render before starting the tuning audit.")
+            return
+        try:
+            instrument, _processing = self._documents()
+            if bool(instrument.get("is_drum")):
+                raise ValueError("tuning audit applies only to pitched instruments")
+            available, _resolution = self._instrument_availability(instrument)
+            if not available:
+                raise ValueError("selected instrument backend is not available on this machine")
+            request = self._current_tuning_request()
+        except Exception as exc:
+            QMessageBox.critical(self, "Cannot audit tuning", str(exc))
+            return
+
+        request_hash = tuning_audit_request_hash(request)
+        request_dir = agent_root() / "instrument_inspector" / "requests"
+        request_dir.mkdir(parents=True, exist_ok=True)
+        request_path = request_dir / f"tuning-{uuid.uuid4().hex[:12]}.json"
+        request_path.write_text(json.dumps(request, indent=2, sort_keys=True), encoding="utf8")
+        self._tuning_request_hash = request_hash
+        self._rendered_tuning_hash = None
+        self.tuning_report.setPlainText(
+            "Rendering one isolated dry range sweep, then measuring each note against A4=440 / 12-TET…"
+        )
+
+        process = QProcess(self)
+        self._tuning_process = process
+        process.setWorkingDirectory(str(self.project_root))
+        process.finished.connect(self._tuning_finished)
+        process.errorOccurred.connect(lambda _error: self.status.setText("Tuning-audit process failed to start."))
+        self.tuning_progress.setVisible(True)
+        self.tuning_button.setEnabled(False)
+        self.render_button.setEnabled(False)
+        self.transport.set_play_request_available(False)
+        self.status.setText("Tuning audit running: rendering dry chromatic/range sweep and measuring note centers…")
+        process.start(
+            sys.executable,
+            ["-m", "ambition_music_renderer.music_instrument_inspector", "--tuning-request", str(request_path)],
+        )
+
+    def _tuning_finished(self, exit_code: int, _exit_status) -> None:
+        process = self._tuning_process
+        expected_hash = self._tuning_request_hash
+        self._tuning_process = None
+        self._tuning_request_hash = None
+        self.tuning_progress.setVisible(False)
+        if process is None:
+            return
+        stdout = bytes(process.readAllStandardOutput()).decode("utf8", errors="replace")
+        stderr = bytes(process.readAllStandardError()).decode("utf8", errors="replace")
+        if exit_code != 0:
+            failure = (stderr or stdout).strip()[-2400:]
+            self.tuning_report.setPlainText("Tuning audit failed:\n" + failure)
+            self.status.setText("Tuning audit failed. See the measured-tuning panel for renderer output.")
+            self._refresh_document_state()
+            return
+        try:
+            line = next(line for line in reversed(stdout.splitlines()) if line.strip().startswith("{"))
+            report = json.loads(line)
+            current_hash = tuning_audit_request_hash(self._current_tuning_request())
+        except Exception as exc:
+            self.tuning_report.setPlainText(f"Tuning audit finished but its result could not be parsed: {exc}\n{stdout[-1200:]}")
+            self.status.setText("Tuning audit result could not be parsed.")
+            self._refresh_document_state()
+            return
+        report_hash = str(report.get("request_hash") or "")
+        if report_hash != expected_hash or current_hash != expected_hash:
+            self.tuning_report.setPlainText(
+                "Tuning audit finished, but the instrument definition or audit settings changed while it was running. Run it again for the current patch."
+            )
+            self.status.setText("Discarded stale tuning-audit result.")
+            self._refresh_document_state()
+            return
+        self._rendered_tuning_hash = report_hash
+        text = format_tuning_audit_report(report)
+        if stderr.strip():
+            text += "\n\nBackend messages:\n" + stderr.strip()[-1200:]
+        self.tuning_report.setPlainText(text)
+        summary = report.get("summary") or {}
+        classification = summary.get("classification", "unknown")
+        median = summary.get("median_cents")
+        median_text = f"; median {float(median):+.2f} cents" if median is not None else ""
+        self._refresh_document_state()
+        self.status.setText(f"Tuning audit ready: {classification}{median_text}. No correction was applied.")
+
     def _render_probe(self, *, auto_play: bool = False) -> None:
+        if self._tuning_process is not None:
+            self.status.setText("Finish the tuning audit before rendering the audition phrase.")
+            return
         if self._render_process is not None:
             if auto_play:
                 self._play_after_render = True
@@ -836,6 +988,9 @@ class InstrumentInspectorWindow(QMainWindow):
         if self._render_process is not None:
             self._render_process.kill()
             self._render_process.waitForFinished(1500)
+        if self._tuning_process is not None:
+            self._tuning_process.kill()
+            self._tuning_process.waitForFinished(1500)
         super().closeEvent(event)
 
 
