@@ -12,7 +12,7 @@ id: nine_lives_at_midnight
 title: Nine Lives at Midnight
 seed: 2026090701
 description: 'Original ninja rooftop/action theme. A repeated-note leap and falling answer anchor an explicit, hand-voiced
-  score: shamisen propulsion, interlocking koto, audible electric bass, and taiko-led percussion. The broad skyline refrain
+  score: shamisen propulsion, interlocking koto, woody upright bass, and taiko-led percussion. The broad skyline refrain
   earns its return after a half-time courtyard and a shamisen chase.'
 timebase: {ppq: 960}
 meter: 4/4
@@ -185,11 +185,16 @@ instruments:
   expression: 106
 - name: footsteps
   group: bass
-  program: fingered_bass
-  volume: 105
+  program: acoustic_bass
+  volume: 108
   pan: 64
   expression: 112
-  instrument_backend: {kind: sfz, library_ref: bass.fashion, required: true}
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    required: true
+    prefer: [notation, basses pizzicato, pizzicato, pizz, upright, acoustic]
+    settings: {fold_to_range: false}
 - name: horizon
   group: strings
   program: string_ensemble_1
@@ -233,12 +238,12 @@ processing:
       - {processor: gain, gain_db: -3.0}
     bass:
       chain:
-      - {processor: highpass, cutoff_hz: 34}
-      - {processor: band_gain, low_hz: 180, high_hz: 420, gain_db: 0.7}
-      - {processor: band_gain, low_hz: 650, high_hz: 1400, gain_db: 0.4}
-      - {processor: lowpass, cutoff_hz: 3600}
-      - {processor: compressor, threshold_db: -22, ratio: 1.9, attack_ms: 24, release_ms: 115, knee_db: 6}
-      - {processor: gain, gain_db: 2.1}
+      - {processor: highpass, cutoff_hz: 31}
+      - {processor: band_gain, low_hz: 80, high_hz: 220, gain_db: 0.9}
+      - {processor: band_gain, low_hz: 620, high_hz: 1250, gain_db: 0.8}
+      - {processor: lowpass, cutoff_hz: 5000}
+      - {processor: compressor, threshold_db: -23, ratio: 1.6, attack_ms: 30, release_ms: 130, knee_db: 6}
+      - {processor: gain, gain_db: 2.4}
     strings:
       chain:
       - {processor: highpass, cutoff_hz: 220}
