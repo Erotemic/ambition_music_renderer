@@ -516,6 +516,26 @@ request, then routed from pre-rendered group stems. This avoids turning catalog
 discovery into implicit combinatorial rendering while keeping candidate intent in
 the score rather than in GUI state.
 
+Instrument Inspector also owns a machine-local **measured tuning audit**. It
+renders an isolated dry range sweep through the selected real backend and compares
+each known MIDI pitch against A4=440 Hz / 12-TET. The primary normalized-
+autocorrelation estimate is independently checked by a harmonic spectral-peak
+estimator before any correction proposal is emitted. The resulting JSON under
+`agent/instrument_inspector/tuning/` is observational evidence, like the workstation
+snapshot and usage census: it may identify a global cents offset, range-dependent
+drift, or local outliers, but it does not mutate `instrument_catalog.yaml` or
+MusicIR automatically.
+
+A score may explicitly author `tuning_correction` on an instrument realization.
+This is **pre-processing synthesis calibration**, not an EQ/plugin effect and not a
+change to semantic score pitch. Global corrections use one MIDI pitch-bend lane;
+per-note curves interpolate measured cents offsets and split only overlapping notes
+that require incompatible offsets into independent render lanes before summing.
+That keeps monophonic bass/lead correction to one synthesis pass while remaining
+polyphony-safe for chords. `cue tuning-audit` writes a conservative
+`corrections.yaml` snippet only when the autocorrelation and spectral estimators
+agree; applying that snippet remains an explicit authoring decision.
+
 Continue by adding patch-specific reliable ranges, articulation realization,
 weak/silent zones, and family audition phrases only when supported by census,
 smoke-test, or listening evidence.

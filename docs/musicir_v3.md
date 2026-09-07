@@ -506,6 +506,59 @@ python -S dev/music_authoring_reference.py search guitar
 python -S dev/music_authoring_reference.py describe guitar.strum
 ```
 
+
+## Explicit instrument tuning calibration
+
+A pitched instrument realization may carry an opt-in `tuning_correction`. This is
+backend synthesis calibration: semantic MusicIR pitches, harmony analysis, MIDI
+exports, and score-derived diagnostics continue to see the authored note number.
+The correction is applied only when producing audio, before EQ/amp/reverb/mastering.
+
+For a nearly constant measured offset:
+
+```yaml
+instruments:
+- name: low_guitar
+  group: giant
+  program: overdriven_guitar
+  tuning_correction:
+    mode: global
+    cents: -6.75
+```
+
+For pitch-dependent sample drift:
+
+```yaml
+instruments:
+- name: giant_bass
+  group: bass
+  program: picked_bass
+  tuning_correction:
+    mode: curve
+    interpolation: linear
+    max_abs_cents: 50
+    points:
+      C1: -32.2
+      E1: -25.0
+      C2: -22.5
+      E2: -11.0
+      E3: -9.3
+```
+
+Curve points are absolute cents corrections at those MIDI notes. Linear
+interpolation is used between points and the nearest endpoint is held outside the
+measured range. The renderer realizes the curve with MIDI pitch bend. Monophonic
+lines remain one render lane even when every note has a different correction;
+polyphonic passages split only simultaneous notes that need different offsets into
+independent lanes and sum them before normal instrument gain/processing.
+
+`tuning_correction` is never inferred during a normal render. Run `cue tuning-audit`
+to obtain dual-estimator measurements and a conservative `corrections.yaml` snippet,
+then explicitly copy/accept the desired profiles into the score. The dependency-free
+fallback synth and the current procedural-FM backend do not support this calibration
+path because they do not render MIDI pitch bend accurately; the renderer fails rather
+than pretending the correction was applied.
+
 ## Authored instrument candidate banks
 
 Instrument A/B choices are authoring metadata rather than an alternate render authority. A score may declare a small bounded bank under `authoring.instrument_candidates`, keyed by the authored instrument name:

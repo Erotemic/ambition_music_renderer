@@ -14,6 +14,7 @@ Subcommands:
     cue graph <cue>         Show the v3 authoring graph and dependencies.
     cue trace_event <cue>   Trace one stable compiled event id to its source.
     cue quality <cue>       Report composition-level review evidence.
+    cue tuning-audit <cue>  Audit every pitched instrument used by the cue.
     cue determinism <cue>   Verify repeated compilation is identical.
     cue publish <cue>       Publish newest preview into the sandbox asset tree.
     cue bundle <cue>...     Render+debug+package one or more cues. For one cue,
@@ -32,6 +33,7 @@ Subcommands:
     instruments describe    Show canonical MusicIR usage and library nuances.
     instruments doctor      Check the local audio-tools install against expectations.
     instruments audition    Write a canonical v3 audition score for one instrument.
+    instruments tuning-audit Measure rendered pitch against A4=440 / 12-TET.
     techniques list         List backend-independent v3 performance techniques.
     techniques describe     Describe one performance technique.
     generators list         List MusicIR v3 procedural generator capabilities.
@@ -1189,7 +1191,6 @@ def cmd_instruments_doctor(args) -> int:
 
     from .instrument_catalog import instrument_catalog, instrument_catalog_policy, instrument_source_catalog
     from .instrument_libraries import collect_sfz_library_diagnostics
-    from .instrument_resolution import resolve_instrument_backend
 
     catalog = instrument_catalog()
     diagnostics = collect_sfz_library_diagnostics(limit=int(args.limit))
@@ -1197,28 +1198,18 @@ def cmd_instruments_doctor(args) -> int:
     for ref, entry in sorted(catalog.items()):
         if not entry.expected:
             continue
-        backend = entry.authoring_snippet()["instrument_backend"]
-        plan = resolve_instrument_backend(backend)
-        resolved_path = plan.resolved_sfz or plan.resolved_soundfont
-        resolved = str(resolved_path) if resolved_path else None
+        resolved = diagnostics["alias_hits"].get(ref)
         rows.append({
             "ref": ref,
             "family": entry.family,
             "source": entry.source,
             "install_profile": entry.install_profile,
-            "backend": plan.kind or "sfz",
             "resolved": resolved,
             "ok": bool(resolved),
         })
     missing = [row for row in rows if not row["ok"]]
-    source_hits = {}
-    for source_name, source in instrument_source_catalog().items():
-        hit = next((row["resolved"] for row in rows if row.get("source") == source_name and row.get("resolved")), None)
-        source_hits[source_name] = hit
-    expected_sources_missing = [
-        name for name, info in instrument_source_catalog().items()
-        if bool(info.get("expected", False)) and not source_hits.get(name)
-    ]
+    source_hits = diagnostics.get("source_hits") or {}
+    expected_sources_missing = list(diagnostics.get("expected_sources_missing") or [])
     expected_source_count = sum(
         1 for info in instrument_source_catalog().values() if bool(info.get("expected", False))
     )
@@ -1512,7 +1503,7 @@ class ExpandCommand(kwconf.Config):
         if len(rows) > int(config.limit):
             print(f"  ... {len(rows) - int(config.limit)} more events; use --json or raise --limit")
         for name, plan in report.get("instrument_resolution", {}).items():
-            selected = plan.get("resolved_sfz") or plan.get("resolved_soundfont") or plan.get("fallback_backend") or plan.get("kind") or "default backend"
+            selected = plan.get("resolved_sfz") or plan.get("fallback_backend") or plan.get("kind") or "default backend"
             print(f"instrument {name}: {selected}")
         return 0
 
@@ -1593,7 +1584,7 @@ class TraceEventCommand(kwconf.Config):
             print(f"  clip: {clip['path']} source={clip.get('generator_kind') or clip.get('material_id') or clip.get('source_kind')}")
         plan = report.get("instrument_resolution") or {}
         if plan:
-            print(f"  realization: {plan.get('resolved_sfz') or plan.get('resolved_soundfont') or plan.get('fallback_backend') or plan.get('kind')}")
+            print(f"  realization: {plan.get('resolved_sfz') or plan.get('fallback_backend') or plan.get('kind')}")
         return 0
 
 
@@ -1699,10 +1690,8 @@ class FingerprintCommand(kwconf.Config):
         instruments = ((deps.get("instrument_resolution") or {}).get("instruments") or {})
         for name, row in instruments.items():
             sfz = row.get("resolved_sfz")
-            soundfont = row.get("resolved_soundfont")
             program = ((sfz or {}).get("program") or {}).get("path") if isinstance(sfz, dict) else None
-            soundfont_path = soundfont.get("path") if isinstance(soundfont, dict) else None
-            selected = program or soundfont_path or row.get("fallback_backend") or row.get("kind") or config.backend
+            selected = program or row.get("fallback_backend") or row.get("kind") or config.backend
             print(f"  {name}: {selected}")
         return 0
 
@@ -1832,6 +1821,66 @@ class ListCommand(kwconf.Config):
         return cmd_cue_list(cls.cli(argv=argv, data=kwargs))
 
 
+class CueTuningAuditCommand(kwconf.Config):
+    """Audit tuning for every pitched instrument realization used by one cue."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    backend: str = kwconf.Value("auto", help="render backend used for dry tuning probes")
+    sample_rate: int = kwconf.Value(48000, help="analysis/render sample rate")
+    max_notes: int = kwconf.Value(61, help="maximum score-used pitches audited per realization")
+    output_dir: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help=(
+            "exact directory for report.json/report.txt/corrections.yaml; default is "
+            "agent/tuning_audits/<cue>/<hash>"
+        ),
+    )
+    force: bool = kwconf.Flag(False, help="rerender tuning probes instead of using cached measurements")
+    warn_only: bool = kwconf.Flag(False, help="return success even when one or more instrument audits fail")
+    json: bool = kwconf.Flag(False, help="emit the consolidated JSON report to stdout")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        candidate = Path(str(config.cue)).expanduser()
+        score = candidate.resolve() if candidate.is_file() else find_score(str(config.cue))
+        if score is None:
+            print(f"cue not found: {config.cue}", file=sys.stderr)
+            return 1
+
+        from .audit.score_tuning import format_score_tuning_report, render_score_tuning_audit
+
+        def progress(index: int, total: int, label: str, state: str) -> None:
+            if state == "running":
+                print(f"[tuning {index}/{total}] {label} ...", file=sys.stderr, flush=True)
+            elif state == "error":
+                print(f"[tuning {index}/{total}] {label}: ERROR", file=sys.stderr, flush=True)
+            else:
+                print(f"[tuning {index}/{total}] {label}: done", file=sys.stderr, flush=True)
+
+        try:
+            report = render_score_tuning_audit(
+                score,
+                backend=str(config.backend),
+                sample_rate=int(config.sample_rate),
+                max_notes=int(config.max_notes),
+                output_dir=config.output_dir,
+                force=bool(config.force),
+                progress=progress,
+            )
+        except (KeyError, ValueError, RuntimeError, OSError) as ex:
+            print(str(ex), file=sys.stderr)
+            return 1
+
+        if config.json:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        else:
+            print(format_score_tuning_report(report))
+        failures = int((report.get("summary") or {}).get("failures", 0))
+        return 0 if bool(config.warn_only) or failures == 0 else 1
+
+
 class CueModal(kwconf.ModalCLI):
     """Cue-oriented workflows."""
 
@@ -1845,6 +1894,7 @@ class CueModal(kwconf.ModalCLI):
     graph = GraphCommand
     trace_event = TraceEventCommand
     quality = QualityCommand
+    tuning_audit = CueTuningAuditCommand
     determinism = DeterminismCommand
     fingerprint = FingerprintCommand
     publish = PublishCommand
@@ -1990,6 +2040,55 @@ class InstrumentAuditionScore(kwconf.Config):
         return 0
 
 
+class InstrumentTuningAuditCommand(kwconf.Config):
+    """Measure one catalog instrument's dry rendered tuning against A4=440 / 12-TET."""
+
+    ref: str = kwconf.Value(None, position=1, help="catalog library_ref")
+    backend: str = kwconf.Value("auto", help="render backend")
+    sample_rate: int = kwconf.Value(48000, help="analysis/render sample rate")
+    velocity: int = kwconf.Value(100, help="MIDI velocity for audit notes")
+    max_notes: int = kwconf.Value(61, help="maximum chromatic/range-covering audit notes")
+    min_midi: int | None = kwconf.Value(None, help="optional lower MIDI bound")
+    max_midi: int | None = kwconf.Value(None, help="optional upper MIDI bound")
+    output: Path | None = kwconf.Value(None, parser=Path, help="optional report JSON copy")
+    json: bool = kwconf.Flag(False, help="emit JSON instead of the compact text report")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        from .instrument_authoring import canonical_audition_score
+        from .music_instrument_inspector_model import (
+            build_tuning_audit_request,
+            format_tuning_audit_report,
+            render_tuning_audit,
+        )
+        try:
+            score = canonical_audition_score(str(config.ref))
+            instrument = dict(score["instruments"][0])
+            request = build_tuning_audit_request(
+                instrument=instrument,
+                backend=str(config.backend),
+                sample_rate=int(config.sample_rate),
+                velocity=int(config.velocity),
+                max_notes=int(config.max_notes),
+                min_midi=config.min_midi,
+                max_midi=config.max_midi,
+            )
+            result = render_tuning_audit(request)
+        except (KeyError, ValueError, RuntimeError, OSError) as ex:
+            print(str(ex), file=sys.stderr)
+            return 1
+        if config.output is not None:
+            output = Path(config.output)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(result.report, indent=2, sort_keys=True), encoding="utf8")
+        if config.json:
+            print(json.dumps(result.report, indent=2, sort_keys=True))
+        else:
+            print(format_tuning_audit_report(result.report))
+        return 0
+
+
 class InstrumentsModal(kwconf.ModalCLI):
     """Discover the checked-in instrument vocabulary and verify local installation."""
 
@@ -1997,6 +2096,7 @@ class InstrumentsModal(kwconf.ModalCLI):
     describe = InstrumentDescribe
     doctor = InstrumentDoctor
     audition = InstrumentAuditionScore
+    tuning_audit = InstrumentTuningAuditCommand
 
 
 def cmd_techniques_list(args) -> int:
@@ -2191,6 +2291,7 @@ def cmd_processing_schema(args) -> int:
 
 
 def cmd_processing_plan(args) -> int:
+    from .musicir.timing import authored_section_rows
     from .processing.mastering import mastering_policy
     from .processing.plans import processing_plan_summary
     from .render.score_core import load_yaml
@@ -2200,7 +2301,7 @@ def cmd_processing_plan(args) -> int:
         raise FileNotFoundError(f"could not find score {args.cue!r}")
     spec = load_yaml(path)
     groups = sorted({str(row.get("group")) for row in spec.get("instruments", []) if isinstance(row, dict) and row.get("group")})
-    sections = [str(row.get("id")) for row in spec.get("sections", []) if isinstance(row, dict) and row.get("id")]
+    sections = [str(row.get("id")) for row in authored_section_rows(spec) if row.get("id")]
     payload = processing_plan_summary(spec, groups=groups, sections=sections)
     payload["mastering_policy"] = mastering_policy(spec).as_dict()
     payload["score"] = str(path)

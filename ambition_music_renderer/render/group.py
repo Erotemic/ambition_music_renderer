@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import shutil
 import sys
 from pathlib import Path
 from typing import Any
@@ -15,7 +16,6 @@ from ..musicir.timing import initial_beats_per_bar, initial_bpm
 from ..instrument_resolution import (
     backend_prefers_procedural_fm,
     backend_prefers_sfizz,
-    backend_prefers_soundfont,
     instrument_backend_spec,
     resolve_instrument_backend,
 )
@@ -23,6 +23,7 @@ from ..audio_utils import coerce_stereo
 from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
 from .synth import render_procedural_fm, render_synth_audio
+from .tuning import build_tuning_lane_pms, tuning_correction_for_instrument
 from .foreground_protection import (
     apply_instrument_foreground_protection,
     foreground_protection_mode,
@@ -104,6 +105,33 @@ def _apply_instrument_mix_gain(audio: np.ndarray, gain_db: float) -> np.ndarray:
     return (audio * (10.0 ** (gain_db / 20.0))).astype(np.float32, copy=False)
 
 
+def _sum_audio_buffers(buffers: list[np.ndarray]) -> np.ndarray:
+    if not buffers:
+        return np.zeros((1, 2), dtype=np.float32)
+    stereo = [coerce_stereo(buffer) for buffer in buffers]
+    max_len = max(len(buffer) for buffer in stereo)
+    out = np.zeros((max_len, 2), dtype=np.float32)
+    for buffer in stereo:
+        out[: len(buffer), :] += buffer
+    return out.astype(np.float32, copy=False)
+
+
+def _assert_pitch_bend_backend_available(backend: str, soundfont: str) -> None:
+    """Reject fallback paths that would discard tuning-correction pitch bends."""
+
+    name = str(backend)
+    if name == "fallback":
+        raise RuntimeError(
+            "tuning_correction requires a backend that renders MIDI pitch bend; "
+            "the dependency-free fallback backend intentionally does not"
+        )
+    if name == "auto" and not (soundfont and shutil.which("fluidsynth")):
+        raise RuntimeError(
+            "tuning_correction with backend=auto requires the FluidSynth CLI and a SoundFont; "
+            "otherwise auto would fall back to a synth that ignores pitch bend"
+        )
+
+
 def _finalize_instrument_mix_audio(
     audio: np.ndarray,
     *,
@@ -157,16 +185,16 @@ def render_group_audio(
         backend_prefers_sfizz(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
-    has_instrument_soundfont = any(
-        backend_prefers_soundfont(instrument_backend_spec(instrument_specs, inst.name))
-        for inst in insts
-    )
     has_instrument_procedural_fm = any(
         backend_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
     has_instrument_mix_gain = any(
         abs(_instrument_mix_gain_db(instrument_specs, inst.name)) > 1e-9
+        for inst in insts
+    )
+    has_tuning_correction = any(
+        tuning_correction_for_instrument(instrument_specs.get(inst.name, {}) or {}) is not None
         for inst in insts
     )
     protection_cfg = dict(render_cfg.get("foreground_protection") or {})
@@ -182,9 +210,9 @@ def render_group_audio(
     if (
         wants_sfizz
         or has_instrument_sfizz
-        or has_instrument_soundfont
         or has_instrument_procedural_fm
         or has_instrument_mix_gain
+        or has_tuning_correction
         or has_instrument_register_protection
     ):
         from ..backends.sfizz_backend import render_sfizz
@@ -206,8 +234,10 @@ def render_group_audio(
         strict_backends = bool(render_cfg.get("strict_backends", render_cfg.get("strict_instruments", False)))
         rendered: list[np.ndarray] = []
         for idx, inst in enumerate(insts):
+            inst_spec = instrument_specs.get(inst.name, {}) or {}
             inst_backend = instrument_backend_spec(instrument_specs, inst.name)
             mix_gain_db = _instrument_mix_gain_db(instrument_specs, inst.name)
+            tuning_profile = tuning_correction_for_instrument(inst_spec)
             plan = resolve_instrument_backend(
                 inst_backend,
                 base_dir=base_dir,
@@ -218,7 +248,14 @@ def render_group_audio(
             allow_fallback = plan.optional and not strict_backends
             fallback_backend_name = str(plan.fallback_backend or default_fallback_backend)
             inst_pm = copy_with_instruments(pm, [inst], bpm)
+            tuning_lanes = build_tuning_lane_pms(inst_pm, inst_spec)
+
             if plan.wants_procedural_fm:
+                if tuning_profile is not None:
+                    raise RuntimeError(
+                        f"instrument {inst.name!r} uses procedural_fm, which does not yet render "
+                        "MIDI pitch bend; tuning_correction cannot be applied safely"
+                    )
                 rendered.append(
                     _finalize_instrument_mix_audio(
                         render_procedural_fm(
@@ -236,84 +273,31 @@ def render_group_audio(
                     )
                 )
                 continue
-            soundfont_path = plan.resolved_soundfont
-            if soundfont_path is not None:
-                midi_path = tempdir / f"group_{group}.{idx}.{inst.name}.soundfont.mid"
-                dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.soundfont.wav"
-                renderer = str(inst_backend.get("renderer") or "fluidsynth-cli")
-                if renderer != "fallback":
-                    inst_pm.write(str(midi_path))
-                try:
-                    inst_audio = render_synth_audio(
-                        inst_pm,
-                        renderer,
-                        str(soundfont_path),
-                        sample_rate,
-                        midi_path,
-                        dry_wav,
-                        minimum_duration,
-                    )
-                except Exception as ex:
-                    if not allow_fallback:
-                        raise
-                    _warn_instrument_backend_once(
-                        f"soundfont-render-failed:{inst.name}:{soundfont_path}",
-                        f"instrument {inst.name!r} requested SoundFont {soundfont_path}, but rendering failed; "
-                        f"using {fallback_backend_name!r} fallback. reason: {ex}",
-                    )
-                else:
-                    if _instrument_has_notes(inst_pm) and _is_effectively_silent(inst_audio):
-                        msg = (
-                            f"instrument {inst.name!r} SoundFont {soundfont_path} rendered SILENCE despite active notes"
-                        )
-                        if not allow_fallback:
-                            raise RuntimeError(msg)
-                        _warn_instrument_backend_once(
-                            f"soundfont-silent:{inst.name}:{soundfont_path}",
-                            f"{msg}; using {fallback_backend_name!r} fallback.",
-                        )
-                    else:
-                        rendered.append(
-                            _finalize_instrument_mix_audio(
-                                inst_audio,
-                                mix_gain_db=mix_gain_db,
-                                pm=pm,
-                                groups=groups,
-                                protection_spec=protection_spec,
-                                instrument_name=inst.name,
-                                sample_rate=sample_rate,
-                            )
-                        )
-                        continue
-            elif plan.wants_soundfont:
-                requested = plan.requested
-                if strict_backends or not plan.optional:
-                    raise FileNotFoundError(
-                        f"instrument {inst.name!r} requested SoundFont library {requested!r}, but no matching .sf2/.sf3 was found; "
-                        "run or repair download_ambition_audio_tools.sh"
-                    )
-                _warn_instrument_backend_once(
-                    f"soundfont-not-found:{inst.name}:{requested}",
-                    f"instrument {inst.name!r} requested SoundFont library {requested!r}, but it did not resolve; "
-                    f"using {fallback_backend_name!r} fallback.",
-                )
 
             sfz_path = plan.resolved_sfz
             if sfz_path is not None:
-                sfz_pm = copy_with_instruments(pm, [inst], bpm)
-                apply_backend_note_remap(sfz_pm, inst_backend)
                 settings = dict(plan.sfizz_settings)
+                lane_audio: list[np.ndarray] = []
                 try:
-                    sfizz_audio = render_sfizz(
-                        sfz_pm,
-                        sfz_path=sfz_path,
-                        sample_rate=sample_rate,
-                        tempdir=tempdir,
-                        output_name=f"group_{group}.{idx}.{inst.name}",
-                        minimum_duration=minimum_duration,
-                        base_dir=base_dir,
-                        settings=settings,
-                    )
+                    for lane_index, lane_pm in enumerate(tuning_lanes):
+                        sfz_pm = copy.deepcopy(lane_pm)
+                        apply_backend_note_remap(sfz_pm, inst_backend)
+                        audio = render_sfizz(
+                            sfz_pm,
+                            sfz_path=sfz_path,
+                            sample_rate=sample_rate,
+                            tempdir=tempdir,
+                            output_name=f"group_{group}.{idx}.{inst.name}.tune{lane_index}",
+                            minimum_duration=minimum_duration,
+                            base_dir=base_dir,
+                            settings=settings,
+                        )
+                        if _instrument_has_notes(sfz_pm) and _is_effectively_silent(audio):
+                            raise RuntimeError(
+                                f"instrument {inst.name!r} SFZ {sfz_path} rendered SILENCE despite "
+                                "active notes (missing samples, or an unmet keyswitch/CC/range)"
+                            )
+                        lane_audio.append(audio)
                 except Exception as ex:
                     if not allow_fallback:
                         raise
@@ -323,35 +307,18 @@ def render_group_audio(
                         f"using {fallback_backend_name!r} fallback. reason: {ex}",
                     )
                 else:
-                    # sfizz exits 0 even when it drops every region (missing
-                    # samples) or nothing matches (unmet keyswitch/CC/range),
-                    # yielding silence. Treat that like a failure so the stem is
-                    # not silently lost.
-                    if _instrument_has_notes(sfz_pm) and _is_effectively_silent(sfizz_audio):
-                        msg = (
-                            f"instrument {inst.name!r} SFZ {sfz_path} rendered SILENCE despite active "
-                            f"notes (missing samples, or an unmet keyswitch/CC/range)"
+                    rendered.append(
+                        _finalize_instrument_mix_audio(
+                            _sum_audio_buffers(lane_audio),
+                            mix_gain_db=mix_gain_db,
+                            pm=pm,
+                            groups=groups,
+                            protection_spec=protection_spec,
+                            instrument_name=inst.name,
+                            sample_rate=sample_rate,
                         )
-                        if not allow_fallback:
-                            raise RuntimeError(msg)
-                        _warn_instrument_backend_once(
-                            f"sfizz-silent:{inst.name}:{sfz_path}",
-                            f"{msg}; using {fallback_backend_name!r} fallback. Fix the SFZ choice or make "
-                            f"{fallback_backend_name!r} this instrument's backend.",
-                        )
-                    else:
-                        rendered.append(
-                            _finalize_instrument_mix_audio(
-                                sfizz_audio,
-                                mix_gain_db=mix_gain_db,
-                                pm=pm,
-                                groups=groups,
-                                protection_spec=protection_spec,
-                                instrument_name=inst.name,
-                                sample_rate=sample_rate,
-                            )
-                        )
-                        continue
+                    )
+                    continue
             elif plan.wants_sfz:
                 requested = plan.requested
                 if (wants_sfizz and not plan.optional) or strict_backends:
@@ -366,32 +333,35 @@ def render_group_audio(
                     f"using {fallback_backend_name!r} fallback.",
                 )
 
-            midi_path = tempdir / f"group_{group}.{idx}.{inst.name}.mid"
-            dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.dry.wav"
-            if fallback_backend_name != "fallback":
-                inst_pm.write(str(midi_path))
-            inst_audio = render_synth_audio(
-                inst_pm,
-                fallback_backend_name,
-                soundfont,
-                sample_rate,
-                midi_path,
-                dry_wav,
-                minimum_duration,
-            )
-            # Last-resort guard: even the fallback can render silence if a GM
-            # program is absent from the soundfont. Never drop a noted stem quietly.
-            if _instrument_has_notes(inst_pm) and _is_effectively_silent(inst_audio):
-                msg = (
-                    f"instrument {inst.name!r} rendered SILENCE despite active notes via "
-                    f"{fallback_backend_name!r} backend (check program/soundfont coverage)"
+            if tuning_profile is not None:
+                _assert_pitch_bend_backend_available(fallback_backend_name, soundfont)
+            lane_audio = []
+            for lane_index, lane_pm in enumerate(tuning_lanes):
+                midi_path = tempdir / f"group_{group}.{idx}.{inst.name}.tune{lane_index}.mid"
+                dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.tune{lane_index}.dry.wav"
+                if fallback_backend_name != "fallback":
+                    lane_pm.write(str(midi_path))
+                audio = render_synth_audio(
+                    lane_pm,
+                    fallback_backend_name,
+                    soundfont,
+                    sample_rate,
+                    midi_path,
+                    dry_wav,
+                    minimum_duration,
                 )
-                if strict_backends:
-                    raise RuntimeError(msg)
-                _warn_instrument_backend_once(f"instrument-silent:{inst.name}", msg)
+                if _instrument_has_notes(lane_pm) and _is_effectively_silent(audio):
+                    msg = (
+                        f"instrument {inst.name!r} rendered SILENCE despite active notes via "
+                        f"{fallback_backend_name!r} backend (check program/soundfont coverage)"
+                    )
+                    if strict_backends:
+                        raise RuntimeError(msg)
+                    _warn_instrument_backend_once(f"instrument-silent:{inst.name}", msg)
+                lane_audio.append(audio)
             rendered.append(
                 _finalize_instrument_mix_audio(
-                    inst_audio,
+                    _sum_audio_buffers(lane_audio),
                     mix_gain_db=mix_gain_db,
                     pm=pm,
                     groups=groups,

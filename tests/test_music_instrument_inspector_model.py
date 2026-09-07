@@ -222,14 +222,82 @@ def test_probe_pm_emits_suggested_controller_before_notes(tmp_path: Path):
     assert (107, 88, 0.0) in ccs
 
 
-def test_shamisen_catalog_alias_applies_soundfont_backend():
-    inst = apply_library_entry(
-        default_instrument_document(),
-        LibraryEntry("catalog_alias", "japan.shamisen", "Shamisen", "japan.shamisen"),
+def test_tuning_audit_request_and_fallback_render(tmp_path: Path):
+    from ambition_music_renderer.music_instrument_inspector_model import (
+        build_tuning_audit_request,
+        render_tuning_audit,
     )
-    assert inst["program"] == 106
-    assert inst["instrument_backend"] == {
-        "kind": "soundfont",
-        "renderer": "fluidsynth-cli",
-        "library_ref": "japan.shamisen",
+
+    req = build_tuning_audit_request(
+        instrument={"name": "lead", "group": "lead", "program": "violin", "volume": 100, "expression": 100},
+        backend="fallback",
+        sample_rate=12000,
+        velocity=96,
+        note_duration_seconds=0.35,
+        gap_seconds=0.10,
+        max_notes=8,
+        min_midi=60,
+        max_midi=64,
+    )
+    result = render_tuning_audit(req, output_root=tmp_path)
+    assert result.dry_audio.is_file()
+    assert result.report_path.is_file()
+    assert result.report["reference"] == {
+        "a4_hz": 440.0,
+        "temperament": "12-TET",
+        "stage": "dry_pre_processing",
     }
+    rows = result.report["notes"]
+    assert [row["midi"] for row in rows] == [60, 61, 62, 63, 64]
+    assert all(row["status"] in {"ok", "unstable"} for row in rows)
+    assert max(abs(float(row["cents"])) for row in rows) < 4.0
+
+
+def test_tuning_span_uses_widest_playable_region_not_low_keyswitch(tmp_path: Path):
+    from ambition_music_renderer.music_instrument_inspector_model import _tuning_audit_span
+
+    sfz = tmp_path / "keyswitch_patch.sfz"
+    sfz.write_text(
+        "<region> key=24 sample=switch.wav\n"
+        "<group> lokey=40 hikey=84\n"
+        "<region> sample=notes.wav\n",
+        encoding="utf8",
+    )
+    assert _tuning_audit_span({}, sfz) == (40, 84)
+
+
+def test_tuning_audit_exact_notes_use_score_velocities(tmp_path: Path):
+    from ambition_music_renderer.music_instrument_inspector_model import (
+        build_tuning_audit_request,
+        render_tuning_audit,
+    )
+
+    req = build_tuning_audit_request(
+        instrument={"name": "lead", "group": "lead", "program": "violin"},
+        backend="fallback",
+        sample_rate=12000,
+        notes=[60, 64, 67],
+        note_velocities={60: 72, 64: 96, 67: 118},
+        base_dir=tmp_path,
+        max_notes=8,
+    )
+    result = render_tuning_audit(req, output_root=tmp_path / "audit")
+    assert result.report["range"]["selection"] == "explicit"
+    assert [row["midi"] for row in result.report["notes"]] == [60, 64, 67]
+    assert [row["velocity"] for row in result.report["notes"]] == [72, 96, 118]
+    assert req["base_dir"] == str(tmp_path.resolve())
+
+
+def test_tuning_audit_request_measures_raw_realization_without_authored_correction():
+    from ambition_music_renderer.music_instrument_inspector_model import build_tuning_audit_request
+
+    request = build_tuning_audit_request(
+        instrument={
+            "name": "lead",
+            "group": "lead",
+            "program": "electric_guitar_clean",
+            "tuning_correction": {"mode": "global", "cents": -9.0},
+        },
+        notes=[60, 64, 67],
+    )
+    assert "tuning_correction" not in request["instrument"]

@@ -31,6 +31,14 @@ from .render.score_core import (
     CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext, choose_soundfont, controller_number,
 )
 from .audit.sfz_measurement import sfz_regions, sfz_startup_cc
+from .audit.instrument_tuning import (
+    TUNING_REPORT_SCHEMA,
+    combine_tuning_estimators,
+    estimate_known_note_tuning,
+    estimate_known_note_tuning_spectral,
+    select_tuning_notes,
+    summarize_tuning_rows,
+)
 from .backends.sfizz_backend import sfz_key_span
 from .render.score_events import add_instrument
 from .render.score_theory import note_to_midi
@@ -79,6 +87,15 @@ class ProbeResult:
     report: dict[str, Any]
 
 
+@dataclass(frozen=True)
+class TuningAuditResult:
+    request_hash: str
+    outdir: Path
+    dry_audio: Path
+    report_path: Path
+    report: dict[str, Any]
+
+
 _GM_FAMILIES = (
     "Piano", "Chromatic percussion", "Organ", "Guitar", "Bass", "Strings",
     "Ensemble", "Brass", "Reed", "Pipe", "Synth lead", "Synth pad",
@@ -108,7 +125,7 @@ def alias_library_entries() -> tuple[LibraryEntry, ...]:
     for name, entry in sorted(instrument_catalog().items()):
         family = entry.family.replace("_", " ").title()
         label = name.split(".")[-1].replace("_", " ").title()
-        rows.append(LibraryEntry("catalog_alias", name, label, name, (family,)))
+        rows.append(LibraryEntry("sfz_alias", name, label, name, (family,)))
     return tuple(rows)
 
 
@@ -181,13 +198,11 @@ def apply_library_entry(instrument: Mapping[str, Any], entry: LibraryEntry) -> d
         inst["program"] = entry.value
         inst.pop("instrument_backend", None)
         inst.pop("is_drum", None)
-    elif entry.kind in {"catalog_alias", "sfz_alias"}:
+    elif entry.kind == "sfz_alias":
+        inst.setdefault("program", "acoustic_grand_piano")
+        inst["instrument_backend"] = {"kind": "sfz", "library_ref": entry.value}
         catalog_entry = get_instrument_catalog_entry(entry.value)
-        if catalog_entry is None:
-            raise KeyError(entry.value)
-        authored = catalog_entry.authoring_snippet()
-        inst.update({key: value for key, value in authored.items() if key != "is_drum"})
-        if catalog_entry.is_drum:
+        if catalog_entry is not None and catalog_entry.is_drum:
             inst["is_drum"] = True
         else:
             inst.pop("is_drum", None)
@@ -204,7 +219,7 @@ def resolved_backend_path(instrument: Mapping[str, Any], *, base_dir: Path | Non
     if not backend:
         return None
     plan = resolve_instrument_backend(backend, base_dir=base_dir)
-    return plan.resolved_sfz or plan.resolved_soundfont
+    return plan.resolved_sfz
 
 
 def load_score_instrument(score_path: Path, instrument_name: str) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -260,6 +275,65 @@ def build_probe_request(
         "backend": str(backend),
         "sample_rate": int(sample_rate),
     }
+
+
+def build_tuning_audit_request(
+    *,
+    instrument: Mapping[str, Any],
+    velocity: int = 100,
+    backend: str = "auto",
+    sample_rate: int = 48000,
+    note_duration_seconds: float = 0.62,
+    gap_seconds: float = 0.18,
+    max_notes: int = 61,
+    min_midi: int | None = None,
+    max_midi: int | None = None,
+    anchors: list[int] | tuple[int, ...] = (),
+    notes: list[int] | tuple[int, ...] | None = None,
+    note_velocities: Mapping[int | str, int] | None = None,
+    base_dir: Path | str | None = None,
+) -> dict[str, Any]:
+    """Build a deterministic dry-instrument tuning-audit request.
+
+    ``notes`` is an optional exact pitch set.  Score-level audits use it to
+    measure only pitches the cue actually asks the realization to play instead
+    of spending time on an instrument-wide chromatic sweep.
+    """
+
+    explicit_notes = (
+        sorted({max(0, min(127, int(note))) for note in notes})
+        if notes is not None
+        else None
+    )
+    velocities: dict[str, int] = {}
+    for key, value in dict(note_velocities or {}).items():
+        midi = max(0, min(127, int(key)))
+        velocities[str(midi)] = max(1, min(127, int(value)))
+    normalized_instrument = normalize_instrument_document(instrument)
+    # Tuning audits measure the raw realization. Applying an already-authored
+    # correction here would make the evidence self-referential and would hide
+    # the source drift the audit is meant to document.
+    normalized_instrument.pop("tuning_correction", None)
+    return {
+        "schema": "ambition.instrument_tuning_request.v3",
+        "instrument": normalized_instrument,
+        "velocity": max(1, min(127, int(velocity))),
+        "backend": str(backend),
+        "sample_rate": int(sample_rate),
+        "note_duration_seconds": max(0.25, min(2.0, float(note_duration_seconds))),
+        "gap_seconds": max(0.08, min(1.0, float(gap_seconds))),
+        "max_notes": max(3, min(128, int(max_notes))),
+        "min_midi": None if min_midi is None else max(0, min(127, int(min_midi))),
+        "max_midi": None if max_midi is None else max(0, min(127, int(max_midi))),
+        "anchors": [max(0, min(127, int(note))) for note in anchors],
+        "notes": explicit_notes,
+        "note_velocities": velocities,
+        "base_dir": str(Path(base_dir).expanduser().resolve()) if base_dir is not None else None,
+    }
+
+
+def tuning_audit_request_hash(request: Mapping[str, Any]) -> str:
+    return probe_request_hash(request)
 
 
 def _probe_pitch(value: str | int) -> int:
@@ -579,10 +653,9 @@ def sfz_probe_preflight(request: Mapping[str, Any], *, base_dir: Path | None = N
     playable patch.  The actual renderer remains authoritative.
     """
     instrument = normalize_instrument_document(request.get("instrument") or {})
-    backend = backend_spec_from_instrument(instrument)
-    plan = resolve_instrument_backend(backend, base_dir=base_dir)
-    path = plan.resolved_sfz
-    if not plan.wants_sfz or path is None:
+    path = resolved_backend_path(instrument, base_dir=base_dir)
+    backend = instrument.get("instrument_backend")
+    if not isinstance(backend, Mapping) or path is None:
         return {"kind": "non_sfz", "status": "ok", "summary": "GM / non-SFZ backend; region preflight does not apply."}
 
     regions = sfz_regions(path)
@@ -815,6 +888,238 @@ def _make_probe_pm(request: Mapping[str, Any]) -> tuple[pretty_midi.PrettyMIDI, 
     # metadata so it can resolve SFZ/procedural backends and mix_gain_db.
     pm._ambition_instrument_specs = ctx.instrument_specs  # type: ignore[attr-defined]
     return pm, ctx.groups, group
+
+
+def _tuning_audit_span(
+    request: Mapping[str, Any],
+    resolved: Path | None,
+) -> tuple[int, int]:
+    requested_low = request.get("min_midi")
+    requested_high = request.get("max_midi")
+    if resolved is not None:
+        # Prefer the widest contiguous SFZ key region instead of the raw
+        # min/max span. Low keyswitches otherwise expand a normal pitched
+        # program into a misleading 0..N audit range.
+        regions = sfz_regions(resolved)
+        ranges = [_sfz_bound(region, "lokey", "hikey", 0, 127) for region in regions]
+        merged = _merge_ranges(ranges)
+        span = max(merged, key=lambda pair: pair[1] - pair[0]) if merged else sfz_key_span(str(resolved))
+    else:
+        span = None
+    low, high = (span if span is not None else (36, 96))
+    if requested_low is not None:
+        low = int(requested_low)
+    if requested_high is not None:
+        high = int(requested_high)
+    low = max(0, min(127, int(low)))
+    high = max(low, min(127, int(high)))
+    return low, high
+
+
+def _make_tuning_audit_pm(
+    request: Mapping[str, Any], notes: list[int]
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, str], str, list[dict[str, Any]]]:
+    inst_spec = normalize_instrument_document(request["instrument"])
+    name = str(inst_spec["name"])
+    group = str(inst_spec["group"])
+    sample_rate = int(request.get("sample_rate", 48000))
+    velocity = int(request.get("velocity", 100))
+    note_velocities = {
+        int(key): max(1, min(127, int(value)))
+        for key, value in dict(request.get("note_velocities") or {}).items()
+    }
+    note_duration = float(request.get("note_duration_seconds", 0.62))
+    gap = float(request.get("gap_seconds", 0.18))
+    pm = pretty_midi.PrettyMIDI(initial_tempo=120.0, resolution=960)
+    ctx = RenderContext(
+        spec={"instruments": [inst_spec]},
+        sample_rate=sample_rate,
+        bpm=120.0,
+        beats_per_bar=4.0,
+        rng=np.random.default_rng(0),
+        pm=pm,
+        instruments={},
+        groups={},
+        section_starts={},
+        motifs={},
+    )
+    add_instrument(ctx, inst_spec)
+    inst = ctx.instruments[name]
+    events: list[dict[str, Any]] = []
+    cursor = 0.20
+    for pitch in notes:
+        start = float(cursor)
+        end = start + note_duration
+        event_velocity = int(note_velocities.get(int(pitch), velocity))
+        inst.notes.append(
+            pretty_midi.Note(
+                velocity=event_velocity, pitch=int(pitch), start=start, end=end
+            )
+        )
+        events.append(
+            {
+                "midi": int(pitch),
+                "velocity": event_velocity,
+                "start": start,
+                "end": end,
+            }
+        )
+        cursor = end + gap
+    pm._ambition_instrument_specs = ctx.instrument_specs  # type: ignore[attr-defined]
+    return pm, ctx.groups, group, events
+
+
+def format_tuning_audit_report(report: Mapping[str, Any]) -> str:
+    """Human-readable tuning report for the Instrument Inspector."""
+
+    summary = dict(report.get("summary") or {})
+    rows = list(report.get("notes") or [])
+    lines = [
+        "Dry instrument tuning against A4=440 Hz / 12-TET (no score processing).",
+        f"Classification: {summary.get('classification', 'unknown')}",
+    ]
+    if summary.get("median_cents") is not None:
+        lines.append(
+            "Median {:+.2f} cents · p95 |error| {:.2f} · max |error| {:.2f} · slope {:+.2f} cents/octave".format(
+                float(summary.get("median_cents", 0.0)),
+                float(summary.get("p95_abs_cents", 0.0)),
+                float(summary.get("max_abs_cents", 0.0)),
+                float(summary.get("slope_cents_per_octave", 0.0)),
+            )
+        )
+    correction = summary.get("suggested_global_correction_cents")
+    if correction not in (None, 0, 0.0):
+        lines.append(
+            f"Diagnostic global correction candidate: {float(correction):+.2f} cents (not applied automatically)."
+        )
+    lines.append(
+        f"Measured {summary.get('reliable_notes', 0)}/{len(rows)} notes; report: {report.get('report_path', '-') }"
+    )
+    lines.append("")
+    lines.append("note   auto     spectral  agree   status")
+    for row in rows:
+        cents = row.get("cents")
+        spectral_cents = (row.get("spectral") or {}).get("cents")
+        agreement = row.get("estimator_agreement_cents")
+        marker = " !" if cents is not None and abs(float(cents)) >= 6.0 else ""
+        cents_text = f"{float(cents):+7.2f}" if cents is not None else "    n/a"
+        spectral_text = f"{float(spectral_cents):+8.2f}" if spectral_cents is not None else "     n/a"
+        agreement_text = f"{float(agreement):5.2f}" if agreement is not None else "  n/a"
+        lines.append(
+            f"{str(row.get('note', row.get('midi', '?'))):5s} {cents_text}  {spectral_text}  {agreement_text}  "
+            f"{row.get('validation_status', '?')}/{row.get('status', '?')}{marker}"
+        )
+    return "\n".join(lines)
+
+
+def render_tuning_audit(
+    request: Mapping[str, Any], *, output_root: Path | None = None, force: bool = False
+) -> TuningAuditResult:
+    """Render one isolated chromatic sweep and measure note-center tuning."""
+
+    request = dict(request)
+    instrument = normalize_instrument_document(request["instrument"])
+    if bool(instrument.get("is_drum")):
+        raise ValueError("tuning audit applies only to pitched instruments")
+    request_hash = tuning_audit_request_hash(request)
+    root = Path(output_root or (agent_root() / "instrument_inspector" / "tuning"))
+    outdir = root / request_hash
+    outdir.mkdir(parents=True, exist_ok=True)
+    dry_path = outdir / "dry.wav"
+    report_path = outdir / "report.json"
+    request_path = outdir / "request.json"
+    request_path.write_text(json.dumps(request, indent=2, sort_keys=True), encoding="utf8")
+    if not force and dry_path.is_file() and report_path.is_file():
+        report = json.loads(report_path.read_text(encoding="utf8"))
+        return TuningAuditResult(request_hash, outdir, dry_path, report_path, report)
+
+    base_dir_raw = request.get("base_dir")
+    base_dir = Path(str(base_dir_raw)).expanduser().resolve() if base_dir_raw else Path.cwd()
+    resolved = resolved_backend_path(instrument, base_dir=base_dir)
+    explicit_notes = request.get("notes")
+    if explicit_notes is not None:
+        notes = sorted({max(0, min(127, int(note))) for note in explicit_notes})
+        if not notes:
+            raise ValueError("tuning audit explicit note set is empty")
+        low, high = min(notes), max(notes)
+        selection = "explicit"
+    else:
+        low, high = _tuning_audit_span(request, resolved)
+        notes = select_tuning_notes(
+            low,
+            high,
+            max_notes=int(request.get("max_notes", 61)),
+            anchors=[int(note) for note in request.get("anchors") or ()],
+        )
+        selection = "range"
+    pm, groups, group, events = _make_tuning_audit_pm(request, notes)
+    sample_rate = int(request.get("sample_rate", 48000))
+    backend = str(request.get("backend", "auto"))
+    total_duration = max((event["end"] for event in events), default=0.5) + 0.6
+    with tempfile.TemporaryDirectory(prefix="ambition-instrument-tuning-") as temp:
+        audio = render_group_audio(
+            pm,
+            groups,
+            group,
+            backend,
+            choose_soundfont(None),
+            sample_rate,
+            Path(temp),
+            minimum_duration=total_duration,
+            bpm=120.0,
+            base_dir=base_dir,
+            render_cfg={"strict_backends": True},
+        )
+    dry = np.asarray(audio, dtype=np.float32)
+    sf.write(dry_path, dry, sample_rate, subtype="PCM_16")
+
+    rows: list[dict[str, Any]] = []
+    for event in events:
+        start = max(0, int(float(event["start"]) * sample_rate))
+        end = min(len(dry), int(float(event["end"]) * sample_rate))
+        note_audio = dry[start:end]
+        measurement = estimate_known_note_tuning(
+            note_audio, sample_rate, int(event["midi"])
+        )
+        spectral = estimate_known_note_tuning_spectral(
+            note_audio, sample_rate, int(event["midi"])
+        )
+        measurement["spectral"] = spectral
+        measurement.update(combine_tuning_estimators(measurement, spectral))
+        measurement["note"] = pretty_midi.note_number_to_name(int(event["midi"]))
+        measurement["velocity"] = int(event.get("velocity", request.get("velocity", 100)))
+        measurement["start_seconds"] = round(float(event["start"]), 3)
+        rows.append(measurement)
+
+    summary = summarize_tuning_rows(rows)
+    summary["validated_notes"] = sum(1 for row in rows if row.get("validation_status") == "agree")
+    summary["estimator_disagreements"] = sum(1 for row in rows if row.get("validation_status") == "disagree")
+    report = {
+        "schema": TUNING_REPORT_SCHEMA,
+        "request_hash": request_hash,
+        "instrument": instrument,
+        "resolved_backend_path": str(resolved) if resolved else None,
+        "dry_audio": str(dry_path),
+        "report_path": str(report_path),
+        "reference": {"a4_hz": 440.0, "temperament": "12-TET", "stage": "dry_pre_processing"},
+        "range": {
+            "low_midi": low,
+            "high_midi": high,
+            "audited_notes": len(notes),
+            "selection": selection,
+        },
+        "summary": summary,
+        "notes": rows,
+    }
+    report_path.write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf8")
+    return TuningAuditResult(request_hash, outdir, dry_path, report_path, report)
+
+
+def render_tuning_audit_request_file(path: Path) -> TuningAuditResult:
+    request = json.loads(Path(path).read_text(encoding="utf8"))
+    if not isinstance(request, dict):
+        raise ValueError("tuning audit request JSON must be an object")
+    return render_tuning_audit(request)
 
 
 def render_probe(request: Mapping[str, Any], *, output_root: Path | None = None) -> ProbeResult:

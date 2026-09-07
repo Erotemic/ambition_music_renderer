@@ -165,17 +165,16 @@ def test_stem_cache_key_tracks_referenced_sfz_sample_identity(tmp_path):
     assert before["right"] == after["right"]
 
 
-def test_stem_cache_key_tracks_per_instrument_soundfont_identity(tmp_path):
-    sf2 = tmp_path / "shamisen.sf2"
-    sf2.write_bytes(b"soundfont-v1")
-    spec = _score()
-    spec["instruments"][0]["instrument_backend"] = {
-        "kind": "soundfont",
-        "soundfont": str(sf2),
-        "renderer": "fluidsynth-cli",
+def test_stem_cache_key_tracks_instrument_tuning_correction(tmp_path):
+    base = _score()
+    edited = deepcopy(base)
+    edited["instruments"][0]["tuning_correction"] = {
+        "mode": "curve",
+        "points": {"C4": -8.0, "E4": -4.0},
     }
-    before = _keys(spec, tmp_path)
-    sf2.write_bytes(b"soundfont-v2-with-different-size")
-    after = _keys(spec, tmp_path)
-    assert before["left"] != after["left"]
-    assert before["right"] == after["right"]
+
+    base_keys = _keys(base, tmp_path)
+    edited_keys = _keys(edited, tmp_path)
+
+    assert base_keys["left"] != edited_keys["left"]
+    assert base_keys["right"] == edited_keys["right"]

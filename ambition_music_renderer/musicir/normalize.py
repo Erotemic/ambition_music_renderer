@@ -13,7 +13,7 @@ import copy
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from ..instrument_resolution import normalize_backend_spec
+from ..instrument_resolution import normalize_backend_spec, normalize_tuning_correction
 
 
 MUSICIR_V1_SCHEMA = "ambition.musicir.v1"
@@ -43,6 +43,12 @@ def _normalize_instrument(instrument: Mapping[str, Any]) -> dict[str, Any]:
         # non-render authoring tools still display them.  All semantic consumers
         # should use instrument_backend from this point onward.
         row["instrument_backend"] = normalize_backend_spec(raw_backend)
+    if "tuning_correction" in row:
+        correction = normalize_tuning_correction(row.get("tuning_correction"))
+        if correction is None:
+            row.pop("tuning_correction", None)
+        else:
+            row["tuning_correction"] = correction
     return row
 
 

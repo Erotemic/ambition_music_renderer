@@ -80,3 +80,66 @@ For large installed SFZ trees, generate the machine-local usage census with
 compact activation metadata for library browsing and controller suggestions.
 This keeps selection changes off the expensive expanded-SFZ parse path. The
 full parser remains authoritative when a probe is actually rendered.
+
+## Measured tuning audit
+
+**Audit tuning** is a separate dry-instrument measurement from the normal audition
+phrase. For pitched instruments it renders a chromatic/range-covering sweep through
+the selected backend, then compares each known MIDI pitch against equal temperament
+with A4 = 440 Hz. Because the intended note is known in advance, the estimator only
+searches a narrow frequency window around that target instead of asking a generic
+pitch detector to guess the fundamental of a bright sample.
+
+The GUI shows an indeterminate progress indicator while the offline sweep and
+analysis run. Results are cached by the complete tuning-audit request under
+`agent/instrument_inspector/tuning/<request-hash>/`, including the dry WAV, request
+JSON, and report JSON. Every note is measured twice: normalized autocorrelation is
+the primary period estimate and a harmonic spectral-peak estimator independently
+checks the implied fundamental. The report records both estimates, their cents
+agreement, a consensus value when they agree, the median offset, range slope, and a
+classification such as `centered`, `global_offset`, `range_dependent`, or
+`local_outliers_or_mixed`. Notes with at least six cents of measured error are
+marked in the text view for quick inspection.
+
+The measurement is deliberately **pre-processing**. EQ, reverb, amp chains, chorus,
+and mastering are excluded so the report answers whether the instrument realization
+itself is centered. Processing-only YAML edits therefore do not invalidate a tuning
+report, while instrument/backend/velocity changes do. The audit never changes the
+score or instrument catalog. A global correction value may be suggested when the
+measurements support a nearly constant offset, but it is evidence for a later explicit
+choice, not an automatic retune.
+
+The same path is available without Qt:
+
+```bash
+python -m ambition_music_renderer instruments tuning-audit guitar.emily
+python -m ambition_music_renderer instruments tuning-audit guitar.emily --json
+```
+
+For a real cue, prefer the score-level batch audit:
+
+```bash
+python -m ambition_music_renderer cue tuning-audit standing_on_shoulders_extended_boss
+```
+
+That command compiles the cue, finds every pitched instrument that actually emits
+notes, skips drums, collapses identical dry realizations, and audits only the MIDI
+pitches the score uses. Each audited pitch is rendered at the median velocity used
+for that pitch in the cue, which keeps the sweep focused on the sampled layers the
+composition is likely to hit. It always dumps `report.json`, `report.txt`, and a
+`corrections.yaml` authoring snippet under `agent/tuning_audits/<cue>/<hash>/` unless
+`--output-dir` is supplied. The correction snippet is generated only from notes whose
+two estimators agree. It proposes a single global cents shift for a clean constant
+offset, or a linearly interpolated per-note curve for validated range-dependent/local
+drift. It is never applied to the score automatically. The individual realization
+measurements continue to use the normal tuning cache, so re-running a batch after an
+interrupted or already-completed audit reuses prior measurements. Use `--force` when
+the local instrument assets changed and the dry measurements need to be regenerated.
+
+When a proposal is accepted, copy its `tuning_correction` onto the corresponding
+MusicIR instrument. Correction happens before audio processing and before sampled
+instrument effects. The renderer uses MIDI pitch bend as the synthesis control and
+partitions only conflicting simultaneous notes into independent tuning lanes, so
+polyphonic curves remain correct without forcing one bend value across a chord.
+A scale-aware VST3 effect remains available for intentionally creative pitch
+processing, but measured instrument calibration does not require autotune.
