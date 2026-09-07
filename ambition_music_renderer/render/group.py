@@ -16,6 +16,7 @@ from ..musicir.timing import initial_beats_per_bar, initial_bpm
 from ..instrument_resolution import (
     backend_prefers_procedural_fm,
     backend_prefers_sfizz,
+    backend_prefers_soundfont,
     instrument_backend_spec,
     resolve_instrument_backend,
 )
@@ -185,6 +186,10 @@ def render_group_audio(
         backend_prefers_sfizz(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
+    has_instrument_soundfont = any(
+        backend_prefers_soundfont(instrument_backend_spec(instrument_specs, inst.name))
+        for inst in insts
+    )
     has_instrument_procedural_fm = any(
         backend_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
@@ -210,6 +215,7 @@ def render_group_audio(
     if (
         wants_sfizz
         or has_instrument_sfizz
+        or has_instrument_soundfont
         or has_instrument_procedural_fm
         or has_instrument_mix_gain
         or has_tuning_correction
@@ -273,6 +279,65 @@ def render_group_audio(
                     )
                 )
                 continue
+            soundfont_path = plan.resolved_soundfont
+            if soundfont_path is not None:
+                renderer = str(inst_backend.get("renderer") or "fluidsynth-cli")
+                if tuning_profile is not None:
+                    _assert_pitch_bend_backend_available(renderer, str(soundfont_path))
+                lane_audio: list[np.ndarray] = []
+                try:
+                    for lane_index, lane_pm in enumerate(tuning_lanes):
+                        midi_path = tempdir / f"group_{group}.{idx}.{inst.name}.soundfont.tune{lane_index}.mid"
+                        dry_wav = tempdir / f"group_{group}.{idx}.{inst.name}.soundfont.tune{lane_index}.wav"
+                        if renderer != "fallback":
+                            lane_pm.write(str(midi_path))
+                        audio = render_synth_audio(
+                            lane_pm,
+                            renderer,
+                            str(soundfont_path),
+                            sample_rate,
+                            midi_path,
+                            dry_wav,
+                            minimum_duration,
+                        )
+                        if _instrument_has_notes(lane_pm) and _is_effectively_silent(audio):
+                            raise RuntimeError(
+                                f"instrument {inst.name!r} SoundFont {soundfont_path} rendered SILENCE despite active notes"
+                            )
+                        lane_audio.append(audio)
+                except Exception as ex:
+                    if not allow_fallback:
+                        raise
+                    _warn_instrument_backend_once(
+                        f"soundfont-render-failed:{inst.name}:{soundfont_path}",
+                        f"instrument {inst.name!r} requested SoundFont {soundfont_path}, but rendering failed; "
+                        f"using {fallback_backend_name!r} fallback. reason: {ex}",
+                    )
+                else:
+                    rendered.append(
+                        _finalize_instrument_mix_audio(
+                            _sum_audio_buffers(lane_audio),
+                            mix_gain_db=mix_gain_db,
+                            pm=pm,
+                            groups=groups,
+                            protection_spec=protection_spec,
+                            instrument_name=inst.name,
+                            sample_rate=sample_rate,
+                        )
+                    )
+                    continue
+            elif plan.wants_soundfont:
+                requested = plan.requested
+                if strict_backends or not plan.optional:
+                    raise FileNotFoundError(
+                        f"instrument {inst.name!r} requested SoundFont library {requested!r}, but no matching .sf2/.sf3 was found; "
+                        "run or repair download_ambition_audio_tools.sh"
+                    )
+                _warn_instrument_backend_once(
+                    f"soundfont-not-found:{inst.name}:{requested}",
+                    f"instrument {inst.name!r} requested SoundFont library {requested!r}, but it did not resolve; "
+                    f"using {fallback_backend_name!r} fallback.",
+                )
 
             sfz_path = plan.resolved_sfz
             if sfz_path is not None:

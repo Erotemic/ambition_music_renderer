@@ -18,6 +18,7 @@ from . import instrument_libraries
 
 
 SFZ_BACKEND_KINDS = frozenset({"sfz", "sfizz", "sample", "sampled"})
+SOUNDFONT_BACKEND_KINDS = frozenset({"soundfont", "sf2", "sf3", "fluidsynth"})
 PROCEDURAL_FM_KINDS = frozenset({"procedural_fm", "fm", "fm_synth", "subtractive_fm"})
 TUNING_CORRECTION_SCHEMA = "ambition.instrument_tuning_correction.v1"
 
@@ -130,6 +131,11 @@ def normalize_backend_spec(raw: Any) -> dict[str, Any]:
             if spec.get(alias):
                 spec["sfz"] = spec[alias]
                 break
+    if "soundfont" not in spec:
+        for alias in ("sf2", "sf3", "soundfont_path"):
+            if spec.get(alias):
+                spec["soundfont"] = spec[alias]
+                break
 
     prefer = spec.get("prefer") or []
     if isinstance(prefer, str):
@@ -180,8 +186,18 @@ def backend_is_optional(spec: Mapping[str, Any]) -> bool:
 
 def backend_prefers_sfizz(spec: Mapping[str, Any]) -> bool:
     canonical = normalize_backend_spec(spec)
-    return str(canonical.get("kind") or "") in SFZ_BACKEND_KINDS or any(
-        canonical.get(key) for key in ("sfz", "library_ref")
+    kind = str(canonical.get("kind") or "")
+    if kind in SOUNDFONT_BACKEND_KINDS or kind in PROCEDURAL_FM_KINDS:
+        return False
+    return kind in SFZ_BACKEND_KINDS or bool(canonical.get("sfz")) or (
+        not kind and bool(canonical.get("library_ref"))
+    )
+
+
+def backend_prefers_soundfont(spec: Mapping[str, Any]) -> bool:
+    canonical = normalize_backend_spec(spec)
+    return str(canonical.get("kind") or "") in SOUNDFONT_BACKEND_KINDS or bool(
+        canonical.get("soundfont")
     )
 
 
@@ -197,12 +213,14 @@ class InstrumentResolutionPlan:
     backend: Mapping[str, Any]
     kind: str
     wants_sfz: bool
+    wants_soundfont: bool
     wants_procedural_fm: bool
     library_ref: str | None = None
     requested: str | None = None
     prefer: tuple[str, ...] = ()
     roots: tuple[str, ...] = ()
     resolved_sfz: Path | None = None
+    resolved_soundfont: Path | None = None
     fallback_backend: str | None = None
     optional: bool = True
     sfizz_settings: Mapping[str, Any] = field(default_factory=dict)
@@ -216,12 +234,14 @@ class InstrumentResolutionPlan:
         return {
             "kind": self.kind,
             "wants_sfz": self.wants_sfz,
+            "wants_soundfont": self.wants_soundfont,
             "wants_procedural_fm": self.wants_procedural_fm,
             "library_ref": self.library_ref,
             "requested": self.requested,
             "prefer": list(self.prefer),
             "roots": list(self.roots),
             "resolved_sfz": str(self.resolved_sfz) if self.resolved_sfz else None,
+            "resolved_soundfont": str(self.resolved_soundfont) if self.resolved_soundfont else None,
             "fallback_backend": self.fallback_backend,
             "optional": self.optional,
             "expected_catalog_instrument": self.expected_catalog_instrument,
@@ -247,6 +267,7 @@ def resolve_instrument_backend(
     sfizz_cfg = dict(sfizz_cfg or {})
     kind = str(backend.get("kind") or "").lower().strip()
     wants_sfz = force_sfz or backend_prefers_sfizz(backend)
+    wants_soundfont = backend_prefers_soundfont(backend) and not force_sfz
     wants_fm = backend_prefers_procedural_fm(backend)
 
     library_ref_raw = backend.get("library_ref")
@@ -258,6 +279,7 @@ def resolve_instrument_backend(
     roots.extend(str(item) for item in (backend.get("library_roots") or []))
 
     resolved: Path | None = None
+    resolved_soundfont: Path | None = None
     requested: str | None = None
     if wants_sfz:
         requested_raw = backend.get("library_ref") or backend.get("sfz")
@@ -273,6 +295,17 @@ def resolve_instrument_backend(
             default_sfz = sfizz_cfg.get("default_sfz")
             requested = requested or str(default_sfz)
             resolved = instrument_libraries.resolve_sfz_reference(default_sfz, base_dir=base_dir, roots=roots)
+    elif wants_soundfont:
+        requested_raw = backend.get("library_ref") or backend.get("soundfont")
+        requested = str(requested_raw) if requested_raw else None
+        soundfont_roots = [str(item) for item in (backend.get("library_roots") or [])]
+        resolved_soundfont = instrument_libraries.resolve_soundfont_reference(
+            backend.get("soundfont"),
+            library_ref=library_ref,
+            prefer=prefer,
+            base_dir=base_dir,
+            roots=soundfont_roots,
+        )
 
     fallback = backend.get("fallback_backend", default_fallback_backend)
     fallback_backend = str(fallback) if fallback is not None else None
@@ -288,12 +321,14 @@ def resolve_instrument_backend(
         backend=backend,
         kind=kind,
         wants_sfz=wants_sfz,
+        wants_soundfont=wants_soundfont,
         wants_procedural_fm=wants_fm,
         library_ref=library_ref,
         requested=requested,
         prefer=prefer,
         roots=tuple(roots),
         resolved_sfz=resolved,
+        resolved_soundfont=resolved_soundfont,
         fallback_backend=fallback_backend,
         optional=backend_is_optional(backend),
         sfizz_settings=settings,
