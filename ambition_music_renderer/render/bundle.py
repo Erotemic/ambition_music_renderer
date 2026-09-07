@@ -133,6 +133,15 @@ def _write_audit_coverage_report(
     return path
 
 
+def _resolve_bundle_dest_root(dest_root: Path | None, *, publish: bool) -> Path | None:
+    """Resolve publish authority only for an operation that can publish."""
+    if dest_root is not None:
+        return Path(dest_root)
+    if publish:
+        return default_publish_dest_root()
+    return None
+
+
 @profile
 def create_bundle(
     cue: str,
@@ -177,12 +186,6 @@ def create_bundle(
         id_warning = ""
     if render_audio_mode not in RENDER_AUDIO_MODES:
         raise ValueError(f"render_audio_mode must be one of {RENDER_AUDIO_MODES}, got {render_audio_mode!r}")
-    if zip_bundle and include_scratch_stems and not zip_report_bundle:
-        progress_line(
-            "WARNING: --zip plus --include_scratch_stems can create a very large "
-            "full archive; also writing a compact --zip_report artifact for review"
-        )
-        zip_report_bundle = True
 
     generated_layout = None
     explicit_outdir = Path(outdir) if outdir is not None else None
@@ -200,10 +203,7 @@ def create_bundle(
         bundle_root = default_bundle_root()
     else:
         bundle_root = Path(bundle_root)
-    if dest_root is None:
-        dest_root = default_publish_dest_root()
-    else:
-        dest_root = Path(dest_root)
+    dest_root = _resolve_bundle_dest_root(dest_root, publish=publish)
 
     progress_line(f"render output directory: {terminal_link(outdir)}")
     progress_line(f"bundle root: {terminal_link(bundle_root)}")
@@ -511,7 +511,7 @@ def create_bundle(
             )
 
             if audit_capabilities["adaptive_full_audio"]:
-                progress_line("running section transition and loop-seam audits")
+                progress_line("running adjacent-section transition audits")
                 commands.extend(
                     run_transition_audits(
                         analysis_root, manifest, reports_dir, tools_dir
@@ -603,6 +603,7 @@ def create_bundle(
         # Import lazily so this module can be used by tests without importing the CLI.
         from ..cli import publish_cue
 
+        assert dest_root is not None  # resolved above whenever publish=True
         ok = publish_cue(cue_id, manifest_root, dest_root)
         if ok:
             published = str(dest_root / cue_id / "full.ogg")
