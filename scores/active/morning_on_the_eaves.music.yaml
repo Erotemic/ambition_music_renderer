@@ -1,0 +1,839 @@
+# Original composition, September 2026.
+# Companion to The Last Lantern: similarly spacious, but designed in D major
+# with rising pentatonic gestures, warmer string cushions, and koto in the
+# foreground. The shakuhachi is intentionally distant environmental color.
+#
+# Beat positions in event lists are fractions of a WHOLE note. The threshold
+# is an exact orchestral copy of the final eight loop bars so the adaptive loop
+# receives the same note/controller/reverb history at both boundaries.
+schema: ambition.musicir.v3
+id: morning_on_the_eaves
+title: Morning on the Eaves
+seed: 2026090703
+description: 'Soft major-key ninja-zone ambience: a rising D-major pentatonic koto hook, warm pizzicato double bass, broad orchestral strings, sparse shamisen glints, and a distant shakuhachi answering from beyond the courtyard.'
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 100
+key: D major
+end: {bar: 73, beat: 1}
+form:
+- id: threshold
+  label: Threshold - sun on the roof tiles
+  role: intro
+  from: {bar: 1, beat: 1}
+  to: {bar: 9, beat: 1}
+- id: zone_loop
+  label: Morning on the Eaves - continuous zone loop
+  role: loop_component
+  from: {bar: 9, beat: 1}
+  to: {bar: 73, beat: 1}
+  loopable: true
+render:
+  backend: pretty-midi
+  sample_rate: 48000
+  ogg_quality: 7
+  strict_backends: true
+  metadata_markers:
+  - {bar: 1, id: m1, label: Threshold - sun on the roof tiles}
+  - {bar: 9, id: m9, label: First light}
+  - {bar: 17, id: m17, label: Along the eaves}
+  - {bar: 25, id: m25, label: Paper doors open}
+  - {bar: 33, id: m33, label: Roofline}
+  - {bar: 41, id: m41, label: Bamboo shadow}
+  - {bar: 49, id: m49, label: Morning refrain}
+  - {bar: 57, id: m57, label: Courtyard return}
+  - {bar: 65, id: m65, label: Sun on the roof tiles}
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - zone_loop
+state_map:
+  default:
+    section: zone_loop
+    stems: {melody: 1.0, shamisen: 1.0, koto: 1.0, bass: 1.0, strings: 1.0, taiko: 1.0, pulse: 1.0}
+harmony:
+  progression:
+  - Dadd9
+  - Dadd9
+  - Gmaj7
+  - Gmaj7
+  - Bm7
+  - Bm7
+  - Aadd9
+  - A
+  - Dadd9
+  - Dadd9
+  - Gmaj7
+  - Gmaj7
+  - Dmaj7
+  - Dmaj7
+  - Aadd9
+  - A
+  - Dmaj7
+  - Dmaj7
+  - Bm7
+  - Bm7
+  - Gmaj7
+  - Gmaj7
+  - Asus4
+  - A
+  - Gmaj7
+  - Gmaj7
+  - Dadd9
+  - Dadd9
+  - Em7
+  - Em7
+  - Aadd9
+  - A
+  - Dmaj7
+  - Dmaj7
+  - Aadd9
+  - Aadd9
+  - Bm7
+  - Bm7
+  - Gmaj7
+  - Gmaj7
+  - Em7
+  - Em7
+  - Gmaj7
+  - Gmaj7
+  - Dadd9
+  - Dadd9
+  - Asus4
+  - A
+  - Gmaj7
+  - Gmaj7
+  - Aadd9
+  - Aadd9
+  - Dmaj7
+  - Dmaj7
+  - Bm7
+  - A
+  - Dadd9
+  - Dadd9
+  - Gmaj7
+  - Gmaj7
+  - Em7
+  - Em7
+  - Aadd9
+  - A
+  - Dadd9
+  - Dadd9
+  - Gmaj7
+  - Gmaj7
+  - Bm7
+  - Bm7
+  - Aadd9
+  - A
+  cycle: false
+instruments:
+- name: silk
+  group: koto
+  program: koto
+  volume: 96
+  pan: 81
+  expression: 106
+- name: breath
+  group: melody
+  program: shakuhachi
+  volume: 58
+  pan: 73
+  expression: 76
+  modulation: 4
+- name: footsteps
+  group: bass
+  program: acoustic_bass
+  volume: 97
+  pan: 63
+  expression: 104
+  instrument_backend: {kind: sfz, library_ref: bass.meatbass_pizz, required: true}
+- name: horizon
+  group: strings
+  program: string_ensemble_1
+  volume: 78
+  pan: 55
+  expression: 90
+  modulation: 60
+  instrument_backend: {kind: sfz, library_ref: vpo.strings, required: true}
+- name: blade
+  group: shamisen
+  program: shamisen
+  volume: 90
+  pan: 42
+  expression: 98
+- name: skin
+  group: taiko
+  program: taiko_drum
+  volume: 88
+  pan: 60
+  expression: 96
+- name: wood
+  group: pulse
+  is_drum: true
+  volume: 76
+  pan: 67
+  expression: 90
+processing:
+  groups:
+    koto:
+      chain:
+      - {processor: highpass, cutoff_hz: 210}
+      - {processor: band_gain, low_hz: 3800, high_hz: 4800, gain_db: -2.4}
+      - {processor: lowpass, cutoff_hz: 9000}
+      - {processor: reverb, wet: 0.14, decay_seconds: 1.5, damping_hz: 4100}
+      - {processor: gain, gain_db: -0.8}
+    melody:
+      chain:
+      - {processor: highpass, cutoff_hz: 240}
+      - {processor: band_gain, low_hz: 2100, high_hz: 4400, gain_db: -5.5}
+      - {processor: lowpass, cutoff_hz: 4700}
+      - {processor: reverb, wet: 0.50, decay_seconds: 3.25, damping_hz: 2400}
+      - {processor: gain, gain_db: -12.0}
+    bass:
+      chain:
+      - {processor: highpass, cutoff_hz: 42}
+      - {processor: band_gain, low_hz: 95, high_hz: 260, gain_db: 0.5}
+      - {processor: band_gain, low_hz: 650, high_hz: 1250, gain_db: 0.2}
+      - {processor: lowpass, cutoff_hz: 4100}
+      - {processor: compressor, threshold_db: -23, ratio: 1.5, attack_ms: 36, release_ms: 160, knee_db: 7}
+      - {processor: gain, gain_db: 0.5}
+    strings:
+      chain:
+      - {processor: highpass, cutoff_hz: 105}
+      - {processor: band_gain, low_hz: 4700, high_hz: 7000, gain_db: -1.4}
+      - {processor: lowpass, cutoff_hz: 6700}
+      - {processor: reverb, wet: 0.31, decay_seconds: 2.45, damping_hz: 3700}
+      - {processor: gain, gain_db: -2.0}
+    shamisen:
+      chain:
+      - {processor: highpass, cutoff_hz: 200}
+      - {processor: band_gain, low_hz: 3500, high_hz: 5200, gain_db: -1.2}
+      - {processor: lowpass, cutoff_hz: 7300}
+      - {processor: reverb, wet: 0.09, decay_seconds: 1.0, damping_hz: 4200}
+      - {processor: gain, gain_db: -2.4}
+    taiko:
+      chain:
+      - {processor: highpass, cutoff_hz: 55}
+      - {processor: lowpass, cutoff_hz: 6200}
+      - {processor: compressor, threshold_db: -20, ratio: 1.4, attack_ms: 34, release_ms: 150, knee_db: 6}
+      - {processor: reverb, wet: 0.09, decay_seconds: 1.0, damping_hz: 3300}
+      - {processor: gain, gain_db: -5.0}
+    pulse:
+      chain:
+      - {processor: highpass, cutoff_hz: 60}
+      - {processor: lowpass, cutoff_hz: 7800}
+      - {processor: gain, gain_db: -7.0}
+  master:
+    chain:
+    - {processor: highpass, cutoff_hz: 30}
+    - {processor: band_gain, low_hz: 3900, high_hz: 5200, gain_db: -0.4}
+    - {processor: gain, gain_db: -4.0}
+    - {processor: compressor, threshold_db: -19, ratio: 1.4, attack_ms: 36, release_ms: 170, knee_db: 7}
+    - {processor: loudness, target_lufs: -17.5, true_peak_db: -1.5}
+  adaptive_sections: {mode: composition_master}
+materials:
+  silk_home:
+    kind: events
+    events:
+    - [0, 1/4, D4, 66]
+    - [1/2, 1/8, E4, 61]
+    - [3/4, 1/4, F#4, 66]
+    - [5/4, 1/4, A4, 69]
+    - [7/4, 1/4, B4, 71]
+    - [9/4, 1/4, A4, 67]
+    - [11/4, 1/4, F#4, 64]
+    - [13/4, 1/4, E4, 61]
+    - [4/1, 1/2, D4, 67]
+    - [19/4, 1/4, F#4, 64]
+    - [21/4, 1/4, A4, 68]
+    - [23/4, 1/4, B4, 70]
+    - [6/1, 1/4, A4, 66]
+    - [27/4, 1/4, F#4, 63]
+    - [29/4, 1/4, E4, 61]
+    - [31/4, 1/4, D4, 65]
+  silk_morning:
+    kind: events
+    events:
+    - [0, 1/4, D4, 68]
+    - [1/2, 1/8, E4, 62]
+    - [3/4, 1/4, F#4, 68]
+    - [5/4, 1/4, A4, 70]
+    - [7/4, 1/4, B4, 72]
+    - [9/4, 1/4, A4, 68]
+    - [11/4, 1/4, F#4, 65]
+    - [13/4, 1/4, E4, 62]
+    - [4/1, 1/4, F#4, 66]
+    - [9/2, 1/4, A4, 69]
+    - [21/4, 1/4, B4, 72]
+    - [23/4, 1/4, D5, 74]
+    - [6/1, 1/4, B4, 69]
+    - [27/4, 1/4, A4, 67]
+    - [29/4, 1/4, F#4, 64]
+    - [31/4, 1/4, E4, 62]
+  silk_eaves:
+    kind: events
+    events:
+    - [1/4, 1/4, F#4, 65]
+    - [3/4, 1/4, A4, 69]
+    - [5/4, 1/4, B4, 71]
+    - [7/4, 1/4, A4, 67]
+    - [9/4, 1/2, F#4, 64]
+    - [11/4, 1/4, E4, 61]
+    - [13/4, 1/4, D4, 63]
+    - [4/1, 1/4, E4, 62]
+    - [9/2, 1/4, F#4, 65]
+    - [21/4, 1/4, A4, 69]
+    - [23/4, 1/4, B4, 71]
+    - [6/1, 1/2, A4, 68]
+    - [27/4, 1/4, F#4, 64]
+    - [29/4, 1/4, E4, 61]
+    - [31/4, 1/4, A4, 66]
+  silk_doors:
+    kind: events
+    events:
+    - [0, 1/4, B3, 62]
+    - [1/2, 1/4, D4, 65]
+    - [3/4, 1/4, E4, 63]
+    - [5/4, 1/4, F#4, 67]
+    - [7/4, 1/4, A4, 69]
+    - [9/4, 1/2, B4, 71]
+    - [3/1, 1/4, A4, 67]
+    - [15/4, 1/4, F#4, 64]
+    - [4/1, 1/4, E4, 63]
+    - [19/4, 1/4, F#4, 65]
+    - [21/4, 1/4, A4, 69]
+    - [23/4, 1/4, B4, 71]
+    - [6/1, 1/2, D5, 73]
+    - [27/4, 1/4, B4, 68]
+    - [29/4, 1/4, A4, 66]
+    - [31/4, 1/4, E4, 62]
+  silk_roofline:
+    kind: events
+    events:
+    - [0, 1/4, D4, 64]
+    - [3/4, 1/4, F#4, 67]
+    - [5/4, 1/4, A4, 70]
+    - [7/4, 1/4, F#4, 65]
+    - [2/1, 1/4, E4, 62]
+    - [11/4, 1/4, A4, 68]
+    - [13/4, 1/4, B4, 70]
+    - [15/4, 1/4, A4, 66]
+    - [4/1, 1/4, F#4, 65]
+    - [19/4, 1/4, A4, 69]
+    - [21/4, 1/4, B4, 71]
+    - [23/4, 1/4, D5, 74]
+    - [6/1, 1/2, B4, 69]
+    - [27/4, 1/4, A4, 66]
+    - [29/4, 1/4, F#4, 64]
+    - [31/4, 1/4, D4, 63]
+  silk_bamboo:
+    kind: events
+    events:
+    - [1/2, 1/4, E4, 62]
+    - [3/2, 1/4, F#4, 64]
+    - [2/1, 1/2, B4, 69]
+    - [3/1, 1/4, A4, 66]
+    - [7/2, 1/4, F#4, 63]
+    - [4/1, 1/4, D4, 62]
+    - [19/4, 1/4, E4, 62]
+    - [21/4, 1/4, F#4, 65]
+    - [23/4, 1/2, A4, 68]
+    - [6/1, 1/4, B4, 69]
+    - [27/4, 1/4, A4, 66]
+    - [29/4, 1/4, F#4, 63]
+    - [31/4, 1/4, E4, 61]
+  silk_refrain:
+    kind: events
+    events:
+    - [0, 1/4, A4, 69]
+    - [1/2, 1/4, B4, 71]
+    - [3/4, 1/4, D5, 75]
+    - [5/4, 1/2, B4, 70]
+    - [7/4, 1/4, A4, 67]
+    - [9/4, 1/4, F#4, 65]
+    - [11/4, 1/4, A4, 69]
+    - [13/4, 1/4, B4, 71]
+    - [4/1, 1/4, D5, 76]
+    - [9/2, 1/4, E5, 74]
+    - [21/4, 1/2, D5, 73]
+    - [23/4, 1/4, B4, 69]
+    - [6/1, 1/4, A4, 67]
+    - [27/4, 1/4, F#4, 64]
+    - [29/4, 1/4, E4, 62]
+    - [31/4, 1/4, A4, 67]
+  silk_return:
+    kind: events
+    events:
+    - [0, 1/4, D4, 65]
+    - [3/4, 1/4, F#4, 67]
+    - [5/4, 1/4, A4, 69]
+    - [7/4, 1/4, B4, 71]
+    - [2/1, 1/2, A4, 68]
+    - [11/4, 1/4, F#4, 64]
+    - [13/4, 1/4, E4, 62]
+    - [4/1, 1/4, B3, 60]
+    - [19/4, 1/4, D4, 64]
+    - [21/4, 1/4, E4, 63]
+    - [23/4, 1/4, F#4, 65]
+    - [6/1, 1/4, A4, 68]
+    - [27/4, 1/4, B4, 70]
+    - [29/4, 1/4, A4, 66]
+    - [31/4, 1/4, E4, 61]
+  breath_home:
+    kind: events
+    events:
+    - [3/2, 3/4, A4, 52]
+    - [15/4, 1/2, D5, 55]
+    - [25/4, 3/4, B4, 52]
+  breath_morning:
+    kind: events
+    events:
+    - [7/4, 3/4, A4, 51]
+    - [17/4, 1/2, D5, 55]
+    - [27/4, 3/4, E5, 54]
+  breath_eaves:
+    kind: events
+    events:
+    - [5/4, 1/2, F#5, 54]
+    - [15/4, 3/4, E5, 52]
+    - [25/4, 1/2, D5, 51]
+  breath_doors:
+    kind: events
+    events:
+    - [3/2, 3/4, B4, 50]
+    - [4/1, 1/2, D5, 54]
+    - [27/4, 3/4, A4, 49]
+  breath_roofline:
+    kind: events
+    events:
+    - [7/4, 1/2, D5, 53]
+    - [17/4, 3/4, F#5, 56]
+    - [27/4, 1/2, E5, 52]
+  breath_bamboo:
+    kind: events
+    events:
+    - [2/1, 3/4, A4, 48]
+    - [19/4, 1/2, B4, 50]
+    - [29/4, 1/2, D5, 52]
+  breath_refrain:
+    kind: events
+    events:
+    - [3/2, 1/2, D5, 54]
+    - [15/4, 3/4, F#5, 57]
+    - [25/4, 1/2, E5, 53]
+  breath_return:
+    kind: events
+    events:
+    - [7/4, 3/4, A4, 50]
+    - [17/4, 1/2, D5, 53]
+    - [29/4, 1/2, B4, 50]
+  bass_home:
+    kind: events
+    events:
+    - [0, 3/4, D2, 72]
+    - [1/1, 3/4, A2, 66]
+    - [2/1, 3/4, G2, 70]
+    - [3/1, 3/4, D2, 65]
+    - [4/1, 3/4, B2, 68]
+    - [5/1, 3/4, F#2, 64]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 65]
+  bass_morning:
+    kind: events
+    events:
+    - [0, 3/4, D2, 73]
+    - [1/1, 3/4, A2, 66]
+    - [2/1, 3/4, G2, 71]
+    - [3/1, 3/4, D2, 65]
+    - [4/1, 3/4, D2, 70]
+    - [5/1, 3/4, A2, 65]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 65]
+  bass_eaves:
+    kind: events
+    events:
+    - [0, 3/4, D2, 71]
+    - [1/1, 3/4, A2, 65]
+    - [2/1, 3/4, B2, 69]
+    - [3/1, 3/4, F#2, 64]
+    - [4/1, 3/4, G2, 70]
+    - [5/1, 3/4, D2, 64]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 64]
+  bass_doors:
+    kind: events
+    events:
+    - [0, 3/4, G2, 70]
+    - [1/1, 3/4, D2, 64]
+    - [2/1, 3/4, D2, 70]
+    - [3/1, 3/4, A2, 65]
+    - [4/1, 3/4, E2, 68]
+    - [5/1, 3/4, B2, 64]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 64]
+  bass_roofline:
+    kind: events
+    events:
+    - [0, 3/4, D2, 71]
+    - [1/1, 3/4, A2, 65]
+    - [2/1, 3/4, A2, 69]
+    - [3/1, 3/4, E2, 64]
+    - [4/1, 3/4, B2, 69]
+    - [5/1, 3/4, F#2, 64]
+    - [6/1, 3/4, G2, 69]
+    - [7/1, 3/4, D2, 64]
+  bass_bamboo:
+    kind: events
+    events:
+    - [0, 3/4, E2, 68]
+    - [1/1, 3/4, B2, 63]
+    - [2/1, 3/4, G2, 69]
+    - [3/1, 3/4, D2, 64]
+    - [4/1, 3/4, D2, 70]
+    - [5/1, 3/4, A2, 64]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 64]
+  bass_refrain:
+    kind: events
+    events:
+    - [0, 3/4, G2, 71]
+    - [1/1, 3/4, D2, 65]
+    - [2/1, 3/4, A2, 70]
+    - [3/1, 3/4, E2, 65]
+    - [4/1, 3/4, D2, 73]
+    - [5/1, 3/4, A2, 66]
+    - [6/1, 3/4, B2, 69]
+    - [7/1, 3/4, E2, 65]
+  bass_return:
+    kind: events
+    events:
+    - [0, 3/4, D2, 72]
+    - [1/1, 3/4, A2, 65]
+    - [2/1, 3/4, G2, 70]
+    - [3/1, 3/4, D2, 64]
+    - [4/1, 3/4, E2, 68]
+    - [5/1, 3/4, B2, 63]
+    - [6/1, 3/4, A2, 70]
+    - [7/1, 3/4, E2, 64]
+  strings_home:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [D3, A3, F#4], velocity: 52}
+    - {at: 9/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 50}
+    - {at: 17/4, dur: 7/4, pitches: [B2, F#3, D4], velocity: 49}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 50}
+  strings_morning:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [D3, A3, E4], velocity: 52}
+    - {at: 9/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 51}
+    - {at: 17/4, dur: 7/4, pitches: [D3, A3, F#4], velocity: 51}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 50}
+  strings_eaves:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [D3, A3, F#4], velocity: 51}
+    - {at: 9/4, dur: 7/4, pitches: [B2, F#3, D4], velocity: 49}
+    - {at: 17/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 51}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, D4], velocity: 50}
+  strings_doors:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 51}
+    - {at: 9/4, dur: 7/4, pitches: [D3, A3, E4], velocity: 51}
+    - {at: 17/4, dur: 7/4, pitches: [E3, B3, G4], velocity: 49}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 50}
+  strings_roofline:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [D3, A3, F#4], velocity: 52}
+    - {at: 9/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 49}
+    - {at: 17/4, dur: 7/4, pitches: [B2, F#3, D4], velocity: 50}
+    - {at: 25/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 51}
+  strings_bamboo:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [E3, B3, G4], velocity: 48}
+    - {at: 9/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 50}
+    - {at: 17/4, dur: 7/4, pitches: [D3, A3, E4], velocity: 51}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, D4], velocity: 49}
+  strings_refrain:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 52}
+    - {at: 9/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 51}
+    - {at: 17/4, dur: 7/4, pitches: [D3, A3, F#4], velocity: 54}
+    - {at: 25/4, dur: 7/4, pitches: [B2, F#3, D4], velocity: 50}
+  strings_return:
+    kind: events
+    events:
+    - {at: 1/4, dur: 7/4, pitches: [D3, A3, E4], velocity: 51}
+    - {at: 9/4, dur: 7/4, pitches: [G3, D4, B4], velocity: 50}
+    - {at: 17/4, dur: 7/4, pitches: [E3, B3, G4], velocity: 49}
+    - {at: 25/4, dur: 7/4, pitches: [A2, E3, B3], velocity: 50}
+  blade_home:
+    kind: events
+    events:
+    - {at: 7/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 15/4, dur: 1/16, pitches: [B3, E4], velocity: 43}
+    - {at: 23/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 31/4, dur: 1/16, pitches: [E3, A3], velocity: 45}
+  blade_morning:
+    kind: events
+    events:
+    - {at: 7/4, dur: 1/16, pitches: [A3, D4], velocity: 45}
+    - {at: 15/4, dur: 1/16, pitches: [B3, E4], velocity: 44}
+    - {at: 23/4, dur: 1/16, pitches: [F#3, B3], velocity: 44}
+    - {at: 31/4, dur: 1/16, pitches: [E3, A3], velocity: 45}
+  blade_eaves:
+    kind: events
+    events:
+    - {at: 3/4, dur: 1/16, pitches: [A3, D4], velocity: 43}
+    - {at: 11/4, dur: 1/16, pitches: [F#3, B3], velocity: 44}
+    - {at: 19/4, dur: 1/16, pitches: [G3, D4], velocity: 44}
+    - {at: 27/4, dur: 1/16, pitches: [E3, A3], velocity: 45}
+  blade_doors:
+    kind: events
+    events:
+    - {at: 7/4, dur: 1/16, pitches: [G3, D4], velocity: 43}
+    - {at: 15/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 23/4, dur: 1/16, pitches: [B3, E4], velocity: 43}
+    - {at: 31/4, dur: 1/16, pitches: [E3, A3], velocity: 44}
+  blade_roofline:
+    kind: events
+    events:
+    - {at: 3/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 11/4, dur: 1/16, pitches: [E3, A3], velocity: 43}
+    - {at: 19/4, dur: 1/16, pitches: [F#3, B3], velocity: 44}
+    - {at: 27/4, dur: 1/16, pitches: [G3, D4], velocity: 44}
+  blade_bamboo:
+    kind: events
+    events:
+    - {at: 7/4, dur: 1/16, pitches: [B3, E4], velocity: 42}
+    - {at: 15/4, dur: 1/16, pitches: [G3, D4], velocity: 43}
+    - {at: 23/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 31/4, dur: 1/16, pitches: [E3, A3], velocity: 44}
+  blade_refrain:
+    kind: events
+    events:
+    - {at: 3/4, dur: 1/16, pitches: [G3, D4], velocity: 45}
+    - {at: 11/4, dur: 1/16, pitches: [A3, E4], velocity: 45}
+    - {at: 19/4, dur: 1/16, pitches: [A3, D4], velocity: 46}
+    - {at: 27/4, dur: 1/16, pitches: [F#3, B3], velocity: 44}
+  blade_return:
+    kind: events
+    events:
+    - {at: 7/4, dur: 1/16, pitches: [A3, D4], velocity: 44}
+    - {at: 15/4, dur: 1/16, pitches: [G3, D4], velocity: 43}
+    - {at: 23/4, dur: 1/16, pitches: [B3, E4], velocity: 43}
+    - {at: 31/4, dur: 1/16, pitches: [E3, A3], velocity: 45}
+  skin_home:
+    kind: events
+    events:
+    - [0, 1/16, D3, 50]
+    - [2/1, 1/16, D3, 45]
+    - [4/1, 1/16, D3, 47]
+    - [6/1, 1/16, D3, 45]
+    - [31/4, 1/16, A3, 42]
+  skin_morning:
+    kind: events
+    events:
+    - [0, 1/16, D3, 51]
+    - [2/1, 1/16, D3, 45]
+    - [4/1, 1/16, D3, 47]
+    - [6/1, 1/16, D3, 45]
+    - [31/4, 1/16, A3, 42]
+  skin_eaves:
+    kind: events
+    events:
+    - [0, 1/16, D3, 48]
+    - [4/1, 1/16, D3, 46]
+    - [31/4, 1/16, A3, 41]
+  skin_doors:
+    kind: events
+    events:
+    - [0, 1/16, D3, 48]
+    - [2/1, 1/16, D3, 44]
+    - [6/1, 1/16, D3, 44]
+    - [31/4, 1/16, A3, 41]
+  skin_roofline:
+    kind: events
+    events:
+    - [0, 1/16, D3, 50]
+    - [2/1, 1/16, D3, 45]
+    - [4/1, 1/16, D3, 47]
+    - [6/1, 1/16, D3, 45]
+  skin_bamboo:
+    kind: events
+    events:
+    - [0, 1/16, D3, 45]
+    - [4/1, 1/16, D3, 44]
+    - [31/4, 1/16, A3, 39]
+  skin_refrain:
+    kind: events
+    events:
+    - [0, 1/16, D3, 52]
+    - [2/1, 1/16, D3, 47]
+    - [4/1, 1/16, D3, 49]
+    - [6/1, 1/16, D3, 47]
+    - [31/4, 1/16, A3, 43]
+  skin_return:
+    kind: events
+    events:
+    - [0, 1/16, D3, 48]
+    - [4/1, 1/16, D3, 45]
+    - [31/4, 1/16, A3, 40]
+  wood_home:
+    kind: events
+    events:
+    - [3/4, 1/32, 37, 33]
+    - [11/4, 1/32, 77, 30]
+    - [19/4, 1/32, 37, 32]
+    - [27/4, 1/32, 77, 29]
+  wood_morning:
+    kind: events
+    events:
+    - [3/4, 1/32, 37, 34]
+    - [11/4, 1/32, 77, 30]
+    - [19/4, 1/32, 37, 33]
+    - [27/4, 1/32, 77, 30]
+  wood_eaves:
+    kind: events
+    events:
+    - [7/4, 1/32, 37, 31]
+    - [15/4, 1/32, 77, 28]
+    - [23/4, 1/32, 37, 31]
+    - [31/4, 1/32, 77, 28]
+  wood_doors:
+    kind: events
+    events:
+    - [3/4, 1/32, 37, 32]
+    - [15/4, 1/32, 77, 29]
+    - [19/4, 1/32, 37, 31]
+    - [31/4, 1/32, 77, 28]
+  wood_roofline:
+    kind: events
+    events:
+    - [3/4, 1/32, 37, 33]
+    - [11/4, 1/32, 77, 29]
+    - [19/4, 1/32, 37, 32]
+    - [27/4, 1/32, 77, 29]
+  wood_bamboo:
+    kind: events
+    events:
+    - [7/4, 1/32, 37, 29]
+    - [23/4, 1/32, 77, 27]
+    - [31/4, 1/32, 37, 29]
+  wood_refrain:
+    kind: events
+    events:
+    - [3/4, 1/32, 37, 34]
+    - [11/4, 1/32, 77, 30]
+    - [19/4, 1/32, 37, 33]
+    - [27/4, 1/32, 77, 30]
+  wood_return:
+    kind: events
+    events:
+    - [7/4, 1/32, 37, 30]
+    - [15/4, 1/32, 77, 28]
+    - [23/4, 1/32, 37, 30]
+    - [31/4, 1/32, 77, 28]
+parts:
+- id: silk_part
+  instrument: silk
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_silk, at: {bar: 1, beat: 1}, use: silk_home}
+    - {id: morning_silk, at: {bar: 9, beat: 1}, use: silk_morning}
+    - {id: eaves_silk, at: {bar: 17, beat: 1}, use: silk_eaves}
+    - {id: doors_silk, at: {bar: 25, beat: 1}, use: silk_doors}
+    - {id: roofline_silk, at: {bar: 33, beat: 1}, use: silk_roofline}
+    - {id: bamboo_silk, at: {bar: 41, beat: 1}, use: silk_bamboo}
+    - {id: refrain_silk, at: {bar: 49, beat: 1}, use: silk_refrain}
+    - {id: return_silk, at: {bar: 57, beat: 1}, use: silk_return}
+    - {id: home_silk, at: {bar: 65, beat: 1}, use: silk_home}
+- id: breath_part
+  instrument: breath
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_breath, at: {bar: 1, beat: 1}, use: breath_home}
+    - {id: morning_breath, at: {bar: 9, beat: 1}, use: breath_morning}
+    - {id: eaves_breath, at: {bar: 17, beat: 1}, use: breath_eaves}
+    - {id: doors_breath, at: {bar: 25, beat: 1}, use: breath_doors}
+    - {id: roofline_breath, at: {bar: 33, beat: 1}, use: breath_roofline}
+    - {id: bamboo_breath, at: {bar: 41, beat: 1}, use: breath_bamboo}
+    - {id: refrain_breath, at: {bar: 49, beat: 1}, use: breath_refrain}
+    - {id: return_breath, at: {bar: 57, beat: 1}, use: breath_return}
+    - {id: home_breath, at: {bar: 65, beat: 1}, use: breath_home}
+- id: footsteps_part
+  instrument: footsteps
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_bass, at: {bar: 1, beat: 1}, use: bass_home}
+    - {id: morning_bass, at: {bar: 9, beat: 1}, use: bass_morning}
+    - {id: eaves_bass, at: {bar: 17, beat: 1}, use: bass_eaves}
+    - {id: doors_bass, at: {bar: 25, beat: 1}, use: bass_doors}
+    - {id: roofline_bass, at: {bar: 33, beat: 1}, use: bass_roofline}
+    - {id: bamboo_bass, at: {bar: 41, beat: 1}, use: bass_bamboo}
+    - {id: refrain_bass, at: {bar: 49, beat: 1}, use: bass_refrain}
+    - {id: return_bass, at: {bar: 57, beat: 1}, use: bass_return}
+    - {id: home_bass, at: {bar: 65, beat: 1}, use: bass_home}
+- id: horizon_part
+  instrument: horizon
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_strings, at: {bar: 1, beat: 1}, use: strings_home}
+    - {id: morning_strings, at: {bar: 9, beat: 1}, use: strings_morning}
+    - {id: eaves_strings, at: {bar: 17, beat: 1}, use: strings_eaves}
+    - {id: doors_strings, at: {bar: 25, beat: 1}, use: strings_doors}
+    - {id: roofline_strings, at: {bar: 33, beat: 1}, use: strings_roofline}
+    - {id: bamboo_strings, at: {bar: 41, beat: 1}, use: strings_bamboo}
+    - {id: refrain_strings, at: {bar: 49, beat: 1}, use: strings_refrain}
+    - {id: return_strings, at: {bar: 57, beat: 1}, use: strings_return}
+    - {id: home_strings, at: {bar: 65, beat: 1}, use: strings_home}
+- id: blade_part
+  instrument: blade
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_blade, at: {bar: 1, beat: 1}, use: blade_home}
+    - {id: morning_blade, at: {bar: 9, beat: 1}, use: blade_morning}
+    - {id: eaves_blade, at: {bar: 17, beat: 1}, use: blade_eaves}
+    - {id: doors_blade, at: {bar: 25, beat: 1}, use: blade_doors}
+    - {id: roofline_blade, at: {bar: 33, beat: 1}, use: blade_roofline}
+    - {id: bamboo_blade, at: {bar: 41, beat: 1}, use: blade_bamboo}
+    - {id: refrain_blade, at: {bar: 49, beat: 1}, use: blade_refrain}
+    - {id: return_blade, at: {bar: 57, beat: 1}, use: blade_return}
+    - {id: home_blade, at: {bar: 65, beat: 1}, use: blade_home}
+- id: skin_part
+  instrument: skin
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_skin, at: {bar: 1, beat: 1}, use: skin_home}
+    - {id: morning_skin, at: {bar: 9, beat: 1}, use: skin_morning}
+    - {id: eaves_skin, at: {bar: 17, beat: 1}, use: skin_eaves}
+    - {id: doors_skin, at: {bar: 25, beat: 1}, use: skin_doors}
+    - {id: roofline_skin, at: {bar: 33, beat: 1}, use: skin_roofline}
+    - {id: bamboo_skin, at: {bar: 41, beat: 1}, use: skin_bamboo}
+    - {id: refrain_skin, at: {bar: 49, beat: 1}, use: skin_refrain}
+    - {id: return_skin, at: {bar: 57, beat: 1}, use: skin_return}
+    - {id: home_skin, at: {bar: 65, beat: 1}, use: skin_home}
+- id: wood_part
+  instrument: wood
+  voices:
+  - id: written
+    clips:
+    - {id: threshold_wood, at: {bar: 1, beat: 1}, use: wood_home}
+    - {id: morning_wood, at: {bar: 9, beat: 1}, use: wood_morning}
+    - {id: eaves_wood, at: {bar: 17, beat: 1}, use: wood_eaves}
+    - {id: doors_wood, at: {bar: 25, beat: 1}, use: wood_doors}
+    - {id: roofline_wood, at: {bar: 33, beat: 1}, use: wood_roofline}
+    - {id: bamboo_wood, at: {bar: 41, beat: 1}, use: wood_bamboo}
+    - {id: refrain_wood, at: {bar: 49, beat: 1}, use: wood_refrain}
+    - {id: return_wood, at: {bar: 57, beat: 1}, use: wood_return}
+    - {id: home_wood, at: {bar: 65, beat: 1}, use: wood_home}
