@@ -219,23 +219,24 @@ processing:
   groups:
     melody:
       chain:
+      # Keep the shakuhachi as the hook, but leave room for the koto/shamisen footwork.
       - {processor: highpass, cutoff_hz: 180}
-      - {processor: band_gain, low_hz: 2600, high_hz: 4400, gain_db: -1.5}
-      - {processor: reverb, wet: 0.07, decay_seconds: 0.8, damping_hz: 4600}
-      - {processor: gain, gain_db: 0}
+      - {processor: band_gain, low_hz: 2600, high_hz: 4400, gain_db: -1.8}
+      - {processor: reverb, wet: 0.08, decay_seconds: 0.88, damping_hz: 4400}
+      - {processor: gain, gain_db: -5.5}
     shamisen:
       chain:
       - {processor: highpass, cutoff_hz: 190}
       - {processor: lowpass, cutoff_hz: 7800}
       - {processor: reverb, wet: 0.045, decay_seconds: 0.65, damping_hz: 4500}
-      - {processor: gain, gain_db: -3.2}
+      - {processor: gain, gain_db: -2.5}
     koto:
       chain:
       - {processor: highpass, cutoff_hz: 220}
       - {processor: band_gain, low_hz: 3800, high_hz: 4800, gain_db: -2.0}
       - {processor: lowpass, cutoff_hz: 9800}
       - {processor: reverb, wet: 0.07, decay_seconds: 0.82, damping_hz: 4600}
-      - {processor: gain, gain_db: -3.0}
+      - {processor: gain, gain_db: -2.0}
     bass:
       chain:
       - {processor: highpass, cutoff_hz: 31}
