@@ -98,14 +98,31 @@ transport-level changes but are not mistaken for authored automation. A
 controller edit with no unique v3 clip owner blocks source application rather
 than being discarded.
 
-## Next large stages
-
 ### Stage 3: conductor reconciliation
 
-Tempo, meter, and form-marker changes are detected now, but `daw_apply` refuses
-them. This stage needs an explicit policy for converting ordinary SMF tempo
-events back into MusicIR's step/ramp model, and must keep MusicIR holds exact even
-though SMF has no native hold event.
+`daw_reconcile` now emits event-level conductor diffs plus a semantic apply plan.
+Supported conductor edits include:
+
+- ordinary step-tempo insertions/deletions/moves/value changes;
+- meter maps whose changes remain on exact bar boundaries at the score PPQ;
+- form-marker moves and label edits without changing form topology;
+- edits to an existing sampled MusicIR tempo ramp when the edited samples still
+  fit a supported compact curve; and
+- newly drawn dense monotone tempo ramps when the MIDI samples fit a linear or
+  exponential curve tightly enough to infer intent.
+
+Existing MusicIR ramp boundaries are baseline-guided. Moving a ramp boundary is
+currently refused instead of guessing where a DAW's sampled run begins or ends.
+Likewise, adding/deleting form markers is a form-topology edit and requires manual
+resolution for now.
+
+MusicIR holds remain source/sidecar-authoritative. If surrounding tempo changes,
+the hold is re-anchored with the reconstructed BPM in force at its tick so the
+hold does not accidentally restore the old tempo. `daw_apply` recompiles the
+result and verifies note ticks, meter/markers, and the reconstructed tempo clock
+before writing.
+
+## Next large stages
 
 ### Stage 4: Ardour session adapter
 
@@ -153,6 +170,7 @@ MusicIR source identities on every note. The sidecar records:
 - v3 authoring-graph fingerprint;
 - MIDI PPQ and exact-clock status;
 - conductor baseline;
+- exact meter changes, compact tempo segments, holds, and score end tick;
 - track/instrument/group identity and MIDI track index;
 - exact baseline note ticks and velocities;
 - stable v3 note/controller source mappings;
@@ -170,5 +188,7 @@ playback, while the exact MusicIR timing remains in source and interchange
 metadata. Score holds are marked in the MIDI conductor track; the sidecar remains
 authoritative because SMF has no direct "pause score time for N seconds" event.
 
-This is why conductor import is its own stage rather than being inferred from a
-naive MIDI diff.
+Stage 3 therefore treats the MIDI conductor as an editable transport surface
+and reconstructs compact MusicIR timing semantics only when the mapping is
+well-supported by the samples and sidecar baseline. Ambiguous ramp boundaries,
+non-bar-aligned meter changes, and form-topology changes stop automatic apply.

@@ -1410,6 +1410,9 @@ class DawReconcileCommand(kwconf.Config):
             print(
                 f"DAW reconciliation: {summary['note_changes']} note change(s), "
                 f"{summary['controller_changes']} controller/bend change(s), "
+                f"conductor={summary['tempo_event_changes']} tempo/"
+                f"{summary['meter_event_changes']} meter/"
+                f"{summary['form_marker_changes']} marker change(s), "
                 f"apply={'yes' if report['apply']['supported'] else 'no'}"
             )
             if report["apply"]["blocked_by"]:
@@ -1420,7 +1423,7 @@ class DawReconcileCommand(kwconf.Config):
 
 
 class DawApplyCommand(kwconf.Config):
-    """Apply supported edited-MIDI note changes by lowering affected v3 clips."""
+    """Apply supported DAW note/automation/conductor edits back to MusicIR v3."""
 
     cue: str = kwconf.Value(None, position=1, help="cue id or YAML path used for the original export")
     midi: Path = kwconf.Value(None, parser=Path, help="MIDI exported from the DAW after editing")
@@ -1461,7 +1464,7 @@ class DawApplyCommand(kwconf.Config):
             reconciliation = reconcile_edited_midi(baseline_compiled, manifest, snapshot)
             if not reconciliation["apply"]["supported"]:
                 blocked = ", ".join(reconciliation["apply"]["blocked_by"])
-                raise DawRoundtripError(f"DAW changes require a later roundtrip stage: {blocked}")
+                raise DawRoundtripError(f"DAW changes cannot be applied safely: {blocked}")
             updated_spec, apply_report = lower_reconciled_clips(source_spec, manifest, reconciliation)
             compiled_after = compile_score(updated_spec)
             verification = verify_compiled_matches_edited_midi(compiled_after, manifest, snapshot)
@@ -1500,6 +1503,14 @@ class DawApplyCommand(kwconf.Config):
                 f"lowered {row['part_id']}/{row['voice_id']}/{row['clip_id']}: "
                 f"{row['from']} -> events ({row['notes']} notes)"
             )
+        conductor_apply = apply_report.get("conductor") or {}
+        if conductor_apply.get("changed"):
+            changed = [
+                name
+                for name in ("tempo", "meter", "form_markers")
+                if conductor_apply.get(name)
+            ]
+            print("reconciled conductor: " + ", ".join(changed))
         if config.report is not None:
             print(config.report)
         return 0

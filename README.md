@@ -58,8 +58,9 @@ python -m ambition_music_renderer audio compare before.wav after.wav
 
 See `docs/agent_composition_workflow.md`, `docs/musicir_v3.md`, and
 `docs/music_quality_review.md`. The checked-in technique, generator, processing,
-and instrument authoring registers are all readable source-only. DAW import is
-currently deferred; the existing MIDI/provenance export seam remains available.
+and instrument authoring registers are all readable source-only. DAW round trip
+is active for MusicIR v3 through MIDI + provenance sidecar reconciliation;
+Ardour is the primary target and REAPER is secondary.
 
 The permanent legacy-corpus gate is:
 
@@ -168,8 +169,8 @@ V2/v3 MIDI previews are written from the exact score clock, including meter and
 tempo events, rather than reconstructed from synthesis seconds. Form markers are
 written as Standard MIDI File marker events.
 
-The existing, currently deferred DAW-interchange seam can export MIDI together with a
-MusicIR provenance sidecar:
+The DAW-interchange seam exports MIDI together with a MusicIR provenance
+sidecar and can reconcile supported Ardour/REAPER edits back into v3 source:
 
 ```bash
 uv run --project tools/ambition_music_renderer \
@@ -178,9 +179,10 @@ uv run --project tools/ambition_music_renderer \
   python -m ambition_music_renderer cue daw_apply <cue_id> --midi /tmp/<cue_id>-edited.mid --manifest /tmp/<cue_id>-daw/<cue_id>.musicir-interchange.json --output /tmp/<cue_id>.daw.music.yaml
 ```
 
-See `docs/daw_interchange.md`. Automatic edited-MIDI import/reconciliation is
-deferred; keep the export boundary stable while the active campaign focuses on
-v3 composition capability and renderer hardening.
+See `docs/daw_interchange.md`. Current automatic reconciliation covers notes,
+clip-owned CC/pitch-bend automation, step tempo, bar-aligned meter changes,
+form-marker moves/renames, and conservatively reconstructable tempo ramps.
+MusicIR holds remain sidecar-authoritative because SMF has no native hold event.
 
 `simple-mix` is the preferred starting point when judging composition. Add
 more render products only when they answer a concrete debugging question.

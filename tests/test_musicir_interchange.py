@@ -374,7 +374,7 @@ def test_daw_apply_lowers_clip_owned_controller_edit(tmp_path: Path):
     assert apply_report["clips_lowered"][0]["automation_points"] == 1
 
 
-def test_daw_reconcile_blocks_conductor_edits(tmp_path: Path):
+def test_daw_reconcile_applies_step_tempo_edit(tmp_path: Path):
     source = _v3_score()
     compiled = compile_score(source)
     paths = export_interchange_bundle(compiled, tmp_path / "baseline")
@@ -392,10 +392,19 @@ def test_daw_reconcile_blocks_conductor_edits(tmp_path: Path):
     assert changed_tempo
     edited_path = tmp_path / "tempo-edited.mid"
     edited.save(str(edited_path))
-    report = reconcile_edited_midi(compiled, manifest, read_midi_snapshot(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
     assert report["summary"]["conductor_changed"] is True
-    assert report["apply"]["supported"] is False
-    assert report["apply"]["blocked_by"] == ["tempo_meter_marker_edits_need_conductor_stage"]
+    assert report["summary"]["tempo_event_changes"] == 1
+    assert report["apply"]["supported"] is True
+    assert report["conductor"]["tempo"]["ramps"] == []
+
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    assert abs(float(updated["tempo"][0]["bpm"]) - 123.0) < 1e-3
+    assert apply_report["conductor"]["tempo"] is True
+    verification = verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)
+    assert verification["ok"] is True
+    assert verification["conductor"]["tempo"]["mode"] == "exact_step_events"
 
 
 def test_daw_reconcile_rejects_stale_musicir_baseline(tmp_path: Path):
@@ -415,3 +424,295 @@ def test_daw_reconcile_rejects_stale_musicir_baseline(tmp_path: Path):
         assert "fresh DAW bundle" in str(ex)
     else:
         raise AssertionError("expected stale MusicIR source to reject DAW reconciliation")
+
+
+def _edit_first_time_signature(mid: mido.MidiFile, *, numerator: int, denominator: int) -> None:
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "time_signature":
+                msg.numerator = numerator
+                msg.denominator = denominator
+                return
+    raise AssertionError("no time signature event")
+
+
+def _ramp_v3_score():
+    source = _v3_score()
+    source["id"] = "interchange_ramp_v3"
+    source["tempo"] = [
+        {"tick": 0, "bpm": [120, 90], "to": {"tick": 1920}, "curve": "linear"},
+    ]
+    source["form"] = [{"id": "main", "from": {"tick": 0}, "to": {"tick": 1920}}]
+    source["end"] = {"tick": 1920}
+    return source
+
+
+def _rewrite_ramp_tempos(mid: mido.MidiFile, *, start_bpm: float, end_bpm: float, end_tick: int) -> None:
+    changed = 0
+    for track in mid.tracks:
+        tick = 0
+        for msg in track:
+            tick += int(msg.time)
+            if msg.type == "set_tempo" and 0 <= tick <= end_tick:
+                frac = tick / float(end_tick)
+                bpm = start_bpm + (end_bpm - start_bpm) * frac
+                msg.tempo = mido.bpm2tempo(bpm)
+                changed += 1
+    assert changed >= 3
+
+
+def test_daw_apply_reconstructs_linear_tempo_ramp(tmp_path: Path):
+    source = _ramp_v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    assert manifest["midi"]["tempo_ramps_sampled_to_smf"] is True
+    assert manifest["midi"]["exact_timing"]["tempo_segments"][0]["curve"] == "linear"
+
+    edited = mido.MidiFile(str(paths["midi"]))
+    _rewrite_ramp_tempos(edited, start_bpm=120.0, end_bpm=100.0, end_tick=1920)
+    edited_path = tmp_path / "ramp-edited.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["apply"]["supported"] is True
+    ramps = report["conductor"]["tempo"]["ramps"]
+    assert ramps[0]["status"] == "reconstructed"
+    assert ramps[0]["curve"] == "linear"
+    assert abs(ramps[0]["end_bpm"] - 100.0) < 1e-3
+
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    assert updated["tempo"][0]["curve"] == "linear"
+    assert updated["tempo"][0]["to"] == {"tick": 1920}
+    assert abs(updated["tempo"][0]["bpm"][1] - 100.0) < 1e-3
+    assert apply_report["conductor"]["tempo_ramps"][0]["status"] == "reconstructed"
+    verification = verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)
+    assert verification["ok"] is True, verification
+    assert verification["conductor"]["tempo"]["mode"] == "semantic_ramp_and_smf_clock"
+
+
+def test_daw_reconcile_blocks_non_curve_ramp_sample_edit(tmp_path: Path):
+    source = _ramp_v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    changed = False
+    for track in edited.tracks:
+        tick = 0
+        for msg in track:
+            tick += int(msg.time)
+            if msg.type == "set_tempo" and 0 < tick < 1920:
+                msg.tempo = mido.bpm2tempo(170)
+                changed = True
+                break
+        if changed:
+            break
+    assert changed
+    edited_path = tmp_path / "ramp-corrupt.mid"
+    edited.save(str(edited_path))
+    report = reconcile_edited_midi(compiled, manifest, read_midi_snapshot(edited_path))
+    assert report["apply"]["supported"] is False
+    assert any(
+        reason.startswith("tempo_ramp_samples_do_not_fit_supported_curve")
+        for reason in report["apply"]["blocked_by"]
+    )
+
+
+def test_daw_apply_meter_edit_preserves_exact_score_extent(tmp_path: Path):
+    source = _v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    _edit_first_time_signature(edited, numerator=3, denominator=4)
+    edited_path = tmp_path / "meter-edited.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["summary"]["meter_event_changes"] == 1
+    assert report["apply"]["supported"] is True
+
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    assert updated["meter"] == [{"bar": 1, "signature": "3/4"}]
+    assert updated["end"] == {"tick": 1920}
+    assert updated["form"][0]["from"] == {"tick": 0}
+    assert updated["form"][0]["to"] == {"tick": 1920}
+    assert apply_report["conductor"]["meter"] is True
+    assert verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)["ok"] is True
+
+
+def test_daw_reconcile_blocks_meter_change_off_bar_boundary(tmp_path: Path):
+    source = _v3_score()
+    source["end"] = {"bar": 3, "beat": 1}
+    source["form"] = [{"id": "main", "from": {"bar": 1, "beat": 1}, "to": {"bar": 3, "beat": 1}}]
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    conductor = edited.tracks[0]
+    # Insert a 3/4 signature 500 ticks after the initial conductor events.  500
+    # is not a 4/4 bar boundary at PPQ 480.
+    inserted = False
+    absolute = 0
+    for idx, msg in enumerate(conductor):
+        next_absolute = absolute + int(msg.time)
+        if next_absolute >= 500:
+            before = 500 - absolute
+            msg.time -= before
+            conductor.insert(idx, mido.MetaMessage("time_signature", numerator=3, denominator=4, time=before))
+            inserted = True
+            break
+        absolute = next_absolute
+    assert inserted
+    edited_path = tmp_path / "meter-off-grid.mid"
+    edited.save(str(edited_path))
+    report = reconcile_edited_midi(compiled, manifest, read_midi_snapshot(edited_path))
+    assert report["apply"]["supported"] is False
+    assert "meter_change_not_on_bar_boundary:500" in report["apply"]["blocked_by"]
+
+
+def test_daw_apply_moves_and_renames_form_marker(tmp_path: Path):
+    source = _v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    moved = False
+    conductor = edited.tracks[0]
+    for index, msg in enumerate(conductor):
+        if msg.type == "marker":
+            msg.text = "Rooftop main"
+            msg.time += 120
+            if index + 1 < len(conductor):
+                conductor[index + 1].time -= 120
+            moved = True
+            break
+    assert moved
+    edited_path = tmp_path / "marker-edited.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["summary"]["form_marker_changes"] == 1
+    assert report["apply"]["supported"] is True
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    assert updated["form"][0]["from"] == {"tick": 120}
+    assert updated["form"][0]["label"] == "Rooftop main"
+    assert apply_report["conductor"]["form_markers"] is True
+    assert verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)["ok"] is True
+
+
+def test_daw_apply_preserves_musicir_hold_while_editing_tempo(tmp_path: Path):
+    source = _v3_score()
+    source["tempo"] = [
+        {"tick": 0, "bpm": 120},
+        {"tick": 960, "bpm": 120, "hold_seconds": 1.5},
+    ]
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    assert manifest["midi"]["holds_sidecar_authoritative"] is True
+    assert manifest["midi"]["exact_timing"]["holds"] == [{"tick": 960, "seconds": 1.5}]
+
+    edited = mido.MidiFile(str(paths["midi"]))
+    for track in edited.tracks:
+        for msg in track:
+            if msg.type == "set_tempo" and msg.time == 0:
+                msg.tempo = mido.bpm2tempo(110)
+                break
+    edited_path = tmp_path / "hold-tempo-edited.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["apply"]["supported"] is True
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    hold_rows = [row for row in updated["tempo"] if row.get("hold_seconds") is not None]
+    assert len(hold_rows) == 1
+    assert hold_rows[0]["tick"] == 960
+    assert abs(float(hold_rows[0]["bpm"]) - 110.0) < 1e-3
+    assert hold_rows[0]["hold_seconds"] == 1.5
+    compiled_after = compile_score(updated)
+    assert compiled_after.exact_metadata["holds"] == [{"tick": 960, "seconds": 1.5}]
+    assert apply_report["conductor"]["holds"]["policy"] == "sidecar_authoritative_preserved"
+    assert verify_compiled_matches_edited_midi(compiled_after, manifest, snapshot)["ok"] is True
+
+
+def _replace_conductor_tempos(mid: mido.MidiFile, points: list[tuple[int, float]]) -> None:
+    track = mid.tracks[0]
+    absolute = 0
+    kept = []
+    order = 0
+    for msg in track:
+        absolute += int(msg.time)
+        if msg.type not in {"set_tempo", "end_of_track"}:
+            kept.append((absolute, order, msg.copy(time=0)))
+            order += 1
+    for tick, bpm in points:
+        kept.append((int(tick), order, mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(float(bpm)), time=0)))
+        order += 1
+    end_tick = max([absolute] + [int(tick) for tick, _bpm in points])
+    kept.sort(key=lambda row: (row[0], row[1]))
+    rebuilt = mido.MidiTrack()
+    previous = 0
+    for tick, _order, msg in kept:
+        rebuilt.append(msg.copy(time=int(tick) - previous))
+        previous = int(tick)
+    rebuilt.append(mido.MetaMessage("end_of_track", time=max(0, end_tick - previous)))
+    mid.tracks[0] = rebuilt
+
+
+def test_daw_apply_infers_new_dense_linear_tempo_ramp(tmp_path: Path):
+    source = _v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    points = []
+    for tick in range(0, 1921, 120):
+        frac = tick / 1920.0
+        points.append((tick, 120.0 + (96.0 - 120.0) * frac))
+    _replace_conductor_tempos(edited, points)
+    edited_path = tmp_path / "new-ramp.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["apply"]["supported"] is True
+    inferred = [row for row in report["conductor"]["tempo"]["ramps"] if row["status"] == "inferred_new_ramp"]
+    assert len(inferred) == 1
+    assert inferred[0]["curve"] == "linear"
+    updated, _apply_report = lower_reconciled_clips(source, manifest, report)
+    assert updated["tempo"][0]["curve"] == "linear"
+    assert updated["tempo"][0]["to"] == {"tick": 1920}
+    verification = verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)
+    assert verification["ok"] is True, verification
+
+
+def test_daw_apply_combines_clip_and_conductor_edits(tmp_path: Path):
+    source = _v3_score()
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited = mido.MidiFile(str(paths["midi"]))
+    changed_note = False
+    changed_tempo = False
+    for track in edited.tracks:
+        for msg in track:
+            if msg.type == "set_tempo" and not changed_tempo:
+                msg.tempo = mido.bpm2tempo(126)
+                changed_tempo = True
+            if msg.type == "note_on" and msg.velocity > 0 and not changed_note:
+                msg.velocity += 5
+                changed_note = True
+    assert changed_note and changed_tempo
+    edited_path = tmp_path / "combined-edited.mid"
+    edited.save(str(edited_path))
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    assert report["summary"]["note_changes"] == 1
+    assert report["summary"]["tempo_event_changes"] == 1
+    assert report["apply"]["supported"] is True
+    updated, apply_report = lower_reconciled_clips(source, manifest, report)
+    assert len(apply_report["clips_lowered"]) == 1
+    assert apply_report["conductor"]["tempo"] is True
+    verification = verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)
+    assert verification["ok"] is True, verification

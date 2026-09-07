@@ -575,6 +575,12 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
             ),
             "holds_sidecar_authoritative": bool(holds),
             "conductor": _baseline_conductor(compiled, timing),
+            "exact_timing": {
+                "meter_changes": copy.deepcopy((compiled.exact_metadata or {}).get("meter_changes", []) or []),
+                "tempo_segments": copy.deepcopy((compiled.exact_metadata or {}).get("tempo_segments", []) or []),
+                "holds": copy.deepcopy(holds),
+                "end_tick": int((compiled.exact_metadata or {}).get("end_tick", 0) or 0),
+            } if timing is not None else None,
         },
         "tracks": tracks,
         "source_regions": _source_regions_from_tracks(tracks),
@@ -588,9 +594,10 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
             ),
             "automatic_musicir_import": True,
             "notes": (
-                "V3 clip/event provenance is preserved in this sidecar. MIDI cannot carry these ids "
-                "portably, so the importer reconciles edited MIDI against this saved baseline and "
-                "lowers only affected v3 clips when applying note edits."
+                "V3 clip/event provenance and exact conductor semantics are preserved in this sidecar. "
+                "MIDI cannot carry clip ids or score holds portably, so the importer reconciles edited "
+                "MIDI against this saved baseline, lowers only affected v3 clips, reconstructs supported "
+                "tempo/meter/form edits, and keeps MusicIR holds sidecar-authoritative."
             ),
         },
     }

@@ -567,7 +567,7 @@ feedback.
 
 ### Active — DAW round trip
 
-Status: stages 1 and 2 established on 2026-09-07.
+Status: stages 1 through 3 established on 2026-09-07.
 
 Established:
 
@@ -579,17 +579,19 @@ Established:
 4. clip-owned CC/pitch-bend reconciliation, while renderer initialization CCs
    remain transport evidence rather than authored source;
 5. source apply by lowering only affected v3 clips to literal events/automation;
-6. stale-baseline refusal and post-apply recompilation verification before write.
+6. conductor reconciliation for step tempo, exact bar-aligned meter changes,
+   form-marker moves/renames, and conservatively fitted sampled tempo ramps;
+7. MusicIR hold preservation as sidecar-authoritative timing semantics;
+8. stale-baseline refusal plus post-apply note/conductor recompilation
+   verification before write.
 
 Next large stages:
 
-1. conductor reconciliation: tempo/meter/form-marker edits with an explicit
-   policy for sampled SMF tempo ramps and sidecar-authoritative holds;
-2. Ardour-first session/setup adapter around the neutral interchange core,
+1. Ardour-first session/setup adapter around the neutral interchange core,
    including useful reference audio/stems and a deterministic edited-MIDI export
    handoff;
-3. REAPER adapter after the Ardour workflow is exercised;
-4. source-location-aware YAML patching to reduce textual diff without changing
+2. REAPER adapter after the Ardour workflow is exercised;
+3. source-location-aware YAML patching to reduce textual diff without changing
    the structural reconciliation model.
 
 Sparse generator-event override layers should be added only if real round-trip

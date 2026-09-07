@@ -86,5 +86,8 @@ python -m ambition_music_renderer cue daw_apply <cue> \
     --report /tmp/<cue>-apply.json
 ```
 
-Current apply supports note edits and clip-owned CC/pitch-bend edits. Conductor
-changes are detected and rejected until the conductor stage lands.
+Current apply supports note edits, clip-owned CC/pitch-bend edits, and the
+Stage 3 conductor path: step tempo edits, bar-aligned meter edits, form-marker
+moves/renames, and conservatively reconstructable sampled tempo ramps. MusicIR
+holds are preserved from the sidecar/source even though Ardour's SMF transport
+cannot encode the pause itself.

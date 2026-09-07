@@ -17,6 +17,11 @@ from typing import Any, Iterable, Mapping
 import yaml
 
 from .graph import normalize_v3_score_graph
+from .interchange_conductor import (
+    apply_conductor_to_v3,
+    reconcile_conductor,
+    verify_conductor_against_snapshot,
+)
 from .model import CompiledScore, compiled_score_fingerprint
 from .normalize import MUSICIR_V3_SCHEMA
 from ..render.exact_score import ScoreClock
@@ -492,10 +497,14 @@ def reconcile_edited_midi(
         for key in ("notes_modified", "notes_deleted", "notes_added")
     )
 
-    conductor_changed = False
-    conductor_baseline = (manifest.get("midi") or {}).get("conductor")
-    if conductor_baseline is not None:
-        conductor_changed = conductor_baseline != (edited.get("conductor") or {})
+    conductor_report = reconcile_conductor(
+        compiled,
+        manifest,
+        edited.get("conductor") or {},
+        ppq=target_ppq,
+    )
+    conductor_changed = bool(conductor_report.get("changed"))
+    conductor_blocked = list((conductor_report.get("apply") or {}).get("blocked_by", []) or [])
 
     return {
         "schema": RECONCILIATION_SCHEMA,
@@ -516,7 +525,11 @@ def reconcile_edited_midi(
             "unassigned_added_notes": len(unassigned_additions),
             "unassigned_controller_edits": len(unassigned_controller_edits),
             "conductor_changed": conductor_changed,
+            "tempo_event_changes": int((conductor_report.get("summary") or {}).get("tempo_event_changes", 0)),
+            "meter_event_changes": int((conductor_report.get("summary") or {}).get("meter_event_changes", 0)),
+            "form_marker_changes": int((conductor_report.get("summary") or {}).get("marker_changes", 0)),
         },
+        "conductor": conductor_report,
         "unassigned_added_notes": unassigned_additions,
         "unassigned_controller_edits": unassigned_controller_edits,
         "apply": {
@@ -525,20 +538,24 @@ def reconcile_edited_midi(
                 and not missing_tracks
                 and not unassigned_additions
                 and not unassigned_controller_edits
-                and not conductor_changed
+                and not conductor_blocked
             ),
-            "strategy": "lower_affected_v3_clips_to_exact_events",
-            "blocked_by": [
-                reason
-                for condition, reason in (
-                    (compiled.canonical_schema != MUSICIR_V3_SCHEMA, "source_is_not_musicir_v3"),
-                    (bool(missing_tracks), "missing_midi_tracks"),
-                    (bool(unassigned_additions), "ambiguous_added_note_source_region"),
-                    (bool(unassigned_controller_edits), "controller_edit_has_no_unique_v3_clip_source"),
-                    (conductor_changed, "tempo_meter_marker_edits_need_conductor_stage"),
+            "strategy": "lower_affected_v3_clips_and_reconcile_conductor",
+            "blocked_by": list(
+                dict.fromkeys(
+                    [
+                        reason
+                        for condition, reason in (
+                            (compiled.canonical_schema != MUSICIR_V3_SCHEMA, "source_is_not_musicir_v3"),
+                            (bool(missing_tracks), "missing_midi_tracks"),
+                            (bool(unassigned_additions), "ambiguous_added_note_source_region"),
+                            (bool(unassigned_controller_edits), "controller_edit_has_no_unique_v3_clip_source"),
+                        )
+                        if condition
+                    ]
+                    + conductor_blocked
                 )
-                if condition
-            ],
+            ),
         },
     }
 
@@ -711,9 +728,15 @@ def lower_reconciled_clips(
             }
         )
 
+    # Apply conductor edits after clip lowering.  Clip/event coordinates above are
+    # interpreted in the baseline clock; changing meter first could change the
+    # meaning of bar-addressed source positions before they are literalized.
+    spec, conductor_apply = apply_conductor_to_v3(spec, report.get("conductor") or {})
+
     return spec, {
-        "strategy": "lower_affected_v3_clips_to_exact_events",
+        "strategy": "lower_affected_v3_clips_and_reconcile_conductor",
         "clips_lowered": lowering_rows,
+        "conductor": conductor_apply,
     }
 
 
@@ -787,4 +810,14 @@ def verify_compiled_matches_edited_midi(
                     "compiled_only": [list(row) for row in sorted(set(actual_notes) - set(expected_notes))[:32]],
                 }
             )
-    return {"ok": not mismatches, "mismatches": mismatches}
+    conductor_verification = verify_conductor_against_snapshot(
+        compiled,
+        edited.get("conductor") or {},
+        ppq=target_ppq,
+    )
+    mismatches.extend(copy.deepcopy(conductor_verification.get("mismatches", []) or []))
+    return {
+        "ok": not mismatches,
+        "mismatches": mismatches,
+        "conductor": conductor_verification,
+    }
