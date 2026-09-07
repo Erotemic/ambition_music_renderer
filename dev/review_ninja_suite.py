@@ -86,9 +86,31 @@ def main(argv: list[str] | None = None) -> int:
             result["compiled_fingerprint"] = fingerprint
             loop_report = score_loop_report(compiled)
             determinism = compilation_determinism_report(spec, rounds=3)
+            quality = composition_quality_report(compiled)
+            pacing = {
+                "notes_per_second": quality["notes_per_second"],
+                "groups": {
+                    row["group"]: {
+                        "note_count": row["note_count"],
+                        "mean_note_duration_s": row["mean_note_duration_s"],
+                        "notes_per_active_second": row["notes_per_active_second"],
+                    }
+                    for row in quality["groups"]
+                },
+            }
+            result["composition_pacing"] = pacing
             save_json(evidence / "loop_source.json", loop_report)
-            save_json(evidence / "composition_quality.json", composition_quality_report(compiled))
+            save_json(evidence / "composition_quality.json", quality)
+            save_json(evidence / "composition_pacing.json", pacing)
             save_json(evidence / "determinism.json", determinism)
+            melody = pacing["groups"].get("melody", {})
+            bass = pacing["groups"].get("bass", {})
+            print(
+                f"[ninja review] {cue}: pacing {pacing['notes_per_second']:.2f} notes/s; "
+                f"melody mean {melody.get('mean_note_duration_s', 0):.2f}s; "
+                f"bass mean {bass.get('mean_note_duration_s', 0):.2f}s",
+                flush=True,
+            )
             compiled.pm.write(str(evidence / f"{cue}.mid"))
             if not determinism["deterministic"]:
                 raise RuntimeError("independent score compilations differ")

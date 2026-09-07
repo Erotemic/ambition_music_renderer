@@ -37,24 +37,26 @@ than simply increasing every instrument's volume.
 `the_last_lantern` is the night/exploration piece: D minor, 96 BPM, 4/4.
 Its loop is 64 bars / 2:40; the full soundtrack is 72 bars / 3:00.
 
-It shares the D-D-A call, but its note lengths, answering phrases, harmonic route,
-and accompaniment are separately written. Koto introduces the melody an octave
-below the flute's later entrance. A second, longer refrain reaches the upper
-register; cello moves underneath instead of holding stacked string chords.
-Percussion leaves more space, and the garden passage thins further before the
-return. The final statement brings the koto back to the opening register.
+It shares the D-D-A identity, but the revision treats 96 BPM as its native
+time scale. Harmonic changes last two bars; the bass normally makes one long
+footfall per bar; cello lines span bars; koto attacks are isolated lantern
+flashes; and the flute phrases are long exhaled tones separated by actual rests.
+The shamisen is punctuation instead of a low-density version of the action
+groove. The empty bridge removes still more attacks before the garden and
+refrain restore motion. This is deliberately different rhythmic architecture
+from Nine Lives, not the same architecture with a smaller tempo number.
 
 | Full preview | Loop-relative bars | Passage |
 | --- | --- | --- |
-| 0:00 | Lead-in | Koto threshold |
-| 0:20 | 1-8 | Koto theme with flute answers |
-| 0:40 | 9-16 | Flute theme and cello counterline |
-| 1:00 | 17-24 | Long-line refrain |
-| 1:20 | 25-32 | Koto refrain |
-| 1:40 | 33-40 | Garden passage |
-| 2:00 | 41-48 | Flute refrain returns |
-| 2:20 | 49-56 | Theme and cello |
-| 2:40 | 57-64 | Homeward koto, then return to loop bar 1 |
+| 0:00 | Lead-in | Homeward lantern threshold |
+| 0:20 | 1-8 | One lantern in the rain; distant flute only |
+| 0:40 | 9-16 | Breath enters over long cello motion |
+| 1:00 | 17-24 | The long road |
+| 1:20 | 25-32 | Empty bridge |
+| 1:40 | 33-40 | Garden after midnight |
+| 2:00 | 41-48 | Lantern refrain |
+| 2:20 | 49-56 | Footsteps returning |
+| 2:40 | 57-64 | Homeward lantern, then loop bar 1 |
 
 ## Instruments and mix
 
@@ -63,17 +65,20 @@ part. These are Japanese-inspired game arrangements, not claims of traditional
 performance practice. The checked-in sampled-instrument catalog does not provide
 those Japanese roles; the GM program choices are intentional.
 
-Electric bass uses the required catalog role `bass.electric`. The action piece
-uses `strings.violins_1`; the night piece uses `strings.cello`. Their SFZ backends
-are required. A missing library must produce a diagnostic, not a substituted
-instrument. Use the repository's normal audio-tools installation and `instruments
-doctor` to inspect that environment; do not rewrite the score to accommodate a
-missing dependency.
+Nine Lives now requests the required clean `bass.fashion` catalog role rather
+than the broader `bass.electric` resolver; the latter resolved to Growlybass in
+the first production review and its character was too colored for the part. The
+night piece retains `bass.electric`. The action piece uses `strings.violins_1`;
+the night piece uses `strings.cello`. Required SFZ roles still fail explicitly
+when missing rather than changing instruments.
 
-Bass has a dedicated part and gain/EQ treatment, including upper harmonics for
-articulation. Percussion and plucked parts have different dynamics. Reverbs are
-short, dark, and group-specific. The master requests -16 LUFS for the action piece
-and -17 LUFS for the night piece. The existing `true_peak_db: -1.5` parameter uses
+The first production report also exposed narrow koto energy around 4.1-4.4 kHz
+in both cues and a 6.2-7.0 kHz ridge in the night-piece cello patch. The revised
+group processing cuts those regions directly instead of globally darkening the
+whole mix. Nine Lives also rounds its clean bass with less upper-mid boost and a
+lower low-pass; Last Lantern makes the cello more audible after taming its high
+ridge. The master requests -16 LUFS for the action piece and -17.5 LUFS for the
+night piece. The existing `true_peak_db: -1.5` parameter uses
 the renderer's sample-peak cap; it does not certify oversampled true peak or that
 the requested integrated loudness is achieved after limiting. Measure the actual
 export rather than treating the settings as results.
@@ -118,7 +123,8 @@ The command processes both cues in a new timestamped directory under
 The runner invokes the existing `cue bundle` command with `pretty-midi`,
 `full-mix-only`, `audition_stems`, and `all_audits`. It adds no synthesis dependency,
 does not publish, and does not select a fallback backend. Source validation,
-three independent compilations, and the loop-input comparison happen first.
+three independent compilations, the loop-input comparison, and a compact pacing
+summary (overall notes/second plus mean melody/bass note duration) happen first.
 The render manifest must match the score just compiled. The runner measures the
 actual decoded loop file and checks its duration and full-scale sample count.
 Native audit command failures produce a nonzero result. Warnings are retained

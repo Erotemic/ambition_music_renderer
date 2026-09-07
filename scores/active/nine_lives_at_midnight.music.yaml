@@ -189,7 +189,7 @@ instruments:
   volume: 105
   pan: 64
   expression: 112
-  instrument_backend: {kind: sfz, library_ref: bass.electric, required: true}
+  instrument_backend: {kind: sfz, library_ref: bass.fashion, required: true}
 - name: horizon
   group: strings
   program: string_ensemble_1
@@ -227,15 +227,18 @@ processing:
     koto:
       chain:
       - {processor: highpass, cutoff_hz: 220}
-      - {processor: reverb, wet: 0.08, decay_seconds: 0.85, damping_hz: 5000}
+      - {processor: band_gain, low_hz: 3800, high_hz: 4800, gain_db: -2.0}
+      - {processor: lowpass, cutoff_hz: 9800}
+      - {processor: reverb, wet: 0.07, decay_seconds: 0.82, damping_hz: 4600}
       - {processor: gain, gain_db: -3.0}
     bass:
       chain:
-      - {processor: highpass, cutoff_hz: 33}
-      - {processor: band_gain, low_hz: 650, high_hz: 1400, gain_db: 1.5}
-      - {processor: lowpass, cutoff_hz: 4200}
-      - {processor: compressor, threshold_db: -22, ratio: 2.0, attack_ms: 22, release_ms: 105, knee_db: 5}
-      - {processor: gain, gain_db: 2.5}
+      - {processor: highpass, cutoff_hz: 34}
+      - {processor: band_gain, low_hz: 180, high_hz: 420, gain_db: 0.7}
+      - {processor: band_gain, low_hz: 650, high_hz: 1400, gain_db: 0.4}
+      - {processor: lowpass, cutoff_hz: 3600}
+      - {processor: compressor, threshold_db: -22, ratio: 1.9, attack_ms: 24, release_ms: 115, knee_db: 6}
+      - {processor: gain, gain_db: 2.1}
     strings:
       chain:
       - {processor: highpass, cutoff_hz: 220}
