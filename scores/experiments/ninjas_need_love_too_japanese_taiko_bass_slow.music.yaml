@@ -1,0 +1,3737 @@
+schema: ambition.musicir.v3
+id: ninjas_need_love_too_japanese_taiko_bass_slow
+title: Ninjas Need Love Too
+description: Slower Japanese/hybrid ninja theme preserving the taiko-drive arrangement, with taiko pulled back,
+  upright bass brought forward, and the entire cue reduced from 158 BPM to 140 BPM.
+notes:
+- 'Taiko is the primary drum pulse throughout the cue: a steady four-beat pattern starts on bar 1 and uses the same
+  groove at the sustaining-loop boundary.'
+- The acoustic kit is secondary glue only; taiko remains the primary beat but is pulled back 2.2 dB from the prior pass.
+- Upright bass uses the Sonatina Performance Bass Solo Pizzicato patch when available, with the catalog bass.upright
+  resolver retained as fallback.
+- The moving pizzicato bassline stays near the shamisen lead event tempo and is raised a further 4.5 dB for stronger low-end presence.
+- Global tempo is 140 BPM instead of 158 BPM; event timing, phrase structure, drum pulse, and loop geometry are otherwise unchanged.
+- Koto is removed from this version.
+- Rhythm shamisen answers four times per eight-bar phrase instead of once, keeping its color audible without becoming
+  another continuous lead.
+- Opening and sustaining-loop first half use the same taiko, bass, rhythm-shamisen, kit, and lead grammar so the
+  full-song restart does not collapse into an intro state.
+seed: 161803
+timebase:
+  ppq: 960
+meter: 4/4
+tempo: 140
+key: E minor
+end:
+  bar: 73
+  beat: 1
+form:
+- id: ink_in_moonlight
+  from:
+    bar: 1
+    beat: 1
+  to:
+    bar: 9
+    beat: 1
+  energy: 0.86
+  density: 0.72
+  role: immediate full-state shamisen action; no soft intro
+- id: roofline_dance
+  from:
+    bar: 9
+    beat: 1
+  to:
+    bar: 25
+    beat: 1
+  energy: 0.86
+  density: 0.72
+  role: fast shamisen pursuit over steady taiko, fast pizzicato upright bass, and restrained kit support
+- id: heart_beneath_mask
+  from:
+    bar: 25
+    beat: 1
+  to:
+    bar: 41
+    beat: 1
+  energy: 0.82
+  density: 0.7
+  role: lyrical but forward-moving shamisen over steady taiko and fast pizzicato upright bass
+- id: vanish_in_smoke
+  from:
+    bar: 41
+    beat: 1
+  to:
+    bar: 49
+    beat: 1
+  energy: 0.76
+  density: 0.62
+  role: reduced lead articulation while taiko and bass keep the pulse moving
+- id: shuriken_sunrise
+  from:
+    bar: 49
+    beat: 1
+  to:
+    bar: 57
+    beat: 1
+  energy: 0.9
+  density: 0.76
+  role: hard shamisen return over steady taiko and fast pizzicato upright bass
+- id: love_and_blades_loop
+  from:
+    bar: 57
+    beat: 1
+  to:
+    bar: 73
+    beat: 1
+  energy: 0.86
+  density: 0.72
+  role: full-state seam-safe sustaining loop
+  loopable: true
+harmony:
+  progression:
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  - Emadd9b13
+  - Cmaj7#11
+  - Emadd9b13
+  - Bm11b9b13
+  - Emadd9b13
+  - Am13add9
+  - Cmaj7#11
+  - Bm11b9b13
+  cycle: false
+instruments:
+- name: shamisen_lead
+  group: shamisen_lead
+  program: 106
+  volume: 101
+  pan: 55
+  expression: 101
+  mix_gain_db: -7.2
+  instrument_backend:
+    kind: soundfont
+    renderer: fluidsynth-cli
+    library_ref: japan.shamisen
+- name: shamisen_rhythm
+  group: shamisen_rhythm
+  program: 106
+  volume: 103
+  pan: 75
+  expression: 101
+  mix_gain_db: -3.2
+  instrument_backend:
+    kind: soundfont
+    renderer: fluidsynth-cli
+    library_ref: japan.shamisen
+- name: shakuhachi_breath
+  group: breath
+  program: shakuhachi
+  volume: 106
+  pan: 70
+  expression: 106
+  mix_gain_db: 0.2
+- name: taiko_low
+  group: taiko
+  program: taiko_drum
+  volume: 118
+  pan: 64
+  expression: 114
+  mix_gain_db: 0.3
+- name: hybrid_kit
+  group: kit
+  is_drum: true
+  volume: 108
+  pan: 64
+  expression: 108
+  mix_gain_db: -4.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.muldjord
+    prefer:
+    - muldjord
+    - stereo
+    - kit
+    settings:
+      fold_to_range: false
+- name: upright_bass
+  group: bass
+  program: acoustic_bass
+  volume: 114
+  pan: 60
+  expression: 110
+  mix_gain_db: 10.5
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.upright
+    prefer:
+    - performance
+    - bass solo pizzicato
+    - solo
+    - pizzicato
+    settings:
+      fold_to_range: false
+    sfz: '**/Strings - Performance/Bass Solo Pizzicato.sfz'
+materials:
+  blade_whisper_a:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 112
+    - id: n02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 96
+    - id: n03
+      at:
+        beats: 1.25
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 104
+    - id: n04
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 92
+    - id: n05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.375
+      pitch: B4
+      velocity: 114
+    - id: n06
+      at:
+        beats: 3.25
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 102
+    - id: n07
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 116
+    - id: n08
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 98
+    - id: n09
+      at:
+        beats: 5.25
+      dur:
+        beats: 0.375
+      pitch: B4
+      velocity: 108
+    - id: n10
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 100
+    - id: n11
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 94
+    - id: n12
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 106
+  blade_whisper_b:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 110
+    - id: n02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 98
+    - id: n03
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 94
+    - id: n04
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 106
+    - id: n05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 101
+    - id: n06
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 112
+    - id: n07
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 104
+    - id: n08
+      at:
+        beats: 4.25
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 106
+    - id: n09
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 98
+    - id: n10
+      at:
+        beats: 5.5
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 92
+    - id: n11
+      at:
+        beats: 6.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 100
+    - id: n12
+      at:
+        beats: 7.0
+      dur:
+        beats: 0.625
+      pitch: B3
+      velocity: 104
+  roof_run_a:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 116
+    - id: n02
+      at:
+        beats: 0.375
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n03
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 118
+    - id: n04
+      at:
+        beats: 1.25
+      dur:
+        beats: 0.25
+      pitch: G5
+      velocity: 108
+    - id: n05
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.375
+      pitch: F#5
+      velocity: 104
+    - id: n06
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 110
+    - id: n07
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 98
+    - id: n08
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.375
+      pitch: B4
+      velocity: 106
+    - id: n09
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 106
+    - id: n10
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 112
+    - id: n11
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 104
+    - id: n12
+      at:
+        beats: 5.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 100
+    - id: n13
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 102
+    - id: n14
+      at:
+        beats: 6.75
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 96
+    - id: n15
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 108
+    - id: n16
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 112
+    - id: n17
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 102
+    - id: n18
+      at:
+        beats: 9.0
+      dur:
+        beats: 0.25
+      pitch: G5
+      velocity: 116
+    - id: n19
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 108
+    - id: n20
+      at:
+        beats: 10.25
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 102
+    - id: n21
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 106
+    - id: n22
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 96
+    - id: n23
+      at:
+        beats: 12.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 100
+    - id: n24
+      at:
+        beats: 13.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 104
+    - id: n25
+      at:
+        beats: 13.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 110
+    - id: n26
+      at:
+        beats: 14.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 104
+    - id: n27
+      at:
+        beats: 15.0
+      dur:
+        beats: 0.75
+      pitch: B4
+      velocity: 108
+  roof_run_b:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 118
+    - id: n02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 104
+    - id: n03
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 102
+    - id: n04
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 100
+    - id: n05
+      at:
+        beats: 2.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 96
+    - id: n06
+      at:
+        beats: 2.75
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 104
+    - id: n07
+      at:
+        beats: 3.25
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 112
+    - id: n08
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 112
+    - id: n09
+      at:
+        beats: 4.375
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n10
+      at:
+        beats: 4.75
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 106
+    - id: n11
+      at:
+        beats: 5.375
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 102
+    - id: n12
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 98
+    - id: n13
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 94
+    - id: n14
+      at:
+        beats: 7.0
+      dur:
+        beats: 0.625
+      pitch: E4
+      velocity: 108
+    - id: n15
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 110
+    - id: n16
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 104
+    - id: n17
+      at:
+        beats: 9.25
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n18
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.375
+      pitch: E5
+      velocity: 118
+    - id: n19
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 102
+    - id: n20
+      at:
+        beats: 11.25
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n21
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 100
+    - id: n22
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 96
+    - id: n23
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 100
+    - id: n24
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 102
+    - id: n25
+      at:
+        beats: 14.75
+      dur:
+        beats: 0.75
+      pitch: B3
+      velocity: 106
+  heart_shamisen:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 94
+    - id: n02
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 88
+    - id: n03
+      at:
+        beats: 1.25
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 96
+    - id: n04
+      at:
+        beats: 2.0
+      dur:
+        beats: 0.5
+      pitch: E5
+      velocity: 100
+    - id: n05
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.375
+      pitch: B4
+      velocity: 91
+    - id: n06
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 86
+    - id: n07
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.5
+      pitch: C5
+      velocity: 94
+    - id: n08
+      at:
+        beats: 4.75
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 88
+    - id: n09
+      at:
+        beats: 5.25
+      dur:
+        beats: 0.5
+      pitch: G4
+      velocity: 90
+    - id: n10
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 86
+    - id: n11
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 92
+    - id: n12
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.375
+      pitch: C5
+      velocity: 90
+    - id: n13
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 92
+    - id: n14
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 88
+    - id: n15
+      at:
+        beats: 9.25
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 96
+    - id: n16
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.5
+      pitch: E5
+      velocity: 98
+    - id: n17
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 90
+    - id: n18
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 86
+    - id: n19
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 94
+    - id: n20
+      at:
+        beats: 12.75
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 90
+    - id: n21
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.5
+      pitch: G4
+      velocity: 88
+    - id: n22
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 86
+    - id: n23
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 90
+    - id: n24
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.5
+      pitch: B3
+      velocity: 92
+  smoke_shamisen:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 96
+    - id: n02
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.375
+      pitch: B4
+      velocity: 100
+    - id: n03
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 92
+    - id: n04
+      at:
+        beats: 6.75
+      dur:
+        beats: 0.5
+      pitch: F#4
+      velocity: 96
+    - id: n05
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 98
+    - id: n06
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.375
+      pitch: C5
+      velocity: 96
+    - id: n07
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 94
+    - id: n08
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.75
+      pitch: E4
+      velocity: 100
+  loop_hook_a:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 116
+    - id: n02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 106
+    - id: n03
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n04
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.375
+      pitch: E5
+      velocity: 118
+    - id: n05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 102
+    - id: n06
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 108
+    - id: n07
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 100
+    - id: n08
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 102
+    - id: n09
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 106
+    - id: n10
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n11
+      at:
+        beats: 5.75
+      dur:
+        beats: 0.5
+      pitch: C5
+      velocity: 108
+    - id: n12
+      at:
+        beats: 6.75
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n13
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 108
+    - id: n14
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 112
+    - id: n15
+      at:
+        beats: 8.375
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 102
+    - id: n16
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 98
+    - id: n17
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 104
+    - id: n18
+      at:
+        beats: 10.25
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 106
+    - id: n19
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n20
+      at:
+        beats: 11.25
+      dur:
+        beats: 0.375
+      pitch: E5
+      velocity: 118
+    - id: n21
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n22
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 102
+    - id: n23
+      at:
+        beats: 13.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 100
+    - id: n24
+      at:
+        beats: 13.75
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 98
+    - id: n25
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 108
+    - id: n26
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.625
+      pitch: B3
+      velocity: 104
+  loop_hook_b:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 118
+    - id: n02
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 108
+    - id: n03
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 102
+    - id: n04
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.375
+      pitch: E4
+      velocity: 98
+    - id: n05
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 102
+    - id: n06
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 106
+    - id: n07
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n08
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 108
+    - id: n09
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 104
+    - id: n10
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 100
+    - id: n11
+      at:
+        beats: 5.75
+      dur:
+        beats: 0.375
+      pitch: E4
+      velocity: 98
+    - id: n12
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 104
+    - id: n13
+      at:
+        beats: 7.0
+      dur:
+        beats: 0.625
+      pitch: B4
+      velocity: 112
+    - id: n14
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 114
+    - id: n15
+      at:
+        beats: 8.5
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 106
+    - id: n16
+      at:
+        beats: 9.0
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 118
+    - id: n17
+      at:
+        beats: 9.75
+      dur:
+        beats: 0.375
+      pitch: G5
+      velocity: 116
+    - id: n18
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.25
+      pitch: E5
+      velocity: 108
+    - id: n19
+      at:
+        beats: 11.25
+      dur:
+        beats: 0.25
+      pitch: C5
+      velocity: 102
+    - id: n20
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 106
+    - id: n21
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 98
+    - id: n22
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 100
+    - id: n23
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 108
+    - id: n24
+      at:
+        beats: 14.75
+      dur:
+        beats: 0.5
+      pitch: B3
+      velocity: 104
+  shakuhachi_love:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 1.0
+      dur:
+        beats: 1.25
+      pitch: E5
+      velocity: 84
+    - id: n02
+      at:
+        beats: 5.5
+      dur:
+        beats: 1.0
+      pitch: E5
+      velocity: 82
+    - id: n03
+      at:
+        beats: 9.0
+      dur:
+        beats: 1.25
+      pitch: B4
+      velocity: 80
+    - id: n04
+      at:
+        beats: 13.5
+      dur:
+        beats: 1.0
+      pitch: E5
+      velocity: 84
+    - id: n05
+      at:
+        beats: 17.0
+      dur:
+        beats: 1.25
+      pitch: G5
+      velocity: 84
+    - id: n06
+      at:
+        beats: 21.5
+      dur:
+        beats: 1.0
+      pitch: E5
+      velocity: 80
+    - id: n07
+      at:
+        beats: 25.0
+      dur:
+        beats: 1.25
+      pitch: E5
+      velocity: 82
+    - id: n08
+      at:
+        beats: 29.5
+      dur:
+        beats: 1.0
+      pitch: B4
+      velocity: 80
+  shakuhachi_loop_response:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.875
+      pitch: B4
+      velocity: 76
+    - id: n02
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.75
+      pitch: E5
+      velocity: 82
+    - id: n03
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.75
+      pitch: G5
+      velocity: 80
+    - id: n04
+      at:
+        beats: 7.0
+      dur:
+        beats: 0.75
+      pitch: F#5
+      velocity: 76
+    - id: n05
+      at:
+        beats: 9.0
+      dur:
+        beats: 0.875
+      pitch: C5
+      velocity: 78
+    - id: n06
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.75
+      pitch: B4
+      velocity: 74
+    - id: n07
+      at:
+        beats: 13.0
+      dur:
+        beats: 0.875
+      pitch: G4
+      velocity: 72
+    - id: n08
+      at:
+        beats: 15.0
+      dur:
+        beats: 0.75
+      pitch: B4
+      velocity: 78
+  wood_click:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.125
+      pitch: C5
+      velocity: 72
+    - id: n02
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.125
+      pitch: G5
+      velocity: 68
+    - id: n03
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.125
+      pitch: C5
+      velocity: 70
+    - id: n04
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.125
+      pitch: G5
+      velocity: 66
+  shakuhachi_cycle:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.75
+      pitch: B4
+      velocity: 76
+    - id: n02
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.75
+      pitch: E5
+      velocity: 78
+    - id: n03
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.75
+      pitch: G5
+      velocity: 78
+    - id: n04
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.75
+      pitch: E5
+      velocity: 76
+    - id: n05
+      at:
+        beats: 18.0
+      dur:
+        beats: 0.75
+      pitch: E5
+      velocity: 78
+    - id: n06
+      at:
+        beats: 22.0
+      dur:
+        beats: 0.75
+      pitch: E5
+      velocity: 74
+    - id: n07
+      at:
+        beats: 26.0
+      dur:
+        beats: 0.75
+      pitch: G5
+      velocity: 76
+    - id: n08
+      at:
+        beats: 30.0
+      dur:
+        beats: 0.75
+      pitch: B4
+      velocity: 74
+  wood_loop:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.5
+      dur:
+        beats: 0.125
+      pitch: C5
+      velocity: 72
+    - id: n02
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.125
+      pitch: G5
+      velocity: 68
+    - id: n03
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.125
+      pitch: C5
+      velocity: 70
+  heart_shamisen_b:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 92
+    - id: n02
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 86
+    - id: n03
+      at:
+        beats: 1.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 90
+    - id: n04
+      at:
+        beats: 2.0
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 94
+    - id: n05
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 86
+    - id: n06
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 88
+    - id: n07
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.5
+      pitch: C5
+      velocity: 92
+    - id: n08
+      at:
+        beats: 4.75
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 86
+    - id: n09
+      at:
+        beats: 5.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 90
+    - id: n10
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.375
+      pitch: F#4
+      velocity: 86
+    - id: n11
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 94
+    - id: n12
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.375
+      pitch: C5
+      velocity: 90
+    - id: n13
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.5
+      pitch: G4
+      velocity: 90
+    - id: n14
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: B4
+      velocity: 92
+    - id: n15
+      at:
+        beats: 9.25
+      dur:
+        beats: 0.5
+      pitch: E5
+      velocity: 98
+    - id: n16
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 92
+    - id: n17
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 88
+    - id: n18
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 86
+    - id: n19
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 94
+    - id: n20
+      at:
+        beats: 12.75
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 86
+    - id: n21
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.5
+      pitch: E4
+      velocity: 90
+    - id: n22
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.375
+      pitch: G4
+      velocity: 88
+    - id: n23
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.5
+      pitch: E5
+      velocity: 92
+    - id: n24
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.5
+      pitch: B4
+      velocity: 94
+  smoke_shamisen_b:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.375
+      pitch: B3
+      velocity: 88
+    - id: n02
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.25
+      pitch: E4
+      velocity: 92
+    - id: n03
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.5
+      pitch: G4
+      velocity: 90
+    - id: n04
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.25
+      pitch: F#4
+      velocity: 88
+    - id: n05
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.625
+      pitch: B4
+      velocity: 94
+    - id: n06
+      at:
+        beats: 9.0
+      dur:
+        beats: 0.25
+      pitch: G4
+      velocity: 88
+    - id: n07
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.375
+      pitch: E4
+      velocity: 90
+    - id: n08
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.75
+      pitch: B3
+      velocity: 92
+  rhythm_e_pulse:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 3.75
+      dur:
+        beats: 0.1875
+      pitch: E3
+      velocity: 66
+    - id: n02
+      at:
+        beats: 11.75
+      dur:
+        beats: 0.1875
+      pitch: B3
+      velocity: 64
+    - id: n03
+      at:
+        beats: 19.75
+      dur:
+        beats: 0.1875
+      pitch: G3
+      velocity: 65
+    - id: n04
+      at:
+        beats: 27.75
+      dur:
+        beats: 0.1875
+      pitch: B3
+      velocity: 63
+  rhythm_e_pulse_soft:
+    kind: events
+    events:
+    - id: n01
+      at:
+        beats: 3.75
+      dur:
+        beats: 0.1875
+      pitch: E3
+      velocity: 58
+    - id: n02
+      at:
+        beats: 11.75
+      dur:
+        beats: 0.1875
+      pitch: B3
+      velocity: 56
+    - id: n03
+      at:
+        beats: 19.75
+      dur:
+        beats: 0.1875
+      pitch: G3
+      velocity: 57
+    - id: n04
+      at:
+        beats: 27.75
+      dur:
+        beats: 0.1875
+      pitch: B3
+      velocity: 55
+  upright_drive_a:
+    kind: events
+    events:
+    - id: n001
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 92
+    - id: n002
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 84
+    - id: n003
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.25
+      pitch: B2
+      velocity: 87
+    - id: n004
+      at:
+        beats: 2.0
+      dur:
+        beats: 0.375
+      pitch: G2
+      velocity: 82
+    - id: n005
+      at:
+        beats: 2.75
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 85
+    - id: n006
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 80
+    - id: n007
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 90
+    - id: n008
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 82
+    - id: n009
+      at:
+        beats: 5.25
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 85
+    - id: n010
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n011
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 83
+    - id: n012
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.25
+      pitch: C2
+      velocity: 78
+    - id: n013
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 90
+    - id: n014
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 82
+    - id: n015
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 85
+    - id: n016
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.375
+      pitch: F#2
+      velocity: 80
+    - id: n017
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 83
+    - id: n018
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.25
+      pitch: B2
+      velocity: 78
+    - id: n019
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 90
+    - id: n020
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 82
+    - id: n021
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 85
+    - id: n022
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.375
+      pitch: A2
+      velocity: 80
+    - id: n023
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.25
+      pitch: A2
+      velocity: 83
+    - id: n024
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 78
+    - id: n025
+      at:
+        beats: 16.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 92
+    - id: n026
+      at:
+        beats: 16.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 84
+    - id: n027
+      at:
+        beats: 17.5
+      dur:
+        beats: 0.25
+      pitch: B2
+      velocity: 87
+    - id: n028
+      at:
+        beats: 18.0
+      dur:
+        beats: 0.375
+      pitch: G2
+      velocity: 82
+    - id: n029
+      at:
+        beats: 18.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 85
+    - id: n030
+      at:
+        beats: 19.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 80
+    - id: n031
+      at:
+        beats: 20.0
+      dur:
+        beats: 0.375
+      pitch: A1
+      velocity: 90
+    - id: n032
+      at:
+        beats: 20.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 82
+    - id: n033
+      at:
+        beats: 21.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 85
+    - id: n034
+      at:
+        beats: 22.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n035
+      at:
+        beats: 22.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 83
+    - id: n036
+      at:
+        beats: 23.25
+      dur:
+        beats: 0.25
+      pitch: A1
+      velocity: 78
+    - id: n037
+      at:
+        beats: 24.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 90
+    - id: n038
+      at:
+        beats: 24.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 82
+    - id: n039
+      at:
+        beats: 25.5
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 85
+    - id: n040
+      at:
+        beats: 26.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 80
+    - id: n041
+      at:
+        beats: 26.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 83
+    - id: n042
+      at:
+        beats: 27.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 78
+    - id: n043
+      at:
+        beats: 28.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 90
+    - id: n044
+      at:
+        beats: 28.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 82
+    - id: n045
+      at:
+        beats: 29.25
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 85
+    - id: n046
+      at:
+        beats: 30.0
+      dur:
+        beats: 0.375
+      pitch: D2
+      velocity: 80
+    - id: n047
+      at:
+        beats: 30.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 83
+    - id: n048
+      at:
+        beats: 31.25
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 78
+  upright_drive_b:
+    kind: events
+    events:
+    - id: n001
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 90
+    - id: n002
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 82
+    - id: n003
+      at:
+        beats: 1.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 85
+    - id: n004
+      at:
+        beats: 2.0
+      dur:
+        beats: 0.375
+      pitch: G2
+      velocity: 80
+    - id: n005
+      at:
+        beats: 2.75
+      dur:
+        beats: 0.25
+      pitch: B2
+      velocity: 83
+    - id: n006
+      at:
+        beats: 3.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 78
+    - id: n007
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 88
+    - id: n008
+      at:
+        beats: 4.5
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 80
+    - id: n009
+      at:
+        beats: 5.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 83
+    - id: n010
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 78
+    - id: n011
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 81
+    - id: n012
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 76
+    - id: n013
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 88
+    - id: n014
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 80
+    - id: n015
+      at:
+        beats: 9.5
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 83
+    - id: n016
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 78
+    - id: n017
+      at:
+        beats: 10.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 81
+    - id: n018
+      at:
+        beats: 11.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 76
+    - id: n019
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 88
+    - id: n020
+      at:
+        beats: 12.5
+      dur:
+        beats: 0.25
+      pitch: A2
+      velocity: 80
+    - id: n021
+      at:
+        beats: 13.25
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 83
+    - id: n022
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.375
+      pitch: D2
+      velocity: 78
+    - id: n023
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.25
+      pitch: A2
+      velocity: 81
+    - id: n024
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 76
+    - id: n025
+      at:
+        beats: 16.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 90
+    - id: n026
+      at:
+        beats: 16.75
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 82
+    - id: n027
+      at:
+        beats: 17.5
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 85
+    - id: n028
+      at:
+        beats: 18.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n029
+      at:
+        beats: 18.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 83
+    - id: n030
+      at:
+        beats: 19.5
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 78
+    - id: n031
+      at:
+        beats: 20.0
+      dur:
+        beats: 0.375
+      pitch: A1
+      velocity: 88
+    - id: n032
+      at:
+        beats: 20.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 80
+    - id: n033
+      at:
+        beats: 21.25
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 83
+    - id: n034
+      at:
+        beats: 22.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 78
+    - id: n035
+      at:
+        beats: 22.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 81
+    - id: n036
+      at:
+        beats: 23.25
+      dur:
+        beats: 0.25
+      pitch: A1
+      velocity: 76
+    - id: n037
+      at:
+        beats: 24.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 88
+    - id: n038
+      at:
+        beats: 24.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 80
+    - id: n039
+      at:
+        beats: 25.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 83
+    - id: n040
+      at:
+        beats: 26.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 78
+    - id: n041
+      at:
+        beats: 26.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 81
+    - id: n042
+      at:
+        beats: 27.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 76
+    - id: n043
+      at:
+        beats: 28.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 88
+    - id: n044
+      at:
+        beats: 28.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 80
+    - id: n045
+      at:
+        beats: 29.25
+      dur:
+        beats: 0.25
+      pitch: A2
+      velocity: 83
+    - id: n046
+      at:
+        beats: 30.0
+      dur:
+        beats: 0.375
+      pitch: D2
+      velocity: 78
+    - id: n047
+      at:
+        beats: 30.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 81
+    - id: n048
+      at:
+        beats: 31.25
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 76
+  upright_drive_smoke:
+    kind: events
+    events:
+    - id: n001
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n002
+      at:
+        beats: 0.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 72
+    - id: n003
+      at:
+        beats: 1.75
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 76
+    - id: n004
+      at:
+        beats: 2.5
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 70
+    - id: n005
+      at:
+        beats: 3.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 68
+    - id: n006
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.375
+      pitch: C2
+      velocity: 80
+    - id: n007
+      at:
+        beats: 4.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 72
+    - id: n008
+      at:
+        beats: 5.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 76
+    - id: n009
+      at:
+        beats: 6.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 70
+    - id: n010
+      at:
+        beats: 7.25
+      dur:
+        beats: 0.25
+      pitch: C2
+      velocity: 68
+    - id: n011
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n012
+      at:
+        beats: 8.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 72
+    - id: n013
+      at:
+        beats: 9.75
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 76
+    - id: n014
+      at:
+        beats: 10.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 70
+    - id: n015
+      at:
+        beats: 11.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 68
+    - id: n016
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 80
+    - id: n017
+      at:
+        beats: 12.75
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 72
+    - id: n018
+      at:
+        beats: 13.75
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 76
+    - id: n019
+      at:
+        beats: 14.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 70
+    - id: n020
+      at:
+        beats: 15.25
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 68
+    - id: n021
+      at:
+        beats: 16.0
+      dur:
+        beats: 0.375
+      pitch: E2
+      velocity: 80
+    - id: n022
+      at:
+        beats: 16.75
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 72
+    - id: n023
+      at:
+        beats: 17.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 76
+    - id: n024
+      at:
+        beats: 18.5
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 70
+    - id: n025
+      at:
+        beats: 19.25
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 68
+    - id: n026
+      at:
+        beats: 20.0
+      dur:
+        beats: 0.375
+      pitch: A1
+      velocity: 80
+    - id: n027
+      at:
+        beats: 20.75
+      dur:
+        beats: 0.25
+      pitch: C2
+      velocity: 72
+    - id: n028
+      at:
+        beats: 21.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 76
+    - id: n029
+      at:
+        beats: 22.5
+      dur:
+        beats: 0.25
+      pitch: B1
+      velocity: 70
+    - id: n030
+      at:
+        beats: 23.25
+      dur:
+        beats: 0.25
+      pitch: A1
+      velocity: 68
+    - id: n031
+      at:
+        beats: 24.0
+      dur:
+        beats: 0.375
+      pitch: C2
+      velocity: 80
+    - id: n032
+      at:
+        beats: 24.75
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 72
+    - id: n033
+      at:
+        beats: 25.75
+      dur:
+        beats: 0.25
+      pitch: G2
+      velocity: 76
+    - id: n034
+      at:
+        beats: 26.5
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 70
+    - id: n035
+      at:
+        beats: 27.25
+      dur:
+        beats: 0.25
+      pitch: C2
+      velocity: 68
+    - id: n036
+      at:
+        beats: 28.0
+      dur:
+        beats: 0.375
+      pitch: B1
+      velocity: 80
+    - id: n037
+      at:
+        beats: 28.75
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 72
+    - id: n038
+      at:
+        beats: 29.75
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 76
+    - id: n039
+      at:
+        beats: 30.5
+      dur:
+        beats: 0.25
+      pitch: D2
+      velocity: 70
+    - id: n040
+      at:
+        beats: 31.25
+      dur:
+        beats: 0.25
+      pitch: F#2
+      velocity: 68
+  taiko_steady_8bar:
+    kind: events
+    events:
+    - id: n001
+      at:
+        beats: 0.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 116
+    - id: n002
+      at:
+        beats: 1.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n003
+      at:
+        beats: 2.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n004
+      at:
+        beats: 3.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n005
+      at:
+        beats: 4.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n006
+      at:
+        beats: 5.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n007
+      at:
+        beats: 6.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n008
+      at:
+        beats: 7.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n009
+      at:
+        beats: 8.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n010
+      at:
+        beats: 9.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n011
+      at:
+        beats: 10.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n012
+      at:
+        beats: 11.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n013
+      at:
+        beats: 12.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n014
+      at:
+        beats: 13.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n015
+      at:
+        beats: 14.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n016
+      at:
+        beats: 15.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n017
+      at:
+        beats: 16.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 116
+    - id: n018
+      at:
+        beats: 17.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n019
+      at:
+        beats: 18.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n020
+      at:
+        beats: 19.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n021
+      at:
+        beats: 20.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n022
+      at:
+        beats: 21.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n023
+      at:
+        beats: 22.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n024
+      at:
+        beats: 23.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n025
+      at:
+        beats: 24.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n026
+      at:
+        beats: 25.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n027
+      at:
+        beats: 26.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n028
+      at:
+        beats: 27.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+    - id: n029
+      at:
+        beats: 28.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 110
+    - id: n030
+      at:
+        beats: 29.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 88
+    - id: n031
+      at:
+        beats: 30.0
+      dur:
+        beats: 0.25
+      pitch: E2
+      velocity: 106
+    - id: n032
+      at:
+        beats: 31.0
+      dur:
+        beats: 0.1875
+      pitch: B2
+      velocity: 92
+parts:
+- id: shamisen_lead_part
+  instrument: shamisen_lead
+  voices:
+  - id: lead
+    clips:
+    - id: opening_a
+      at:
+        bar: 1
+        beat: 1
+      use: loop_hook_a
+      velocity_scale: 1.0
+    - id: opening_b
+      at:
+        bar: 5
+        beat: 1
+      use: loop_hook_b
+      velocity_scale: 1.0
+    - id: roof_a
+      at:
+        bar: 9
+        beat: 1
+      use: roof_run_a
+    - id: roof_b
+      at:
+        bar: 13
+        beat: 1
+      use: roof_run_b
+    - id: roof_a2
+      at:
+        bar: 17
+        beat: 1
+      use: roof_run_a
+      velocity_scale: 1.03
+    - id: roof_b2
+      at:
+        bar: 21
+        beat: 1
+      use: roof_run_b
+      velocity_scale: 0.9
+    - id: heart_a
+      at:
+        bar: 25
+        beat: 1
+      use: heart_shamisen
+    - id: heart_b
+      at:
+        bar: 29
+        beat: 1
+      use: heart_shamisen_b
+      velocity_scale: 0.9
+    - id: heart_c
+      at:
+        bar: 33
+        beat: 1
+      use: heart_shamisen
+      velocity_scale: 0.96
+    - id: heart_d
+      at:
+        bar: 37
+        beat: 1
+      use: heart_shamisen_b
+      velocity_scale: 0.84
+    - id: smoke_a
+      at:
+        bar: 41
+        beat: 1
+      use: smoke_shamisen
+    - id: smoke_b
+      at:
+        bar: 45
+        beat: 1
+      use: smoke_shamisen_b
+      velocity_scale: 0.94
+    - id: sunrise_a
+      at:
+        bar: 49
+        beat: 1
+      use: roof_run_b
+      velocity_scale: 1.05
+    - id: sunrise_b
+      at:
+        bar: 53
+        beat: 1
+      use: roof_run_a
+      velocity_scale: 0.92
+    - id: loop_a1
+      at:
+        bar: 57
+        beat: 1
+      use: loop_hook_a
+    - id: loop_b1
+      at:
+        bar: 61
+        beat: 1
+      use: loop_hook_b
+    - id: loop_a2
+      at:
+        bar: 65
+        beat: 1
+      use: loop_hook_a
+      velocity_scale: 0.98
+    - id: loop_b2
+      at:
+        bar: 69
+        beat: 1
+      use: loop_hook_b
+      velocity_scale: 0.98
+- id: shamisen_rhythm_part
+  instrument: shamisen_rhythm
+  voices:
+  - id: rhythm
+    clips:
+    - id: rhythm_open
+      at:
+        bar: 1
+        beat: 1
+      use: rhythm_e_pulse
+    - id: rhythm_roof_a
+      at:
+        bar: 9
+        beat: 1
+      use: rhythm_e_pulse
+    - id: rhythm_roof_b
+      at:
+        bar: 17
+        beat: 1
+      use: rhythm_e_pulse
+      velocity_scale: 0.96
+    - id: rhythm_heart_a
+      at:
+        bar: 25
+        beat: 1
+      use: rhythm_e_pulse
+      velocity_scale: 0.9
+    - id: rhythm_heart_b
+      at:
+        bar: 33
+        beat: 1
+      use: rhythm_e_pulse
+      velocity_scale: 0.88
+    - id: rhythm_smoke
+      at:
+        bar: 41
+        beat: 1
+      use: rhythm_e_pulse_soft
+    - id: rhythm_return
+      at:
+        bar: 49
+        beat: 1
+      use: rhythm_e_pulse
+      velocity_scale: 1.0
+    - id: rhythm_loop_a
+      at:
+        bar: 57
+        beat: 1
+      use: rhythm_e_pulse
+    - id: rhythm_loop_b
+      at:
+        bar: 65
+        beat: 1
+      use: rhythm_e_pulse
+      velocity_scale: 0.96
+- id: shakuhachi_part
+  instrument: shakuhachi_breath
+  voices:
+  - id: breath
+    clips:
+    - id: smoke_breath
+      at:
+        bar: 41
+        beat: 1
+      use: shakuhachi_cycle
+      velocity_scale: 0.62
+- id: taiko_part
+  instrument: taiko_low
+  voices:
+  - id: steady_pulse
+    clips:
+    - id: taiko_open
+      at:
+        bar: 1
+        beat: 1
+      use: taiko_steady_8bar
+    - id: taiko_roof_a
+      at:
+        bar: 9
+        beat: 1
+      use: taiko_steady_8bar
+    - id: taiko_roof_b
+      at:
+        bar: 17
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 0.98
+    - id: taiko_heart_a
+      at:
+        bar: 25
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 0.94
+    - id: taiko_heart_b
+      at:
+        bar: 33
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 0.94
+    - id: taiko_smoke
+      at:
+        bar: 41
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 0.9
+    - id: taiko_return
+      at:
+        bar: 49
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 1.02
+    - id: taiko_loop_a
+      at:
+        bar: 57
+        beat: 1
+      use: taiko_steady_8bar
+    - id: taiko_loop_b
+      at:
+        bar: 65
+        beat: 1
+      use: taiko_steady_8bar
+      velocity_scale: 0.98
+- id: hybrid_kit_part
+  instrument: hybrid_kit
+  voices:
+  - id: groove
+    clips:
+    - id: kit_intro
+      at:
+        bar: 1
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 66
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 48
+        velocity: 82
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.02
+        - 0.98
+        - 1.0
+        - 0.97
+        - 1.01
+        - 1.0
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 0
+        humanize_velocity_pct: 2.0
+    - id: kit_roof
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 66
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 48
+        velocity: 82
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.03
+        - 0.97
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+    - id: kit_heart
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 66
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 48
+        velocity: 82
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.03
+        - 0.97
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+    - id: kit_smoke
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 60
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 43
+        velocity: 76
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.03
+        - 0.97
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+    - id: kit_return
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 66
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 48
+        velocity: 82
+        bar_velocity_pattern:
+        - 1.0
+        - 0.94
+        - 1.03
+        - 0.97
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 4
+        humanize_velocity_pct: 2.0
+    - id: kit_loop
+      at:
+        bar: 57
+        beat: 1
+      duration:
+        bars: 16
+      generate:
+        kind: drums.pattern
+        events:
+        - drum: snare
+          beats:
+          - 2.0
+          velocity: 66
+        - drum: closed_hat
+          beats:
+          - 0.5
+          - 1.5
+          - 2.5
+          - 3.5
+          velocity: 48
+        velocity: 82
+        bar_velocity_pattern:
+        - 1.0
+        - 0.96
+        - 1.02
+        - 0.98
+        - 1.0
+        - 0.97
+        - 1.01
+        - 1.0
+        fill_every_bars: 0
+        fill_mode: overlay
+        humanize_ms: 0
+        humanize_velocity_pct: 2.0
+- id: upright_bass_part
+  instrument: upright_bass
+  voices:
+  - id: drive
+    clips:
+    - id: bass_open
+      at:
+        bar: 1
+        beat: 1
+      use: upright_drive_a
+    - id: bass_roof_a
+      at:
+        bar: 9
+        beat: 1
+      use: upright_drive_a
+    - id: bass_roof_b
+      at:
+        bar: 17
+        beat: 1
+      use: upright_drive_b
+    - id: bass_heart_a
+      at:
+        bar: 25
+        beat: 1
+      use: upright_drive_b
+      velocity_scale: 0.94
+    - id: bass_heart_b
+      at:
+        bar: 33
+        beat: 1
+      use: upright_drive_a
+      velocity_scale: 0.94
+    - id: bass_smoke
+      at:
+        bar: 41
+        beat: 1
+      use: upright_drive_smoke
+      velocity_scale: 0.9
+    - id: bass_return
+      at:
+        bar: 49
+        beat: 1
+      use: upright_drive_b
+      velocity_scale: 1.02
+    - id: bass_loop_a
+      at:
+        bar: 57
+        beat: 1
+      use: upright_drive_a
+    - id: bass_loop_b
+      at:
+        bar: 65
+        beat: 1
+      use: upright_drive_b
+      velocity_scale: 0.98
+processing:
+  groups:
+    shamisen_lead:
+      chain:
+      - processor: highpass
+        cutoff_hz: 70
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 280
+          q: 0.8
+          db: 0.6
+        - type: peak
+          hz: 3400
+          q: 2.0
+          db: -1.5
+        - type: peak
+          hz: 6500
+          q: 2.8
+          db: -2.2
+      - processor: high_shelf
+        hz: 7600
+        gain_db: -1.6
+      - processor: lowpass
+        cutoff_hz: 10500
+      - processor: compressor
+        threshold_db: -20
+        ratio: 1.22
+        attack_ms: 18
+        release_ms: 100
+    shamisen_rhythm:
+      chain:
+      - processor: highpass
+        cutoff_hz: 85
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 260
+          q: 0.8
+          db: 1.2
+        - type: peak
+          hz: 3300
+          q: 1.8
+          db: -0.8
+      - processor: lowpass
+        cutoff_hz: 9000
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.22
+        attack_ms: 15
+        release_ms: 95
+    breath:
+      chain:
+      - processor: highpass
+        cutoff_hz: 135
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 650
+          q: 0.8
+          db: 1.0
+        - type: peak
+          hz: 4200
+          q: 1.8
+          db: -0.8
+      - processor: lowpass
+        cutoff_hz: 9000
+      - processor: compressor
+        threshold_db: -23
+        ratio: 1.18
+        attack_ms: 25
+        release_ms: 125
+    taiko:
+      chain:
+      - processor: highpass
+        cutoff_hz: 68
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 110
+          q: 1.0
+          db: -2.2
+        - type: peak
+          hz: 650
+          q: 0.9
+          db: 2.4
+        - type: peak
+          hz: 1450
+          q: 1.0
+          db: 2.2
+        - type: peak
+          hz: 2600
+          q: 1.1
+          db: 1.4
+      - processor: lowpass
+        cutoff_hz: 5600
+      - processor: compressor
+        threshold_db: -20
+        ratio: 1.25
+        attack_ms: 28
+        release_ms: 115
+    kit:
+      chain:
+      - processor: highpass
+        cutoff_hz: 72
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 105
+          q: 0.8
+          db: -0.8
+        - type: peak
+          hz: 420
+          q: 0.9
+          db: 1.2
+        - type: peak
+          hz: 2600
+          q: 1.0
+          db: 0.7
+      - processor: high_shelf
+        hz: 9000
+        gain_db: -0.7
+      - processor: compressor
+        threshold_db: -20
+        ratio: 1.28
+        attack_ms: 20
+        release_ms: 110
+    bass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 42
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 95
+          q: 0.8
+          db: -1.0
+        - type: peak
+          hz: 190
+          q: 0.9
+          db: 1.0
+        - type: peak
+          hz: 520
+          q: 1.0
+          db: 1.8
+        - type: peak
+          hz: 1150
+          q: 1.1
+          db: 1.4
+      - processor: lowpass
+        cutoff_hz: 5200
+      - processor: compressor
+        threshold_db: -23
+        ratio: 1.22
+        attack_ms: 30
+        release_ms: 95
+  master:
+    chain:
+    - processor: highpass
+      cutoff_hz: 26
+    - processor: parametric_eq
+      bands:
+      - type: peak
+        hz: 4700
+        q: 1.1
+        db: -0.4
+    - processor: compressor
+      threshold_db: -20
+      ratio: 1.28
+      attack_ms: 24
+      release_ms: 130
+    - processor: reverb
+      wet: 0.035
+      decay_seconds: 0.6
+      damping_hz: 4300
+    - processor: limiter
+      target_peak_db: -1.0
+      drive: 1.01
+      normalize: true
+  adaptive_sections:
+    mode: composition_master
