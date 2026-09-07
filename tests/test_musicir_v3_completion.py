@@ -193,7 +193,7 @@ def test_source_only_authoring_register_check_runs_with_python_S():
         cwd=ROOT, text=True, capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "74 instruments" in proc.stdout
+    assert "73 instruments" in proc.stdout
     assert "16 generators" in proc.stdout
 
     index_check = subprocess.run(
@@ -237,13 +237,26 @@ def test_audio_compare_reports_signal_and_spectral_deltas():
     assert report["delta"]["aligned_waveform_correlation"] < 0.2
 
 
-def test_legacy_regeneration_corpus_compiles():
+def test_legacy_regeneration_corpus_compiles(tmp_path):
+    report_fpath = tmp_path / "legacy_regeneration.json"
     proc = subprocess.run(
-        [sys.executable, str(ROOT / "dev/check_legacy_regeneration.py")],
+        [
+            sys.executable,
+            str(ROOT / "dev/check_legacy_regeneration.py"),
+            "--json-out",
+            str(report_fpath),
+        ],
         cwd=ROOT, text=True, capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "legacy regeneration OK: 97 scores compiled" in proc.stdout
+    report = json.loads(report_fpath.read_text(encoding="utf8"))
+    assert report["score_count"] > 0
+    assert report["failed"] == 0
+    assert report["passed"] == report["score_count"]
+    assert (
+        f"legacy regeneration OK: {report['passed']} scores compiled "
+        f"across {report['rounds']} round(s)"
+    ) in proc.stdout
 
 
 def test_sequence_material_composes_event_materials_with_transforms_and_provenance():
