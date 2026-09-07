@@ -30,7 +30,7 @@ from .render.group import render_group_audio
 from .render.score_core import (
     CC_NUMBERS, DRUMS, GM_PROGRAMS, RenderContext, choose_soundfont, controller_number,
 )
-from .audit.sfz_measurement import sfz_regions, sfz_startup_cc
+from .audit.sfz_measurement import midi_frequency, sfz_regions, sfz_startup_cc
 from .audit.instrument_tuning import (
     TUNING_REPORT_SCHEMA,
     combine_tuning_estimators,
@@ -285,6 +285,8 @@ def build_tuning_audit_request(
     sample_rate: int = 48000,
     note_duration_seconds: float = 0.62,
     gap_seconds: float = 0.18,
+    minimum_steady_cycles: float = 48.0,
+    max_note_duration_seconds: float = 2.2,
     max_notes: int = 61,
     min_midi: int | None = None,
     max_midi: int | None = None,
@@ -315,13 +317,15 @@ def build_tuning_audit_request(
     # the source drift the audit is meant to document.
     normalized_instrument.pop("tuning_correction", None)
     return {
-        "schema": "ambition.instrument_tuning_request.v3",
+        "schema": "ambition.instrument_tuning_request.v4",
         "instrument": normalized_instrument,
         "velocity": max(1, min(127, int(velocity))),
         "backend": str(backend),
         "sample_rate": int(sample_rate),
         "note_duration_seconds": max(0.25, min(2.0, float(note_duration_seconds))),
         "gap_seconds": max(0.08, min(1.0, float(gap_seconds))),
+        "minimum_steady_cycles": max(8.0, min(96.0, float(minimum_steady_cycles))),
+        "max_note_duration_seconds": max(0.5, min(4.0, float(max_note_duration_seconds))),
         "max_notes": max(3, min(128, int(max_notes))),
         "min_midi": None if min_midi is None else max(0, min(127, int(min_midi))),
         "max_midi": None if max_midi is None else max(0, min(127, int(max_midi))),
@@ -928,7 +932,11 @@ def _make_tuning_audit_pm(
         int(key): max(1, min(127, int(value)))
         for key, value in dict(request.get("note_velocities") or {}).items()
     }
-    note_duration = float(request.get("note_duration_seconds", 0.62))
+    base_note_duration = float(request.get("note_duration_seconds", 0.62))
+    minimum_steady_cycles = float(request.get("minimum_steady_cycles", 48.0))
+    max_note_duration = max(
+        base_note_duration, float(request.get("max_note_duration_seconds", 2.2))
+    )
     gap = float(request.get("gap_seconds", 0.18))
     pm = pretty_midi.PrettyMIDI(initial_tempo=120.0, resolution=960)
     ctx = RenderContext(
@@ -948,6 +956,15 @@ def _make_tuning_audit_pm(
     events: list[dict[str, Any]] = []
     cursor = 0.20
     for pitch in notes:
+        # Use a fixed minimum number of steady-state periods rather than one
+        # wall-clock duration for every pitch. At C1/C2 this materially improves
+        # both estimators, while ordinary mid/high notes keep the short probe.
+        expected_hz = midi_frequency(int(pitch))
+        cycle_duration = minimum_steady_cycles / max(expected_hz, 1e-9)
+        note_duration = min(
+            max_note_duration,
+            max(base_note_duration, cycle_duration + 0.14),
+        )
         start = float(cursor)
         end = start + note_duration
         event_velocity = int(note_velocities.get(int(pitch), velocity))
@@ -962,6 +979,7 @@ def _make_tuning_audit_pm(
                 "velocity": event_velocity,
                 "start": start,
                 "end": end,
+                "duration_seconds": round(float(note_duration), 4),
             }
         )
         cursor = end + gap
@@ -1089,6 +1107,7 @@ def render_tuning_audit(
         measurement["note"] = pretty_midi.note_number_to_name(int(event["midi"]))
         measurement["velocity"] = int(event.get("velocity", request.get("velocity", 100)))
         measurement["start_seconds"] = round(float(event["start"]), 3)
+        measurement["duration_seconds"] = round(float(event["end"] - event["start"]), 4)
         rows.append(measurement)
 
     summary = summarize_tuning_rows(rows)
@@ -1102,6 +1121,12 @@ def render_tuning_audit(
         "dry_audio": str(dry_path),
         "report_path": str(report_path),
         "reference": {"a4_hz": 440.0, "temperament": "12-TET", "stage": "dry_pre_processing"},
+        "analysis": {
+            "note_duration_floor_seconds": float(request.get("note_duration_seconds", 0.62)),
+            "minimum_steady_cycles": float(request.get("minimum_steady_cycles", 48.0)),
+            "max_note_duration_seconds": float(request.get("max_note_duration_seconds", 2.2)),
+            "low_frequency_window_policy": "adaptive_period_count",
+        },
         "range": {
             "low_midi": low,
             "high_midi": high,

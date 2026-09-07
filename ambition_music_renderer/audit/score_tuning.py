@@ -26,7 +26,7 @@ from ..musicir.model import CompiledScore, compiled_score_fingerprint
 from .instrument_tuning import TUNING_REPORT_SCHEMA, summarize_tuning_rows
 
 
-SCORE_TUNING_REPORT_SCHEMA = "ambition.score_tuning_audit.v2"
+SCORE_TUNING_REPORT_SCHEMA = "ambition.score_tuning_audit.v3"
 
 
 def _canonical_json_hash(payload: Mapping[str, Any], *, length: int = 20) -> str:
@@ -216,49 +216,207 @@ def score_tuning_report_hash(plan: Mapping[str, Any], options: Mapping[str, Any]
     return _canonical_json_hash(payload)
 
 
+def summarize_tuning_consensus(audit: Mapping[str, Any]) -> dict[str, Any]:
+    """Summarize dual-estimator evidence separately from the raw estimator.
+
+    The raw instrument summary remains useful diagnostic evidence, but correction
+    eligibility is based only on notes where the two independent estimators agree.
+    This prevents a coherent bias in one estimator from being mistaken for an
+    instrument-wide tuning offset.
+    """
+
+    notes = list(audit.get("notes") or [])
+    validated = [
+        row for row in notes
+        if row.get("validation_status") == "agree" and row.get("validated_cents") is not None
+    ]
+    disagreements = sum(1 for row in notes if row.get("validation_status") == "disagree")
+    insufficient = sum(1 for row in notes if row.get("validation_status") == "insufficient")
+    total = len(notes)
+    fraction = (len(validated) / total) if total else 0.0
+    all_midis = [int(row["midi"]) for row in notes if row.get("midi") is not None]
+    validated_midis = [int(row["midi"]) for row in validated]
+    full_span = (max(all_midis) - min(all_midis)) if len(all_midis) >= 2 else 0
+    validated_span = (
+        max(validated_midis) - min(validated_midis) if len(validated_midis) >= 2 else 0
+    )
+    span_coverage = (
+        float(validated_span) / float(full_span) if full_span > 0 else (1.0 if validated else 0.0)
+    )
+    normalized_rows = [
+        {"midi": int(row["midi"]), "status": "ok", "cents": float(row["validated_cents"])}
+        for row in validated
+    ]
+    if normalized_rows:
+        consensus_summary = summarize_tuning_rows(normalized_rows)
+    else:
+        consensus_summary = {
+            "classification": "insufficient_evidence",
+            "reliable_notes": 0,
+            "suggested_global_correction_cents": None,
+        }
+
+    # The headline consensus class is evidence-oriented rather than a proposal.
+    # Fewer than half of the score-used notes agreeing is too weak to describe
+    # the realization as globally/range shifted even if the surviving subset is.
+    if len(validated) < 3 or fraction < 0.5:
+        consensus_classification = "insufficient_consensus"
+    else:
+        consensus_classification = str(consensus_summary.get("classification") or "unknown")
+
+    return {
+        "classification": consensus_classification,
+        "validated_summary": consensus_summary,
+        "audited_notes": total,
+        "validated_notes": len(validated),
+        "estimator_disagreements": disagreements,
+        "estimator_insufficient": insufficient,
+        "validation_fraction": round(fraction, 4),
+        "full_span_semitones": int(full_span),
+        "validated_span_semitones": int(validated_span),
+        "span_coverage": round(span_coverage, 4),
+    }
+
+
+def evaluate_tuning_correction_eligibility(
+    audit: Mapping[str, Any], *, max_abs_cents: float = 50.0
+) -> dict[str, Any]:
+    """Return an explicit conservative correction decision and its evidence."""
+
+    raw_summary = dict(audit.get("summary") or {})
+    raw_classification = str(raw_summary.get("classification") or "unknown")
+    consensus = summarize_tuning_consensus(audit)
+    validated_summary = dict(consensus.get("validated_summary") or {})
+    validated = [
+        row for row in (audit.get("notes") or [])
+        if row.get("validation_status") == "agree" and row.get("validated_cents") is not None
+    ]
+    max_measured = max(
+        (abs(float(row["validated_cents"])) for row in validated), default=0.0
+    )
+    decision = {
+        "status": "rejected",
+        "reason": "insufficient_consensus",
+        "raw_classification": raw_classification,
+        "consensus_classification": consensus.get("classification"),
+        "validated_notes": consensus.get("validated_notes", 0),
+        "audited_notes": consensus.get("audited_notes", 0),
+        "validation_fraction": consensus.get("validation_fraction", 0.0),
+        "validated_span_semitones": consensus.get("validated_span_semitones", 0),
+        "full_span_semitones": consensus.get("full_span_semitones", 0),
+        "span_coverage": consensus.get("span_coverage", 0.0),
+        "max_validated_abs_cents": round(float(max_measured), 3),
+    }
+    if max_measured > float(max_abs_cents):
+        decision["reason"] = "exceeds_correction_limit"
+        return decision
+    if raw_classification == "centered":
+        decision["status"] = "not_needed"
+        decision["reason"] = "raw_behavior_centered"
+        return decision
+
+    validated_notes = int(consensus.get("validated_notes", 0))
+    validation_fraction = float(consensus.get("validation_fraction", 0.0))
+    if validated_notes < 3 or validation_fraction < 0.5:
+        decision["reason"] = "insufficient_consensus"
+        return decision
+    if max_measured < 3.0:
+        decision["status"] = "not_needed"
+        decision["reason"] = "centered_or_too_small"
+        return decision
+
+    span_coverage = float(consensus.get("span_coverage", 0.0))
+    validated_span = int(consensus.get("validated_span_semitones", 0))
+    consensus_class = str(consensus.get("classification") or "")
+
+    # Global correction requires both raw and independent-consensus views to
+    # agree that the offset is global, plus broad note/range coverage.
+    if raw_classification == "global_offset" and consensus_class == "global_offset":
+        if validated_notes < 5 or validation_fraction < 0.60:
+            decision["reason"] = "insufficient_consensus"
+            return decision
+        if span_coverage < 0.60:
+            decision["reason"] = "insufficient_range_coverage"
+            return decision
+        if validated_summary.get("suggested_global_correction_cents") is None:
+            decision["reason"] = "no_consensus_global_offset"
+            return decision
+        decision["status"] = "eligible_global"
+        decision["reason"] = "dual_estimator_global_offset"
+        return decision
+
+    # Per-note curves are only proposed for raw range drift. Mixed/outlier raw
+    # behavior is not treated as a smooth correction model. Requiring 65% span
+    # coverage deliberately blocks extrapolation over large unaudited regions.
+    if raw_classification == "range_dependent":
+        if validated_notes < 5 or validation_fraction < 0.60:
+            decision["reason"] = "insufficient_consensus"
+            return decision
+        if validated_span < 12 or span_coverage < 0.65:
+            decision["reason"] = "insufficient_range_coverage"
+            return decision
+        if max_measured < 6.0:
+            decision["reason"] = "centered_or_too_small"
+            return decision
+        decision["status"] = "eligible_curve"
+        decision["reason"] = "dual_estimator_range_curve"
+        return decision
+
+    if raw_classification == "local_outliers_or_mixed":
+        decision["reason"] = "raw_behavior_mixed"
+    elif raw_classification == "centered":
+        decision["reason"] = "raw_behavior_centered"
+    elif consensus_class == "insufficient_consensus":
+        decision["reason"] = "insufficient_consensus"
+    else:
+        decision["reason"] = "classification_mismatch"
+    return decision
+
+
 def propose_tuning_correction(
     audit: Mapping[str, Any],
     *,
     report_hash: str,
     realization_id: str,
     max_abs_cents: float = 50.0,
+    decision: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
-    """Build a conservative correction profile from dual-estimator consensus."""
+    """Build a correction profile only when explicit eligibility gates pass."""
 
+    eligibility = dict(
+        decision or evaluate_tuning_correction_eligibility(audit, max_abs_cents=max_abs_cents)
+    )
+    if not str(eligibility.get("status", "")).startswith("eligible_"):
+        return None
     validated = [
         row for row in (audit.get("notes") or [])
         if row.get("validation_status") == "agree" and row.get("validated_cents") is not None
     ]
-    if len(validated) < 3:
-        return None
     normalized_rows = [
         {"midi": int(row["midi"]), "status": "ok", "cents": float(row["validated_cents"])}
         for row in validated
     ]
     summary = summarize_tuning_rows(normalized_rows)
-    max_measured = max(abs(float(row["validated_cents"])) for row in validated)
-    if max_measured > float(max_abs_cents):
-        return None
-    if max_measured < 3.0:
-        return None
     source = {
         "kind": "score_tuning_audit_consensus",
         "report_hash": str(report_hash),
         "realization_id": str(realization_id),
         "validated_notes": len(validated),
+        "validation_fraction": eligibility.get("validation_fraction"),
+        "span_coverage": eligibility.get("span_coverage"),
+        "policy": "conservative_v2",
         "estimators": ["normalized_autocorrelation", "harmonic_spectral_peaks"],
     }
-    classification = str(summary.get("classification") or "")
-    global_correction = summary.get("suggested_global_correction_cents")
-    if classification == "global_offset" and global_correction is not None:
+    if eligibility.get("status") == "eligible_global":
+        correction = summary.get("suggested_global_correction_cents")
+        if correction is None:
+            return None
         return {
             "mode": "global",
-            "cents": round(float(global_correction), 3),
+            "cents": round(float(correction), 3),
             "max_abs_cents": float(max_abs_cents),
             "source": source,
         }
-    if max_measured < 6.0:
-        return None
     points = {
         pretty_midi.note_number_to_name(int(row["midi"])): round(-float(row["validated_cents"]), 3)
         for row in sorted(validated, key=lambda item: int(item["midi"]))
@@ -270,7 +428,6 @@ def propose_tuning_correction(
         "points": points,
         "source": source,
     }
-
 
 def score_correction_snippet(report: Mapping[str, Any]) -> dict[str, Any]:
     """Return a score-authoring snippet; it never mutates the score automatically."""
@@ -304,7 +461,7 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
             f"failures: {summary.get('failures', 0)}"
         ),
         "",
-        "instrument(s)                         used/audited   class                     median    p95    max",
+        "instrument(s)                         used/audited   raw class                consensus class           action           median    p95    max",
     ]
     for row in report.get("realizations") or []:
         names = ",".join(
@@ -317,11 +474,15 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
             used = int(row.get("distinct_used_pitches", 0))
             audited = int(row.get("audited_pitches", 0))
             lines.append(
-                f"{names[:36]:36s} {used:3d}/{audited:3d}       "
-                f"ERROR  {row.get('error', '')}"
+                f"{names[:36]:36s} {used:3d}/{audited:3d}       ERROR  {row.get('error', '')}"
             )
             continue
-        classification = str(audit_summary.get("classification", "unknown"))
+        raw_class = str(audit_summary.get("classification", "unknown"))
+        consensus = dict(row.get("tuning_consensus") or summarize_tuning_consensus(result))
+        consensus_class = str(consensus.get("classification", "unknown"))
+        decision = dict(row.get("correction_decision") or evaluate_tuning_correction_eligibility(result))
+        action = str(decision.get("status", "unknown"))
+        consensus_action = action
         med = audit_summary.get("median_cents")
         p95 = audit_summary.get("p95_abs_cents")
         max_abs = audit_summary.get("max_abs_cents")
@@ -330,7 +491,8 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
         max_text = f"{float(max_abs):6.2f}" if max_abs is not None else "   n/a"
         lines.append(
             f"{names[:36]:36s} {row.get('distinct_used_pitches', 0):3d}/{row.get('audited_pitches', 0):3d}       "
-            f"{classification[:24]:24s} {med_text} {p95_text} {max_text}"
+            f"{raw_class[:24]:24s} {consensus_class[:24]:24s} {consensus_action[:16]:16s} "
+            f"{med_text} {p95_text} {max_text}"
         )
 
     proposals = [
@@ -338,7 +500,7 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
         if row.get("proposed_tuning_correction")
     ]
     if proposals:
-        lines.extend(["", "Correction proposals (dual-estimator consensus; not applied automatically):"] )
+        lines.extend(["", "Correction proposals (dual-estimator consensus; not applied automatically):"])
         for row in proposals:
             names = ",".join(row.get("instrument_names") or [])
             proposal = dict(row.get("proposed_tuning_correction") or {})
@@ -346,27 +508,62 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
                 detail = f"global {float(proposal.get('cents', 0.0)):+.2f} cents"
             else:
                 detail = f"curve with {len(proposal.get('points') or {})} measured points"
+            decision = dict(row.get("correction_decision") or {})
+            detail += (
+                f"; validation={float(decision.get('validation_fraction', 0.0)):.0%}, "
+                f"span={float(decision.get('span_coverage', 0.0)):.0%}"
+            )
             lines.append(f"  {names}: {detail}")
 
-    issues: list[str] = []
+    rejected = [
+        row for row in report.get("realizations") or []
+        if row.get("status") == "ok"
+        and (row.get("correction_decision") or {}).get("status") == "rejected"
+    ]
+    if rejected:
+        lines.extend(["", "Correction decisions withheld:"])
+        for row in rejected:
+            names = ",".join(row.get("instrument_names") or [])
+            decision = dict(row.get("correction_decision") or {})
+            lines.append(
+                f"  {names}: {decision.get('reason')} "
+                f"(validated {decision.get('validated_notes', 0)}/{decision.get('audited_notes', 0)}, "
+                f"span {float(decision.get('span_coverage', 0.0)):.0%})"
+            )
+
+    validated_issues: list[str] = []
+    disagreements: list[str] = []
+    non_ok: list[str] = []
     for row in report.get("realizations") or []:
         if row.get("status") != "ok":
             continue
         names = ",".join(row.get("instrument_names") or [])
         for note in (row.get("audit") or {}).get("notes") or []:
-            cents = note.get("cents")
             status = str(note.get("status") or "")
-            if cents is None:
-                if status in {"silent", "unreliable", "unstable"}:
-                    issues.append(f"  {names}: {note.get('note', '?')} {status}")
-                continue
-            if abs(float(cents)) >= 6.0 or status != "ok":
-                issues.append(
-                    f"  {names}: {note.get('note', '?')} @ vel {note.get('velocity', '?')} "
-                    f"{float(cents):+.2f} cents ({status})"
-                )
-    if issues:
-        lines.extend(["", "Used-note findings (>=6 cents or non-ok):", *issues])
+            validation = str(note.get("validation_status") or "")
+            validated_cents = note.get("validated_cents")
+            if validation == "agree" and validated_cents is not None:
+                if abs(float(validated_cents)) >= 6.0:
+                    validated_issues.append(
+                        f"  {names}: {note.get('note', '?')} @ vel {note.get('velocity', '?')} "
+                        f"{float(validated_cents):+.2f} cents (consensus)"
+                    )
+            elif validation == "disagree":
+                auto = note.get("cents")
+                spectral = (note.get("spectral") or {}).get("cents")
+                if auto is not None and spectral is not None and max(abs(float(auto)), abs(float(spectral))) >= 6.0:
+                    disagreements.append(
+                        f"  {names}: {note.get('note', '?')} auto {float(auto):+.2f}, "
+                        f"spectral {float(spectral):+.2f} cents"
+                    )
+            if status in {"silent", "unreliable", "unstable"}:
+                non_ok.append(f"  {names}: {note.get('note', '?')} {status}")
+    if validated_issues:
+        lines.extend(["", "Validated used-note findings (dual-estimator consensus >=6 cents):", *validated_issues])
+    if disagreements:
+        lines.extend(["", "Estimator disagreements (not correction evidence):", *disagreements])
+    if non_ok:
+        lines.extend(["", "Measurement quality findings:", *non_ok])
 
     skipped = report.get("skipped") or []
     if skipped:
@@ -383,7 +580,6 @@ def format_score_tuning_report(report: Mapping[str, Any]) -> str:
         ]
     )
     return "\n".join(lines)
-
 
 def render_score_tuning_audit(
     score_path: Path,
@@ -452,10 +648,13 @@ def render_score_tuning_audit(
             row["audit_report_path"] = str(result.report_path)
             row["dry_audio"] = str(result.dry_audio)
             row["audit"] = result.report
+            row["tuning_consensus"] = summarize_tuning_consensus(result.report)
+            row["correction_decision"] = evaluate_tuning_correction_eligibility(result.report)
             row["proposed_tuning_correction"] = propose_tuning_correction(
                 result.report,
                 report_hash=report_hash,
                 realization_id=str(target.get("realization_id", "")),
+                decision=row["correction_decision"],
             )
         except (KeyError, ValueError, RuntimeError, OSError) as ex:
             row["status"] = "error"
@@ -467,6 +666,16 @@ def render_score_tuning_audit(
     failures = sum(1 for row in rows if row.get("status") == "error")
     classifications = Counter(
         str((row.get("audit") or {}).get("summary", {}).get("classification", "unknown"))
+        for row in rows
+        if row.get("status") == "ok"
+    )
+    consensus_classifications = Counter(
+        str((row.get("tuning_consensus") or {}).get("classification", "unknown"))
+        for row in rows
+        if row.get("status") == "ok"
+    )
+    correction_decisions = Counter(
+        str((row.get("correction_decision") or {}).get("status", "unknown"))
         for row in rows
         if row.get("status") == "ok"
     )
@@ -489,7 +698,9 @@ def render_score_tuning_audit(
             "unique_realizations": int(plan["unique_realizations"]),
             "skipped": len(plan.get("skipped") or []),
             "failures": failures,
-            "classifications": dict(sorted(classifications.items())),
+            "raw_classifications": dict(sorted(classifications.items())),
+            "consensus_classifications": dict(sorted(consensus_classifications.items())),
+            "correction_decisions": dict(sorted(correction_decisions.items())),
         },
         "realizations": rows,
         "skipped": plan.get("skipped") or [],

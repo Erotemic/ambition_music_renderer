@@ -19,7 +19,7 @@ import numpy as np
 from .sfz_measurement import midi_frequency
 
 
-TUNING_REPORT_SCHEMA = "ambition.instrument_tuning_audit.v2"
+TUNING_REPORT_SCHEMA = "ambition.instrument_tuning_audit.v3"
 
 
 def _mono(audio: np.ndarray) -> np.ndarray:
@@ -76,7 +76,10 @@ def estimate_known_note_tuning(
     expected_period = sample_rate / expected_hz
     desired = max(1024.0, expected_period * 10.0)
     power = int(math.ceil(math.log2(desired)))
-    frame_len = int(max(2048, min(8192, 2**power)))
+    # Low fundamentals need more cycles per frame. The previous 8192-sample
+    # cap left C1/C2 measurements with only a handful of periods and made the
+    # autocorrelation estimate more sensitive to attack/timbre.
+    frame_len = int(max(2048, min(16384, 2**power)))
     frame_len = min(frame_len, len(steady))
     if frame_len < 256:
         return {**base, "status": "unreliable", "reason": "steady_window_too_short"}

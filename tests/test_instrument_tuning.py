@@ -92,3 +92,22 @@ def test_tuning_estimator_disagreement_blocks_consensus():
     )
     assert got["validation_status"] == "disagree"
     assert got["validated_cents"] is None
+
+
+def test_low_frequency_tuning_probe_gets_more_steady_state_time():
+    from ambition_music_renderer.music_instrument_inspector_model import (
+        _make_tuning_audit_pm,
+        build_tuning_audit_request,
+    )
+
+    request = build_tuning_audit_request(
+        instrument={"name": "bass", "group": "bass", "program": "fingered_bass"},
+        notes=[24, 60],
+        note_duration_seconds=0.62,
+        minimum_steady_cycles=48.0,
+        max_note_duration_seconds=2.2,
+    )
+    _pm, _groups, _group, events = _make_tuning_audit_pm(request, [24, 60])
+    low, middle = events
+    assert low["duration_seconds"] > 1.4
+    assert middle["duration_seconds"] == 0.62

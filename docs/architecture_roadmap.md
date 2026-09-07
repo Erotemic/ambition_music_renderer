@@ -585,6 +585,23 @@ consumers are migrated and the whole-corpus legacy regeneration gate stays green
 Do not prioritize module motion over authoring capability or real composition
 feedback.
 
+
+### Tuning evidence and correction authority
+
+Instrument tuning correction is a synthesis authority, but tuning *evidence* remains
+observational and machine-local. Keep three layers distinct:
+
+1. raw estimator evidence, including disagreements and measurement quality;
+2. dual-estimator consensus plus explicit coverage metrics;
+3. an opt-in MusicIR `tuning_correction` profile accepted by a human or authoring
+   workflow.
+
+Do not infer correction authority from a raw `global_offset`/`range_dependent` label
+alone. Proposal generation must be consensus- and coverage-gated, and should reject
+mixed behavior or large unvalidated pitch regions rather than extrapolating a smooth
+model through them. Very-low-frequency audit notes should receive enough steady-state
+cycles for both estimators to make an independent claim.
+
 ### Deferred — DAW round trip
 
 Status: deferred by product decision. Exact MIDI + provenance sidecar export

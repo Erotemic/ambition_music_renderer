@@ -126,15 +126,33 @@ That command compiles the cue, finds every pitched instrument that actually emit
 notes, skips drums, collapses identical dry realizations, and audits only the MIDI
 pitches the score uses. Each audited pitch is rendered at the median velocity used
 for that pitch in the cue, which keeps the sweep focused on the sampled layers the
-composition is likely to hit. It always dumps `report.json`, `report.txt`, and a
-`corrections.yaml` authoring snippet under `agent/tuning_audits/<cue>/<hash>/` unless
-`--output-dir` is supplied. The correction snippet is generated only from notes whose
-two estimators agree. It proposes a single global cents shift for a clean constant
-offset, or a linearly interpolated per-note curve for validated range-dependent/local
-drift. It is never applied to the score automatically. The individual realization
-measurements continue to use the normal tuning cache, so re-running a batch after an
-interrupted or already-completed audit reuses prior measurements. Use `--force` when
-the local instrument assets changed and the dry measurements need to be regenerated.
+composition is likely to hit. Very low notes automatically receive longer probes so
+each estimator sees a minimum number of steady-state periods instead of the same
+wall-clock window used for mid/high notes. This is particularly important below
+roughly E2, where short probes can bias a period estimator.
+
+It always dumps `report.json`, `report.txt`, and a `corrections.yaml` authoring
+snippet under `agent/tuning_audits/<cue>/<hash>/` unless `--output-dir` is supplied.
+The report separates the raw autocorrelation classification from a dual-estimator
+consensus classification and an explicit correction decision. Large values from one
+estimator are shown under an estimator-disagreement section rather than presented as
+validated tuning facts.
+
+Correction generation uses a conservative eligibility policy. Global corrections
+require the raw and consensus summaries to both classify the realization as a global
+offset, at least five validated notes, at least 60% note consensus, and at least 60%
+pitch-span coverage. Per-note curves are limited to raw `range_dependent`
+realizations with at least five validated notes, at least 60% note consensus, at
+least one octave of validated span, and at least 65% coverage of the score-used pitch
+range. `local_outliers_or_mixed` behavior is never collapsed into a global shift.
+These gates deliberately reject correction profiles that would extrapolate through a
+large unvalidated register.
+
+The correction snippet is generated only from proposals that pass those gates and is
+never applied to the score automatically. The individual realization measurements
+continue to use the normal tuning cache, so re-running a batch after an interrupted
+or already-completed audit reuses prior measurements. Use `--force` when the local
+instrument assets changed and the dry measurements need to be regenerated.
 
 When a proposal is accepted, copy its `tuning_correction` onto the corresponding
 MusicIR instrument. Correction happens before audio processing and before sampled
