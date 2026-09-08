@@ -193,7 +193,14 @@ def test_source_only_authoring_register_check_runs_with_python_S():
         cwd=ROOT, text=True, capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "73 instruments" in proc.stdout
+    # The register's count is compared with the checked-in catalog, not a
+    # literal: the catalog may grow (73 -> 74 with `japan.shamisen`) and the
+    # claim under test is "the source-only register agrees with the authority",
+    # which stays falsifiable — a register that skipped or double-counted an
+    # instrument would still disagree with the catalog.
+    expected_instruments = len(instrument_catalog())
+    assert expected_instruments > 0
+    assert f"{expected_instruments} instruments" in proc.stdout, proc.stdout
     assert "16 generators" in proc.stdout
 
     index_check = subprocess.run(
