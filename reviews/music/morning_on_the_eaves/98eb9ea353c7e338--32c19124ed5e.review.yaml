@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: morning_on_the_eaves
+  title: Morning on the Eaves
+  version_id: 98eb9ea353c7e338:32c19124ed5e
+  render_hash: 98eb9ea353c7e338
+  preview_sha256: 32c19124ed5e97f18705b99596acc9cadc4e1b495d114b58b7c09a6a1bcf730f
+  preview_path: generated/morning_on_the_eaves/.versioned/98eb9ea353c7e338/preview/morning_on_the_eaves_98eb9ea353c7e338.full_soundtrack_preview.ogg
+  manifest_path: generated/morning_on_the_eaves/.versioned/98eb9ea353c7e338/morning_on_the_eaves_98eb9ea353c7e338.adaptive_manifest.json
+  manifest_sha256: 511eb695aa38a047ce21080ea16648b8f049886f8d2d78a0eafc0d76b8e23af4
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/morning_on_the_eaves.music.yaml
+  score_sha256_at_review: 1b2ba1c142c175936f04bcedff0a13141e58fbd3f126b4a96985ce754bd59b2a
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.1
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 30.465
+  furthest_played_fraction: 0.1763
+  created_at: '2026-09-08T01:40:59Z'
+  updated_at: '2026-09-08T01:40:59Z'
+  reviewed_at: '2026-09-08T01:40:59Z'
+history: []

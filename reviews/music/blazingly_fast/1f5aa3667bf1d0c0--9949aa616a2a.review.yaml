@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: blazingly_fast
+  title: Blazingly Fast
+  version_id: 1f5aa3667bf1d0c0:9949aa616a2a
+  render_hash: 1f5aa3667bf1d0c0
+  preview_sha256: 9949aa616a2afea949c40535822d1ef00b9d5ac39fbed2d96f987499b84d3a0f
+  preview_path: generated/blazingly_fast/.versioned/1f5aa3667bf1d0c0/preview/blazingly_fast_1f5aa3667bf1d0c0.full_soundtrack_preview.ogg
+  manifest_path: generated/blazingly_fast/.versioned/1f5aa3667bf1d0c0/blazingly_fast_1f5aa3667bf1d0c0.adaptive_manifest.json
+  manifest_sha256: 4da4e7dcf7bd1094c8f7c88179c1faef13b1d1d4b67745293153462906177509
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/blazingly_fast.music.yaml
+  score_sha256_at_review: cf45b09485b6bb01305912fb5298790e1bce164d2a162d828921a97fce7e5122
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.1
+  label: Acceptable
+  notes: Sounds rusty in a good way, but  still off.
+  issues: []
+  furthest_played_seconds: 30.876
+  furthest_played_fraction: 0.1608
+  created_at: '2026-09-08T01:39:38Z'
+  updated_at: '2026-09-08T01:39:38Z'
+  reviewed_at: '2026-09-08T01:39:38Z'
+history: []

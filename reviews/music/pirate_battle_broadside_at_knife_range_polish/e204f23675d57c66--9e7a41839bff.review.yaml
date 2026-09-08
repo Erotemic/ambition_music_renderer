@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pirate_battle_broadside_at_knife_range_polish
+  title: Broadside at Knife Range - Combat Polish
+  version_id: e204f23675d57c66:9e7a41839bff
+  render_hash: e204f23675d57c66
+  preview_sha256: 9e7a41839bff53aec9290ca64ef4fca7d09be9b653f67d2be52fe40ea473e1b1
+  preview_path: generated/pirate_battle_broadside_at_knife_range_polish/.versioned/e204f23675d57c66/preview/pirate_battle_broadside_at_knife_range_polish_e204f23675d57c66.full_soundtrack_preview.ogg
+  manifest_path: generated/pirate_battle_broadside_at_knife_range_polish/.versioned/e204f23675d57c66/pirate_battle_broadside_at_knife_range_polish_e204f23675d57c66.adaptive_manifest.json
+  manifest_sha256: 037c9e68b51d4fd8ee09c57d337ab65991167a19c8d2272a802a1b880973a305
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/experiments/pirate_battle_broadside_at_knife_range_polish.music.yaml
+  score_sha256_at_review: a37ced2c6471a48492d639a1e46b111694e39397c06ead8490cfafe55dd4350d
+  score_scope: experiments
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.8
+  label: Acceptable
+  notes: ''
+  issues: []
+  furthest_played_seconds: 25.26
+  furthest_played_fraction: 0.2184
+  created_at: '2026-09-08T01:41:43Z'
+  updated_at: '2026-09-08T01:41:43Z'
+  reviewed_at: '2026-09-08T01:41:43Z'
+history: []

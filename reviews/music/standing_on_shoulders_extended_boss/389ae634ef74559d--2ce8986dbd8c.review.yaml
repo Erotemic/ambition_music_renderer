@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: standing_on_shoulders_extended_boss
+  title: Standing on Shoulders - Extended Boss Battle
+  version_id: 389ae634ef74559d:2ce8986dbd8c
+  render_hash: 389ae634ef74559d
+  preview_sha256: 2ce8986dbd8cbab1ed122e08cc9592c2bf4201799ac16bba41943d569ad804a5
+  preview_path: generated/standing_on_shoulders_extended_boss/.versioned/389ae634ef74559d/preview/standing_on_shoulders_extended_boss_389ae634ef74559d.full_soundtrack_preview.ogg
+  manifest_path: generated/standing_on_shoulders_extended_boss/.versioned/389ae634ef74559d/standing_on_shoulders_extended_boss_389ae634ef74559d.adaptive_manifest.json
+  manifest_sha256: ef82b5f308b9aa0a808460e905fe4f38b742c02e5b0d17d4f47708e35239078e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/experiments/standing_on_shoulders_extended_boss.music.yaml
+  score_sha256_at_review: 90c450286e8352fd3da4b05cb547bc5664ef51471fc3a4a99997f01b75ab9f0f
+  score_scope: experiments
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.0
+  label: Standout
+  notes: The only thing that might need to change in this is the recursive dual solos. There also might be a tuning
+    issue with the insturments.
+  issues: []
+  furthest_played_seconds: 72.854
+  furthest_played_fraction: 0.3381
+  created_at: '2026-09-08T01:38:36Z'
+  updated_at: '2026-09-08T01:38:41Z'
+  reviewed_at: '2026-09-08T01:38:41Z'
+history: []
