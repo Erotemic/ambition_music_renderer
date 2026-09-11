@@ -181,6 +181,7 @@ install_sfizz_obs_repo(){
 build_sfizz_from_source() {
     local version="${SFIZZ_SOURCE_VERSION:-1.2.3}"
     local workdir tarball
+    SFIZZ_SOURCE_BUILD_TRIED=1
     apt_ensure build-essential cmake ninja-build pkg-config libsndfile1-dev curl || return 1
 
     workdir="$(mktemp -d)"
@@ -217,17 +218,30 @@ UPDATE="${UPDATE:-1}" apt_ensure \
     sox \
     rubberband-cli
 
-echo "[setup] Installing optional LV2/plugin-host tooling"
+echo "[setup] Installing LV2/plugin-host tooling"
 preseed_jack_no_realtime
 
-# These vary by Ubuntu release / enabled repositories, so skip gracefully.
-UPDATE="${UPDATE:-1}" apt_ensure_if_available \
+# ⛔ REQUIRED, NOT BEST-EFFORT. Shipped cues NAME these: `kind: lv2proc` steps
+# host Guitarix's gxts9 / gx_jcm800pre_st (blazingly_fast, standing_on_shoulders
+# experiments), and unar/p7zip unpack the instrument archives the downloader
+# fetches. A missing one fails a render or leaves a library empty, so a machine
+# without them must stop here, not finish "successfully".
+UPDATE="${UPDATE:-1}" apt_ensure \
     lilv-utils \
     lv2proc \
+    guitarix-lv2 \
+    curl \
+    unzip \
+    file \
+    p7zip-full \
+    unar
+
+# Hosts and plugin collections no shipped cue requires yet; they vary by Ubuntu
+# release / enabled repositories, so skip gracefully.
+UPDATE="${UPDATE:-1}" apt_ensure_if_available \
     jalv \
     carla \
     guitarix \
-    guitarix-lv2 \
     lsp-plugins \
     lsp-plugins-lv2 \
     x42-plugins \
@@ -236,23 +250,35 @@ UPDATE="${UPDATE:-1}" apt_ensure_if_available \
     mda-lv2 \
     swh-lv2
 
-if [ "${INSTALL_SFIZZ_OBS:-0}" = "1" ]; then
-    echo "[setup] Installing sfizz from OBS apt repository"
-    install_sfizz_obs_repo
-else
-    echo "[setup] Skipping sfizz OBS repo. Set INSTALL_SFIZZ_OBS=1 to enable it."
-    echo "[setup] Trying distro sfizz package if already available."
-    apt_ensure_if_available sfizz sfizz-tools
-    # The name mismatch is not specific to the OBS packages, so this path needs
-    # the same normalization. Ubuntu does not ship sfizz in the main archive at
-    # all, so reaching here usually means no SFZ player: say so plainly, because
-    # the consequence downstream is a quiet quality drop, not an error.
-    ensure_sfizz_render_compat_shim
-    if ! command -v sfizz_render >/dev/null 2>&1; then
-        echo "[setup] NOTE: no sfizz_render on this machine." >&2
-        echo "[setup] Sampled SFZ instruments will fall back to General MIDI." >&2
-        echo "[setup] Re-run with INSTALL_SFIZZ_OBS=1 to install it from the sfztools repo." >&2
+# ⛔ sfizz IS A DEPENDENCY OF THE MUSIC, NOT AN OPTION. 363 instrument slots in
+# the shipped scores are `kind: sfz`, and the renderer refuses to render them
+# without `sfizz_render`. This used to be opt-in (INSTALL_SFIZZ_OBS=0 by
+# default), so a plain `./setup.sh` finished green on a machine that could not
+# render the catalogue.
+#
+# Order: an existing sfizz_render, then a distro/apt package, then the sfztools
+# OBS repo (a third-party apt source; INSTALL_SFIZZ_OBS=0 skips only that step),
+# then a source build. Only if all of them fail does setup stop.
+apt_ensure_if_available sfizz sfizz-tools
+ensure_sfizz_render_compat_shim
+if ! command -v sfizz_render >/dev/null 2>&1; then
+    if [ "${INSTALL_SFIZZ_OBS:-1}" = "1" ]; then
+        # Falls back to the source build itself when the OBS package fails.
+        echo "[setup] Installing sfizz from OBS apt repository"
+        install_sfizz_obs_repo || true
+    else
+        echo "[setup] Building sfizz from source (INSTALL_SFIZZ_OBS=0)"
+        build_sfizz_from_source || true
     fi
+fi
+# The OBS path returns early (no source build) on an Ubuntu release it has no
+# repository mapping for.
+if ! command -v sfizz_render >/dev/null 2>&1 && [ -z "${SFIZZ_SOURCE_BUILD_TRIED:-}" ]; then
+    build_sfizz_from_source || true
+fi
+if ! command -v sfizz_render >/dev/null 2>&1; then
+    echo "[setup] ERROR: could not obtain sfizz_render; sampled SFZ instruments cannot render." >&2
+    exit 1
 fi
 
 # Local developer setup. Assumes uv is installed.
@@ -304,8 +330,33 @@ ensure_venv(){
 ensure_venv
 source "$VENV_DIR/bin/activate"
 
+# `[all]` includes `[optional]` = pedalboard + dawdreamer: 51 shipped effect
+# chains are `kind: pedalboard`, and a cue that names one fails to render
+# without it. Keep it `[all]`.
 echo "[setup] Installing Python renderer extras"
 UV_LINK_MODE=copy uv pip install -e ".[all]"
+
+# ⛔ THE INSTRUMENT LIBRARIES ARE PART OF THIS SETUP. The scores name them; a
+# machine without them either refuses to render or renders General-MIDI
+# stand-ins. `download_ambition_audio_tools.sh` is idempotent (installed
+# libraries are skipped), and it exits non-zero when a library the catalog
+# expects is still missing afterwards.
+#
+# AMBITION_SKIP_AUDIO_TOOLS_DOWNLOAD=1 is for a caller that runs the downloader
+# itself (the repo's scripts/setup/audio_libraries.sh), not a way to opt out.
+AUDIO_TOOLS_ROOT="${AMBITION_AUDIO_TOOLS_ROOT:-/data/audio-tools}"
+if [ "${AMBITION_SKIP_AUDIO_TOOLS_DOWNLOAD:-0}" != "1" ]; then
+    # /data is root-owned on a fresh box and the downloader does not escalate.
+    # Test writability, not `mkdir -p`: that succeeds on an existing dir no
+    # matter who owns it.
+    if [ ! -w "$AUDIO_TOOLS_ROOT" ]; then
+        _SUDO="$(_sudo_prefix)"
+        ${_SUDO:+$_SUDO} mkdir -p "$AUDIO_TOOLS_ROOT"
+        ${_SUDO:+$_SUDO} chown "$(id -u):$(id -g)" "$AUDIO_TOOLS_ROOT"
+    fi
+    echo "[setup] Downloading instrument libraries and plugins into $AUDIO_TOOLS_ROOT"
+    ./download_ambition_audio_tools.sh "$AUDIO_TOOLS_ROOT"
+fi
 
 echo
 echo "[setup] final plugin/tool status:"

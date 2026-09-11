@@ -67,6 +67,10 @@ if ! have_cmd 7z && ! have_cmd 7za; then
     echo "Warning: 7z/7za not found. FreePats Upright Piano KW is a .7z archive." >&2
     echo "On Debian/Ubuntu: sudo apt install p7zip-full" >&2
 fi
+if ! have_cmd unar && ! have_cmd bsdtar && ! have_cmd unrar; then
+    echo "Warning: no RAR extractor (unar). The shamisen articulation archives are RARs," >&2
+    echo "and Ubuntu's 7z writes their members as empty files. sudo apt install unar" >&2
+fi
 
 seven_zip() {
     if have_cmd 7z; then
@@ -1227,4 +1231,83 @@ log "soundfont count: $(find "$SOUNDFONT_ROOT" -type f \( -iname '*.sf2' -o -ina
 log "clap count: $(find "$CLAP_ROOT" -maxdepth 1 -name '*.clap' | wc -l | tr -d ' ')"
 log "lv2 count: $(find "$LV2_ROOT" -maxdepth 1 -name '*.lv2' | wc -l | tr -d ' ')"
 log "vst3 count: $(find "$VST3_ROOT" -maxdepth 1 -name '*.vst3' | wc -l | tr -d ' ')"
+
+# ⛔⛔ EVERY DOWNLOAD ABOVE IS `|| true`, SO WITHOUT THIS THE EXIT CODE MEANS
+# NOTHING. A run that lost Emilyguitar, Big Rusty Drums and the shamisen still
+# printed "done" and exited 0 — and `blazingly_fast` then rendered through
+# General-MIDI stand-ins with no error anywhere. The catalog is the contract:
+# every source it marks `expected` must be on disk when this script finishes.
+verify_expected_sources() {
+    [[ "$DRY_RUN" == "1" ]] && return 0
+    local catalog
+    catalog="${AMBITION_INSTRUMENT_CATALOG:-$(dirname "${BASH_SOURCE[0]}")/ambition_music_renderer/data/instrument_catalog.yaml}"
+    if [[ ! -f "$catalog" ]]; then
+        log "ERROR: cannot verify the install: catalog not found at $catalog"
+        log "run this script from the music renderer checkout, or set AMBITION_INSTRUMENT_CATALOG"
+        return 1
+    fi
+    python3 - "$catalog" "$ROOT" "$MODE" "$ORCHESTRA_EXTRAS" "$SOUNDFONTS" "$JAPANESE_RAW_SAMPLES" <<'PY_VERIFY'
+import re
+import sys
+from pathlib import Path
+
+catalog, root, mode, orchestra_extras, soundfonts, raw_samples = sys.argv[1:]
+root = Path(root)
+
+# Minimal reader for the `sources:` block so this needs no PyYAML.
+sources, current, in_sources = {}, None, False
+for line in Path(catalog).read_text(encoding="utf8").splitlines():
+    if re.match(r"^\S", line):
+        in_sources = line.startswith("sources:")
+        continue
+    if not in_sources:
+        continue
+    m = re.match(r"^  ([A-Za-z0-9_.-]+):\s*$", line)
+    if m:
+        current = sources.setdefault(m.group(1), {})
+        continue
+    m = re.match(r"^    (expected|install_profile|relative_root):\s*(.+?)\s*$", line)
+    if m and current is not None:
+        current[m.group(1)] = m.group(2)
+
+# Sources the current flags deliberately skip.
+orchestra = {"vcsl", "sonatina", "vsco2_ce", "naked_drums", "muldjord_kit"}
+missing = []
+for key, src in sources.items():
+    if src.get("expected", "true").lower() != "true" or "relative_root" not in src:
+        continue
+    if src.get("install_profile") == "pro" and mode == "starter":
+        continue
+    if key in orchestra and orchestra_extras == "0":
+        continue
+    rel = src["relative_root"]
+    if rel.startswith("soundfonts/") and soundfonts == "0":
+        continue
+    path = root / rel
+    if path.is_file():
+        ok = path.stat().st_size > 0
+    else:
+        ok = path.is_dir() and any(path.rglob("*.sfz"))
+    if not ok:
+        missing.append(f"{key} -> {path}")
+
+# The shamisen articulation recordings are not a catalog source yet, but this
+# script promises them; an extractor without the RAR codec leaves them empty.
+raw = root / "raw-samples" / "Yukinisuzume" / "Shamisen"
+if raw_samples != "0" and mode != "starter" and soundfonts != "0":
+    wavs = list(raw.rglob("*.wav")) if raw.exists() else []
+    if not wavs or any(w.stat().st_size == 0 for w in wavs):
+        missing.append(f"yukinisuzume raw shamisen samples (empty or absent; install unar) -> {raw}")
+
+if missing:
+    print("[audio-tools] ERROR: expected instrument sources are MISSING after this run:", file=sys.stderr)
+    for row in missing:
+        print(f"[audio-tools]   - {row}", file=sys.stderr)
+    print("[audio-tools] cues that name them cannot render correctly; see the log above for the failed step.", file=sys.stderr)
+    raise SystemExit(1)
+print(f"[audio-tools] verified: all {len(sources)} catalog sources expected for MODE={mode} are installed")
+PY_VERIFY
+}
+
+verify_expected_sources || exit 1
 log "done"
