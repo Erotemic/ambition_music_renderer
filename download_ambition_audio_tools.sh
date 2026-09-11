@@ -166,7 +166,10 @@ extract_archive() {
         *.zip)
             unzip -o "$archive" -d "$dest"
             ;;
-        *.7z|*.rar)
+        *.rar)
+            extract_rar "$archive" "$dest" || return 1
+            ;;
+        *.7z)
             if have_cmd 7z || have_cmd 7za; then
                 seven_zip x -y "-o$dest" "$archive"
             else
@@ -249,6 +252,37 @@ download_file_optional() {
     cp -f "$archive" "$dest_path"
 }
 
+# ⛔ UBUNTU'S 7z LISTS A RAR AND CANNOT DECOMPRESS IT. p7zip-full / 7zip ship
+# without the non-free RAR codec: `7z l` succeeds and prints every member, and
+# `7z x` creates each file ZERO BYTES long with `ERROR: Unsupported Method`.
+# Measured 2026-09-11 on the Yukinisuzume shamisen archives: 115 empty .wav files.
+# `unar` (universe, free) and `bsdtar` read RAR v4; 7z is the last resort.
+extract_rar() {
+    local archive="$1"
+    local dest="$2"
+    mkdir -p "$dest"
+    if have_cmd unar; then
+        unar -quiet -force-overwrite -no-directory -output-directory "$dest" "$archive"
+    elif have_cmd bsdtar; then
+        bsdtar -xf "$archive" -C "$dest"
+    elif have_cmd unrar; then
+        unrar x -o+ -inul "$archive" "$dest/"
+    elif have_cmd 7z || have_cmd 7za; then
+        seven_zip x -y "-o$dest" "$archive" >/dev/null
+    else
+        log "cannot extract RAR without unar, bsdtar, unrar or 7z: $archive"
+        return 1
+    fi
+}
+
+# An extraction that leaves empty files behind is a failed extraction.
+has_empty_payload() {
+    find "$1" -type f -size 0 ! -name '.ambition_audio_tools_extracted.*' -print -quit 2>/dev/null | grep -q .
+}
+has_nonempty_payload() {
+    find "$1" -type f -size +0 ! -name '.ambition_audio_tools_extracted.*' -print -quit 2>/dev/null | grep -q .
+}
+
 download_raw_sample_archive_optional() {
     local label="$1"
     local url="$2"
@@ -256,7 +290,10 @@ download_raw_sample_archive_optional() {
     local dest_dir="$4"
     local archive="$ARCHIVES/$archive_name"
     local marker="$dest_dir/.ambition_audio_tools_extracted.$archive_name"
-    if [[ "$DRY_RUN" != "1" && -e "$marker" && -n "$(find "$dest_dir" -type f ! -name '.ambition_audio_tools_extracted.*' -print -quit 2>/dev/null)" ]]; then
+    # Markers are now written only after a verified extraction, but ones from
+    # before that sit beside empty files — so an empty file anywhere in the
+    # dest disqualifies every marker there.
+    if [[ "$DRY_RUN" != "1" && -e "$marker" ]] && ! has_empty_payload "$dest_dir"; then
         log "raw samples already extracted: $label -> $dest_dir"
         return 0
     fi
@@ -267,12 +304,27 @@ download_raw_sample_archive_optional() {
     if [[ "$DRY_RUN" == "1" ]]; then
         return 0
     fi
-    if ! have_cmd 7z && ! have_cmd 7za; then
-        log "raw archive cached but not extracted (install p7zip-full): $archive"
-        return 0
+    # The marker used to follow the extractor unconditionally, and `set -e` does
+    # not fire inside a function called from `|| true`, so a failed RAR decode
+    # was recorded as done and every later run skipped it.
+    #
+    # Stage per archive: several archives share one dest (ff1 + ff2 -> strong/),
+    # so verifying the dest judges this archive by its siblings' files.
+    rm -f "$marker"
+    local staging="$dest_dir/.staging.$archive_name"
+    rm -rf "$staging"
+    if ! extract_rar "$archive" "$staging"; then
+        rm -rf "$staging"
+        log "raw archive cached but NOT extracted (install unar): $archive"
+        return 1
     fi
-    mkdir -p "$dest_dir"
-    seven_zip x -y "-o$dest_dir" "$archive" >/dev/null
+    if has_empty_payload "$staging" || ! has_nonempty_payload "$staging"; then
+        rm -rf "$staging"
+        log "raw archive extracted EMPTY files (RAR codec missing? install unar): $archive"
+        return 1
+    fi
+    cp -a "$staging/." "$dest_dir/"
+    rm -rf "$staging"
     date -Iseconds > "$marker"
 }
 
@@ -293,7 +345,39 @@ import urllib.request
 
 repo, pattern = sys.argv[1:3]
 rx = re.compile(pattern, re.I)
-url = f"https://api.github.com/repos/{repo}/releases/latest"
+# `owner/repo@tag` pins a named release for projects whose Linux plugin builds
+# live on a rolling tag rather than on "latest" (airwin2rack's `DAWPlugin`).
+repo, _, tag = repo.partition("@")
+if tag:
+    url = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+else:
+    url = f"https://api.github.com/repos/{repo}/releases/latest"
+
+# ⛔ THE FIRST `linux` ASSET IS NOT THIS MACHINE'S. Upstreams list arm64 before
+# x86_64 (Surge XT, Dragonfly, Wolf Shaper), so a first-match pick installed
+# aarch64 plugins on an x86_64 box — the bundles index, and then no host can
+# load them. Reject any asset that names a foreign arch or OS, and prefer one
+# that names ours over an arch-neutral one.
+ARCH_TOKENS = {
+    "x86_64": {"x86_64", "x86-64", "amd64", "x64"},
+    "aarch64": {"aarch64", "arm64"},
+}
+FOREIGN_TOKENS = {"armhf", "arm32", "i386", "i586", "i686", "riscv64", "win32", "win64", "windows", "macos", "mac", "osx", "freebsd"}
+import platform
+host = platform.machine().lower()
+host = {"amd64": "x86_64", "arm64": "aarch64"}.get(host, host)
+host_tokens = ARCH_TOKENS.get(host, {host})
+for arch, tokens in ARCH_TOKENS.items():
+    if arch != host:
+        FOREIGN_TOKENS |= tokens
+
+
+def arch_rank(name):
+    """0 names the host arch, 1 is arch-neutral, None names a foreign one."""
+    words = set(re.split(r"[^a-z0-9_]+", name.lower().replace("x86-64", "x86_64")))
+    if words & FOREIGN_TOKENS:
+        return None
+    return 0 if words & host_tokens else 1
 
 
 def fetch(url):
@@ -360,12 +444,16 @@ except Exception as ex:
     print(f"ERROR {repo}: {ex}", file=sys.stderr)
     raise SystemExit(1)
 assets = data.get("assets") or []
-for asset in assets:
+candidates = []
+for index, asset in enumerate(assets):
     name = asset.get("name") or ""
-    if rx.search(name):
-        print(asset.get("browser_download_url") or "")
-        raise SystemExit(0)
-print(f"ERROR {repo}: no asset matched {pattern!r}. Assets: " + ", ".join(a.get("name", "") for a in assets), file=sys.stderr)
+    rank = arch_rank(name)
+    if rank is not None and rx.search(name):
+        candidates.append((rank, index, asset))
+if candidates:
+    print(min(candidates, key=lambda c: c[:2])[2].get("browser_download_url") or "")
+    raise SystemExit(0)
+print(f"ERROR {repo}: no {host} asset matched {pattern!r}. Assets: " + ", ".join(a.get("name", "") for a in assets), file=sys.stderr)
 raise SystemExit(1)
 PY
 }
@@ -839,7 +927,8 @@ download_open_plugin_bundles() {
     fi
     # Asset names vary between projects, so failures are non-fatal.  The manual
     # checklist names package-manager fallbacks for the same tools.
-    download_github_release_asset "LSP Plugins Linux bundle" "lsp-plugins/lsp-plugins" "(linux|x86_64|amd64).*(clap|lv2|vst3)?.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/LSP" || true
+    # LSP publishes its Linux bundles only as .7z.
+    download_github_release_asset "LSP Plugins Linux bundle" "lsp-plugins/lsp-plugins" "linux.*\.(7z|tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/LSP" || true
     download_github_release_asset "Surge XT Linux plugin bundle" "surge-synthesizer/surge" "(linux|ubuntu|debian|x86_64|amd64).*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/SurgeXT" || true
     download_github_release_asset "Cardinal modular synth/effects" "DISTRHO/Cardinal" "linux.*x86_64.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Cardinal" || true
     download_github_release_asset "DISTRHO DPF plugin collection" "DISTRHO/DPF-Plugins" "linux.*x86_64.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/DPF-Plugins" || true
@@ -847,7 +936,9 @@ download_open_plugin_bundles() {
     download_github_release_asset "Dexed DX7 FM synth" "asb2m10/dexed" "(linux|lnx|ubuntu|debian|x86_64|amd64).*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Dexed" || true
     download_github_release_asset "BYOD guitar/effects processor" "Chowdhury-DSP/BYOD" "linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/BYOD" || true
     download_github_release_asset "Dragonfly Reverb" "michaelwillis/dragonfly-reverb" "linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/DragonflyReverb" || true
-    download_github_release_asset "Airwindows consolidated plugins" "airwindows/airwindows" "(linux|clap|lv2|vst).*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Airwindows" || true
+    # airwindows/airwindows publishes no releases; the consolidated CLAP/VST3/LV2
+    # build lives on airwin2rack's rolling DAWPlugin tag.
+    download_github_release_asset "Airwindows consolidated plugins" "baconpaul/airwin2rack@DAWPlugin" "AirwindowsConsolidated-.*linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Airwindows" || true
     download_github_release_asset "Wolf Shaper distortion" "wolf-plugins/wolf-shaper" "linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/WolfShaper" || true
     collect_plugin_bundles
     write_environment_file

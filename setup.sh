@@ -135,7 +135,7 @@ install_sfizz_obs_repo(){
     KEYRING="/usr/share/keyrings/home_sfztools_sfizz.gpg"
     LIST_FILE="/etc/apt/sources.list.d/home_sfztools_sfizz.list"
 
-    apt_ensure curl gpg ca-certificates p7zip-full
+    apt_ensure curl gpg ca-certificates p7zip-full unar
 
     if [ ! -f "$KEYRING" ]; then
         echo "[setup] Installing sfizz OBS keyring: $KEYRING"
