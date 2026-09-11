@@ -180,9 +180,22 @@ def _renderer_package_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
+# Modules no render path can import, so they cannot change audio. Every other
+# .py stays in the fingerprint. ⛔ Hashing the review bank made a GUI tweak mark
+# the WHOLE catalogue stale (2026-09-11: an edit to music_reviews.py mid-regen
+# failed seven cues with "render dependencies changed after the versioned output
+# directory was selected" and queued ~90 needless re-renders). Only exclude a
+# module here after checking nothing outside it imports it.
+_NON_AUDIO_MODULE_PREFIXES = ("music_review",)
+
+
 def _compute_renderer_implementation_identity(root: Path) -> dict[str, Any]:
     files = sorted(
-        [path for path in root.rglob("*.py") if "__pycache__" not in path.parts]
+        [
+            path
+            for path in root.rglob("*.py")
+            if "__pycache__" not in path.parts and not path.name.startswith(_NON_AUDIO_MODULE_PREFIXES)
+        ]
         + list((root / "data").glob("*.yaml"))
     )
     h = hashlib.sha256()

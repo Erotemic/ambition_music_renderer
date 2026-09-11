@@ -24,11 +24,15 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import re
 from typing import Any, Iterable, Mapping
 
 import yaml
 
 from ._paths import SCORE_DIRS, project_root as default_project_root
+
+# libyaml's C loader when present: the pure-Python loader is ~10x slower.
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 REVIEW_SCHEMA_V1 = "ambition.music_review.v1"
 REVIEW_SCHEMA = "ambition.music_review.v2"
@@ -147,6 +151,56 @@ def sha256_file(path: Path, *, chunk_size: int = 1024 * 1024) -> str:
     return h.hexdigest()
 
 
+# ⛔ HASHING EVERY PREVIEW ON EVERY LAUNCH WAS HALF A MINUTE. The review bank
+# keys versions by the SHA-256 of the audio heard, so each of the ~470 previews
+# was re-read in full each time the GUI opened or refreshed, though a finished
+# render never changes. The digest is cached against (size, mtime_ns); a
+# rewritten file changes at least one of them and is hashed again.
+_SHA_CACHE: dict[str, list] = {}
+_SHA_CACHE_DIRTY = False
+
+
+def cached_sha256_file(path: Path) -> str:
+    global _SHA_CACHE_DIRTY
+    path = Path(path)
+    stat = path.stat()
+    key = str(path.resolve())
+    hit = _SHA_CACHE.get(key)
+    if hit and hit[0] == stat.st_size and hit[1] == stat.st_mtime_ns:
+        return str(hit[2])
+    digest = sha256_file(path)
+    _SHA_CACHE[key] = [stat.st_size, stat.st_mtime_ns, digest]
+    _SHA_CACHE_DIRTY = True
+    return digest
+
+
+def _sha_cache_path(root: Path) -> Path:
+    # generated/ is gitignored and holds the audio being hashed.
+    return Path(root) / "generated" / ".review_preview_sha256_cache.json"
+
+
+def _load_sha_cache(root: Path) -> None:
+    data = _load_json(_sha_cache_path(root))
+    for key, value in data.items():
+        if isinstance(value, list) and len(value) == 3:
+            _SHA_CACHE.setdefault(key, value)
+
+
+def _save_sha_cache(root: Path) -> None:
+    global _SHA_CACHE_DIRTY
+    if not _SHA_CACHE_DIRTY:
+        return
+    path = _sha_cache_path(root)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(_SHA_CACHE), encoding="utf8")
+        tmp.replace(path)
+        _SHA_CACHE_DIRTY = False
+    except OSError:
+        pass
+
+
 def safe_relative(path: Path | None, root: Path) -> str | None:
     if path is None:
         return None
@@ -158,10 +212,44 @@ def safe_relative(path: Path | None, root: Path) -> str | None:
 
 def _load_yaml(path: Path) -> dict[str, Any]:
     try:
-        data = yaml.safe_load(Path(path).read_text(encoding="utf8")) or {}
+        data = yaml.load(Path(path).read_text(encoding="utf8"), Loader=_YAML_LOADER) or {}
     except Exception:
         return {}
     return dict(data) if isinstance(data, Mapping) else {}
+
+
+_HEADER_RX = re.compile(r"^(id|title):(.*)$")
+
+
+def _score_header(path: Path) -> dict[str, Any]:
+    """The top-level ``id`` / ``title`` of a score, without parsing the score.
+
+    ⛔ A FULL PARSE COST ~90% OF GUI STARTUP. Discovery needs two header keys,
+    but loaded all 117 scores whole (the largest are thousands of lines of
+    events). Top-level keys sit at column 0, so read those two lines and parse
+    each alone. A block scalar or anything else a single line cannot express
+    falls back to the full parse.
+    """
+    found: dict[str, Any] = {}
+    try:
+        with Path(path).open(encoding="utf8") as file:
+            for line in file:
+                m = _HEADER_RX.match(line.rstrip("\n"))
+                if not m or m.group(1) in found:
+                    continue
+                raw = m.group(2).strip()
+                if not raw or raw[0] in "|>&*!":
+                    return _load_yaml(path)
+                try:
+                    value = yaml.load(f"v: {raw}", Loader=_YAML_LOADER)["v"]
+                except Exception:
+                    return _load_yaml(path)
+                found[m.group(1)] = value
+                if len(found) == 2:
+                    break
+    except OSError:
+        return {}
+    return found
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -198,7 +286,7 @@ class RenderVersion:
     @property
     def preview_sha256(self) -> str:
         if self._preview_sha256 is None:
-            self._preview_sha256 = sha256_file(self.preview_path)
+            self._preview_sha256 = cached_sha256_file(self.preview_path)
         return self._preview_sha256
 
     @property
@@ -314,7 +402,7 @@ def discover_score_sources(project_root: Path | None = None) -> dict[str, ScoreS
         if not directory.is_dir():
             continue
         for path in sorted(directory.glob("*.yaml")):
-            data = _load_yaml(path)
+            data = _score_header(path)
             cue_id = str(data.get("id") or path.name.removesuffix(".music.yaml").removesuffix(".yaml"))
             title = str(data.get("title") or cue_id.replace("_", " ").title())
             found[cue_id] = ScoreSource(cue_id=cue_id, title=title, path=path.resolve(), scope=scope)
@@ -371,9 +459,25 @@ def _version_from_run(
     )
 
 
-def discover_render_versions(project_root: Path | None = None, *, include_agent_bundles: bool = True) -> list[RenderVersion]:
+def discover_render_versions(
+    project_root: Path | None = None,
+    *,
+    include_agent_bundles: bool = True,
+    score_sources: Mapping[str, ScoreSource] | None = None,
+) -> list[RenderVersion]:
+    """Every playable render. Pass ``score_sources`` when the caller already has them."""
     root = Path(project_root or default_project_root()).resolve()
-    scores = discover_score_sources(root)
+    scores = dict(score_sources) if score_sources is not None else discover_score_sources(root)
+    _load_sha_cache(root)
+    try:
+        return _discover_render_versions(root, scores, include_agent_bundles=include_agent_bundles)
+    finally:
+        _save_sha_cache(root)
+
+
+def _discover_render_versions(
+    root: Path, scores: Mapping[str, ScoreSource], *, include_agent_bundles: bool
+) -> list[RenderVersion]:
     versions: list[RenderVersion] = []
     seen: set[tuple[str, str, str]] = set()
     generated = root / "generated"

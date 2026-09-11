@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+import sys
 from typing import Any
 
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import QProcess, Qt, QUrl
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (
@@ -75,7 +76,10 @@ class ReviewWindow(QMainWindow):
         self.versions: list[RenderVersion] = []
         self.versions_by_cue: dict[str, list[RenderVersion]] = {}
         self.documents_by_cue: dict[str, list[ReviewDocument]] = {}
-        self.active_sources = {}
+        self.listed_sources = {}
+        self.render_process: QProcess | None = None
+        self.render_cue_id: str | None = None
+        self.render_output: list[str] = []
         self._loaded_cue_id: str | None = None
         self.current_version: RenderVersion | None = None
         self.current_review: ReviewDocument | None = None
@@ -111,7 +115,7 @@ class ReviewWindow(QMainWindow):
         self.search.setPlaceholderText("Filter cues…")
         self.search.textChanged.connect(self._populate_cue_table)
         self.filter_combo = QComboBox()
-        self.filter_combo.addItems(["All", "Unrated latest", "Needs polish (1–6)", "Strong (7–10)", "Standout (9–10)"])
+        self.filter_combo.addItems(["All", "Unrated latest", "Unrendered", "Needs polish (1–6)", "Strong (7–10)", "Standout (9–10)"])
         self.filter_combo.currentTextChanged.connect(self._populate_cue_table)
         refresh = QPushButton("Refresh")
         refresh.clicked.connect(lambda: self.refresh())
@@ -157,6 +161,13 @@ class ReviewWindow(QMainWindow):
         version_row.addWidget(self.version_combo, 1)
         self.version_badge = QLabel("")
         version_row.addWidget(self.version_badge)
+        self.render_button = QPushButton("Render")
+        self.render_button.setToolTip(
+            "Render this cue's score now (skipped if the latest render is already current)."
+        )
+        self.render_button.clicked.connect(self.render_selected_cue)
+        self.render_button.setEnabled(False)
+        version_row.addWidget(self.render_button)
         right_layout.addLayout(version_row)
 
         self.identity_label = QLabel("")
@@ -301,7 +312,9 @@ class ReviewWindow(QMainWindow):
         if confirm and self._dirty and not self._confirm_discard():
             return
         current_cue = initial_cue or self.selected_cue_id()
-        self.versions = discover_render_versions(self.project_root)
+        # Parse the score headers once; discover_render_versions used to redo it.
+        sources = discover_score_sources(self.project_root)
+        self.versions = discover_render_versions(self.project_root, score_sources=sources)
         grouped: dict[str, list[RenderVersion]] = defaultdict(list)
         for version in self.versions:
             grouped[version.cue_id].append(version)
@@ -309,7 +322,10 @@ class ReviewWindow(QMainWindow):
             cue_versions.sort(key=lambda version: (not version.is_latest, -version.generated_at))
         self.versions_by_cue = dict(grouped)
         self.documents_by_cue = reviews_by_cue(self.store.load_all())
-        self.active_sources = {cue: source for cue, source in discover_score_sources(self.project_root).items() if source.scope == "active"}
+        # Every renderable score is listed, not only scores/active: an unrendered
+        # experiment (standing_on_shoulders_extended_boss, ...) must be reachable
+        # so it can be rendered from here. Archived copies stay out.
+        self.listed_sources = {cue: source for cue, source in sources.items() if source.scope != "archive"}
         self._populate_cue_table(select_cue=current_cue)
 
     def selected_cue_id(self) -> str | None:
@@ -320,7 +336,7 @@ class ReviewWindow(QMainWindow):
         return item.data(Qt.UserRole) if item else None
 
     def _summary_rows(self) -> list[dict[str, Any]]:
-        return cue_summary(self.versions, self.store.load_all(), self.active_sources, self.store.load_comparisons())
+        return cue_summary(self.versions, self.store.load_all(), self.listed_sources, self.store.load_comparisons())
 
     def _populate_cue_table(self, *_args: Any, select_cue: str | None = None) -> None:
         wanted = (self.search.text() if hasattr(self, "search") else "").strip().lower()
@@ -328,6 +344,8 @@ class ReviewWindow(QMainWindow):
         rows = self._summary_rows()
         if filter_name == "Unrated latest":
             rows = [row for row in rows if row["latest_score"] is None]
+        elif filter_name == "Unrendered":
+            rows = [row for row in rows if row["cue_id"] not in self.versions_by_cue]
         elif filter_name == "Needs polish (1–6)":
             rows = [row for row in rows if row["latest_score"] is not None and row["latest_score"] <= POLISH_THRESHOLD]
         elif filter_name == "Strong (7–10)":
@@ -402,15 +420,19 @@ class ReviewWindow(QMainWindow):
             latest = "latest · " if version.is_latest else ""
             self.version_combo.addItem(f"{latest}{version.display_hash} · {_format_date(version.generated_at)}{score_text}", version)
         self.version_combo.blockSignals(False)
-        title = versions[0].title if versions else (self.active_sources[cue_id].title if cue_id in self.active_sources else cue_id)
+        title = versions[0].title if versions else (self.listed_sources[cue_id].title if cue_id in self.listed_sources else cue_id)
         self.title_label.setText(f"{title}\n{cue_id}")
         self._populate_history(cue_id)
+        self._update_render_button()
         if versions:
             self.version_combo.setCurrentIndex(0)
             self._load_version(versions[0])
         else:
             self._clear_version()
-            self.identity_label.setText("No playable generated preview is available locally for this active score.")
+            if cue_id in self.listed_sources:
+                self.identity_label.setText("Not rendered yet — press Render to render this score.")
+            else:
+                self.identity_label.setText("No playable render, and no score to render it from.")
 
     def _version_selected(self, index: int) -> None:
         if index < 0:
@@ -757,7 +779,77 @@ class ReviewWindow(QMainWindow):
         self.filter_combo.setCurrentText("All")
         self._populate_cue_table(select_cue=target)
 
+    def _update_render_button(self) -> None:
+        cue_id = self.selected_cue_id()
+        busy = self.render_process is not None
+        self.render_button.setEnabled(not busy and cue_id is not None and cue_id in self.listed_sources)
+        if busy:
+            self.render_button.setText(f"Rendering {self.render_cue_id}…")
+        elif cue_id is not None and cue_id not in self.versions_by_cue:
+            self.render_button.setText("Render")
+        else:
+            self.render_button.setText("Re-render")
+
+    def render_selected_cue(self) -> None:
+        """Render the selected cue through the same path as the batch pipeline.
+
+        `radio render --cue=<id>` writes the versioned generated/<cue>/ run this
+        window discovers, reuses a current render instead of redoing it, and
+        runs the sampled-library preflight, so a machine missing a library
+        refuses here exactly as it would in scripts/regen/music.sh. It renders
+        only; publishing to the game stays with the regen script.
+        """
+        cue_id = self.selected_cue_id()
+        if cue_id is None or self.render_process is not None:
+            return
+        process = QProcess(self)
+        process.setWorkingDirectory(str(self.project_root))
+        process.setProcessChannelMode(QProcess.MergedChannels)
+        process.readyReadStandardOutput.connect(self._render_output_ready)
+        process.finished.connect(self._render_finished)
+        self.render_process = process
+        self.render_cue_id = cue_id
+        self.render_output = []
+        self._update_render_button()
+        self.statusBar().showMessage(f"Rendering {cue_id}…")
+        process.start(sys.executable, ["-m", "ambition_music_renderer", "radio", "render", f"--cue={cue_id}", "--jobs=1"])
+
+    def _render_output_ready(self) -> None:
+        if self.render_process is None:
+            return
+        text = bytes(self.render_process.readAllStandardOutput()).decode("utf8", "replace")
+        for line in text.splitlines():
+            if line.strip():
+                self.render_output.append(line)
+                self.statusBar().showMessage(f"{self.render_cue_id}: {line[:160]}")
+        del self.render_output[:-200]
+
+    def _render_finished(self, exit_code: int, _status: QProcess.ExitStatus) -> None:
+        cue_id = self.render_cue_id
+        self.render_process = None
+        self.render_cue_id = None
+        if exit_code == 0:
+            self.statusBar().showMessage(f"Rendered {cue_id}", 8000)
+            self.refresh(initial_cue=cue_id)
+            # An unchanged selection emits no selection signal, so refresh alone
+            # left the button reading "Rendering…".
+            self._update_render_button()
+        else:
+            self._update_render_button()
+            tail = "\n".join(self.render_output[-25:])
+            QMessageBox.warning(self, "Render failed", f"Rendering {cue_id} failed (exit {exit_code}).\n\n{tail}")
+
     def closeEvent(self, event) -> None:  # type: ignore[override]
+        if self.render_process is not None:
+            result = QMessageBox.question(
+                self, "Render in progress", f"{self.render_cue_id} is still rendering. Quit and stop it?",
+                QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel,
+            )
+            if result != QMessageBox.Yes:
+                event.ignore()
+                return
+            self.render_process.kill()
+            self.render_process.waitForFinished(3000)
         if self._confirm_discard():
             event.accept()
         else:
