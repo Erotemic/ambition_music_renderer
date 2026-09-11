@@ -29,8 +29,13 @@ dependencies = [
 [project.optional-dependencies]
 
 optional = [
+    # 51 shipped effect chains are `kind: pedalboard`; a cue naming one fails
+    # to render without it.
     "pedalboard",
-    "dawdreamer",
+    # No cp313 wheel exists (0.8.3 ships cp310-cp312), and one unsatisfiable
+    # member fails the WHOLE extra — so on 3.13 pedalboard never installed
+    # either. Nothing in the renderer imports dawdreamer today.
+    "dawdreamer; python_version < '3.13'",
 ]
 dev = ["pytest", "ruff", "line_profiler"]
 all = [

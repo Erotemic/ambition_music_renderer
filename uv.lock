@@ -39,7 +39,7 @@ dependencies = [
 
 [package.optional-dependencies]
 all = [
-    { name = "dawdreamer" },
+    { name = "dawdreamer", marker = "python_full_version < '3.13'" },
     { name = "line-profiler" },
     { name = "pedalboard" },
     { name = "pytest" },
@@ -51,7 +51,7 @@ dev = [
     { name = "ruff" },
 ]
 optional = [
-    { name = "dawdreamer" },
+    { name = "dawdreamer", marker = "python_full_version < '3.13'" },
     { name = "pedalboard" },
 ]
 
@@ -66,7 +66,7 @@ dev = [
 requires-dist = [
     { name = "ambition-music-renderer", extras = ["dev"], marker = "extra == 'all'" },
     { name = "ambition-music-renderer", extras = ["optional"], marker = "extra == 'all'" },
-    { name = "dawdreamer", marker = "extra == 'optional'" },
+    { name = "dawdreamer", marker = "python_full_version < '3.13' and extra == 'optional'" },
     { name = "kwconf", specifier = ">=0.10.0" },
     { name = "lazy-loader" },
     { name = "librosa" },
