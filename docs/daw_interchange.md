@@ -21,17 +21,25 @@ python -m ambition_music_renderer cue ardour_export <cue> \
 ```
 
 The destination contains `<cue>.ardour`, one semantically named MIDI track per
-compiled instrument, one ACE Reasonable Synth on each MIDI track for immediate
-audible editing, clean stereo routing to Master, section markers, and an
+compiled instrument, clean stereo routing to Master, section markers, and an
 `ambition/` directory containing the ordinary DAW-neutral MIDI + provenance
 sidecar. The Master bus intentionally contains no instrument plugin. The session
 does not pin a machine-specific audio device, so select/retain the desired Ardour
 audio backend normally.
 
-The current session serializer supports constant tempo and meter. It records the
-canonical resolved SFZ/SoundFont plan in `.ambition-ardour-export.json`, but the
-first implementation deliberately uses ACE Reasonable Synth as the live audition
-instrument rather than pretending to recreate renderer timbre or mastering.
+The adapter consumes the canonical `InstrumentResolutionPlan`. Resolved SFZ
+instruments use the sfizz LV2 plugin; resolved SoundFonts and ordinary GM tracks
+use ACE Fluid Synth. Path-valued plugin state is stored in Ardour's normal
+`plugins/<processor-id>/state1/state.ttl` layout and points at the machine-local
+resolved SFZ/SF2. A bypassed ACE Reasonable Synth is placed behind a resolved
+real instrument as a neutral composition-audition fallback. To inspect the MIDI
+without the production timbre, bypass the real instrument and activate Reasonable
+Synth; the MIDI region itself is unchanged. `--audition-only` creates that
+neutral listening mode directly.
+
+The current session serializer supports constant tempo and meter. Renderer
+processing/mastering is still outside the Ardour adapter, and generated sessions
+reference local sample libraries rather than packaging their assets.
 
 Do not regenerate into an Ardour session after hand-editing it. The command
 refuses to overwrite a non-empty destination by default. `--force` is restricted
@@ -146,18 +154,18 @@ before writing.
 
 ### Stage 4: Ardour session adapter
 
-First forward-editing pass implemented. `cue ardour_export` creates an Ardour 9
-session scaffold around the neutral interchange core with semantic track names,
-per-track MIDI sources/regions/playlists, one audible ACE Reasonable Synth per
-MIDI track, clean Master routing, section markers, and no machine-specific audio
-device binding. It also records canonical `InstrumentResolutionPlan` data without
-reimplementing instrument resolution.
+Forward editing and sampled realization are implemented. `cue ardour_export`
+creates an Ardour 9 session around the neutral interchange core with semantic
+track names, per-track MIDI sources/regions/playlists, sfizz/ACE Fluid Synth
+realization from canonical `InstrumentResolutionPlan` data, a neutral Reasonable
+Synth audition fallback, clean Master routing, section markers, and no
+machine-specific audio-device binding.
 
-The next fidelity step is to instantiate the resolved SFZ/SoundFont backends and
-optionally reference full mix/stems inside Ardour. That work should be driven by
-actual editing use before more round-trip machinery is added. REAPER should
-consume the same interchange/reconciliation objects and receive a thinner adapter
-after the Ardour workflow has been exercised.
+The next forward-workflow fidelity step is driven by editing use: decide which
+renderer processing, reference full mix/stems, grouping, and instrument-swap
+ergonomics are worth reproducing in Ardour. Do that before adding more round-trip
+machinery. REAPER should consume the same interchange/reconciliation objects and
+receive a thinner adapter after the Ardour workflow has been exercised.
 
 ### Stage 5: source-preserving patch quality
 

@@ -8,7 +8,11 @@ import mido
 import pytest
 
 from ambition_music_renderer.ardour_export import (
+    ACE_FLUID_SYNTH_FILE_PROPERTY,
+    ACE_FLUID_SYNTH_URI,
     ACE_REASONABLE_SYNTH_URI,
+    SFIZZ_FILE_PROPERTY,
+    SFIZZ_URI,
     ArdourExportError,
     export_ardour_session,
 )
@@ -104,7 +108,11 @@ def _tempo_change_v2_score():
 
 def test_ardour_export_builds_semantic_audible_editing_session(tmp_path: Path):
     compiled = compile_score(_constant_v1_score())
-    result = export_ardour_session(compiled, tmp_path / "session")
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+    )
 
     assert result.session_file.exists()
     assert result.neutral_midi.exists()
@@ -165,10 +173,66 @@ def test_ardour_export_builds_semantic_audible_editing_session(tmp_path: Path):
     assert names == ["lead", "kit"]
 
     manifest = json.loads(result.export_manifest.read_text())
-    assert manifest["schema"] == "ambition.ardour_export.v1"
+    assert manifest["schema"] == "ambition.ardour_export.v2"
     assert manifest["generated_session"] is True
     assert manifest["audition"]["plugin"] == "ACE Reasonable Synth"
     assert [row["instrument"] for row in manifest["tracks"]] == ["lead", "kit"]
+
+
+def test_ardour_export_realizes_sfz_and_gm_with_neutral_backup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    sfz = tmp_path / "library" / "lead.sfz"
+    sfz.parent.mkdir(parents=True)
+    sfz.write_text("<region> sample=lead.wav key=60\n", encoding="utf8")
+    soundfont = tmp_path / "GeneralUser-GS.sf2"
+    soundfont.write_bytes(b"fixture")
+    monkeypatch.setenv("AMBITION_MUSIC_DEFAULT_SOUNDFONT", str(soundfont))
+
+    spec = _constant_v1_score()
+    spec["instruments"][0]["instrument_backend"] = {
+        "kind": "sfz",
+        "sfz": str(sfz),
+    }
+    compiled = compile_score(spec)
+    result = export_ardour_session(compiled, tmp_path / "session")
+
+    root = ET.parse(result.session_file).getroot()
+    routes_node = root.find("Routes")
+    assert routes_node is not None
+    routes = {route.get("name"): route for route in routes_node}
+
+    lead_plugins = [proc for proc in routes["lead"].findall("Processor") if proc.get("type") == "lv2"]
+    assert [(proc.get("name"), proc.get("unique-id"), proc.get("active")) for proc in lead_plugins] == [
+        ("sfizz", SFIZZ_URI, "1"),
+        ("ACE Reasonable Synth", ACE_REASONABLE_SYNTH_URI, "0"),
+    ]
+    lead_lv2 = lead_plugins[0].find("lv2")
+    assert lead_lv2 is not None
+    assert lead_lv2.get("state-dir") == "state1"
+
+    kit_plugins = [proc for proc in routes["kit"].findall("Processor") if proc.get("type") == "lv2"]
+    assert [(proc.get("name"), proc.get("unique-id"), proc.get("active")) for proc in kit_plugins] == [
+        ("ACE Fluid Synth", ACE_FLUID_SYNTH_URI, "1"),
+        ("ACE Reasonable Synth", ACE_REASONABLE_SYNTH_URI, "0"),
+    ]
+
+    manifest = json.loads(result.export_manifest.read_text())
+    tracks = {row["instrument"]: row for row in manifest["tracks"]}
+    assert tracks["lead"]["ardour_realization"]["kind"] == "sfizz"
+    assert tracks["lead"]["ardour_realization"]["asset"] == str(sfz.resolve())
+    assert tracks["kit"]["ardour_realization"]["kind"] == "ace_fluidsynth_gm"
+    assert tracks["kit"]["ardour_realization"]["asset"] == str(soundfont.resolve())
+
+    lead_state = result.session_dir / "plugins" / tracks["lead"]["instrument_plugin_id"] / "state1" / "state.ttl"
+    kit_state = result.session_dir / "plugins" / tracks["kit"]["instrument_plugin_id"] / "state1" / "state.ttl"
+    assert lead_state.is_file()
+    assert kit_state.is_file()
+    lead_text = lead_state.read_text(encoding="utf8")
+    kit_text = kit_state.read_text(encoding="utf8")
+    assert f"<{SFIZZ_FILE_PROPERTY}> <{sfz.resolve().as_uri()}>" in lead_text
+    assert f"<{ACE_FLUID_SYNTH_FILE_PROPERTY}> <{soundfont.resolve().as_uri()}>" in kit_text
 
 
 def test_ardour_export_does_not_clobber_unmarked_directory(tmp_path: Path):
@@ -194,6 +258,19 @@ def test_ardour_export_force_replaces_only_generated_session(tmp_path: Path):
     export_ardour_session(compiled, destination, force=True)
     assert not stale.exists()
     assert (destination / ".ambition-ardour-export.json").exists()
+
+
+def test_ardour_export_force_accepts_previous_generated_marker_schema(tmp_path: Path):
+    compiled = compile_score(_constant_v1_score())
+    destination = tmp_path / "generated"
+    result = export_ardour_session(compiled, destination)
+    marker = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    marker["schema"] = "ambition.ardour_export.v1"
+    result.export_manifest.write_text(json.dumps(marker), encoding="utf8")
+
+    export_ardour_session(compiled, destination, force=True)
+    refreshed = json.loads((destination / ".ambition-ardour-export.json").read_text(encoding="utf8"))
+    assert refreshed["schema"] == "ambition.ardour_export.v2"
 
 
 def test_ardour_export_rejects_tempo_map_until_session_serializer_supports_it(tmp_path: Path):

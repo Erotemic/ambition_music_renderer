@@ -92,7 +92,8 @@ cd ~/code/ardour/gtk2_ardour
 Expected session shape:
 
 - one MIDI track per `CompiledScore` instrument, using its semantic name;
-- exactly one ACE Reasonable Synth on each MIDI track for immediate audible edits;
+- resolved SFZ tracks use sfizz and resolved SoundFont/GM tracks use ACE Fluid Synth;
+- an inactive ACE Reasonable Synth follows each resolved real instrument as a neutral MIDI-audit fallback;
 - stereo audio from each MIDI track into Master;
 - **no instrument plugin on Master**;
 - section markers from compiled form;
@@ -100,10 +101,15 @@ Expected session shape:
 - neutral MIDI + `.musicir-interchange.json` under `ambition/`; and
 - `.ambition-ardour-export.json` containing resolved renderer instrument plans.
 
-The current adapter supports fixed tempo/meter sessions. It does not yet recreate
-SFZ/SoundFont plugin state or renderer processing/mastering inside Ardour; ACE
-Reasonable Synth is an audition instrument so MIDI edits can be heard immediately.
-Do not overwrite a session after making DAW edits.
+The current adapter supports fixed tempo/meter sessions. It writes SFZ/SoundFont
+plugin state into Ardour's `plugins/<processor-id>/state1/state.ttl` directories,
+using the canonical resolved local asset paths. It does not yet recreate renderer
+processing/mastering. Do not overwrite a session after making DAW edits.
+
+For note-composition review, either export with `--audition-only`, or bypass the
+real sfizz/ACE Fluid Synth processor on one track and activate the Reasonable Synth
+behind it. The MIDI stays fixed while the listening timbre changes, which makes
+instrument swapping and neutral pitch/rhythm review cheap inside Ardour.
 
 If playback is silent, first verify that MIDI-track meters and Master move. The
 audio backend can be ALSA or PulseAudio; on the maintainer setup PulseAudio maps

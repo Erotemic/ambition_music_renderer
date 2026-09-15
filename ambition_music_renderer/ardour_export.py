@@ -5,17 +5,19 @@ interchange.  MusicIR remains authoritative; the Ardour session is a working
 editing surface.  The neutral multitrack MIDI + provenance sidecar are emitted
 alongside the session so reverse reconciliation does not depend on Ardour XML.
 
-The first Ardour adapter deliberately uses one known-bundled audition
-instrument (ACE Reasonable Synth) on every MIDI track.  Renderer-specific
-SFZ/SoundFont realization is recorded in the export manifest but is not yet
-serialized as Ardour plugin state.  That keeps the first editing milestone
-reliable while preserving the information needed for the next fidelity pass.
+The adapter instantiates the sampled realization selected by the canonical
+``InstrumentResolutionPlan`` when Ardour has a native LV2 counterpart:
+``sfizz`` for SFZ and ACE Fluid Synth for SoundFonts/GM.  A bypassed
+ACE Reasonable Synth can sit behind the real instrument as a deliberately
+neutral composition-audition fallback.  MusicIR still owns the notes and
+instrument identities; Ardour owns only this generated editing surface.
 """
 
 from __future__ import annotations
 
 import json
 import math
+import os
 import shutil
 import time
 import uuid
@@ -26,17 +28,29 @@ from typing import Any, Mapping
 
 import mido
 
+from . import instrument_libraries
 from .instrument_resolution import instrument_backend_spec, resolve_instrument_backend
 from .musicir.interchange import export_interchange_bundle
 from .musicir.model import CompiledScore
+from .render.score_core import choose_soundfont
 
 
 ARDOUR_SESSION_VERSION = "7003"
 ARDOUR_SUPERCLOCKS_PER_SECOND = 282_240_000
 ARDOUR_BEAT_TICKS = 1920
 ACE_REASONABLE_SYNTH_URI = "https://community.ardour.org/node/7596"
-EXPORT_SCHEMA = "ambition.ardour_export.v1"
+ACE_FLUID_SYNTH_URI = "urn:ardour:a-fluidsynth"
+ACE_FLUID_SYNTH_FILE_PROPERTY = "urn:ardour:a-fluidsynth:sf2file"
+SFIZZ_URI = "http://sfztools.github.io/sfizz"
+SFIZZ_FILE_PROPERTY = "http://sfztools.github.io/sfizz:sfzfile"
+EXPORT_SCHEMA = "ambition.ardour_export.v2"
 EXPORT_MARKER = ".ambition-ardour-export.json"
+SUPPORTED_EXPORT_MARKER_SCHEMAS = frozenset(
+    {
+        "ambition.ardour_export.v1",
+        EXPORT_SCHEMA,
+    }
+)
 
 
 class ArdourExportError(RuntimeError):
@@ -58,6 +72,61 @@ class ArdourExportResult:
             "neutral_midi": str(self.neutral_midi),
             "interchange_manifest": str(self.interchange_manifest),
             "export_manifest": str(self.export_manifest),
+        }
+
+
+@dataclass(frozen=True)
+class _Lv2AssetState:
+    """One LV2 path-valued state property that must be serialized on disk."""
+
+    processor_id: str
+    plugin_name: str
+    plugin_uri: str
+    property_uri: str
+    asset_path: Path
+
+
+@dataclass(frozen=True)
+class _TrackRealization:
+    """Ardour-specific realization of one canonical compiled instrument."""
+
+    instrument: str
+    group: str
+    program: int
+    is_drum: bool
+    authored_backend: Mapping[str, Any]
+    resolution: Mapping[str, Any]
+    resolution_error: str | None
+    kind: str
+    plugin_name: str | None
+    plugin_uri: str | None
+    asset_path: Path | None
+    property_uri: str | None
+    source: str | None
+    fallback_reason: str | None
+
+    @property
+    def has_real_instrument(self) -> bool:
+        return self.plugin_uri is not None and self.kind != "reasonable_synth"
+
+    def to_manifest(self) -> dict[str, Any]:
+        return {
+            "instrument": self.instrument,
+            "group": self.group,
+            "program": self.program,
+            "is_drum": self.is_drum,
+            "authored_backend": dict(self.authored_backend),
+            "resolution": dict(self.resolution),
+            "resolution_error": self.resolution_error,
+            "ardour_realization": {
+                "kind": self.kind,
+                "plugin": self.plugin_name,
+                "plugin_uri": self.plugin_uri,
+                "asset": str(self.asset_path) if self.asset_path is not None else None,
+                "asset_property": self.property_uri,
+                "source": self.source,
+                "fallback_reason": self.fallback_reason,
+            },
         }
 
 
@@ -294,24 +363,51 @@ def _add_amp_processor(route: ET.Element, ids: _IdAllocator, *, kind: str, contr
     ET.SubElement(proc, "Controllable", {"name": control_name, "id": ids.take(), "flags": "GainLike", "value": "1"})
 
 
-def _add_reasonable_synth(route: ET.Element, ids: _IdAllocator) -> str:
+def _add_lv2_instrument(
+    route: ET.Element,
+    ids: _IdAllocator,
+    *,
+    name: str,
+    plugin_uri: str,
+    active: bool,
+    pass_audio: bool = False,
+    asset_path: Path | None = None,
+    asset_property: str | None = None,
+) -> tuple[str, _Lv2AssetState | None]:
+    """Add a MIDI-in/stereo-out LV2 instrument processor.
+
+    Ardour stores path-valued LV2 state outside the session XML under
+    ``plugins/<processor-id>/state1/state.ttl``.  ``asset_path`` is therefore
+    returned as a state-writing request instead of being copied into the XML.
+
+    ``pass_audio`` is used for the bypassed neutral audition synth that sits
+    behind a real instrument.  Ardour then has enough configured channels to
+    pass the real instrument's stereo audio while the audition synth is
+    inactive, and enough MIDI to make the audition synth audible when the real
+    instrument is bypassed.
+    """
+
+    if (asset_path is None) != (asset_property is None):
+        raise ValueError("asset_path and asset_property must be provided together")
     plugin_id = ids.take()
     proc = ET.SubElement(
         route,
         "Processor",
         {
             "id": plugin_id,
-            "name": "ACE Reasonable Synth",
-            "active": "1",
+            "name": name,
+            "active": "1" if active else "0",
             "user-latency": "0",
             "use-user-latency": "0",
             "type": "lv2",
-            "unique-id": ACE_REASONABLE_SYNTH_URI,
+            "unique-id": plugin_uri,
             "count": "1",
             "custom": "0",
         },
     )
     configured_in = ET.SubElement(proc, "ConfiguredInput")
+    if pass_audio:
+        ET.SubElement(configured_in, "Channels", {"type": "audio", "count": "2"})
     ET.SubElement(configured_in, "Channels", {"type": "midi", "count": "1"})
     sinks = ET.SubElement(proc, "CustomSinks")
     ET.SubElement(sinks, "Channels", {"type": "midi", "count": "1"})
@@ -325,8 +421,65 @@ def _add_reasonable_synth(route: ET.Element, ids: _IdAllocator) -> str:
     ET.SubElement(output_map, "Channelmap", {"type": "audio", "from": "0", "to": "0"})
     ET.SubElement(output_map, "Channelmap", {"type": "audio", "from": "1", "to": "1"})
     ET.SubElement(proc, "ThruMap")
-    ET.SubElement(proc, "lv2", {"last-preset-uri": "", "last-preset-label": "", "parameter-changed-since-last-preset": "0"})
+    lv2_attrs = {
+        "last-preset-uri": "",
+        "last-preset-label": "",
+        "parameter-changed-since-last-preset": "1" if asset_path is not None else "0",
+    }
+    if asset_path is not None:
+        lv2_attrs["state-dir"] = "state1"
+    ET.SubElement(proc, "lv2", lv2_attrs)
+    state = None
+    if asset_path is not None and asset_property is not None:
+        state = _Lv2AssetState(
+            processor_id=plugin_id,
+            plugin_name=name,
+            plugin_uri=plugin_uri,
+            property_uri=asset_property,
+            asset_path=asset_path,
+        )
+    return plugin_id, state
+
+
+def _add_reasonable_synth(
+    route: ET.Element,
+    ids: _IdAllocator,
+    *,
+    active: bool = True,
+    pass_audio: bool = False,
+) -> str:
+    plugin_id, _state = _add_lv2_instrument(
+        route,
+        ids,
+        name="ACE Reasonable Synth",
+        plugin_uri=ACE_REASONABLE_SYNTH_URI,
+        active=active,
+        pass_audio=pass_audio,
+    )
     return plugin_id
+
+
+def _add_real_instrument(
+    route: ET.Element,
+    ids: _IdAllocator,
+    realization: _TrackRealization,
+) -> tuple[str | None, _Lv2AssetState | None]:
+    if not realization.has_real_instrument:
+        return None, None
+    assert realization.plugin_name is not None
+    assert realization.plugin_uri is not None
+    assert realization.asset_path is not None
+    assert realization.property_uri is not None
+    return _add_lv2_instrument(
+        route,
+        ids,
+        name=realization.plugin_name,
+        plugin_uri=realization.plugin_uri,
+        active=True,
+        pass_audio=False,
+        asset_path=realization.asset_path,
+        asset_property=realization.property_uri,
+    )
 
 
 def _add_trigger_box(route: ET.Element, ids: _IdAllocator, *, order: int) -> None:
@@ -429,7 +582,15 @@ def _build_master(ids: _IdAllocator, track_names: list[str]) -> tuple[ET.Element
     return route, route_id
 
 
-def _build_midi_route(ids: _IdAllocator, *, name: str, playlist_id: str, order: int, add_synth: bool) -> tuple[ET.Element, str, str | None]:
+def _build_midi_route(
+    ids: _IdAllocator,
+    *,
+    name: str,
+    playlist_id: str,
+    order: int,
+    realization: _TrackRealization,
+    add_audition_synth: bool,
+) -> tuple[ET.Element, str, dict[str, Any], list[_Lv2AssetState]]:
     route_id = ids.take()
     route = ET.Element(
         "Route",
@@ -483,7 +644,24 @@ def _build_midi_route(ids: _IdAllocator, *, name: str, playlist_id: str, order: 
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"player:{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "diskreader"})
     _add_trigger_box(route, ids, order=order - 1)
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": "Polarity", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "polarity"})
-    plugin_id = _add_reasonable_synth(route, ids) if add_synth else None
+    lv2_states: list[_Lv2AssetState] = []
+    real_plugin_id, real_state = _add_real_instrument(route, ids, realization)
+    if real_state is not None:
+        lv2_states.append(real_state)
+
+    # A real instrument is the normal listening path.  The optional Reasonable
+    # Synth behind it is deliberately inactive and serves as a neutral MIDI
+    # composition debugger.  When no real realization is available, the same
+    # synth becomes the active fallback so the generated session remains useful.
+    audition_plugin_id: str | None = None
+    audition_active = not realization.has_real_instrument
+    if add_audition_synth or not realization.has_real_instrument:
+        audition_plugin_id = _add_reasonable_synth(
+            route,
+            ids,
+            active=audition_active,
+            pass_audio=realization.has_real_instrument,
+        )
     _add_amp_processor(route, ids, kind="amp", control_name="gaincontrol", automation_id="gain", interpolation="Exponential")
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"meter-{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "meter"})
     main = ET.SubElement(route, "Processor", {"id": ids.take(), "name": name, "active": "1", "user-latency": "0", "use-user-latency": "0", "own-input": "1", "own-output": "0", "output": name, "type": "main-outs", "role": "Main"})
@@ -492,7 +670,12 @@ def _build_midi_route(ids: _IdAllocator, *, name: str, playlist_id: str, order: 
     ET.SubElement(route, "Controllable", {"name": "monitor", "id": ids.take(), "flags": "RealTime", "value": "0", "monitoring": ""})
     ET.SubElement(route, "Controllable", {"name": "rec-safe", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
     ET.SubElement(route, "Controllable", {"name": "rec-enable", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
-    return route, route_id, plugin_id
+    plugin_state = {
+        "instrument_plugin_id": real_plugin_id,
+        "audition_plugin_id": audition_plugin_id,
+        "audition_plugin_active": bool(audition_plugin_id and audition_active),
+    }
+    return route, route_id, plugin_state, lv2_states
 
 
 def _region_element(*, ids: _IdAllocator, name: str, source_id: str, length: str, whole_file: bool) -> ET.Element:
@@ -540,13 +723,14 @@ def _build_session_xml(
     session_name: str,
     sample_rate: int,
     track_midis: list[dict[str, Any]],
+    realizations: list[_TrackRealization],
     bpm: float,
     numerator: int,
     denominator: int,
     end_beats: float,
     end_seconds: float,
-    add_synth: bool,
-) -> tuple[ET.ElementTree, list[dict[str, Any]]]:
+    add_audition_synth: bool,
+) -> tuple[ET.ElementTree, list[dict[str, Any]], list[_Lv2AssetState]]:
     ids = _IdAllocator()
     root = ET.Element(
         "Session",
@@ -619,18 +803,48 @@ def _build_session_xml(
 
     region_length = f"b{int(math.ceil(end_beats * ARDOUR_BEAT_TICKS))}@b0"
     track_manifest: list[dict[str, Any]] = []
+    lv2_states: list[_Lv2AssetState] = []
     pgroup_id = time.strftime("%Y-%m-%d %H.%M.%S")
-    for order, (inst, midi_row) in enumerate(zip(compiled.pm.instruments, track_midis), start=1):
+    if len(realizations) != len(track_midis):
+        raise ArdourExportError(
+            "instrument realization count does not match exported MIDI tracks: "
+            f"{len(realizations)} realizations vs {len(track_midis)} tracks"
+        )
+    for order, (inst, midi_row, realization) in enumerate(
+        zip(compiled.pm.instruments, track_midis, realizations),
+        start=1,
+    ):
         name = str(inst.name)
+        if realization.instrument != name:
+            raise ArdourExportError(
+                f"instrument realization order mismatch: {realization.instrument!r} vs {name!r}"
+            )
         source_id = ids.take()
         playlist_id = ids.take()
         ET.SubElement(sources, "Source", {"name": midi_row["filename"], "take-id": "", "type": "midi", "flags": "Writable", "id": source_id, "origin": midi_row["filename"]})
         regions.append(_region_element(ids=ids, name=name, source_id=source_id, length=region_length, whole_file=True))
-        route, route_id, plugin_id = _build_midi_route(ids, name=name, playlist_id=playlist_id, order=order, add_synth=add_synth)
+        route, route_id, plugin_state, route_lv2_states = _build_midi_route(
+            ids,
+            name=name,
+            playlist_id=playlist_id,
+            order=order,
+            realization=realization,
+            add_audition_synth=add_audition_synth,
+        )
+        lv2_states.extend(route_lv2_states)
         routes.append(route)
         playlist = ET.SubElement(playlists, "Playlist", {"id": playlist_id, "name": name, "type": "midi", "orig-track-id": route_id, "pgroup-id": pgroup_id, "shared-with-ids": "", "frozen": "0", "combine-ops": "0"})
         playlist.append(_region_element(ids=ids, name=name, source_id=source_id, length=region_length, whole_file=False))
-        track_manifest.append({"name": name, "route_id": route_id, "playlist_id": playlist_id, "source_id": source_id, "midi_source": midi_row["filename"], "audition_plugin_id": plugin_id})
+        track_manifest.append(
+            {
+                "name": name,
+                "route_id": route_id,
+                "playlist_id": playlist_id,
+                "source_id": source_id,
+                "midi_source": midi_row["filename"],
+                **plugin_state,
+            }
+        )
 
     tempo_map = ET.SubElement(root, "TempoMap", {"superclocks-per-second": str(ARDOUR_SUPERCLOCKS_PER_SECOND)})
     tempos = ET.SubElement(tempo_map, "Tempos")
@@ -649,38 +863,187 @@ def _build_session_xml(
     script.text = "c2NyaXB0cyA9IHt9IA=="
     ET.SubElement(root, "IOPlugins")
     root.set("id-counter", str(ids.next_value + 1))
-    return ET.ElementTree(root), track_manifest
+    return ET.ElementTree(root), track_manifest, lv2_states
 
 
-def _instrument_realization_manifest(
+def _resolve_gm_soundfont(
     compiled: CompiledScore,
     *,
     base_dir: Path | None,
-) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
+) -> tuple[Path | None, str | None, str | None]:
+    """Resolve the SoundFont used for plain GM instruments in Ardour.
+
+    Score-authored ``render.soundfont`` remains authoritative.  Otherwise we
+    reuse the renderer's normal system SoundFont preference, while also
+    honoring the audio-tools environment used by this repository.  The latter
+    is adapter configuration rather than MusicIR semantics and is recorded in
+    the export manifest.
+    """
+
+    render_cfg = dict(compiled.normalized_spec.get("render") or {})
+    explicit = render_cfg.get("soundfont")
+    if explicit:
+        candidate = Path(str(explicit)).expanduser()
+        if not candidate.is_absolute() and base_dir is not None:
+            candidate = base_dir / candidate
+        candidate = candidate.resolve()
+        if candidate.is_file():
+            return candidate, "render.soundfont", None
+        return None, None, f"authored render.soundfont does not exist: {candidate}"
+
+    env_default = os.environ.get("AMBITION_MUSIC_DEFAULT_SOUNDFONT")
+    if env_default:
+        candidate = Path(env_default).expanduser().resolve()
+        if candidate.is_file():
+            return candidate, "AMBITION_MUSIC_DEFAULT_SOUNDFONT", None
+
+    renderer_default = choose_soundfont(None)
+    if renderer_default:
+        return Path(renderer_default).expanduser().resolve(), "renderer default", None
+
+    # The standard Ambition asset install includes GeneralUser-GS.sf2.  Check
+    # only exact shallow candidates here: recursive discovery can traverse the
+    # entire multi-gigabyte audio-tools tree when its root is configured.
+    for root in instrument_libraries.configured_soundfont_roots():
+        for candidate in (
+            root / "GeneralUser-GS.sf2",
+            root / "soundfonts" / "GeneralUser-GS.sf2",
+        ):
+            if candidate.is_file():
+                return candidate.resolve(), "audio-tools GeneralUser-GS", None
+    return None, None, "no GM SoundFont was found"
+
+
+def _resolve_track_realizations(
+    compiled: CompiledScore,
+    *,
+    base_dir: Path | None,
+    realize_instruments: bool,
+) -> list[_TrackRealization]:
+    rows: list[_TrackRealization] = []
+    render_cfg = dict(compiled.normalized_spec.get("render") or {})
+    sfizz_cfg = dict(render_cfg.get("sfizz") or {})
+    default_fallback = sfizz_cfg.get("fallback_backend", render_cfg.get("sfizz_fallback_backend"))
+    gm_soundfont, gm_source, gm_error = _resolve_gm_soundfont(compiled, base_dir=base_dir)
     for inst in compiled.pm.instruments:
         name = str(inst.name)
         backend = instrument_backend_spec(compiled.instrument_specs, name)
         try:
-            plan = resolve_instrument_backend(backend, base_dir=base_dir)
+            plan = resolve_instrument_backend(
+                backend,
+                base_dir=base_dir,
+                sfizz_cfg=sfizz_cfg,
+                default_fallback_backend=(str(default_fallback) if default_fallback is not None else None),
+            )
             resolved: Mapping[str, Any] = plan.to_dict()
             resolution_error = None
         except Exception as ex:  # Export remains useful as an audition session.
+            plan = None
             resolved = {"backend": dict(backend)}
             resolution_error = str(ex)
+
+        kind = "audition_only"
+        plugin_name: str | None = None
+        plugin_uri: str | None = None
+        asset_path: Path | None = None
+        property_uri: str | None = None
+        source: str | None = None
+        fallback_reason: str | None = None
+
+        if realize_instruments and plan is not None and plan.resolved_sfz is not None:
+            kind = "sfizz"
+            plugin_name = "sfizz"
+            plugin_uri = SFIZZ_URI
+            asset_path = plan.resolved_sfz.resolve()
+            property_uri = SFIZZ_FILE_PROPERTY
+            source = "InstrumentResolutionPlan.resolved_sfz"
+        elif realize_instruments and plan is not None and plan.resolved_soundfont is not None:
+            kind = "ace_fluidsynth"
+            plugin_name = "ACE Fluid Synth"
+            plugin_uri = ACE_FLUID_SYNTH_URI
+            asset_path = plan.resolved_soundfont.resolve()
+            property_uri = ACE_FLUID_SYNTH_FILE_PROPERTY
+            source = "InstrumentResolutionPlan.resolved_soundfont"
+        elif realize_instruments and plan is not None and not (
+            plan.wants_sfz or plan.wants_soundfont or plan.wants_procedural_fm
+        ):
+            # A plain MusicIR/PrettyMIDI program is a GM instrument.  The MIDI
+            # already contains its program change; ACE Fluid Synth only needs
+            # the common GM SoundFont loaded.
+            if gm_soundfont is not None:
+                kind = "ace_fluidsynth_gm"
+                plugin_name = "ACE Fluid Synth"
+                plugin_uri = ACE_FLUID_SYNTH_URI
+                asset_path = gm_soundfont
+                property_uri = ACE_FLUID_SYNTH_FILE_PROPERTY
+                source = gm_source
+            else:
+                kind = "reasonable_synth"
+                fallback_reason = gm_error
+        elif realize_instruments:
+            kind = "reasonable_synth"
+            if resolution_error:
+                fallback_reason = resolution_error
+            elif plan is not None and plan.wants_sfz:
+                fallback_reason = f"SFZ backend did not resolve: {plan.requested or name}"
+            elif plan is not None and plan.wants_soundfont:
+                fallback_reason = f"SoundFont backend did not resolve: {plan.requested or name}"
+            elif plan is not None and plan.wants_procedural_fm:
+                fallback_reason = "procedural_fm has no Ardour LV2 realization yet"
+            else:
+                fallback_reason = "no supported Ardour realization was resolved"
+        else:
+            fallback_reason = "--audition-only requested"
+
         rows.append(
-            {
-                "instrument": name,
-                "group": compiled.groups.get(name, name),
-                "program": int(inst.program),
-                "is_drum": bool(inst.is_drum),
-                "audition_plugin": "ACE Reasonable Synth",
-                "authored_backend": dict(backend),
-                "resolution": dict(resolved),
-                "resolution_error": resolution_error,
-            }
+            _TrackRealization(
+                instrument=name,
+                group=str(compiled.groups.get(name, name)),
+                program=int(inst.program),
+                is_drum=bool(inst.is_drum),
+                authored_backend=dict(backend),
+                resolution=dict(resolved),
+                resolution_error=resolution_error,
+                kind=kind,
+                plugin_name=plugin_name,
+                plugin_uri=plugin_uri,
+                asset_path=asset_path,
+                property_uri=property_uri,
+                source=source,
+                fallback_reason=fallback_reason,
+            )
         )
     return rows
+
+
+def _lv2_asset_state_ttl(state: _Lv2AssetState) -> str:
+    asset_uri = state.asset_path.expanduser().resolve().as_uri()
+    return "\n".join(
+        [
+            "@prefix atom: <http://lv2plug.in/ns/ext/atom#> .",
+            "@prefix lv2: <http://lv2plug.in/ns/lv2core#> .",
+            "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .",
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .",
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
+            "@prefix state: <http://lv2plug.in/ns/ext/state#> .",
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .",
+            "",
+            "<>",
+            "    a pset:Preset ;",
+            f"    lv2:appliesTo <{state.plugin_uri}> ;",
+            "    state:state [",
+            f"        <{state.property_uri}> <{asset_uri}>",
+            "    ] .",
+            "",
+        ]
+    )
+
+
+def _write_lv2_asset_states(destination: Path, states: list[_Lv2AssetState]) -> None:
+    for state in states:
+        state_dir = destination / "plugins" / state.processor_id / "state1"
+        state_dir.mkdir(parents=True, exist_ok=True)
+        (state_dir / "state.ttl").write_text(_lv2_asset_state_ttl(state), encoding="utf8")
 
 
 def _prepare_destination(destination: Path, *, force: bool) -> None:
@@ -703,7 +1066,7 @@ def _prepare_destination(destination: Path, *, force: bool) -> None:
         data = json.loads(marker.read_text(encoding="utf8"))
     except Exception as ex:
         raise ArdourExportError(f"cannot validate generated-session marker {marker}: {ex}") from ex
-    if data.get("schema") != EXPORT_SCHEMA or not data.get("generated_session"):
+    if data.get("schema") not in SUPPORTED_EXPORT_MARKER_SCHEMAS or not data.get("generated_session"):
         raise ArdourExportError(f"refusing --force because {marker} is not a valid Ambition export marker")
     shutil.rmtree(destination)
     destination.mkdir(parents=True, exist_ok=False)
@@ -717,6 +1080,7 @@ def export_ardour_session(
     sample_rate: int | None = None,
     base_dir: Path | None = None,
     source_score: Path | None = None,
+    realize_instruments: bool = True,
     add_audition_synth: bool = True,
     force: bool = False,
 ) -> ArdourExportResult:
@@ -753,23 +1117,29 @@ def export_ardour_session(
     (destination / "peaks").mkdir(parents=True, exist_ok=True)
     (destination / "plugins").mkdir(parents=True, exist_ok=True)
 
-    tree, track_state = _build_session_xml(
+    realizations = _resolve_track_realizations(
+        compiled,
+        base_dir=base_dir,
+        realize_instruments=realize_instruments,
+    )
+    tree, track_state, lv2_states = _build_session_xml(
         compiled,
         session_name=session_name,
         sample_rate=sample_rate,
         track_midis=track_midis,
+        realizations=realizations,
         bpm=bpm,
         numerator=numerator,
         denominator=denominator,
         end_beats=end_beats,
         end_seconds=end_seconds,
-        add_synth=add_audition_synth,
+        add_audition_synth=add_audition_synth,
     )
     ET.indent(tree, space="  ")
     session_file = destination / f"{session_name}.ardour"
     tree.write(session_file, encoding="UTF-8", xml_declaration=True)
+    _write_lv2_asset_states(destination, lv2_states)
 
-    realization = _instrument_realization_manifest(compiled, base_dir=base_dir)
     export_manifest = destination / EXPORT_MARKER
     manifest_data = {
         "schema": EXPORT_SCHEMA,
@@ -785,18 +1155,31 @@ def export_ardour_session(
             "midi": str(neutral["midi"].relative_to(destination)),
             "manifest": str(neutral["manifest"].relative_to(destination)),
         },
+        "instrument_realization": {
+            "enabled": bool(realize_instruments),
+            "sfz_plugin": "sfizz",
+            "sfz_plugin_uri": SFIZZ_URI,
+            "soundfont_plugin": "ACE Fluid Synth",
+            "soundfont_plugin_uri": ACE_FLUID_SYNTH_URI,
+            "local_asset_paths": True,
+        },
         "audition": {
-            "plugin": "ACE Reasonable Synth" if add_audition_synth else None,
-            "plugin_uri": ACE_REASONABLE_SYNTH_URI if add_audition_synth else None,
-            "purpose": "immediate MIDI edit/audition; not renderer-timbre equivalence",
+            "plugin": "ACE Reasonable Synth",
+            "plugin_uri": ACE_REASONABLE_SYNTH_URI,
+            "backup_enabled": bool(add_audition_synth),
+            "purpose": (
+                "neutral MIDI composition audit; inactive behind resolved real instruments, "
+                "active only when no real instrument realization is available"
+            ),
         },
         "tracks": [
-            {**state, **real}
-            for state, real in zip(track_state, realization)
+            {**state, **realization.to_manifest()}
+            for state, realization in zip(track_state, realizations)
         ],
         "limitations": [
             "Ardour session tempo/meter scaffolding currently requires constant tempo and meter.",
-            "Sampled SFZ/SoundFont renderer backends are resolved and recorded here but not yet instantiated as Ardour plugins.",
+            "The generated Ardour session references machine-local SFZ/SoundFont paths and is not a portable sample bundle.",
+            "Procedural-FM and unsupported backend realizations fall back to the neutral audition synth.",
             "Renderer processing/mastering is not serialized into Ardour; use renderer audio as reference when timbral fidelity matters.",
         ],
     }
@@ -809,15 +1192,26 @@ def export_ardour_session(
                 "",
                 f"Open: {session_file}",
                 "",
-                "Each MIDI track has exactly one ACE Reasonable Synth for immediate audible editing.",
+                "Resolved SFZ instruments use sfizz. SoundFont/GM instruments use ACE Fluid Synth.",
+                "Their local SFZ/SF2 paths are restored through Ardour LV2 state files under plugins/.",
+                "",
+                "When a real instrument is resolved, ACE Reasonable Synth is inserted behind it inactive.",
+                "For a neutral MIDI composition audit: deactivate/bypass the real instrument and activate",
+                "ACE Reasonable Synth. This changes timbre only; the MIDI region stays the same.",
+                "When a real instrument could not be resolved, Reasonable Synth is active as the fallback.",
+                "",
+                "To swap an SFZ without touching notes, open the sfizz processor and choose another SFZ.",
+                "To swap a GM/SoundFont realization, change the ACE Fluid Synth SoundFont or replace the",
+                "instrument processor. Ardour keeps the MIDI region independent of the instrument plugin.",
+                "",
                 "The Master bus intentionally has no instrument plugin.",
                 "The session does not pin an audio backend or hardware device; Ardour should use your current setup.",
                 "",
                 "The `ambition/` directory contains the DAW-neutral MIDI + MusicIR provenance sidecar.",
                 "Do not use this session XML as the future round-trip authority.",
                 "",
-                "Current fidelity limitation: renderer SFZ/SoundFont backends and processing are listed in",
-                f"{EXPORT_MARKER} but are not yet recreated as Ardour plugins.",
+                "Current fidelity limitation: renderer processing/mastering is not recreated in Ardour.",
+                f"See {EXPORT_MARKER} for the resolved instrument path and fallback status of every track.",
                 "",
             ]
         ),

@@ -337,11 +337,12 @@ line up as follows:
 13. **DAW note/controller round trip** — edited MIDI can be reconciled against
     an exact export baseline; note and clip-owned CC/pitch-bend edits can be
     applied by lowering only affected v3 clips, with recompilation verification.
-14. **Ardour forward editing adapter** — first pass implemented: generated
-    Ardour 9 sessions carry semantic MIDI tracks, an audible per-track audition
-    synth, clean Master routing, section markers, neutral interchange artifacts,
-    and canonical instrument-resolution evidence. Renderer-timbre plugin
-    realization/reference stems remain follow-up work.
+14. **Ardour forward editing adapter** — second pass implemented: generated
+    Ardour 9 sessions carry semantic MIDI tracks, sfizz/ACE Fluid Synth
+    realization from canonical instrument-resolution plans, a neutral per-track
+    audition fallback, clean Master routing, section markers, and neutral
+    interchange artifacts. Reference stems and renderer processing remain
+    forward-workflow follow-up work.
 15+. **Conductor round trip hardening, real Ardour editing feedback,
     generator/instrument improvement, legacy-internal isolation, and module
     decomposition** remain active work. Ardour is the primary DAW target; REAPER

@@ -1382,7 +1382,11 @@ class ArdourExportCommand(kwconf.Config):
     )
     no_audition_synth: bool = kwconf.Flag(
         False,
-        help="do not insert ACE Reasonable Synth on MIDI tracks",
+        help="omit the inactive ACE Reasonable Synth backup on tracks with a resolved real instrument",
+    )
+    audition_only: bool = kwconf.Flag(
+        False,
+        help="use only ACE Reasonable Synth; do not instantiate resolved SFZ/SoundFont instruments",
     )
     force: bool = kwconf.Flag(
         False,
@@ -1417,12 +1421,33 @@ class ArdourExportCommand(kwconf.Config):
                 session_name=config.session_name,
                 base_dir=score.parent,
                 source_score=score.resolve(),
+                realize_instruments=not bool(config.audition_only),
                 add_audition_synth=not config.no_audition_synth,
                 force=bool(config.force),
             )
         except (OSError, ValueError, ArdourExportError) as ex:
             print(str(ex), file=sys.stderr)
             return 1
+        try:
+            manifest_data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+            fallbacks = [
+                row
+                for row in manifest_data.get("tracks", [])
+                if row.get("ardour_realization", {}).get("kind") in {"reasonable_synth", "audition_only"}
+            ]
+            real_count = len(manifest_data.get("tracks", [])) - len(fallbacks)
+            print(
+                f"Ardour instruments: {real_count} resolved real, {len(fallbacks)} neutral fallback",
+                file=sys.stderr,
+            )
+            for row in fallbacks:
+                reason = row.get("ardour_realization", {}).get("fallback_reason") or "no real realization"
+                print(f"  fallback {row.get('instrument')}: {reason}", file=sys.stderr)
+        except (OSError, ValueError, TypeError):
+            # The paths printed below are the command's stable machine-readable
+            # outputs. A diagnostic-summary failure should not invalidate an
+            # otherwise successful session export.
+            pass
         print(result.session_file)
         print(result.export_manifest)
         print(result.neutral_midi)
