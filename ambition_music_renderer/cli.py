@@ -9,6 +9,7 @@ Subcommands:
                             game asset tree.
     cue midi <cue>          Export a marked MIDI preview for score/form review.
     cue daw_export <cue>    Export DAW MIDI plus MusicIR provenance sidecar.
+    cue ardour_export <cue> Export a ready-to-open Ardour editing session.
     cue daw_reconcile <cue> Compare edited DAW MIDI with its saved baseline.
     cue daw_apply <cue>     Apply supported DAW note edits back into MusicIR v3.
     cue validate <cue>      Compile/validate MusicIR without synthesizing audio.
@@ -1366,6 +1367,68 @@ class DawExportCommand(kwconf.Config):
         return 0
 
 
+class ArdourExportCommand(kwconf.Config):
+    """Export a ready-to-open Ardour 9 MIDI editing session."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or YAML path")
+    destination: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help="Ardour session directory; defaults to generated/ardour/<cue>",
+    )
+    session_name: str | None = kwconf.Value(
+        None,
+        help="Ardour session/snapshot name; defaults to the MusicIR cue id",
+    )
+    no_audition_synth: bool = kwconf.Flag(
+        False,
+        help="do not insert ACE Reasonable Synth on MIDI tracks",
+    )
+    force: bool = kwconf.Flag(
+        False,
+        help="replace a prior Ambition-generated session at --destination",
+    )
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        score = find_score(config.cue)
+        if score is None:
+            print(f"cue not found: {config.cue}", file=sys.stderr)
+            return 2
+
+        from .ardour_export import ArdourExportError, export_ardour_session
+        from .musicir.compile import compile_score
+        from .render.score_core import load_yaml
+
+        score = Path(score)
+        spec = load_yaml(score)
+        compiled = compile_score(spec)
+        cue_id = str(spec.get("id", cue_id_from_path(score)))
+        destination = (
+            Path(config.destination)
+            if config.destination is not None
+            else Path("generated") / "ardour" / cue_id
+        )
+        try:
+            result = export_ardour_session(
+                compiled,
+                destination,
+                session_name=config.session_name,
+                base_dir=score.parent,
+                source_score=score.resolve(),
+                add_audition_synth=not config.no_audition_synth,
+                force=bool(config.force),
+            )
+        except (OSError, ValueError, ArdourExportError) as ex:
+            print(str(ex), file=sys.stderr)
+            return 1
+        print(result.session_file)
+        print(result.export_manifest)
+        print(result.neutral_midi)
+        return 0
+
+
 class DawReconcileCommand(kwconf.Config):
     """Compare edited DAW MIDI against a saved MusicIR interchange baseline."""
 
@@ -1979,6 +2042,7 @@ class CueModal(kwconf.ModalCLI):
     render = RenderCommand
     midi = MidiCommand
     daw_export = DawExportCommand
+    ardour_export = ArdourExportCommand
     daw_reconcile = DawReconcileCommand
     daw_apply = DawApplyCommand
     validate = ValidateCommand

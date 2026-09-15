@@ -66,15 +66,54 @@ cd ~/code/ardour/gtk2_ardour
 
 sudo dpkg-reconfigure -p high jackd2
 
-## Ambition MusicIR round trip
+## Ambition MusicIR editing workflow
 
-Ardour is the primary DAW target for the renderer round trip. Keep the neutral
-MIDI + sidecar boundary intact; do not make `.ardour` XML a MusicIR authority.
+Ardour is the primary DAW target. Keep `.ardour` session state outside the
+MusicIR authority boundary: the neutral MIDI + sidecar in the generated session
+remains the eventual reconciliation baseline.
+
+### Forward export: preferred path
+
+From the renderer repo, create an editable Ardour session directly:
+
+```bash
+python -m ambition_music_renderer cue ardour_export \
+    scores/experiments/standing_on_shoulders_extended_boss.music.yaml \
+    --destination /tmp/standing-on-shoulders-extended-ardour
+```
+
+Then open:
+
+```bash
+cd ~/code/ardour/gtk2_ardour
+./ardev /tmp/standing-on-shoulders-extended-ardour/standing_on_shoulders_extended_boss.ardour
+```
+
+Expected session shape:
+
+- one MIDI track per `CompiledScore` instrument, using its semantic name;
+- exactly one ACE Reasonable Synth on each MIDI track for immediate audible edits;
+- stereo audio from each MIDI track into Master;
+- **no instrument plugin on Master**;
+- section markers from compiled form;
+- current Ardour audio backend/device left to Ardour rather than serialized from another machine;
+- neutral MIDI + `.musicir-interchange.json` under `ambition/`; and
+- `.ambition-ardour-export.json` containing resolved renderer instrument plans.
+
+The current adapter supports fixed tempo/meter sessions. It does not yet recreate
+SFZ/SoundFont plugin state or renderer processing/mastering inside Ardour; ACE
+Reasonable Synth is an audition instrument so MIDI edits can be heard immediately.
+Do not overwrite a session after making DAW edits.
+
+If playback is silent, first verify that MIDI-track meters and Master move. The
+audio backend can be ALSA or PulseAudio; on the maintainer setup PulseAudio maps
+cleanly to the default speaker output. A synth belongs on MIDI tracks, not Master.
+
+### Neutral/manual path and later round trip
 
 ```bash
 python -m ambition_music_renderer cue daw_export <cue> --destination /tmp/<cue>-daw
-# Import /tmp/<cue>-daw/<cue>.mid into Ardour and edit MIDI.
-# Export the edited MIDI from Ardour to /tmp/<cue>-edited.mid.
+# Manual Ardour import, then edit/export MIDI.
 python -m ambition_music_renderer cue daw_reconcile <cue> \
     --midi /tmp/<cue>-edited.mid \
     --manifest /tmp/<cue>-daw/<cue>.musicir-interchange.json \
@@ -86,8 +125,5 @@ python -m ambition_music_renderer cue daw_apply <cue> \
     --report /tmp/<cue>-apply.json
 ```
 
-Current apply supports note edits, clip-owned CC/pitch-bend edits, and the
-Stage 3 conductor path: step tempo edits, bar-aligned meter edits, form-marker
-moves/renames, and conservatively reconstructable sampled tempo ramps. MusicIR
-holds are preserved from the sidecar/source even though Ardour's SMF transport
-cannot encode the pause itself.
+Round-trip work is intentionally secondary to exercising the forward Ardour
+editing workflow.

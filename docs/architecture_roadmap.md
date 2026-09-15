@@ -13,10 +13,11 @@ The project has two immediate product goals:
    combine concise musical intent with an exact-event escape hatch, checked-in
    knowledge of the expected audio environment, and objective review evidence.
 
-DAW round-trip work was reprioritized on 2026-09-07. The active order is a
-DAW-neutral reconciliation core first, then Ardour-first workflow integration;
-REAPER is the secondary DAW target. MusicIR remains the sole musical source of
-truth throughout the round trip.
+DAW work now prioritizes exercising the Ardour forward-editing workflow before
+further reverse-path expansion. The DAW-neutral reconciliation core remains the
+round-trip authority; the Ardour session adapter is a convenience layer around
+it. REAPER is the secondary DAW target. MusicIR remains the sole musical source
+of truth throughout the round trip.
 
 A future polished replacement for a v1/v2 tune is expected to be a new v3
 composition, potentially with a different arrangement and sonic realization.
@@ -250,6 +251,9 @@ only dependencies used by the cue should invalidate that cue/stem.
 `musicir.interchange_reconcile` owns the reverse comparison/apply path. Exact
 Standard MIDI is editable transport and the `.musicir-interchange.json` sidecar
 preserves MusicIR source/provenance that MIDI cannot carry portably.
+`ambition_music_renderer.ardour_export` owns Ardour-specific session scaffolding
+and must consume `CompiledScore`, `musicir.interchange`, and canonical
+`InstrumentResolutionPlan` data rather than reinterpreting score YAML.
 
 The reverse path compares edited performance against the saved baseline, rescales
 DAW PPQ changes, and updates the smallest currently supported v3 source region:
@@ -333,7 +337,12 @@ line up as follows:
 13. **DAW note/controller round trip** — edited MIDI can be reconciled against
     an exact export baseline; note and clip-owned CC/pitch-bend edits can be
     applied by lowering only affected v3 clips, with recompilation verification.
-14+. **Conductor round trip, Ardour integration, real cue authoring,
+14. **Ardour forward editing adapter** — first pass implemented: generated
+    Ardour 9 sessions carry semantic MIDI tracks, an audible per-track audition
+    synth, clean Master routing, section markers, neutral interchange artifacts,
+    and canonical instrument-resolution evidence. Renderer-timbre plugin
+    realization/reference stems remain follow-up work.
+15+. **Conductor round trip hardening, real Ardour editing feedback,
     generator/instrument improvement, legacy-internal isolation, and module
     decomposition** remain active work. Ardour is the primary DAW target; REAPER
     is secondary.

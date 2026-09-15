@@ -170,7 +170,16 @@ tempo events, rather than reconstructed from synthesis seconds. Form markers are
 written as Standard MIDI File marker events.
 
 The DAW-interchange seam exports MIDI together with a MusicIR provenance
-sidecar and can reconcile supported Ardour/REAPER edits back into v3 source:
+sidecar and can reconcile supported Ardour/REAPER edits back into v3 source.
+For forward Ardour editing, `cue ardour_export` also creates a ready-to-open
+Ardour 9 session with semantic MIDI tracks and per-track audition synths:
+
+```bash
+python -m ambition_music_renderer cue ardour_export <cue_id> \
+  --destination /tmp/<cue_id>-ardour
+```
+
+The neutral interchange remains the round-trip boundary:
 
 ```bash
 uv run --project tools/ambition_music_renderer \

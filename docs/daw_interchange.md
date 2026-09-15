@@ -6,27 +6,47 @@ the reconciliation baseline that preserves MusicIR identities MIDI cannot carry
 portably.
 
 Ardour is the primary DAW target. REAPER remains a secondary interoperability
-target through the same DAW-neutral MIDI/sidecar boundary. DAW-specific project
-adapters come after the generic reverse path is reliable.
+target through the same DAW-neutral MIDI/sidecar boundary. DAW-specific
+project adapters remain convenience surfaces outside the neutral
+reconciliation core. The Ardour adapter is now usable for the forward editing
+workflow; reverse reconciliation remains independent of `.ardour` XML.
 
 ## Current workflow
 
-Export a v3 cue:
+For Ardour-first editing, export a ready-to-open session:
+
+```bash
+python -m ambition_music_renderer cue ardour_export <cue> \
+    --destination /tmp/<cue>-ardour
+```
+
+The destination contains `<cue>.ardour`, one semantically named MIDI track per
+compiled instrument, one ACE Reasonable Synth on each MIDI track for immediate
+audible editing, clean stereo routing to Master, section markers, and an
+`ambition/` directory containing the ordinary DAW-neutral MIDI + provenance
+sidecar. The Master bus intentionally contains no instrument plugin. The session
+does not pin a machine-specific audio device, so select/retain the desired Ardour
+audio backend normally.
+
+The current session serializer supports constant tempo and meter. It records the
+canonical resolved SFZ/SoundFont plan in `.ambition-ardour-export.json`, but the
+first implementation deliberately uses ACE Reasonable Synth as the live audition
+instrument rather than pretending to recreate renderer timbre or mastering.
+
+Do not regenerate into an Ardour session after hand-editing it. The command
+refuses to overwrite a non-empty destination by default. `--force` is restricted
+to directories carrying the Ambition generated-session marker, but it is still
+destructive to DAW edits.
+
+For DAW-neutral interchange only, use:
 
 ```bash
 python -m ambition_music_renderer cue daw_export <cue> --destination /tmp/<cue>-daw
 ```
 
-This writes:
-
-```text
-<cue>.mid
-<cue>.musicir-interchange.json
-```
-
-Import `<cue>.mid` into Ardour, make MIDI performance edits, then export the
-edited MIDI from Ardour. Keep the original interchange JSON; it describes the
-baseline that the edited MIDI came from.
+This writes `<cue>.mid` and `<cue>.musicir-interchange.json`. After editing in
+Ardour, export edited MIDI and keep the original interchange JSON; it describes
+the baseline that the edited MIDI came from.
 
 Inspect the edit without changing MusicIR:
 
@@ -126,14 +146,18 @@ before writing.
 
 ### Stage 4: Ardour session adapter
 
-Once conductor reconciliation is dependable, add an Ardour-first convenience
-adapter around the neutral interchange core. The intended job is session setup,
-not new musical authority. Likely outputs are an Ardour session scaffold,
-reference full mix/stems, track naming/routing, and a scripted export location
-that points back to `daw_reconcile` / `daw_apply`.
+First forward-editing pass implemented. `cue ardour_export` creates an Ardour 9
+session scaffold around the neutral interchange core with semantic track names,
+per-track MIDI sources/regions/playlists, one audible ACE Reasonable Synth per
+MIDI track, clean Master routing, section markers, and no machine-specific audio
+device binding. It also records canonical `InstrumentResolutionPlan` data without
+reimplementing instrument resolution.
 
-REAPER support should consume the same interchange/reconciliation objects and
-receive a thinner adapter after the Ardour workflow has been exercised.
+The next fidelity step is to instantiate the resolved SFZ/SoundFont backends and
+optionally reference full mix/stems inside Ardour. That work should be driven by
+actual editing use before more round-trip machinery is added. REAPER should
+consume the same interchange/reconciliation objects and receive a thinner adapter
+after the Ardour workflow has been exercised.
 
 ### Stage 5: source-preserving patch quality
 
