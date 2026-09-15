@@ -27,15 +27,16 @@ sidecar. The Master bus intentionally contains no instrument plugin. The session
 does not pin a machine-specific audio device, so select/retain the desired Ardour
 audio backend normally.
 
-The adapter consumes the canonical `InstrumentResolutionPlan`. Resolved SFZ
-instruments use the sfizz LV2 plugin; resolved SoundFonts and ordinary GM tracks
-use ACE Fluid Synth. Path-valued plugin state is stored in Ardour's normal
-`plugins/<processor-id>/state1/state.ttl` layout and points at the machine-local
-resolved SFZ/SF2. A bypassed ACE Reasonable Synth is placed behind a resolved
-real instrument as a neutral composition-audition fallback. To inspect the MIDI
-without the production timbre, bypass the real instrument and activate Reasonable
-Synth; the MIDI region itself is unchanged. `--audition-only` creates that
-neutral listening mode directly.
+The adapter consumes the canonical `InstrumentResolutionPlan`. Python first writes
+exactly one ACE Reasonable Synth on every MIDI track, using the session shape that
+has been validated interactively. For a normal export it then runs the generated
+`ambition/apply_real_instruments.lua` through Ardour's command-line `arlua`
+frontend. Libardour replaces that one instrument with sfizz for resolved SFZs or
+ACE Fluid Synth for resolved SoundFonts/GM tracks, sets the machine-local asset
+property, and saves the session. Python therefore does not reverse-engineer or
+hand-serialize arbitrary LV2 pin maps and state. Unsupported tracks remain on
+Reasonable Synth. `--audition-only` skips the native replacement pass and leaves
+the whole cue in the neutral listening mode.
 
 The current session serializer supports constant tempo and meter. Renderer
 processing/mastering is still outside the Ardour adapter, and generated sessions
@@ -156,10 +157,12 @@ before writing.
 
 Forward editing and sampled realization are implemented. `cue ardour_export`
 creates an Ardour 9 session around the neutral interchange core with semantic
-track names, per-track MIDI sources/regions/playlists, sfizz/ACE Fluid Synth
-realization from canonical `InstrumentResolutionPlan` data, a neutral Reasonable
-Synth audition fallback, clean Master routing, section markers, and no
-machine-specific audio-device binding.
+track names, per-track MIDI sources/regions/playlists, a known-good Reasonable
+Synth scaffold, native libardour replacement with sfizz/ACE Fluid Synth from
+canonical `InstrumentResolutionPlan` data, clean Master routing, section markers,
+and no machine-specific audio-device binding. A failed native realization leaves
+the audible Reasonable Synth scaffold on disk rather than a half-serialized
+instrument chain.
 
 The next forward-workflow fidelity step is driven by editing use: decide which
 renderer processing, reference full mix/stems, grouping, and instrument-swap

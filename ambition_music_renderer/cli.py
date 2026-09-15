@@ -1382,7 +1382,18 @@ class ArdourExportCommand(kwconf.Config):
     )
     no_audition_synth: bool = kwconf.Flag(
         False,
-        help="omit the inactive ACE Reasonable Synth backup on tracks with a resolved real instrument",
+        help=(
+            "deprecated compatibility flag; ignored because the safe scaffold always contains "
+            "exactly one ACE Reasonable Synth before Ardour replaces it"
+        ),
+    )
+    ardour_lua: Path | None = kwconf.Value(
+        None,
+        parser=Path,
+        help=(
+            "path to Ardour's command-line Lua frontend (arlua/ardour-lua); "
+            "auto-detected from PATH or ~/code/ardour/gtk2_ardour/arlua"
+        ),
     )
     audition_only: bool = kwconf.Flag(
         False,
@@ -1401,7 +1412,12 @@ class ArdourExportCommand(kwconf.Config):
             print(f"cue not found: {config.cue}", file=sys.stderr)
             return 2
 
-        from .ardour_export import ArdourExportError, export_ardour_session
+        from .ardour_export import (
+            ArdourExportError,
+            apply_ardour_instruments,
+            detect_ardour_lua,
+            export_ardour_session,
+        )
         from .musicir.compile import compile_score
         from .render.score_core import load_yaml
 
@@ -1414,6 +1430,12 @@ class ArdourExportCommand(kwconf.Config):
             if config.destination is not None
             else Path("generated") / "ardour" / cue_id
         )
+        if config.no_audition_synth:
+            print(
+                "warning: --no-audition-synth is deprecated and ignored; the safe scaffold "
+                "always starts with one ACE Reasonable Synth per MIDI track",
+                file=sys.stderr,
+            )
         try:
             result = export_ardour_session(
                 compiled,
@@ -1422,12 +1444,46 @@ class ArdourExportCommand(kwconf.Config):
                 base_dir=score.parent,
                 source_score=score.resolve(),
                 realize_instruments=not bool(config.audition_only),
-                add_audition_synth=not config.no_audition_synth,
+                add_audition_synth=True,
                 force=bool(config.force),
             )
         except (OSError, ValueError, ArdourExportError) as ex:
             print(str(ex), file=sys.stderr)
             return 1
+
+        native_realization_failed = False
+        if not config.audition_only:
+            arlua = detect_ardour_lua(config.ardour_lua)
+            if arlua is None:
+                native_realization_failed = True
+                print(
+                    "Ardour Lua frontend not found; leaving the known-good ACE Reasonable Synth "
+                    "scaffold untouched.",
+                    file=sys.stderr,
+                )
+                print(
+                    "Build/use Ardour's arlua (normally ~/code/ardour/gtk2_ardour/arlua) "
+                    "or pass --ardour-lua. The generated bootstrap is: "
+                    f"{result.instrument_bootstrap}",
+                    file=sys.stderr,
+                )
+            else:
+                try:
+                    completed = apply_ardour_instruments(result, ardour_lua=arlua)
+                except ArdourExportError as ex:
+                    native_realization_failed = True
+                    print(str(ex), file=sys.stderr)
+                else:
+                    print(f"Ardour native instrument realization applied via {arlua}", file=sys.stderr)
+                    if completed.returncode != 0:
+                        print(
+                            "Ardour Lua frontend returned a non-zero status, but the persisted "
+                            "instrument state verified; accepting the verified realization.",
+                            file=sys.stderr,
+                        )
+                    if completed.stdout.strip():
+                        print(completed.stdout.rstrip(), file=sys.stderr)
+
         try:
             manifest_data = json.loads(result.export_manifest.read_text(encoding="utf8"))
             fallbacks = [
@@ -1437,7 +1493,7 @@ class ArdourExportCommand(kwconf.Config):
             ]
             real_count = len(manifest_data.get("tracks", [])) - len(fallbacks)
             print(
-                f"Ardour instruments: {real_count} resolved real, {len(fallbacks)} neutral fallback",
+                f"Ardour instrument plan: {real_count} real candidates, {len(fallbacks)} neutral fallback",
                 file=sys.stderr,
             )
             for row in fallbacks:
@@ -1451,6 +1507,13 @@ class ArdourExportCommand(kwconf.Config):
         print(result.session_file)
         print(result.export_manifest)
         print(result.neutral_midi)
+        if native_realization_failed:
+            print(
+                "Real-instrument post-processing failed or was unavailable; the printed session "
+                "is intentionally still the audible Reasonable Synth recovery scaffold.",
+                file=sys.stderr,
+            )
+            return 1
         return 0
 
 

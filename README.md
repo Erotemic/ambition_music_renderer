@@ -172,10 +172,10 @@ written as Standard MIDI File marker events.
 The DAW-interchange seam exports MIDI together with a MusicIR provenance
 sidecar and can reconcile supported Ardour/REAPER edits back into v3 source.
 For forward Ardour editing, `cue ardour_export` also creates a ready-to-open
-Ardour 9 session with semantic MIDI tracks. Resolved SFZ instruments are loaded
-through sfizz, SoundFont/GM instruments through ACE Fluid Synth, and an inactive
-ACE Reasonable Synth can remain behind each real instrument as a neutral MIDI
-composition-audition fallback:
+Ardour 9 session with semantic MIDI tracks. Python first writes the known-good
+single-ACE-Reasonable-Synth scaffold, then invokes Ardour's own `arlua`/libardour
+frontend to replace that one instrument with sfizz or ACE Fluid Synth when a
+real SFZ/SoundFont realization is available:
 
 ```bash
 python -m ambition_music_renderer cue ardour_export <cue_id> \
@@ -184,7 +184,9 @@ python -m ambition_music_renderer cue ardour_export <cue_id> \
 
 Use `--audition-only` to deliberately skip the sampled realization and hear the
 whole cue through ACE Reasonable Synth. This is useful for finding note, rhythm,
-voicing, and overlap problems without the sampled timbre masking them. Generated
+voicing, and overlap problems without the sampled timbre masking them. The real
+instrument pass uses Ardour itself to create and serialize plugin state; Python
+does not hand-author arbitrary LV2 pin maps or state directories. Generated
 sessions reference local sample-library paths and are therefore working sessions,
 not portable sample bundles.
 

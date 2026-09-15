@@ -338,11 +338,14 @@ line up as follows:
     an exact export baseline; note and clip-owned CC/pitch-bend edits can be
     applied by lowering only affected v3 clips, with recompilation verification.
 14. **Ardour forward editing adapter** — second pass implemented: generated
-    Ardour 9 sessions carry semantic MIDI tracks, sfizz/ACE Fluid Synth
-    realization from canonical instrument-resolution plans, a neutral per-track
-    audition fallback, clean Master routing, section markers, and neutral
-    interchange artifacts. Reference stems and renderer processing remain
-    forward-workflow follow-up work.
+    Ardour 9 sessions carry semantic MIDI tracks and a validated single-instrument
+    Reasonable Synth scaffold; Ardour's own Lua/libardour API then replaces that
+    synth with sfizz/ACE Fluid Synth from canonical instrument-resolution plans.
+    Failed/unsupported realization therefore falls back to the audible scaffold
+    instead of relying on hand-written LV2 state or serial instrument chains.
+    Clean Master routing, section markers, and neutral interchange artifacts are
+    included. Reference stems and renderer processing remain forward-workflow
+    follow-up work.
 15+. **Conductor round trip hardening, real Ardour editing feedback,
     generator/instrument improvement, legacy-internal isolation, and module
     decomposition** remain active work. Ardour is the primary DAW target; REAPER

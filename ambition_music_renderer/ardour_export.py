@@ -5,23 +5,26 @@ interchange.  MusicIR remains authoritative; the Ardour session is a working
 editing surface.  The neutral multitrack MIDI + provenance sidecar are emitted
 alongside the session so reverse reconciliation does not depend on Ardour XML.
 
-The adapter instantiates the sampled realization selected by the canonical
-``InstrumentResolutionPlan`` when Ardour has a native LV2 counterpart:
-``sfizz`` for SFZ and ACE Fluid Synth for SoundFonts/GM.  A bypassed
-ACE Reasonable Synth can sit behind the real instrument as a deliberately
-neutral composition-audition fallback.  MusicIR still owns the notes and
-instrument identities; Ardour owns only this generated editing surface.
+The session XML deliberately contains only the simple ACE Reasonable Synth
+configuration already validated against Ardour.  Real SFZ/SoundFont
+instruments are applied by Ardour itself through its Lua/libardour API after
+the scaffold is written.  This keeps plugin serialization, pin maps, control
+ports, and LV2 state under Ardour's authority instead of reverse-engineering
+those implementation details in Python.
 """
 
 from __future__ import annotations
 
+import copy
 import json
 import math
 import os
 import shutil
+import subprocess
 import time
 import uuid
 import xml.etree.ElementTree as ET
+from urllib.parse import unquote
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -38,11 +41,20 @@ from .render.score_core import choose_soundfont
 ARDOUR_SESSION_VERSION = "7003"
 ARDOUR_SUPERCLOCKS_PER_SECOND = 282_240_000
 ARDOUR_BEAT_TICKS = 1920
+# Ardour/Evoral writes internal MIDI sources at 10x its beat-tick resolution.
+# Keeping generated source-event positions on that 10-tick lattice avoids a
+# cumulative rounding loss in SMFSource::render(), which converts each SMF
+# delta independently into Temporal::Beats.  A low/non-divisor PPQ such as
+# PrettyMIDI's 220 can otherwise make dense tracks (especially drums) creep
+# earlier by seconds over the course of a long cue.
+ARDOUR_SMF_PPQN = 19_200
+ARDOUR_SMF_TICKS_PER_BEAT_TICK = ARDOUR_SMF_PPQN // ARDOUR_BEAT_TICKS
 ACE_REASONABLE_SYNTH_URI = "https://community.ardour.org/node/7596"
 ACE_FLUID_SYNTH_URI = "urn:ardour:a-fluidsynth"
 ACE_FLUID_SYNTH_FILE_PROPERTY = "urn:ardour:a-fluidsynth:sf2file"
 SFIZZ_URI = "http://sfztools.github.io/sfizz"
 SFIZZ_FILE_PROPERTY = "http://sfztools.github.io/sfizz:sfzfile"
+ARDOUR_ASSET_SETTLE_SCHEDULE_SECONDS = (0.75, 3.0, 12.0)
 EXPORT_SCHEMA = "ambition.ardour_export.v2"
 EXPORT_MARKER = ".ambition-ardour-export.json"
 SUPPORTED_EXPORT_MARKER_SCHEMAS = frozenset(
@@ -64,6 +76,7 @@ class ArdourExportResult:
     neutral_midi: Path
     interchange_manifest: Path
     export_manifest: Path
+    instrument_bootstrap: Path | None = None
 
     def to_dict(self) -> dict[str, str]:
         return {
@@ -72,18 +85,10 @@ class ArdourExportResult:
             "neutral_midi": str(self.neutral_midi),
             "interchange_manifest": str(self.interchange_manifest),
             "export_manifest": str(self.export_manifest),
+            "instrument_bootstrap": (
+                str(self.instrument_bootstrap) if self.instrument_bootstrap is not None else ""
+            ),
         }
-
-
-@dataclass(frozen=True)
-class _Lv2AssetState:
-    """One LV2 path-valued state property that must be serialized on disk."""
-
-    processor_id: str
-    plugin_name: str
-    plugin_uri: str
-    property_uri: str
-    asset_path: Path
 
 
 @dataclass(frozen=True)
@@ -234,19 +239,56 @@ def _score_end_seconds(compiled: CompiledScore, end_beats: float, bpm: float) ->
     return max(end_seconds, 1.0)
 
 
-def _copy_track_to_end(track: mido.MidiTrack, end_tick: int) -> mido.MidiTrack:
+def _ardour_smf_tick(absolute_tick: int, *, source_ppq: int) -> int:
+    """Map one absolute source tick onto Ardour's lossless SMF lattice.
+
+    Ardour's musical-time primitive has ``ARDOUR_BEAT_TICKS`` ticks per beat,
+    while newly-created Ardour SMF sources use ``ARDOUR_SMF_PPQN``.  Evoral's
+    SMFSource reader converts *delta* ticks independently and truncates during
+    PPQ conversion.  If the source PPQ does not divide the internal beat grid
+    (notably PrettyMIDI's default 220 PPQ), those tiny per-delta losses
+    accumulate differently on tracks with different event density.
+
+    Quantize absolute positions once onto Ardour's internal beat grid, then
+    serialize them at 10x resolution.  Every emitted delta is therefore a
+    multiple of 10 and converts back to Temporal::Beats exactly.
+    """
+
+    if source_ppq <= 0:
+        raise ValueError("source_ppq must be positive")
+    beat_tick = int(round(int(absolute_tick) * ARDOUR_BEAT_TICKS / source_ppq))
+    return beat_tick * ARDOUR_SMF_TICKS_PER_BEAT_TICK
+
+
+def _copy_track_to_ardour_ppq(
+    track: mido.MidiTrack,
+    *,
+    source_ppq: int,
+    end_beats: float,
+) -> mido.MidiTrack:
     copied = mido.MidiTrack()
     absolute = 0
-    non_eot: list[tuple[int, mido.Message | mido.MetaMessage]] = []
+    non_eot: list[tuple[int, int, mido.Message | mido.MetaMessage]] = []
+    order = 0
     for msg in track:
         absolute += int(msg.time)
         if msg.type != "end_of_track":
-            non_eot.append((absolute, msg.copy(time=0)))
+            target_tick = _ardour_smf_tick(absolute, source_ppq=source_ppq)
+            non_eot.append((target_tick, order, msg.copy(time=0)))
+            order += 1
+
+    # Stable ordering matters for note-off/note-on pairs and controllers that
+    # intentionally share a coordinate.  Python's sort is stable, but keep an
+    # explicit order field so the invariant remains obvious.
+    non_eot.sort(key=lambda row: (row[0], row[1]))
     previous = 0
-    for tick, msg in non_eot:
+    for tick, _order, msg in non_eot:
         copied.append(msg.copy(time=max(0, tick - previous)))
         previous = tick
-    copied.append(mido.MetaMessage("end_of_track", time=max(0, int(end_tick) - previous)))
+
+    end_beat_tick = int(math.ceil(float(end_beats) * ARDOUR_BEAT_TICKS))
+    end_tick = end_beat_tick * ARDOUR_SMF_TICKS_PER_BEAT_TICK
+    copied.append(mido.MetaMessage("end_of_track", time=max(0, end_tick - previous)))
     return copied
 
 
@@ -255,6 +297,7 @@ def _write_track_midis(
     destination: Path,
     *,
     track_names: list[str],
+    track_is_drum: list[bool],
     end_beats: float,
 ) -> list[dict[str, Any]]:
     mid = mido.MidiFile(str(full_midi_path))
@@ -263,25 +306,66 @@ def _write_track_midis(
             "compiled MIDI track count does not match compiled instruments: "
             f"{len(mid.tracks) - 1} MIDI tracks vs {len(track_names)} instruments"
         )
+    if len(track_is_drum) != len(track_names):
+        raise ArdourExportError(
+            "track_is_drum count does not match compiled instruments: "
+            f"{len(track_is_drum)} flags vs {len(track_names)} instruments"
+        )
     destination.mkdir(parents=True, exist_ok=True)
-    end_tick = int(math.ceil(end_beats * mid.ticks_per_beat))
-    conductor = _copy_track_to_end(mid.tracks[0], end_tick)
+    source_ppq = int(mid.ticks_per_beat)
+    conductor = _copy_track_to_ardour_ppq(
+        mid.tracks[0],
+        source_ppq=source_ppq,
+        end_beats=end_beats,
+    )
     rows: list[dict[str, Any]] = []
-    for index, (name, source_track) in enumerate(zip(track_names, mid.tracks[1:]), start=1):
+    for index, (name, _is_drum, source_track) in enumerate(
+        zip(track_names, track_is_drum, mid.tracks[1:]),
+        start=1,
+    ):
         filename = f"{index:02d}_{_safe_filename(name)}.mid"
         path = destination / filename
-        one = mido.MidiFile(type=1, ticks_per_beat=mid.ticks_per_beat)
-        one.tracks.append(_copy_track_to_end(conductor, end_tick))
-        track = _copy_track_to_end(source_track, end_tick)
-        # Preserve the semantic CompiledScore instrument name even if an upstream
-        # MIDI writer ever changes its default source-track naming.
+        one = mido.MidiFile(type=1, ticks_per_beat=ARDOUR_SMF_PPQN)
+        # ``conductor`` is already on the Ardour SMF lattice.  Copy it without
+        # re-quantizing by using the target PPQ as the source PPQ.
+        one.tracks.append(
+            _copy_track_to_ardour_ppq(
+                conductor,
+                source_ppq=ARDOUR_SMF_PPQN,
+                end_beats=end_beats,
+            )
+        )
+        track = _copy_track_to_ardour_ppq(
+            source_track,
+            source_ppq=source_ppq,
+            end_beats=end_beats,
+        )
+        # Preserve the neutral export's authored/global MIDI channel exactly.
+        # The first working Ardour proof used these channels successfully; a
+        # later attempt to normalize every pitched route to channel 1 was an
+        # unsupported inference from FluidSynth warnings and regressed the
+        # known-good audition scaffold.  Track separation already prevents
+        # cross-instrument MIDI leakage, so there is no reason to rewrite the
+        # channel here.
+        source_channels = sorted(
+            {int(message.channel) for message in track if hasattr(message, "channel")}
+        )
         for message in track:
             if message.type == "track_name":
                 message.name = str(name)
-                break
         one.tracks.append(track)
         one.save(str(path))
-        rows.append({"name": name, "filename": filename, "path": path})
+        rows.append(
+            {
+                "name": name,
+                "filename": filename,
+                "path": path,
+                "midi_channel": source_channels[0] if len(source_channels) == 1 else None,
+                "midi_channels": source_channels,
+                "source_ppq": source_ppq,
+                "ardour_ppq": ARDOUR_SMF_PPQN,
+            }
+        )
     return rows
 
 
@@ -363,51 +447,31 @@ def _add_amp_processor(route: ET.Element, ids: _IdAllocator, *, kind: str, contr
     ET.SubElement(proc, "Controllable", {"name": control_name, "id": ids.take(), "flags": "GainLike", "value": "1"})
 
 
-def _add_lv2_instrument(
-    route: ET.Element,
-    ids: _IdAllocator,
-    *,
-    name: str,
-    plugin_uri: str,
-    active: bool,
-    pass_audio: bool = False,
-    asset_path: Path | None = None,
-    asset_property: str | None = None,
-) -> tuple[str, _Lv2AssetState | None]:
-    """Add a MIDI-in/stereo-out LV2 instrument processor.
+def _add_reasonable_synth(route: ET.Element, ids: _IdAllocator) -> str:
+    """Insert the exact ACE Reasonable Synth shape validated in Ardour.
 
-    Ardour stores path-valued LV2 state outside the session XML under
-    ``plugins/<processor-id>/state1/state.ttl``.  ``asset_path`` is therefore
-    returned as a state-writing request instead of being copied into the XML.
-
-    ``pass_audio`` is used for the bypassed neutral audition synth that sits
-    behind a real instrument.  Ardour then has enough configured channels to
-    pass the real instrument's stereo audio while the audition synth is
-    inactive, and enough MIDI to make the audition synth audible when the real
-    instrument is bypassed.
+    Do not generalize this XML to arbitrary LV2 instruments.  Different LV2
+    plugins have plugin-specific control/state and pin-map serialization.  The
+    real-instrument pass uses Ardour's Lua API so Ardour creates that state.
     """
 
-    if (asset_path is None) != (asset_property is None):
-        raise ValueError("asset_path and asset_property must be provided together")
     plugin_id = ids.take()
     proc = ET.SubElement(
         route,
         "Processor",
         {
             "id": plugin_id,
-            "name": name,
-            "active": "1" if active else "0",
+            "name": "ACE Reasonable Synth",
+            "active": "1",
             "user-latency": "0",
             "use-user-latency": "0",
             "type": "lv2",
-            "unique-id": plugin_uri,
+            "unique-id": ACE_REASONABLE_SYNTH_URI,
             "count": "1",
             "custom": "0",
         },
     )
     configured_in = ET.SubElement(proc, "ConfiguredInput")
-    if pass_audio:
-        ET.SubElement(configured_in, "Channels", {"type": "audio", "count": "2"})
     ET.SubElement(configured_in, "Channels", {"type": "midi", "count": "1"})
     sinks = ET.SubElement(proc, "CustomSinks")
     ET.SubElement(sinks, "Channels", {"type": "midi", "count": "1"})
@@ -421,65 +485,16 @@ def _add_lv2_instrument(
     ET.SubElement(output_map, "Channelmap", {"type": "audio", "from": "0", "to": "0"})
     ET.SubElement(output_map, "Channelmap", {"type": "audio", "from": "1", "to": "1"})
     ET.SubElement(proc, "ThruMap")
-    lv2_attrs = {
-        "last-preset-uri": "",
-        "last-preset-label": "",
-        "parameter-changed-since-last-preset": "1" if asset_path is not None else "0",
-    }
-    if asset_path is not None:
-        lv2_attrs["state-dir"] = "state1"
-    ET.SubElement(proc, "lv2", lv2_attrs)
-    state = None
-    if asset_path is not None and asset_property is not None:
-        state = _Lv2AssetState(
-            processor_id=plugin_id,
-            plugin_name=name,
-            plugin_uri=plugin_uri,
-            property_uri=asset_property,
-            asset_path=asset_path,
-        )
-    return plugin_id, state
-
-
-def _add_reasonable_synth(
-    route: ET.Element,
-    ids: _IdAllocator,
-    *,
-    active: bool = True,
-    pass_audio: bool = False,
-) -> str:
-    plugin_id, _state = _add_lv2_instrument(
-        route,
-        ids,
-        name="ACE Reasonable Synth",
-        plugin_uri=ACE_REASONABLE_SYNTH_URI,
-        active=active,
-        pass_audio=pass_audio,
+    ET.SubElement(
+        proc,
+        "lv2",
+        {
+            "last-preset-uri": "",
+            "last-preset-label": "",
+            "parameter-changed-since-last-preset": "0",
+        },
     )
     return plugin_id
-
-
-def _add_real_instrument(
-    route: ET.Element,
-    ids: _IdAllocator,
-    realization: _TrackRealization,
-) -> tuple[str | None, _Lv2AssetState | None]:
-    if not realization.has_real_instrument:
-        return None, None
-    assert realization.plugin_name is not None
-    assert realization.plugin_uri is not None
-    assert realization.asset_path is not None
-    assert realization.property_uri is not None
-    return _add_lv2_instrument(
-        route,
-        ids,
-        name=realization.plugin_name,
-        plugin_uri=realization.plugin_uri,
-        active=True,
-        pass_audio=False,
-        asset_path=realization.asset_path,
-        asset_property=realization.property_uri,
-    )
 
 
 def _add_trigger_box(route: ET.Element, ids: _IdAllocator, *, order: int) -> None:
@@ -588,9 +603,8 @@ def _build_midi_route(
     name: str,
     playlist_id: str,
     order: int,
-    realization: _TrackRealization,
-    add_audition_synth: bool,
-) -> tuple[ET.Element, str, dict[str, Any], list[_Lv2AssetState]]:
+    add_synth: bool,
+) -> tuple[ET.Element, str, str | None]:
     route_id = ids.take()
     route = ET.Element(
         "Route",
@@ -644,24 +658,7 @@ def _build_midi_route(
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"player:{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "diskreader"})
     _add_trigger_box(route, ids, order=order - 1)
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": "Polarity", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "polarity"})
-    lv2_states: list[_Lv2AssetState] = []
-    real_plugin_id, real_state = _add_real_instrument(route, ids, realization)
-    if real_state is not None:
-        lv2_states.append(real_state)
-
-    # A real instrument is the normal listening path.  The optional Reasonable
-    # Synth behind it is deliberately inactive and serves as a neutral MIDI
-    # composition debugger.  When no real realization is available, the same
-    # synth becomes the active fallback so the generated session remains useful.
-    audition_plugin_id: str | None = None
-    audition_active = not realization.has_real_instrument
-    if add_audition_synth or not realization.has_real_instrument:
-        audition_plugin_id = _add_reasonable_synth(
-            route,
-            ids,
-            active=audition_active,
-            pass_audio=realization.has_real_instrument,
-        )
+    plugin_id = _add_reasonable_synth(route, ids) if add_synth else None
     _add_amp_processor(route, ids, kind="amp", control_name="gaincontrol", automation_id="gain", interpolation="Exponential")
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"meter-{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "meter"})
     main = ET.SubElement(route, "Processor", {"id": ids.take(), "name": name, "active": "1", "user-latency": "0", "use-user-latency": "0", "own-input": "1", "own-output": "0", "output": name, "type": "main-outs", "role": "Main"})
@@ -670,13 +667,7 @@ def _build_midi_route(
     ET.SubElement(route, "Controllable", {"name": "monitor", "id": ids.take(), "flags": "RealTime", "value": "0", "monitoring": ""})
     ET.SubElement(route, "Controllable", {"name": "rec-safe", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
     ET.SubElement(route, "Controllable", {"name": "rec-enable", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
-    plugin_state = {
-        "instrument_plugin_id": real_plugin_id,
-        "audition_plugin_id": audition_plugin_id,
-        "audition_plugin_active": bool(audition_plugin_id and audition_active),
-    }
-    return route, route_id, plugin_state, lv2_states
-
+    return route, route_id, plugin_id
 
 def _region_element(*, ids: _IdAllocator, name: str, source_id: str, length: str, whole_file: bool) -> ET.Element:
     return ET.Element(
@@ -723,14 +714,13 @@ def _build_session_xml(
     session_name: str,
     sample_rate: int,
     track_midis: list[dict[str, Any]],
-    realizations: list[_TrackRealization],
     bpm: float,
     numerator: int,
     denominator: int,
     end_beats: float,
     end_seconds: float,
-    add_audition_synth: bool,
-) -> tuple[ET.ElementTree, list[dict[str, Any]], list[_Lv2AssetState]]:
+    add_synth: bool,
+) -> tuple[ET.ElementTree, list[dict[str, Any]]]:
     ids = _IdAllocator()
     root = ET.Element(
         "Session",
@@ -803,35 +793,20 @@ def _build_session_xml(
 
     region_length = f"b{int(math.ceil(end_beats * ARDOUR_BEAT_TICKS))}@b0"
     track_manifest: list[dict[str, Any]] = []
-    lv2_states: list[_Lv2AssetState] = []
     pgroup_id = time.strftime("%Y-%m-%d %H.%M.%S")
-    if len(realizations) != len(track_midis):
-        raise ArdourExportError(
-            "instrument realization count does not match exported MIDI tracks: "
-            f"{len(realizations)} realizations vs {len(track_midis)} tracks"
-        )
-    for order, (inst, midi_row, realization) in enumerate(
-        zip(compiled.pm.instruments, track_midis, realizations),
-        start=1,
-    ):
+    for order, (inst, midi_row) in enumerate(zip(compiled.pm.instruments, track_midis), start=1):
         name = str(inst.name)
-        if realization.instrument != name:
-            raise ArdourExportError(
-                f"instrument realization order mismatch: {realization.instrument!r} vs {name!r}"
-            )
         source_id = ids.take()
         playlist_id = ids.take()
         ET.SubElement(sources, "Source", {"name": midi_row["filename"], "take-id": "", "type": "midi", "flags": "Writable", "id": source_id, "origin": midi_row["filename"]})
         regions.append(_region_element(ids=ids, name=name, source_id=source_id, length=region_length, whole_file=True))
-        route, route_id, plugin_state, route_lv2_states = _build_midi_route(
+        route, route_id, plugin_id = _build_midi_route(
             ids,
             name=name,
             playlist_id=playlist_id,
             order=order,
-            realization=realization,
-            add_audition_synth=add_audition_synth,
+            add_synth=add_synth,
         )
-        lv2_states.extend(route_lv2_states)
         routes.append(route)
         playlist = ET.SubElement(playlists, "Playlist", {"id": playlist_id, "name": name, "type": "midi", "orig-track-id": route_id, "pgroup-id": pgroup_id, "shared-with-ids": "", "frozen": "0", "combine-ops": "0"})
         playlist.append(_region_element(ids=ids, name=name, source_id=source_id, length=region_length, whole_file=False))
@@ -842,7 +817,10 @@ def _build_session_xml(
                 "playlist_id": playlist_id,
                 "source_id": source_id,
                 "midi_source": midi_row["filename"],
-                **plugin_state,
+                "midi_channel": midi_row.get("midi_channel"),
+                "source_ppq": midi_row.get("source_ppq"),
+                "ardour_source_ppq": midi_row.get("ardour_ppq"),
+                "audition_plugin_id": plugin_id,
             }
         )
 
@@ -863,7 +841,21 @@ def _build_session_xml(
     script.text = "c2NyaXB0cyA9IHt9IA=="
     ET.SubElement(root, "IOPlugins")
     root.set("id-counter", str(ids.next_value + 1))
-    return ET.ElementTree(root), track_manifest, lv2_states
+    return ET.ElementTree(root), track_manifest
+
+
+def _soundfont_is_ace_portable(path: Path) -> bool:
+    """Return whether a SoundFont is in the portable ACE Fluid Synth subset.
+
+    Ardour's bundled ACE Fluid Synth is built against the FluidSynth library
+    selected by that Ardour build.  In practice an installed ``.sf3`` may be
+    newer than the bundled FluidSynth decoder (the source-build used for the
+    Standing on Shoulders session rejects MuseScore_General_Full.sf3 v3.1).
+    ``.sf2`` is the conservative interchange format that works across those
+    builds, so the generated Ardour session never selects an SF3 implicitly.
+    """
+
+    return path.suffix.lower() == ".sf2"
 
 
 def _resolve_gm_soundfont(
@@ -871,48 +863,103 @@ def _resolve_gm_soundfont(
     *,
     base_dir: Path | None,
 ) -> tuple[Path | None, str | None, str | None]:
-    """Resolve the SoundFont used for plain GM instruments in Ardour.
+    """Resolve an ACE-FluidSynth-compatible SoundFont for plain GM tracks.
 
-    Score-authored ``render.soundfont`` remains authoritative.  Otherwise we
-    reuse the renderer's normal system SoundFont preference, while also
-    honoring the audio-tools environment used by this repository.  The latter
-    is adapter configuration rather than MusicIR semantics and is recorded in
-    the export manifest.
+    This is deliberately an Ardour-adapter decision, not a change to renderer
+    semantics.  The renderer may prefer an SF3 that its own FluidSynth can
+    decode; Ardour's bundled ACE Fluid Synth can be built without support for
+    that SF3 revision.  Prefer an explicit/configured SF2, then the repository's
+    GeneralUser-GS SF2, then other installed SF2s.  Never silently feed ACE a
+    renderer-selected SF3 merely because it exists.
     """
 
+    rejected: list[str] = []
     render_cfg = dict(compiled.normalized_spec.get("render") or {})
-    explicit = render_cfg.get("soundfont")
-    if explicit:
-        candidate = Path(str(explicit)).expanduser()
+
+    def accept(candidate: Path, source: str) -> tuple[Path | None, str | None, str | None] | None:
+        candidate = candidate.expanduser()
         if not candidate.is_absolute() and base_dir is not None:
             candidate = base_dir / candidate
         candidate = candidate.resolve()
-        if candidate.is_file():
-            return candidate, "render.soundfont", None
-        return None, None, f"authored render.soundfont does not exist: {candidate}"
+        if not candidate.is_file():
+            rejected.append(f"{source} does not exist: {candidate}")
+            return None
+        if not _soundfont_is_ace_portable(candidate):
+            rejected.append(
+                f"{source} is {candidate.suffix or '<no extension>'}, but Ardour ACE Fluid Synth "
+                "export uses the portable .sf2 subset"
+            )
+            return None
+        return candidate, source, None
+
+    explicit = render_cfg.get("soundfont")
+    if explicit:
+        accepted = accept(Path(str(explicit)), "render.soundfont")
+        if accepted is not None:
+            return accepted
 
     env_default = os.environ.get("AMBITION_MUSIC_DEFAULT_SOUNDFONT")
     if env_default:
-        candidate = Path(env_default).expanduser().resolve()
-        if candidate.is_file():
-            return candidate, "AMBITION_MUSIC_DEFAULT_SOUNDFONT", None
+        accepted = accept(Path(env_default), "AMBITION_MUSIC_DEFAULT_SOUNDFONT")
+        if accepted is not None:
+            return accepted
 
+    # The standard Ambition asset install includes GeneralUser-GS.sf2.  Prefer
+    # it before the renderer's system default because choose_soundfont() may
+    # intentionally select MuseScore SF3, which is not portable to ACE.
+    roots = instrument_libraries.configured_soundfont_roots()
+    shallow_candidates: list[tuple[Path, str]] = []
+    for root in roots:
+        shallow_candidates.extend(
+            [
+                (root / "GeneralUser-GS.sf2", "audio-tools GeneralUser-GS"),
+                (root / "default-GM.sf2", "configured default-GM.sf2"),
+                (root / "soundfonts" / "GeneralUser-GS.sf2", "audio-tools GeneralUser-GS"),
+                (root / "soundfonts" / "default-GM.sf2", "configured default-GM.sf2"),
+            ]
+        )
+    shallow_candidates.extend(
+        [
+            (Path("/usr/share/sounds/sf2/FluidR3_GM.sf2"), "system FluidR3_GM.sf2"),
+            (Path("/usr/share/sounds/sf2/TimGM6mb.sf2"), "system TimGM6mb.sf2"),
+            (Path("/usr/share/sounds/sf2/default-GM.sf2"), "system default-GM.sf2"),
+        ]
+    )
+    seen: set[Path] = set()
+    for candidate, source in shallow_candidates:
+        expanded = candidate.expanduser()
+        if expanded in seen:
+            continue
+        seen.add(expanded)
+        if expanded.is_file():
+            return expanded.resolve(), source, None
+
+    # Reuse the renderer preference only when it already happens to be SF2.
     renderer_default = choose_soundfont(None)
     if renderer_default:
-        return Path(renderer_default).expanduser().resolve(), "renderer default", None
+        candidate = Path(renderer_default).expanduser().resolve()
+        if candidate.is_file() and _soundfont_is_ace_portable(candidate):
+            return candidate, "renderer default", None
+        if candidate.is_file():
+            rejected.append(
+                f"renderer default is {candidate.name}, but Ardour ACE Fluid Synth export uses .sf2"
+            )
 
-    # The standard Ambition asset install includes GeneralUser-GS.sf2.  Check
-    # only exact shallow candidates here: recursive discovery can traverse the
-    # entire multi-gigabyte audio-tools tree when its root is configured.
-    for root in instrument_libraries.configured_soundfont_roots():
-        for candidate in (
-            root / "GeneralUser-GS.sf2",
-            root / "soundfonts" / "GeneralUser-GS.sf2",
-        ):
-            if candidate.is_file():
-                return candidate.resolve(), "audio-tools GeneralUser-GS", None
-    return None, None, "no GM SoundFont was found"
+    # Finally scan the configured SoundFont roots, which are normally small and
+    # specific even when the overall audio-tools tree is large.
+    try:
+        discovered = instrument_libraries.discover_soundfont_files(roots)
+    except OSError:
+        discovered = []
+    sf2s = sorted(path.resolve() for path in discovered if path.suffix.lower() == ".sf2")
+    if sf2s:
+        return sf2s[0], "configured SF2 discovery", None
 
+    detail = "; ".join(rejected)
+    return None, None, (
+        "no ACE-FluidSynth-compatible .sf2 SoundFont was found"
+        + (f" ({detail})" if detail else "")
+    )
 
 def _resolve_track_realizations(
     compiled: CompiledScore,
@@ -928,6 +975,9 @@ def _resolve_track_realizations(
     for inst in compiled.pm.instruments:
         name = str(inst.name)
         backend = instrument_backend_spec(compiled.instrument_specs, name)
+        exact_sfz: Path | None = None
+        exact_soundfont: Path | None = None
+        resolved_incompatible_soundfont: Path | None = None
         try:
             plan = resolve_instrument_backend(
                 backend,
@@ -935,7 +985,47 @@ def _resolve_track_realizations(
                 sfizz_cfg=sfizz_cfg,
                 default_fallback_backend=(str(default_fallback) if default_fallback is not None else None),
             )
-            resolved: Mapping[str, Any] = plan.to_dict()
+            # Ardour's "real instrument" mode is intentionally stricter than
+            # the forgiving renderer fallback path.  Re-resolve the authored
+            # asset directly so render.sfizz.default_sfz (or another generic
+            # fallback) can never masquerade as the requested instrument in a
+            # DAW session.
+            if plan.wants_sfz:
+                exact_sfz = instrument_libraries.resolve_sfz_reference(
+                    backend.get("sfz"),
+                    library_ref=plan.library_ref,
+                    prefer=plan.prefer,
+                    base_dir=base_dir,
+                    roots=(plan.roots or None),
+                )
+            elif plan.wants_soundfont:
+                exact_soundfont = instrument_libraries.resolve_soundfont_reference(
+                    backend.get("soundfont"),
+                    library_ref=plan.library_ref,
+                    prefer=plan.prefer,
+                    base_dir=base_dir,
+                    roots=(backend.get("library_roots") or None),
+                )
+                if exact_soundfont is not None and not _soundfont_is_ace_portable(exact_soundfont):
+                    resolved_incompatible_soundfont = exact_soundfont
+                    exact_soundfont = None
+                else:
+                    resolved_incompatible_soundfont = None
+            else:
+                resolved_incompatible_soundfont = None
+            resolved_data = plan.to_dict()
+            resolved_data["ardour_exact_resolved_sfz"] = (
+                str(exact_sfz) if exact_sfz is not None else None
+            )
+            resolved_data["ardour_exact_resolved_soundfont"] = (
+                str(exact_soundfont) if exact_soundfont is not None else None
+            )
+            resolved_data["ardour_incompatible_soundfont"] = (
+                str(resolved_incompatible_soundfont)
+                if resolved_incompatible_soundfont is not None
+                else None
+            )
+            resolved: Mapping[str, Any] = resolved_data
             resolution_error = None
         except Exception as ex:  # Export remains useful as an audition session.
             plan = None
@@ -950,20 +1040,20 @@ def _resolve_track_realizations(
         source: str | None = None
         fallback_reason: str | None = None
 
-        if realize_instruments and plan is not None and plan.resolved_sfz is not None:
+        if realize_instruments and plan is not None and exact_sfz is not None:
             kind = "sfizz"
             plugin_name = "sfizz"
             plugin_uri = SFIZZ_URI
-            asset_path = plan.resolved_sfz.resolve()
+            asset_path = exact_sfz.resolve()
             property_uri = SFIZZ_FILE_PROPERTY
-            source = "InstrumentResolutionPlan.resolved_sfz"
-        elif realize_instruments and plan is not None and plan.resolved_soundfont is not None:
+            source = "exact authored SFZ resolution"
+        elif realize_instruments and plan is not None and exact_soundfont is not None:
             kind = "ace_fluidsynth"
             plugin_name = "ACE Fluid Synth"
             plugin_uri = ACE_FLUID_SYNTH_URI
-            asset_path = plan.resolved_soundfont.resolve()
+            asset_path = exact_soundfont.resolve()
             property_uri = ACE_FLUID_SYNTH_FILE_PROPERTY
-            source = "InstrumentResolutionPlan.resolved_soundfont"
+            source = "exact authored SoundFont resolution"
         elif realize_instruments and plan is not None and not (
             plan.wants_sfz or plan.wants_soundfont or plan.wants_procedural_fm
         ):
@@ -985,9 +1075,26 @@ def _resolve_track_realizations(
             if resolution_error:
                 fallback_reason = resolution_error
             elif plan is not None and plan.wants_sfz:
-                fallback_reason = f"SFZ backend did not resolve: {plan.requested or name}"
+                if plan.resolved_sfz is not None:
+                    fallback_reason = (
+                        "authored SFZ did not resolve exactly; renderer fallback was rejected for Ardour: "
+                        f"{plan.resolved_sfz}"
+                    )
+                else:
+                    fallback_reason = f"SFZ backend did not resolve: {plan.requested or name}"
             elif plan is not None and plan.wants_soundfont:
-                fallback_reason = f"SoundFont backend did not resolve: {plan.requested or name}"
+                if resolved_incompatible_soundfont is not None:
+                    fallback_reason = (
+                        "SoundFont resolved, but Ardour ACE Fluid Synth export currently uses the portable .sf2 "
+                        f"subset; rejected {resolved_incompatible_soundfont}"
+                    )
+                elif plan.resolved_soundfont is not None:
+                    fallback_reason = (
+                        "authored SoundFont did not resolve exactly; renderer fallback was rejected for Ardour: "
+                        f"{plan.resolved_soundfont}"
+                    )
+                else:
+                    fallback_reason = f"SoundFont backend did not resolve: {plan.requested or name}"
             elif plan is not None and plan.wants_procedural_fm:
                 fallback_reason = "procedural_fm has no Ardour LV2 realization yet"
             else:
@@ -1016,35 +1123,605 @@ def _resolve_track_realizations(
     return rows
 
 
-def _lv2_asset_state_ttl(state: _Lv2AssetState) -> str:
-    asset_uri = state.asset_path.expanduser().resolve().as_uri()
-    return "\n".join(
-        [
-            "@prefix atom: <http://lv2plug.in/ns/ext/atom#> .",
-            "@prefix lv2: <http://lv2plug.in/ns/lv2core#> .",
-            "@prefix pset: <http://lv2plug.in/ns/ext/presets#> .",
-            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .",
-            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
-            "@prefix state: <http://lv2plug.in/ns/ext/state#> .",
-            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .",
-            "",
-            "<>",
-            "    a pset:Preset ;",
-            f"    lv2:appliesTo <{state.plugin_uri}> ;",
-            "    state:state [",
-            f"        <{state.property_uri}> <{asset_uri}>",
-            "    ] .",
-            "",
-        ]
+def _lua_string(value: str) -> str:
+    """Quote a Python string as a conservative Lua string literal."""
+
+    return (
+        '"'
+        + str(value)
+        .replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        + '"'
     )
 
 
-def _write_lv2_asset_states(destination: Path, states: list[_Lv2AssetState]) -> None:
-    for state in states:
-        state_dir = destination / "plugins" / state.processor_id / "state1"
-        state_dir.mkdir(parents=True, exist_ok=True)
-        (state_dir / "state.ttl").write_text(_lv2_asset_state_ttl(state), encoding="utf8")
+def _write_ardour_instrument_bootstrap(
+    destination: Path,
+    *,
+    session_name: str,
+    realizations: list[_TrackRealization],
+) -> Path:
+    """Write the libardour pass that owns real LV2 plugin serialization.
 
+    ``get_plugin_insert_property`` is *not* a portable readiness probe.  In the
+    user's Ardour/sfizz build it returned ``nil`` forever even though setting the
+    property was accepted and earlier sessions later restored the requested
+    SFZs.  The reliable boundary is Ardour's serialized LV2 state: ask Ardour to
+    create the plugins and set their path properties, give worker threads a
+    conservative settling window, save/close, then let Python inspect the state
+    directories that Ardour actually wrote.  ``apply_ardour_instruments`` can
+    retry from the pristine audition scaffold with a longer settle window if a
+    large library (notably a drum kit) was still on its default asset.
+    """
+
+    script_path = destination / "ambition" / "apply_real_instruments.lua"
+    script_path.parent.mkdir(parents=True, exist_ok=True)
+    specs: list[str] = []
+    for realization in realizations:
+        if not realization.has_real_instrument:
+            continue
+        assert realization.plugin_uri is not None
+        assert realization.asset_path is not None
+        assert realization.property_uri is not None
+        specs.append(
+            "  [%s] = { uri = %s, property = %s, asset = %s },"
+            % (
+                _lua_string(realization.instrument),
+                _lua_string(realization.plugin_uri),
+                _lua_string(realization.property_uri),
+                _lua_string(str(realization.asset_path)),
+            )
+        )
+
+    text = "\n".join(
+        [
+            "-- Generated by ambition_music_renderer. Do not hand-edit.",
+            "-- Run with Ardour's gtk2_ardour/arlua so libardour owns plugin state.",
+            "local session_dir = assert(arg[1], 'missing session directory')",
+            "local snapshot = assert(arg[2], 'missing snapshot/session name')",
+            "local settle_seconds = tonumber(arg[3] or '1.0')",
+            "assert(settle_seconds >= 0, 'invalid settle time')",
+            "",
+            "local specs = {",
+            *specs,
+            "}",
+            "",
+            "load_session(session_dir, snapshot)",
+            "assert(Session ~= nil, 'failed to load Ardour session')",
+            "",
+            "local pending = {}",
+            "for route in Session:get_routes():iter() do",
+            "  local spec = specs[route:name()]",
+            "  if spec ~= nil then",
+            "    local old = route:the_instrument()",
+            "    assert(not old:isnil(), 'no instrument processor on route ' .. route:name())",
+            "    local proc = ARDOUR.LuaAPI.new_plugin(Session, spec.uri, ARDOUR.PluginType.LV2, '')",
+            "    assert(not proc:isnil(), 'LV2 plugin is unavailable: ' .. spec.uri)",
+            "    table.insert(pending, { route = route, old = old, proc = proc, spec = spec })",
+            "  end",
+            "end",
+            "",
+            "-- Instantiate every plugin before mutating the routes so a missing plugin",
+            "-- cannot leave a half-converted session.",
+            "for _, item in ipairs(pending) do",
+            "  item.route:replace_processor(item.old, item.proc, nil)",
+            "  local insert = item.proc:to_insert()",
+            "  assert(not insert:isnil(), 'new processor is not a plugin insert on ' .. item.route:name())",
+            "  local ok = ARDOUR.LuaAPI.set_plugin_insert_property(insert, item.spec.property, item.spec.asset)",
+            "  assert(ok, 'failed to set instrument asset on ' .. item.route:name())",
+            "  print('Ambition Ardour instrument requested: ' .. item.route:name() .. ' -> ' .. item.spec.asset)",
+            "end",
+            "",
+            "-- LV2 path changes can schedule worker-thread loads.  Sleeping here leaves",
+            "-- the audio engine/workers running; Python verifies the *serialized* state",
+            "-- after save and retries from the pristine scaffold with a longer delay when",
+            "-- a large asset was not ready yet.",
+            "sleep(settle_seconds)",
+            "Session:save_state('')",
+            "Session:close()",
+            "",
+        ]
+    )
+    script_path.write_text(text, encoding="utf8")
+    return script_path
+
+def detect_ardour_lua(explicit: Path | str | None = None) -> Path | None:
+    """Find the command-line libardour Lua frontend used for post-processing."""
+
+    if explicit is not None:
+        candidate = Path(explicit).expanduser().resolve()
+        return candidate if candidate.is_file() else None
+    env_value = os.environ.get("ARDOUR_LUA")
+    if env_value:
+        candidate = Path(env_value).expanduser().resolve()
+        if candidate.is_file():
+            return candidate
+    for command in ("ardour-lua", "arlua"):
+        found = shutil.which(command)
+        if found:
+            return Path(found).resolve()
+    source_build = Path.home() / "code" / "ardour" / "gtk2_ardour" / "arlua"
+    if source_build.is_file():
+        return source_build.resolve()
+    return None
+
+
+
+def _expected_realization_rows(result: ArdourExportResult) -> list[dict[str, str]]:
+    """Return the concrete LV2 asset requests recorded in the export marker."""
+
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    rows: list[dict[str, str]] = []
+    for track in data.get("tracks", []):
+        realization = dict(track.get("ardour_realization") or {})
+        plugin_uri = realization.get("plugin_uri")
+        asset = realization.get("asset")
+        if not plugin_uri or not asset:
+            continue
+        rows.append(
+            {
+                "instrument": str(track.get("instrument") or track.get("name") or ""),
+                "plugin_uri": str(plugin_uri),
+                "asset": str(asset),
+            }
+        )
+    return rows
+
+
+def _state_dir_mentions_asset(state_dir: Path, expected_asset: Path) -> tuple[bool, str]:
+    """Verify one Ardour-owned LV2 state directory names the expected asset.
+
+    Ardour's LV2 state mapper commonly creates a symlink/copy beside state.ttl;
+    some plugins instead persist an abstract/absolute path in Turtle.  Accept
+    either representation, but require the exact expected basename and reject a
+    generic/default asset.  A symlink/hardlink is additionally checked against
+    the original machine-local asset path when possible.
+    """
+
+    expected_asset = expected_asset.expanduser().resolve()
+    candidate = state_dir / expected_asset.name
+    wrong_symlink_target: Path | None = None
+    copied_candidate = False
+    if candidate.is_symlink():
+        try:
+            resolved_candidate = candidate.resolve()
+            if resolved_candidate == expected_asset:
+                return True, f"symlink {candidate.name} -> {expected_asset}"
+            wrong_symlink_target = resolved_candidate
+        except OSError:
+            wrong_symlink_target = candidate
+    elif candidate.exists():
+        try:
+            if os.path.samefile(candidate, expected_asset):
+                return True, f"samefile {candidate.name}"
+        except OSError:
+            pass
+        try:
+            if candidate.is_file() and candidate.stat().st_size == expected_asset.stat().st_size:
+                # LV2 state mappers are allowed to copy external assets.  The
+                # exact basename plus exact byte size is sufficient here; the
+                # adjacent Turtle check below still confirms this is the path
+                # the plugin serialized rather than an unrelated file.
+                copied_candidate = True
+        except OSError:
+            copied_candidate = False
+
+    expected_name = expected_asset.name
+    expected_path = str(expected_asset)
+    turtle_hits: list[str] = []
+    for path in sorted(state_dir.rglob("*.ttl")):
+        try:
+            raw = path.read_text(encoding="utf8", errors="replace")
+        except OSError:
+            continue
+        decoded = unquote(raw)
+        if expected_name in decoded or expected_path in decoded:
+            turtle_hits.append(str(path.relative_to(state_dir)))
+    if turtle_hits:
+        if wrong_symlink_target is not None:
+            return (
+                False,
+                f"state names {expected_name!r}, but its symlink resolves to "
+                f"{wrong_symlink_target} instead of {expected_asset}",
+            )
+        if candidate.exists() and copied_candidate:
+            return True, f"copied asset + Turtle reference ({', '.join(turtle_hits)})"
+        # An absolute/abstract path can legitimately remain external, so a
+        # Turtle reference to the exact path/name is itself valid state.
+        return True, f"Turtle reference ({', '.join(turtle_hits)})"
+
+    visible = []
+    try:
+        visible = sorted(path.name for path in state_dir.iterdir())[:12]
+    except OSError:
+        pass
+    return False, f"state dir {state_dir} does not reference {expected_name!r}; contains {visible}"
+
+
+def _serialized_instrument_state_errors(result: ArdourExportResult) -> list[str]:
+    """Check the LV2 state Ardour actually persisted after the native pass."""
+
+    expected_rows = _expected_realization_rows(result)
+    if not expected_rows:
+        return []
+    try:
+        root = ET.parse(result.session_file).getroot()
+    except Exception as ex:
+        return [f"cannot parse Ardour session after native save: {ex}"]
+
+    routes_node = root.find("Routes")
+    if routes_node is None:
+        return ["Ardour session has no Routes node after native save"]
+    routes = {str(route.get("name")): route for route in routes_node.findall("Route")}
+    errors: list[str] = []
+    for expected in expected_rows:
+        name = expected["instrument"]
+        route = routes.get(name)
+        if route is None:
+            errors.append(f"{name}: route missing after native save")
+            continue
+        processors = [
+            proc
+            for proc in route.findall("Processor")
+            if proc.get("type") == "lv2" and proc.get("unique-id") == expected["plugin_uri"]
+        ]
+        if len(processors) != 1:
+            found = [
+                (proc.get("name"), proc.get("unique-id"), proc.get("id"))
+                for proc in route.findall("Processor")
+                if proc.get("type") == "lv2"
+            ]
+            errors.append(
+                f"{name}: expected one LV2 {expected['plugin_uri']!r}, found {found}"
+            )
+            continue
+        proc = processors[0]
+        proc_id = proc.get("id")
+        if not proc_id:
+            errors.append(f"{name}: serialized LV2 processor has no id")
+            continue
+        plugin_root = result.session_dir / "plugins" / str(proc_id)
+        state_name = proc.get("state-dir")
+        if state_name:
+            candidate_state_dirs = [plugin_root / state_name]
+        else:
+            candidate_state_dirs = sorted(path for path in plugin_root.glob("state*") if path.is_dir())
+        if not candidate_state_dirs:
+            errors.append(f"{name}: no serialized LV2 state directory under {plugin_root}")
+            continue
+        expected_asset = Path(expected["asset"])
+        verified = False
+        details: list[str] = []
+        for state_dir in candidate_state_dirs:
+            ok, detail = _state_dir_mentions_asset(state_dir, expected_asset)
+            details.append(detail)
+            if ok:
+                verified = True
+                break
+        if not verified:
+            errors.append(f"{name}: " + "; ".join(details))
+    return errors
+
+
+def _element_semantic_signature(element: ET.Element | None) -> tuple[Any, ...] | None:
+    """Return a whitespace-insensitive XML signature for structural invariants."""
+
+    if element is None:
+        return None
+    return (
+        element.tag,
+        tuple(sorted((str(key), str(value)) for key, value in element.attrib.items())),
+        (element.text or "").strip(),
+        tuple(_element_semantic_signature(child) for child in list(element)),
+    )
+
+
+def _session_timing_signature(root: ET.Element) -> tuple[Any, ...]:
+    """Capture the session structures that define MIDI placement and tempo.
+
+    Native libardour is allowed to own plugin serialization, but the instrument
+    realization pass must not rewrite the already-auditioned MIDI scaffold.
+    Keeping this signature stable prevents a plugin bootstrap/save cycle from
+    changing source identity, region placement, playlists, locations, or tempo.
+    """
+
+    return tuple(
+        (tag, _element_semantic_signature(root.find(tag)))
+        for tag in ("Sources", "Regions", "Playlists", "Locations", "TempoMap")
+    )
+
+
+def _graft_native_instruments_onto_scaffold(
+    result: ArdourExportResult,
+    *,
+    scaffold_bytes: bytes,
+) -> None:
+    """Keep pristine MIDI/session timing and copy only Ardour-owned instruments.
+
+    ``arlua`` must save the session so Ardour can create valid LV2 processor and
+    state objects.  Accepting that *entire* saved session is unnecessary, though,
+    and lets a headless load/save normalize unrelated hand-authored scaffold
+    state.  Instead, extract only the verified instrument processor from each
+    route, restore the known-good scaffold, and graft those processors back at
+    the exact Reasonable Synth slot.  The plugin state directories are already
+    Ardour-owned and remain in place.
+    """
+
+    expected_rows = _expected_realization_rows(result)
+    if not expected_rows:
+        # No real instruments were requested; the native session has nothing
+        # useful to contribute.  Preserve the known-good scaffold byte-for-byte.
+        result.session_file.write_bytes(scaffold_bytes)
+        return
+
+    try:
+        native_root = ET.parse(result.session_file).getroot()
+        scaffold_root = ET.fromstring(scaffold_bytes)
+    except Exception as ex:
+        raise ArdourExportError(f"cannot parse Ardour session for instrument graft: {ex}") from ex
+
+    scaffold_timing = _session_timing_signature(scaffold_root)
+    native_routes_node = native_root.find("Routes")
+    scaffold_routes_node = scaffold_root.find("Routes")
+    if native_routes_node is None or scaffold_routes_node is None:
+        raise ArdourExportError("cannot graft instruments: Ardour session has no Routes node")
+
+    native_routes = {str(route.get("name")): route for route in native_routes_node.findall("Route")}
+    scaffold_routes = {str(route.get("name")): route for route in scaffold_routes_node.findall("Route")}
+
+    for expected in expected_rows:
+        name = expected["instrument"]
+        native_route = native_routes.get(name)
+        scaffold_route = scaffold_routes.get(name)
+        if native_route is None or scaffold_route is None:
+            raise ArdourExportError(f"cannot graft instrument {name!r}: route missing")
+
+        native_plugins = [
+            proc
+            for proc in native_route.findall("Processor")
+            if proc.get("type") == "lv2" and proc.get("unique-id") == expected["plugin_uri"]
+        ]
+        if len(native_plugins) != 1:
+            raise ArdourExportError(
+                f"cannot graft instrument {name!r}: expected one native plugin "
+                f"{expected['plugin_uri']!r}, found {len(native_plugins)}"
+            )
+
+        scaffold_plugins = [
+            proc
+            for proc in scaffold_route.findall("Processor")
+            if proc.get("type") == "lv2" and proc.get("unique-id") == ACE_REASONABLE_SYNTH_URI
+        ]
+        if len(scaffold_plugins) != 1:
+            raise ArdourExportError(
+                f"cannot graft instrument {name!r}: expected one Reasonable Synth slot, "
+                f"found {len(scaffold_plugins)}"
+            )
+
+        old = scaffold_plugins[0]
+        children = list(scaffold_route)
+        position = children.index(old)
+        scaffold_route.remove(old)
+        scaffold_route.insert(position, copy.deepcopy(native_plugins[0]))
+
+    # The copied processor/state objects were allocated from the native
+    # session's ID counter.  Carry only that allocator watermark forward so
+    # future Ardour edits cannot reuse one of those IDs.
+    try:
+        scaffold_counter = int(scaffold_root.get("id-counter", "0"))
+        native_counter = int(native_root.get("id-counter", "0"))
+        scaffold_root.set("id-counter", str(max(scaffold_counter, native_counter)))
+    except ValueError:
+        pass
+
+    if _session_timing_signature(scaffold_root) != scaffold_timing:
+        raise ArdourExportError(
+            "internal error: instrument graft changed MIDI/session timing structure"
+        )
+
+    tree = ET.ElementTree(scaffold_root)
+    ET.indent(tree, space="  ")
+    tree.write(result.session_file, encoding="UTF-8", xml_declaration=True)
+
+
+def _ardour_midi_source_dir(result: ArdourExportResult) -> Path:
+    return (
+        result.session_dir
+        / "interchange"
+        / result.session_file.stem
+        / "midifiles"
+    )
+
+
+def _snapshot_ardour_midi_sources(result: ArdourExportResult) -> dict[str, bytes]:
+    """Capture generated MIDI sources before libardour is allowed to touch them."""
+
+    midi_dir = _ardour_midi_source_dir(result)
+    if not midi_dir.is_dir():
+        raise ArdourExportError(f"generated Ardour MIDI source directory is missing: {midi_dir}")
+    snapshot = {
+        str(path.relative_to(midi_dir)): path.read_bytes()
+        for path in sorted(midi_dir.rglob("*"))
+        if path.is_file()
+    }
+    if not snapshot:
+        raise ArdourExportError(f"generated Ardour MIDI source directory is empty: {midi_dir}")
+    return snapshot
+
+
+def _restore_ardour_midi_sources(
+    result: ArdourExportResult,
+    snapshot: Mapping[str, bytes],
+) -> None:
+    """Restore MIDI sources exactly, removing native-save scratch/take files."""
+
+    midi_dir = _ardour_midi_source_dir(result)
+    if midi_dir.exists():
+        shutil.rmtree(midi_dir)
+    midi_dir.mkdir(parents=True, exist_ok=True)
+    for relative, payload in snapshot.items():
+        path = midi_dir / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+
+
+def _restore_ardour_scaffold(
+    result: ArdourExportResult,
+    scaffold_bytes: bytes,
+    *,
+    midi_snapshot: Mapping[str, bytes] | None = None,
+) -> None:
+    """Return a failed/retry attempt to the known-good audition baseline."""
+
+    result.session_file.write_bytes(scaffold_bytes)
+    if midi_snapshot is not None:
+        _restore_ardour_midi_sources(result, midi_snapshot)
+    plugins_dir = result.session_dir / "plugins"
+    if plugins_dir.exists():
+        shutil.rmtree(plugins_dir)
+    plugins_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _update_realization_status(
+    result: ArdourExportResult,
+    *,
+    status: str,
+    ardour_lua: Path | None = None,
+    error: str | None = None,
+) -> None:
+    """Record post-processing status without making session XML authoritative."""
+
+    try:
+        data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+        realization = data.setdefault("instrument_realization", {})
+        realization["status"] = status
+        if ardour_lua is not None:
+            realization["ardour_lua"] = str(ardour_lua)
+        if error is not None:
+            realization["error"] = error
+        else:
+            realization.pop("error", None)
+        result.export_manifest.write_text(
+            json.dumps(data, indent=2, sort_keys=True),
+            encoding="utf8",
+        )
+    except (OSError, ValueError, TypeError):
+        # Status reporting is diagnostic. Never turn a successfully generated
+        # or successfully post-processed session into a failure because the
+        # adjacent JSON marker could not be rewritten.
+        pass
+
+
+def apply_ardour_instruments(
+    result: ArdourExportResult,
+    *,
+    ardour_lua: Path | str,
+) -> subprocess.CompletedProcess[str]:
+    """Ask Ardour to realize plugins, then verify Ardour's serialized LV2 state.
+
+    Runtime property readback is not used: sfizz can accept a path change while
+    ``get_plugin_insert_property`` remains nil in headless ``arlua``.  Instead
+    each attempt starts from the exact known-good audition scaffold *and MIDI
+    source bytes*, lets Ardour own plugin creation/state saving, and verifies the
+    resulting ``plugins/...``
+    state directories.  If a large asset was still on its default patch, retry
+    with a longer settle window.  Any final failure restores the audible
+    Reasonable Synth scaffold.
+    """
+
+    if result.instrument_bootstrap is None:
+        raise ArdourExportError("Ardour export has no instrument bootstrap script")
+    exe = Path(ardour_lua).expanduser().resolve()
+    if not exe.is_file():
+        raise ArdourExportError(f"Ardour Lua frontend does not exist: {exe}")
+
+    scaffold_bytes = result.session_file.read_bytes()
+    midi_snapshot = _snapshot_ardour_midi_sources(result)
+    attempt_messages: list[str] = []
+    last_completed: subprocess.CompletedProcess[str] | None = None
+
+    for attempt_index, settle_seconds in enumerate(ARDOUR_ASSET_SETTLE_SCHEDULE_SECONDS, start=1):
+        if attempt_index > 1:
+            _restore_ardour_scaffold(
+                result, scaffold_bytes, midi_snapshot=midi_snapshot
+            )
+        command = [
+            str(exe),
+            str(result.instrument_bootstrap),
+            str(result.session_dir),
+            result.session_file.stem,
+            f"{settle_seconds:g}",
+        ]
+        completed = subprocess.run(command, text=True, capture_output=True, check=False)
+        last_completed = completed
+        details = "\n".join(part for part in (completed.stdout, completed.stderr) if part.strip())
+
+        # The libardour/arlua process exit code is advisory here.  We have seen
+        # headless Ardour return non-zero after it has nevertheless serialized
+        # every requested LV2 instrument correctly.  Conversely, a zero exit
+        # code does not prove that a large asynchronous SFZ/SF2 asset finished
+        # loading.  The persisted plugin state is therefore the authoritative
+        # postcondition: accept a non-zero process result when all requested
+        # assets verify, and retry/rollback when they do not.
+        verification_errors = _serialized_instrument_state_errors(result)
+        if not verification_errors:
+            # libardour treats generated MIDI sources as writable and may
+            # normalize/rewrite them while saving plugin state.  Musical data
+            # is not part of this native post-processing transaction: restore
+            # the pristine generated sources before grafting only the verified
+            # instrument processors onto the timing scaffold.
+            _restore_ardour_midi_sources(result, midi_snapshot)
+            # Keep Ardour-owned plugin serialization/state, but do not accept
+            # unrelated session normalization from the headless load/save.
+            # The audition scaffold is already our proven MIDI timing surface.
+            _graft_native_instruments_onto_scaffold(
+                result,
+                scaffold_bytes=scaffold_bytes,
+            )
+            post_graft_errors = _serialized_instrument_state_errors(result)
+            if post_graft_errors:
+                _restore_ardour_scaffold(
+                    result, scaffold_bytes, midi_snapshot=midi_snapshot
+                )
+                raise ArdourExportError(
+                    "verified native instruments became invalid while grafting them onto "
+                    "the timing-preserving scaffold: " + " | ".join(post_graft_errors)
+                )
+            _update_realization_status(result, status="applied", ardour_lua=exe)
+            return completed
+
+        attempt_summary = (
+            f"attempt {attempt_index} settle={settle_seconds:g}s "
+            f"exit={completed.returncode}: "
+            + " | ".join(verification_errors)
+        )
+        if details:
+            attempt_summary += "\n" + details
+        attempt_messages.append(attempt_summary)
+
+    _restore_ardour_scaffold(
+        result, scaffold_bytes, midi_snapshot=midi_snapshot
+    )
+    error_text = "\n".join(attempt_messages)
+    if last_completed is not None:
+        native_output = "\n".join(
+            part for part in (last_completed.stdout, last_completed.stderr) if part.strip()
+        )
+        if native_output:
+            error_text = (error_text + "\n" + native_output).strip()
+    _update_realization_status(
+        result,
+        status="failed",
+        ardour_lua=exe,
+        error=error_text or "serialized LV2 state did not match requested assets",
+    )
+    raise ArdourExportError(
+        "Ardour saved instrument plugins, but their serialized LV2 state did not match the "
+        "requested assets after all settle/retry windows. The generated session was rolled "
+        "back to the working ACE Reasonable Synth scaffold.\n" + error_text
+    )
 
 def _prepare_destination(destination: Path, *, force: bool) -> None:
     if not destination.exists():
@@ -1090,6 +1767,12 @@ def export_ardour_session(
     neutral MIDI/interchange sidecar remain the round-trip boundary.
     """
 
+    # ``add_audition_synth`` is retained for compatibility with the first
+    # experimental CLI.  The safe architecture now requires exactly one
+    # Reasonable Synth in the scaffold so libardour has one instrument to
+    # replace atomically; serial backup instruments are deliberately gone.
+    _ = add_audition_synth
+
     destination = Path(destination).expanduser().resolve()
     _prepare_destination(destination, force=force)
     cue_id = str(compiled.normalized_spec.get("id") or "score")
@@ -1108,6 +1791,7 @@ def export_ardour_session(
         neutral["midi"],
         midi_dir,
         track_names=[str(inst.name) for inst in compiled.pm.instruments],
+        track_is_drum=[bool(inst.is_drum) for inst in compiled.pm.instruments],
         end_beats=end_beats,
     )
     (destination / "interchange" / session_name / "audiofiles").mkdir(parents=True, exist_ok=True)
@@ -1122,23 +1806,28 @@ def export_ardour_session(
         base_dir=base_dir,
         realize_instruments=realize_instruments,
     )
-    tree, track_state, lv2_states = _build_session_xml(
+    # Always serialize the same single-instrument audition scaffold that was
+    # validated interactively.  Real plugins are applied by libardour below.
+    tree, track_state = _build_session_xml(
         compiled,
         session_name=session_name,
         sample_rate=sample_rate,
         track_midis=track_midis,
-        realizations=realizations,
         bpm=bpm,
         numerator=numerator,
         denominator=denominator,
         end_beats=end_beats,
         end_seconds=end_seconds,
-        add_audition_synth=add_audition_synth,
+        add_synth=True,
     )
     ET.indent(tree, space="  ")
     session_file = destination / f"{session_name}.ardour"
     tree.write(session_file, encoding="UTF-8", xml_declaration=True)
-    _write_lv2_asset_states(destination, lv2_states)
+    instrument_bootstrap = _write_ardour_instrument_bootstrap(
+        destination,
+        session_name=session_name,
+        realizations=(realizations if realize_instruments else []),
+    )
 
     export_manifest = destination / EXPORT_MARKER
     manifest_data = {
@@ -1157,20 +1846,21 @@ def export_ardour_session(
         },
         "instrument_realization": {
             "enabled": bool(realize_instruments),
+            "method": "ardour_lua_replace_single_instrument",
+            "bootstrap": str(instrument_bootstrap.relative_to(destination)),
             "sfz_plugin": "sfizz",
             "sfz_plugin_uri": SFIZZ_URI,
             "soundfont_plugin": "ACE Fluid Synth",
             "soundfont_plugin_uri": ACE_FLUID_SYNTH_URI,
             "local_asset_paths": True,
+            "asset_verification": "serialized_lv2_state_retry_verify",
+            "session_merge": "plugin_processor_graft_onto_pristine_scaffold",
+            "status": "pending" if realize_instruments else "audition_only",
         },
         "audition": {
             "plugin": "ACE Reasonable Synth",
             "plugin_uri": ACE_REASONABLE_SYNTH_URI,
-            "backup_enabled": bool(add_audition_synth),
-            "purpose": (
-                "neutral MIDI composition audit; inactive behind resolved real instruments, "
-                "active only when no real instrument realization is available"
-            ),
+            "purpose": "known-good neutral MIDI composition audit and safe pre-realization scaffold",
         },
         "tracks": [
             {**state, **realization.to_manifest()}
@@ -1179,7 +1869,10 @@ def export_ardour_session(
         "limitations": [
             "Ardour session tempo/meter scaffolding currently requires constant tempo and meter.",
             "The generated Ardour session references machine-local SFZ/SoundFont paths and is not a portable sample bundle.",
-            "Procedural-FM and unsupported backend realizations fall back to the neutral audition synth.",
+            "Real plugins are created and serialized by Ardour/libardour, then only the verified instrument Processor nodes are grafted onto the pristine timing scaffold.",
+            "Ardour per-track MIDI preserves the neutral interchange channel assignment; route separation provides instrument isolation without rewriting channels.",
+            "Procedural-FM and unsupported backend realizations remain on the neutral audition synth.",
+            "ACE Fluid Synth realization uses SF2 only; SF3 compatibility depends on the FluidSynth version bundled into Ardour.",
             "Renderer processing/mastering is not serialized into Ardour; use renderer audio as reference when timbral fidelity matters.",
         ],
     }
@@ -1192,17 +1885,16 @@ def export_ardour_session(
                 "",
                 f"Open: {session_file}",
                 "",
-                "Resolved SFZ instruments use sfizz. SoundFont/GM instruments use ACE Fluid Synth.",
-                "Their local SFZ/SF2 paths are restored through Ardour LV2 state files under plugins/.",
+                "The XML scaffold starts with exactly one ACE Reasonable Synth per MIDI track.",
+                "That is the known-good audible editing baseline.",
                 "",
-                "When a real instrument is resolved, ACE Reasonable Synth is inserted behind it inactive.",
-                "For a neutral MIDI composition audit: deactivate/bypass the real instrument and activate",
-                "ACE Reasonable Synth. This changes timbre only; the MIDI region stays the same.",
-                "When a real instrument could not be resolved, Reasonable Synth is active as the fallback.",
+                "Real SFZ/SoundFont instruments are applied by Ardour's own Lua/libardour frontend",
+                "using ambition/apply_real_instruments.lua. Ardour saves its own LV2 state; Python",
+                "then verifies those serialized state directories and retries from the pristine",
+                "audition scaffold with longer settle windows when a large asset is not ready yet.",
                 "",
-                "To swap an SFZ without touching notes, open the sfizz processor and choose another SFZ.",
-                "To swap a GM/SoundFont realization, change the ACE Fluid Synth SoundFont or replace the",
-                "instrument processor. Ardour keeps the MIDI region independent of the instrument plugin.",
+                "Once a real instrument is applied, swap it in Ardour's processor box without touching",
+                "the MIDI region. Unsupported instruments remain on ACE Reasonable Synth.",
                 "",
                 "The Master bus intentionally has no instrument plugin.",
                 "The session does not pin an audio backend or hardware device; Ardour should use your current setup.",
@@ -1223,4 +1915,5 @@ def export_ardour_session(
         neutral_midi=neutral["midi"],
         interchange_manifest=neutral["manifest"],
         export_manifest=export_manifest,
+        instrument_bootstrap=instrument_bootstrap,
     )

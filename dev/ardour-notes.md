@@ -92,8 +92,9 @@ cd ~/code/ardour/gtk2_ardour
 Expected session shape:
 
 - one MIDI track per `CompiledScore` instrument, using its semantic name;
-- resolved SFZ tracks use sfizz and resolved SoundFont/GM tracks use ACE Fluid Synth;
-- an inactive ACE Reasonable Synth follows each resolved real instrument as a neutral MIDI-audit fallback;
+- Python writes exactly one ACE Reasonable Synth per MIDI track as the validated audible scaffold;
+- unless `--audition-only` is used, `ardour_export` auto-detects Ardour's `arlua` frontend and asks libardour to replace that one synth with sfizz or ACE Fluid Synth on resolvable tracks;
+- unsupported/unresolved tracks stay on the known-good ACE Reasonable Synth rather than entering a broken plugin chain;
 - stereo audio from each MIDI track into Master;
 - **no instrument plugin on Master**;
 - section markers from compiled form;
@@ -101,15 +102,18 @@ Expected session shape:
 - neutral MIDI + `.musicir-interchange.json` under `ambition/`; and
 - `.ambition-ardour-export.json` containing resolved renderer instrument plans.
 
-The current adapter supports fixed tempo/meter sessions. It writes SFZ/SoundFont
-plugin state into Ardour's `plugins/<processor-id>/state1/state.ttl` directories,
-using the canonical resolved local asset paths. It does not yet recreate renderer
-processing/mastering. Do not overwrite a session after making DAW edits.
+The current adapter supports fixed tempo/meter sessions. It does **not** hand-write
+SFZ/SoundFont LV2 state. Instead `ambition/apply_real_instruments.lua` is run by
+Ardour's command-line Lua/libardour frontend, which creates the plugin, sets its
+path-valued asset property, and serializes the resulting session itself. Pass
+`--ardour-lua <path>` if auto-detection does not find `~/code/ardour/gtk2_ardour/arlua`.
+It does not yet recreate renderer processing/mastering. Do not overwrite a session
+after making DAW edits.
 
-For note-composition review, either export with `--audition-only`, or bypass the
-real sfizz/ACE Fluid Synth processor on one track and activate the Reasonable Synth
-behind it. The MIDI stays fixed while the listening timbre changes, which makes
-instrument swapping and neutral pitch/rhythm review cheap inside Ardour.
+For note-composition review, export a separate `--audition-only` session. That
+keeps every track on the validated Reasonable Synth and is currently the safest
+neutral pitch/rhythm audit surface. Instrument A/B should be implemented as a
+parallel/replace workflow, not by chaining two instrument plugins in series.
 
 If playback is silent, first verify that MIDI-track meters and Master move. The
 audio backend can be ALSA or PulseAudio; on the maintainer setup PulseAudio maps
