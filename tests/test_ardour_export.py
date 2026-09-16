@@ -22,8 +22,12 @@ from ambition_music_renderer.ardour_export import (
     apply_ardour_processing,
     export_ardour_session,
 )
-from ambition_music_renderer.ardour_processing import compile_processing_transport
+from ambition_music_renderer.ardour_processing import (
+    compile_processing_transport,
+    translate_processing_plan,
+)
 from ambition_music_renderer.musicir.compile import compile_score
+from ambition_music_renderer.processing.model import ProcessingOperation, ProcessingPlan
 
 
 
@@ -358,6 +362,8 @@ def test_ardour_export_realization_uses_known_good_scaffold_and_ardour_bootstrap
     assert "wait_for_asset" not in lua
     assert "settle_seconds" in lua
     assert "Session:save_state('')" in lua
+    assert "session_port.rc" in lua
+    assert "restore_misc_port_state()" in lua
     assert SFIZZ_URI in lua
     assert SFIZZ_FILE_PROPERTY in lua
     assert str(sfz.resolve()) in lua
@@ -925,6 +931,40 @@ def _mix_transport_score():
     return spec
 
 
+def test_ardour_processing_transport_omits_known_realtime_unsafe_lv2_insert():
+    safe_uri = "http://guitarix.sourceforge.net/plugins/gxts9#ts9sim"
+    unsafe_uri = "http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st"
+    plan = ProcessingPlan(
+        stage="group_stem",
+        source="test",
+        operations=(
+            ProcessingOperation(
+                "lv2",
+                {
+                    "plugin_uri": safe_uri,
+                    "params": {"fslider0_": -4.0},
+                    "required": True,
+                },
+            ),
+            ProcessingOperation(
+                "lv2",
+                {
+                    "plugin_uri": unsafe_uri,
+                    "params": {"P6v": 0.7, "GAIN": -2.0},
+                    "required": True,
+                },
+            ),
+        ),
+    )
+
+    processors, omitted = translate_processing_plan(plan)
+
+    assert [processor.plugin for processor in processors] == [safe_uri]
+    assert len(omitted) == 1
+    assert unsafe_uri in omitted[0]
+    assert "poison/silence downstream Ardour bus audio" in omitted[0]
+
+
 def test_ardour_processing_transport_keeps_safe_scaffold_and_generates_native_bus_plan(tmp_path: Path):
     compiled = compile_score(_mix_transport_score())
     result = export_ardour_session(
@@ -965,6 +1005,9 @@ def test_ardour_processing_transport_keeps_safe_scaffold_and_generates_native_bu
     assert processing["enabled"] is True
     assert processing["status"] == "pending"
     assert processing["method"] == "canonical_processing_plan_to_libardour_native_group_buses"
+    assert processing["session_merge"] == "libardour_native_routes_node_onto_pristine_session"
+    assert processing["live_graph_verification"] == "arlua_reload_port_connected_to"
+    assert processing["verification_bootstrap"] == "ambition/verify_processing.lua"
     assert processing["mix_routing"]["groups"]["melody"]["created_by"] == "libardour.Session:new_audio_route"
     assert manifest["tracks"][0]["output_route"] == "AMB Group melody"
     assert manifest["tracks"][0]["scaffold_output_route"] == "Master"
@@ -981,16 +1024,25 @@ def test_ardour_processing_transport_keeps_safe_scaffold_and_generates_native_bu
     assert result.processing_bootstrap is not None
     lua = result.processing_bootstrap.read_text(encoding="utf8")
     assert "Session:new_audio_route" in lua
+    assert "session_port.rc" in lua
+    assert "restore_misc_port_state()" in lua
+    assert "get_output_auto_connect()" in lua
     assert "ARDOUR.config():set_output_auto_connect(ARDOUR.AutoConnectOption.ManualConnect)" in lua
+    assert "ARDOUR.config():set_output_auto_connect(previous_output_auto_connect)" in lua
     assert "op:connect(ip:name())" in lua
     assert "op:connected_to(ip:name())" in lua
     assert "route:amp():gain_control()" in lua
     assert "ac:set_automation_state(ARDOUR.AutoState.Play)" in lua
     assert "route:add_processor_by_index" in lua
     assert "ARDOUR.LuaAPI.set_processor_param" in lua
+    verifier = result.processing_bootstrap.with_name("verify_processing.lua")
+    assert verifier.is_file()
+    verify_lua = verifier.read_text(encoding="utf8")
+    assert "op:connected_to(ip:name())" in verify_lua
+    assert "Ambition Ardour live mix graph verified" in verify_lua
 
 
-def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_state(
+def test_apply_ardour_processing_keeps_native_route_graph_and_pristine_timing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
     compiled = compile_score(_mix_transport_score())
@@ -1001,17 +1053,26 @@ def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_stat
         realize_processing=True,
     )
     before = result.session_file.read_bytes()
-    before_root = ET.fromstring(before)
-    before_routes = {route.get("name"): route for route in before_root.find("Routes")}
-    before_master_output = next(
-        io for io in before_routes["Master"].findall("IO") if io.get("direction") == "Output"
-    )
     arlua = tmp_path / "arlua"
     arlua.write_text("#!/bin/sh\n", encoding="utf8")
 
     def fake_run(command, **kwargs):
         import subprocess
 
+        if Path(command[1]).name == "verify_processing.lua":
+            root = ET.parse(result.session_file).getroot()
+            routes = {route.get("name"): route for route in root.find("Routes")}
+            assert routes["lead"].get("native-track-mutation") == "must-survive"
+            assert routes["AMB Composition"].get("native-normalized") == "1"
+            assert root.find("TempoMap").get("native-timing-mutation") is None
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                stdout="Ambition Ardour live mix graph verified\n",
+                stderr="",
+            )
+
+        assert Path(command[1]).name == "apply_processing.lua"
         data = json.loads(result.export_manifest.read_text(encoding="utf8"))
         plan = data["processing_transport"]["plan"]
         mix = data["processing_transport"]["mix_routing"]
@@ -1136,17 +1197,20 @@ def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_stat
                 route.insert(position, ET.Element("Processor", attrs))
                 position += 1
 
-        # A native headless save may know about Dummy outputs.  The final
-        # portable session must retain the scaffold Master output IO.
+        # A native headless save may know about Dummy outputs.  Keep the native
+        # Master IO object itself, but strip only its machine-specific links.
         master_output = next(
             io for io in routes["Master"].findall("IO") if io.get("direction") == "Output"
         )
+        master_output.set("native-output-identity", "must-survive")
         first_port = master_output.find("Port")
         ET.SubElement(first_port, "Connection", {"other": "system:playback_1"})
+        ET.SubElement(first_port, "ExtConnection", {"other": "system:playback_1"})
 
-        # Non-routing native mutations to MIDI tracks must not escape the mix
-        # transaction; only the live-routed Output IO is allowed through.
-        routes["lead"].set("native-track-mutation", "must-not-survive")
+        # Route normalization belongs to libardour and must survive as a whole;
+        # musical placement state remains scaffold-owned.
+        routes["lead"].set("native-track-mutation", "must-survive")
+        root.find("TempoMap").set("native-timing-mutation", "must-not-survive")
         root.set("id-counter", str(next_id + 1))
         tree.write(result.session_file, encoding="UTF-8", xml_declaration=True)
         return subprocess.CompletedProcess(
@@ -1164,7 +1228,7 @@ def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_stat
     assert data["processing_transport"]["status"] == "applied"
     assert (
         data["processing_transport"]["session_merge"]
-        == "libardour_native_bus_graph_onto_pristine_timing_scaffold"
+        == "libardour_native_routes_node_onto_pristine_session"
     )
 
     root = ET.parse(result.session_file).getroot()
@@ -1185,22 +1249,27 @@ def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_stat
             for conn in port.findall("Connection")
         }
 
-    # MIDI track state stays pristine except for the Ardour-created live output
-    # routing that is the purpose of this transaction.
+    # The complete libardour-normalized route graph is retained, including the
+    # MIDI routes that participate in it.  Timing nodes are restored separately.
     lead = routes["lead"]
-    assert lead.get("native-track-mutation") is None
+    assert lead.get("native-track-mutation") == "must-survive"
+    assert root.find("TempoMap").get("native-timing-mutation") is None
     assert "AMB Group melody/audio_in 1" in output_connections(lead)
     assert "AMB Group rhythm/audio_in 1" in output_connections(routes["kit"])
     assert "AMB Composition/audio_in 1" in output_connections(melody)
     assert "Master/audio_in 1" in output_connections(routes["AMB Composition"])
     assert any(proc.get("name") == "ACE Reasonable Synth" for proc in lead.findall("Processor"))
 
-    # Dummy/headless hardware routing is not allowed into the portable session.
+    # Dummy/headless hardware links are removed without replacing the native
+    # Master Output IO object that belongs to the coherent route graph.
     master_output = next(
         io for io in routes["Master"].findall("IO") if io.get("direction") == "Output"
     )
-    assert ET.tostring(master_output, encoding="unicode") == ET.tostring(
-        before_master_output, encoding="unicode"
+    assert master_output.get("native-output-identity") == "must-survive"
+    assert all(
+        child.tag not in {"Connection", "ExtConnection"}
+        for port in master_output.findall("Port")
+        for child in list(port)
     )
     master_input = next(
         io for io in routes["Master"].findall("IO") if io.get("direction") == "Input"
@@ -1271,6 +1340,60 @@ def test_apply_ardour_processing_requires_completion_marker(tmp_path: Path, monk
 
     with pytest.raises(ArdourExportError, match="completion marker"):
         apply_ardour_processing(result, ardour_lua=arlua)
+    assert result.session_file.read_bytes() == before
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    assert data["processing_transport"]["status"] == "failed"
+
+
+def test_apply_ardour_processing_requires_live_reload_verification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    compiled = compile_score(_mix_transport_score())
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+        realize_processing=True,
+    )
+    before = result.session_file.read_bytes()
+    arlua = tmp_path / "arlua"
+    arlua.write_text("#!/bin/sh\n", encoding="utf8")
+    calls = []
+
+    def fake_run(command, **kwargs):
+        import subprocess
+
+        calls.append(Path(command[1]).name)
+        if len(calls) == 1:
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                stdout=(
+                    "Ambition Ardour native mix graph configured\n"
+                    "Ambition Ardour processing configured\n"
+                ),
+                stderr="",
+            )
+        return subprocess.CompletedProcess(
+            command,
+            1,
+            stdout="",
+            stderr="live edge missing after reload\n",
+        )
+
+    monkeypatch.setattr("ambition_music_renderer.ardour_export.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "ambition_music_renderer.ardour_export._serialized_processing_errors",
+        lambda _result: [],
+    )
+    monkeypatch.setattr(
+        "ambition_music_renderer.ardour_export._preserve_native_processing_session",
+        lambda _result, *, scaffold_bytes: None,
+    )
+
+    with pytest.raises(ArdourExportError, match="did not reconstruct the native live mix graph"):
+        apply_ardour_processing(result, ardour_lua=arlua)
+    assert calls == ["apply_processing.lua", "verify_processing.lua"]
     assert result.session_file.read_bytes() == before
     data = json.loads(result.export_manifest.read_text(encoding="utf8"))
     assert data["processing_transport"]["status"] == "failed"

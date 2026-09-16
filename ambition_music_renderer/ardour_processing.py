@@ -29,8 +29,21 @@ ACE_REVERB_URI = "urn:ardour:a-reverb"
 ACE_AMPLIFIER = "ACE Amplifier"
 ACE_HILO_FILTER = "ACE High/Low Pass Filter"
 
+# Some plugins are valid in the canonical/offline processing path but are not
+# safe to instantiate as realtime Ardour inserts.  Keep this adapter-local:
+# omitting one here must not change the score's ProcessingPlan or the renderer's
+# normal offline LV2 realization.
+_ARDOUR_UNSAFE_LV2_PLUGINS: dict[str, str] = {
+    "http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st": (
+        "Gxjcm800preST has been observed to poison/silence downstream Ardour "
+        "bus audio when instantiated in the exported realtime mix graph; keep "
+        "the canonical offline LV2 effect, but omit this Ardour insert"
+    ),
+}
+
+
 # Stable public LV2 metadata for the Guitarix processors currently authored by
-# Ambition.  Generic plugins still use lv2info; these are a deterministic
+# Ambition. Generic plugins still use lv2info; these are a deterministic
 # fallback for environments where lv2info is not in PATH but the LV2 bundles
 # are visible to Ardour.
 _KNOWN_LV2_CONTROL_ORDINALS: dict[str, dict[str, int]] = {
@@ -340,6 +353,10 @@ def translate_processing_plan(plan: ProcessingPlan) -> tuple[tuple[ArdourProcess
             required = bool(p.get("required", not bool(p.get("optional", False))))
             if not uri:
                 omitted.append("LV2 operation has no plugin_uri")
+                continue
+            unsafe_reason = _ARDOUR_UNSAFE_LV2_PLUGINS.get(uri)
+            if unsafe_reason is not None:
+                omitted.append(f"LV2 {uri}: {unsafe_reason}")
                 continue
             ordinals, error = _lv2_param_ordinals(uri, [str(k) for k in params])
             if error and params:
