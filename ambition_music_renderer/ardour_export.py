@@ -36,6 +36,13 @@ from .instrument_resolution import instrument_backend_spec, resolve_instrument_b
 from .musicir.interchange import export_interchange_bundle
 from .musicir.model import CompiledScore
 from .render.score_core import choose_soundfont
+from .ardour_processing import (
+    COMPOSITION_BUS_NAME,
+    ArdourProcessingTransportPlan,
+    ArdourProcessorSpec,
+    compile_processing_transport,
+    group_bus_name,
+)
 
 
 ARDOUR_SESSION_VERSION = "7003"
@@ -77,6 +84,7 @@ class ArdourExportResult:
     interchange_manifest: Path
     export_manifest: Path
     instrument_bootstrap: Path | None = None
+    processing_bootstrap: Path | None = None
 
     def to_dict(self) -> dict[str, str]:
         return {
@@ -87,6 +95,9 @@ class ArdourExportResult:
             "export_manifest": str(self.export_manifest),
             "instrument_bootstrap": (
                 str(self.instrument_bootstrap) if self.instrument_bootstrap is not None else ""
+            ),
+            "processing_bootstrap": (
+                str(self.processing_bootstrap) if self.processing_bootstrap is not None else ""
             ),
         }
 
@@ -419,7 +430,21 @@ def _add_musical_mode(route: ET.Element) -> None:
     )
 
 
-def _add_amp_processor(route: ET.Element, ids: _IdAllocator, *, kind: str, control_name: str, automation_id: str, interpolation: str) -> None:
+def _db_to_gain(db: float) -> float:
+    return 10.0 ** (float(db) / 20.0)
+
+
+def _add_amp_processor(
+    route: ET.Element,
+    ids: _IdAllocator,
+    *,
+    kind: str,
+    control_name: str,
+    automation_id: str,
+    interpolation: str,
+    value: float = 1.0,
+    automation_points: list[tuple[float, float]] | None = None,
+) -> None:
     proc = ET.SubElement(
         route,
         "Processor",
@@ -433,18 +458,30 @@ def _add_amp_processor(route: ET.Element, ids: _IdAllocator, *, kind: str, contr
         },
     )
     automation = ET.SubElement(proc, "Automation")
+    attrs = {
+        "automation-id": automation_id,
+        "id": ids.take(),
+        "interpolation-style": interpolation,
+        "time-domain": "AudioTime",
+        "state": "Play" if automation_points else "Off",
+    }
+    alist = ET.SubElement(automation, "AutomationList", attrs)
+    if automation_points:
+        events = ET.SubElement(alist, "events")
+        events.text = "\n".join(
+            f"a{int(round(float(seconds) * ARDOUR_SUPERCLOCKS_PER_SECOND))} {_db_to_gain(db):.15g}"
+            for seconds, db in automation_points
+        )
     ET.SubElement(
-        automation,
-        "AutomationList",
+        proc,
+        "Controllable",
         {
-            "automation-id": automation_id,
+            "name": control_name,
             "id": ids.take(),
-            "interpolation-style": interpolation,
-            "time-domain": "AudioTime",
-            "state": "Off",
+            "flags": "GainLike",
+            "value": f"{float(value):.15g}",
         },
     )
-    ET.SubElement(proc, "Controllable", {"name": control_name, "id": ids.take(), "flags": "GainLike", "value": "1"})
 
 
 def _add_reasonable_synth(route: ET.Element, ids: _IdAllocator) -> str:
@@ -597,6 +634,138 @@ def _build_master(ids: _IdAllocator, track_names: list[str]) -> tuple[ET.Element
     return route, route_id
 
 
+def _section_gain_automation_points(
+    compiled: CompiledScore,
+    *,
+    bpm: float,
+    group: str | None,
+) -> list[tuple[float, float]]:
+    """Return sparse dB automation points matching renderer section riders."""
+
+    sections = list(compiled.sections)
+    if not sections or bpm <= 0:
+        return []
+    render_cfg = dict(compiled.normalized_spec.get("render") or {})
+    if group is None:
+        default_beats = float(render_cfg.get("section_mix_transition_beats", 1.0))
+    else:
+        default_beats = float(
+            render_cfg.get(
+                "section_stem_mix_transition_beats",
+                render_cfg.get("section_mix_transition_beats", 1.0),
+            )
+        )
+
+    def value(row: Mapping[str, Any]) -> float:
+        if group is None:
+            return float(row.get("mix_gain_db") or 0.0)
+        raw = row.get("stem_mix_db") or {}
+        return float(raw.get(group, 0.0))
+
+    gains = [value(row) for row in sections]
+    if not any(abs(gain) > 1e-9 for gain in gains):
+        return []
+
+    points: list[tuple[float, float]] = [
+        (max(0.0, float(sections[0].get("start_seconds", 0.0) or 0.0)), gains[0])
+    ]
+    for index in range(1, len(sections)):
+        prev = sections[index - 1]
+        nxt = sections[index]
+        prev_gain = gains[index - 1]
+        next_gain = gains[index]
+        if abs(prev_gain - next_gain) < 1e-9:
+            continue
+        boundary = float(nxt.get("start_seconds", 0.0) or 0.0)
+        if group is None:
+            beats = float(nxt.get("mix_gain_transition_beats") or default_beats)
+        else:
+            beats = float(nxt.get("stem_mix_transition_beats") or default_beats)
+        transition = max(0.0, beats * 60.0 / bpm)
+        prev_start = float(prev.get("start_seconds", 0.0) or 0.0)
+        next_end = float(nxt.get("end_seconds", boundary) or boundary)
+        if transition <= 0.0:
+            points.append((max(prev_start, boundary - 1e-6), prev_gain))
+            points.append((boundary, next_gain))
+        else:
+            left = max(prev_start, boundary - transition * 0.5)
+            right = min(next_end, boundary + transition * 0.5)
+            points.append((left, prev_gain))
+            points.append((right, next_gain))
+    final_end = float(sections[-1].get("end_seconds", points[-1][0]) or points[-1][0])
+    points.append((final_end, gains[-1]))
+
+    # Ardour automation lists require strictly ordered coordinates.  Multiple
+    # semantic boundaries may collapse to the same superclock; last writer wins.
+    by_clock: dict[int, tuple[float, float]] = {}
+    for seconds, db in points:
+        clock = int(round(max(0.0, seconds) * ARDOUR_SUPERCLOCKS_PER_SECOND))
+        by_clock[clock] = (clock / ARDOUR_SUPERCLOCKS_PER_SECOND, db)
+    return [by_clock[key] for key in sorted(by_clock)]
+
+
+def _build_audio_bus(
+    ids: _IdAllocator,
+    *,
+    name: str,
+    input_routes: list[str],
+    output_route: str,
+    order: int,
+    gain_automation: list[tuple[float, float]] | None = None,
+) -> tuple[ET.Element, str]:
+    route_id = ids.take()
+    route = ET.Element(
+        "Route",
+        {
+            "version": ARDOUR_SESSION_VERSION,
+            "id": route_id,
+            "name": name,
+            "default-type": "audio",
+            "strict-io": "1",
+            "active": "1",
+            "denormal-protection": "0",
+            "meter-point": "MeterPostFader",
+            "disk-io-point": "DiskIOPreFader",
+            "meter-type": "MeterPeak",
+        },
+    )
+    ET.SubElement(route, "PresentationInfo", {"order": str(order), "flags": "AudioBus,OrderSet", "color": "3221225727"})
+    ET.SubElement(route, "Controllable", {"name": "solo", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0", "self-solo": "0", "soloed-by-upstream": "0", "soloed-by-downstream": "0"})
+    ET.SubElement(route, "Controllable", {"name": "solo-iso", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0", "solo-isolated": "0"})
+    ET.SubElement(route, "Controllable", {"name": "solo-safe", "id": ids.take(), "flags": "Toggle", "value": "0", "solo-safe": "0"})
+    inp = ET.SubElement(route, "IO", {"name": name, "id": ids.take(), "direction": "Input", "default-type": "audio"})
+    for channel in (1, 2):
+        port = ET.SubElement(inp, "Port", {"name": f"{name}/audio_in {channel}", "type": "audio", "direction": "Input"})
+        for source in input_routes:
+            ET.SubElement(port, "Connection", {"other": f"{source}/audio_out {channel}"})
+    out = ET.SubElement(route, "IO", {"name": name, "id": ids.take(), "direction": "Output", "default-type": "audio"})
+    for channel in (1, 2):
+        port = ET.SubElement(out, "Port", {"name": f"{name}/audio_out {channel}", "type": "audio", "direction": "Output"})
+        ET.SubElement(port, "Connection", {"other": f"{output_route}/audio_in {channel}"})
+    ET.SubElement(route, "MuteMaster", {"mute-point": "PostFader,Listen,Main,SurroundSend", "muted": "0"})
+    ET.SubElement(route, "Controllable", {"name": "mute", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
+    ET.SubElement(route, "Controllable", {"name": "phase", "id": ids.take(), "flags": "Toggle", "value": "0", "phase-invert": "00"})
+    _add_automation(route, [("solo", "Discrete"), ("solo-iso", "Discrete"), ("solo-safe", "Discrete"), ("mute", "Discrete"), ("phase", "Discrete")], ids, time_domain="AudioTime")
+    _add_pannable(route, ids)
+    _add_musical_mode(route)
+    ET.SubElement(route, "Processor", {"id": ids.take(), "name": "Polarity", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "polarity"})
+    _add_amp_processor(route, ids, kind="trim", control_name="trimcontrol", automation_id="trim", interpolation="Logarithmic")
+    _add_amp_processor(
+        route,
+        ids,
+        kind="amp",
+        control_name="gaincontrol",
+        automation_id="gain",
+        interpolation="Exponential",
+        automation_points=gain_automation,
+    )
+    ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"meter-{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "meter"})
+    main = ET.SubElement(route, "Processor", {"id": ids.take(), "name": name, "active": "1", "user-latency": "0", "use-user-latency": "0", "own-input": "1", "own-output": "0", "output": name, "type": "main-outs", "role": "Main"})
+    ET.SubElement(main, "PannerShell", {"bypassed": "0", "user-panner": "", "linked-to-route": "1"})
+    ET.SubElement(route, "Slavable")
+    return route, route_id
+
+
 def _build_midi_route(
     ids: _IdAllocator,
     *,
@@ -604,6 +773,8 @@ def _build_midi_route(
     playlist_id: str,
     order: int,
     add_synth: bool,
+    output_route: str = "Master",
+    mix_gain_db: float = 0.0,
 ) -> tuple[ET.Element, str, str | None]:
     route_id = ids.take()
     route = ET.Element(
@@ -641,7 +812,7 @@ def _build_midi_route(
     out = ET.SubElement(route, "IO", {"name": name, "id": ids.take(), "direction": "Output", "default-type": "midi"})
     for channel in (1, 2):
         port = ET.SubElement(out, "Port", {"name": f"{name}/audio_out {channel}", "type": "audio", "direction": "Output"})
-        ET.SubElement(port, "Connection", {"other": f"Master/audio_in {channel}"})
+        ET.SubElement(port, "Connection", {"other": f"{output_route}/audio_in {channel}"})
     ET.SubElement(out, "Port", {"name": f"{name}/midi_out 1", "type": "midi", "direction": "Output"})
     ET.SubElement(route, "MuteMaster", {"mute-point": "PostFader,Listen,Main,SurroundSend", "muted": "0"})
     ET.SubElement(route, "Controllable", {"name": "mute", "id": ids.take(), "flags": "Toggle,RealTime", "value": "0"})
@@ -659,7 +830,15 @@ def _build_midi_route(
     _add_trigger_box(route, ids, order=order - 1)
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": "Polarity", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "polarity"})
     plugin_id = _add_reasonable_synth(route, ids) if add_synth else None
-    _add_amp_processor(route, ids, kind="amp", control_name="gaincontrol", automation_id="gain", interpolation="Exponential")
+    _add_amp_processor(
+        route,
+        ids,
+        kind="amp",
+        control_name="gaincontrol",
+        automation_id="gain",
+        interpolation="Exponential",
+        value=_db_to_gain(mix_gain_db),
+    )
     ET.SubElement(route, "Processor", {"id": ids.take(), "name": f"meter-{name}", "active": "1", "user-latency": "0", "use-user-latency": "0", "type": "meter"})
     main = ET.SubElement(route, "Processor", {"id": ids.take(), "name": name, "active": "1", "user-latency": "0", "use-user-latency": "0", "own-input": "1", "own-output": "0", "output": name, "type": "main-outs", "role": "Main"})
     ET.SubElement(main, "PannerShell", {"bypassed": "0", "user-panner": "", "linked-to-route": "1"})
@@ -720,7 +899,8 @@ def _build_session_xml(
     end_beats: float,
     end_seconds: float,
     add_synth: bool,
-) -> tuple[ET.ElementTree, list[dict[str, Any]]]:
+    transport_processing: bool = False,
+) -> tuple[ET.ElementTree, list[dict[str, Any]], dict[str, Any]]:
     ids = _IdAllocator()
     root = ET.Element(
         "Session",
@@ -788,14 +968,27 @@ def _build_session_xml(
     ET.SubElement(speakers, "Speaker", {"azimuth": "120", "elevation": "0", "distance": "1"})
 
     track_names = [str(inst.name) for inst in compiled.pm.instruments]
+    groups_in_order = list(dict.fromkeys(str(compiled.groups.get(name, name)) for name in track_names))
+    tracks_by_group: dict[str, list[str]] = {group: [] for group in groups_in_order}
+    for name in track_names:
+        tracks_by_group[str(compiled.groups.get(name, name))].append(name)
+
+    # The on-disk scaffold deliberately remains the already-proven direct-to-Master
+    # topology.  When processing transport is requested, libardour creates the
+    # semantic audio buses later through Session:new_audio_route() and rewires the
+    # live route ports.  Hand-authoring AudioBus XML produced routes that looked
+    # connected in Ardour's UI but did not actually receive audio.
     master, _master_id = _build_master(ids, track_names)
     routes.append(master)
 
     region_length = f"b{int(math.ceil(end_beats * ARDOUR_BEAT_TICKS))}@b0"
     track_manifest: list[dict[str, Any]] = []
+    mix_manifest: dict[str, Any] = {"enabled": bool(transport_processing), "groups": {}}
     pgroup_id = time.strftime("%Y-%m-%d %H.%M.%S")
     for order, (inst, midi_row) in enumerate(zip(compiled.pm.instruments, track_midis), start=1):
         name = str(inst.name)
+        group = str(compiled.groups.get(name, name))
+        mix_gain_db = float((compiled.instrument_specs.get(name, {}) or {}).get("mix_gain_db", 0.0))
         source_id = ids.take()
         playlist_id = ids.take()
         ET.SubElement(sources, "Source", {"name": midi_row["filename"], "take-id": "", "type": "midi", "flags": "Writable", "id": source_id, "origin": midi_row["filename"]})
@@ -806,6 +999,8 @@ def _build_session_xml(
             playlist_id=playlist_id,
             order=order,
             add_synth=add_synth,
+            output_route="Master",
+            mix_gain_db=(mix_gain_db if transport_processing else 0.0),
         )
         routes.append(route)
         playlist = ET.SubElement(playlists, "Playlist", {"id": playlist_id, "name": name, "type": "midi", "orig-track-id": route_id, "pgroup-id": pgroup_id, "shared-with-ids": "", "frozen": "0", "combine-ops": "0"})
@@ -821,8 +1016,39 @@ def _build_session_xml(
                 "source_ppq": midi_row.get("source_ppq"),
                 "ardour_source_ppq": midi_row.get("ardour_ppq"),
                 "audition_plugin_id": plugin_id,
+                "group": group,
+                "mix_gain_db": mix_gain_db if transport_processing else 0.0,
+                # Final semantic destination is recorded for the native routing
+                # pass, while the safe scaffold itself remains direct-to-Master.
+                "output_route": group_bus_name(group) if transport_processing else "Master",
+                "scaffold_output_route": "Master",
             }
         )
+
+    if transport_processing:
+        # Only describe the intended semantic bus graph here.  The buses are
+        # created by libardour in ``apply_processing.lua`` so their IO, main-outs,
+        # panner and graph bookkeeping are all native from birth.
+        bus_order = len(track_names) + 1
+        for offset, group in enumerate(groups_in_order):
+            automation = _section_gain_automation_points(compiled, bpm=bpm, group=group)
+            bus_name = group_bus_name(group)
+            mix_manifest["groups"][group] = {
+                "route": bus_name,
+                "route_id": None,
+                "order": bus_order + offset,
+                "tracks": list(tracks_by_group[group]),
+                "section_gain_automation_db": [[seconds, db] for seconds, db in automation],
+                "created_by": "libardour.Session:new_audio_route",
+            }
+        composition_automation = _section_gain_automation_points(compiled, bpm=bpm, group=None)
+        mix_manifest["composition"] = {
+            "route": COMPOSITION_BUS_NAME,
+            "route_id": None,
+            "order": bus_order + len(groups_in_order),
+            "section_gain_automation_db": [[seconds, db] for seconds, db in composition_automation],
+            "created_by": "libardour.Session:new_audio_route",
+        }
 
     tempo_map = ET.SubElement(root, "TempoMap", {"superclocks-per-second": str(ARDOUR_SUPERCLOCKS_PER_SECOND)})
     tempos = ET.SubElement(tempo_map, "Tempos")
@@ -841,7 +1067,7 @@ def _build_session_xml(
     script.text = "c2NyaXB0cyA9IHt9IA=="
     ET.SubElement(root, "IOPlugins")
     root.set("id-counter", str(ids.next_value + 1))
-    return ET.ElementTree(root), track_manifest
+    return ET.ElementTree(root), track_manifest, mix_manifest
 
 
 def _soundfont_is_ace_portable(path: Path) -> bool:
@@ -1220,6 +1446,224 @@ def _write_ardour_instrument_bootstrap(
             "-- a large asset was not ready yet.",
             "sleep(settle_seconds)",
             "Session:save_state('')",
+            "Session:close()",
+            "",
+        ]
+    )
+    script_path.write_text(text, encoding="utf8")
+    return script_path
+
+def _write_ardour_processing_bootstrap(
+    destination: Path,
+    *,
+    transport: ArdourProcessingTransportPlan,
+    mix_state: Mapping[str, Any],
+) -> Path:
+    """Write the libardour pass that creates buses, routing and processors.
+
+    Audio buses are deliberately *not* hand-authored into the initial session
+    XML.  Ardour's native ``Session:new_audio_route`` path performs additional
+    route initialization (IO registration, internal-return creation, graph
+    integration, processor configuration) that a plausible-looking Route XML
+    element does not reproduce reliably.  The initial scaffold therefore stays
+    on the already-proven track -> Master topology.  This pass creates the
+    semantic buses in libardour and rewires live ports before saving them.
+    """
+
+    script_path = destination / "ambition" / "apply_processing.lua"
+    script_path.parent.mkdir(parents=True, exist_ok=True)
+
+    route_rows: list[str] = []
+    plans = [*transport.groups.values(), transport.master]
+    for plan in plans:
+        processor_rows: list[str] = []
+        for spec in plan.processors:
+            param_rows = ", ".join(
+                "{%d, %.17g}" % (index, value)
+                for index, value in spec.parameters
+            )
+            processor_rows.append(
+                "      { host = %s, plugin = %s, required = %s, params = {%s} },"
+                % (
+                    _lua_string(spec.host_kind),
+                    _lua_string(spec.plugin),
+                    "true" if spec.required else "false",
+                    param_rows,
+                )
+            )
+        route_rows.extend(
+            [
+                "  { route = %s, processors = {" % _lua_string(plan.route_name),
+                *processor_rows,
+                "    } },",
+            ]
+        )
+
+    groups = dict(mix_state.get("groups") or {})
+    group_rows: list[str] = []
+    for group, raw_row in groups.items():
+        row = dict(raw_row or {})
+        tracks = ", ".join(_lua_string(str(name)) for name in row.get("tracks") or [])
+        gain_points = ", ".join(
+            "{%.17g, %.17g}" % (float(seconds), _db_to_gain(float(db)))
+            for seconds, db in row.get("section_gain_automation_db") or []
+        )
+        group_rows.append(
+            "    { group = %s, route = %s, order = %d, tracks = {%s}, gain_points = {%s} },"
+            % (
+                _lua_string(str(group)),
+                _lua_string(str(row.get("route") or group_bus_name(str(group)))),
+                int(row.get("order") or 0),
+                tracks,
+                gain_points,
+            )
+        )
+
+    composition = dict(mix_state.get("composition") or {})
+    composition_points = ", ".join(
+        "{%.17g, %.17g}" % (float(seconds), _db_to_gain(float(db)))
+        for seconds, db in composition.get("section_gain_automation_db") or []
+    )
+    composition_route = str(composition.get("route") or COMPOSITION_BUS_NAME)
+    composition_order = int(composition.get("order") or 0)
+
+    text = "\n".join(
+        [
+            "-- Generated by ambition_music_renderer. Do not hand-edit.",
+            "-- Canonical ProcessingPlan -> Ardour-native buses/processors.",
+            "local session_dir = assert(arg[1], 'missing session directory')",
+            "local snapshot = assert(arg[2], 'missing snapshot/session name')",
+            "",
+            "local routespecs = {",
+            *route_rows,
+            "}",
+            "",
+            "local mixspec = {",
+            "  composition = { route = %s, order = %d, gain_points = {%s} },"
+            % (_lua_string(composition_route), composition_order, composition_points),
+            "  groups = {",
+            *group_rows,
+            "  },",
+            "}",
+            "",
+            "load_session(session_dir, snapshot)",
+            "assert(Session ~= nil, 'failed to load Ardour session')",
+            "",
+            "-- new_audio_route() queues normal output auto-connect work.  This arlua",
+            "-- process is disposable, so keep its process-local configuration in manual",
+            "-- mode for the lifetime of the pass and establish every semantic edge below.",
+            "ARDOUR.config():set_output_auto_connect(ARDOUR.AutoConnectOption.ManualConnect)",
+            "",
+            "local function require_route(name)",
+            "  local route = Session:route_by_name(name)",
+            "  assert(not route:isnil(), 'route is missing: ' .. name)",
+            "  return route",
+            "end",
+            "",
+            "local function create_bus(spec)",
+            "  local existing = Session:route_by_name(spec.route)",
+            "  assert(existing:isnil(), 'processing bus unexpectedly exists before native creation: ' .. spec.route)",
+            "  local created = Session:new_audio_route(2, 2, ARDOUR.RouteGroup(), 1, spec.route, ARDOUR.PresentationInfo.Flag.AudioBus, spec.order)",
+            "  assert(created:size() == 1, 'failed to create native processing bus: ' .. spec.route)",
+            "  local route = created:front()",
+            "  assert(not route:isnil(), 'native processing bus is nil: ' .. spec.route)",
+            "  assert(route:name() == spec.route, 'native processing bus was renamed: expected ' .. spec.route .. ', got ' .. route:name())",
+            "  assert(route:n_inputs():n_audio() == 2, 'native processing bus is not stereo at input: ' .. spec.route)",
+            "  assert(route:n_outputs():n_audio() == 2, 'native processing bus is not stereo at output: ' .. spec.route)",
+            "  return route",
+            "end",
+            "",
+            "local function connect_stereo(source, destination)",
+            "  for channel = 0, 1 do",
+            "    local op = source:output():audio(channel)",
+            "    local ip = destination:input():audio(channel)",
+            "    assert(not op:isnil(), 'missing source audio port ' .. tostring(channel + 1) .. ' on ' .. source:name())",
+            "    assert(not ip:isnil(), 'missing destination audio port ' .. tostring(channel + 1) .. ' on ' .. destination:name())",
+            "    op:disconnect_all()",
+            "    local rc = op:connect(ip:name())",
+            "    assert(rc == 0, 'failed to connect ' .. op:name() .. ' -> ' .. ip:name())",
+            "    assert(op:connected_to(ip:name()), 'connection did not become live: ' .. op:name() .. ' -> ' .. ip:name())",
+            "  end",
+            "end",
+            "",
+            "local function set_gain_automation(route, points)",
+            "  if #points == 0 then return end",
+            "  local ac = route:amp():gain_control()",
+            "  local al = ac:alist()",
+            "  al:clear_list()",
+            "  al:set_interpolation(Evoral.InterpolationStyle.Exponential)",
+            "  local sample_rate = Session:nominal_sample_rate()",
+            "  for _, point in ipairs(points) do",
+            "    local when = Temporal.timepos_t(math.floor(point[1] * sample_rate + 0.5))",
+            "    al:add(when, point[2], false, true)",
+            "  end",
+            "  ac:set_automation_state(ARDOUR.AutoState.Play)",
+            "end",
+            "",
+            "-- Create the receiving composition bus first, then each semantic group.",
+            "local composition = create_bus(mixspec.composition)",
+            "local group_routes = {}",
+            "for _, spec in ipairs(mixspec.groups) do",
+            "  group_routes[spec.route] = create_bus(spec)",
+            "end",
+            "",
+            "-- Rewire the proven direct-to-Master scaffold through native buses using",
+            "-- Ardour's live Port API.  This is the same mechanism used by Ardour's own",
+            "-- Lua routing scripts; the saved XML is now an output of libardour, not input.",
+            "for _, spec in ipairs(mixspec.groups) do",
+            "  local bus = group_routes[spec.route]",
+            "  for _, track_name in ipairs(spec.tracks) do",
+            "    connect_stereo(require_route(track_name), bus)",
+            "  end",
+            "  connect_stereo(bus, composition)",
+            "  set_gain_automation(bus, spec.gain_points)",
+            "end",
+            "local master = Session:master_out()",
+            "assert(not master:isnil(), 'Master route is missing')",
+            "connect_stereo(composition, master)",
+            "set_gain_automation(composition, mixspec.composition.gain_points)",
+            "",
+            "-- Refresh route lookup after native buses have been added.",
+            "local routes = {}",
+            "for route in Session:get_routes():iter() do",
+            "  routes[route:name()] = route",
+            "end",
+            "",
+            "for _, routespec in ipairs(routespecs) do",
+            "  local route = routes[routespec.route]",
+            "  assert(route ~= nil, 'processing route is missing: ' .. routespec.route)",
+            "  local position = 0",
+            "  for _, spec in ipairs(routespec.processors) do",
+            "    local proc",
+            "    if spec.host == 'lv2' then",
+            "      proc = ARDOUR.LuaAPI.new_plugin(Session, spec.plugin, ARDOUR.PluginType.LV2, '')",
+            "    elseif spec.host == 'luaproc' then",
+            "      proc = ARDOUR.LuaAPI.new_luaproc(Session, spec.plugin)",
+            "    else",
+            "      error('unknown processing host kind: ' .. tostring(spec.host))",
+            "    end",
+            "    if proc:isnil() then",
+            "      if spec.required then",
+            "        error('required processing plugin unavailable on ' .. routespec.route .. ': ' .. spec.plugin)",
+            "      else",
+            "        print('Ambition Ardour processing skipped optional plugin: ' .. spec.plugin)",
+            "      end",
+            "    else",
+            "      local rc = route:add_processor_by_index(proc, position, nil, true)",
+            "      assert(rc == 0, 'failed to add processor on ' .. routespec.route .. ': ' .. spec.plugin)",
+            "      for _, param in ipairs(spec.params) do",
+            "        local ok = ARDOUR.LuaAPI.set_processor_param(proc, param[1], param[2])",
+            "        assert(ok, 'failed to set parameter ' .. tostring(param[1]) .. ' on ' .. spec.plugin)",
+            "      end",
+            "      position = position + 1",
+            "      print('Ambition Ardour processing added: ' .. routespec.route .. ' -> ' .. spec.plugin)",
+            "    end",
+            "  end",
+            "end",
+            "",
+            "Session:save_state('')",
+            "print('Ambition Ardour native mix graph configured')",
+            "print('Ambition Ardour processing configured')",
             "Session:close()",
             "",
         ]
@@ -1723,6 +2167,444 @@ def apply_ardour_instruments(
         "back to the working ACE Reasonable Synth scaffold.\n" + error_text
     )
 
+def _expected_processing_routes(result: ArdourExportResult) -> list[dict[str, Any]]:
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    transport = dict(data.get("processing_transport") or {})
+    plan = dict(transport.get("plan") or {})
+    rows: list[dict[str, Any]] = []
+    groups = dict(plan.get("groups") or {})
+    for group, route_plan in groups.items():
+        rows.append({"group": group, **dict(route_plan)})
+    master = plan.get("master")
+    if isinstance(master, Mapping):
+        rows.append({"group": None, **dict(master)})
+    return rows
+
+
+def _processor_matches_transport(proc: ET.Element, spec: Mapping[str, Any]) -> bool:
+    host = str(spec.get("host_kind") or "")
+    plugin = str(spec.get("plugin") or "")
+    if host == "lv2":
+        return proc.get("type") == "lv2" and proc.get("unique-id") == plugin
+    if host == "luaproc":
+        return proc.get("name") == plugin and proc.get("type") not in {
+            "amp", "trim", "polarity", "meter", "main-outs", "diskreader", "diskwriter", "triggerbox"
+        }
+    return False
+
+
+def _processing_processors_on_route(
+    route: ET.Element,
+    expected: list[Mapping[str, Any]],
+) -> tuple[list[ET.Element], list[str]]:
+    children = list(route.findall("Processor"))
+    matched: list[ET.Element] = []
+    errors: list[str] = []
+    cursor = 0
+    for spec in expected:
+        found: ET.Element | None = None
+        found_at = -1
+        for index in range(cursor, len(children)):
+            if _processor_matches_transport(children[index], spec):
+                found = children[index]
+                found_at = index
+                break
+        if found is None:
+            if bool(spec.get("required", True)):
+                errors.append(
+                    f"missing required processor {spec.get('plugin')!r}"
+                )
+            continue
+        matched.append(found)
+        cursor = found_at + 1
+    return matched, errors
+
+
+def _route_output_connections(route: ET.Element) -> set[str]:
+    """Return serialized destinations of a route's main Output IO."""
+
+    return {
+        str(connection.get("other"))
+        for io in route.findall("IO")
+        if io.get("direction") == "Output"
+        for port in io.findall("Port")
+        for connection in port.findall("Connection")
+        if connection.get("other")
+    }
+
+
+def _route_has_native_internal_return(route: ET.Element) -> bool:
+    """Native Ardour audio buses contain the InternalReturn processor."""
+
+    return any(proc.get("type") == "intreturn" for proc in route.findall("Processor"))
+
+
+def _serialized_mix_routing_errors(
+    result: ArdourExportResult,
+    *,
+    root: ET.Element,
+) -> list[str]:
+    """Verify that libardour serialized the intended live audio graph.
+
+    A destination shown in a hand-authored ``.ardour`` file is not sufficient
+    evidence that the receiving bus was initialized as a real Ardour route.
+    Require the native bus marker (InternalReturn) and the exact stereo edges
+    that the live Port API established before accepting the processing pass.
+    """
+
+    routes_node = root.find("Routes")
+    if routes_node is None:
+        return ["Ardour session has no Routes node after processing pass"]
+    routes = {str(route.get("name")): route for route in routes_node.findall("Route")}
+    try:
+        data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    except Exception as ex:
+        return [f"cannot read Ardour export manifest for mix verification: {ex}"]
+    transport = dict(data.get("processing_transport") or {})
+    mix = dict(transport.get("mix_routing") or {})
+    groups = dict(mix.get("groups") or {})
+    composition = dict(mix.get("composition") or {})
+    composition_name = str(composition.get("route") or COMPOSITION_BUS_NAME)
+
+    errors: list[str] = []
+
+    def require_stereo_edge(source_name: str, target_name: str) -> None:
+        source = routes.get(source_name)
+        if source is None:
+            errors.append(f"mix route missing: {source_name}")
+            return
+        connections = _route_output_connections(source)
+        expected = {
+            f"{target_name}/audio_in 1",
+            f"{target_name}/audio_in 2",
+        }
+        missing = sorted(expected - connections)
+        if missing:
+            errors.append(
+                f"{source_name}: missing serialized stereo edge to {target_name}: "
+                + ", ".join(missing)
+            )
+
+    for raw_row in groups.values():
+        if not isinstance(raw_row, Mapping):
+            continue
+        route_name = str(raw_row.get("route") or "")
+        if not route_name:
+            continue
+        bus = routes.get(route_name)
+        if bus is None:
+            errors.append(f"native group bus missing: {route_name}")
+        else:
+            if not _route_has_native_internal_return(bus):
+                errors.append(f"{route_name}: native InternalReturn processor is missing")
+            presentation = bus.find("PresentationInfo")
+            flags = presentation.get("flags", "") if presentation is not None else ""
+            if "AudioBus" not in flags:
+                errors.append(f"{route_name}: route is not serialized as an AudioBus")
+        for track_name in raw_row.get("tracks") or []:
+            require_stereo_edge(str(track_name), route_name)
+        require_stereo_edge(route_name, composition_name)
+
+    composition_route = routes.get(composition_name)
+    if composition_route is None:
+        errors.append(f"native composition bus missing: {composition_name}")
+    else:
+        if not _route_has_native_internal_return(composition_route):
+            errors.append(f"{composition_name}: native InternalReturn processor is missing")
+        presentation = composition_route.find("PresentationInfo")
+        flags = presentation.get("flags", "") if presentation is not None else ""
+        if "AudioBus" not in flags:
+            errors.append(f"{composition_name}: route is not serialized as an AudioBus")
+        require_stereo_edge(composition_name, "Master")
+
+    if "Master" not in routes:
+        errors.append("Master route missing after processing pass")
+    return errors
+
+
+def _serialized_processing_errors(result: ArdourExportResult) -> list[str]:
+    try:
+        root = ET.parse(result.session_file).getroot()
+    except Exception as ex:
+        return [f"cannot parse Ardour session after processing pass: {ex}"]
+    routes_node = root.find("Routes")
+    if routes_node is None:
+        return ["Ardour session has no Routes node after processing pass"]
+    routes = {str(route.get("name")): route for route in routes_node.findall("Route")}
+    errors = _serialized_mix_routing_errors(result, root=root)
+    for row in _expected_processing_routes(result):
+        route_name = str(row.get("route") or "")
+        route = routes.get(route_name)
+        if route is None:
+            errors.append(f"processing route missing: {route_name}")
+            continue
+        expected = [dict(spec) for spec in row.get("processors") or []]
+        _matched, route_errors = _processing_processors_on_route(route, expected)
+        errors.extend(f"{route_name}: {error}" for error in route_errors)
+    return errors
+
+
+def _processing_mix_route_names(result: ArdourExportResult) -> list[str]:
+    """Return the audio routes whose live shape belongs to Ardour.
+
+    Track MIDI/timing remains scaffold-owned.  The semantic audio-bus graph is
+    different: libardour is the authority for a bus' IO, main-outs processor,
+    panner, processor ordering and connection serialization.
+    """
+
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    transport = dict(data.get("processing_transport") or {})
+    mix = dict(transport.get("mix_routing") or {})
+    names: list[str] = []
+    for row in dict(mix.get("groups") or {}).values():
+        if isinstance(row, Mapping) and row.get("route"):
+            names.append(str(row["route"]))
+    composition = mix.get("composition")
+    if isinstance(composition, Mapping) and composition.get("route"):
+        names.append(str(composition["route"]))
+    names.append("Master")
+    return list(dict.fromkeys(names))
+
+
+def _replace_route(routes_node: ET.Element, old: ET.Element, new: ET.Element) -> None:
+    children = list(routes_node)
+    position = children.index(old)
+    routes_node.remove(old)
+    routes_node.insert(position, copy.deepcopy(new))
+
+
+def _replace_route_output_io(
+    scaffold_route: ET.Element,
+    native_route: ET.Element,
+) -> None:
+    """Copy only Ardour's live-routed Output IO onto a pristine MIDI route."""
+
+    scaffold_output = next(
+        (child for child in list(scaffold_route) if child.tag == "IO" and child.get("direction") == "Output"),
+        None,
+    )
+    native_output = next(
+        (child for child in list(native_route) if child.tag == "IO" and child.get("direction") == "Output"),
+        None,
+    )
+    if scaffold_output is None or native_output is None:
+        raise ArdourExportError(
+            f"cannot graft native output routing for {scaffold_route.get('name')!r}: Output IO is missing"
+        )
+    position = list(scaffold_route).index(scaffold_output)
+    scaffold_route.remove(scaffold_output)
+    scaffold_route.insert(position, copy.deepcopy(native_output))
+
+
+def _master_route_with_scaffold_output(
+    native_route: ET.Element,
+    scaffold_route: ET.Element,
+) -> ET.Element:
+    """Keep Ardour's native Master internals without pinning Dummy IO."""
+
+    merged = copy.deepcopy(native_route)
+    native_output = next(
+        (child for child in list(merged) if child.tag == "IO" and child.get("direction") == "Output"),
+        None,
+    )
+    scaffold_output = next(
+        (child for child in list(scaffold_route) if child.tag == "IO" and child.get("direction") == "Output"),
+        None,
+    )
+    if native_output is None or scaffold_output is None:
+        raise ArdourExportError("cannot merge Master route: output IO is missing")
+    position = list(merged).index(native_output)
+    merged.remove(native_output)
+    merged.insert(position, copy.deepcopy(scaffold_output))
+    return merged
+
+
+def _graft_native_processing_onto_scaffold(
+    result: ArdourExportResult,
+    *,
+    scaffold_bytes: bytes,
+) -> None:
+    """Graft a libardour-created audio graph onto pristine musical state.
+
+    The safe input scaffold contains only MIDI tracks routed directly to Master.
+    The headless native pass creates every semantic audio bus through
+    ``Session:new_audio_route`` and connects the live ports.  After that pass,
+    preserve the complete native group/composition routes and the MIDI tracks'
+    native Output IO, but keep all other MIDI route/region/source/timing state
+    from the pristine scaffold.  Master keeps native receiving/processor state
+    while retaining the scaffold's machine-neutral external Output IO.
+    """
+
+    try:
+        native_root = ET.parse(result.session_file).getroot()
+        scaffold_root = ET.fromstring(scaffold_bytes)
+    except Exception as ex:
+        raise ArdourExportError(f"cannot parse Ardour session for processing graft: {ex}") from ex
+    timing_signature = _session_timing_signature(scaffold_root)
+    native_routes_node = native_root.find("Routes")
+    scaffold_routes_node = scaffold_root.find("Routes")
+    if native_routes_node is None or scaffold_routes_node is None:
+        raise ArdourExportError("cannot graft processing: Ardour session has no Routes node")
+    native_routes = {str(route.get("name")): route for route in native_routes_node.findall("Route")}
+    scaffold_routes = {str(route.get("name")): route for route in scaffold_routes_node.findall("Route")}
+
+    # Verify the processing stages before accepting any native route state.
+    for row in _expected_processing_routes(result):
+        route_name = str(row.get("route") or "")
+        native_route = native_routes.get(route_name)
+        if native_route is None:
+            raise ArdourExportError(f"cannot graft processing route {route_name!r}: native route missing")
+        expected = [dict(spec) for spec in row.get("processors") or []]
+        _matched, errors = _processing_processors_on_route(native_route, expected)
+        if errors:
+            raise ArdourExportError(
+                f"cannot graft processing route {route_name!r}: " + " | ".join(errors)
+            )
+
+    # The live Port API rewired MIDI tracks to their semantic group buses.  Copy
+    # only each track's Output IO; instrument/plugin/timing state stays pristine.
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    mix = dict((data.get("processing_transport") or {}).get("mix_routing") or {})
+    group_rows = dict(mix.get("groups") or {})
+    routed_track_names = list(
+        dict.fromkeys(
+            str(track_name)
+            for row in group_rows.values()
+            if isinstance(row, Mapping)
+            for track_name in (row.get("tracks") or [])
+        )
+    )
+    for track_name in routed_track_names:
+        native_route = native_routes.get(track_name)
+        scaffold_route = scaffold_routes.get(track_name)
+        if native_route is None or scaffold_route is None:
+            raise ArdourExportError(
+                f"cannot graft native track routing for {track_name!r}: route missing"
+            )
+        _replace_route_output_io(scaffold_route, native_route)
+
+    # Native buses do not exist in the safe scaffold.  They are accepted only
+    # after serialized topology verification and copied as complete Ardour-owned
+    # routes, including InternalReturn/main-outs/panner/processor bookkeeping.
+    for route_name in _processing_mix_route_names(result):
+        if route_name == "Master":
+            continue
+        native_route = native_routes.get(route_name)
+        if native_route is None:
+            raise ArdourExportError(f"cannot graft native mix route {route_name!r}: native route missing")
+        existing = next(
+            (route for route in scaffold_routes_node.findall("Route") if route.get("name") == route_name),
+            None,
+        )
+        if existing is None:
+            scaffold_routes_node.append(copy.deepcopy(native_route))
+        else:
+            _replace_route(scaffold_routes_node, existing, native_route)
+
+    native_master = native_routes.get("Master")
+    scaffold_master = next(
+        (route for route in scaffold_routes_node.findall("Route") if route.get("name") == "Master"),
+        None,
+    )
+    if native_master is None or scaffold_master is None:
+        raise ArdourExportError("cannot graft native Master route: route missing")
+    _replace_route(
+        scaffold_routes_node,
+        scaffold_master,
+        _master_route_with_scaffold_output(native_master, scaffold_master),
+    )
+
+    try:
+        scaffold_counter = int(scaffold_root.get("id-counter", "0"))
+        native_counter = int(native_root.get("id-counter", "0"))
+        scaffold_root.set("id-counter", str(max(scaffold_counter, native_counter)))
+    except ValueError:
+        pass
+    if _session_timing_signature(scaffold_root) != timing_signature:
+        raise ArdourExportError("internal error: processing graft changed MIDI/session timing structure")
+    tree = ET.ElementTree(scaffold_root)
+    ET.indent(tree, space="  ")
+    tree.write(result.session_file, encoding="UTF-8", xml_declaration=True)
+
+def _update_processing_status(
+    result: ArdourExportResult,
+    *,
+    status: str,
+    ardour_lua: Path | None = None,
+    error: str | None = None,
+) -> None:
+    try:
+        data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+        processing = data.setdefault("processing_transport", {})
+        processing["status"] = status
+        if ardour_lua is not None:
+            processing["ardour_lua"] = str(ardour_lua)
+        if error is None:
+            processing.pop("error", None)
+        else:
+            processing["error"] = error
+        result.export_manifest.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf8")
+    except (OSError, ValueError, TypeError):
+        pass
+
+
+def apply_ardour_processing(
+    result: ArdourExportResult,
+    *,
+    ardour_lua: Path | str,
+) -> subprocess.CompletedProcess[str]:
+    """Instantiate editable processors without allowing Ardour to rewrite MIDI."""
+
+    if result.processing_bootstrap is None:
+        raise ArdourExportError("Ardour export has no processing bootstrap script")
+    exe = Path(ardour_lua).expanduser().resolve()
+    if not exe.is_file():
+        raise ArdourExportError(f"Ardour Lua frontend does not exist: {exe}")
+    scaffold_bytes = result.session_file.read_bytes()
+    midi_snapshot = _snapshot_ardour_midi_sources(result)
+    plugins_dir = result.session_dir / "plugins"
+    plugin_dirs_before = {path.name for path in plugins_dir.iterdir()} if plugins_dir.is_dir() else set()
+    command = [
+        str(exe),
+        str(result.processing_bootstrap),
+        str(result.session_dir),
+        result.session_file.stem,
+    ]
+    completed = subprocess.run(command, text=True, capture_output=True, check=False)
+    details = "\n".join(part for part in (completed.stdout, completed.stderr) if part.strip())
+    errors = _serialized_processing_errors(result)
+    if "Ambition Ardour processing configured" not in completed.stdout:
+        errors.append("processing bootstrap did not reach its post-save completion marker")
+    if not errors:
+        _restore_ardour_midi_sources(result, midi_snapshot)
+        _graft_native_processing_onto_scaffold(result, scaffold_bytes=scaffold_bytes)
+        post = _serialized_processing_errors(result)
+        if not post:
+            _update_processing_status(result, status="applied", ardour_lua=exe)
+            return completed
+        errors = post
+
+    # Processing is deliberately a second transaction.  A failure must not
+    # destroy the already-verified real instruments or the timing fix.
+    result.session_file.write_bytes(scaffold_bytes)
+    _restore_ardour_midi_sources(result, midi_snapshot)
+    if plugins_dir.is_dir():
+        for path in list(plugins_dir.iterdir()):
+            if path.name not in plugin_dirs_before:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+    error_text = " | ".join(errors)
+    if details:
+        error_text = (error_text + "\n" + details).strip()
+    _update_processing_status(result, status="failed", ardour_lua=exe, error=error_text)
+    raise ArdourExportError(
+        "Ardour mix/processing transport failed; the session was restored to the "
+        "verified real-instrument mix-routing scaffold.\n" + error_text
+    )
+
+
 def _prepare_destination(destination: Path, *, force: bool) -> None:
     if not destination.exists():
         destination.mkdir(parents=True, exist_ok=False)
@@ -1758,6 +2640,7 @@ def export_ardour_session(
     base_dir: Path | None = None,
     source_score: Path | None = None,
     realize_instruments: bool = True,
+    realize_processing: bool = False,
     add_audition_synth: bool = True,
     force: bool = False,
 ) -> ArdourExportResult:
@@ -1806,9 +2689,10 @@ def export_ardour_session(
         base_dir=base_dir,
         realize_instruments=realize_instruments,
     )
+    processing_transport = compile_processing_transport(compiled) if realize_processing else None
     # Always serialize the same single-instrument audition scaffold that was
     # validated interactively.  Real plugins are applied by libardour below.
-    tree, track_state = _build_session_xml(
+    tree, track_state, mix_state = _build_session_xml(
         compiled,
         session_name=session_name,
         sample_rate=sample_rate,
@@ -1819,6 +2703,7 @@ def export_ardour_session(
         end_beats=end_beats,
         end_seconds=end_seconds,
         add_synth=True,
+        transport_processing=bool(realize_processing),
     )
     ET.indent(tree, space="  ")
     session_file = destination / f"{session_name}.ardour"
@@ -1827,6 +2712,11 @@ def export_ardour_session(
         destination,
         session_name=session_name,
         realizations=(realizations if realize_instruments else []),
+    )
+    processing_bootstrap = (
+        _write_ardour_processing_bootstrap(destination, transport=processing_transport, mix_state=mix_state)
+        if processing_transport is not None
+        else None
     )
 
     export_manifest = destination / EXPORT_MARKER
@@ -1857,6 +2747,19 @@ def export_ardour_session(
             "session_merge": "plugin_processor_graft_onto_pristine_scaffold",
             "status": "pending" if realize_instruments else "audition_only",
         },
+        "processing_transport": {
+            "enabled": bool(realize_processing),
+            "method": "canonical_processing_plan_to_libardour_native_group_buses",
+            "session_merge": "libardour_native_bus_graph_onto_pristine_timing_scaffold",
+            "bootstrap": (
+                str(processing_bootstrap.relative_to(destination))
+                if processing_bootstrap is not None
+                else None
+            ),
+            "status": "pending" if realize_processing else "disabled",
+            "mix_routing": mix_state,
+            "plan": processing_transport.as_dict() if processing_transport is not None else None,
+        },
         "audition": {
             "plugin": "ACE Reasonable Synth",
             "plugin_uri": ACE_REASONABLE_SYNTH_URI,
@@ -1873,7 +2776,8 @@ def export_ardour_session(
             "Ardour per-track MIDI preserves the neutral interchange channel assignment; route separation provides instrument isolation without rewriting channels.",
             "Procedural-FM and unsupported backend realizations remain on the neutral audition synth.",
             "ACE Fluid Synth realization uses SF2 only; SF3 compatibility depends on the FluidSynth version bundled into Ardour.",
-            "Renderer processing/mastering is not serialized into Ardour; use renderer audio as reference when timbral fidelity matters.",
+            "Group/master processing is transported from canonical ProcessingPlan objects onto editable Ardour buses; the manifest records approximations and omitted operations.",
+            "Renderer transient_tame, stereo_width, soft limiter/normalization, loudness, VST3/command effects, and renderer-level wet_mix are not yet exact Ardour equivalents.",
         ],
     }
     export_manifest.write_text(json.dumps(manifest_data, indent=2, sort_keys=True), encoding="utf8")
@@ -1902,8 +2806,12 @@ def export_ardour_session(
                 "The `ambition/` directory contains the DAW-neutral MIDI + MusicIR provenance sidecar.",
                 "Do not use this session XML as the future round-trip authority.",
                 "",
-                "Current fidelity limitation: renderer processing/mastering is not recreated in Ardour.",
-                f"See {EXPORT_MARKER} for the resolved instrument path and fallback status of every track.",
+                "When processing transport is enabled, tracks feed semantic group buses, then AMB Composition,",
+                "then Master. Instrument mix_gain_db and section stem_mix_db riders are visible in the mixer,",
+                "and canonical group/master processing is instantiated as editable Ardour processors.",
+                "The export manifest records every approximation/omission (notably soft limiting/normalization,",
+                "stereo-width/transient-tame, and renderer-level wet/dry blends).",
+                f"See {EXPORT_MARKER} for instrument and processing transport status.",
                 "",
             ]
         ),
@@ -1916,4 +2824,5 @@ def export_ardour_session(
         interchange_manifest=neutral["manifest"],
         export_manifest=export_manifest,
         instrument_bootstrap=instrument_bootstrap,
+        processing_bootstrap=processing_bootstrap,
     )

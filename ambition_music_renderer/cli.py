@@ -1399,6 +1399,10 @@ class ArdourExportCommand(kwconf.Config):
         False,
         help="use only ACE Reasonable Synth; do not instantiate resolved SFZ/SoundFont instruments",
     )
+    no_processing: bool = kwconf.Flag(
+        False,
+        help="do not transport renderer mix routing, section gain riders, or processing into Ardour",
+    )
     force: bool = kwconf.Flag(
         False,
         help="replace a prior Ambition-generated session at --destination",
@@ -1415,6 +1419,7 @@ class ArdourExportCommand(kwconf.Config):
         from .ardour_export import (
             ArdourExportError,
             apply_ardour_instruments,
+            apply_ardour_processing,
             detect_ardour_lua,
             export_ardour_session,
         )
@@ -1444,6 +1449,7 @@ class ArdourExportCommand(kwconf.Config):
                 base_dir=score.parent,
                 source_score=score.resolve(),
                 realize_instruments=not bool(config.audition_only),
+                realize_processing=(not bool(config.audition_only) and not bool(config.no_processing)),
                 add_audition_synth=True,
                 force=bool(config.force),
             )
@@ -1484,6 +1490,31 @@ class ArdourExportCommand(kwconf.Config):
                     if completed.stdout.strip():
                         print(completed.stdout.rstrip(), file=sys.stderr)
 
+        native_processing_failed = False
+        if (
+            not config.audition_only
+            and not config.no_processing
+            and not native_realization_failed
+        ):
+            # Reuse the exact same libardour frontend. Processing is a separate
+            # transaction so a mix-plugin failure never rolls back verified
+            # real instruments or MIDI timing.
+            try:
+                processing_completed = apply_ardour_processing(result, ardour_lua=arlua)
+            except ArdourExportError as ex:
+                native_processing_failed = True
+                print(str(ex), file=sys.stderr)
+            else:
+                print(f"Ardour mix/processing transport applied via {arlua}", file=sys.stderr)
+                if processing_completed.returncode != 0:
+                    print(
+                        "Ardour Lua frontend returned a non-zero status, but the persisted "
+                        "processing graph verified; accepting the verified realization.",
+                        file=sys.stderr,
+                    )
+                if processing_completed.stdout.strip():
+                    print(processing_completed.stdout.rstrip(), file=sys.stderr)
+
         try:
             manifest_data = json.loads(result.export_manifest.read_text(encoding="utf8"))
             fallbacks = [
@@ -1499,6 +1530,16 @@ class ArdourExportCommand(kwconf.Config):
             for row in fallbacks:
                 reason = row.get("ardour_realization", {}).get("fallback_reason") or "no real realization"
                 print(f"  fallback {row.get('instrument')}: {reason}", file=sys.stderr)
+            processing = manifest_data.get("processing_transport") or {}
+            if processing.get("enabled"):
+                warnings = ((processing.get("plan") or {}).get("warnings") or [])
+                print(
+                    f"Ardour processing transport: {processing.get('status', 'unknown')}, "
+                    f"{len(warnings)} approximation/omission note(s)",
+                    file=sys.stderr,
+                )
+                for warning in warnings:
+                    print(f"  processing note: {warning}", file=sys.stderr)
         except (OSError, ValueError, TypeError):
             # The paths printed below are the command's stable machine-readable
             # outputs. A diagnostic-summary failure should not invalidate an
@@ -1511,6 +1552,13 @@ class ArdourExportCommand(kwconf.Config):
             print(
                 "Real-instrument post-processing failed or was unavailable; the printed session "
                 "is intentionally still the audible Reasonable Synth recovery scaffold.",
+                file=sys.stderr,
+            )
+            return 1
+        if native_processing_failed:
+            print(
+                "Mix/processing transport failed; the printed session still contains the verified "
+                "real instruments and timing-preserving mix-routing scaffold.",
                 file=sys.stderr,
             )
             return 1
