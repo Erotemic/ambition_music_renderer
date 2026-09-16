@@ -248,12 +248,20 @@ stem_postprocess:
 authoring:
   instrument_candidates:
     harpsichord_voice:
-      primary: sonatina_full
+      primary: sonatina_ks
       candidates:
+      - id: sonatina_ks
+        label: Sonatina Harpsichord KS
+        family: keys
+        summary: Selected for this cue after Ardour audition; the keyswitch patch has the preferred character for the scholar voice.
+        program: harpsichord
+        instrument_backend:
+          kind: sfz
+          sfz_glob: '**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord KS.sfz'
       - id: sonatina_full
         label: Sonatina Harpsichord Full
         family: keys
-        summary: Baseline. Full registration with the broadest body for the proclamation.
+        summary: Full registration with the broadest body for the proclamation.
         program: harpsichord
         instrument_backend:
           kind: sfz
@@ -380,11 +388,11 @@ instruments:
     12: 127
   instrument_backend:
     kind: sfz
-    sfz_glob: '**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord Full.sfz'
+    sfz_glob: '**/Sonatina Symphonic Orchestra/Harpsichord/Harpsichord KS.sfz'
     prefer:
     - sonatina
     - harpsichord
-    - full
+    - ks
     settings:
       fold_to_range: false
 - name: heavy_distortion
