@@ -95,20 +95,34 @@ Expected session shape:
 - Python writes exactly one ACE Reasonable Synth per MIDI track as the validated audible scaffold;
 - unless `--audition-only` is used, `ardour_export` auto-detects Ardour's `arlua` frontend and asks libardour to replace that one synth with sfizz or ACE Fluid Synth on resolvable tracks;
 - unsupported/unresolved tracks stay on the known-good ACE Reasonable Synth rather than entering a broken plugin chain;
-- stereo audio from each MIDI track into Master;
+- normal exports route tracks through semantic `AMB Group <group>` buses, then `AMB Composition`, then Master;
+- the track fader carries instrument `mix_gain_db`; group/composition fader automation carries section `stem_mix_db` / `mix_gain_db` transitions;
+- supported canonical group/master `ProcessingPlan` operations appear as editable processors on group buses / Master, in renderer order;
 - **no instrument plugin on Master**;
 - section markers from compiled form;
 - current Ardour audio backend/device left to Ardour rather than serialized from another machine;
 - neutral MIDI + `.musicir-interchange.json` under `ambition/`; and
-- `.ambition-ardour-export.json` containing resolved renderer instrument plans.
+- `.ambition-ardour-export.json` containing resolved renderer instrument plans plus processing fidelity/omission diagnostics.
 
 The current adapter supports fixed tempo/meter sessions. It does **not** hand-write
 SFZ/SoundFont LV2 state. Instead `ambition/apply_real_instruments.lua` is run by
 Ardour's command-line Lua/libardour frontend, which creates the plugin, sets its
 path-valued asset property, and serializes the resulting session itself. Pass
 `--ardour-lua <path>` if auto-detection does not find `~/code/ardour/gtk2_ardour/arlua`.
-It does not yet recreate renderer processing/mastering. Do not overwrite a session
-after making DAW edits.
+
+Mix/processing transport is a second libardour transaction. The static routing
+and gain riders are written into the timing-preserving scaffold from compiled
+metadata; `ambition/apply_processing.lua` then instantiates the editable DSP
+processors selected from canonical `ProcessingPlan` objects. Python verifies and
+grafts only those processors back onto the pre-processing session so an Ardour
+save cannot mutate MIDI timing. If processing realization fails, the session
+retains its verified real instruments and mix-routing scaffold. Use
+`--no-processing` to skip this pass. Current explicit gaps are transient-tame,
+stereo-width, time-varying canonical section-bus DSP, soft
+limiter/normalization/loudness, and exact outer wet/dry wrappers around
+otherwise-supported plugins.
+
+Do not overwrite a session after making DAW edits.
 
 For note-composition review, export a separate `--audition-only` session. That
 keeps every track on the validated Reasonable Synth and is currently the safest

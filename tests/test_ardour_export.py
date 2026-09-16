@@ -19,8 +19,10 @@ from ambition_music_renderer.ardour_export import (
     ArdourExportError,
     _serialized_instrument_state_errors,
     apply_ardour_instruments,
+    apply_ardour_processing,
     export_ardour_session,
 )
+from ambition_music_renderer.ardour_processing import compile_processing_transport
 from ambition_music_renderer.musicir.compile import compile_score
 
 
@@ -851,3 +853,439 @@ def test_native_realization_grafts_only_plugins_and_preserves_scaffold_timing(
     manifest = json.loads(result.export_manifest.read_text(encoding="utf8"))
     assert manifest["instrument_realization"]["status"] == "applied"
     assert manifest["instrument_realization"]["session_merge"] == "plugin_processor_graft_onto_pristine_scaffold"
+
+
+def _mix_transport_score():
+    spec = _constant_v1_score()
+    spec["instruments"][0]["mix_gain_db"] = 6.0
+    spec["sections"] = [
+        {
+            "id": "a",
+            "bars": 1,
+            "stem_mix_db": {"melody": -6.0, "rhythm": 1.0},
+            "layers": [
+                {
+                    "instrument": "lead",
+                    "kind": "notes",
+                    "events": [{"beat": 0, "duration": 1, "pitch": "C4", "velocity": 80}],
+                },
+                {
+                    "instrument": "kit",
+                    "kind": "notes",
+                    "events": [{"beat": 0, "duration": 0.25, "pitch": 36, "velocity": 100}],
+                },
+            ],
+        },
+        {
+            "id": "b",
+            "bars": 1,
+            "stem_mix_db": {"melody": 2.0, "rhythm": -2.0},
+            "layers": [
+                {
+                    "instrument": "lead",
+                    "kind": "notes",
+                    "events": [{"beat": 0, "duration": 1, "pitch": "E4", "velocity": 84}],
+                },
+                {
+                    "instrument": "kit",
+                    "kind": "notes",
+                    "events": [{"beat": 0, "duration": 0.25, "pitch": 38, "velocity": 96}],
+                },
+            ],
+        },
+    ]
+    spec["render"] = {"section_stem_mix_transition_beats": 0.5}
+    spec["group_postprocess"] = {
+        "melody": {
+            "gain_db": 2.0,
+            "highpass_hz": 90.0,
+            "compressor_threshold_db": -20.0,
+            "compressor_ratio": 2.0,
+            "reverb_wet": 0.05,
+            "stereo_width": 0.0,
+            "limiter_enabled": False,
+        },
+        "rhythm": {
+            "gain_db": 1.0,
+            "highpass_hz": 35.0,
+            "reverb_wet": 0.0,
+            "stereo_width": 0.0,
+            "limiter_enabled": False,
+        },
+    }
+    spec["postprocess"] = {
+        "highpass_hz": 30.0,
+        "compressor_threshold_db": -18.0,
+        "compressor_ratio": 3.0,
+        "reverb_wet": 0.0,
+        "stereo_width": 0.0,
+        "limiter_enabled": False,
+        "normalize": False,
+    }
+    return spec
+
+
+def test_ardour_processing_transport_keeps_safe_scaffold_and_generates_native_bus_plan(tmp_path: Path):
+    compiled = compile_score(_mix_transport_score())
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+        realize_processing=True,
+    )
+
+    root = ET.parse(result.session_file).getroot()
+    routes = {route.get("name"): route for route in root.find("Routes")}
+    # The initial file must remain the already-proven audible topology.  Audio
+    # buses are born later through libardour rather than being guessed as XML.
+    assert "AMB Group melody" not in routes
+    assert "AMB Group rhythm" not in routes
+    assert "AMB Composition" not in routes
+
+    def output_connections(route):
+        return {
+            conn.get("other")
+            for io in route.findall("IO")
+            if io.get("direction") == "Output"
+            for port in io.findall("Port")
+            for conn in port.findall("Connection")
+        }
+
+    assert "Master/audio_in 1" in output_connections(routes["lead"])
+    assert "Master/audio_in 1" in output_connections(routes["kit"])
+
+    # Static instrument calibration remains visible on each MIDI-track fader.
+    lead_amp = next(proc for proc in routes["lead"].findall("Processor") if proc.get("type") == "amp")
+    lead_gain = lead_amp.find("Controllable[@name='gaincontrol']")
+    assert lead_gain is not None
+    assert float(lead_gain.get("value")) == pytest.approx(10 ** (6.0 / 20.0))
+
+    manifest = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    processing = manifest["processing_transport"]
+    assert processing["enabled"] is True
+    assert processing["status"] == "pending"
+    assert processing["method"] == "canonical_processing_plan_to_libardour_native_group_buses"
+    assert processing["mix_routing"]["groups"]["melody"]["created_by"] == "libardour.Session:new_audio_route"
+    assert manifest["tracks"][0]["output_route"] == "AMB Group melody"
+    assert manifest["tracks"][0]["scaffold_output_route"] == "Master"
+    melody_points = processing["mix_routing"]["groups"]["melody"]["section_gain_automation_db"]
+    assert melody_points
+    assert melody_points[0][1] == pytest.approx(-6.0)
+    assert max(point[1] for point in melody_points) == pytest.approx(2.0)
+
+    melody_plan = processing["plan"]["groups"]["melody"]
+    plugins = [row["plugin"] for row in melody_plan["processors"]]
+    assert "ACE Amplifier" in plugins
+    assert "ACE High/Low Pass Filter" in plugins
+    assert "urn:ardour:a-comp" in plugins
+    assert result.processing_bootstrap is not None
+    lua = result.processing_bootstrap.read_text(encoding="utf8")
+    assert "Session:new_audio_route" in lua
+    assert "ARDOUR.config():set_output_auto_connect(ARDOUR.AutoConnectOption.ManualConnect)" in lua
+    assert "op:connect(ip:name())" in lua
+    assert "op:connected_to(ip:name())" in lua
+    assert "route:amp():gain_control()" in lua
+    assert "ac:set_automation_state(ARDOUR.AutoState.Play)" in lua
+    assert "route:add_processor_by_index" in lua
+    assert "ARDOUR.LuaAPI.set_processor_param" in lua
+
+
+def test_apply_ardour_processing_grafts_native_bus_graph_but_pristine_track_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    compiled = compile_score(_mix_transport_score())
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+        realize_processing=True,
+    )
+    before = result.session_file.read_bytes()
+    before_root = ET.fromstring(before)
+    before_routes = {route.get("name"): route for route in before_root.find("Routes")}
+    before_master_output = next(
+        io for io in before_routes["Master"].findall("IO") if io.get("direction") == "Output"
+    )
+    arlua = tmp_path / "arlua"
+    arlua.write_text("#!/bin/sh\n", encoding="utf8")
+
+    def fake_run(command, **kwargs):
+        import subprocess
+
+        data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+        plan = data["processing_transport"]["plan"]
+        mix = data["processing_transport"]["mix_routing"]
+        tree = ET.parse(result.session_file)
+        root = tree.getroot()
+        routes_node = root.find("Routes")
+        routes = {route.get("name"): route for route in routes_node}
+        next_id = 9000
+
+        def take_id():
+            nonlocal next_id
+            value = str(next_id)
+            next_id += 1
+            return value
+
+        def make_native_bus(name, order, target):
+            route = ET.Element(
+                "Route",
+                {
+                    "version": "7003",
+                    "id": take_id(),
+                    "name": name,
+                    "default-type": "audio",
+                    "strict-io": "1",
+                    "active": "1",
+                    "native-normalized": "1",
+                },
+            )
+            ET.SubElement(
+                route,
+                "PresentationInfo",
+                {"order": str(order), "flags": "AudioBus,OrderSet"},
+            )
+            inp = ET.SubElement(
+                route,
+                "IO",
+                {"name": name, "id": take_id(), "direction": "Input", "default-type": "audio"},
+            )
+            out = ET.SubElement(
+                route,
+                "IO",
+                {"name": name, "id": take_id(), "direction": "Output", "default-type": "audio"},
+            )
+            for channel in (1, 2):
+                ET.SubElement(
+                    inp,
+                    "Port",
+                    {"name": f"{name}/audio_in {channel}", "type": "audio", "direction": "Input"},
+                )
+                port = ET.SubElement(
+                    out,
+                    "Port",
+                    {"name": f"{name}/audio_out {channel}", "type": "audio", "direction": "Output"},
+                )
+                ET.SubElement(port, "Connection", {"other": f"{target}/audio_in {channel}"})
+            ET.SubElement(
+                route,
+                "Processor",
+                {"id": take_id(), "name": "internal-return", "active": "1", "type": "intreturn"},
+            )
+            ET.SubElement(
+                route,
+                "Processor",
+                {"id": take_id(), "name": name, "active": "1", "type": "main-outs", "role": "Main"},
+            )
+            routes_node.append(route)
+            routes[name] = route
+            return route
+
+        composition_name = mix["composition"]["route"]
+        make_native_bus(
+            composition_name,
+            mix["composition"]["order"],
+            "Master",
+        )
+        for row in mix["groups"].values():
+            make_native_bus(row["route"], row["order"], composition_name)
+
+        def rewire_output(source_name, target_name):
+            route = routes[source_name]
+            output = next(io for io in route.findall("IO") if io.get("direction") == "Output")
+            for port in output.findall("Port"):
+                if port.get("type") != "audio":
+                    continue
+                for connection in list(port.findall("Connection")):
+                    port.remove(connection)
+                channel = port.get("name").rsplit(" ", 1)[-1]
+                ET.SubElement(port, "Connection", {"other": f"{target_name}/audio_in {channel}"})
+
+        for row in mix["groups"].values():
+            for track_name in row["tracks"]:
+                rewire_output(track_name, row["route"])
+
+        # Simulate Ardour's receiving-side connection serialization as well.
+        master_input = next(
+            io for io in routes["Master"].findall("IO") if io.get("direction") == "Input"
+        )
+        for port in master_input.findall("Port"):
+            for connection in list(port.findall("Connection")):
+                port.remove(connection)
+            channel = port.get("name").rsplit(" ", 1)[-1]
+            ET.SubElement(
+                port,
+                "Connection",
+                {"other": f"{composition_name}/audio_out {channel}"},
+            )
+
+        route_plans = list(plan["groups"].values()) + [plan["master"]]
+        for route_plan in route_plans:
+            route = routes[route_plan["route"]]
+            route.set("native-normalized", "1")
+            position = 0
+            for spec in route_plan["processors"]:
+                attrs = {
+                    "id": take_id(),
+                    "name": spec["plugin"],
+                    "active": "1",
+                    "type": "lv2" if spec["host_kind"] == "lv2" else "luaproc",
+                }
+                if spec["host_kind"] == "lv2":
+                    attrs["unique-id"] = spec["plugin"]
+                route.insert(position, ET.Element("Processor", attrs))
+                position += 1
+
+        # A native headless save may know about Dummy outputs.  The final
+        # portable session must retain the scaffold Master output IO.
+        master_output = next(
+            io for io in routes["Master"].findall("IO") if io.get("direction") == "Output"
+        )
+        first_port = master_output.find("Port")
+        ET.SubElement(first_port, "Connection", {"other": "system:playback_1"})
+
+        # Non-routing native mutations to MIDI tracks must not escape the mix
+        # transaction; only the live-routed Output IO is allowed through.
+        routes["lead"].set("native-track-mutation", "must-not-survive")
+        root.set("id-counter", str(next_id + 1))
+        tree.write(result.session_file, encoding="UTF-8", xml_declaration=True)
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout="processing ok\nAmbition Ardour native mix graph configured\nAmbition Ardour processing configured\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr("ambition_music_renderer.ardour_export.subprocess.run", fake_run)
+    completed = apply_ardour_processing(result, ardour_lua=arlua)
+    assert completed.returncode == 0
+    assert result.session_file.read_bytes() != before
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    assert data["processing_transport"]["status"] == "applied"
+    assert (
+        data["processing_transport"]["session_merge"]
+        == "libardour_native_bus_graph_onto_pristine_timing_scaffold"
+    )
+
+    root = ET.parse(result.session_file).getroot()
+    routes = {route.get("name"): route for route in root.find("Routes")}
+    melody = routes["AMB Group melody"]
+    assert melody.get("native-normalized") == "1"
+    assert any(proc.get("type") == "intreturn" for proc in melody.findall("Processor"))
+    assert any(proc.get("name") == "ACE Amplifier" for proc in melody.findall("Processor"))
+    assert routes["AMB Composition"].get("native-normalized") == "1"
+    assert routes["Master"].get("native-normalized") == "1"
+
+    def output_connections(route):
+        return {
+            conn.get("other")
+            for io in route.findall("IO")
+            if io.get("direction") == "Output"
+            for port in io.findall("Port")
+            for conn in port.findall("Connection")
+        }
+
+    # MIDI track state stays pristine except for the Ardour-created live output
+    # routing that is the purpose of this transaction.
+    lead = routes["lead"]
+    assert lead.get("native-track-mutation") is None
+    assert "AMB Group melody/audio_in 1" in output_connections(lead)
+    assert "AMB Group rhythm/audio_in 1" in output_connections(routes["kit"])
+    assert "AMB Composition/audio_in 1" in output_connections(melody)
+    assert "Master/audio_in 1" in output_connections(routes["AMB Composition"])
+    assert any(proc.get("name") == "ACE Reasonable Synth" for proc in lead.findall("Processor"))
+
+    # Dummy/headless hardware routing is not allowed into the portable session.
+    master_output = next(
+        io for io in routes["Master"].findall("IO") if io.get("direction") == "Output"
+    )
+    assert ET.tostring(master_output, encoding="unicode") == ET.tostring(
+        before_master_output, encoding="unicode"
+    )
+    master_input = next(
+        io for io in routes["Master"].findall("IO") if io.get("direction") == "Input"
+    )
+    assert any(
+        conn.get("other") == "AMB Composition/audio_out 1"
+        for port in master_input.findall("Port")
+        for conn in port.findall("Connection")
+    )
+
+
+def test_apply_ardour_processing_rejects_missing_native_bus_graph(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    compiled = compile_score(_mix_transport_score())
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+        realize_processing=True,
+    )
+    before = result.session_file.read_bytes()
+    arlua = tmp_path / "arlua"
+    arlua.write_text("#!/bin/sh\n", encoding="utf8")
+
+    def fake_run(command, **kwargs):
+        import subprocess
+
+        # Pretend the Lua pass reached save/close but failed to create any of
+        # the required native buses.  The serialized graph verifier must reject
+        # this instead of trusting a completion string alone.
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout="Ambition Ardour processing configured\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr("ambition_music_renderer.ardour_export.subprocess.run", fake_run)
+    with pytest.raises(ArdourExportError, match="native group bus missing"):
+        apply_ardour_processing(result, ardour_lua=arlua)
+    assert result.session_file.read_bytes() == before
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    assert data["processing_transport"]["status"] == "failed"
+
+def test_apply_ardour_processing_requires_completion_marker(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    compiled = compile_score(_mix_transport_score())
+    result = export_ardour_session(
+        compiled,
+        tmp_path / "session",
+        realize_instruments=False,
+        realize_processing=True,
+    )
+    before = result.session_file.read_bytes()
+    arlua = tmp_path / "arlua"
+    arlua.write_text("#!/bin/sh\n", encoding="utf8")
+
+    def fake_run(command, **kwargs):
+        import subprocess
+
+        return subprocess.CompletedProcess(command, 1, stdout="", stderr="late native failure\n")
+
+    monkeypatch.setattr("ambition_music_renderer.ardour_export.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "ambition_music_renderer.ardour_export._serialized_processing_errors",
+        lambda _result: [],
+    )
+
+    with pytest.raises(ArdourExportError, match="completion marker"):
+        apply_ardour_processing(result, ardour_lua=arlua)
+    assert result.session_file.read_bytes() == before
+    data = json.loads(result.export_manifest.read_text(encoding="utf8"))
+    assert data["processing_transport"]["status"] == "failed"
+
+
+def test_ardour_processing_transport_reports_section_bus_dsp_gap():
+    spec = _mix_transport_score()
+    spec["processing"] = {
+        "sections": {
+            "a": {"chain": [{"processor": "gain", "gain_db": -2.0}]},
+        }
+    }
+    compiled = compile_score(spec)
+    transport = compile_processing_transport(compiled)
+    assert any(
+        "section a: section-bus ProcessingPlan is not transported yet" in warning
+        for warning in transport.warnings
+    )

@@ -21,11 +21,12 @@ python -m ambition_music_renderer cue ardour_export <cue> \
 ```
 
 The destination contains `<cue>.ardour`, one semantically named MIDI track per
-compiled instrument, clean stereo routing to Master, section markers, and an
-`ambition/` directory containing the ordinary DAW-neutral MIDI + provenance
-sidecar. The Master bus intentionally contains no instrument plugin. The session
-does not pin a machine-specific audio device, so select/retain the desired Ardour
-audio backend normally.
+compiled instrument, section markers, and an `ambition/` directory containing
+the ordinary DAW-neutral MIDI + provenance sidecar. In a normal processed export,
+tracks feed semantic `AMB Group <group>` buses, those buses feed `AMB Composition`,
+and the composition bus feeds Master. The Master bus intentionally contains no
+instrument plugin. The session does not pin a machine-specific audio device, so
+select/retain the desired Ardour audio backend normally.
 
 The adapter consumes the canonical `InstrumentResolutionPlan`. Python first writes
 exactly one ACE Reasonable Synth on every MIDI track, using the session shape that
@@ -38,9 +39,30 @@ hand-serialize arbitrary LV2 pin maps and state. Unsupported tracks remain on
 Reasonable Synth. `--audition-only` skips the native replacement pass and leaves
 the whole cue in the neutral listening mode.
 
-The current session serializer supports constant tempo and meter. Renderer
-processing/mastering is still outside the Ardour adapter, and generated sessions
-reference local sample libraries rather than packaging their assets.
+The adapter now transports the major audio-domain mix controls from the same
+canonical objects used by the renderer. Instrument `mix_gain_db` is placed on the
+track fader. Section `stem_mix_db` becomes smooth automation on the semantic group
+bus, preserving the renderer's dB-domain transition convention. Section
+`mix_gain_db` similarly rides the `AMB Composition` bus. Group/master
+`ProcessingPlan` operations are translated in order to editable Ardour processors:
+gain, high/low-pass filters, shelves/parametric EQ, compression, reverb,
+Pedalboard gain/filter/compressor steps, and LV2 processors such as the authored
+Guitarix stages are represented. This is an adapter over `ProcessingPlan`, not a
+second YAML interpreter.
+
+Not every offline renderer operation has an exact realtime analogue yet. The
+manifest records approximations/omissions explicitly: `transient_tame`,
+`stereo_width`, canonical time-varying section-bus DSP, the renderer soft
+limiter/normalization/loudness stages, and renderer-level wet/dry wrappers remain
+follow-up work; ACE reverb and compressor
+also have different DSP implementations even when their authored controls map
+closely. `--no-processing` keeps real instrument realization while omitting the
+mix/processing transport. `--audition-only` intentionally omits both real
+instruments and processing for neutral note-composition review.
+
+The current session serializer still supports constant tempo and meter, and
+generated sessions reference local sample libraries rather than packaging their
+assets.
 
 Do not regenerate into an Ardour session after hand-editing it. The command
 refuses to overwrite a non-empty destination by default. `--force` is restricted
@@ -155,20 +177,24 @@ before writing.
 
 ### Stage 4: Ardour session adapter
 
-Forward editing and sampled realization are implemented. `cue ardour_export`
-creates an Ardour 9 session around the neutral interchange core with semantic
-track names, per-track MIDI sources/regions/playlists, a known-good Reasonable
-Synth scaffold, native libardour replacement with sfizz/ACE Fluid Synth from
-canonical `InstrumentResolutionPlan` data, clean Master routing, section markers,
-and no machine-specific audio-device binding. A failed native realization leaves
-the audible Reasonable Synth scaffold on disk rather than a half-serialized
-instrument chain.
+Forward editing, sampled realization, and the first mix/processing transport
+are implemented. `cue ardour_export` creates an Ardour 9 session around the
+neutral interchange core with semantic track names, per-track MIDI
+sources/regions/playlists, a known-good Reasonable Synth scaffold, native
+libardour replacement with sfizz/ACE Fluid Synth from canonical
+`InstrumentResolutionPlan` data, semantic group/composition buses, renderer
+mix-gain riders, supported canonical `ProcessingPlan` operations, section markers,
+and no machine-specific audio-device binding. Instrument realization and
+processing are separate transactions: a processing-plugin failure leaves the
+verified real instruments and timing-preserving routing scaffold intact.
 
-The next forward-workflow fidelity step is driven by editing use: decide which
-renderer processing, reference full mix/stems, grouping, and instrument-swap
-ergonomics are worth reproducing in Ardour. Do that before adding more round-trip
-machinery. REAPER should consume the same interchange/reconciliation objects and
-receive a thinner adapter after the Ardour workflow has been exercised.
+The next forward-workflow fidelity step is driven by editing use: close the
+explicit DSP gaps (`transient_tame`, stereo width, limiter/normalization/loudness,
+and true outer wet/dry wrappers), add reference full mix/stems where they improve
+judgment, and improve instrument-swap ergonomics. Do that before adding more
+round-trip machinery. REAPER should consume the same interchange/reconciliation
+objects and receive a thinner adapter after the Ardour workflow has been
+exercised.
 
 ### Stage 5: source-preserving patch quality
 

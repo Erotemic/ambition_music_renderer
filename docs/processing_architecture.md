@@ -154,6 +154,43 @@ New v3 music should not use `sections[].postprocess`. Use
 `processing.sections.<id>` when a section needs a special treatment; that stage
 runs before the composition master.
 
+## Ardour processing transport
+
+`ambition_music_renderer.ardour_processing` is a DAW adapter over this same
+canonical contract. It does **not** own a second processing vocabulary and must
+not reinterpret cue postprocess YAML independently. `cue ardour_export` compiles
+the normal group/master `ProcessingPlan` objects, maps supported operations to
+editable Ardour processors, and records approximations or omissions in the
+generated-session manifest.
+
+The current Ardour signal-flow projection is:
+
+```text
+real instrument
+  -> track fader (`mix_gain_db`)
+  -> `AMB Group <group>` processors
+  -> group fader automation (`stem_mix_db`)
+  -> `AMB Composition` fader automation (`mix_gain_db`)
+  -> Master processors
+  -> output
+```
+
+That ordering mirrors the renderer's important audio-domain ownership boundaries:
+instrument calibration precedes group processing, section family riders follow
+group processing, composition-level section riding precedes the one master chain.
+The libardour processing pass is transactional: only verified Processor nodes are
+grafted back onto the timing-preserving session, so a native Ardour save cannot
+become authority for MIDI timing or other MusicIR state.
+
+Currently supported transport includes gain, second-order high/low-pass filters,
+shelves/bell EQ, compressor controls, approximate room reverb, supported
+Pedalboard primitives, and parameterized LV2 stages such as the authored Guitarix
+chain. Explicit gaps include transient-tame, stereo widening beyond the source
+stereo image, soft limiting/normalization/loudness, outer renderer wet/dry
+wrappers, VST3/command stages, and time-varying canonical section-bus DSP. These
+gaps must remain visible in the export manifest until a faithful realtime mapping
+is designed.
+
 ## Regression evidence
 
 `processing.metrics` provides deterministic peak/RMS/clipping/DC and section

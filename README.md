@@ -186,9 +186,21 @@ Use `--audition-only` to deliberately skip the sampled realization and hear the
 whole cue through ACE Reasonable Synth. This is useful for finding note, rhythm,
 voicing, and overlap problems without the sampled timbre masking them. The real
 instrument pass uses Ardour itself to create and serialize plugin state; Python
-does not hand-author arbitrary LV2 pin maps or state directories. Generated
-sessions reference local sample-library paths and are therefore working sessions,
-not portable sample bundles.
+does not hand-author arbitrary LV2 pin maps or state directories.
+
+Normal Ardour exports also transport the renderer's mix hierarchy from the
+canonical `ProcessingPlan`: instrument `mix_gain_db` becomes the track fader,
+tracks feed semantic `AMB Group <group>` buses, section `stem_mix_db` becomes
+smooth group-bus gain automation, all groups feed `AMB Composition`, section
+`mix_gain_db` becomes composition-bus automation, and supported group/master DSP
+is created as editable Ardour processors. Use `--no-processing` to keep the real
+instruments but omit that processing transport. The export manifest records
+operations that are approximate or currently omitted rather than silently
+claiming renderer-identical DSP. Time-varying canonical section-bus DSP is one
+of those explicit follow-up gaps.
+
+Generated sessions reference local sample-library paths and are therefore working
+sessions, not portable sample bundles.
 
 The neutral interchange remains the round-trip boundary:
 

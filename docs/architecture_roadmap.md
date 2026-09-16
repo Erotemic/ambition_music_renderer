@@ -254,6 +254,10 @@ preserves MusicIR source/provenance that MIDI cannot carry portably.
 `ambition_music_renderer.ardour_export` owns Ardour-specific session scaffolding
 and must consume `CompiledScore`, `musicir.interchange`, and canonical
 `InstrumentResolutionPlan` data rather than reinterpreting score YAML.
+`ambition_music_renderer.ardour_processing` is the corresponding DSP adapter: it
+consumes canonical `ProcessingPlan` objects and lowers supported operations to
+editable Ardour processor specifications. It must not grow a parallel processing
+configuration language or reparse cue postprocess YAML on its own.
 
 The reverse path compares edited performance against the saved baseline, rescales
 DAW PPQ changes, and updates the smallest currently supported v3 source region:
@@ -337,15 +341,21 @@ line up as follows:
 13. **DAW note/controller round trip** — edited MIDI can be reconciled against
     an exact export baseline; note and clip-owned CC/pitch-bend edits can be
     applied by lowering only affected v3 clips, with recompilation verification.
-14. **Ardour forward editing adapter** — second pass implemented: generated
-    Ardour 9 sessions carry semantic MIDI tracks and a validated single-instrument
-    Reasonable Synth scaffold; Ardour's own Lua/libardour API then replaces that
-    synth with sfizz/ACE Fluid Synth from canonical instrument-resolution plans.
-    Failed/unsupported realization therefore falls back to the audible scaffold
-    instead of relying on hand-written LV2 state or serial instrument chains.
-    Clean Master routing, section markers, and neutral interchange artifacts are
-    included. Reference stems and renderer processing remain forward-workflow
-    follow-up work.
+14. **Ardour forward editing adapter** — third pass implemented: generated
+    Ardour 9 sessions carry semantic MIDI tracks on Ardour's stable high-PPQ
+    source lattice and a validated single-instrument Reasonable Synth scaffold;
+    Ardour's own Lua/libardour API then replaces that synth with sfizz/ACE Fluid
+    Synth from canonical instrument-resolution plans. Failed/unsupported
+    realization therefore falls back to the audible scaffold instead of relying
+    on hand-written LV2 state or serial instrument chains. The adapter also
+    transports the renderer mix hierarchy from canonical data: instrument
+    `mix_gain_db`, semantic group buses, section stem/composition gain riders,
+    and supported group/master `ProcessingPlan` operations become editable
+    Ardour faders/automation/processors. Instrument and processing realization
+    are isolated transactions whose native saves cannot become timing authority.
+    Explicit remaining fidelity gaps, including time-varying section-bus DSP,
+    are recorded in the export manifest rather than silently approximated as
+    exact.
 15+. **Conductor round trip hardening, real Ardour editing feedback,
     generator/instrument improvement, legacy-internal isolation, and module
     decomposition** remain active work. Ardour is the primary DAW target; REAPER
