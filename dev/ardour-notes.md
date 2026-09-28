@@ -1,6 +1,10 @@
 
 Instructions for: Ubuntu 24.04 and Ardour 9.7-312-g97a96e7c24
 
+
+cd ~/code
+git clone https://github.com/Ardour/ardour.git
+
 sudo apt update
 
 sudo apt install -y \
@@ -47,6 +51,72 @@ sudo apt install -y \
     vamp-plugin-sdk
 
 
+# FOr 22.04
+
+# Ubuntu 22.04 / Jammy
+sudo apt update
+
+# Several Ardour dependencies live in Universe.
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y universe
+sudo apt update
+
+sudo apt install libcurl4-gnutls-dev
+
+sudo apt install -y \
+    build-essential \
+    pkg-config \
+    python3 \
+    gettext \
+    intltool \
+    itstool \
+    ladspa-sdk \
+    libarchive-dev \
+    libasound2-dev \
+    libaubio-dev \
+    libboost-dev \
+    libcairomm-1.0-dev \
+    libcurl4-gnutls-dev \
+    libcwiid-dev \
+    libdbus-1-dev \
+    libfftw3-dev \
+    libfluidsynth-dev \
+    libglibmm-2.4-dev \
+    libgtkmm-2.4-dev \
+    libhidapi-dev \
+    libjack-jackd2-dev \
+    liblilv-dev \
+    liblo-dev \
+    liblrdf0-dev \
+    libltc-dev \
+    libpangomm-1.4-dev \
+    libpulse-dev \
+    libqm-dsp-dev \
+    libreadline-dev \
+    librubberband-dev \
+    libsamplerate0-dev \
+    libsigc++-2.0-dev \
+    libsndfile1-dev \
+    libsuil-dev \
+    libtag1-dev \
+    libusb-1.0-0-dev \
+    libwebsockets-dev \
+    libxinerama-dev \
+    libxrandr-dev \
+    lv2-dev \
+    vamp-plugin-sdk \
+    libxml2-dev \
+    libogg-dev \
+    libflac-dev \
+    uuid-dev \
+    libfontconfig1-dev \
+    libx11-dev \
+    libpng-dev \
+    libjpeg-dev
+
+
+### Common Part
+
 cd ~/code/ardour
 
 /usr/bin/python3 ./waf configure \
@@ -75,6 +145,10 @@ remains the eventual reconciliation baseline.
 ### Forward export: preferred path
 
 From the renderer repo, create an editable Ardour session directly:
+
+```bash
+cd ~/code/ambition/tools/ambition_music_renderer
+```
 
 ```bash
 python -m ambition_music_renderer cue ardour_export \
