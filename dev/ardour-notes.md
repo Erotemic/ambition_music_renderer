@@ -115,6 +115,18 @@ sudo apt install -y \
     libjpeg-dev
 
 
+
+cd /tmp
+
+curl -fLO \
+  https://download.opensuse.org/repositories/home:/sfztools:/sfizz/xUbuntu_22.04/amd64/sfizz_1.2.3-0_amd64.deb
+
+echo \
+'aa421694b98ec167c712255b03ee268fe9901c1bc72972c83c4232f81331d43c  sfizz_1.2.3-0_amd64.deb' \
+  | sha256sum -c -
+
+sudo apt install ./sfizz_1.2.3-0_amd64.deb
+
 ### Common Part
 
 cd ~/code/ardour
