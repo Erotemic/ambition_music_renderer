@@ -3,11 +3,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-_sudo_prefix(){
-    if [ "$(whoami)" != "root" ]; then
-        printf 'sudo'
-    fi
-}
+# shellcheck source=apt_helpers.sh
+. ./apt_helpers.sh
 
 apt_ensure(){
     ARGS=("$@")
@@ -27,7 +24,7 @@ apt_ensure(){
 
     if [ "${#MISS_PKGS[@]}" -gt 0 ]; then
         if [ "${UPDATE:-}" != "" ]; then
-            ${_SUDO:+$_SUDO} apt update -y
+            apt_update_tolerant
         fi
         DEBIAN_FRONTEND=noninteractive ${_SUDO:+$_SUDO} apt install -y "${MISS_PKGS[@]}"
     else
@@ -137,12 +134,9 @@ install_sfizz_obs_repo(){
 
     apt_ensure curl gpg ca-certificates p7zip-full unar
 
-    if [ ! -f "$KEYRING" ]; then
-        echo "[setup] Installing sfizz OBS keyring: $KEYRING"
-        curl -fsSL "$KEY_URL" | gpg --dearmor | ${_SUDO:+$_SUDO} tee "$KEYRING" >/dev/null
-    else
-        echo "[setup] Already have sfizz OBS keyring: $KEYRING"
-    fi
+    # ⛔ ALWAYS ASKED, never "already have it": OBS keys expire and are replaced,
+    # and a keyring downloaded once goes stale and then fails every `apt update`.
+    refresh_apt_keyring "$KEY_URL" "$KEYRING"
 
     DESIRED_LINE="deb [signed-by=$KEYRING] $REPO_URL /"
 
@@ -155,7 +149,11 @@ install_sfizz_obs_repo(){
 
     # ⚠ `|| true`: an unusable OBS repo must fall through to the source build
     # below, not abort setup. `apt_ensure` runs under `set -e`.
-    UPDATE=1 apt_ensure sfizz || true
+    apt_update_tolerant
+    # A repository that cannot be verified would fail every later `apt update`
+    # on this machine; switch it off and let the source build below provide sfizz.
+    disable_apt_repo_if_unsigned "$LIST_FILE" 'sfztools' || true
+    apt_ensure sfizz || true
     ensure_sfizz_render_compat_shim
 
     if ! command -v sfizz_render >/dev/null 2>&1; then
