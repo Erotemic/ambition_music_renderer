@@ -96,3 +96,12 @@ disable_apt_repo_if_unsigned(){
     fi
     return 1
 }
+
+# `apt install` that really is non-interactive. ⛔ `DEBIAN_FRONTEND=... sudo apt`
+# does not work: sudo's env_reset drops the variable, so a debconf or
+# needrestart dialog still opens. `env` after sudo is what passes it.
+apt_install_noninteractive(){
+    local sudo_prefix
+    sudo_prefix="$(_sudo_prefix)"
+    ${sudo_prefix:+$sudo_prefix} env DEBIAN_FRONTEND=noninteractive NEEDRESTART_SUSPEND=1 apt install -y "$@"
+}

@@ -170,3 +170,31 @@ def test_a_missing_audio_root_is_created_and_a_writable_one_is_left_alone(tmp_pa
     result = _bash(_audio_root_function() + f'\nensure_audio_tools_root "{fresh}"\nensure_audio_tools_root "{fresh}"\n', fakes["env"])
     assert result.returncode == 0, result.stderr
     assert fresh.is_dir()
+
+
+def test_apt_install_noninteractive_survives_an_env_resetting_sudo(tmp_path):
+    """`VAR=x sudo apt` loses VAR to sudo's env_reset; `sudo env VAR=x apt` keeps it."""
+    import os, stat, subprocess
+    from pathlib import Path
+
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    seen = tmp_path / "seen.txt"
+
+    def script(name, body):
+        p = bin_dir / name
+        p.write_text("#!/usr/bin/env bash\n" + body)
+        p.chmod(p.stat().st_mode | stat.S_IEXEC)
+
+    script("sudo", 'exec env -i PATH="$PATH" "$@"\n')
+    script("apt", f'echo "frontend=${{DEBIAN_FRONTEND:-UNSET}} needrestart=${{NEEDRESTART_SUSPEND:-UNSET}} $*" >> "{seen}"\n')
+    helpers = Path(__file__).resolve().parent.parent / "apt_helpers.sh"
+    env = dict(os.environ, PATH=f"{bin_dir}:{os.environ['PATH']}")
+    r = subprocess.run(
+        ["bash", "-c", f". {helpers}\n_sudo_prefix() {{ printf sudo; }}\napt_install_noninteractive pkg-a pkg-b\n"],
+        capture_output=True, text=True, env=env,
+    )
+    assert r.returncode == 0, r.stderr
+    line = seen.read_text().strip()
+    assert "frontend=noninteractive" in line and "needrestart=1" in line, line
+    assert "install -y pkg-a pkg-b" in line, line

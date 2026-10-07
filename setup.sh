@@ -26,7 +26,7 @@ apt_ensure(){
         if [ "${UPDATE:-}" != "" ]; then
             apt_update_tolerant
         fi
-        DEBIAN_FRONTEND=noninteractive ${_SUDO:+$_SUDO} apt install -y "${MISS_PKGS[@]}"
+        apt_install_noninteractive "${MISS_PKGS[@]}"
     else
         echo "No missing packages"
     fi
