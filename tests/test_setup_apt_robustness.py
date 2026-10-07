@@ -134,3 +134,17 @@ def test_setup_no_longer_trusts_an_existing_keyring_without_looking():
     assert "Already have sfizz OBS keyring" not in text
     assert "refresh_apt_keyring" in text and "apt_update_tolerant" in text
     assert not re.search(r"^\s*(\$\{_SUDO:\+\$_SUDO\}\s+)?apt update -y\s*$", text, re.M), "a bare fatal apt update is back"
+
+
+def test_the_status_variables_exist_even_when_the_update_ran_in_a_subshell(tmp_path):
+    """`apt_update_tolerant | tail` runs in a subshell; a caller under `set -u`
+    must read an empty answer rather than die on an unbound variable."""
+    fakes = _fakes(tmp_path)
+    result = _bash(
+        'apt_update_tolerant 2>&1 | tail -1 >/dev/null\n'
+        'echo "status=$APT_UPDATE_STATUS output=[${APT_UPDATE_OUTPUT}]"\n'
+        'disable_apt_repo_if_unsigned /nonexistent sfztools || echo not-disabled\n',
+        fakes["env"],
+    )
+    assert result.returncode == 0, result.stderr
+    assert "status=0 output=[]" in result.stdout and "not-disabled" in result.stdout

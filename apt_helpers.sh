@@ -8,11 +8,23 @@
 # (`EXPKEYSIG ... home:sfztools OBS Project`). The key had been downloaded on an
 # earlier run and "Already have sfizz OBS keyring" never looked at it again.
 #
+# ⚠ MEASURED 2026-10-07 ON A MACHINE WITH THE SAME REPOSITORY: re-downloading the
+# vendor's `Release.key` changed nothing ("keyring is current") and `apt update`
+# still reported EXPKEYSIG, because the key the vendor PUBLISHES was itself
+# expired. A refresh cannot fix that; renaming the list file is what restored
+# `apt update` to exit 0. The refresh stays, for the case where the vendor has
+# renewed a key that a machine downloaded earlier.
+#
 # So: an update that fails is a WARNING that names the failing repositories;
 # the install that follows is what decides whether setup can go on. A managed
 # repository that stays unusable is switched off (renamed, not deleted), so it
 # stops failing every later `apt update` on the machine, and the caller falls
 # back to building from source.
+
+# Defined up front so a caller under `set -u` that ran the update in a subshell
+# (for example piped into `tail`) reads an empty answer, not an unbound variable.
+APT_UPDATE_OUTPUT="${APT_UPDATE_OUTPUT:-}"
+APT_UPDATE_STATUS="${APT_UPDATE_STATUS:-0}"
 
 _sudo_prefix(){
     if [ "$(whoami)" != "root" ]; then
