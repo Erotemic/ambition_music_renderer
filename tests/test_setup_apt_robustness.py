@@ -148,3 +148,25 @@ def test_the_status_variables_exist_even_when_the_update_ran_in_a_subshell(tmp_p
     )
     assert result.returncode == 0, result.stderr
     assert "status=0 output=[]" in result.stdout and "not-disabled" in result.stdout
+
+
+def _audio_root_function() -> str:
+    return re.search(r"^ensure_audio_tools_root\(\)\{.*?^\}\n", SETUP.read_text(), re.S | re.M).group(0)
+
+
+def test_a_dangling_audio_root_symlink_is_named_not_reported_as_file_exists(tmp_path):
+    fakes = _fakes(tmp_path)
+    link = tmp_path / "audio-tools"
+    link.symlink_to(tmp_path / "unmounted-raid" / "audio-tools")
+    result = _bash(_audio_root_function() + f'\nensure_audio_tools_root "{link}"\n', fakes["env"])
+    assert result.returncode != 0
+    assert "symlink" in result.stderr and "does not exist" in result.stderr and "mounted" in result.stderr
+    assert "File exists" not in result.stderr
+
+
+def test_a_missing_audio_root_is_created_and_a_writable_one_is_left_alone(tmp_path):
+    fakes = _fakes(tmp_path)
+    fresh = tmp_path / "new-root"
+    result = _bash(_audio_root_function() + f'\nensure_audio_tools_root "{fresh}"\nensure_audio_tools_root "{fresh}"\n', fakes["env"])
+    assert result.returncode == 0, result.stderr
+    assert fresh.is_dir()

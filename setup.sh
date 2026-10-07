@@ -299,6 +299,24 @@ ensure_uv(){
     fi
 }
 
+# Make the instrument-library root exist and be writable. A root that is a
+# symlink to a directory that is not there (an unmounted disk) is named as such:
+# `mkdir -p` on it fails with "File exists", which says nothing about the cause.
+ensure_audio_tools_root(){
+    local root="$1" sudo_prefix
+    if [ -L "$root" ] && [ ! -e "$root" ]; then
+        echo "[setup] ERROR: $root is a symlink to $(readlink "$root"), which does not exist." >&2
+        echo "[setup]        Is its disk mounted? Otherwise point AMBITION_AUDIO_TOOLS_ROOT at a real" >&2
+        echo "[setup]        directory, or remove the stale link: sudo rm $root" >&2
+        return 1
+    fi
+    if [ ! -w "$root" ]; then
+        sudo_prefix="$(_sudo_prefix)"
+        ${sudo_prefix:+$sudo_prefix} mkdir -p "$root"
+        ${sudo_prefix:+$sudo_prefix} chown "$(id -u):$(id -g)" "$root"
+    fi
+}
+
 ensure_venv(){
     ensure_uv
 
@@ -347,11 +365,7 @@ if [ "${AMBITION_SKIP_AUDIO_TOOLS_DOWNLOAD:-0}" != "1" ]; then
     # /data is root-owned on a fresh box and the downloader does not escalate.
     # Test writability, not `mkdir -p`: that succeeds on an existing dir no
     # matter who owns it.
-    if [ ! -w "$AUDIO_TOOLS_ROOT" ]; then
-        _SUDO="$(_sudo_prefix)"
-        ${_SUDO:+$_SUDO} mkdir -p "$AUDIO_TOOLS_ROOT"
-        ${_SUDO:+$_SUDO} chown "$(id -u):$(id -g)" "$AUDIO_TOOLS_ROOT"
-    fi
+    ensure_audio_tools_root "$AUDIO_TOOLS_ROOT"
     echo "[setup] Downloading instrument libraries and plugins into $AUDIO_TOOLS_ROOT"
     ./download_ambition_audio_tools.sh "$AUDIO_TOOLS_ROOT"
 fi
