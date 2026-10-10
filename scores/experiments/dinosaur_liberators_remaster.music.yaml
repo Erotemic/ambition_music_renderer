@@ -8,7 +8,7 @@ notes:
   - 'The original is scores/examples/dinosaur_liberators.music.yaml (MusicIR v1). That file does not change.'
   - 'Kept: G major, 110 BPM, the six sections and their lengths, the chords, and every melody (the two phrases of the tune, the slide fill, solo licks A and B, the climax lick) at its original place.'
   - 'Changed, six chords: the tune holds its home note G where the original chord had an F sharp. Bars 10 and 18 are G over F sharp in place of B minor over F sharp (the bass line is the same). Bars 27, 31, 35 and 75 are Dsus4 in place of D. The tune does not change.'
-  - 'Instruments: an acoustic guitar (the Shinyguitar archtop through its microphone, five voices) plays the arpeggio. The lead and solo guitars go through the Guitarix amp chain. Sampled bass, drum kit, piano and horns. The organ is still General MIDI.'
+  - 'Instruments: the Shinyguitar archtop plays the arpeggio through a clean amp (Jon picked it from a reel of four) and plays the tune through the Guitarix lead amp. The Emily guitar plays the solos through the same lead amp. Sampled bass, drum kit, piano and horns. The organ is still General MIDI.'
   - 'Jon, 2026-10-10, on the first render: the guitar timbre was wrong, most of all in the intro, and the ambient strings did not work in a southern rock power ballad. The intro guitar was a flatwound electric with no amp, with almost no sound above 3 kHz. The strings and the warm pad are gone; the slide guitar holds long notes in their place.'
   - 'Changed, solo sections: the original played a lick and then rested for two or three bars. New answer phrases fill those rests. The second time the climax lick plays, a second guitar plays harmony.'
   - 'Changed, verse and chorus: the slide guitar answers the tune in two silent places, and harmonizes the last chorus phrase.'
@@ -40,7 +40,8 @@ instruments:
     volume: 104
     pan: 64
     expression: 112
-    instrument_backend: {kind: sfz, sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz', settings: {fold_to_range: false}}
+    controls: {100: 0, 107: 0}
+    instrument_backend: {kind: sfz, sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_one.sfz', settings: {fold_to_range: false}}
   - name: solo
     group: solo
     program: clean_guitar
@@ -67,14 +68,14 @@ instruments:
     mix_gain_db: 4.0
     controls: {111: 0, 114: 46, 116: 10}
     instrument_backend: {kind: sfz, sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz', settings: {fold_to_range: false}}
-  - name: acoustic
-    group: acoustic
-    program: steel_guitar
+  - name: arpeggio
+    group: arpeggio
+    program: clean_guitar
     volume: 110
     pan: 64
     expression: 112
-    controls: {100: 126, 107: 127}
-    instrument_backend: {kind: sfz, sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/acoustic_five.sfz', settings: {fold_to_range: false}}
+    controls: {100: 0, 107: 127}
+    instrument_backend: {kind: sfz, sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_five.sfz', settings: {fold_to_range: false}}
   - name: crunch
     group: crunch
     program: clean_guitar
@@ -520,32 +521,32 @@ parts:
             at: {bar: 9, beat: 1}
             use: vocal_a
             automation:
-              - {id: lead_verse_a_1_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -410], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 123], [{ticks: 3200}, 0], [{ticks: 3360}, 123], [{ticks: 3520}, 0], [{ticks: 3680}, 123], [{ticks: 3836}, 123], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 150], [{ticks: 7040}, 0], [{ticks: 7200}, 150], [{ticks: 7360}, 0], [{ticks: 7520}, 150], [{ticks: 7680}, 0], [{ticks: 7840}, 150], [{ticks: 8000}, 0], [{ticks: 8160}, 150], [{ticks: 8320}, 0], [{ticks: 8480}, 150], [{ticks: 8640}, 0], [{ticks: 8800}, 150], [{ticks: 8960}, 0], [{ticks: 9120}, 150], [{ticks: 9280}, 0], [{ticks: 9440}, 150], [{ticks: 9596}, 150], [{ticks: 9600}, 0]]}
+              - {id: lead_verse_a_1_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -2458], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 737], [{ticks: 3200}, 0], [{ticks: 3360}, 737], [{ticks: 3520}, 0], [{ticks: 3680}, 737], [{ticks: 3836}, 737], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 901], [{ticks: 7040}, 0], [{ticks: 7200}, 901], [{ticks: 7360}, 0], [{ticks: 7520}, 901], [{ticks: 7680}, 0], [{ticks: 7840}, 901], [{ticks: 8000}, 0], [{ticks: 8160}, 901], [{ticks: 8320}, 0], [{ticks: 8480}, 901], [{ticks: 8640}, 0], [{ticks: 8800}, 901], [{ticks: 8960}, 0], [{ticks: 9120}, 901], [{ticks: 9280}, 0], [{ticks: 9440}, 901], [{ticks: 9596}, 901], [{ticks: 9600}, 0]]}
           - id: lead_verse_a_2
             at: {bar: 17, beat: 1}
             use: vocal_a
             automation:
-              - {id: lead_verse_a_2_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -410], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 123], [{ticks: 3200}, 0], [{ticks: 3360}, 123], [{ticks: 3520}, 0], [{ticks: 3680}, 123], [{ticks: 3836}, 123], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 150], [{ticks: 7040}, 0], [{ticks: 7200}, 150], [{ticks: 7360}, 0], [{ticks: 7520}, 150], [{ticks: 7680}, 0], [{ticks: 7840}, 150], [{ticks: 8000}, 0], [{ticks: 8160}, 150], [{ticks: 8320}, 0], [{ticks: 8480}, 150], [{ticks: 8640}, 0], [{ticks: 8800}, 150], [{ticks: 8960}, 0], [{ticks: 9120}, 150], [{ticks: 9280}, 0], [{ticks: 9440}, 150], [{ticks: 9596}, 150], [{ticks: 9600}, 0]]}
+              - {id: lead_verse_a_2_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -2458], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 737], [{ticks: 3200}, 0], [{ticks: 3360}, 737], [{ticks: 3520}, 0], [{ticks: 3680}, 737], [{ticks: 3836}, 737], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 901], [{ticks: 7040}, 0], [{ticks: 7200}, 901], [{ticks: 7360}, 0], [{ticks: 7520}, 901], [{ticks: 7680}, 0], [{ticks: 7840}, 901], [{ticks: 8000}, 0], [{ticks: 8160}, 901], [{ticks: 8320}, 0], [{ticks: 8480}, 901], [{ticks: 8640}, 0], [{ticks: 8800}, 901], [{ticks: 8960}, 0], [{ticks: 9120}, 901], [{ticks: 9280}, 0], [{ticks: 9440}, 901], [{ticks: 9596}, 901], [{ticks: 9600}, 0]]}
           - id: lead_verse_b
             at: {bar: 13, beat: 1}
             use: vocal_b
             automation:
-              - {id: lead_verse_b_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -410], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 123], [{ticks: 3680}, 0], [{ticks: 3840}, 123], [{ticks: 4000}, 0], [{ticks: 4160}, 123], [{ticks: 4316}, 123], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -546], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 150], [{ticks: 8480}, 0], [{ticks: 8640}, 150], [{ticks: 8800}, 0], [{ticks: 8960}, 150], [{ticks: 9120}, 0], [{ticks: 9280}, 150], [{ticks: 9440}, 0], [{ticks: 9600}, 150], [{ticks: 9760}, 0], [{ticks: 9920}, 150], [{ticks: 10080}, 0], [{ticks: 10240}, 150], [{ticks: 10400}, 0], [{ticks: 10560}, 150], [{ticks: 10720}, 0], [{ticks: 10880}, 150], [{ticks: 11040}, 0], [{ticks: 11200}, 150], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
+              - {id: lead_verse_b_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -2458], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 737], [{ticks: 3680}, 0], [{ticks: 3840}, 737], [{ticks: 4000}, 0], [{ticks: 4160}, 737], [{ticks: 4316}, 737], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -3277], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 901], [{ticks: 8480}, 0], [{ticks: 8640}, 901], [{ticks: 8800}, 0], [{ticks: 8960}, 901], [{ticks: 9120}, 0], [{ticks: 9280}, 901], [{ticks: 9440}, 0], [{ticks: 9600}, 901], [{ticks: 9760}, 0], [{ticks: 9920}, 901], [{ticks: 10080}, 0], [{ticks: 10240}, 901], [{ticks: 10400}, 0], [{ticks: 10560}, 901], [{ticks: 10720}, 0], [{ticks: 10880}, 901], [{ticks: 11040}, 0], [{ticks: 11200}, 901], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
           - id: lead_chorus_b_1
             at: {bar: 25, beat: 1}
             use: vocal_b
             automation:
-              - {id: lead_chorus_b_1_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -410], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 123], [{ticks: 3680}, 0], [{ticks: 3840}, 123], [{ticks: 4000}, 0], [{ticks: 4160}, 123], [{ticks: 4316}, 123], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -546], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 150], [{ticks: 8480}, 0], [{ticks: 8640}, 150], [{ticks: 8800}, 0], [{ticks: 8960}, 150], [{ticks: 9120}, 0], [{ticks: 9280}, 150], [{ticks: 9440}, 0], [{ticks: 9600}, 150], [{ticks: 9760}, 0], [{ticks: 9920}, 150], [{ticks: 10080}, 0], [{ticks: 10240}, 150], [{ticks: 10400}, 0], [{ticks: 10560}, 150], [{ticks: 10720}, 0], [{ticks: 10880}, 150], [{ticks: 11040}, 0], [{ticks: 11200}, 150], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
+              - {id: lead_chorus_b_1_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -2458], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 737], [{ticks: 3680}, 0], [{ticks: 3840}, 737], [{ticks: 4000}, 0], [{ticks: 4160}, 737], [{ticks: 4316}, 737], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -3277], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 901], [{ticks: 8480}, 0], [{ticks: 8640}, 901], [{ticks: 8800}, 0], [{ticks: 8960}, 901], [{ticks: 9120}, 0], [{ticks: 9280}, 901], [{ticks: 9440}, 0], [{ticks: 9600}, 901], [{ticks: 9760}, 0], [{ticks: 9920}, 901], [{ticks: 10080}, 0], [{ticks: 10240}, 901], [{ticks: 10400}, 0], [{ticks: 10560}, 901], [{ticks: 10720}, 0], [{ticks: 10880}, 901], [{ticks: 11040}, 0], [{ticks: 11200}, 901], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
           - id: lead_chorus_a
             at: {bar: 29, beat: 1}
             use: vocal_a
             automation:
-              - {id: lead_chorus_a_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -410], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 123], [{ticks: 3200}, 0], [{ticks: 3360}, 123], [{ticks: 3520}, 0], [{ticks: 3680}, 123], [{ticks: 3836}, 123], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 150], [{ticks: 7040}, 0], [{ticks: 7200}, 150], [{ticks: 7360}, 0], [{ticks: 7520}, 150], [{ticks: 7680}, 0], [{ticks: 7840}, 150], [{ticks: 8000}, 0], [{ticks: 8160}, 150], [{ticks: 8320}, 0], [{ticks: 8480}, 150], [{ticks: 8640}, 0], [{ticks: 8800}, 150], [{ticks: 8960}, 0], [{ticks: 9120}, 150], [{ticks: 9280}, 0], [{ticks: 9440}, 150], [{ticks: 9596}, 150], [{ticks: 9600}, 0]]}
+              - {id: lead_chorus_a_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -2458], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 737], [{ticks: 3200}, 0], [{ticks: 3360}, 737], [{ticks: 3520}, 0], [{ticks: 3680}, 737], [{ticks: 3836}, 737], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 901], [{ticks: 7040}, 0], [{ticks: 7200}, 901], [{ticks: 7360}, 0], [{ticks: 7520}, 901], [{ticks: 7680}, 0], [{ticks: 7840}, 901], [{ticks: 8000}, 0], [{ticks: 8160}, 901], [{ticks: 8320}, 0], [{ticks: 8480}, 901], [{ticks: 8640}, 0], [{ticks: 8800}, 901], [{ticks: 8960}, 0], [{ticks: 9120}, 901], [{ticks: 9280}, 0], [{ticks: 9440}, 901], [{ticks: 9596}, 901], [{ticks: 9600}, 0]]}
           - id: lead_chorus_b_2
             at: {bar: 33, beat: 1}
             use: vocal_b
             automation:
-              - {id: lead_chorus_b_2_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -410], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 123], [{ticks: 3680}, 0], [{ticks: 3840}, 123], [{ticks: 4000}, 0], [{ticks: 4160}, 123], [{ticks: 4316}, 123], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -546], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 150], [{ticks: 8480}, 0], [{ticks: 8640}, 150], [{ticks: 8800}, 0], [{ticks: 8960}, 150], [{ticks: 9120}, 0], [{ticks: 9280}, 150], [{ticks: 9440}, 0], [{ticks: 9600}, 150], [{ticks: 9760}, 0], [{ticks: 9920}, 150], [{ticks: 10080}, 0], [{ticks: 10240}, 150], [{ticks: 10400}, 0], [{ticks: 10560}, 150], [{ticks: 10720}, 0], [{ticks: 10880}, 150], [{ticks: 11040}, 0], [{ticks: 11200}, 150], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
+              - {id: lead_chorus_b_2_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -2458], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 737], [{ticks: 3680}, 0], [{ticks: 3840}, 737], [{ticks: 4000}, 0], [{ticks: 4160}, 737], [{ticks: 4316}, 737], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -3277], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 901], [{ticks: 8480}, 0], [{ticks: 8640}, 901], [{ticks: 8800}, 0], [{ticks: 8960}, 901], [{ticks: 9120}, 0], [{ticks: 9280}, 901], [{ticks: 9440}, 0], [{ticks: 9600}, 901], [{ticks: 9760}, 0], [{ticks: 9920}, 901], [{ticks: 10080}, 0], [{ticks: 10240}, 901], [{ticks: 10400}, 0], [{ticks: 10560}, 901], [{ticks: 10720}, 0], [{ticks: 10880}, 901], [{ticks: 11040}, 0], [{ticks: 11200}, 901], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
           - id: lead_d_climax_octave
             at: {bar: 57, beat: 1}
             use: solo_climax
@@ -555,7 +556,7 @@ parts:
             at: {bar: 73, beat: 1}
             use: vocal_a
             automation:
-              - {id: lead_outro_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -410], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 123], [{ticks: 3200}, 0], [{ticks: 3360}, 123], [{ticks: 3520}, 0], [{ticks: 3680}, 123], [{ticks: 3836}, 123], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 150], [{ticks: 7040}, 0], [{ticks: 7200}, 150], [{ticks: 7360}, 0], [{ticks: 7520}, 150], [{ticks: 7680}, 0], [{ticks: 7840}, 150], [{ticks: 8000}, 0], [{ticks: 8160}, 150], [{ticks: 8320}, 0], [{ticks: 8480}, 150], [{ticks: 8640}, 0], [{ticks: 8800}, 150], [{ticks: 8960}, 0], [{ticks: 9120}, 150], [{ticks: 9280}, 0], [{ticks: 9440}, 150], [{ticks: 9596}, 150], [{ticks: 9600}, 0]]}
+              - {id: lead_outro_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 478}, 0], [{ticks: 480}, -2458], [{ticks: 720}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2398}, 0], [{ticks: 2400}, 0], [{ticks: 2880}, 0], [{ticks: 3040}, 737], [{ticks: 3200}, 0], [{ticks: 3360}, 737], [{ticks: 3520}, 0], [{ticks: 3680}, 737], [{ticks: 3836}, 737], [{ticks: 3840}, 0], [{ticks: 5758}, 0], [{ticks: 5760}, 0], [{ticks: 6720}, 0], [{ticks: 6880}, 901], [{ticks: 7040}, 0], [{ticks: 7200}, 901], [{ticks: 7360}, 0], [{ticks: 7520}, 901], [{ticks: 7680}, 0], [{ticks: 7840}, 901], [{ticks: 8000}, 0], [{ticks: 8160}, 901], [{ticks: 8320}, 0], [{ticks: 8480}, 901], [{ticks: 8640}, 0], [{ticks: 8800}, 901], [{ticks: 8960}, 0], [{ticks: 9120}, 901], [{ticks: 9280}, 0], [{ticks: 9440}, 901], [{ticks: 9596}, 901], [{ticks: 9600}, 0]]}
   - id: slide_part
     instrument: slide
     voices:
@@ -719,12 +720,12 @@ parts:
             use: climax_close_low
             automation:
               - {id: solo2_d_close_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 958}, 0], [{ticks: 1200}, 0], [{ticks: 1680}, 11], [{ticks: 1900}, 11], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 5040}, 0], [{ticks: 5520}, 11], [{ticks: 5740}, 11], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9600}, 0], [{ticks: 10080}, 14], [{ticks: 11500}, 14], [{ticks: 11520}, 0]]}
-  - id: acoustic_part
-    instrument: acoustic
+  - id: arpeggio_part
+    instrument: arpeggio
     voices:
-      - id: acoustic_main
+      - id: arpeggio_main
         clips:
-          - id: acoustic_intro
+          - id: arpeggio_intro
             at: {bar: 1, beat: 1}
             duration: {bars: 8}
             velocity_scale: 1.55
@@ -740,7 +741,7 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: acoustic_verse
+          - id: arpeggio_verse
             at: {bar: 9, beat: 1}
             duration: {bars: 16}
             velocity_scale: 1.3
@@ -756,7 +757,7 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: acoustic_chorus
+          - id: arpeggio_chorus
             at: {bar: 25, beat: 1}
             duration: {bars: 16}
             velocity_scale: 1.1
@@ -772,7 +773,7 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: acoustic_solo
+          - id: arpeggio_solo
             at: {bar: 41, beat: 1}
             duration: {bars: 16}
             velocity_scale: 1.1
@@ -788,7 +789,7 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: acoustic_climax
+          - id: arpeggio_climax
             at: {bar: 57, beat: 1}
             duration: {bars: 16}
             generate:
@@ -803,7 +804,7 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: acoustic_outro
+          - id: arpeggio_outro
             at: {bar: 73, beat: 1}
             duration: {bars: 3}
             velocity_scale: 1.4
@@ -1334,7 +1335,7 @@ processing:
       chain:
         - processor: pedalboard
           effects:
-            - {effect: gain, gain_db: 8.0}
+            - {effect: gain, gain_db: 12.0}
             - {effect: compressor, threshold_db: -24.0, ratio: 2.4, attack_ms: 8.0, release_ms: 110.0}
         - processor: lv2
           plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
@@ -1358,7 +1359,7 @@ processing:
         - processor: pedalboard
           effects:
             - {effect: delay, delay_ms: 409, feedback: 0.2, mix: 0.14}
-        - {processor: gain, gain_db: 2.5}
+        - {processor: gain, gain_db: 1.0}
         - {processor: balance, position: -0.15}
     slide:
       chain:
@@ -1466,16 +1467,25 @@ processing:
         - {processor: lowpass, cutoff_hz: 9800}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.1, attack_ms: 8.0, release_ms: 90.0}
         - {processor: balance, position: 0.7}
-    acoustic:
+    arpeggio:
       chain:
-        - {processor: highpass, cutoff_hz: 100}
+        - processor: lv2
+          plugin_uri: http://guitarix.sourceforge.net/plugins/gx_redeye#chump
+          binary: lv2apply
+          channel_mode: dual_mono
+          params: {Gain: 0.38, Tone: 0.62, Volume: 0.5}
+        - {processor: highpass, cutoff_hz: 90}
         - processor: parametric_eq
           bands:
-            - {type: peak, hz: 260, q: 0.9, db: -2.0}
-        - {processor: high_shelf, hz: 6000, gain_db: 2.0}
+            - {type: peak, hz: 2800, q: 1.0, db: 3.0}
+        - {processor: lowpass, cutoff_hz: 6000}
+        - {processor: lowpass, cutoff_hz: 6000}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.2, attack_ms: 15.0, release_ms: 120.0, makeup_db: 2.0}
-        - {processor: reverb, wet: 0.1, decay_seconds: 1.4}
-        - {processor: gain, gain_db: -7.0}
+        - processor: pedalboard
+          effects:
+            - {effect: chorus, rate_hz: 0.7, depth: 0.15, mix: 0.2}
+        - {processor: reverb, wet: 0.12, decay_seconds: 1.5}
+        - {processor: gain, gain_db: -10.0}
         - {processor: balance, position: -0.45}
     bass:
       chain:
