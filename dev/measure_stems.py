@@ -13,7 +13,7 @@ stem, twice for each sixteenth note, as note name and cents.
 The stems are the audio after group processing and before the master chain. The
 score must have one tempo and a 4/4 meter.
 
-What this found on dinosaur_liberators_v2 (2026-10-10):
+What this found on carry_the_one (2026-10-10):
 
 - An instrument ``pan`` before an amp simulator gave only 2 dB between left and
   right. The amp compresses each channel separately. A ``balance`` stage after

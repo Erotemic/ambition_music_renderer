@@ -97,3 +97,15 @@ def test_a_symlinked_DIRECTORY_raises_rather_than_being_rewritten(tmp_path):
     else:
         raise AssertionError("a symlinked directory must not be silently unlinked")
     assert shared.is_dir() and link.is_symlink()
+
+
+def test_publish_without_a_declared_root_says_so(tmp_path, monkeypatch):
+    """`cue render --publish` passes no root. The error must name the missing declaration."""
+    import pytest
+
+    from ambition_music_renderer._paths import PublishRootUndeclared
+    from ambition_music_renderer.cli import publish_cue
+
+    monkeypatch.delenv("AMBITION_MUSIC_PUBLISH_ROOT", raising=False)
+    with pytest.raises(PublishRootUndeclared):
+        publish_cue("any_cue", tmp_path, None)

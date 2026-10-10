@@ -474,7 +474,10 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
     return copied
 
 
-def publish_cue(cue: str, outdir: Path, dest_root: Path) -> bool:
+def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
+    if dest_root is None:
+        # An argument default of `None` means that no caller named a root.
+        dest_root = default_publish_dest_root()
     outdir = resolve_latest_generated_dir(outdir)
     preview_dir = outdir / "preview"
     src = find_full_mix(preview_dir, cue)

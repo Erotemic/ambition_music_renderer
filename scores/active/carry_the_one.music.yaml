@@ -1,14 +1,14 @@
 schema: ambition.musicir.v3
-id: dinosaur_liberators_v2
-title: Dinosaur Liberators II - Southern Rock Anthem (experiment)
+id: carry_the_one
+title: Carry the One - Overflow Boss Anthem
 description: >-
-  An experiment. A new composition for the T-rex fight, in the place of dinosaur_liberators.
-  It keeps the idea (a southern rock anthem that starts as a ballad and ends with long guitar
-  solos) and none of the notes.
+  A southern rock anthem that starts as a ballad and ends with long guitar solos. It is the
+  music of the Overflow boss: the melody climbs past the top while the bass goes down.
 notes:
+  - 'History: written 2026-10-10 as an experimental second version of dinosaur_liberators. Jon liked it and wanted the T-rex to keep its own song, so it got a name and a boss of its own.'
   - 'Key of E. Tempo 152. The intro is in half time, so the ballad and the jam share one tempo.'
   - 'The theme is one melody. The intro plays it at half speed. The choruses play it at full speed over a bass line that goes down by step: E, D sharp, D, C sharp, C, B, A, B.'
-  - 'The riff is E, G, A and back. The stomp in the middle is the T-rex: half time, low, with the flat fifth.'
+  - 'The riff is E, G, A and back. The stomp in the middle is in half time and low, with the flat fifth.'
   - 'The intro lead has a cleaner amp of its own. Then two lead guitars. lead_1 is the Emily guitar and bends with pitch bend (range 1200 cents). lead_2 is the Black guitar and uses its own vibrato (CC111, about 2 cents for each step).'
   - 'The guitars go through the Guitarix TS9 and JCM800 chain that standing_on_shoulders uses. The amp removes an instrument pan, so each guitar group is placed with a balance stage after the amp.'
   - 'Form: intro 1-8, riff 9-16, verse 17-32, chorus 33-40, stomp 41-48, solo 49-64, twin guitars 65-80, chorus 81-88, outro 89-96.'
@@ -251,7 +251,7 @@ materials:
       - [13/8, 1/8, [B2, F#3, B3], 114]
       - [7/4, 1/8, [B2, F#3, B3], 116]
       - [15/8, 1/8, [B2, F#3, B3], 118]
-  # The T-rex walks: a slow low riff with the flat fifth.
+  # The stomp: a slow low riff with the flat fifth.
   stomp_riff:
     kind: events
     events:
