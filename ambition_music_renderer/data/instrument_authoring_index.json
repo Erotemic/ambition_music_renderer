@@ -1,5 +1,5 @@
 {
-  "catalog_semantic_sha256": "2da0aa07e490eba11428a7561a66e23a43771c88ba66484070fd8f162865ed30",
+  "catalog_semantic_sha256": "b5c6061527077952b863b2055019ac600a6fea8a809dfb5745f2c2c8cfd1d347",
   "family_profiles": {
     "bass": {
       "audition": {
@@ -3156,7 +3156,13 @@
         ],
         "relative_root": "sfz/Karoryfer/Shinyguitar"
       },
-      "usage": {}
+      "usage": {
+        "nuances": [
+          "The acoustic programs are silent while CC100 (pickup to microphone blend) is 0, and the render then falls back to General MIDI. Set `controls: {100: 126}` on the instrument.",
+          "acoustic_five.sfz plays five voices for each note and also needs CC107 at 127."
+        ],
+        "summary": "Shinyguitar archtop through its microphone; the only guitar here that is not recorded direct."
+      }
     },
     "guitar.acoustic_warm": {
       "backend": {
@@ -3716,7 +3722,8 @@
       "usage": {
         "nuances": [
           "The catalog alias intentionally favors chord/barre programs.",
-          "The resolved chord program may expose keyswitches 33..35."
+          "The resolved chord program may expose keyswitches 33..35.",
+          "The guitar has flatwound strings and is recorded direct. Without an amp it is dull: measured 2026-10-10, a clean arpeggio had almost no sound above 3 kHz. Use it through a high-gain chain; use another guitar for clean parts."
         ],
         "summary": "Emilyguitar chord-oriented electric guitar. Good for rhythm/power-chord writing; prefer a dedicated single-note program for lead melodies."
       }

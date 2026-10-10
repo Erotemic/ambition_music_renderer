@@ -1427,6 +1427,11 @@ instruments:
     source: karoryfer.shinyguitar
     expected: true
     install_profile: starter
+    usage:
+      summary: Shinyguitar archtop through its microphone; the only guitar here that is not recorded direct.
+      nuances:
+      - 'The acoustic programs are silent while CC100 (pickup to microphone blend) is 0, and the render then falls back to General MIDI. Set `controls: {100: 126}` on the instrument.'
+      - 'acoustic_five.sfz plays five voices for each note and also needs CC107 at 127.'
   guitar.acoustic_warm:
     family: guitar
     role: acoustic_warm
@@ -1875,6 +1880,7 @@ instruments:
       nuances:
       - The catalog alias intentionally favors chord/barre programs.
       - The resolved chord program may expose keyswitches 33..35.
+      - 'The guitar has flatwound strings and is recorded direct. Without an amp it is dull: measured 2026-10-10, a clean arpeggio had almost no sound above 3 kHz. Use it through a high-gain chain; use another guitar for clean parts.'
   bass.black_and_blue:
     family: bass
     role: electric_bass

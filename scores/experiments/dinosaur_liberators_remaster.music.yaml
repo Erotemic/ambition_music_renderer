@@ -8,7 +8,8 @@ notes:
   - 'The original is scores/examples/dinosaur_liberators.music.yaml (MusicIR v1). That file does not change.'
   - 'Kept: G major, 110 BPM, the six sections and their lengths, the chords, and every melody (the two phrases of the tune, the slide fill, solo licks A and B, the climax lick) at its original place.'
   - 'Changed, six chords: the tune holds its home note G where the original chord had an F sharp. Bars 10 and 18 are G over F sharp in place of B minor over F sharp (the bass line is the same). Bars 27, 31, 35 and 75 are Dsus4 in place of D. The tune does not change.'
-  - 'Instruments: sampled guitars through the Guitarix amp chain, a sampled bass, drum kit, piano, strings and horns. The organ is still General MIDI. The warm synth pad is gone; the strings do its work.'
+  - 'Instruments: an acoustic guitar (the Shinyguitar archtop through its microphone, five voices) plays the arpeggio. The lead and solo guitars go through the Guitarix amp chain. Sampled bass, drum kit, piano and horns. The organ is still General MIDI.'
+  - 'Jon, 2026-10-10, on the first render: the guitar timbre was wrong, most of all in the intro, and the ambient strings did not work in a southern rock power ballad. The intro guitar was a flatwound electric with no amp, with almost no sound above 3 kHz. The strings and the warm pad are gone; the slide guitar holds long notes in their place.'
   - 'Changed, solo sections: the original played a lick and then rested for two or three bars. New answer phrases fill those rests. The second time the climax lick plays, a second guitar plays harmony.'
   - 'Changed, verse and chorus: the slide guitar answers the tune in two silent places, and harmonizes the last chorus phrase.'
   - 'Changed, band: a heavier rhythm guitar from the chorus on, drum fills at the ends of phrases, a busier chorus piano, and a last note of G where the original ended on E.'
@@ -66,14 +67,14 @@ instruments:
     mix_gain_db: 4.0
     controls: {111: 0, 114: 46, 116: 10}
     instrument_backend: {kind: sfz, sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz', settings: {fold_to_range: false}}
-  - name: clean
-    group: clean
-    program: clean_guitar
+  - name: acoustic
+    group: acoustic
+    program: steel_guitar
     volume: 110
-    pan: 40
+    pan: 64
     expression: 112
-    mix_gain_db: 6.0
-    instrument_backend: {kind: sfz, sfz_glob: '**/Emilyguitar/Emilyguitar/emily_clean.sfz', settings: {fold_to_range: false}}
+    controls: {100: 126, 107: 127}
+    instrument_backend: {kind: sfz, sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/acoustic_five.sfz', settings: {fold_to_range: false}}
   - name: crunch
     group: crunch
     program: clean_guitar
@@ -102,13 +103,6 @@ instruments:
     pan: 46
     expression: 108
     instrument_backend: {kind: sfz, library_ref: freepats.salamander_grand}
-  - name: strings
-    group: strings
-    program: string_ensemble_1
-    volume: 100
-    pan: 64
-    expression: 104
-    instrument_backend: {kind: sfz, library_ref: vpo.strings}
   - name: horn
     group: horn
     program: french_horn
@@ -205,6 +199,33 @@ materials:
       - [11/8, 1/8, E5, 84]
       - [3/2, 1/4, G5, 88]
       - [7/4, 1/4, E5, 84]
+  # New: long slide notes over the second half of the intro. They take the place of the string pad.
+  slide_intro:
+    kind: events
+    events:
+      - [0, 1/2, B4, 84]
+      - [1/2, 1/2, D5, 86]
+      - [1/1, 1/1, F#5, 88]
+      - [2/1, 1/2, A5, 90]
+      - [5/2, 1/2, F5, 86]
+      - [3/1, 1/2, G5, 88]
+      - [7/2, 3/8, E5, 84]
+  # New: one long slide note in each bar of the chorus, where the strings were.
+  slide_pad_1:
+    kind: events
+    events:
+      - [0, 7/8, D5, 80]
+      - [1/1, 7/8, E5, 80]
+      - [2/1, 7/8, D5, 80]
+      - [3/1, 7/8, D5, 80]
+      - [4/1, 7/8, D5, 80]
+      - [5/1, 7/8, E5, 80]
+  slide_pad_2:
+    kind: events
+    events:
+      - [0, 7/8, G5, 80]
+      - [1/1, 7/8, E5, 80]
+      - [2/1, 7/8, D5, 80]
   # The same fill, placed on beat 3 as in the original chorus.
   slide_lick_late:
     kind: events
@@ -560,6 +581,21 @@ parts:
             use: slide_lick
             automation:
               - {id: slide_fill_23_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 2398}, 0], [{ticks: 2640}, 0], [{ticks: 3120}, 14], [{ticks: 3820}, 14], [{ticks: 3840}, 0]]}
+          - id: slide_intro
+            at: {bar: 5, beat: 1}
+            use: slide_intro
+            automation:
+              - {id: slide_intro_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 720}, 0], [{ticks: 1200}, 12], [{ticks: 1900}, 12], [{ticks: 1920}, 0], [{ticks: 1921}, 0], [{ticks: 2640}, 0], [{ticks: 3120}, 12], [{ticks: 3820}, 12], [{ticks: 3840}, 0], [{ticks: 3841}, 0], [{ticks: 4800}, 0], [{ticks: 5280}, 14], [{ticks: 7660}, 14], [{ticks: 7680}, 0], [{ticks: 7681}, 0], [{ticks: 8400}, 0], [{ticks: 8880}, 13], [{ticks: 9580}, 13], [{ticks: 9600}, 0], [{ticks: 9601}, 0], [{ticks: 10320}, 0], [{ticks: 10800}, 12], [{ticks: 11500}, 12], [{ticks: 11520}, 0], [{ticks: 11521}, 0], [{ticks: 12240}, 0], [{ticks: 12720}, 13], [{ticks: 13420}, 13], [{ticks: 13440}, 0], [{ticks: 13441}, 0], [{ticks: 13920}, 0], [{ticks: 14400}, 12], [{ticks: 14860}, 12], [{ticks: 14880}, 0]]}
+          - id: slide_pad_25
+            at: {bar: 25, beat: 1}
+            use: slide_pad_1
+            automation:
+              - {id: slide_pad_25_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 960}, 0], [{ticks: 1440}, 11], [{ticks: 3340}, 11], [{ticks: 3360}, 0], [{ticks: 3838}, 0], [{ticks: 4800}, 0], [{ticks: 5280}, 11], [{ticks: 7180}, 11], [{ticks: 7200}, 0], [{ticks: 7678}, 0], [{ticks: 8640}, 0], [{ticks: 9120}, 11], [{ticks: 11020}, 11], [{ticks: 11040}, 0], [{ticks: 11518}, 0], [{ticks: 12480}, 0], [{ticks: 12960}, 11], [{ticks: 14860}, 11], [{ticks: 14880}, 0], [{ticks: 15358}, 0], [{ticks: 16320}, 0], [{ticks: 16800}, 11], [{ticks: 18700}, 11], [{ticks: 18720}, 0], [{ticks: 19198}, 0], [{ticks: 20160}, 0], [{ticks: 20640}, 11], [{ticks: 22540}, 11], [{ticks: 22560}, 0]]}
+          - id: slide_pad_36
+            at: {bar: 36, beat: 1}
+            use: slide_pad_2
+            automation:
+              - {id: slide_pad_36_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 960}, 0], [{ticks: 1440}, 11], [{ticks: 3340}, 11], [{ticks: 3360}, 0], [{ticks: 3838}, 0], [{ticks: 4800}, 0], [{ticks: 5280}, 11], [{ticks: 7180}, 11], [{ticks: 7200}, 0], [{ticks: 7678}, 0], [{ticks: 8640}, 0], [{ticks: 9120}, 11], [{ticks: 11020}, 11], [{ticks: 11040}, 0]]}
           - id: slide_chorus_harmony
             at: {bar: 33, beat: 1}
             use: vocal_b_low
@@ -683,17 +719,18 @@ parts:
             use: climax_close_low
             automation:
               - {id: solo2_d_close_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 958}, 0], [{ticks: 1200}, 0], [{ticks: 1680}, 11], [{ticks: 1900}, 11], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 5040}, 0], [{ticks: 5520}, 11], [{ticks: 5740}, 11], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9600}, 0], [{ticks: 10080}, 14], [{ticks: 11500}, 14], [{ticks: 11520}, 0]]}
-  - id: clean_part
-    instrument: clean
+  - id: acoustic_part
+    instrument: acoustic
     voices:
-      - id: clean_main
+      - id: acoustic_main
         clips:
-          - id: clean_intro
+          - id: acoustic_intro
             at: {bar: 1, beat: 1}
             duration: {bars: 8}
+            velocity_scale: 1.55
             generate:
               kind: harmony.arpeggio
-              velocity: 112
+              velocity: 110
               octave: 3
               pattern: [0, 1, 2, 1, 0, 1, 2, 1]
               step: 0.5
@@ -703,12 +740,13 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: clean_verse
+          - id: acoustic_verse
             at: {bar: 9, beat: 1}
             duration: {bars: 16}
+            velocity_scale: 1.3
             generate:
               kind: harmony.arpeggio
-              velocity: 84
+              velocity: 110
               octave: 3
               pattern: [0, 1, 2, 1, 0, 1, 2, 1]
               step: 0.5
@@ -718,12 +756,13 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: clean_chorus
+          - id: acoustic_chorus
             at: {bar: 25, beat: 1}
             duration: {bars: 16}
+            velocity_scale: 1.1
             generate:
               kind: harmony.arpeggio
-              velocity: 90
+              velocity: 110
               octave: 3
               pattern: [0, 1, 2, 1, 0, 1, 2, 1]
               step: 0.5
@@ -733,12 +772,13 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: clean_solo
+          - id: acoustic_solo
             at: {bar: 41, beat: 1}
             duration: {bars: 16}
+            velocity_scale: 1.1
             generate:
               kind: harmony.arpeggio
-              velocity: 80
+              velocity: 104
               octave: 3
               pattern: [0, 1, 2]
               step: 0.5
@@ -748,12 +788,12 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: clean_climax
+          - id: acoustic_climax
             at: {bar: 57, beat: 1}
             duration: {bars: 16}
             generate:
               kind: harmony.arpeggio
-              velocity: 90
+              velocity: 110
               octave: 3
               pattern: [0, 1, 2, 1, 0, 1, 2, 1]
               step: 0.5
@@ -763,12 +803,13 @@ parts:
               articulation: sustain
               humanize_ms: 3
               humanize_velocity_pct: 4
-          - id: clean_outro
+          - id: acoustic_outro
             at: {bar: 73, beat: 1}
             duration: {bars: 3}
+            velocity_scale: 1.4
             generate:
               kind: harmony.arpeggio
-              velocity: 86
+              velocity: 110
               octave: 3
               pattern: [0, 1, 2, 1, 0, 1, 2, 1]
               step: 0.5
@@ -1096,89 +1137,6 @@ parts:
               voicing: open
               humanize_ms: 3
               humanize_velocity_pct: 3
-  - id: strings_part
-    instrument: strings
-    voices:
-      - id: strings_main
-        clips:
-          - id: strings_intro
-            at: {bar: 1, beat: 1}
-            duration: {bars: 8}
-            generate:
-              kind: harmony.pad
-              velocity: 88
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
-          - id: strings_verse
-            at: {bar: 9, beat: 1}
-            duration: {bars: 16}
-            generate:
-              kind: harmony.pad
-              velocity: 74
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
-          - id: strings_chorus
-            at: {bar: 25, beat: 1}
-            duration: {bars: 16}
-            generate:
-              kind: harmony.pad
-              velocity: 76
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
-          - id: strings_solo
-            at: {bar: 41, beat: 1}
-            duration: {bars: 16}
-            generate:
-              kind: harmony.pad
-              velocity: 76
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
-          - id: strings_climax
-            at: {bar: 57, beat: 1}
-            duration: {bars: 16}
-            generate:
-              kind: harmony.pad
-              velocity: 82
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
-          - id: strings_outro
-            at: {bar: 73, beat: 1}
-            duration: {bars: 4}
-            generate:
-              kind: harmony.pad
-              velocity: 76
-              humanize_ms: 8
-              humanize_velocity_pct: 3
-              octave: 3
-              duration_beats: 3.7
-              articulation: pad
-              voicing: open
-              constraints: {max_pitch: 95}
   - id: horn_part
     instrument: horn
     voices:
@@ -1376,24 +1334,31 @@ processing:
       chain:
         - processor: pedalboard
           effects:
-            - {effect: gain, gain_db: 6.0}
+            - {effect: gain, gain_db: 8.0}
             - {effect: compressor, threshold_db: -24.0, ratio: 2.4, attack_ms: 8.0, release_ms: 110.0}
         - processor: lv2
           plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
           binary: lv2apply
           channel_mode: dual_mono
-          wet_mix: 0.4
-          params: {fslider0_: -4.0, fslider1_: 620.0, fslider2_: 0.5, BYPASS: 1.0}
+          wet_mix: 0.5
+          params: {fslider0_: -4.0, fslider1_: 680.0, fslider2_: 0.68, BYPASS: 1.0}
+        - processor: lv2
+          plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+          binary: lv2apply
+          wet_mix: 0.58
+          params: {P6v: 0.74, Middle: 0.68, Bass: 0.48, Treble: 0.6, WET_DRY: 60.0, GAIN: -2.0}
         - {processor: highpass, cutoff_hz: 110}
         - processor: parametric_eq
           bands:
+            - {type: peak, hz: 4130, q: 3.0, db: -3.0}
             - {type: peak, hz: 4920, q: 3.0, db: -3.0}
-        - {processor: lowpass, cutoff_hz: 7000}
+            - {type: peak, hz: 6200, q: 3.5, db: -4.0}
+        - {processor: lowpass, cutoff_hz: 8200}
+        - {processor: compressor, threshold_db: -22.0, ratio: 2.0, attack_ms: 7.0, release_ms: 90.0}
         - processor: pedalboard
           effects:
-            - {effect: delay, delay_ms: 409, feedback: 0.22, mix: 0.16}
-        - {processor: reverb, wet: 0.14, decay_seconds: 1.6}
-        - {processor: gain, gain_db: 2.0}
+            - {effect: delay, delay_ms: 409, feedback: 0.2, mix: 0.14}
+        - {processor: gain, gain_db: 2.5}
         - {processor: balance, position: -0.15}
     slide:
       chain:
@@ -1416,7 +1381,6 @@ processing:
           effects:
             - {effect: delay, delay_ms: 409, feedback: 0.22, mix: 0.16}
         - {processor: reverb, wet: 0.14, decay_seconds: 1.6}
-        - {processor: gain, gain_db: 3.0}
         - {processor: balance, position: 0.45}
     solo:
       chain:
@@ -1502,13 +1466,17 @@ processing:
         - {processor: lowpass, cutoff_hz: 9800}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.1, attack_ms: 8.0, release_ms: 90.0}
         - {processor: balance, position: 0.7}
-    clean:
+    acoustic:
       chain:
-        - {processor: highpass, cutoff_hz: 90}
-        - processor: pedalboard
-          effects:
-            - {effect: chorus, rate_hz: 0.8, depth: 0.22, mix: 0.3}
-        - {processor: reverb, wet: 0.12, decay_seconds: 1.5}
+        - {processor: highpass, cutoff_hz: 100}
+        - processor: parametric_eq
+          bands:
+            - {type: peak, hz: 260, q: 0.9, db: -2.0}
+        - {processor: high_shelf, hz: 6000, gain_db: 2.0}
+        - {processor: compressor, threshold_db: -22.0, ratio: 2.2, attack_ms: 15.0, release_ms: 120.0, makeup_db: 2.0}
+        - {processor: reverb, wet: 0.1, decay_seconds: 1.4}
+        - {processor: gain, gain_db: -7.0}
+        - {processor: balance, position: -0.45}
     bass:
       chain:
         - {processor: highpass, cutoff_hz: 30}
@@ -1534,12 +1502,6 @@ processing:
         - {processor: high_shelf, hz: 4500, gain_db: 1.5}
         - {processor: compressor, threshold_db: -20.0, ratio: 2.0, attack_ms: 12.0, release_ms: 100.0, makeup_db: 1.5}
         - {processor: gain, gain_db: 7.0}
-    strings:
-      chain:
-        - {processor: highpass, cutoff_hz: 120}
-        - {processor: lowpass, cutoff_hz: 9000}
-        - {processor: reverb, wet: 0.16, decay_seconds: 1.8}
-        - {processor: gain, gain_db: 2.0}
     horn:
       chain:
         - {processor: highpass, cutoff_hz: 110}
