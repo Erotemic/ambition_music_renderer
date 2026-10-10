@@ -12,6 +12,7 @@ notes:
   - 'Jon, 2026-10-10, on the first render: the guitar timbre was wrong, most of all in the intro, and the ambient strings did not work in a southern rock power ballad. The intro guitar was a flatwound electric with no amp, with almost no sound above 3 kHz. The strings and the warm pad are gone; the slide guitar holds long notes in their place.'
   - 'Changed, solo sections: the original played a lick and then rested for two or three bars. New answer phrases fill those rests. The second time the climax lick plays, a second guitar plays harmony.'
   - 'Changed, verse and chorus: the slide guitar answers the tune in two silent places, and harmonizes the last chorus phrase.'
+  - 'Jon, 2026-10-10, on the third render: too high and piercing, most of all the very high parts; make the tune warmer. The climax lick is one octave lower than the original (its top is G5, not G6). No held note in the solos is above A5, with one B5 at the very end. The tune has a darker tone. The master has no presence boost.'
   - 'Changed, band: a heavier rhythm guitar from the chorus on, drum fills at the ends of phrases, a busier chorus piano, and a last note of G where the original ended on E.'
 seed: 19770804
 timebase: {ppq: 960}
@@ -193,13 +194,13 @@ materials:
   slide_answer_2:
     kind: events
     events:
-      - [1/2, 1/8, F5, 86]
-      - [5/8, 1/8, A5, 90]
-      - [3/4, 1/4, C6, 94]
-      - [1/1, 3/8, G5, 90]
-      - [11/8, 1/8, E5, 84]
-      - [3/2, 1/4, G5, 88]
-      - [7/4, 1/4, E5, 84]
+      - [1/2, 1/8, A4, 84]
+      - [5/8, 1/8, C5, 88]
+      - [3/4, 1/4, F5, 92]
+      - [1/1, 3/8, E5, 90]
+      - [11/8, 1/8, G5, 86]
+      - [3/2, 1/4, E5, 88]
+      - [7/4, 1/4, C5, 84]
   # New: long slide notes over the second half of the intro. They take the place of the string pad.
   slide_intro:
     kind: events
@@ -277,24 +278,24 @@ materials:
       - [13/16, 1/16, B4, 100]
       - [7/8, 1/16, A4, 100]
       - [15/16, 1/16, G4, 100]
-  # The climax lick of the original (solo_climax_lick).
+  # The climax lick of the original (solo_climax_lick), one octave lower than the original.
   solo_climax:
     kind: events
     events:
-      - [0, 1/8, E6, 118]
-      - [1/8, 1/16, G6, 118]
-      - [3/16, 1/16, F#6, 114]
-      - [1/4, 1/8, E6, 118]
-      - [3/8, 1/8, D6, 114]
-      - [1/2, 1/8, B5, 110]
-      - [5/8, 1/16, A5, 108]
-      - [11/16, 1/16, B5, 108]
-      - [3/4, 1/16, D6, 114]
-      - [13/16, 1/16, E6, 118]
-      - [7/8, 1/16, D6, 112]
-      - [15/16, 1/8, B5, 110]
-      - [17/16, 1/8, G5, 108]
-      - [19/16, 1/1, E5, 110]
+      - [0, 1/8, E5, 114]
+      - [1/8, 1/16, G5, 114]
+      - [3/16, 1/16, F#5, 110]
+      - [1/4, 1/8, E5, 114]
+      - [3/8, 1/8, D5, 110]
+      - [1/2, 1/8, B4, 106]
+      - [5/8, 1/16, A4, 104]
+      - [11/16, 1/16, B4, 104]
+      - [3/4, 1/16, D5, 110]
+      - [13/16, 1/16, E5, 114]
+      - [7/8, 1/16, D5, 108]
+      - [15/16, 1/8, B4, 106]
+      - [17/16, 1/8, G4, 104]
+      - [19/16, 1/1, E4, 106]
   # New: an answer to lick A, over D, C and D.
   solo_answer_1:
     kind: events
@@ -333,65 +334,65 @@ materials:
       - [5/2, 1/4, D5, 102]
       - [11/4, 1/8, C5, 100]
       - [23/8, 1/8, A4, 98]
-  # New: the first answer again, higher.
+  # New: the first answer again, a little higher.
   solo_answer_3:
     kind: events
     events:
       - [1/2, 1/8, D5, 102]
       - [5/8, 1/8, E5, 104]
-      - [3/4, 1/4, A5, 108]
-      - [1/1, 3/8, C6, 114]
-      - [11/8, 1/8, B5, 106]
+      - [3/4, 1/4, F#5, 108]
+      - [1/1, 3/8, G5, 112]
+      - [11/8, 1/8, A5, 106]
       - [3/2, 1/8, G5, 104]
       - [13/8, 1/8, E5, 102]
       - [7/4, 1/4, G5, 108]
       - [2/1, 1/8, F#5, 104]
-      - [17/8, 1/8, A5, 106]
-      - [9/4, 1/4, D6, 114]
-      - [5/2, 1/8, A5, 106]
-      - [21/8, 1/8, F#5, 102]
+      - [17/8, 1/8, D5, 102]
+      - [9/4, 1/4, A5, 112]
+      - [5/2, 1/8, F#5, 104]
+      - [21/8, 1/8, D5, 102]
       - [11/4, 1/4, D5, 102]
-  # New: a climb from the low B to the D below the climax. The climax lick bends up from it.
+  # New: a phrase that settles on the D below the climax. The climax lick bends up from it.
   solo_answer_4:
     kind: events
     events:
       - [0, 1/8, B4, 102]
       - [1/8, 1/8, D5, 104]
       - [1/4, 1/8, G5, 108]
-      - [3/8, 1/8, B5, 110]
-      - [1/2, 1/2, D6, 114]
-      - [1/1, 1/8, C6, 110]
-      - [9/8, 1/8, B5, 108]
-      - [5/4, 1/8, G5, 106]
-      - [11/8, 1/8, E5, 104]
-      - [3/2, 1/8, G5, 106]
-      - [13/8, 1/8, C6, 110]
-      - [7/4, 1/4, C6, 112]
-      - [2/1, 1/4, D6, 114]
-      - [9/4, 1/8, A5, 106]
-      - [19/8, 1/8, F#5, 104]
-      - [5/2, 1/16, D5, 102]
-      - [41/16, 1/16, F#5, 104]
-      - [21/8, 1/16, A5, 106]
-      - [43/16, 1/16, B5, 108]
-      - [11/4, 1/4, D6, 114]
+      - [3/8, 1/8, A5, 108]
+      - [1/2, 1/2, G5, 112]
+      - [1/1, 1/8, E5, 104]
+      - [9/8, 1/8, G5, 106]
+      - [5/4, 1/8, A5, 108]
+      - [11/8, 1/8, G5, 106]
+      - [3/2, 1/8, E5, 104]
+      - [13/8, 1/8, C5, 102]
+      - [7/4, 1/4, E5, 106]
+      - [2/1, 1/4, F#5, 108]
+      - [9/4, 1/8, D5, 104]
+      - [19/8, 1/8, A4, 102]
+      - [5/2, 1/16, F#4, 100]
+      - [41/16, 1/16, A4, 102]
+      - [21/8, 1/16, D5, 104]
+      - [43/16, 1/16, F#5, 106]
+      - [11/4, 1/4, D5, 110]
   # New: after the held E of the climax lick, over D and C.
   climax_answer_1:
     kind: events
     events:
-      - [1/4, 1/8, F#5, 104]
-      - [3/8, 1/8, A5, 108]
-      - [1/2, 1/4, D6, 114]
-      - [3/4, 1/8, B5, 108]
-      - [7/8, 1/8, A5, 106]
-      - [1/1, 1/4, G5, 108]
-      - [5/4, 1/8, E5, 104]
-      - [11/8, 1/8, G5, 106]
-      - [3/2, 1/8, C6, 112]
-      - [13/8, 1/8, B5, 108]
-      - [7/4, 1/8, G5, 106]
-      - [15/8, 1/8, A5, 106]
-  # New: over D, C and D, and up to the second climax.
+      - [1/4, 1/8, D5, 104]
+      - [3/8, 1/8, F#5, 106]
+      - [1/2, 1/4, A5, 112]
+      - [3/4, 1/8, F#5, 104]
+      - [7/8, 1/8, D5, 102]
+      - [1/1, 1/4, E5, 106]
+      - [5/4, 1/8, C5, 102]
+      - [11/8, 1/8, E5, 104]
+      - [3/2, 1/8, G5, 108]
+      - [13/8, 1/8, E5, 104]
+      - [7/4, 1/8, D5, 102]
+      - [15/8, 1/8, E5, 104]
+  # New: over D, C and D, and back to the D below the second climax.
   climax_answer_2:
     kind: events
     events:
@@ -402,115 +403,115 @@ materials:
       - [3/4, 1/4, A5, 108]
       - [1/1, 1/8, G5, 106]
       - [9/8, 1/8, E5, 104]
-      - [5/4, 1/4, C6, 114]
-      - [3/2, 1/8, B5, 108]
-      - [13/8, 1/8, G5, 106]
+      - [5/4, 1/4, G5, 110]
+      - [3/2, 1/8, E5, 104]
+      - [13/8, 1/8, C5, 102]
       - [7/4, 1/4, E5, 104]
       - [2/1, 1/8, D5, 104]
       - [17/8, 1/8, F#5, 106]
       - [9/4, 1/8, A5, 108]
-      - [19/8, 1/8, D6, 112]
-      - [5/2, 1/2, D6, 116]
+      - [19/8, 1/8, F#5, 106]
+      - [5/2, 1/2, D5, 112]
   # New: two guitars in harmony after the second climax.
   climax_answer_3:
     kind: events
     events:
-      - [1/4, 1/8, F#5, 108]
-      - [3/8, 1/8, A5, 110]
-      - [1/2, 3/8, D6, 116]
-      - [7/8, 1/8, C6, 110]
-      - [1/1, 3/8, C6, 114]
-      - [11/8, 1/8, B5, 108]
-      - [3/2, 1/8, G5, 106]
+      - [1/4, 1/8, D5, 106]
+      - [3/8, 1/8, F#5, 108]
+      - [1/2, 3/8, A5, 114]
+      - [7/8, 1/8, G5, 108]
+      - [1/1, 3/8, G5, 112]
+      - [11/8, 1/8, E5, 106]
+      - [3/2, 1/8, C5, 104]
       - [13/8, 1/8, E5, 104]
-      - [7/4, 1/4, G5, 108]
+      - [7/4, 1/4, E5, 106]
   climax_answer_3_low:
     kind: events
     events:
-      - [1/4, 1/8, D5, 102]
-      - [3/8, 1/8, F#5, 104]
-      - [1/2, 3/8, A5, 110]
-      - [7/8, 1/8, A5, 104]
-      - [1/1, 3/8, G5, 108]
-      - [11/8, 1/8, G5, 102]
-      - [3/2, 1/8, E5, 100]
+      - [1/4, 1/8, A4, 100]
+      - [3/8, 1/8, D5, 102]
+      - [1/2, 3/8, F#5, 108]
+      - [7/8, 1/8, E5, 102]
+      - [1/1, 3/8, E5, 106]
+      - [11/8, 1/8, C5, 100]
+      - [3/2, 1/8, G4, 98]
       - [13/8, 1/8, C5, 98]
-      - [7/4, 1/4, E5, 102]
-  # New: the last climb, over C, D and G. It ends on the fifth, and the tune comes back.
+      - [7/4, 1/4, C5, 100]
+  # New: the last climb, over C, D and G. It ends on the B, the highest held note of the song, and the tune comes back.
   climax_close:
     kind: events
     events:
-      - [0, 1/8, E5, 106]
-      - [1/8, 1/8, G5, 108]
-      - [1/4, 1/4, C6, 114]
-      - [1/2, 1/8, B5, 108]
-      - [5/8, 1/8, G5, 106]
+      - [0, 1/8, C5, 104]
+      - [1/8, 1/8, E5, 106]
+      - [1/4, 1/4, G5, 112]
+      - [1/2, 1/8, E5, 106]
+      - [5/8, 1/8, C5, 104]
       - [3/4, 1/4, E5, 104]
-      - [1/1, 1/8, F#5, 108]
-      - [9/8, 1/8, A5, 110]
-      - [5/4, 1/4, D6, 116]
-      - [3/2, 1/8, C6, 110]
-      - [13/8, 1/8, A5, 108]
+      - [1/1, 1/8, D5, 106]
+      - [9/8, 1/8, F#5, 108]
+      - [5/4, 1/4, A5, 114]
+      - [3/2, 1/8, F#5, 108]
+      - [13/8, 1/8, D5, 106]
       - [7/4, 1/4, F#5, 106]
       - [2/1, 1/8, D5, 108]
       - [17/8, 1/8, G5, 110]
-      - [9/4, 1/8, B5, 114]
-      - [19/8, 5/8, D6, 120]
+      - [9/4, 1/8, A5, 112]
+      - [19/8, 5/8, B5, 118]
   climax_close_low:
     kind: events
     events:
-      - [0, 1/8, C5, 100]
-      - [1/8, 1/8, E5, 102]
-      - [1/4, 1/4, G5, 108]
-      - [1/2, 1/8, G5, 102]
-      - [5/8, 1/8, E5, 100]
+      - [0, 1/8, G4, 98]
+      - [1/8, 1/8, C5, 100]
+      - [1/4, 1/4, E5, 106]
+      - [1/2, 1/8, C5, 100]
+      - [5/8, 1/8, G4, 98]
       - [3/4, 1/4, C5, 98]
-      - [1/1, 1/8, D5, 102]
-      - [9/8, 1/8, F#5, 104]
-      - [5/4, 1/4, A5, 110]
-      - [3/2, 1/8, A5, 104]
-      - [13/8, 1/8, F#5, 102]
+      - [1/1, 1/8, A4, 100]
+      - [9/8, 1/8, D5, 102]
+      - [5/4, 1/4, F#5, 108]
+      - [3/2, 1/8, D5, 102]
+      - [13/8, 1/8, A4, 100]
       - [7/4, 1/4, D5, 100]
       - [2/1, 1/8, B4, 102]
       - [17/8, 1/8, D5, 104]
-      - [9/4, 1/8, G5, 108]
-      - [19/8, 5/8, B5, 114]
+      - [9/4, 1/8, D5, 104]
+      - [19/8, 5/8, G5, 112]
   # New: harmony for the second time the climax lick plays.
   solo_climax_low:
     kind: events
     events:
-      - [0, 1/8, B5, 110]
-      - [1/8, 1/16, D6, 110]
-      - [3/16, 1/16, D6, 106]
-      - [1/4, 1/8, B5, 110]
-      - [3/8, 1/8, B5, 106]
-      - [1/2, 1/8, G5, 102]
-      - [5/8, 1/16, F#5, 100]
-      - [11/16, 1/16, G5, 100]
-      - [3/4, 1/16, B5, 106]
-      - [13/16, 1/16, B5, 110]
-      - [7/8, 1/16, B5, 104]
-      - [15/16, 1/8, G5, 102]
-      - [17/16, 1/8, E5, 100]
-      - [19/16, 1/1, B4, 102]
-  # The climax lick once more. New: its last note is G, the home note.
+      - [0, 1/8, B4, 106]
+      - [1/8, 1/16, D5, 106]
+      - [3/16, 1/16, D5, 102]
+      - [1/4, 1/8, B4, 106]
+      - [3/8, 1/8, B4, 102]
+      - [1/2, 1/8, G4, 98]
+      - [5/8, 1/16, F#4, 96]
+      - [11/16, 1/16, G4, 96]
+      - [3/4, 1/16, B4, 102]
+      - [13/16, 1/16, B4, 106]
+      - [7/8, 1/16, B4, 100]
+      - [15/16, 1/8, G4, 98]
+      - [17/16, 1/8, E4, 96]
+      - [19/16, 1/1, B3, 98]
+  # The climax lick once more. New: it ends on the D above the home note that the tune holds.
   outro_climax:
     kind: events
     events:
-      - [0, 1/8, E6, 118]
-      - [1/8, 1/16, G6, 118]
-      - [3/16, 1/16, F#6, 114]
-      - [1/4, 1/8, E6, 118]
-      - [3/8, 1/8, D6, 114]
-      - [1/2, 1/8, B5, 110]
-      - [5/8, 1/16, A5, 108]
-      - [11/16, 1/16, B5, 108]
-      - [3/4, 1/16, D6, 114]
-      - [13/16, 1/16, E6, 118]
-      - [7/8, 1/16, D6, 112]
-      - [15/16, 1/8, B5, 110]
-      - [17/16, 1/8, A5, 104]
-      - [19/16, 7/4, G5, 110]
+      - [0, 1/8, E5, 114]
+      - [1/8, 1/16, G5, 114]
+      - [3/16, 1/16, F#5, 110]
+      - [1/4, 1/8, E5, 114]
+      - [3/8, 1/8, D5, 110]
+      - [1/2, 1/8, B4, 106]
+      - [5/8, 1/16, A4, 104]
+      - [11/16, 1/16, B4, 104]
+      - [3/4, 1/16, D5, 110]
+      - [13/16, 1/16, E5, 114]
+      - [7/8, 1/16, D5, 108]
+      - [15/16, 1/8, B4, 106]
+      - [17/16, 1/8, B4, 100]
+      - [19/16, 7/4, D5, 106]
 parts:
   - id: lead_part
     instrument: lead
@@ -547,10 +548,9 @@ parts:
             use: vocal_b
             automation:
               - {id: lead_chorus_b_2_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, -2458], [{ticks: 1200}, 0], [{ticks: 1436}, 0], [{ticks: 1440}, 0], [{ticks: 2878}, 0], [{ticks: 2880}, 0], [{ticks: 3360}, 0], [{ticks: 3520}, 737], [{ticks: 3680}, 0], [{ticks: 3840}, 737], [{ticks: 4000}, 0], [{ticks: 4160}, 737], [{ticks: 4316}, 737], [{ticks: 4320}, 0], [{ticks: 5278}, 0], [{ticks: 5280}, -3277], [{ticks: 5520}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 7198}, 0], [{ticks: 7200}, 0], [{ticks: 8160}, 0], [{ticks: 8320}, 901], [{ticks: 8480}, 0], [{ticks: 8640}, 901], [{ticks: 8800}, 0], [{ticks: 8960}, 901], [{ticks: 9120}, 0], [{ticks: 9280}, 901], [{ticks: 9440}, 0], [{ticks: 9600}, 901], [{ticks: 9760}, 0], [{ticks: 9920}, 901], [{ticks: 10080}, 0], [{ticks: 10240}, 901], [{ticks: 10400}, 0], [{ticks: 10560}, 901], [{ticks: 10720}, 0], [{ticks: 10880}, 901], [{ticks: 11040}, 0], [{ticks: 11200}, 901], [{ticks: 11360}, 0], [{ticks: 11516}, 0], [{ticks: 11520}, 0]]}
-          - id: lead_d_climax_octave
+          - id: lead_d_climax_unison
             at: {bar: 57, beat: 1}
             use: solo_climax
-            transpose: -12
             velocity_scale: 0.86
           - id: lead_outro
             at: {bar: 73, beat: 1}
@@ -688,7 +688,7 @@ parts:
             at: {bar: 70, beat: 1}
             use: climax_close
             automation:
-              - {id: solo_d_close_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, 0], [{ticks: 1200}, 0], [{ticks: 1360}, 164], [{ticks: 1520}, 0], [{ticks: 1680}, 164], [{ticks: 1840}, 0], [{ticks: 1916}, 0], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 4800}, 0], [{ticks: 5040}, 0], [{ticks: 5200}, 164], [{ticks: 5360}, 0], [{ticks: 5520}, 164], [{ticks: 5680}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9120}, -1365], [{ticks: 9600}, 0], [{ticks: 9760}, 205], [{ticks: 9920}, 0], [{ticks: 10080}, 205], [{ticks: 10240}, 0], [{ticks: 10400}, 205], [{ticks: 10560}, 0], [{ticks: 10720}, 205], [{ticks: 10880}, 0], [{ticks: 11040}, 205], [{ticks: 11200}, 0], [{ticks: 11360}, 205], [{ticks: 11516}, 205], [{ticks: 11520}, 0]]}
+              - {id: solo_d_close_bend, pitch_bend: 0, interpolation: smooth, resolution: 1/64, points: [[{ticks: 958}, 0], [{ticks: 960}, 0], [{ticks: 1200}, 0], [{ticks: 1360}, 164], [{ticks: 1520}, 0], [{ticks: 1680}, 164], [{ticks: 1840}, 0], [{ticks: 1916}, 0], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 4800}, 0], [{ticks: 5040}, 0], [{ticks: 5200}, 164], [{ticks: 5360}, 0], [{ticks: 5520}, 164], [{ticks: 5680}, 0], [{ticks: 5756}, 0], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9120}, -1365], [{ticks: 9600}, 0], [{ticks: 9760}, 191], [{ticks: 9920}, 0], [{ticks: 10080}, 191], [{ticks: 10240}, 0], [{ticks: 10400}, 191], [{ticks: 10560}, 0], [{ticks: 10720}, 191], [{ticks: 10880}, 0], [{ticks: 11040}, 191], [{ticks: 11200}, 0], [{ticks: 11360}, 191], [{ticks: 11516}, 191], [{ticks: 11520}, 0]]}
           - id: solo_outro
             at: {bar: 74, beat: 1}
             use: outro_climax
@@ -719,7 +719,7 @@ parts:
             at: {bar: 70, beat: 1}
             use: climax_close_low
             automation:
-              - {id: solo2_d_close_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 958}, 0], [{ticks: 1200}, 0], [{ticks: 1680}, 11], [{ticks: 1900}, 11], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 5040}, 0], [{ticks: 5520}, 11], [{ticks: 5740}, 11], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9600}, 0], [{ticks: 10080}, 14], [{ticks: 11500}, 14], [{ticks: 11520}, 0]]}
+              - {id: solo2_d_close_vib, cc: 111, interpolation: linear, resolution: 1/32, points: [[{ticks: 958}, 0], [{ticks: 1200}, 0], [{ticks: 1680}, 11], [{ticks: 1900}, 11], [{ticks: 1920}, 0], [{ticks: 4798}, 0], [{ticks: 5040}, 0], [{ticks: 5520}, 11], [{ticks: 5740}, 11], [{ticks: 5760}, 0], [{ticks: 9118}, 0], [{ticks: 9600}, 0], [{ticks: 10080}, 13], [{ticks: 11500}, 13], [{ticks: 11520}, 0]]}
   - id: arpeggio_part
     instrument: arpeggio
     voices:
@@ -1298,9 +1298,9 @@ parts:
                 - {drum: snare, beats: [1, 3], velocity: 122}
                 - {drum: snare, beats: [1.75], velocity: 54}
                 - {drum: closed_hat, beats: [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75], velocity: 60}
-                - {drum: ride_bell, beats: [0, 1, 2, 3], velocity: 96}
+                - {drum: ride, beats: [0, 1, 2, 3], velocity: 94}
                 - {drum: ride, beats: [0.5, 1.5, 2.5, 3.5], velocity: 76}
-                - {drum: crash, beats: [0], velocity: 118, bars: [0, 2, 4, 6, 8, 10, 12, 14]}
+                - {drum: crash, beats: [0], velocity: 114, bars: [0, 4, 8, 12]}
                 - {drum: snare, beats: [3.5, 3.75], velocity: 112, bars: [3, 11]}
                 - {drum: high_tom, beats: [3, 3.25], velocity: 112, bars: [7]}
                 - {drum: mid_tom, beats: [3.5], velocity: 114, bars: [7]}
@@ -1351,15 +1351,17 @@ processing:
         - {processor: highpass, cutoff_hz: 110}
         - processor: parametric_eq
           bands:
+            - {type: peak, hz: 520, q: 0.8, db: 1.5}
+            - {type: peak, hz: 3000, q: 0.8, db: -3.5}
             - {type: peak, hz: 4130, q: 3.0, db: -3.0}
             - {type: peak, hz: 4920, q: 3.0, db: -3.0}
-            - {type: peak, hz: 6200, q: 3.5, db: -4.0}
-        - {processor: lowpass, cutoff_hz: 8200}
+        - {processor: lowpass, cutoff_hz: 5200}
+        - {processor: lowpass, cutoff_hz: 7500}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.0, attack_ms: 7.0, release_ms: 90.0}
         - processor: pedalboard
           effects:
             - {effect: delay, delay_ms: 409, feedback: 0.2, mix: 0.14}
-        - {processor: gain, gain_db: 1.0}
+        - {processor: gain, gain_db: 2.0}
         - {processor: balance, position: -0.15}
     slide:
       chain:
@@ -1376,8 +1378,10 @@ processing:
         - {processor: highpass, cutoff_hz: 110}
         - processor: parametric_eq
           bands:
+            - {type: peak, hz: 3000, q: 0.8, db: -3.5}
+            - {type: peak, hz: 4130, q: 3.0, db: -4.0}
             - {type: peak, hz: 4920, q: 3.0, db: -3.0}
-        - {processor: lowpass, cutoff_hz: 7000}
+        - {processor: lowpass, cutoff_hz: 5500}
         - processor: pedalboard
           effects:
             - {effect: delay, delay_ms: 409, feedback: 0.22, mix: 0.16}
@@ -1406,7 +1410,8 @@ processing:
             - {type: peak, hz: 4130, q: 3.0, db: -3.0}
             - {type: peak, hz: 4920, q: 3.0, db: -3.0}
             - {type: peak, hz: 6200, q: 3.5, db: -4.0}
-        - {processor: lowpass, cutoff_hz: 8200}
+            - {type: peak, hz: 3000, q: 0.8, db: -2.5}
+        - {processor: lowpass, cutoff_hz: 6200}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.0, attack_ms: 7.0, release_ms: 90.0}
         - processor: pedalboard
           effects:
@@ -1436,7 +1441,8 @@ processing:
             - {type: peak, hz: 4130, q: 3.0, db: -3.0}
             - {type: peak, hz: 4920, q: 3.0, db: -3.0}
             - {type: peak, hz: 6200, q: 3.5, db: -4.0}
-        - {processor: lowpass, cutoff_hz: 8200}
+            - {type: peak, hz: 3000, q: 0.8, db: -2.5}
+        - {processor: lowpass, cutoff_hz: 6200}
         - {processor: compressor, threshold_db: -22.0, ratio: 2.0, attack_ms: 7.0, release_ms: 90.0}
         - processor: pedalboard
           effects:
@@ -1509,7 +1515,6 @@ processing:
     piano:
       chain:
         - {processor: highpass, cutoff_hz: 110}
-        - {processor: high_shelf, hz: 4500, gain_db: 1.5}
         - {processor: compressor, threshold_db: -20.0, ratio: 2.0, attack_ms: 12.0, release_ms: 100.0, makeup_db: 1.5}
         - {processor: gain, gain_db: 7.0}
     horn:
@@ -1521,7 +1526,7 @@ processing:
     drums:
       chain:
         - {processor: highpass, cutoff_hz: 32}
-        - {processor: high_shelf, hz: 6200, gain_db: 1.5}
+        - {processor: high_shelf, hz: 6200, gain_db: 0.5}
         - {processor: lowpass, cutoff_hz: 12500}
         - {processor: compressor, threshold_db: -16.0, ratio: 2.0, attack_ms: 18.0, release_ms: 90.0, makeup_db: 1.0}
   master:
@@ -1530,7 +1535,6 @@ processing:
       - processor: parametric_eq
         bands:
           - {type: peak, hz: 420, q: 0.8, db: -1.5}
-          - {type: peak, hz: 3500, q: 0.8, db: 2.0}
       - {processor: compressor, threshold_db: -17.5, ratio: 3.0, attack_ms: 12.0, release_ms: 100.0, makeup_db: 2.0, knee_db: 6.0}
       - {processor: reverb, wet: 0.05, decay_seconds: 1.3}
       - {processor: stereo_width, amount: 0.08}
