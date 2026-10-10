@@ -506,7 +506,9 @@ def _validate_event(
                     locations=locations,
                 )
             ]
-        row = {"at": raw[0], "dur": raw[1], "pitch": raw[2], "velocity": raw[3]}
+        # The compiler accepts a list of pitches in the pitch slot of a compact row.
+        pitch_key = "pitches" if isinstance(raw[2], (list, tuple)) else "pitch"
+        row = {"at": raw[0], "dur": raw[1], pitch_key: raw[2], "velocity": raw[3]}
         compact = True
     elif _mapping(raw):
         row = raw

@@ -403,6 +403,24 @@
     }
   },
   "processors": {
+    "balance": {
+      "aliases": [
+        "pan"
+      ],
+      "automation": {
+        "supported": false
+      },
+      "backend": "builtin",
+      "parameters": {
+        "position": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": -1.0,
+          "type": "number"
+        }
+      },
+      "summary": "Stereo balance: -1 is left, +1 is right. Use it after a nonlinear stage, which removes an instrument pan."
+    },
     "band_gain": {
       "aliases": [
         "presence"
@@ -630,6 +648,22 @@
       },
       "backend": "lv2",
       "parameters": {
+        "binary": {
+          "default": "lv2proc",
+          "enum": [
+            "lv2proc",
+            "lv2apply"
+          ],
+          "type": "string"
+        },
+        "channel_mode": {
+          "default": "stereo",
+          "enum": [
+            "stereo",
+            "dual_mono"
+          ],
+          "type": "string"
+        },
         "optional": {
           "default": false,
           "type": "boolean"

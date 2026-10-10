@@ -2843,7 +2843,7 @@ def export_ardour_session(
             "Procedural-FM and unsupported backend realizations remain on the neutral audition synth.",
             "ACE Fluid Synth realization uses SF2 only; SF3 compatibility depends on the FluidSynth version bundled into Ardour.",
             "Group/master processing is transported from canonical ProcessingPlan objects onto editable Ardour buses; the manifest records approximations and omitted operations.",
-            "Renderer transient_tame, stereo_width, soft limiter/normalization, loudness, VST3/command effects, and renderer-level wet_mix are not yet exact Ardour equivalents.",
+            "Renderer transient_tame, stereo_width, balance, soft limiter/normalization, loudness, VST3/command effects, and renderer-level wet_mix are not yet exact Ardour equivalents.",
         ],
     }
     export_manifest.write_text(json.dumps(manifest_data, indent=2, sort_keys=True), encoding="utf8")

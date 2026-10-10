@@ -52,7 +52,7 @@ second YAML interpreter.
 
 Not every offline renderer operation has an exact realtime analogue yet. The
 manifest records approximations/omissions explicitly: `transient_tame`,
-`stereo_width`, canonical time-varying section-bus DSP, the renderer soft
+`stereo_width`, `balance`, canonical time-varying section-bus DSP, the renderer soft
 limiter/normalization/loudness stages, and renderer-level wet/dry wrappers remain
 follow-up work; ACE reverb and compressor
 also have different DSP implementations even when their authored controls map

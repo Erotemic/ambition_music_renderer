@@ -458,6 +458,23 @@ def stereo_widen(audio: np.ndarray, amount: float = 0.12) -> np.ndarray:
 
 
 @profile
+def stereo_balance(audio: np.ndarray, position: float = 0.0) -> np.ndarray:
+    """Move a stereo signal left (-1) or right (+1) by attenuating the other channel.
+
+    An instrument ``pan`` is applied before group processing. A nonlinear stage
+    such as an amp simulator then compresses the two channels separately and
+    removes most of that pan. This stage places the processed signal.
+    """
+    position = float(np.clip(position, -1.0, 1.0))
+    if position == 0.0:
+        return audio.astype(np.float32, copy=False)
+    out = audio.astype(np.float32, copy=True)
+    far = 1 if position < 0 else 0
+    out[:, far] *= np.float32(np.cos(abs(position) * np.pi / 2.0))
+    return out
+
+
+@profile
 def soft_limit(
     audio: np.ndarray,
     target_peak_db: float = -1.0,

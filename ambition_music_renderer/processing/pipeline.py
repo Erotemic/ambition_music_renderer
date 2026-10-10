@@ -72,6 +72,8 @@ def _apply_operation(
             decay=float(p.get("decay_seconds", 1.4)),
             damping_hz=float(p.get("damping_hz", 6000.0)),
         )
+    if name == "balance":
+        return fx.stereo_balance(audio, float(p.get("position", 0.0)))
     if name == "stereo_width":
         return fx.stereo_widen(audio, float(p.get("amount", 0.10)))
     if name == "loudness":

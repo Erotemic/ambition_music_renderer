@@ -242,6 +242,48 @@ def test_v3_processing_validation_uses_registry_names_and_ranges():
     assert "V3_PROCESSOR_PARAMETER" in by_code
 
 
+def test_v3_processing_validation_accepts_lv2_host_routing_fields():
+    """A mono LV2 plugin needs `channel_mode: dual_mono`, and Lilv needs `binary: lv2apply`."""
+    spec = _minimal_v3()
+    spec["processing"] = {
+        "groups": {
+            "music": {
+                "chain": [
+                    {
+                        "processor": "lv2",
+                        "plugin_uri": "urn:example:mono_amp",
+                        "binary": "lv2apply",
+                        "channel_mode": "dual_mono",
+                        "params": {"gain": 0.5},
+                    }
+                ]
+            }
+        }
+    }
+    validate_musicir_spec(spec)
+
+
+def test_balance_places_a_signal_after_a_stage_that_removed_its_pan():
+    sr, audio = _audio_fixture()
+    plan = processing_plan_for_group(
+        {"processing": {"groups": {"music": {"chain": [{"processor": "balance", "position": -1.0}]}}}},
+        "music",
+    )
+    left = apply_processing_plan(audio, sr, plan)
+    assert np.array_equal(left[:, 0], audio[:, 0])
+    assert float(np.abs(left[:, 1]).max()) < 1e-6
+    half = apply_processing_plan(
+        audio,
+        sr,
+        processing_plan_for_group(
+            {"processing": {"groups": {"music": {"chain": [{"processor": "pan", "position": 0.5}]}}}},
+            "music",
+        ),
+    )
+    assert np.array_equal(half[:, 1], audio[:, 1])
+    assert np.allclose(half[:, 0], audio[:, 0] * np.cos(np.pi / 4), atol=1e-6)
+
+
 def test_processing_catalog_has_dependency_free_source_reader():
     import subprocess
     import sys

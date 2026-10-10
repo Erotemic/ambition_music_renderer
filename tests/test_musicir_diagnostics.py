@@ -123,6 +123,14 @@ def test_v3_validation_points_at_bad_material_and_pitch_semantics(tmp_path: Path
     assert by_code["V3_SCALE_MODE"].location is not None
 
 
+def test_v3_validation_accepts_a_chord_in_a_compact_event_row():
+    """The compiler takes a list in the pitch slot of a compact row, so validation must."""
+    spec = _minimal_score()
+    spec["materials"]["hook"]["events"] = [[0, "1/4", ["C3", "G3", "C4"], 90]]
+    validate_musicir_spec(spec)
+    assert len(compile_score(spec).note_events) == 3
+
+
 def test_v3_validation_catches_source_identity_and_controller_contracts(tmp_path: Path):
     spec = _minimal_score()
     clips = spec["parts"][0]["voices"][0]["clips"]

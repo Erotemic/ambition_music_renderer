@@ -378,7 +378,7 @@ def translate_processing_plan(plan: ProcessingPlan) -> tuple[tuple[ArdourProcess
                 required=required,
                 note=note,
             ))
-        elif name in {"transient_tame", "stereo_width", "limiter", "loudness", "vst3", "command"}:
+        elif name in {"transient_tame", "stereo_width", "balance", "limiter", "loudness", "vst3", "command"}:
             omitted.append(f"{name}: no faithful realtime Ardour transport yet")
         else:
             omitted.append(f"{name}: unsupported Ardour processing transport")
