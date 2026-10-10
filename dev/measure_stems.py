@@ -5,10 +5,13 @@ Render with ``cue bundle <cue> --include_scratch_stems=True`` first. Then:
 
     python dev/measure_stems.py generated/<cue>/latest scores/.../<cue>.music.yaml
     python dev/measure_stems.py generated/<cue>/latest <score> --pitch lead_2 45 46
+    python dev/measure_stems.py generated/<cue>/latest <score> --held lead
 
 The first form prints the RMS of each stem group in each form section, and the
 left-minus-right level of each group. The second form prints the pitch of one
-stem, twice for each sixteenth note, as note name and cents.
+stem, twice for each sixteenth note, as note name and cents. The third form
+prints, for each held note of one stem, the level of its last quarter minus the
+level of its first quarter.
 
 The stems are the audio after group processing and before the master chain. The
 score must have one tempo and a 4/4 meter.
@@ -21,11 +24,18 @@ What this found on carry_the_one (2026-10-10):
 - The Black and Green guitar vibrato (CC111) is about 2.2 cents for each
   controller step: a value of 108 moved a held G5 up to A5.
 - The Emily guitar follows pitch bend with a range of 1200 cents.
+
+What ``--held`` found on dinosaur_liberators_remaster (2026-10-10):
+
+- Three held lead notes were silent 0.2 s after their start (-50 dB or lower);
+  the other held notes lost 3 dB. The cause was the sampler, not the score: see
+  ``_whole_sample_sfz`` in ``backends/sfizz_backend.py``.
 """
 from __future__ import annotations
 
 import argparse
 import glob
+import json
 import os
 
 import numpy as np
@@ -88,17 +98,37 @@ def print_pitch(audio: np.ndarray, first: float, last: float, bar_seconds: float
         print(f"bar {first + i / 32:6.2f}: " + " ".join(cells[i:i + 16]))
 
 
+def print_held(render_dir: str, group: str, audio: np.ndarray, min_seconds: float, sr: int) -> None:
+    timeline = glob.glob(os.path.join(os.path.realpath(render_dir), "authoring", "*.note_timeline.json"))[0]
+    notes = [n for n in json.load(open(timeline, encoding="utf8"))["notes"] if n["group"] == group]
+    mono = audio.mean(axis=1)
+    cut = 0
+    for n in notes:
+        if n["end_seconds"] - n["start_seconds"] < min_seconds:
+            continue
+        lo, hi = int(n["start_seconds"] * sr), int(n["end_seconds"] * sr)
+        quarter = (hi - lo) // 4
+        drop = rms_db(mono[hi - quarter:hi]) - rms_db(mono[lo:lo + quarter])
+        cut += drop < -30
+        print(f"beat {n['start_beat']:7.2f} {n['note']:4s} {n['end_seconds'] - n['start_seconds']:4.1f} s  {drop:6.1f} dB" + ("  CUT" if drop < -30 else ""))
+    print(f"{group}: {cut} cut note(s)")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("render_dir", help="generated/<cue>/latest")
     parser.add_argument("score", help="the MusicIR v3 score of that render")
     parser.add_argument("--pitch", nargs=3, metavar=("GROUP", "FIRST_BAR", "LAST_BAR"))
+    parser.add_argument("--held", metavar="GROUP", help="level change across each held note of this stem")
+    parser.add_argument("--held_seconds", type=float, default=0.5, help="shortest note that --held measures")
     parser.add_argument("--sample_rate", type=int, default=48000)
     args = parser.parse_args()
     spec = yaml.safe_load(open(args.score, encoding="utf8"))
     bar_seconds = 4 * 60.0 / float(spec["tempo"])
     stems = load_stems(args.render_dir)
-    if args.pitch:
+    if args.held:
+        print_held(args.render_dir, args.held, stems[args.held], args.held_seconds, args.sample_rate)
+    elif args.pitch:
         group, first, last = args.pitch
         print_pitch(stems[group], float(first), float(last), bar_seconds, args.sample_rate)
     else:

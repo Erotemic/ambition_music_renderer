@@ -243,6 +243,46 @@ def _bound_midi_end_of_track(
     mid.save(str(midi_path))
 
 
+def _wants_whole_samples(settings: dict[str, Any]) -> bool:
+    import os
+    if "whole_samples_in_memory" in settings:
+        return bool(settings["whole_samples_in_memory"])
+    return os.environ.get("AMBITION_SFIZZ_WHOLE_SAMPLES", "1") != "0"
+
+
+def _whole_sample_sfz(sfz: Path) -> Path | None:
+    """Write a program next to ``sfz`` that loads each sample fully into memory.
+
+    ``sfizz_render`` 1.2.3 reads the start of each sample at load time and the
+    remainder on a background thread. When that thread is late, the voice stops
+    at the end of the part that is in memory: a held note is silent after
+    approximately 0.2 s. The defect is random and increases with machine load.
+    Measured 2026-10-10 on a 15-note guitar line with six renders in parallel:
+    20 of 60 renders had a cut note, and 0 of 60 with ``hint_ram_based=1``.
+
+    The opcode is legal only in ``<control>``, and sample paths are relative to
+    the top program. Thus the new program must be in the same directory. The
+    caller deletes it. Returns ``None`` when the directory is read-only.
+
+    Cost, measured: the Salamander piano uses 2.6 GB and 18 s where it used
+    0.15 GB and 1.6 s.
+    """
+    import uuid
+    wrapper = sfz.with_name(f".{sfz.stem}.whole_samples.{uuid.uuid4().hex}.sfz")
+    try:
+        wrapper.write_text(
+            f'<control> hint_ram_based=1\n#include "{sfz.name}"\n', encoding="utf8"
+        )
+    except OSError as ex:
+        log.warning(
+            "%s: cannot write a whole-sample program next to it (%s); "
+            "sfizz will stream the samples, and held notes can stop early.",
+            sfz, ex,
+        )
+        return None
+    return wrapper
+
+
 def _render_sfizz_cli(
     pm: pretty_midi.PrettyMIDI,
     *,
@@ -253,6 +293,35 @@ def _render_sfizz_cli(
     minimum_duration: float,
     settings: dict[str, Any],
 ) -> np.ndarray:
+    wrapper = _whole_sample_sfz(Path(sfz)) if _wants_whole_samples(settings) else None
+    try:
+        return _render_sfizz_cli_program(
+            pm,
+            sfz=sfz,
+            sampler_sfz=wrapper or sfz,
+            sample_rate=sample_rate,
+            tempdir=tempdir,
+            output_name=output_name,
+            minimum_duration=minimum_duration,
+            settings=settings,
+        )
+    finally:
+        if wrapper is not None:
+            wrapper.unlink(missing_ok=True)
+
+
+def _render_sfizz_cli_program(
+    pm: pretty_midi.PrettyMIDI,
+    *,
+    sfz: Path,
+    sampler_sfz: Path,
+    sample_rate: int,
+    tempdir: Path,
+    output_name: str,
+    minimum_duration: float,
+    settings: dict[str, Any],
+) -> np.ndarray:
+    """Render ``pm``. ``sfz`` is the instrument; ``sampler_sfz`` is the program sfizz opens."""
     binary = str(settings.get("binary", "sfizz_render"))
     if not shutil.which(binary):
         raise FileNotFoundError(
@@ -298,7 +367,7 @@ def _render_sfizz_cli(
         )
     mapping = {
         "binary": binary,
-        "sfz": str(sfz),
+        "sfz": str(sampler_sfz),
         "midi": str(midi_path),
         "wav": str(wav_path),
         "sample_rate": str(int(sample_rate)),

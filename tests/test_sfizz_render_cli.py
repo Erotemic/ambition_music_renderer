@@ -139,3 +139,62 @@ def test_sfizz_cli_rate_probe_falls_back_without_dropping_blocksize(tmp_path, mo
     assert first[first.index("--blocksize") + 1] == "1024"
     assert "--samplerate" not in second
     assert second[second.index("--blocksize") + 1] == "1024"
+
+
+def _render_probe(tmp_path, monkeypatch, settings, seen):
+    sfz = tmp_path / "library" / "instrument.sfz"
+    sfz.parent.mkdir(exist_ok=True)
+    sfz.write_text("<region> sample=dummy.wav key=60\n")
+    monkeypatch.setattr(sfizz_backend.shutil, "which", lambda binary: f"/usr/bin/{binary}")
+    monkeypatch.setattr(sfizz_backend, "sfz_key_span", lambda path: None)
+
+    def outcome(cmd, _index):
+        program = Path(cmd[cmd.index("--sfz") + 1])
+        seen.append((program, program.read_text()))
+        return 0, ""
+
+    _patch_sfizz_calls(monkeypatch, [], outcome)
+    sfizz_backend._render_sfizz_cli(
+        _minimal_pm(),
+        sfz=sfz,
+        sample_rate=48000,
+        tempdir=tmp_path,
+        output_name="probe",
+        minimum_duration=0.0,
+        settings=settings,
+    )
+    return sfz
+
+
+def test_sfizz_cli_loads_whole_samples_through_a_sibling_program(tmp_path, monkeypatch):
+    """A streamed sample can stop a held note early; see `_whole_sample_sfz`."""
+    seen: list[tuple[Path, str]] = []
+    sfz = _render_probe(tmp_path, monkeypatch, {}, seen)
+
+    program, text = seen[0]
+    # Sample paths in the instrument are relative to the program sfizz opens.
+    assert program.parent == sfz.parent
+    assert "hint_ram_based=1" in text
+    assert f'#include "{sfz.name}"' in text
+    assert sorted(sfz.parent.iterdir()) == [sfz]
+
+
+def test_sfizz_cli_can_stream_samples_on_request(tmp_path, monkeypatch):
+    seen: list[tuple[Path, str]] = []
+    sfz = _render_probe(tmp_path, monkeypatch, {"whole_samples_in_memory": False}, seen)
+
+    assert seen[0][0] == sfz
+
+
+def test_sfizz_cli_streams_when_the_library_is_read_only(tmp_path, monkeypatch):
+    def refuse(self, *_args, **_kwargs):
+        if ".whole_samples." in self.name:
+            raise PermissionError("read-only library")
+        return original(self, *_args, **_kwargs)
+
+    original = Path.write_text
+    monkeypatch.setattr(Path, "write_text", refuse)
+    seen: list[tuple[Path, str]] = []
+    sfz = _render_probe(tmp_path, monkeypatch, {}, seen)
+
+    assert seen[0][0] == sfz
