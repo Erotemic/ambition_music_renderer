@@ -71,7 +71,7 @@ def print_levels(stems: dict[str, np.ndarray], sections: list[tuple[str, int, in
     print("left minus right (dB): " + " ".join(f"{n}={rms_db(stems[n][:, 0]) - rms_db(stems[n][:, 1]):+.1f}" for n in names))
 
 
-def print_pitch(audio: np.ndarray, first: float, last: float, bar_seconds: float, sr: int) -> None:
+def print_pitch(audio: np.ndarray, first: float, last: float, bar_seconds: float, sr: int, floor_hz: float = 150.0) -> None:
     mono = audio.mean(axis=1)[int((first - 1) * bar_seconds * sr): int((last - 1) * bar_seconds * sr)]
     win, hop = 4096, 1024
     track: list[float | None] = []
@@ -81,10 +81,10 @@ def print_pitch(audio: np.ndarray, first: float, last: float, bar_seconds: float
             track.append(None)
             continue
         ac = np.correlate(frame, frame, "full")[win - 1:]
-        lo, hi = int(sr / 1600), int(sr / 150)
+        lo, hi = int(sr / 1600), min(int(sr / floor_hz), win - 2)
         k = float(lo + int(np.argmax(ac[lo:hi])))
         a, b, c = ac[int(k) - 1], ac[int(k)], ac[int(k) + 1]
-        k += 0.5 * (a - c) / (a - 2 * b + c + 1e-12)
+        k += float(np.clip(0.5 * (a - c) / (a - 2 * b + c + 1e-12), -1.0, 1.0))
         track.append(69 + 12 * np.log2(sr / k / 440))
     step = max(1, int(round(bar_seconds * sr / 16 / hop / 2)))
     cells = []
@@ -119,6 +119,7 @@ def main() -> None:
     parser.add_argument("render_dir", help="generated/<cue>/latest")
     parser.add_argument("score", help="the MusicIR v3 score of that render")
     parser.add_argument("--pitch", nargs=3, metavar=("GROUP", "FIRST_BAR", "LAST_BAR"))
+    parser.add_argument("--pitch_floor_hz", type=float, default=150.0, help="lowest pitch --pitch looks for; use 35 for a bass")
     parser.add_argument("--held", metavar="GROUP", help="level change across each held note of this stem")
     parser.add_argument("--held_seconds", type=float, default=0.5, help="shortest note that --held measures")
     parser.add_argument("--sample_rate", type=int, default=48000)
@@ -130,7 +131,7 @@ def main() -> None:
         print_held(args.render_dir, args.held, stems[args.held], args.held_seconds, args.sample_rate)
     elif args.pitch:
         group, first, last = args.pitch
-        print_pitch(stems[group], float(first), float(last), bar_seconds, args.sample_rate)
+        print_pitch(stems[group], float(first), float(last), bar_seconds, args.sample_rate, args.pitch_floor_hz)
     else:
         sections = [(str(f["id"]), int(f["from"]["bar"]), int(f["to"]["bar"])) for f in spec["form"]]
         print_levels(stems, sections, bar_seconds, args.sample_rate)
