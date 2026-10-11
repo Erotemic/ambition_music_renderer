@@ -1,0 +1,738 @@
+schema: ambition.musicir.v1
+id: eternal_cosmic
+title: Eternal Cosmic
+seed: 2026101101
+notes: >-
+  The theme of Eternal Cosmic Mary-O, her ultimate form. An intro of two bars
+  is as long as her transformation (3.4 s at 140 BPM): a harp goes up, the
+  timpani roll, the horns call, and the choir and a cymbal arrive on the
+  second bar. The loop is an anthem of sixteen bars in E major: violins have
+  the tune over a disco bass in octaves, a kick on each beat and open hats
+  between them, with a celesta over it. In the second eight bars the tune is
+  in longer notes and a choir and horns hold the chords. It is not the theme
+  of the quasar: that one is a sprint at 208 BPM with a piano in sixteenths.
+  The loop is forty bars: the anthem, eight bars where the horns have a
+  tune of their own and the violins rest, and the anthem again with the
+  choir all through it. The tune stays at or under A5. Melody, harmony and
+  rhythm are original.
+
+tempo:
+  bpm: 140
+meter:
+  beats_per_bar: 4
+  beat_unit: 4
+
+constraints:
+  voice_leading: minimize_motion
+  no_clusters: true
+
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+  backend: pretty-midi
+  soundfont: /usr/share/sounds/sf2/TimGM6mb.sf2
+  sfizz:
+    library_roots:
+      - /data/audio-tools/sfz
+      - /data/audio-tools
+    fallback_backend: pretty-midi
+  runtime_stems:
+    target_peak_db: -9.0
+    max_gain_db: 14.0
+
+postprocess:
+  gain_db: -0.8
+  highpass_hz: 30
+  lowpass_hz: 12800
+  presence_low_hz: 1700
+  presence_high_hz: 5200
+  presence_db: 0.6
+  transient_tame: 0.03
+  transient_lowpass_hz: 10500
+  reverb_wet: 0.035
+  reverb_decay_seconds: 0.68
+  reverb_damping_hz: 7600
+  stereo_width: 0.16
+  compressor_threshold_db: -17.0
+  compressor_ratio: 2.8
+  compressor_attack_ms: 7.0
+  compressor_release_ms: 78.0
+  compressor_makeup_db: 1.0
+  compressor_knee_db: 5.0
+  limiter_drive: 0.94
+  normalize: true
+  target_peak_db: -3.0
+  eq_bands:
+    - {type: low_shelf, hz: 85, q: 0.75, db: 1.0}
+    - {type: peak, hz: 320, q: 0.90, db: -1.3}
+    - {type: peak, hz: 2800, q: 1.00, db: -0.7}
+    - {type: high_shelf, hz: 8200, q: 0.70, db: 0.5}
+
+stem_postprocess:
+  gain_db: 0.0
+  highpass_hz: 30
+  reverb_wet: 0.006
+  reverb_decay_seconds: 0.32
+  reverb_damping_hz: 7200
+  stereo_width: 0.04
+  limiter_drive: 0.86
+  normalize: false
+  target_peak_db: -4.0
+
+instruments:
+  - name: cosmic_violins
+    group: lead
+    program: string_ensemble_1
+    volume: 108
+    pan: 62
+    expression: 112
+    modulation: 6
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violins_1
+      prefer: [notation, 1st violins, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_violas
+    group: strings
+    program: string_ensemble_1
+    volume: 84
+    pan: 76
+    expression: 96
+    instrument_backend:
+      kind: sfz
+      library_ref: strings.violas
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_choir
+    group: choir
+    program: choir_aahs
+    volume: 96
+    pan: 64
+    expression: 102
+    modulation: 2
+    instrument_backend:
+      kind: sfz
+      library_ref: vpo.choir
+      prefer: [soprano, choir, aah, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_horns
+    group: brass
+    program: french_horn
+    volume: 96
+    pan: 48
+    expression: 104
+    modulation: 5
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.horns_sustain
+      prefer: [notation, horns, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_grand
+    group: piano
+    program: acoustic_grand_piano
+    volume: 92
+    pan: 54
+    expression: 104
+    instrument_backend:
+      kind: sfz
+      library_ref: freepats.salamander_grand
+      prefer: [salamander, grand, piano, flac]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_bass
+    group: bass
+    program: fingered_bass
+    volume: 98
+    pan: 64
+    expression: 106
+    instrument_backend:
+      kind: sfz
+      library_ref: bass.growly
+      prefer: [clean, finger, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_harp
+    group: sparkle
+    program: orchestral_harp
+    volume: 78
+    pan: 84
+    expression: 90
+    instrument_backend:
+      kind: sfz
+      library_ref: folk.harp
+      prefer: [harp, normal, sustain]
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_celesta
+    group: sparkle
+    program: celesta
+    volume: 70
+    pan: 40
+    expression: 84
+    instrument_backend:
+      kind: sfz
+      library_ref: celeste
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_timpani
+    group: percussion
+    program: timpani
+    volume: 100
+    pan: 60
+    expression: 108
+    instrument_backend:
+      kind: sfz
+      library_ref: orchestra.timpani
+      optional: true
+      fallback_backend: pretty-midi
+
+  - name: cosmic_kit
+    group: drums
+    is_drum: true
+    volume: 104
+    pan: 64
+    expression: 112
+    instrument_backend:
+      kind: sfz
+      library_ref: drums.gogodze
+      prefer: [kit, drum, gm, gogodze]
+      optional: true
+      fallback_backend: pretty-midi
+
+motifs:
+  - id: harp_bloom
+    root: E5
+    intervals: [0, 4, 7, 11, 12]
+    rhythm: [0.25, 0.25, 0.25, 0.25, 1.0]
+    velocities: [0.56, 0.62, 0.70, 0.78, 0.88]
+
+layer_templates:
+  string_bed:
+    kind: pad_chords
+    instruments: [cosmic_violas]
+    octave: 4
+    every_bars: 1
+    duration_beats: 3.7
+    velocity: 44
+    articulation: tenuto
+    voicing: shell
+    constraints:
+      max_notes: 3
+    humanize_ms: 3
+    humanize_velocity_pct: 2
+
+  piano_push:
+    # Chords on the two off beats of each half bar: the push of a dance band.
+    kind: arpeggio
+    instrument: cosmic_grand
+    octave: 4
+    pattern: [0, 2, 1, 2, 0, 2, 1, 3]
+    step: 0.5
+    duration_beats: 0.42
+    velocity: 60
+    density: 1.0
+    articulation: staccato
+    voicing: open
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  celesta_stars:
+    kind: arpeggio
+    instrument: cosmic_celesta
+    octave: 6
+    pattern: [2, 0, 1, 2, 3, 2, 1, 0]
+    step: 0.5
+    duration_beats: 0.40
+    velocity: 44
+    density: 1.0
+    articulation: bell
+    voicing: open
+    humanize_ms: 1
+    humanize_velocity_pct: 3
+
+  disco_bass:
+    kind: bassline
+    instrument: cosmic_bass
+    octave: 2
+    pattern:
+      - [0, 0.0, 0.42]
+      - [12, 0.5, 0.36]
+      - [0, 1.0, 0.42]
+      - [12, 1.5, 0.36]
+      - [0, 2.0, 0.42]
+      - [12, 2.5, 0.36]
+      - [7, 3.0, 0.42]
+      - [12, 3.5, 0.36]
+    velocity: 80
+    articulation: staccato
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  harp_blooms:
+    kind: motif
+    instrument: cosmic_harp
+    motif: harp_bloom
+    root: E5
+    velocity: 56
+    articulation: pluck
+    gate: 0.80
+    starts: [[3, 2.0], [7, 2.0], [11, 2.0], [15, 2.0], [19, 2.0], [23, 2.0], [25, 2.0], [27, 2.0], [29, 2.0], [31, 2.0], [33, 2.0], [35, 2.0], [37, 2.0], [39, 2.0]]
+    repeats: 1
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+
+  dance_drums:
+    kind: drums
+    instrument: cosmic_kit
+    humanize_ms: 1
+    humanize_velocity_pct: 2
+    events:
+      - {drum: kick, beats: [0.0, 1.0, 2.0, 3.0], velocity: 86}
+      - {drum: snare, beats: [1.0, 3.0], velocity: 70}
+      - {drum: closed_hat, beats: [0.0, 0.25, 1.0, 1.25, 2.0, 2.25, 3.0, 3.25], velocity: 34}
+      - {drum: open_hat, beats: [0.5, 1.5, 2.5, 3.5], velocity: 46}
+
+playback:
+  mode: section_stem_matrix
+  intro: awakening
+  loop_components: [anthem]
+  exit_policy:
+    request_outro: stop_at_next_valid_exit_bar
+    bridge_stems: [lead, piano, bass, drums]
+    fade_stems: [strings, choir, brass, sparkle, percussion]
+
+state_map:
+  starting: {section: awakening}
+  default:
+    preferred_section: anthem
+    stems: {lead: 1.0, strings: 0.60, choir: 0.70, brass: 0.66, piano: 0.72, bass: 0.88, sparkle: 0.62, percussion: 0.80, drums: 0.90}
+
+sections:
+  - id: awakening
+    kind: intro
+    label: the transformation
+    bars: 2
+    intensity: 0.92
+    density: 0.80
+    loopable: false
+    harmony: [B, E]
+    layers:
+      # The harp goes up through the bar, two octaves and a half.
+      - kind: notes
+        instrument: cosmic_harp
+        articulation: pluck
+        notes:
+          - [0, 0.00, B2, 0.60, 52]
+          - [0, 0.25, D#3, 0.60, 55]
+          - [0, 0.50, F#3, 0.60, 58]
+          - [0, 0.75, B3, 0.60, 61]
+          - [0, 1.00, D#4, 0.60, 64]
+          - [0, 1.25, F#4, 0.60, 67]
+          - [0, 1.50, B4, 0.60, 70]
+          - [0, 1.75, C#5, 0.60, 73]
+          - [0, 2.00, D#5, 0.60, 76]
+          - [0, 2.25, F#5, 0.60, 79]
+          - [0, 2.50, G#5, 0.60, 82]
+          - [0, 2.75, B5, 0.60, 85]
+          - [0, 3.00, C#6, 0.60, 88]
+          - [0, 3.25, D#6, 0.60, 91]
+          - [0, 3.50, F#6, 0.60, 94]
+          - [0, 3.75, B6, 0.60, 97]
+          - [1, 0.00, E6, 2.00, 96]
+      # The timpani roll under it, and one stroke on the bar of the arrival.
+      - kind: notes
+        instrument: cosmic_timpani
+        articulation: normal
+        notes:
+          - [0, 0.00, B2, 0.22, 46]
+          - [0, 0.25, B2, 0.22, 50]
+          - [0, 0.50, B2, 0.22, 54]
+          - [0, 0.75, B2, 0.22, 58]
+          - [0, 1.00, B2, 0.22, 62]
+          - [0, 1.25, B2, 0.22, 66]
+          - [0, 1.50, B2, 0.22, 70]
+          - [0, 1.75, B2, 0.22, 74]
+          - [0, 2.00, B2, 0.22, 78]
+          - [0, 2.25, B2, 0.22, 82]
+          - [0, 2.50, B2, 0.22, 86]
+          - [0, 2.75, B2, 0.22, 90]
+          - [0, 3.00, B2, 0.22, 94]
+          - [0, 3.25, B2, 0.22, 98]
+          - [0, 3.50, B2, 0.22, 102]
+          - [0, 3.75, B2, 0.22, 106]
+          - [1, 0.00, E2, 2.50, 112]
+      # The call of the horns, up to the fifth, and the chord of the arrival.
+      - kind: notes
+        instrument: cosmic_horns
+        articulation: marcato
+        notes:
+          - [0, 2.00, B3, 0.46, 84]
+          - [0, 2.50, D#4, 0.46, 88]
+          - [0, 3.00, F#4, 0.92, 96]
+          - {bar: 1, beat: 0.0, note: [E3, B3, E4, G#4], dur: 3.6, vel: 100}
+      - kind: notes
+        instrument: cosmic_choir
+        articulation: tenuto
+        notes:
+          - {bar: 1, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 92}
+      # The violins come in on the arrival and go up to the first note of the tune.
+      - kind: notes
+        instrument: cosmic_violins
+        articulation: tenuto
+        notes:
+          - [1, 0.00, G#5, 2.00, 92]
+          - [1, 2.00, F#5, 1.00, 90]
+          - [1, 3.00, G#5, 0.50, 92]
+          - [1, 3.50, A5, 0.46, 96]
+      - kind: drums
+        instrument: cosmic_kit
+        events:
+          - {drum: crash, beats: [0.0], velocity: 84, bars: [1]}
+          - {drum: kick, beats: [0.0, 2.0, 3.0, 3.5], velocity: 88, bars: [1]}
+          - {drum: snare, beats: [3.0, 3.25, 3.5, 3.75], velocity: 62, bars: [1]}
+
+  - id: anthem
+    kind: loop_component
+    label: eternal cosmic anthem
+    bars: 40
+    intensity: 0.96
+    density: 0.84
+    loopable: true
+    valid_exit_local_bars: [8, 16, 24, 32, 40]
+    harmony: [E, B, C#m, A, E, B, A, B, C#m, A, E, B, C#m, A, B, B, A, B, C#m, C#m, A, B, E, B, E, B, C#m, A, E, B, A, B, C#m, A, E, B, C#m, A, B, B]
+    layers:
+      - kind: notes
+        instrument: cosmic_violins
+        articulation: tenuto
+        humanize_ms: 2
+        humanize_velocity_pct: 2
+        notes:
+          - [0, 0.00, B4, 0.47, 94]
+          - [0, 0.50, E5, 0.94, 86]
+          - [0, 1.50, G#5, 1.41, 90]
+          - [0, 3.00, F#5, 0.47, 86]
+          - [0, 3.50, E5, 0.47, 86]
+          - [1, 0.00, F#5, 1.41, 98]
+          - [1, 1.50, D#5, 0.47, 86]
+          - [1, 2.00, B4, 0.94, 86]
+          - [1, 3.00, D#5, 0.47, 86]
+          - [1, 3.50, F#5, 0.47, 86]
+          - [2, 0.00, G#5, 0.94, 94]
+          - [2, 1.00, E5, 0.47, 86]
+          - [2, 1.50, C#5, 1.41, 90]
+          - [2, 3.00, E5, 0.47, 86]
+          - [2, 3.50, G#5, 0.47, 86]
+          - [3, 0.00, A5, 1.41, 98]
+          - [3, 1.50, G#5, 0.47, 86]
+          - [3, 2.00, F#5, 0.47, 86]
+          - [3, 2.50, E5, 0.47, 86]
+          - [3, 3.00, C#5, 0.94, 86]
+          - [4, 0.00, B4, 0.47, 94]
+          - [4, 0.50, E5, 0.94, 86]
+          - [4, 1.50, G#5, 1.41, 90]
+          - [4, 3.00, F#5, 0.47, 86]
+          - [4, 3.50, G#5, 0.47, 86]
+          - [5, 0.00, A5, 0.94, 94]
+          - [5, 1.00, F#5, 0.47, 86]
+          - [5, 1.50, D#5, 1.41, 90]
+          - [5, 3.00, F#5, 0.47, 86]
+          - [5, 3.50, D#5, 0.47, 86]
+          - [6, 0.00, E5, 1.41, 98]
+          - [6, 1.50, C#5, 0.47, 86]
+          - [6, 2.00, A4, 0.94, 86]
+          - [6, 3.00, C#5, 0.47, 86]
+          - [6, 3.50, E5, 0.47, 86]
+          - [7, 0.00, F#5, 1.88, 98]
+          - [7, 2.00, D#5, 0.94, 86]
+          - [7, 3.00, F#5, 0.47, 86]
+          - [7, 3.50, G#5, 0.47, 86]
+          - [8, 0.00, G#5, 1.88, 98]
+          - [8, 2.00, E5, 0.94, 86]
+          - [8, 3.00, C#5, 0.94, 86]
+          - [9, 0.00, A5, 1.41, 98]
+          - [9, 1.50, G#5, 0.47, 86]
+          - [9, 2.00, E5, 1.88, 90]
+          - [10, 0.00, G#5, 0.94, 94]
+          - [10, 1.00, F#5, 0.47, 86]
+          - [10, 1.50, E5, 1.41, 90]
+          - [10, 3.00, B4, 0.47, 86]
+          - [10, 3.50, E5, 0.47, 86]
+          - [11, 0.00, F#5, 2.35, 98]
+          - [11, 2.50, D#5, 0.47, 86]
+          - [11, 3.00, F#5, 0.94, 86]
+          - [12, 0.00, G#5, 1.88, 98]
+          - [12, 2.00, E5, 0.94, 86]
+          - [12, 3.00, G#5, 0.94, 86]
+          - [13, 0.00, A5, 1.41, 98]
+          - [13, 1.50, G#5, 0.47, 86]
+          - [13, 2.00, F#5, 0.94, 86]
+          - [13, 3.00, E5, 0.94, 86]
+          - [14, 0.00, F#5, 0.94, 94]
+          - [14, 1.00, G#5, 0.94, 86]
+          - [14, 2.00, A5, 0.94, 86]
+          - [14, 3.00, F#5, 0.94, 86]
+          - [15, 0.00, B4, 0.47, 94]
+          - [15, 0.50, D#5, 0.47, 86]
+          - [15, 1.00, F#5, 0.94, 86]
+          - [15, 2.00, D#5, 0.94, 86]
+          - [15, 3.00, F#5, 0.94, 86]
+          - [24, 0.00, B4, 0.47, 98]
+          - [24, 0.50, E5, 0.94, 90]
+          - [24, 1.50, G#5, 1.41, 94]
+          - [24, 3.00, F#5, 0.47, 90]
+          - [24, 3.50, E5, 0.47, 90]
+          - [25, 0.00, F#5, 1.41, 102]
+          - [25, 1.50, D#5, 0.47, 90]
+          - [25, 2.00, B4, 0.94, 90]
+          - [25, 3.00, D#5, 0.47, 90]
+          - [25, 3.50, F#5, 0.47, 90]
+          - [26, 0.00, G#5, 0.94, 98]
+          - [26, 1.00, E5, 0.47, 90]
+          - [26, 1.50, C#5, 1.41, 94]
+          - [26, 3.00, E5, 0.47, 90]
+          - [26, 3.50, G#5, 0.47, 90]
+          - [27, 0.00, A5, 1.41, 102]
+          - [27, 1.50, G#5, 0.47, 90]
+          - [27, 2.00, F#5, 0.47, 90]
+          - [27, 2.50, E5, 0.47, 90]
+          - [27, 3.00, C#5, 0.94, 90]
+          - [28, 0.00, B4, 0.47, 98]
+          - [28, 0.50, E5, 0.94, 90]
+          - [28, 1.50, G#5, 1.41, 94]
+          - [28, 3.00, F#5, 0.47, 90]
+          - [28, 3.50, G#5, 0.47, 90]
+          - [29, 0.00, A5, 0.94, 98]
+          - [29, 1.00, F#5, 0.47, 90]
+          - [29, 1.50, D#5, 1.41, 94]
+          - [29, 3.00, F#5, 0.47, 90]
+          - [29, 3.50, D#5, 0.47, 90]
+          - [30, 0.00, E5, 1.41, 102]
+          - [30, 1.50, C#5, 0.47, 90]
+          - [30, 2.00, A4, 0.94, 90]
+          - [30, 3.00, C#5, 0.47, 90]
+          - [30, 3.50, E5, 0.47, 90]
+          - [31, 0.00, F#5, 1.88, 102]
+          - [31, 2.00, D#5, 0.94, 90]
+          - [31, 3.00, F#5, 0.47, 90]
+          - [31, 3.50, G#5, 0.47, 90]
+          - [32, 0.00, G#5, 1.88, 102]
+          - [32, 2.00, E5, 0.94, 90]
+          - [32, 3.00, C#5, 0.94, 90]
+          - [33, 0.00, A5, 1.41, 102]
+          - [33, 1.50, G#5, 0.47, 90]
+          - [33, 2.00, E5, 1.88, 94]
+          - [34, 0.00, G#5, 0.94, 98]
+          - [34, 1.00, F#5, 0.47, 90]
+          - [34, 1.50, E5, 1.41, 94]
+          - [34, 3.00, B4, 0.47, 90]
+          - [34, 3.50, E5, 0.47, 90]
+          - [35, 0.00, F#5, 2.35, 102]
+          - [35, 2.50, D#5, 0.47, 90]
+          - [35, 3.00, F#5, 0.94, 90]
+          - [36, 0.00, G#5, 1.88, 102]
+          - [36, 2.00, E5, 0.94, 90]
+          - [36, 3.00, G#5, 0.94, 90]
+          - [37, 0.00, A5, 1.41, 102]
+          - [37, 1.50, G#5, 0.47, 90]
+          - [37, 2.00, F#5, 0.94, 90]
+          - [37, 3.00, E5, 0.94, 90]
+          - [38, 0.00, F#5, 0.94, 98]
+          - [38, 1.00, G#5, 0.94, 90]
+          - [38, 2.00, A5, 0.94, 90]
+          - [38, 3.00, F#5, 0.94, 90]
+          - [39, 0.00, B4, 0.47, 98]
+          - [39, 0.50, D#5, 0.47, 90]
+          - [39, 1.00, F#5, 0.94, 90]
+          - [39, 2.00, D#5, 0.94, 90]
+          - [39, 3.00, F#5, 0.94, 90]
+      # The choir and the horns hold the chords of the second eight bars.
+      - kind: notes
+        instrument: cosmic_choir
+        articulation: tenuto
+        notes:
+          - {bar: 8, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 70}
+          - {bar: 9, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 70}
+          - {bar: 10, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 70}
+          - {bar: 11, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 70}
+          - {bar: 12, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 70}
+          - {bar: 13, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 70}
+          - {bar: 14, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 70}
+          - {bar: 15, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 70}
+          - {bar: 16, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 54}
+          - {bar: 17, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 54}
+          - {bar: 18, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 54}
+          - {bar: 19, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 54}
+          - {bar: 20, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 54}
+          - {bar: 21, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 54}
+          - {bar: 22, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 54}
+          - {bar: 23, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 54}
+          - {bar: 24, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 76}
+          - {bar: 25, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+          - {bar: 26, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 27, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 28, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 76}
+          - {bar: 29, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+          - {bar: 30, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 31, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+          - {bar: 32, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 33, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 34, beat: 0.0, note: [G#4, B4, E5], dur: 3.7, vel: 76}
+          - {bar: 35, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+          - {bar: 36, beat: 0.0, note: [G#4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 37, beat: 0.0, note: [A4, C#5, E5], dur: 3.7, vel: 76}
+          - {bar: 38, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+          - {bar: 39, beat: 0.0, note: [F#4, B4, D#5], dur: 3.7, vel: 76}
+      - kind: notes
+        instrument: cosmic_horns
+        articulation: tenuto
+        notes:
+          - [8, 0.00, E4, 3.60, 72]
+          - [9, 0.00, E4, 3.60, 66]
+          - [10, 0.00, G#4, 3.60, 66]
+          - [11, 0.00, F#4, 3.60, 66]
+          - [12, 0.00, E4, 3.60, 72]
+          - [13, 0.00, E4, 3.60, 66]
+          - [14, 0.00, F#4, 3.60, 66]
+          - [15, 0.00, F#4, 3.60, 66]
+          - [32, 0.00, E4, 3.60, 72]
+          - [33, 0.00, E4, 3.60, 66]
+          - [34, 0.00, G#4, 3.60, 66]
+          - [35, 0.00, F#4, 3.60, 66]
+          - [36, 0.00, E4, 3.60, 72]
+          - [37, 0.00, E4, 3.60, 66]
+          - [38, 0.00, F#4, 3.60, 66]
+          - [39, 0.00, F#4, 3.60, 66]
+          - [16, 0.00, C#5, 1.88, 96]
+          - [16, 2.00, B4, 0.94, 84]
+          - [16, 3.00, A4, 0.94, 84]
+          - [17, 0.00, B4, 1.41, 96]
+          - [17, 1.50, A4, 0.47, 84]
+          - [17, 2.00, F#4, 1.88, 88]
+          - [18, 0.00, G#4, 0.94, 92]
+          - [18, 1.00, C#5, 0.94, 84]
+          - [18, 2.00, B4, 0.94, 84]
+          - [18, 3.00, G#4, 0.94, 84]
+          - [19, 0.00, E4, 0.94, 92]
+          - [19, 1.00, G#4, 0.94, 84]
+          - [19, 2.00, B4, 1.88, 88]
+          - [20, 0.00, C#5, 1.88, 96]
+          - [20, 2.00, B4, 0.94, 84]
+          - [20, 3.00, A4, 0.94, 84]
+          - [21, 0.00, B4, 1.41, 96]
+          - [21, 1.50, C#5, 0.47, 84]
+          - [21, 2.00, D#5, 1.88, 88]
+          - [22, 0.00, E5, 2.82, 96]
+          - [22, 3.00, D#5, 0.94, 84]
+          - [23, 0.00, D#5, 0.94, 92]
+          - [23, 1.00, C#5, 0.94, 84]
+          - [23, 2.00, B4, 0.94, 84]
+          - [23, 3.00, D#5, 0.94, 84]
+      - kind: notes
+        instrument: cosmic_timpani
+        articulation: normal
+        notes:
+          - [0, 0.00, E2, 1.50, 96]
+          - [7, 3.00, B2, 0.40, 80]
+          - [7, 3.50, B2, 0.40, 92]
+          - [8, 0.00, C#3, 1.50, 100]
+          - [15, 3.00, B2, 0.40, 84]
+          - [15, 3.50, B2, 0.40, 96]
+          - [16, 0.00, A2, 1.50, 92]
+          - [23, 2.00, B2, 0.40, 76]
+          - [23, 2.50, B2, 0.40, 84]
+          - [23, 3.00, B2, 0.40, 92]
+          - [23, 3.50, B2, 0.40, 104]
+          - [24, 0.00, E2, 1.50, 108]
+          - [31, 3.00, B2, 0.40, 84]
+          - [31, 3.50, B2, 0.40, 96]
+          - [32, 0.00, C#3, 1.50, 104]
+          - [39, 2.00, B2, 0.40, 76]
+          - [39, 2.50, B2, 0.40, 84]
+          - [39, 3.00, B2, 0.40, 92]
+          - [39, 3.50, B2, 0.40, 100]
+      # A cymbal on the first bar of each part, and a fill of the snare into each.
+      - kind: drums
+        instrument: cosmic_kit
+        events:
+          - {drum: crash, beats: [0.0], velocity: 74, bars: [0, 8, 16, 24, 32]}
+          - {drum: snare, beats: [3.0, 3.25, 3.5, 3.75], velocity: 78, bars: [7, 15, 23, 31, 39]}
+      - string_bed
+      - piano_push
+      - celesta_stars
+      - disco_bass
+      - harp_blooms
+      - dance_drums
+
+group_postprocess:
+  lead:
+    gain_db: 1.5
+    highpass_hz: 180
+    lowpass_hz: 8400
+    transient_tame: 0.03
+    reverb_wet: 0.030
+
+  strings:
+    gain_db: -1.0
+    highpass_hz: 160
+    lowpass_hz: 8200
+    reverb_wet: 0.022
+
+  choir:
+    gain_db: -3.0
+    highpass_hz: 200
+    lowpass_hz: 8600
+    reverb_wet: 0.040
+
+  brass:
+    gain_db: -2.5
+    highpass_hz: 110
+    lowpass_hz: 7200
+    reverb_wet: 0.028
+
+  piano:
+    gain_db: 3.0
+    highpass_hz: 110
+    lowpass_hz: 10800
+    transient_tame: 0.05
+    reverb_wet: 0.012
+
+  bass:
+    gain_db: 3.0
+    highpass_hz: 35
+    lowpass_hz: 2400
+    compressor_threshold_db: -18.0
+    compressor_ratio: 3.0
+    compressor_attack_ms: 5.0
+    compressor_release_ms: 65.0
+    reverb_wet: 0.0
+
+  sparkle:
+    gain_db: 6.0
+    highpass_hz: 480
+    lowpass_hz: 11000
+    transient_tame: 0.04
+    reverb_wet: 0.030
+
+  percussion:
+    gain_db: -1.0
+    highpass_hz: 40
+    lowpass_hz: 6000
+    reverb_wet: 0.020
+
+  drums:
+    gain_db: 0.2
+    highpass_hz: 38
+    lowpass_hz: 11800
+    transient_tame: 0.02
+    reverb_wet: 0.006
