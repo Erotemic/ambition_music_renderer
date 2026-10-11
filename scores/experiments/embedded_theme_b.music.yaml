@@ -10,7 +10,8 @@ notes:
   - 'Jon on the first render of this candidate: "I like the groove of this when it gets moving around the minute mark ... we are going to go with this, but we have got to polish it". The call and response was "far too pronounced"; "lose a little sustain in the bass to evoke the original"; "move it a smidge towards the mario underground theme".'
   - 'What it keeps from the model: a short riff for the bass in three pairs of a low note and its octave, short notes, the last pair on a note that does not resolve; silence after it; the riff again a fourth higher; then one long run and a long silence. The roots, the rhythm and the run are its own.'
   - 'The riff is in A, in sixteenth notes with a light swing, at 104 BPM. The pairs are on A, C and D, then on A, C and D sharp. Three low notes go up to the root each time: E, G, G sharp. The run ends with the same climb, slow: E, F, F sharp, G, G sharp, A.'
-  - 'Embedded: a quiet square wave (the chip) has two notes in the silence, three times in the first cycle and after each run. In the bridge the chip has the riff and the bass has a slow tune.'
+  - 'Embedded: a quiet square wave (the chip) has two notes in the silence, three times in the first cycle. After each run it has a line: the chromatic climb of the bass, turned over, in triplets; the model ends with chromatic triplets and silence. In the bridge the chip has the riff and the bass has a slow tune.'
+  - 'Jon on the second render: the quiet answers are good; the two notes after the run were not interesting; and in the bridge the bass had "too much buzz in the higher and medium registers ... I like the idea if we can do it cleanly". The stem had as much energy from 1.5 to 4 kHz as the riff has, on long notes. The tune is now on the clean program, at a lower velocity, with a low-pass filter and no presence boost.'
   - 'The bass is the Growlybass Jazz Bass. Its samples sound one octave below the key. Long notes use the sustained program and short notes the staccato program; a note with velocity 44 is a dead note.'
 seed: 20261012
 timebase: {ppq: 960}
@@ -21,7 +22,7 @@ end: {bar: 57, beat: 1}
 form:
   - {id: riff_1, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, energy: 1.0, density: 1.0, role: 'the bass alone has the riff; a hi-hat, a side stick; silence, and two times a quiet chip'}
   - {id: riff_1_d, from: {bar: 9, beat: 1}, to: {bar: 13, beat: 1}, energy: 1.0, density: 1.0, role: 'the riff a fourth higher; the full kit comes in'}
-  - {id: run_1, from: {bar: 13, beat: 1}, to: {bar: 17, beat: 1}, energy: 1.0, density: 1.0, role: 'the run, one hit, silence'}
+  - {id: run_1, from: {bar: 13, beat: 1}, to: {bar: 17, beat: 1}, energy: 1.0, density: 1.0, role: 'the run, one hit, and in the silence the chip comes down by semitones in triplets'}
   - {id: riff_2, from: {bar: 17, beat: 1}, to: {bar: 25, beat: 1}, energy: 1.0, density: 1.0, role: 'the full band: clavinet, organ, and a tune above'}
   - {id: riff_2_d, from: {bar: 25, beat: 1}, to: {bar: 29, beat: 1}, energy: 1.0, density: 1.0, role: 'the riff and the tune in D'}
   - {id: run_2, from: {bar: 29, beat: 1}, to: {bar: 33, beat: 1}, energy: 1.0, density: 1.0, role: 'the run with the clavinet, one hit, silence'}
@@ -49,6 +50,13 @@ instruments:
     expression: 118
     mix_gain_db: 0.0
     instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_vicious.sfz', settings: {fold_to_range: false}}
+  - name: bass_song
+    group: bass_song
+    program: fingered_bass
+    volume: 118
+    pan: 64
+    expression: 118
+    instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_clean.sfz', settings: {fold_to_range: false}}
   - {name: chip, group: chip, program: lead_square, volume: 92, pan: 84, expression: 104}
   - {name: chipbass, group: chipbass, program: lead_square, volume: 100, pan: 64, expression: 110}
   - {name: lead, group: lead, program: lead_square, volume: 96, pan: 52, expression: 110}
@@ -199,12 +207,26 @@ materials:
     events:
       - [4613/3840, 1/16, G5, 70]
       - [11/8, 7/80, D5, 60]
-  # In the silence after the run: two notes.
+  # In the silence after the run: the chromatic climb of the bass, turned over, in triplets.
   chip_break:
     kind: events
     events:
-      - [3/8, 1/16, E5, 66]
-      - [3/4, 7/80, A4, 58]
+      - [1/2, 23/160, A4, 100]
+      - [2/3, 23/160, G#4, 97]
+      - [5/6, 23/160, G4, 94]
+      - [1/1, 23/160, F#4, 91]
+      - [7/6, 23/160, F4, 88]
+      - [4/3, 9/40, E4, 85]
+  # The same line with a major third below it. It stops on C and E: the chord of A minor.
+  chip_break_thirds:
+    kind: events
+    events:
+      - [1/2, 23/160, [F4, A4], 100]
+      - [2/3, 23/160, [E4, G#4], 97]
+      - [5/6, 23/160, [D#4, G4], 94]
+      - [1/1, 23/160, [D4, F#4], 91]
+      - [7/6, 23/160, [C#4, F4], 88]
+      - [4/3, 9/40, [C4, E4], 85]
   # The tune above the riff: it starts after the bass in each bar, and holds a long note where the bass is silent.
   tune_a:
     kind: events
@@ -536,9 +558,6 @@ parts:
           - id: bass_c3_run_long
             at: {bar: 53, beat: 1}
             use: run_long
-          - id: bass_bridge_long
-            at: {bar: 33, beat: 1}
-            use: song_long
   - id: bass_stac_part
     instrument: bass_stac
     voices:
@@ -583,6 +602,15 @@ parts:
           - id: bass_bridge_short
             at: {bar: 33, beat: 1}
             use: song_short
+  - id: bass_song_part
+    instrument: bass_song
+    voices:
+      - id: bass_song_main
+        clips:
+          - id: bass_bridge_long
+            at: {bar: 33, beat: 1}
+            use: song_long
+            velocity_scale: 0.84
   - id: chip_part
     instrument: chip
     voices:
@@ -602,10 +630,10 @@ parts:
             use: chip_break
           - id: chip_c2_break
             at: {bar: 31, beat: 1}
-            use: chip_break
+            use: chip_break_thirds
           - id: chip_c3_break
             at: {bar: 55, beat: 1}
-            use: chip_break
+            use: chip_break_thirds
   - id: chipbass_part
     instrument: chipbass
     voices:
@@ -1019,6 +1047,15 @@ processing:
             - {type: peak, hz: 2400, q: 1.0, db: 3.0}
         - {processor: compressor, threshold_db: -26.0, ratio: 4.0, attack_ms: 12.0, release_ms: 140.0, makeup_db: 5.0}
         - {processor: gain, gain_db: 0.0}
+    bass_song:
+      chain:
+        - {processor: highpass, cutoff_hz: 50}
+        - {processor: lowpass, cutoff_hz: 2000}
+        - processor: parametric_eq
+          bands:
+            - {type: peak, hz: 2000, q: 0.8, db: -3.0}
+        - {processor: compressor, threshold_db: -22.0, ratio: 2.5, attack_ms: 20.0, release_ms: 200.0, makeup_db: 2.0}
+        - {processor: gain, gain_db: 0.0}
     chip:
       chain:
         - {processor: highpass, cutoff_hz: 300}
@@ -1030,7 +1067,7 @@ processing:
     chipbass:
       chain:
         - {processor: highpass, cutoff_hz: 60}
-        - {processor: lowpass, cutoff_hz: 2600}
+        - {processor: lowpass, cutoff_hz: 1800}
         - {processor: gain, gain_db: -6.0}
     lead:
       chain:
