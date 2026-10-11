@@ -133,7 +133,6 @@ def is_adaptive_cue(cue: str) -> bool:
 # not auto-publish. Add new entries here as content lands in examples/.
 EXTRA_RADIO_CUES = (
     "crooked_ascent_boss",
-    "dinosaur_liberators",
     "dinosaur_liberators_long",
     "env_advocacy_solace",
     "fast_paced_violin_boss",

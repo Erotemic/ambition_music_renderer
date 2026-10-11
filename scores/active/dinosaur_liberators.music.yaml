@@ -1,11 +1,12 @@
 schema: ambition.musicir.v3
-id: dinosaur_liberators_remaster
-title: Dinosaur Liberators - Southern Rock Anthem (remaster experiment)
+id: dinosaur_liberators
+title: Dinosaur Liberators - Southern Rock Anthem
 description: >-
-  An experiment. The original dinosaur_liberators with sampled instruments and a few
-  changes to the arrangement. Jon decides if it replaces the original.
+  The remaster of the first Dinosaur Liberators: the same song with sampled instruments
+  and a few changes to the arrangement. Jon approved it on 2026-10-10 and it took the
+  cue id of the original.
 notes:
-  - 'The original is scores/examples/dinosaur_liberators.music.yaml (MusicIR v1). That file does not change.'
+  - 'The original is scores/archive/dinosaur_liberators_v1.music.yaml (MusicIR v1). It renders as the cue dinosaur_liberators_v1.'
   - 'Kept: G major, 110 BPM, the six sections and their lengths, the chords, and every melody (the two phrases of the tune, the slide fill, solo licks A and B, the climax lick) at its original place.'
   - 'Changed, six chords: the tune holds its home note G where the original chord had an F sharp. Bars 10 and 18 are G over F sharp in place of B minor over F sharp (the bass line is the same). Bars 27, 31, 35 and 75 are Dsus4 in place of D. The tune does not change.'
   - 'Instruments: the Shinyguitar archtop plays the arpeggio through a clean amp (Jon picked it from a reel of four) and plays the tune through the Guitarix lead amp. The Emily guitar plays the solos through the same lead amp. Sampled bass, drum kit, piano and horns. The organ is still General MIDI.'
