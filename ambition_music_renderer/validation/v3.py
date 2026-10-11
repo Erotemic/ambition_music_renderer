@@ -1049,6 +1049,30 @@ def _validate_processing(
     return result
 
 
+def _validate_playback_layers(
+    spec: Mapping[str, Any], *, locations: Mapping[SourcePath, SourceLocation]
+) -> list[Diagnostic]:
+    """The render's own check of `playback.layers`, before a render is paid for."""
+    playback = spec.get("playback")
+    instruments, form = spec.get("instruments"), spec.get("form")
+    if not _mapping(playback) or not playback.get("layers") or not _list(instruments) or not _list(form):
+        return []
+    from ..render.playback_layers import playback_layer_plan
+
+    groups = sorted({str(item.get("group", item.get("name"))) for item in instruments if _mapping(item)})
+    # Only the ids and the order of the form matter to the check.
+    rows = [
+        {"id": item.get("id"), "start_seconds": i, "end_seconds": i + 1, "start_beat": i, "end_beat": i + 1}
+        for i, item in enumerate(form)
+        if _mapping(item)
+    ]
+    try:
+        playback_layer_plan(dict(spec), rows, groups)
+    except ValueError as ex:
+        return [diagnostic("V3_PLAYBACK_LAYERS", str(ex), path=("playback",), locations=locations)]
+    return []
+
+
 def diagnose_v3_spec(
     spec: Mapping[str, Any],
     *,
@@ -1112,6 +1136,7 @@ def diagnose_v3_spec(
             result.append(diagnostic("V3_KEY", "score key must be a string or mapping", path=("key",), locations=locations))
 
     result.extend(_validate_processing(spec.get("processing"), path=("processing",), locations=locations))
+    result.extend(_validate_playback_layers(spec, locations=locations))
 
     ppq = 960
     timebase = spec.get("timebase")

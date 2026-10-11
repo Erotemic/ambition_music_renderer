@@ -473,6 +473,42 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
     return copied
 
 
+def publish_playback_layers(cue: str, outdir: Path, dest_dir: Path) -> list[Path]:
+    """Publish the playback layer files of the latest render to stable paths.
+
+    A render names them ``playback/<section>/<cue>_<hash>.<section>.<layer>.ogg``.
+    The game's cue catalog names ``playback/<section>/<section>.<layer>.ogg``.
+    A missing file publishes nothing: a game must not get one part of a mix.
+    """
+    manifest_path = find_latest_manifest(outdir, cue)
+    if manifest_path is None:
+        return []
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf8"))
+    except Exception as ex:
+        print(f"skip playback publish {cue}: failed to read {manifest_path}: {ex}", file=sys.stderr)
+        return []
+    playback = ((manifest.get("files") or {}).get("playback") or {})
+    if not isinstance(playback, dict):
+        return []
+    to_copy: list[tuple[Path, Path]] = []
+    for section_id, layers in sorted(playback.items()):
+        for layer_id, rel in sorted((layers or {}).items()):
+            src = manifest_path.parent / str(rel)
+            if not src.exists():
+                print(f"skip playback publish {cue}: missing {src}", file=sys.stderr)
+                return []
+            to_copy.append((src, dest_dir / "playback" / str(section_id) / f"{section_id}.{layer_id}.ogg"))
+    copied: list[Path] = []
+    for src, dest in to_copy:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        publish_copy(src, dest)
+        copied.append(dest)
+    if copied:
+        publish_copy(manifest_path, dest_dir / f"{cue}.adaptive_manifest.json")
+    return copied
+
+
 def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
     if dest_root is None:
         # An argument default of `None` means that no caller named a root.
@@ -502,6 +538,9 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
     dest = dest_dir / "full.ogg"
     publish_copy(src, dest)
     print(f"publish {cue}: {_display_path(src)} -> {_display_path(dest)}")
+    playback_copied = publish_playback_layers(cue, outdir, dest_dir)
+    if playback_copied:
+        print(f"publish {cue}: {len(playback_copied)} playback layer files -> {_display_path(dest_dir / 'playback')}")
     for adaptive_dest in adaptive_copied:
         print(f"publish {cue}: adaptive section -> {_display_path(adaptive_dest)}")
     if adaptive_copied:

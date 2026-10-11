@@ -32,6 +32,7 @@ from ..music_timeline import write_render_authoring_artifacts
 from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio
+from .playback_layers import playback_layer_plan, write_playback_layers
 from .foreground_protection import apply_foreground_protection, foreground_protection_mode
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
@@ -530,13 +531,14 @@ def _manifest_paths(manifest: dict, outdir: Path) -> list[Path]:
     for rel in preview.values():
         if isinstance(rel, str):
             paths.append(outdir / rel)
-    adaptive = files.get("adaptive") or {}
-    if isinstance(adaptive, dict):
-        for section in adaptive.values():
-            if isinstance(section, dict):
-                for rel in section.values():
-                    if isinstance(rel, str):
-                        paths.append(outdir / rel)
+    for tree in ("adaptive", "playback"):
+        sections = files.get(tree) or {}
+        if isinstance(sections, dict):
+            for section in sections.values():
+                if isinstance(section, dict):
+                    for rel in section.values():
+                        if isinstance(rel, str):
+                            paths.append(outdir / rel)
     return paths
 
 
@@ -1087,6 +1089,20 @@ def _render_main(ns) -> int:
                 )
                 write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False)
 
+    # Playback layers: sums of the native group stems over spans of the form,
+    # for a game that mixes the cue from layers. A score asks for them in its
+    # `playback` block, in each render mode.
+    playback_plan = playback_layer_plan(spec, meta, list(group_names))
+    if playback_plan is not None:
+        output_files["playback"] = write_playback_layers(
+            playback_plan,
+            stem_audio,
+            sr,
+            outdir,
+            f"{spec['id']}_{cue_hash}",
+            lambda audio, path: write_ogg_from_audio(audio, sr, path, quality=quality, keep_wav=False),
+        )
+
     # Per-section full slices for horizontal adaptive playback.
     #
     # Legacy mode (section_postprocess) lets a section run its own mastering
@@ -1240,6 +1256,7 @@ def _render_main(ns) -> int:
         "rendered": list(groups_to_render),
         "keys": dict(cache_keys),
     }
+    manifest["playback_layers"] = playback_plan
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db

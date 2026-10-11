@@ -671,3 +671,34 @@ timeline. Do not use legacy `sections[].postprocess` as a new v3 composition
 technique. Existing v1/v2 scores continue to support it for exact regeneration.
 
 See `docs/processing_architecture.md` for signal-flow and compatibility details.
+
+## Playback layers
+
+A game can mix a cue from layers, and add or remove layers while one loop plays.
+A score asks for the files in its `playback` block:
+
+```yaml
+playback:
+  layers:
+    bed: [arpeggio, bass, organ, piano]
+    drums: [drums]
+    tune: [lead, slide]
+  sections:
+    - {id: intro, form: [intro]}
+    - {id: trail, form: [main_a, main_b], loop: true}
+```
+
+- A layer is the sum of its stem groups after group processing and before the
+  master chain. Each group must be in one layer, so all layers together are the
+  pre-master mix.
+- A section is a span of consecutive `form` sections. Without `sections`, each
+  form section is one playback section.
+- The render writes `playback/<section>/<cue>_<hash>.<section>.<layer>.ogg`, and
+  `cue publish` copies them to `playback/<section>/<section>.<layer>.ogg`.
+- Each file has a fade of a few milliseconds at its two ends. A note that rings
+  across the end of a looped section stops there.
+- Each layer must be complete in each state the game plays. A layer that is
+  silent for one half of a loop adds nothing there.
+
+`cue validate` refuses a block that cannot give a complete mix. The first score
+that uses it is `scores/active/dinosaur_liberators_adaptive.music.yaml`.
