@@ -3,14 +3,16 @@ id: embedded_theme
 title: Embedded Theme
 description: >-
   Mary-O world 1-2, the level below the ground. Support Theme is her play on a ground
-  theme; this is her play on an underground theme. A bass in octave pairs with silence
-  after it, a chromatic tail that slows down and stops on a note that does not resolve,
-  and drums with a swing.
+  theme; this is her play on an underground theme: a bass that has the tune, silence
+  after each phrase, and a tail that stops on a note that does not resolve. The band is
+  a small jazz group with brushes.
 notes:
-  - 'A parody by shape, not by notes. The model has octave pairs that go down a minor third and up a semitone, then the same a fifth lower, then semitone pairs that go down around a circle of fourths. Each interval here is the mirror: up a minor third and down a semitone, then a fifth higher, then semitone pairs that go up around a circle of fifths. No phrase of the model is here.'
-  - 'The grid is a triplet swing: 12 parts in a bar. The model is straight.'
+  - 'Jon, 2026-10-11, on the first draft: too close to the model, and he did not like the percussion; he wanted jazz brush drums. That draft had octave pairs in the rhythm of the model, a chromatic run, bongos, woodblocks and timbales. None of them is here.'
+  - 'What is kept from the idea of an underground theme: the bass has the tune, each phrase stops and leaves silence, and the tail does not resolve. The notes, the rhythm and the form are new: two knocks and a fall of three quick notes, on a blues of 12 bars, with stairs of whole tones for a tail.'
+  - 'The grid is a triplet swing: 12 parts in a bar.'
   - 'The bridge is the motto of Support Theme (her level theme) in E minor: the levels of one world share one tune.'
-  - 'Embedded: a square-wave buzzer answers in the silence, a square wave doubles the bass, and woodblocks tick like a clock. The echo is the cave.'
+  - 'Embedded: a square-wave buzzer answers in the silence, and a square wave doubles the bass. The echo is the cave.'
+  - 'Drums: Big Rusty Drums with brushes (controllers 25 to 28 select the brush samples). Each piece of the kit is its own small program, so each has its own level: the stirs are 20 dB below the kick in the samples.'
   - 'The last tail has no drum fill, so the loop goes back to the quiet first hook.'
 seed: 20261010
 timebase: {ppq: 960}
@@ -19,17 +21,17 @@ tempo: 108
 key: E dorian
 end: {bar: 45, beat: 1}
 form:
-  - {id: hook_a, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, energy: 1.0, density: 1.0, role: 'the hook alone: bass, a clock of woodblocks, and the buzzer in the silence'}
+  - {id: hook_a, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, energy: 1.0, density: 1.0, role: 'the hook alone: bass, brush stirs, and the buzzer in the silence'}
   - {id: tail_a, from: {bar: 9, beat: 1}, to: {bar: 13, beat: 1}, energy: 1.0, density: 1.0, role: 'the tail, and one bar of silence'}
-  - {id: hook_b, from: {bar: 13, beat: 1}, to: {bar: 21, beat: 1}, energy: 1.0, density: 1.0, role: 'the hook with the drums; a steel drum answers'}
+  - {id: hook_b, from: {bar: 13, beat: 1}, to: {bar: 21, beat: 1}, energy: 1.0, density: 1.0, role: 'the hook with the brushes in full swing; a steel drum answers'}
   - {id: tail_b, from: {bar: 21, beat: 1}, to: {bar: 25, beat: 1}, energy: 1.0, density: 1.0, role: 'the tail with a marimba two octaves above'}
-  - {id: bridge, from: {bar: 25, beat: 1}, to: {bar: 33, beat: 1}, energy: 1.0, density: 1.0, role: 'the Support Theme motto in the minor over a bass that does not stop'}
+  - {id: bridge, from: {bar: 25, beat: 1}, to: {bar: 33, beat: 1}, energy: 1.0, density: 1.0, role: 'the Support Theme motto in the minor over a walking bass and a brushed ride'}
   - {id: hook_c, from: {bar: 33, beat: 1}, to: {bar: 41, beat: 1}, energy: 1.0, density: 1.0, role: 'the hook with all the band'}
   - {id: tail_c, from: {bar: 41, beat: 1}, to: {bar: 45, beat: 1}, energy: 1.0, density: 1.0, role: 'the tail; the silence goes back to the first hook'}
 harmony:
   every_bars: 1
   cycle: false
-  progression: [Em, Em, Em, Em, Bm, Bm, Bm, Bm, B7, B7, B7, B7, Em, Em, Em, Em, Bm, Bm, Bm, Bm, B7, B7, B7, B7, Em, Em, A, A, C, D, Em, B7, Em, Em, Em, Em, Bm, Bm, Bm, Bm, B7, B7, B7, B7]
+  progression: [Em, Em, Em, Em, A7, A7, Em, Em, B7, A7, Em, B7, Em, Em, Em, Em, A7, A7, Em, Em, B7, A7, Em, B7, Em, Em, A, A, C, D, Em, B7, Em, Em, Em, Em, A7, A7, Em, Em, B7, A7, Em, B7]
 instruments:
   - name: bass
     group: bass
@@ -44,58 +46,47 @@ instruments:
   - {name: lead, group: lead, program: lead_square, volume: 96, pan: 58, expression: 110}
   - {name: steel, group: steel, program: steel_drums, volume: 104, pan: 44, expression: 112}
   - {name: marimba, group: marimba, program: marimba, volume: 100, pan: 80, expression: 108}
-  - {name: kit, group: drums, is_drum: true, volume: 112, pan: 64, expression: 116}
+  - {name: kick, group: kick, is_drum: true, volume: 110, pan: 64, expression: 110, mix_gain_db: 7.0, instrument_backend: {kind: sfz, sfz_glob: '**/BigRustyDrums/Programs/03-kick.sfz', settings: {fold_to_range: false}}}
+  - {name: brush, group: brush, is_drum: true, volume: 110, pan: 60, expression: 110, mix_gain_db: 15.0, controls: {25: 80}, instrument_backend: {kind: sfz, sfz_glob: '**/BigRustyDrums/Programs/04-snare.sfz', settings: {fold_to_range: false}}}
+  - {name: stir, group: stir, is_drum: true, volume: 110, pan: 60, expression: 110, mix_gain_db: 23.0, controls: {25: 80, 80: 127, 81: 127, 82: 127}, instrument_backend: {kind: sfz, sfz_glob: '**/BigRustyDrums/Programs/04-snare.sfz', settings: {fold_to_range: false}}}
+  - {name: hat, group: hat, is_drum: true, volume: 110, pan: 74, expression: 110, mix_gain_db: 9.0, controls: {27: 100}, instrument_backend: {kind: sfz, sfz_glob: '**/BigRustyDrums/Programs/06-hihat.sfz', settings: {fold_to_range: false}}}
+  - {name: ride, group: ride, is_drum: true, volume: 110, pan: 50, expression: 110, mix_gain_db: 21.0, controls: {28: 80}, instrument_backend: {kind: sfz, sfz_glob: '**/BigRustyDrums/Programs/07-cymbals.sfz', settings: {fold_to_range: false}}}
 materials:
-  # The hook: three octave pairs, low then high, and then silence. Up a minor third, then down a semitone.
+  # The hook: two knocks on the low note, three quick notes that fall from the seventh, and a stop on the fifth. Then silence.
   hook_e:
     kind: events
     events:
-      - [0, 13/120, E2, 108]
-      - [1/6, 1/15, E3, 96]
-      - [1/4, 13/120, G2, 104]
-      - [5/12, 1/15, G3, 96]
-      - [1/2, 13/120, F#2, 106]
-      - [2/3, 2/15, F#3, 112]
-  # The hook a fifth higher.
-  hook_b:
+      - [0, 1/10, E2, 110]
+      - [1/4, 1/10, E2, 104]
+      - [1/2, 3/40, D3, 100]
+      - [7/12, 3/40, C#3, 96]
+      - [2/3, 3/40, C3, 98]
+      - [3/4, 1/5, B2, 108]
+  # The hook on the fourth degree, as in a blues.
+  hook_a:
     kind: events
     events:
-      - [0, 13/120, B2, 108]
-      - [1/6, 1/15, B3, 96]
-      - [1/4, 13/120, D3, 104]
-      - [5/12, 1/15, D4, 96]
-      - [1/2, 13/120, C#3, 106]
-      - [2/3, 2/15, C#4, 112]
-  # Three semitones up into the tail.
-  pickup:
-    kind: events
-    events:
-      - [3/4, 3/40, G#2, 92]
-      - [5/6, 3/40, A2, 98]
-      - [11/12, 3/40, A#2, 104]
-  # The tail: pairs of semitones that go up, each pair a fifth from the last; a run that leaps a tritone; then slower notes that stop on the tritone of the key. One bar of silence follows.
+      - [0, 1/10, A2, 110]
+      - [1/4, 1/10, A2, 104]
+      - [1/2, 3/40, G3, 100]
+      - [7/12, 3/40, F#3, 96]
+      - [2/3, 3/40, F3, 98]
+      - [3/4, 1/5, E3, 108]
+  # The tail: two flights of stairs in whole tones, down from the fifth and then from the fourth; two knocks at home; and a stop on the tritone, which does not resolve. One bar of silence follows.
   tail:
     kind: events
     events:
-      - [0, 5/24, B2, 110]
-      - [1/4, 17/120, D3, 100]
-      - [5/12, 3/40, D#3, 96]
-      - [1/2, 17/120, A2, 100]
-      - [2/3, 3/40, A#2, 96]
-      - [3/4, 17/120, E3, 104]
-      - [11/12, 3/40, F3, 100]
-      - [1/1, 3/40, F#3, 108]
-      - [13/12, 3/40, C3, 98]
-      - [7/6, 3/40, C#3, 100]
-      - [5/4, 3/40, D3, 104]
-      - [4/3, 3/40, G#2, 98]
-      - [17/12, 3/40, A2, 100]
-      - [3/2, 3/20, A#2, 106]
-      - [5/3, 3/20, D#2, 100]
-      - [11/6, 3/20, G2, 102]
-      - [2/1, 3/20, G#2, 104]
-      - [13/6, 3/20, A2, 106]
-      - [7/3, 5/12, A#2, 110]
+      - [0, 13/120, B2, 108]
+      - [1/4, 13/120, A2, 102]
+      - [1/2, 13/120, G2, 102]
+      - [3/4, 13/120, F2, 104]
+      - [1/1, 13/120, A2, 106]
+      - [5/4, 13/120, G2, 100]
+      - [3/2, 13/120, F2, 100]
+      - [7/4, 13/120, D#2, 104]
+      - [2/1, 1/10, E2, 110]
+      - [9/4, 1/10, E2, 104]
+      - [5/2, 3/8, A#2, 106]
   # The buzzer answers in the silence of the hook.
   beep_1:
     kind: events
@@ -111,14 +102,14 @@ materials:
   beep_3:
     kind: events
     events:
-      - [1/4, 1/24, F#6, 88]
-      - [5/12, 1/24, B5, 84]
+      - [1/4, 1/24, E6, 88]
+      - [5/12, 1/24, A5, 84]
   beep_4:
     kind: events
     events:
-      - [1/4, 1/24, F#6, 88]
-      - [5/12, 1/24, D#6, 86]
-      - [1/2, 1/24, F#6, 94]
+      - [1/4, 1/24, E6, 88]
+      - [5/12, 1/24, B5, 86]
+      - [1/2, 1/24, E6, 94]
   beep_one:
     kind: events
     events:
@@ -126,8 +117,8 @@ materials:
   beep_one_b:
     kind: events
     events:
-      - [0, 1/24, F#6, 80]
-  # The steel drum answers the hook, and stops on the note the hook stops on.
+      - [0, 1/24, A6, 80]
+  # The steel drum answers the hook in its silence.
   answer_1:
     kind: events
     events:
@@ -147,17 +138,17 @@ materials:
   answer_3:
     kind: events
     events:
-      - [1/4, 1/12, F#5, 96]
-      - [5/12, 1/12, A5, 100]
-      - [1/2, 1/6, B5, 104]
-      - [2/3, 1/12, D6, 106]
-      - [3/4, 5/24, C#6, 102]
+      - [1/4, 1/12, E5, 96]
+      - [5/12, 1/12, G5, 100]
+      - [1/2, 1/6, A5, 104]
+      - [2/3, 1/12, C#6, 106]
+      - [3/4, 5/24, B5, 102]
   answer_4:
     kind: events
     events:
       - [1/4, 1/12, B5, 100]
       - [5/12, 1/12, A5, 96]
-      - [1/2, 1/6, F#5, 98]
+      - [1/2, 1/6, G5, 98]
       - [2/3, 1/12, E5, 94]
       - [3/4, 5/24, D#5, 98]
   # The motto of Support Theme (motto_a: an arpeggio up and down), in the minor and with a swing.
@@ -232,69 +223,45 @@ materials:
       - [1/1, 3/20, F#5, 104]
       - [7/6, 3/40, D#5, 96]
       - [5/4, 5/24, B4, 100]
-  # The bridge bass keeps the low-high pairs of the hook, with no silence.
+  # The bridge bass walks: one note on each beat.
   bridge_bass:
     kind: events
     events:
-      - [0, 13/120, E2, 102]
-      - [1/6, 1/15, E3, 92]
-      - [1/4, 13/120, B2, 98]
-      - [5/12, 1/15, E3, 92]
-      - [1/2, 13/120, E2, 102]
-      - [2/3, 1/15, E3, 92]
-      - [3/4, 13/120, B2, 98]
-      - [11/12, 1/15, E3, 92]
-      - [1/1, 13/120, E2, 102]
-      - [7/6, 1/15, E3, 92]
-      - [5/4, 13/120, B2, 98]
-      - [17/12, 1/15, E3, 92]
-      - [3/2, 13/120, E2, 102]
-      - [5/3, 1/15, E3, 92]
-      - [7/4, 13/120, B2, 98]
-      - [23/12, 1/15, E3, 92]
-      - [2/1, 13/120, A2, 102]
-      - [13/6, 1/15, A3, 92]
-      - [9/4, 13/120, E3, 98]
-      - [29/12, 1/15, A3, 92]
-      - [5/2, 13/120, A2, 102]
-      - [8/3, 1/15, A3, 92]
-      - [11/4, 13/120, E3, 98]
-      - [35/12, 1/15, A3, 92]
-      - [3/1, 13/120, A2, 102]
-      - [19/6, 1/15, A3, 92]
-      - [13/4, 13/120, E3, 98]
-      - [41/12, 1/15, A3, 92]
-      - [7/2, 13/120, A2, 102]
-      - [11/3, 1/15, A3, 92]
-      - [15/4, 13/120, E3, 98]
-      - [47/12, 1/15, A3, 92]
-      - [4/1, 13/120, C3, 102]
-      - [25/6, 1/15, C4, 92]
-      - [17/4, 13/120, G3, 98]
-      - [53/12, 1/15, C4, 92]
-      - [9/2, 13/120, C3, 102]
-      - [14/3, 1/15, C4, 92]
-      - [19/4, 13/120, G3, 98]
-      - [59/12, 1/15, C4, 92]
-      - [5/1, 13/120, D3, 102]
-      - [31/6, 1/15, D4, 92]
-      - [21/4, 13/120, A3, 98]
-      - [65/12, 1/15, D4, 92]
-      - [11/2, 13/120, D3, 102]
-      - [17/3, 1/15, D4, 92]
-      - [23/4, 13/120, A3, 98]
-      - [71/12, 1/15, D4, 92]
-      - [6/1, 13/120, E2, 102]
-      - [37/6, 1/15, E3, 92]
-      - [25/4, 13/120, B2, 98]
-      - [77/12, 1/15, E3, 92]
-      - [13/2, 13/120, E2, 102]
-      - [20/3, 1/15, E3, 92]
-      - [27/4, 13/120, B2, 98]
-      - [83/12, 1/15, E3, 92]
-      - [7/1, 13/120, B2, 106]
-      - [43/6, 1/15, B3, 96]
-      - [29/4, 1/6, D#3, 104]
+      - [0, 1/5, E2, 104]
+      - [1/4, 1/5, G2, 96]
+      - [1/2, 1/5, B2, 96]
+      - [3/4, 1/5, D3, 96]
+      - [1/1, 1/5, E3, 104]
+      - [5/4, 1/5, D3, 96]
+      - [3/2, 1/5, B2, 96]
+      - [7/4, 1/5, G#2, 96]
+      - [23/12, 1/15, A2, 88]
+      - [2/1, 1/5, A2, 104]
+      - [9/4, 1/5, C#3, 96]
+      - [5/2, 1/5, E3, 96]
+      - [11/4, 1/5, F#3, 96]
+      - [3/1, 1/5, G3, 104]
+      - [13/4, 1/5, E3, 96]
+      - [7/2, 1/5, C#3, 96]
+      - [15/4, 1/5, B2, 96]
+      - [47/12, 1/15, C3, 88]
+      - [4/1, 1/5, C3, 104]
+      - [17/4, 1/5, E3, 96]
+      - [9/2, 1/5, G3, 96]
+      - [19/4, 1/5, C#3, 96]
+      - [5/1, 1/5, D3, 104]
+      - [21/4, 1/5, A2, 96]
+      - [11/2, 1/5, F#2, 96]
+      - [23/4, 1/5, F2, 96]
+      - [71/12, 1/15, E2, 88]
+      - [6/1, 1/5, E2, 104]
+      - [25/4, 1/5, G2, 96]
+      - [13/2, 1/5, B2, 96]
+      - [27/4, 1/5, E3, 96]
+      - [7/1, 1/5, B2, 104]
+      - [29/4, 1/5, A2, 96]
+      - [15/2, 1/5, F#2, 96]
+      - [31/4, 1/5, D#2, 96]
   # Marimba chords on the weak part of each beat.
   bridge_skank:
     kind: events
@@ -329,6 +296,61 @@ materials:
       - [83/12, 7/120, [G4, B4, E5], 58]
       - [43/6, 7/120, [A4, B4, D#5], 66]
       - [89/12, 7/120, [A4, B4, D#5], 66]
+  # Brush stirs on the snare. In the kit, C#5 is the long stir and D5 is the short stir.
+  stir_4:
+    kind: events
+    events:
+      - [0, 7/30, C#5, 96]
+      - [1/4, 13/60, D5, 114]
+      - [1/2, 7/30, C#5, 96]
+      - [3/4, 13/60, D5, 114]
+      - [1/1, 7/30, C#5, 96]
+      - [5/4, 13/60, D5, 114]
+      - [3/2, 7/30, C#5, 96]
+      - [7/4, 13/60, D5, 114]
+      - [2/1, 7/30, C#5, 96]
+      - [9/4, 13/60, D5, 114]
+      - [5/2, 7/30, C#5, 96]
+      - [11/4, 13/60, D5, 114]
+      - [3/1, 7/30, C#5, 96]
+      - [13/4, 13/60, D5, 114]
+      - [7/2, 7/30, C#5, 96]
+      - [15/4, 13/60, D5, 114]
+  stir_8:
+    kind: events
+    events:
+      - [0, 7/30, C#5, 96]
+      - [1/4, 13/60, D5, 114]
+      - [1/2, 7/30, C#5, 96]
+      - [3/4, 13/60, D5, 114]
+      - [1/1, 7/30, C#5, 96]
+      - [5/4, 13/60, D5, 114]
+      - [3/2, 7/30, C#5, 96]
+      - [7/4, 13/60, D5, 114]
+      - [2/1, 7/30, C#5, 96]
+      - [9/4, 13/60, D5, 114]
+      - [5/2, 7/30, C#5, 96]
+      - [11/4, 13/60, D5, 114]
+      - [3/1, 7/30, C#5, 96]
+      - [13/4, 13/60, D5, 114]
+      - [7/2, 7/30, C#5, 96]
+      - [15/4, 13/60, D5, 114]
+      - [4/1, 7/30, C#5, 96]
+      - [17/4, 13/60, D5, 114]
+      - [9/2, 7/30, C#5, 96]
+      - [19/4, 13/60, D5, 114]
+      - [5/1, 7/30, C#5, 96]
+      - [21/4, 13/60, D5, 114]
+      - [11/2, 7/30, C#5, 96]
+      - [23/4, 13/60, D5, 114]
+      - [6/1, 7/30, C#5, 96]
+      - [25/4, 13/60, D5, 114]
+      - [13/2, 7/30, C#5, 96]
+      - [27/4, 13/60, D5, 114]
+      - [7/1, 7/30, C#5, 96]
+      - [29/4, 13/60, D5, 114]
+      - [15/2, 7/30, C#5, 96]
+      - [31/4, 13/60, D5, 114]
 parts:
   - id: bass_part
     instrument: bass
@@ -343,13 +365,10 @@ parts:
             use: hook_e
           - id: bass_a_hook_3
             at: {bar: 5, beat: 1}
-            use: hook_b
+            use: hook_a
           - id: bass_a_hook_4
             at: {bar: 7, beat: 1}
-            use: hook_b
-          - id: bass_a_pickup
-            at: {bar: 8, beat: 1}
-            use: pickup
+            use: hook_e
           - id: bass_a_tail
             at: {bar: 9, beat: 1}
             use: tail
@@ -361,13 +380,10 @@ parts:
             use: hook_e
           - id: bass_b_hook_3
             at: {bar: 17, beat: 1}
-            use: hook_b
+            use: hook_a
           - id: bass_b_hook_4
             at: {bar: 19, beat: 1}
-            use: hook_b
-          - id: bass_b_pickup
-            at: {bar: 20, beat: 1}
-            use: pickup
+            use: hook_e
           - id: bass_b_tail
             at: {bar: 21, beat: 1}
             use: tail
@@ -379,22 +395,16 @@ parts:
             use: hook_e
           - id: bass_c_hook_3
             at: {bar: 37, beat: 1}
-            use: hook_b
+            use: hook_a
           - id: bass_c_hook_4
             at: {bar: 39, beat: 1}
-            use: hook_b
-          - id: bass_c_pickup
-            at: {bar: 40, beat: 1}
-            use: pickup
+            use: hook_e
           - id: bass_c_tail
             at: {bar: 41, beat: 1}
             use: tail
           - id: bass_bridge
             at: {bar: 25, beat: 1}
             use: bridge_bass
-          - id: bass_bridge_pickup
-            at: {bar: 32, beat: 1}
-            use: pickup
   - id: chip_part
     instrument: chip
     voices:
@@ -414,11 +424,11 @@ parts:
             transpose: 12
           - id: chip_b_hook_3
             at: {bar: 17, beat: 1}
-            use: hook_b
+            use: hook_a
             transpose: 12
           - id: chip_b_hook_4
             at: {bar: 19, beat: 1}
-            use: hook_b
+            use: hook_e
             transpose: 12
           - id: chip_b_tail
             at: {bar: 21, beat: 1}
@@ -434,11 +444,11 @@ parts:
             transpose: 12
           - id: chip_c_hook_3
             at: {bar: 37, beat: 1}
-            use: hook_b
+            use: hook_a
             transpose: 12
           - id: chip_c_hook_4
             at: {bar: 39, beat: 1}
-            use: hook_b
+            use: hook_e
             transpose: 12
           - id: chip_c_tail
             at: {bar: 41, beat: 1}
@@ -472,7 +482,7 @@ parts:
             use: beep_one_b
           - id: beep_b_4
             at: {bar: 20, beat: 1}
-            use: beep_one_b
+            use: beep_one
           - id: beep_c_1
             at: {bar: 34, beat: 1}
             use: beep_one
@@ -484,7 +494,7 @@ parts:
             use: beep_one_b
           - id: beep_c_4
             at: {bar: 40, beat: 1}
-            use: beep_one_b
+            use: beep_one
   - id: lead_part
     instrument: lead
     voices:
@@ -569,128 +579,253 @@ parts:
           - id: marimba_bridge
             at: {bar: 25, beat: 1}
             use: bridge_skank
-  - id: kit_part
-    instrument: kit
+  - id: kick_part
+    instrument: kick
     voices:
-      - id: kit_main
+      - id: kick_main
         clips:
-          - id: kit_hook_a
-            at: {bar: 1, beat: 1}
-            duration: {bars: 8}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
-              events:
-                - {drum: woodblock_low, beats: [0.0, 2.0], velocity: 66}
-                - {drum: woodblock_hi, beats: [1.0, 3.0], velocity: 78}
-                - {drum: bongo_hi, beats: [2.0, 2.6667], velocity: 104, bars: [1, 3, 5, 7]}
-                - {drum: bongo_low, beats: [3.0], velocity: 112, bars: [1, 3, 5, 7]}
-          - id: kit_hook_b
+          - id: kick_hook_b
             at: {bar: 13, beat: 1}
             duration: {bars: 8}
             generate:
               kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
               events:
-                - {drum: kick, beats: [0.0, 2.6667], velocity: 106}
-                - {drum: kick, beats: [2.0], velocity: 96, bars: [1, 3, 5, 7]}
-                - {drum: snare, beats: [1.0, 3.0], velocity: 100}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 52}
-                - {drum: bongo_hi, beats: [1.6667, 3.6667], velocity: 64}
-                - {drum: bongo_low, beats: [3.3333], velocity: 70, bars: [1, 3, 5, 7]}
-                - {drum: timbale_hi, beats: [3.0, 3.3333], velocity: 96, bars: [7]}
-                - {drum: timbale_low, beats: [3.6667], velocity: 104, bars: [7]}
-          - id: kit_hook_c
-            at: {bar: 33, beat: 1}
-            duration: {bars: 8}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
-              events:
-                - {drum: kick, beats: [0.0, 2.6667], velocity: 106}
-                - {drum: kick, beats: [2.0], velocity: 96, bars: [1, 3, 5, 7]}
-                - {drum: snare, beats: [1.0, 3.0], velocity: 100}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 52}
-                - {drum: bongo_hi, beats: [1.6667, 3.6667], velocity: 64}
-                - {drum: bongo_low, beats: [3.3333], velocity: 70, bars: [1, 3, 5, 7]}
-                - {drum: timbale_hi, beats: [3.0, 3.3333], velocity: 96, bars: [7]}
-                - {drum: timbale_low, beats: [3.6667], velocity: 104, bars: [7]}
-          - id: kit_tail_a
-            at: {bar: 9, beat: 1}
-            duration: {bars: 4}
-            generate:
-              kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
-              events:
-                - {drum: kick, beats: [0.0], velocity: 108, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 60, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 44, bars: [0, 1]}
-                - {drum: snare, beats: [3.0], velocity: 84, bars: [0]}
-                - {drum: woodblock_low, beats: [0.0, 2.0], velocity: 66, bars: [3]}
-                - {drum: woodblock_hi, beats: [1.0, 3.0], velocity: 78, bars: [3]}
-                - {drum: snare, beats: [2.0], velocity: 72, bars: [3]}
-                - {drum: snare, beats: [2.3333], velocity: 84, bars: [3]}
-                - {drum: snare, beats: [2.6667], velocity: 96, bars: [3]}
-                - {drum: timbale_hi, beats: [3.0, 3.3333], velocity: 102, bars: [3]}
-                - {drum: timbale_low, beats: [3.6667], velocity: 110, bars: [3]}
-          - id: kit_tail_b
+                - {drum: kick, beats: [0.0], velocity: 66}
+                - {drum: kick, beats: [2.0], velocity: 50}
+          - id: kick_tail_b
             at: {bar: 21, beat: 1}
             duration: {bars: 4}
             generate:
               kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
               events:
-                - {drum: kick, beats: [0.0], velocity: 108, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 60, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 44, bars: [0, 1]}
-                - {drum: snare, beats: [3.0], velocity: 84, bars: [0]}
-                - {drum: woodblock_low, beats: [0.0, 2.0], velocity: 66, bars: [3]}
-                - {drum: woodblock_hi, beats: [1.0, 3.0], velocity: 78, bars: [3]}
-                - {drum: snare, beats: [2.0], velocity: 72, bars: [3]}
-                - {drum: snare, beats: [2.3333], velocity: 84, bars: [3]}
-                - {drum: snare, beats: [2.6667], velocity: 96, bars: [3]}
-                - {drum: timbale_hi, beats: [3.0, 3.3333], velocity: 102, bars: [3]}
-                - {drum: timbale_low, beats: [3.6667], velocity: 110, bars: [3]}
-          - id: kit_tail_c
+                - {drum: kick, beats: [0.0, 2.0], velocity: 60, bars: [0, 1]}
+                - {drum: kick, beats: [0.0, 1.0], velocity: 70, bars: [2]}
+          - id: kick_hook_c
+            at: {bar: 33, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: kick, beats: [0.0], velocity: 66}
+                - {drum: kick, beats: [2.0], velocity: 50}
+          - id: kick_tail_c
             at: {bar: 41, beat: 1}
             duration: {bars: 4}
             generate:
               kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
               events:
-                - {drum: kick, beats: [0.0], velocity: 108, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 60, bars: [0, 1, 2]}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 44, bars: [0, 1]}
-                - {drum: snare, beats: [3.0], velocity: 84, bars: [0]}
-                - {drum: woodblock_low, beats: [0.0, 2.0], velocity: 66, bars: [3]}
-                - {drum: woodblock_hi, beats: [1.0, 3.0], velocity: 78, bars: [3]}
-          - id: kit_bridge
+                - {drum: kick, beats: [0.0, 2.0], velocity: 60, bars: [0, 1]}
+                - {drum: kick, beats: [0.0, 1.0], velocity: 70, bars: [2]}
+          - id: kick_bridge
             at: {bar: 25, beat: 1}
             duration: {bars: 8}
             generate:
               kind: drums.pattern
-              humanize_ms: 2.0
-              humanize_velocity_pct: 4
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
               events:
-                - {drum: kick, beats: [0.0, 2.0, 2.6667], velocity: 104, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: snare, beats: [1.0, 3.0], velocity: 102, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: closed_hat, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: closed_hat, beats: [0.6667, 1.6667, 2.6667, 3.6667], velocity: 54, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: tambourine, beats: [1.0, 3.0], velocity: 58, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: bongo_hi, beats: [1.6667, 3.6667], velocity: 62, bars: [0, 1, 2, 3, 4, 5, 6]}
-                - {drum: kick, beats: [0.0], velocity: 108, bars: [7]}
-                - {drum: snare, beats: [1.0], velocity: 104, bars: [7]}
-                - {drum: snare, beats: [3.0], velocity: 80, bars: [7]}
-                - {drum: snare, beats: [3.3333], velocity: 92, bars: [7]}
-                - {drum: snare, beats: [3.6667], velocity: 106, bars: [7]}
+                - {drum: kick, beats: [0.0, 1.0, 2.0, 3.0], velocity: 50, bars: [0, 1, 2, 3, 4, 5, 6]}
+                - {drum: kick, beats: [0.0], velocity: 72, bars: [7]}
+  - id: brush_part
+    instrument: brush
+    voices:
+      - id: brush_main
+        clips:
+          - id: brush_tail_a
+            at: {bar: 9, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72, bars: [0, 1]}
+                - {drum: snare, beats: [0.0, 1.0], velocity: 84, bars: [2]}
+                - {drum: snare, beats: [2.0], velocity: 60, bars: [3]}
+                - {drum: snare, beats: [2.3333], velocity: 70, bars: [3]}
+                - {drum: snare, beats: [2.6667], velocity: 80, bars: [3]}
+                - {drum: snare, beats: [3.0], velocity: 90, bars: [3]}
+                - {drum: snare, beats: [3.3333], velocity: 98, bars: [3]}
+                - {drum: snare, beats: [3.6667], velocity: 108, bars: [3]}
+          - id: brush_hook_b
+            at: {bar: 13, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [0.0, 2.0], velocity: 56}
+                - {drum: snare, beats: [1.0, 3.0], velocity: 86}
+                - {drum: snare, beats: [1.6667, 3.6667], velocity: 60}
+          - id: brush_tail_b
+            at: {bar: 21, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72, bars: [0, 1]}
+                - {drum: snare, beats: [0.0, 1.0], velocity: 84, bars: [2]}
+                - {drum: snare, beats: [2.0], velocity: 60, bars: [3]}
+                - {drum: snare, beats: [2.3333], velocity: 70, bars: [3]}
+                - {drum: snare, beats: [2.6667], velocity: 80, bars: [3]}
+                - {drum: snare, beats: [3.0], velocity: 90, bars: [3]}
+                - {drum: snare, beats: [3.3333], velocity: 98, bars: [3]}
+                - {drum: snare, beats: [3.6667], velocity: 108, bars: [3]}
+          - id: brush_hook_c
+            at: {bar: 33, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [0.0, 2.0], velocity: 56}
+                - {drum: snare, beats: [1.0, 3.0], velocity: 86}
+                - {drum: snare, beats: [1.6667, 3.6667], velocity: 60}
+          - id: brush_tail_c
+            at: {bar: 41, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [0.0, 1.0, 2.0, 3.0], velocity: 72, bars: [0, 1]}
+                - {drum: snare, beats: [0.0, 1.0], velocity: 84, bars: [2]}
+          - id: brush_bridge
+            at: {bar: 25, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: snare, beats: [3.0], velocity: 84, bars: [0, 1, 2, 3, 4, 5, 6]}
+                - {drum: snare, beats: [1.0], velocity: 88, bars: [7]}
+                - {drum: snare, beats: [3.0], velocity: 76, bars: [7]}
+                - {drum: snare, beats: [3.3333], velocity: 90, bars: [7]}
+                - {drum: snare, beats: [3.6667], velocity: 104, bars: [7]}
+  - id: stir_part
+    instrument: stir
+    voices:
+      - id: stir_main
+        clips:
+          - id: stir_hook_a
+            at: {bar: 1, beat: 1}
+            use: stir_8
+          - id: stir_tail_a
+            at: {bar: 9, beat: 1}
+            use: stir_4
+          - id: stir_hook_b
+            at: {bar: 13, beat: 1}
+            use: stir_8
+          - id: stir_tail_b
+            at: {bar: 21, beat: 1}
+            use: stir_4
+          - id: stir_bridge
+            at: {bar: 25, beat: 1}
+            use: stir_8
+          - id: stir_hook_c
+            at: {bar: 33, beat: 1}
+            use: stir_8
+          - id: stir_tail_c
+            at: {bar: 41, beat: 1}
+            use: stir_4
+  - id: hat_part
+    instrument: hat
+    voices:
+      - id: hat_main
+        clips:
+          - id: hat_hook_a
+            at: {bar: 1, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 58}
+          - id: hat_tail_a
+            at: {bar: 9, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 62}
+          - id: hat_hook_b
+            at: {bar: 13, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 70}
+          - id: hat_tail_b
+            at: {bar: 21, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 64}
+          - id: hat_hook_c
+            at: {bar: 33, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 70}
+          - id: hat_tail_c
+            at: {bar: 41, beat: 1}
+            duration: {bars: 4}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 64}
+          - id: hat_bridge
+            at: {bar: 25, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: pedal_hat, beats: [1.0, 3.0], velocity: 74, bars: [0, 1, 2, 3, 4, 5, 6]}
+  - id: ride_part
+    instrument: ride
+    voices:
+      - id: ride_main
+        clips:
+          - id: ride_bridge
+            at: {bar: 25, beat: 1}
+            duration: {bars: 8}
+            generate:
+              kind: drums.pattern
+              humanize_ms: 5.0
+              humanize_velocity_pct: 8
+              events:
+                - {drum: ride, beats: [0.0, 2.0], velocity: 96, bars: [0, 1, 2, 3, 4, 5, 6]}
+                - {drum: ride, beats: [1.0, 3.0], velocity: 112, bars: [0, 1, 2, 3, 4, 5, 6]}
+                - {drum: ride, beats: [1.6667, 3.6667], velocity: 92, bars: [0, 1, 2, 3, 4, 5, 6]}
 processing:
   groups:
     bass:
@@ -733,11 +868,12 @@ processing:
       chain:
         - {processor: highpass, cutoff_hz: 140}
         - {processor: gain, gain_db: -2.0}
-    drums:
+    kick:
       chain:
         - {processor: highpass, cutoff_hz: 36}
-        - {processor: compressor, threshold_db: -16.0, ratio: 2.2, attack_ms: 14.0, release_ms: 90.0, makeup_db: 1.0}
-        - {processor: gain, gain_db: -5.0}
+    stir:
+      chain:
+        - {processor: highpass, cutoff_hz: 250}
   master:
     chain:
       - {processor: highpass, cutoff_hz: 30}
