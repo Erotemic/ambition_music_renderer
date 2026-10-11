@@ -7,9 +7,10 @@ description: >-
   ends in one hit and a bar and a half of nothing.
 notes:
   - 'Jon, 2026-10-11, on the first Embedded Theme (four drafts, then shipped): "it is just not doing it for me ... try something that is different ... forget all the feedback ... still a parody of Mario 1-2, and it still should be driven by the bass, but other than that just be musically inventive".'
-  - 'What it keeps from the model is the shape, not the notes: a short riff for the bass that jumps an octave and stops on a note that does not resolve; silence after it; the riff again a fourth higher; then one long run and a long silence.'
-  - 'The riff is in A, in sixteenth notes with a light swing, at 104 BPM. It stops on D, then on E flat. Three low notes go up to the root each time: E, G, G sharp. The run ends with the same climb, slow: E, F, F sharp, G, G sharp, A.'
-  - 'Embedded: a square wave (the chip) answers the bass in the silence. In the bridge they change places: the chip has the riff and the bass has a slow tune.'
+  - 'Jon on the first render of this candidate: "I like the groove of this when it gets moving around the minute mark ... we are going to go with this, but we have got to polish it". The call and response was "far too pronounced"; "lose a little sustain in the bass to evoke the original"; "move it a smidge towards the mario underground theme".'
+  - 'What it keeps from the model: a short riff for the bass in three pairs of a low note and its octave, short notes, the last pair on a note that does not resolve; silence after it; the riff again a fourth higher; then one long run and a long silence. The roots, the rhythm and the run are its own.'
+  - 'The riff is in A, in sixteenth notes with a light swing, at 104 BPM. The pairs are on A, C and D, then on A, C and D sharp. Three low notes go up to the root each time: E, G, G sharp. The run ends with the same climb, slow: E, F, F sharp, G, G sharp, A.'
+  - 'Embedded: a quiet square wave (the chip) has two notes in the silence, three times in the first cycle and after each run. In the bridge the chip has the riff and the bass has a slow tune.'
   - 'The bass is the Growlybass Jazz Bass. Its samples sound one octave below the key. Long notes use the sustained program and short notes the staccato program; a note with velocity 44 is a dead note.'
 seed: 20261012
 timebase: {ppq: 960}
@@ -18,14 +19,14 @@ tempo: 104
 key: A minor
 end: {bar: 57, beat: 1}
 form:
-  - {id: riff_1, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, energy: 1.0, density: 1.0, role: 'the bass alone has the riff; a hi-hat, a side stick; a chip answers in the silence'}
+  - {id: riff_1, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, energy: 1.0, density: 1.0, role: 'the bass alone has the riff; a hi-hat, a side stick; silence, and two times a quiet chip'}
   - {id: riff_1_d, from: {bar: 9, beat: 1}, to: {bar: 13, beat: 1}, energy: 1.0, density: 1.0, role: 'the riff a fourth higher; the full kit comes in'}
   - {id: run_1, from: {bar: 13, beat: 1}, to: {bar: 17, beat: 1}, energy: 1.0, density: 1.0, role: 'the run, one hit, silence'}
   - {id: riff_2, from: {bar: 17, beat: 1}, to: {bar: 25, beat: 1}, energy: 1.0, density: 1.0, role: 'the full band: clavinet, organ, and a tune above'}
   - {id: riff_2_d, from: {bar: 25, beat: 1}, to: {bar: 29, beat: 1}, energy: 1.0, density: 1.0, role: 'the riff and the tune in D'}
   - {id: run_2, from: {bar: 29, beat: 1}, to: {bar: 33, beat: 1}, energy: 1.0, density: 1.0, role: 'the run with the clavinet, one hit, silence'}
   - {id: bridge, from: {bar: 33, beat: 1}, to: {bar: 41, beat: 1}, energy: 1.0, density: 1.0, role: 'the chip has the riff; the bass has a slow tune, high on its neck'}
-  - {id: riff_3, from: {bar: 41, beat: 1}, to: {bar: 49, beat: 1}, energy: 1.0, density: 1.0, role: 'the full band, with the chip in the gaps'}
+  - {id: riff_3, from: {bar: 41, beat: 1}, to: {bar: 49, beat: 1}, energy: 1.0, density: 1.0, role: 'the full band'}
   - {id: riff_3_d, from: {bar: 49, beat: 1}, to: {bar: 53, beat: 1}, energy: 1.0, density: 1.0, role: 'the riff and the tune in D'}
   - {id: run_3, from: {bar: 53, beat: 1}, to: {bar: 57, beat: 1}, energy: 1.0, density: 1.0, role: 'all have the run; one hit, silence, and the three notes that go up to the start'}
 harmony:
@@ -68,93 +69,93 @@ instruments:
     expression: 116
     instrument_backend: {kind: sfz, library_ref: drums.naked, settings: {render_timeout_s: 900}}
 materials:
-  # The riff, in A: four bars. It stops on D, then on E flat, and silence follows. Three low notes go up to the root: E, G, G sharp.
+  # The riff, in A: four bars. Three octave pairs, on A, C and D, then on A, C and D sharp; the notes are short and silence follows. Three low notes go up to the root: E, G, G sharp.
   riff_a_long:
     kind: events
     events:
-      - [0, 9/80, A2, 116]
-      - [1733/3840, 17/160, A3, 108]
-      - [5/8, 19/160, C4, 106]
-      - [3173/3840, 17/80, D4, 112]
-      - [13/8, 17/160, E2, 96]
-      - [7/4, 17/160, G2, 100]
-      - [15/8, 19/160, G#2, 106]
-      - [2/1, 9/80, A2, 116]
-      - [9413/3840, 17/160, A3, 108]
-      - [21/8, 19/160, C4, 106]
-      - [10853/3840, 17/80, D#4, 112]
-      - [31/8, 19/160, G3, 102]
+      - [3173/3840, 1/8, D4, 112]
+      - [10853/3840, 1/8, D#4, 112]
   riff_a_short:
     kind: events
     events:
+      - [0, 11/160, A2, 116]
       - [1/8, 3/80, A2, 44]
       - [773/3840, 9/160, A3, 108]
-      - [3/8, 1/20, G3, 96]
+      - [3/8, 9/160, C3, 102]
+      - [1733/3840, 11/160, C4, 108]
       - [2213/3840, 3/80, A3, 44]
+      - [5/8, 9/160, D3, 106]
+      - [13/8, 11/160, E2, 96]
+      - [7/4, 11/160, G2, 100]
+      - [15/8, 3/40, G#2, 106]
+      - [2/1, 11/160, A2, 116]
       - [17/8, 3/80, A2, 44]
       - [8453/3840, 9/160, A3, 108]
-      - [19/8, 1/20, G3, 96]
+      - [19/8, 9/160, C3, 102]
+      - [9413/3840, 11/160, C4, 108]
       - [9893/3840, 3/80, A3, 44]
+      - [21/8, 9/160, D#3, 106]
       - [7/2, 9/160, D4, 100]
       - [29/8, 9/160, C4, 98]
       - [15/4, 9/160, A3, 98]
+      - [31/8, 3/40, G3, 102]
   riff_a_to_d_long:
     kind: events
     events:
-      - [0, 9/80, A2, 116]
-      - [1733/3840, 17/160, A3, 108]
-      - [5/8, 19/160, C4, 106]
-      - [3173/3840, 17/80, D4, 112]
-      - [13/8, 17/160, E2, 96]
-      - [7/4, 17/160, G2, 100]
-      - [15/8, 19/160, G#2, 106]
-      - [2/1, 9/80, A2, 116]
-      - [9413/3840, 17/160, A3, 108]
-      - [21/8, 19/160, C4, 106]
-      - [10853/3840, 17/80, D#4, 112]
-      - [29/8, 17/160, A2, 98]
-      - [15/4, 17/160, C3, 102]
-      - [31/8, 19/160, C#3, 108]
+      - [3173/3840, 1/8, D4, 112]
+      - [10853/3840, 1/8, D#4, 112]
   riff_a_to_d_short:
     kind: events
     events:
+      - [0, 11/160, A2, 116]
       - [1/8, 3/80, A2, 44]
       - [773/3840, 9/160, A3, 108]
-      - [3/8, 1/20, G3, 96]
+      - [3/8, 9/160, C3, 102]
+      - [1733/3840, 11/160, C4, 108]
       - [2213/3840, 3/80, A3, 44]
+      - [5/8, 9/160, D3, 106]
+      - [13/8, 11/160, E2, 96]
+      - [7/4, 11/160, G2, 100]
+      - [15/8, 3/40, G#2, 106]
+      - [2/1, 11/160, A2, 116]
       - [17/8, 3/80, A2, 44]
       - [8453/3840, 9/160, A3, 108]
-      - [19/8, 1/20, G3, 96]
+      - [19/8, 9/160, C3, 102]
+      - [9413/3840, 11/160, C4, 108]
       - [9893/3840, 3/80, A3, 44]
-  # The riff a fourth higher, in D, as the model moves its riff.
+      - [21/8, 9/160, D#3, 106]
+      - [29/8, 11/160, A2, 98]
+      - [15/4, 11/160, C3, 102]
+      - [31/8, 3/40, C#3, 108]
+  # The riff a fourth higher, in D, as the model moves its riff: pairs on D, F and G, then on D, F and E.
   riff_d_long:
     kind: events
     events:
-      - [0, 9/80, D3, 116]
-      - [1733/3840, 17/160, D4, 108]
-      - [5/8, 19/160, F4, 106]
-      - [3173/3840, 17/80, G4, 112]
-      - [13/8, 17/160, A2, 96]
-      - [7/4, 17/160, C3, 100]
-      - [15/8, 19/160, C#3, 106]
-      - [2/1, 9/80, D3, 116]
-      - [9413/3840, 17/160, D4, 108]
-      - [21/8, 19/160, F4, 106]
-      - [10853/3840, 17/80, F4, 112]
-      - [7/2, 1/10, D4, 102]
-      - [29/8, 1/10, C4, 98]
-      - [15/4, 9/40, A3, 104]
+      - [3173/3840, 1/8, G4, 112]
+      - [10853/3840, 1/8, E4, 112]
+      - [15/4, 1/8, A3, 104]
   riff_d_short:
     kind: events
     events:
+      - [0, 11/160, D3, 116]
       - [1/8, 3/80, D3, 44]
       - [773/3840, 9/160, D4, 108]
-      - [3/8, 1/20, C4, 96]
+      - [3/8, 9/160, F3, 102]
+      - [1733/3840, 11/160, F4, 108]
       - [2213/3840, 3/80, D4, 44]
+      - [5/8, 9/160, G3, 106]
+      - [13/8, 11/160, A2, 96]
+      - [7/4, 11/160, C3, 100]
+      - [15/8, 3/40, C#3, 106]
+      - [2/1, 11/160, D3, 116]
       - [17/8, 3/80, D3, 44]
       - [8453/3840, 9/160, D4, 108]
-      - [19/8, 1/20, C4, 96]
+      - [19/8, 9/160, F3, 102]
+      - [9413/3840, 11/160, F4, 108]
       - [9893/3840, 3/80, D4, 44]
+      - [21/8, 9/160, E3, 106]
+      - [7/2, 1/16, D4, 102]
+      - [29/8, 1/16, C4, 98]
   # The run: down two octaves in a pattern of four notes, a slow chromatic climb from E to G sharp, one hit on A, then a bar and a half of silence.
   run_long:
     kind: events
@@ -165,9 +166,6 @@ materials:
       - [6053/3840, 7/40, G2, 112]
       - [7/4, 19/80, G#2, 116]
       - [2/1, 9/80, A2, 122]
-      - [29/8, 17/160, E2, 96]
-      - [15/4, 17/160, G2, 100]
-      - [31/8, 19/160, G#2, 106]
   run_short:
     kind: events
     events:
@@ -187,39 +185,26 @@ materials:
       - [3173/3840, 1/16, C3, 100]
       - [7/8, 1/16, A2, 104]
       - [3653/3840, 1/16, C3, 100]
-  # The chip: a square wave copies the end of the riff, two octaves higher, in the silence.
+      - [29/8, 11/160, E2, 96]
+      - [15/4, 11/160, G2, 100]
+      - [31/8, 3/40, G#2, 106]
+  # The chip: a quiet square wave, two notes in the silence. The bass stops on D sharp; the chip brings it down to D.
+  chip_a:
+    kind: events
+    events:
+      - [4613/3840, 1/16, D#5, 70]
+      - [11/8, 7/80, D5, 60]
   chip_d:
     kind: events
     events:
-      - [4133/3840, 7/160, A5, 84]
-      - [5/4, 7/160, C6, 88]
-      - [11/8, 7/160, D6, 92]
-  chip_eb:
-    kind: events
-    events:
-      - [4133/3840, 7/160, A5, 84]
-      - [5/4, 7/160, C6, 88]
-      - [11/8, 7/160, D#6, 92]
-  chip_g:
-    kind: events
-    events:
-      - [4133/3840, 7/160, D6, 84]
-      - [5/4, 7/160, F6, 88]
-      - [11/8, 7/160, G6, 92]
-  chip_f:
-    kind: events
-    events:
-      - [4133/3840, 7/160, D6, 84]
-      - [5/4, 7/160, G6, 88]
-      - [11/8, 7/160, F6, 92]
-  # In the silence after the run the chip counts alone.
+      - [4613/3840, 1/16, G5, 70]
+      - [11/8, 7/80, D5, 60]
+  # In the silence after the run: two notes.
   chip_break:
     kind: events
     events:
-      - [1/4, 7/160, A5, 80]
-      - [1/2, 7/160, E6, 84]
-      - [2693/3840, 7/160, A6, 76]
-      - [5/4, 7/160, E6, 72]
+      - [3/8, 1/16, E5, 66]
+      - [3/4, 7/80, A4, 58]
   # The tune above the riff: it starts after the bass in each bar, and holds a long note where the bass is silent.
   tune_a:
     kind: events
@@ -604,53 +589,14 @@ parts:
       - id: chip_main
         clips:
           - id: chip_c1_1
-            at: {bar: 1, beat: 1}
-            use: chip_d
-            velocity_scale: 1.0
-          - id: chip_c1_2
             at: {bar: 3, beat: 1}
-            use: chip_eb
-            velocity_scale: 1.0
-          - id: chip_c1_3
-            at: {bar: 5, beat: 1}
-            use: chip_d
-            velocity_scale: 1.0
-          - id: chip_c1_4
+            use: chip_a
+          - id: chip_c1_2
             at: {bar: 7, beat: 1}
-            use: chip_eb
-            velocity_scale: 1.0
-          - id: chip_c1_5
+            use: chip_a
+          - id: chip_c1_3
             at: {bar: 9, beat: 1}
-            use: chip_g
-            velocity_scale: 1.0
-          - id: chip_c1_6
-            at: {bar: 11, beat: 1}
-            use: chip_f
-            velocity_scale: 1.0
-          - id: chip_c3_1
-            at: {bar: 41, beat: 1}
             use: chip_d
-            velocity_scale: 0.8
-          - id: chip_c3_2
-            at: {bar: 43, beat: 1}
-            use: chip_eb
-            velocity_scale: 0.8
-          - id: chip_c3_3
-            at: {bar: 45, beat: 1}
-            use: chip_d
-            velocity_scale: 0.8
-          - id: chip_c3_4
-            at: {bar: 47, beat: 1}
-            use: chip_eb
-            velocity_scale: 0.8
-          - id: chip_c3_5
-            at: {bar: 49, beat: 1}
-            use: chip_g
-            velocity_scale: 0.8
-          - id: chip_c3_6
-            at: {bar: 51, beat: 1}
-            use: chip_f
-            velocity_scale: 0.8
           - id: chip_c1_break
             at: {bar: 15, beat: 1}
             use: chip_break
@@ -1075,12 +1021,12 @@ processing:
         - {processor: gain, gain_db: 0.0}
     chip:
       chain:
-        - {processor: highpass, cutoff_hz: 500}
-        - {processor: lowpass, cutoff_hz: 6000}
+        - {processor: highpass, cutoff_hz: 300}
+        - {processor: lowpass, cutoff_hz: 2800}
         - processor: pedalboard
           effects:
             - {effect: delay, delay_ms: 216, feedback: 0.32, mix: 0.35}
-        - {processor: gain, gain_db: -6.0}
+        - {processor: gain, gain_db: -13.0}
     chipbass:
       chain:
         - {processor: highpass, cutoff_hz: 60}
