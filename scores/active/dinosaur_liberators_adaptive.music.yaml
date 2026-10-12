@@ -3,12 +3,14 @@ id: dinosaur_liberators_adaptive
 title: Dinosaur Liberators - the primeval trail (adaptive)
 description: >-
   The adaptive arrangement of dinosaur_liberators for the primeval trail. The game plays
-  it as layers: the rooms of the level add layers as they get harder, and the T-rex fight
-  plays the solo sections.
+  it as layers of ONE loop, the whole song: each room of the level adds a layer, and the
+  T-rex fight is all of them.
 notes:
   - 'The song is scores/active/dinosaur_liberators.music.yaml. Read that file for the history of the arrangement. This score has the same form, chords, melodies, instruments and processing.'
-  - 'The game plays the playback sections, not the mastered mix: intro (one time), trail (the verse and the chorus, a loop of 32 bars) and fight (the two solo sections, a loop of 32 bars).'
-  - 'Different from the song, in the trail loop only: each layer must be complete in each state. The bed layer has no drums in the soft state, so the bass keeps its walk and the piano keeps its long chords in the chorus, and the organ does not stab. The heavy rhythm guitar and the horns also play in the verse; they are silent there below the driving state.'
+  - 'The game plays the playback sections, not the mastered mix: intro (one time) and song (the verse, the chorus and the two solo sections: a loop of 64 bars). The song with its intro, its outro and a master chain is dinosaur_liberators: that is the soundtrack version.'
+  - 'Jon, 2026-10-12: the player never hears a discontinuity. New instruments layer onto the loop, so each room rocks harder than the one before; each level of intensity is the whole song. Until that day the loop was two (the verse and chorus for the rooms, the solo sections for the fight), and a change of loop is a cut.'
+  - 'The tune layer is the melody of each part of the song: the lead and the slide in the verse and the chorus, the first solo guitar in the solo sections. So the song has its tune at each level.'
+  - 'Different from the song, in the verse and the chorus only: each layer must be complete in each state. The bed layer has no drums in the soft state, so the bass keeps its walk and the piano keeps its long chords in the chorus, and the organ does not stab. The heavy rhythm guitar and the horns also play in the verse; they are silent there below the driving state.'
 seed: 19770804
 timebase: {ppq: 960}
 meter: 4/4
@@ -1551,14 +1553,15 @@ processing:
 playback:
   # The game plays these files: one for each layer of each section. A layer is the
   # sum of its groups before the master chain. A section is a span of the form.
+  # In the order a level adds them. A game mixes at most six.
   layers:
     bed: [arpeggio, bass, organ, piano]
+    tune: [lead, slide, solo]
     drums: [drums]
-    tune: [lead, slide]
-    grit: [crunch, horn]
-    solo: [solo, solo_2]
+    crunch: [crunch]
+    horn: [horn]
+    second: [solo_2]
   sections:
     - {id: intro, form: [intro]}
-    - {id: trail, form: [main_a, main_b], loop: true}
-    - {id: fight, form: [main_c, main_d], loop: true}
+    - {id: song, form: [main_a, main_b, main_c, main_d], loop: true}
     - {id: outro, form: [outro]}
