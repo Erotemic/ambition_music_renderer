@@ -1,0 +1,4624 @@
+# v7: 8-bar render-only preroll and 48-bar castle-rock loop.
+# Export adaptive/castle_loop/*.full.ogg; the 56-bar preview is not a loop asset.
+schema: ambition.musicir.v3
+id: castle_crash_override
+title: Castle Crash Override
+seed: 2026101117
+description: Original 48-bar castle-rock piece with Salamander piano hook, twin guitar solos, and an A-to-D-minor
+  loop cadence. Eight-bar render-only threshold primes sample, amp, and reverb state for the exported 48-bar loop;
+  the first heard bar of the loop is the original piano entrance.
+timebase:
+  ppq: 960
+meter: 4/4
+tempo: 168
+key: D minor
+end:
+  bar: 57
+  beat: 1
+form:
+- id: threshold
+  label: Render-only pre-roll matching final eight loop bars
+  role: intro
+  from:
+    bar: 1
+    beat: 1
+  to:
+    bar: 9
+    beat: 1
+- id: castle_loop
+  label: Castle Crash Override - seamless game loop
+  role: loop_component
+  from:
+    bar: 9
+    beat: 1
+  to:
+    bar: 57
+    beat: 1
+  loopable: true
+harmony:
+  every_bars: 1
+  cycle: false
+  progression:
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+  - Dm
+  - Eb
+  - Dm
+  - A
+  - Bb
+  - Gm
+  - Eb
+  - A
+render:
+  backend: pretty-midi
+  sample_rate: 48000
+  ogg_quality: 7
+  strict_backends: true
+  metadata_markers:
+  - bar: 1
+    id: preroll
+    label: Render-only threshold
+  - bar: 9
+    id: piano_gate
+    label: Piano Gate
+  - bar: 17
+    id: iron_advance
+    label: Iron Advance
+  - bar: 25
+    id: guitar_bends
+    label: Guitar Bends
+  - bar: 33
+    id: guitar_shred
+    label: Guitar Shred
+  - bar: 41
+    id: piano_return
+    label: Piano Return
+  - bar: 49
+    id: castle_turn
+    label: Castle Turn
+instruments:
+- name: rhy_l
+  group: rhythm_l
+  program: clean_guitar
+  volume: 110
+  pan: 64
+  expression: 110
+  mix_gain_db: 5.5
+  controls:
+    27: 31
+    101: 127
+    114: 40
+  instrument_backend:
+    kind: sfz
+    library_ref: guitar.hollowbody
+    settings:
+      fold_to_range: false
+- name: rhy_r
+  group: rhythm_r
+  program: clean_guitar
+  volume: 108
+  pan: 64
+  expression: 110
+  mix_gain_db: 5.5
+  controls:
+    27: 31
+    101: 127
+    114: 40
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
+    settings:
+      fold_to_range: false
+- name: lead_main
+  group: lead_guitar
+  program: clean_guitar
+  volume: 106
+  pan: 64
+  expression: 112
+  mix_gain_db: 4.0
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
+    settings:
+      fold_to_range: false
+- name: piano_theme
+  group: piano_lead
+  program: acoustic_grand_piano
+  volume: 112
+  pan: 64
+  expression: 116
+  mix_gain_db: 6.0
+  instrument_backend:
+    kind: sfz
+    library_ref: freepats.salamander_grand
+    settings:
+      fold_to_range: false
+- name: bass
+  group: bass
+  program: fingered_bass
+  volume: 102
+  pan: 64
+  expression: 104
+  mix_gain_db: 1.0
+  instrument_backend:
+    kind: sfz
+    library_ref: bass.growly
+    settings:
+      fold_to_range: false
+- name: organ
+  group: organ
+  program: drawbar_organ
+  volume: 88
+  pan: 85
+  expression: 92
+  mix_gain_db: -3.0
+- name: kit
+  group: drums
+  is_drum: true
+  volume: 121
+  pan: 64
+  expression: 118
+  mix_gain_db: 1.5
+  instrument_backend:
+    kind: sfz
+    library_ref: drums.big_rusty
+    settings:
+      fold_to_range: false
+processing:
+  groups:
+    rhythm_l:
+      chain:
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 7.5
+        - effect: compressor
+          threshold_db: -23
+          ratio: 2.1
+          attack_ms: 9
+          release_ms: 100
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+        binary: lv2apply
+        channel_mode: dual_mono
+        wet_mix: 0.46
+        params:
+          fslider0_: -4.5
+          fslider1_: 650
+          fslider2_: 0.66
+          BYPASS: 1.0
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+        binary: lv2apply
+        wet_mix: 0.48
+        params:
+          P6v: 0.7
+          Middle: 0.67
+          Bass: 0.48
+          Treble: 0.56
+          WET_DRY: 58.0
+          GAIN: -2.8
+      - processor: highpass
+        cutoff_hz: 82
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 280
+          q: 0.9
+          db: -1.2
+        - type: peak
+          hz: 4200
+          q: 2.5
+          db: -1.0
+      - processor: lowpass
+        cutoff_hz: 9600
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.8
+        attack_ms: 10
+        release_ms: 96
+      - processor: balance
+        position: -0.79
+    rhythm_r:
+      chain:
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 7.5
+        - effect: compressor
+          threshold_db: -23
+          ratio: 2.1
+          attack_ms: 9
+          release_ms: 100
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+        binary: lv2apply
+        channel_mode: dual_mono
+        wet_mix: 0.46
+        params:
+          fslider0_: -4.5
+          fslider1_: 650
+          fslider2_: 0.66
+          BYPASS: 1.0
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+        binary: lv2apply
+        wet_mix: 0.48
+        params:
+          P6v: 0.7
+          Middle: 0.67
+          Bass: 0.48
+          Treble: 0.56
+          WET_DRY: 58.0
+          GAIN: -2.8
+      - processor: highpass
+        cutoff_hz: 82
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 280
+          q: 0.9
+          db: -1.2
+        - type: peak
+          hz: 4200
+          q: 2.5
+          db: -1.0
+      - processor: lowpass
+        cutoff_hz: 9600
+      - processor: compressor
+        threshold_db: -22
+        ratio: 1.8
+        attack_ms: 10
+        release_ms: 96
+      - processor: balance
+        position: 0.79
+    lead_guitar:
+      chain:
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 8.5
+        - effect: compressor
+          threshold_db: -24
+          ratio: 2.1
+          attack_ms: 9
+          release_ms: 100
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+        binary: lv2apply
+        channel_mode: dual_mono
+        wet_mix: 0.49
+        params:
+          fslider0_: -4.5
+          fslider1_: 650
+          fslider2_: 0.66
+          BYPASS: 1.0
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+        binary: lv2apply
+        wet_mix: 0.55
+        params:
+          P6v: 0.7
+          Middle: 0.67
+          Bass: 0.48
+          Treble: 0.56
+          WET_DRY: 58.0
+          GAIN: -2.8
+      - processor: highpass
+        cutoff_hz: 108
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 280
+          q: 0.9
+          db: -1.2
+        - type: peak
+          hz: 4200
+          q: 2.5
+          db: -2.2
+      - processor: lowpass
+        cutoff_hz: 8500
+      - processor: compressor
+        threshold_db: -23
+        ratio: 1.8
+        attack_ms: 10
+        release_ms: 96
+      - processor: pedalboard
+        effects:
+        - effect: delay
+          delay_ms: 216
+          feedback: 0.16
+          mix: 0.09
+      - processor: balance
+        position: -0.16
+      - processor: gain
+        gain_db: 1.4
+    bass:
+      chain:
+      - processor: highpass
+        cutoff_hz: 40
+      - processor: lowpass
+        cutoff_hz: 1800
+      - processor: compressor
+        threshold_db: -21
+        ratio: 2.0
+        attack_ms: 25
+        release_ms: 120
+    organ:
+      chain:
+      - processor: highpass
+        cutoff_hz: 130
+      - processor: pedalboard
+        effects:
+        - effect: distortion
+          drive_db: 4.0
+        - effect: chorus
+          rate_hz: 5
+          depth: 0.16
+          mix: 0.2
+      - processor: lowpass
+        cutoff_hz: 7300
+      - processor: gain
+        gain_db: -2.5
+    drums:
+      chain:
+      - processor: highpass
+        cutoff_hz: 33
+      - processor: high_shelf
+        hz: 6400
+        gain_db: 1.1
+      - processor: lowpass
+        cutoff_hz: 13000
+      - processor: compressor
+        threshold_db: -18
+        ratio: 2.0
+        attack_ms: 14
+        release_ms: 94
+        makeup_db: 1.8
+      - processor: gain
+        gain_db: -2.4
+    piano_lead:
+      chain:
+      - processor: highpass
+        cutoff_hz: 75
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 340
+          q: 1.2
+          db: -1.5
+      - processor: compressor
+        threshold_db: -24
+        ratio: 1.45
+        attack_ms: 19
+        release_ms: 150
+        makeup_db: 1.0
+      - processor: reverb
+        wet: 0.09
+        decay_seconds: 0.8
+      - processor: gain
+        gain_db: 0.7
+  master:
+    chain:
+    - processor: highpass
+      cutoff_hz: 32
+    - processor: parametric_eq
+      bands:
+      - type: peak
+        hz: 310
+        q: 0.85
+        db: -1.2
+      - type: peak
+        hz: 3000
+        q: 0.9
+        db: 0.4
+    - processor: compressor
+      threshold_db: -18
+      ratio: 2.1
+      attack_ms: 14
+      release_ms: 110
+      makeup_db: 1.0
+      knee_db: 5.0
+    - processor: limiter
+      target_peak_db: -1.8
+      drive: 0.95
+      normalize: true
+  adaptive_sections:
+    mode: composition_master
+parts:
+- id: piano_theme_part
+  instrument: piano_theme
+  voices:
+  - id: piano_theme_part_voice
+    clips:
+    - id: threshold_turnaround_call
+      at:
+        bar: 1
+        beat: 1
+      use: castle_call
+    - id: threshold_turnaround_answer
+      at:
+        bar: 5
+        beat: 1
+      use: castle_answer
+    - id: opening_call
+      at:
+        bar: 9
+        beat: 1
+      use: castle_call_soft
+    - id: opening_answer
+      at:
+        bar: 13
+        beat: 1
+      use: castle_answer_soft
+    - id: main_call
+      at:
+        bar: 17
+        beat: 1
+      use: castle_call
+    - id: main_answer
+      at:
+        bar: 21
+        beat: 1
+      use: castle_answer
+    - id: return_call
+      at:
+        bar: 41
+        beat: 1
+      use: castle_call
+    - id: return_answer
+      at:
+        bar: 45
+        beat: 1
+      use: castle_answer
+    - id: turnaround_call
+      at:
+        bar: 49
+        beat: 1
+      use: castle_call
+    - id: turnaround_answer
+      at:
+        bar: 53
+        beat: 1
+      use: castle_answer
+    - id: piano_solo_anchor_1
+      at:
+        bar: 25
+        beat: 1
+      use: piano_anchor
+    - id: piano_solo_anchor_2
+      at:
+        bar: 33
+        beat: 1
+      use: piano_anchor
+- id: rhythm_left_part
+  instrument: rhy_l
+  voices:
+  - id: rhythm_left_part_voice
+    clips:
+    - id: threshold_rhy_l_midi_exact
+      at:
+        bar: 1
+        beat: 1
+      events:
+      - - ticks: 0
+        - ticks: 302
+        - 50
+        - 102
+      - - ticks: 7
+        - ticks: 303
+        - 57
+        - 97
+      - - ticks: 32
+        - ticks: 302
+        - 62
+        - 87
+      - - ticks: 478
+        - ticks: 152
+        - 50
+        - 102
+      - - ticks: 493
+        - ticks: 151
+        - 57
+        - 105
+      - - ticks: 505
+        - ticks: 152
+        - 62
+        - 95
+      - - ticks: 1435
+        - ticks: 272
+        - 50
+        - 105
+      - - ticks: 1445
+        - ticks: 272
+        - 57
+        - 95
+      - - ticks: 1469
+        - ticks: 272
+        - 62
+        - 91
+      - - ticks: 1913
+        - ticks: 302
+        - 50
+        - 100
+      - - ticks: 1942
+        - ticks: 302
+        - 62
+        - 91
+      - - ticks: 1952
+        - ticks: 302
+        - 57
+        - 98
+      - - ticks: 2390
+        - ticks: 212
+        - 50
+        - 107
+      - - ticks: 2413
+        - ticks: 211
+        - 57
+        - 102
+      - - ticks: 2427
+        - ticks: 211
+        - 62
+        - 99
+      - - ticks: 3348
+        - ticks: 212
+        - 57
+        - 101
+      - - ticks: 3370
+        - ticks: 212
+        - 64
+        - 90
+      - - ticks: 3379
+        - ticks: 212
+        - 69
+        - 91
+      - - ticks: 3849
+        - ticks: 302
+        - 51
+        - 95
+      - - ticks: 3854
+        - ticks: 303
+        - 58
+        - 104
+      - - ticks: 3855
+        - ticks: 303
+        - 63
+        - 90
+      - - ticks: 4320
+        - ticks: 152
+        - 58
+        - 93
+      - - ticks: 4323
+        - ticks: 151
+        - 51
+        - 106
+      - - ticks: 4337
+        - ticks: 151
+        - 63
+        - 96
+      - - ticks: 5278
+        - ticks: 272
+        - 51
+        - 97
+      - - ticks: 5294
+        - ticks: 272
+        - 58
+        - 99
+      - - ticks: 5295
+        - ticks: 272
+        - 63
+        - 96
+      - - ticks: 5762
+        - ticks: 302
+        - 51
+        - 100
+      - - ticks: 5774
+        - ticks: 302
+        - 63
+        - 95
+      - - ticks: 5785
+        - ticks: 302
+        - 58
+        - 99
+      - - ticks: 6236
+        - ticks: 212
+        - 58
+        - 91
+      - - ticks: 6246
+        - ticks: 212
+        - 51
+        - 100
+      - - ticks: 6263
+        - ticks: 212
+        - 63
+        - 90
+      - - ticks: 7204
+        - ticks: 211
+        - 65
+        - 97
+      - - ticks: 7216
+        - ticks: 212
+        - 58
+        - 100
+      - - ticks: 7219
+        - ticks: 212
+        - 70
+        - 91
+      - - ticks: 7682
+        - ticks: 303
+        - 57
+        - 97
+      - - ticks: 7692
+        - ticks: 303
+        - 50
+        - 94
+      - - ticks: 7701
+        - ticks: 303
+        - 62
+        - 93
+      - - ticks: 8164
+        - ticks: 151
+        - 50
+        - 101
+      - - ticks: 8170
+        - ticks: 151
+        - 57
+        - 92
+      - - ticks: 8186
+        - ticks: 152
+        - 62
+        - 105
+      - - ticks: 9122
+        - ticks: 272
+        - 57
+        - 94
+      - - ticks: 9126
+        - ticks: 272
+        - 50
+        - 98
+      - - ticks: 9151
+        - ticks: 272
+        - 62
+        - 104
+      - - ticks: 9602
+        - ticks: 303
+        - 50
+        - 100
+      - - ticks: 9618
+        - ticks: 302
+        - 57
+        - 94
+      - - ticks: 9624
+        - ticks: 302
+        - 62
+        - 93
+      - - ticks: 10069
+        - ticks: 212
+        - 50
+        - 102
+      - - ticks: 10093
+        - ticks: 212
+        - 57
+        - 99
+      - - ticks: 10107
+        - ticks: 211
+        - 62
+        - 92
+      - - ticks: 11039
+        - ticks: 211
+        - 57
+        - 101
+      - - ticks: 11048
+        - ticks: 212
+        - 69
+        - 92
+      - - ticks: 11059
+        - ticks: 211
+        - 64
+        - 96
+      - - ticks: 11515
+        - ticks: 303
+        - 57
+        - 102
+      - - ticks: 11525
+        - ticks: 302
+        - 64
+        - 96
+      - - ticks: 11527
+        - ticks: 303
+        - 69
+        - 92
+      - - ticks: 12005
+        - ticks: 151
+        - 57
+        - 97
+      - - ticks: 12014
+        - ticks: 151
+        - 64
+        - 102
+      - - ticks: 12027
+        - ticks: 151
+        - 69
+        - 97
+      - - ticks: 12952
+        - ticks: 272
+        - 57
+        - 98
+      - - ticks: 12967
+        - ticks: 272
+        - 64
+        - 95
+      - - ticks: 12990
+        - ticks: 272
+        - 69
+        - 93
+      - - ticks: 13441
+        - ticks: 302
+        - 57
+        - 98
+      - - ticks: 13448
+        - ticks: 302
+        - 64
+        - 97
+      - - ticks: 13471
+        - ticks: 302
+        - 69
+        - 102
+      - - ticks: 13911
+        - ticks: 212
+        - 57
+        - 104
+      - - ticks: 13942
+        - ticks: 212
+        - 64
+        - 108
+      - - ticks: 13945
+        - ticks: 212
+        - 69
+        - 98
+      - - ticks: 14878
+        - ticks: 212
+        - 71
+        - 100
+      - - ticks: 14895
+        - ticks: 212
+        - 64
+        - 96
+      - - ticks: 14911
+        - ticks: 212
+        - 76
+        - 98
+      - - ticks: 15362
+        - ticks: 303
+        - 58
+        - 97
+      - - ticks: 15364
+        - ticks: 302
+        - 65
+        - 97
+      - - ticks: 15378
+        - ticks: 302
+        - 70
+        - 96
+      - - ticks: 15839
+        - ticks: 151
+        - 58
+        - 103
+      - - ticks: 15858
+        - ticks: 151
+        - 65
+        - 96
+      - - ticks: 15859
+        - ticks: 151
+        - 70
+        - 102
+      - - ticks: 16800
+        - ticks: 272
+        - 58
+        - 96
+      - - ticks: 16809
+        - ticks: 272
+        - 65
+        - 97
+      - - ticks: 16814
+        - ticks: 272
+        - 70
+        - 100
+      - - ticks: 17276
+        - ticks: 302
+        - 58
+        - 104
+      - - ticks: 17295
+        - ticks: 303
+        - 65
+        - 92
+      - - ticks: 17302
+        - ticks: 302
+        - 70
+        - 94
+      - - ticks: 17757
+        - ticks: 212
+        - 58
+        - 99
+      - - ticks: 17771
+        - ticks: 212
+        - 65
+        - 100
+      - - ticks: 17780
+        - ticks: 212
+        - 70
+        - 93
+      - - ticks: 18713
+        - ticks: 212
+        - 65
+        - 95
+      - - ticks: 18727
+        - ticks: 212
+        - 72
+        - 94
+      - - ticks: 18740
+        - ticks: 212
+        - 77
+        - 96
+      - - ticks: 19186
+        - ticks: 302
+        - 55
+        - 108
+      - - ticks: 19208
+        - ticks: 302
+        - 62
+        - 97
+      - - ticks: 19223
+        - ticks: 302
+        - 67
+        - 91
+      - - ticks: 19673
+        - ticks: 152
+        - 55
+        - 104
+      - - ticks: 19685
+        - ticks: 151
+        - 62
+        - 94
+      - - ticks: 19696
+        - ticks: 151
+        - 67
+        - 95
+      - - ticks: 20650
+        - ticks: 272
+        - 62
+        - 93
+      - - ticks: 20655
+        - ticks: 272
+        - 55
+        - 107
+      - - ticks: 20661
+        - ticks: 272
+        - 67
+        - 97
+      - - ticks: 21117
+        - ticks: 302
+        - 55
+        - 96
+      - - ticks: 21121
+        - ticks: 302
+        - 62
+        - 95
+      - - ticks: 21156
+        - ticks: 302
+        - 67
+        - 96
+      - - ticks: 21588
+        - ticks: 211
+        - 55
+        - 101
+      - - ticks: 21601
+        - ticks: 212
+        - 62
+        - 100
+      - - ticks: 21617
+        - ticks: 211
+        - 67
+        - 94
+      - - ticks: 22550
+        - ticks: 212
+        - 62
+        - 96
+      - - ticks: 22576
+        - ticks: 212
+        - 69
+        - 95
+      - - ticks: 22579
+        - ticks: 212
+        - 74
+        - 93
+      - - ticks: 23046
+        - ticks: 302
+        - 51
+        - 94
+      - - ticks: 23054
+        - ticks: 303
+        - 63
+        - 91
+      - - ticks: 23065
+        - ticks: 302
+        - 58
+        - 99
+      - - ticks: 23511
+        - ticks: 152
+        - 51
+        - 93
+      - - ticks: 23527
+        - ticks: 152
+        - 63
+        - 97
+      - - ticks: 23532
+        - ticks: 151
+        - 58
+        - 98
+      - - ticks: 24479
+        - ticks: 273
+        - 51
+        - 101
+      - - ticks: 24497
+        - ticks: 273
+        - 58
+        - 104
+      - - ticks: 24509
+        - ticks: 272
+        - 63
+        - 93
+      - - ticks: 24960
+        - ticks: 302
+        - 51
+        - 98
+      - - ticks: 24976
+        - ticks: 302
+        - 58
+        - 104
+      - - ticks: 24992
+        - ticks: 303
+        - 63
+        - 92
+      - - ticks: 25440
+        - ticks: 212
+        - 58
+        - 96
+      - - ticks: 25448
+        - ticks: 212
+        - 51
+        - 93
+      - - ticks: 25459
+        - ticks: 211
+        - 63
+        - 102
+      - - ticks: 26396
+        - ticks: 212
+        - 58
+        - 110
+      - - ticks: 26412
+        - ticks: 211
+        - 70
+        - 99
+      - - ticks: 26413
+        - ticks: 211
+        - 65
+        - 106
+      - - ticks: 26882
+        - ticks: 302
+        - 57
+        - 98
+      - - ticks: 26885
+        - ticks: 303
+        - 64
+        - 97
+      - - ticks: 26892
+        - ticks: 302
+        - 69
+        - 100
+      - - ticks: 27346
+        - ticks: 151
+        - 64
+        - 97
+      - - ticks: 27359
+        - ticks: 152
+        - 57
+        - 104
+      - - ticks: 27382
+        - ticks: 151
+        - 69
+        - 94
+      - - ticks: 28326
+        - ticks: 272
+        - 64
+        - 96
+      - - ticks: 28327
+        - ticks: 273
+        - 57
+        - 93
+      - - ticks: 28343
+        - ticks: 272
+        - 69
+        - 92
+      - - ticks: 28795
+        - ticks: 302
+        - 57
+        - 94
+      - - ticks: 28810
+        - ticks: 303
+        - 69
+        - 91
+      - - ticks: 28814
+        - ticks: 303
+        - 64
+        - 100
+      - - ticks: 29277
+        - ticks: 212
+        - 57
+        - 97
+      - - ticks: 29294
+        - ticks: 212
+        - 64
+        - 103
+      - - ticks: 29302
+        - ticks: 212
+        - 69
+        - 97
+      - - ticks: 30243
+        - ticks: 212
+        - 76
+        - 90
+      - - ticks: 30244
+        - ticks: 212
+        - 64
+        - 97
+      - - ticks: 30259
+        - ticks: 212
+        - 71
+        - 100
+    - id: rhythm_L_1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 75
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.65
+        - - 0
+          - 2
+          - 0.55
+        - - 7
+          - 3.5
+          - 0.4
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_L_9
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 100
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.5
+        - - 0
+          - 0.5
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.45
+        - - 0
+          - 2
+          - 0.5
+        - - 0
+          - 2.5
+          - 0.35
+        - - 7
+          - 3.5
+          - 0.35
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_L_17
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 100
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.5
+        - - 0
+          - 0.5
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.45
+        - - 0
+          - 2
+          - 0.5
+        - - 0
+          - 2.5
+          - 0.35
+        - - 7
+          - 3.5
+          - 0.35
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_L_25
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 100
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.24
+        - - 0
+          - 0.5
+          - 0.25
+        - - 0
+          - 1
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.25
+        - - 0
+          - 2
+          - 0.25
+        - - 0
+          - 2.5
+          - 0.25
+        - - 0
+          - 3
+          - 0.25
+        - - 7
+          - 3.5
+          - 0.25
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_L_33
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 100
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.5
+        - - 0
+          - 0.5
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.45
+        - - 0
+          - 2
+          - 0.5
+        - - 0
+          - 2.5
+          - 0.35
+        - - 7
+          - 3.5
+          - 0.35
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_L_41
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 100
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.5
+        - - 0
+          - 0.5
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.45
+        - - 0
+          - 2
+          - 0.5
+        - - 0
+          - 2.5
+          - 0.35
+        - - 7
+          - 3.5
+          - 0.35
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+- id: rhythm_right_part
+  instrument: rhy_r
+  voices:
+  - id: rhythm_right_part_voice
+    clips:
+    - id: threshold_rhy_r_midi_exact
+      at:
+        bar: 1
+        beat: 1
+      events:
+      - - ticks: 0
+        - ticks: 272
+        - 50
+        - 92
+      - - ticks: 5
+        - ticks: 272
+        - 57
+        - 90
+      - - ticks: 30
+        - ticks: 272
+        - 62
+        - 90
+      - - ticks: 719
+        - ticks: 151
+        - 57
+        - 89
+      - - ticks: 728
+        - ticks: 151
+        - 64
+        - 94
+      - - ticks: 757
+        - ticks: 152
+        - 69
+        - 95
+      - - ticks: 1201
+        - ticks: 242
+        - 50
+        - 96
+      - - ticks: 1215
+        - ticks: 242
+        - 57
+        - 97
+      - - ticks: 1223
+        - ticks: 242
+        - 62
+        - 92
+      - - ticks: 1911
+        - ticks: 273
+        - 50
+        - 90
+      - - ticks: 1935
+        - ticks: 272
+        - 57
+        - 96
+      - - ticks: 1947
+        - ticks: 273
+        - 62
+        - 85
+      - - ticks: 2633
+        - ticks: 181
+        - 57
+        - 99
+      - - ticks: 2646
+        - ticks: 182
+        - 64
+        - 91
+      - - ticks: 2665
+        - ticks: 181
+        - 69
+        - 90
+      - - ticks: 3116
+        - ticks: 182
+        - 57
+        - 93
+      - - ticks: 3117
+        - ticks: 182
+        - 50
+        - 92
+      - - ticks: 3140
+        - ticks: 181
+        - 62
+        - 89
+      - - ticks: 3827
+        - ticks: 272
+        - 51
+        - 91
+      - - ticks: 3846
+        - ticks: 273
+        - 58
+        - 94
+      - - ticks: 3865
+        - ticks: 272
+        - 63
+        - 89
+      - - ticks: 4559
+        - ticks: 152
+        - 58
+        - 92
+      - - ticks: 4566
+        - ticks: 151
+        - 65
+        - 96
+      - - ticks: 4579
+        - ticks: 151
+        - 70
+        - 92
+      - - ticks: 5034
+        - ticks: 242
+        - 51
+        - 96
+      - - ticks: 5056
+        - ticks: 242
+        - 58
+        - 93
+      - - ticks: 5065
+        - ticks: 242
+        - 63
+        - 84
+      - - ticks: 5763
+        - ticks: 272
+        - 58
+        - 91
+      - - ticks: 5769
+        - ticks: 272
+        - 51
+        - 92
+      - - ticks: 5777
+        - ticks: 272
+        - 63
+        - 90
+      - - ticks: 6463
+        - ticks: 182
+        - 58
+        - 92
+      - - ticks: 6499
+        - ticks: 182
+        - 65
+        - 88
+      - - ticks: 6503
+        - ticks: 182
+        - 70
+        - 92
+      - - ticks: 6959
+        - ticks: 181
+        - 51
+        - 93
+      - - ticks: 6967
+        - ticks: 182
+        - 63
+        - 92
+      - - ticks: 6969
+        - ticks: 182
+        - 58
+        - 96
+      - - ticks: 7674
+        - ticks: 272
+        - 50
+        - 95
+      - - ticks: 7686
+        - ticks: 273
+        - 57
+        - 93
+      - - ticks: 7695
+        - ticks: 272
+        - 62
+        - 90
+      - - ticks: 8396
+        - ticks: 151
+        - 57
+        - 97
+      - - ticks: 8400
+        - ticks: 151
+        - 64
+        - 95
+      - - ticks: 8417
+        - ticks: 151
+        - 69
+        - 90
+      - - ticks: 8881
+        - ticks: 242
+        - 50
+        - 92
+      - - ticks: 8897
+        - ticks: 242
+        - 57
+        - 94
+      - - ticks: 8901
+        - ticks: 242
+        - 62
+        - 86
+      - - ticks: 9604
+        - ticks: 272
+        - 50
+        - 93
+      - - ticks: 9613
+        - ticks: 272
+        - 57
+        - 91
+      - - ticks: 9617
+        - ticks: 272
+        - 62
+        - 89
+      - - ticks: 10318
+        - ticks: 181
+        - 64
+        - 95
+      - - ticks: 10321
+        - ticks: 182
+        - 57
+        - 94
+      - - ticks: 10341
+        - ticks: 182
+        - 69
+        - 93
+      - - ticks: 10797
+        - ticks: 182
+        - 50
+        - 96
+      - - ticks: 10808
+        - ticks: 181
+        - 57
+        - 89
+      - - ticks: 10821
+        - ticks: 182
+        - 62
+        - 95
+      - - ticks: 11530
+        - ticks: 273
+        - 57
+        - 92
+      - - ticks: 11548
+        - ticks: 272
+        - 69
+        - 91
+      - - ticks: 11549
+        - ticks: 272
+        - 64
+        - 85
+      - - ticks: 12245
+        - ticks: 151
+        - 64
+        - 92
+      - - ticks: 12260
+        - ticks: 151
+        - 71
+        - 85
+      - - ticks: 12265
+        - ticks: 152
+        - 76
+        - 90
+      - - ticks: 12721
+        - ticks: 242
+        - 57
+        - 97
+      - - ticks: 12729
+        - ticks: 242
+        - 64
+        - 96
+      - - ticks: 12737
+        - ticks: 242
+        - 69
+        - 85
+      - - ticks: 13450
+        - ticks: 272
+        - 57
+        - 96
+      - - ticks: 13455
+        - ticks: 272
+        - 64
+        - 93
+      - - ticks: 13466
+        - ticks: 272
+        - 69
+        - 88
+      - - ticks: 14159
+        - ticks: 181
+        - 64
+        - 93
+      - - ticks: 14161
+        - ticks: 182
+        - 71
+        - 93
+      - - ticks: 14188
+        - ticks: 181
+        - 76
+        - 86
+      - - ticks: 14645
+        - ticks: 181
+        - 64
+        - 94
+      - - ticks: 14646
+        - ticks: 182
+        - 57
+        - 95
+      - - ticks: 14649
+        - ticks: 182
+        - 69
+        - 91
+      - - ticks: 15351
+        - ticks: 272
+        - 58
+        - 95
+      - - ticks: 15362
+        - ticks: 272
+        - 65
+        - 91
+      - - ticks: 15371
+        - ticks: 272
+        - 70
+        - 94
+      - - ticks: 16071
+        - ticks: 151
+        - 65
+        - 94
+      - - ticks: 16103
+        - ticks: 152
+        - 72
+        - 89
+      - - ticks: 16105
+        - ticks: 151
+        - 77
+        - 90
+      - - ticks: 16543
+        - ticks: 242
+        - 58
+        - 91
+      - - ticks: 16576
+        - ticks: 242
+        - 65
+        - 93
+      - - ticks: 16578
+        - ticks: 242
+        - 70
+        - 92
+      - - ticks: 17286
+        - ticks: 272
+        - 58
+        - 97
+      - - ticks: 17292
+        - ticks: 272
+        - 65
+        - 89
+      - - ticks: 17304
+        - ticks: 272
+        - 70
+        - 92
+      - - ticks: 17998
+        - ticks: 182
+        - 65
+        - 83
+      - - ticks: 18004
+        - ticks: 182
+        - 72
+        - 95
+      - - ticks: 18025
+        - ticks: 181
+        - 77
+        - 90
+      - - ticks: 18479
+        - ticks: 182
+        - 58
+        - 100
+      - - ticks: 18500
+        - ticks: 181
+        - 65
+        - 92
+      - - ticks: 18517
+        - ticks: 181
+        - 70
+        - 91
+      - - ticks: 19214
+        - ticks: 272
+        - 55
+        - 88
+      - - ticks: 19214
+        - ticks: 272
+        - 62
+        - 80
+      - - ticks: 19216
+        - ticks: 272
+        - 67
+        - 90
+      - - ticks: 19925
+        - ticks: 151
+        - 62
+        - 96
+      - - ticks: 19931
+        - ticks: 151
+        - 69
+        - 84
+      - - ticks: 19945
+        - ticks: 152
+        - 74
+        - 94
+      - - ticks: 20416
+        - ticks: 242
+        - 55
+        - 91
+      - - ticks: 20424
+        - ticks: 242
+        - 67
+        - 90
+      - - ticks: 20425
+        - ticks: 242
+        - 62
+        - 95
+      - - ticks: 21115
+        - ticks: 273
+        - 55
+        - 93
+      - - ticks: 21126
+        - ticks: 272
+        - 62
+        - 90
+      - - ticks: 21140
+        - ticks: 272
+        - 67
+        - 86
+      - - ticks: 21830
+        - ticks: 181
+        - 62
+        - 87
+      - - ticks: 21856
+        - ticks: 181
+        - 74
+        - 89
+      - - ticks: 21862
+        - ticks: 181
+        - 69
+        - 94
+      - - ticks: 22327
+        - ticks: 182
+        - 67
+        - 82
+      - - ticks: 22328
+        - ticks: 182
+        - 55
+        - 94
+      - - ticks: 22330
+        - ticks: 181
+        - 62
+        - 92
+      - - ticks: 23030
+        - ticks: 272
+        - 51
+        - 94
+      - - ticks: 23049
+        - ticks: 272
+        - 58
+        - 93
+      - - ticks: 23073
+        - ticks: 272
+        - 63
+        - 89
+      - - ticks: 23758
+        - ticks: 151
+        - 58
+        - 93
+      - - ticks: 23770
+        - ticks: 151
+        - 65
+        - 102
+      - - ticks: 23776
+        - ticks: 151
+        - 70
+        - 84
+      - - ticks: 24245
+        - ticks: 242
+        - 58
+        - 86
+      - - ticks: 24247
+        - ticks: 242
+        - 51
+        - 95
+      - - ticks: 24251
+        - ticks: 242
+        - 63
+        - 91
+      - - ticks: 24969
+        - ticks: 272
+        - 51
+        - 93
+      - - ticks: 24971
+        - ticks: 272
+        - 63
+        - 85
+      - - ticks: 24984
+        - ticks: 272
+        - 58
+        - 94
+      - - ticks: 25691
+        - ticks: 181
+        - 65
+        - 86
+      - - ticks: 25700
+        - ticks: 181
+        - 58
+        - 95
+      - - ticks: 25700
+        - ticks: 181
+        - 70
+        - 88
+      - - ticks: 26147
+        - ticks: 182
+        - 51
+        - 96
+      - - ticks: 26163
+        - ticks: 181
+        - 58
+        - 91
+      - - ticks: 26182
+        - ticks: 181
+        - 63
+        - 86
+      - - ticks: 26872
+        - ticks: 272
+        - 57
+        - 92
+      - - ticks: 26883
+        - ticks: 272
+        - 64
+        - 87
+      - - ticks: 26910
+        - ticks: 272
+        - 69
+        - 85
+      - - ticks: 27606
+        - ticks: 151
+        - 64
+        - 100
+      - - ticks: 27606
+        - ticks: 151
+        - 71
+        - 88
+      - - ticks: 27629
+        - ticks: 151
+        - 76
+        - 90
+      - - ticks: 28086
+        - ticks: 242
+        - 57
+        - 93
+      - - ticks: 28086
+        - ticks: 242
+        - 69
+        - 81
+      - - ticks: 28098
+        - ticks: 242
+        - 64
+        - 90
+      - - ticks: 28799
+        - ticks: 272
+        - 57
+        - 96
+      - - ticks: 28805
+        - ticks: 272
+        - 64
+        - 89
+      - - ticks: 28835
+        - ticks: 272
+        - 69
+        - 84
+      - - ticks: 29529
+        - ticks: 181
+        - 64
+        - 92
+      - - ticks: 29536
+        - ticks: 182
+        - 71
+        - 88
+      - - ticks: 29543
+        - ticks: 181
+        - 76
+        - 96
+      - - ticks: 29991
+        - ticks: 182
+        - 57
+        - 102
+      - - ticks: 30022
+        - ticks: 181
+        - 64
+        - 90
+      - - ticks: 30023
+        - ticks: 181
+        - 69
+        - 88
+    - id: rhythm_R_1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 69
+        gate: 0.63
+        pattern:
+        - - 0
+          - 1
+          - 0.45
+        - - 0
+          - 3
+          - 0.45
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_R_9
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 94
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.45
+        - - 7
+          - 0.75
+          - 0.25
+        - - 0
+          - 1.25
+          - 0.4
+        - - 0
+          - 2
+          - 0.45
+        - - 7
+          - 2.75
+          - 0.3
+        - - 0
+          - 3.25
+          - 0.3
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_R_17
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 94
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.45
+        - - 7
+          - 0.75
+          - 0.25
+        - - 0
+          - 1.25
+          - 0.4
+        - - 0
+          - 2
+          - 0.45
+        - - 7
+          - 2.75
+          - 0.3
+        - - 0
+          - 3.25
+          - 0.3
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_R_25
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 94
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.35
+        - - 7
+          - 0.75
+          - 0.25
+        - - 0
+          - 1.5
+          - 0.35
+        - - 0
+          - 2
+          - 0.35
+        - - 7
+          - 2.75
+          - 0.25
+        - - 0
+          - 3.5
+          - 0.25
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_R_33
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 94
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.45
+        - - 7
+          - 0.75
+          - 0.25
+        - - 0
+          - 1.25
+          - 0.4
+        - - 0
+          - 2
+          - 0.45
+        - - 7
+          - 2.75
+          - 0.3
+        - - 0
+          - 3.25
+          - 0.3
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+    - id: rhythm_R_41
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 8
+      technique: palm_mute
+      generate:
+        kind: guitar.chug
+        octave: 3
+        shape: fifth_octave
+        velocity: 94
+        gate: 0.63
+        pattern:
+        - - 0
+          - 0
+          - 0.45
+        - - 7
+          - 0.75
+          - 0.25
+        - - 0
+          - 1.25
+          - 0.4
+        - - 0
+          - 2
+          - 0.45
+        - - 7
+          - 2.75
+          - 0.3
+        - - 0
+          - 3.25
+          - 0.3
+        humanize_ms: 3
+        humanize_velocity_pct: 4
+- id: solo_guitar_part
+  instrument: lead_main
+  voices:
+  - id: solo_guitar_part_voice
+    clips:
+    - id: bent_guitar_solo
+      at:
+        bar: 25
+        beat: 1
+      use: solo_sing
+      automation:
+      - id: solo_sung_bends
+        pitch_bend: 0
+        interpolation: smooth
+        resolution: 1/64
+        points:
+        - - ticks: 0
+          - -1365
+        - - ticks: 440
+          - 0
+        - - ticks: 1142
+          - 0
+        - - ticks: 1293
+          - 180
+        - - ticks: 1478
+          - -140
+        - - ticks: 1676
+          - 0
+        - - ticks: 1682
+          - 0
+        - - ticks: 3838
+          - 0
+        - - ticks: 3840
+          - -1365
+        - - ticks: 4280
+          - 0
+        - - ticks: 4819
+          - 0
+        - - ticks: 4948
+          - 180
+        - - ticks: 5107
+          - -140
+        - - ticks: 5276
+          - 0
+        - - ticks: 5282
+          - 0
+        - - ticks: 7678
+          - 0
+        - - ticks: 7680
+          - -1365
+        - - ticks: 8120
+          - 0
+        - - ticks: 8659
+          - 0
+        - - ticks: 8788
+          - 180
+        - - ticks: 8947
+          - -140
+        - - ticks: 9116
+          - 0
+        - - ticks: 9122
+          - 0
+        - - ticks: 11518
+          - 0
+        - - ticks: 11520
+          - -683
+        - - ticks: 11822
+          - 0
+        - - ticks: 12380
+          - 0
+        - - ticks: 12386
+          - 0
+        - - ticks: 15358
+          - 0
+        - - ticks: 15360
+          - -1365
+        - - ticks: 15800
+          - 0
+        - - ticks: 16273
+          - 0
+        - - ticks: 16394
+          - 180
+        - - ticks: 16542
+          - -140
+        - - ticks: 16700
+          - 0
+        - - ticks: 16706
+          - 0
+        - - ticks: 19198
+          - 0
+        - - ticks: 19200
+          - -1365
+        - - ticks: 19640
+          - 0
+        - - ticks: 20179
+          - 0
+        - - ticks: 20308
+          - 180
+        - - ticks: 20467
+          - -140
+        - - ticks: 20636
+          - 0
+        - - ticks: 20642
+          - 0
+        - - ticks: 23038
+          - 0
+        - - ticks: 23040
+          - -683
+        - - ticks: 23292
+          - 0
+        - - ticks: 23756
+          - 0
+        - - ticks: 23762
+          - 0
+        - - ticks: 26878
+          - 0
+        - - ticks: 26880
+          - -683
+        - - ticks: 27132
+          - 0
+        - - ticks: 27596
+          - 0
+        - - ticks: 27602
+          - 0
+        - - ticks: 30720
+          - 0
+    - id: shredding_guitar_solo
+      at:
+        bar: 33
+        beat: 1
+      use: solo_shred
+      automation:
+      - id: solo_shred_bends
+        pitch_bend: 0
+        interpolation: smooth
+        resolution: 1/64
+        points:
+        - - ticks: 0
+          - 0
+        - - ticks: 3838
+          - 0
+        - - ticks: 3840
+          - -1365
+        - - ticks: 4320
+          - 0
+        - - ticks: 4480
+          - 0
+        - - ticks: 4620
+          - 155
+        - - ticks: 4790
+          - -125
+        - - ticks: 4968
+          - 0
+        - - ticks: 5000
+          - 0
+        - - ticks: 11518
+          - 0
+        - - ticks: 11520
+          - -683
+        - - ticks: 11900
+          - 0
+        - - ticks: 12370
+          - 0
+        - - ticks: 24958
+          - 0
+        - - ticks: 24960
+          - -683
+        - - ticks: 25340
+          - 0
+        - - ticks: 25710
+          - 170
+        - - ticks: 25960
+          - -135
+        - - ticks: 26380
+          - 0
+        - - ticks: 28798
+          - 0
+        - - ticks: 28800
+          - -1365
+        - - ticks: 29260
+          - 0
+        - - ticks: 29650
+          - 190
+        - - ticks: 29950
+          - -165
+        - - ticks: 30230
+          - 0
+        - - ticks: 30720
+          - 0
+- id: support_bass_part
+  instrument: bass
+  voices:
+  - id: support_bass_part_voice
+    clips:
+    - id: threshold_bass_pulse_41
+      at:
+        bar: 1
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_1
+      at:
+        bar: 9
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_9
+      at:
+        bar: 17
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_17
+      at:
+        bar: 25
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_25
+      at:
+        bar: 33
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_33
+      at:
+        bar: 41
+        beat: 1
+      use: bass_foundation
+    - id: bass_pulse_41
+      at:
+        bar: 49
+        beat: 1
+      use: bass_foundation
+- id: castle_organ_part
+  instrument: organ
+  voices:
+  - id: castle_organ_part_voice
+    clips:
+    - id: threshold_organ_stabs_41
+      at:
+        bar: 1
+        beat: 1
+      use: organ_riff
+    - id: organ_intro
+      at:
+        bar: 9
+        beat: 1
+      use: organ_intro
+    - id: organ_stabs_9
+      at:
+        bar: 17
+        beat: 1
+      use: organ_riff
+    - id: organ_stabs_33
+      at:
+        bar: 41
+        beat: 1
+      use: organ_riff
+    - id: organ_stabs_41
+      at:
+        bar: 49
+        beat: 1
+      use: organ_riff
+    - id: organ_solo_under_17
+      at:
+        bar: 25
+        beat: 1
+      use: organ_under
+    - id: organ_solo_under_25
+      at:
+        bar: 33
+        beat: 1
+      use: organ_under
+- id: rock_drums_part
+  instrument: kit
+  voices:
+  - id: rock_drums_part_voice
+    clips:
+    - id: threshold_kit_midi_exact
+      at:
+        bar: 1
+        beat: 1
+      events:
+      - - ticks: 0
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 0
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 486
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 721
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 954
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 959
+        - ticks: 96
+        - 38
+        - 103
+      - - ticks: 1443
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 1914
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 1926
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 2396
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 2403
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 2881
+        - ticks: 96
+        - 38
+        - 103
+      - - ticks: 2882
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 3361
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 3369
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 3602
+        - ticks: 96
+        - 46
+        - 68
+      - - ticks: 3835
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 3836
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 4319
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 4563
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 4798
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 4799
+        - ticks: 96
+        - 38
+        - 112
+      - - ticks: 5280
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 5759
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 5761
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 6238
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 6243
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 6721
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 6722
+        - ticks: 96
+        - 38
+        - 112
+      - - ticks: 7192
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 7205
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 7444
+        - ticks: 96
+        - 46
+        - 73
+      - - ticks: 7670
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 7681
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 8160
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 8399
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 8639
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 8641
+        - ticks: 96
+        - 38
+        - 108
+      - - ticks: 9123
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 9600
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 9606
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 10070
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 10080
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 10567
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 10569
+        - ticks: 96
+        - 38
+        - 108
+      - - ticks: 11036
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 11036
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 11285
+        - ticks: 96
+        - 46
+        - 71
+      - - ticks: 11520
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 11529
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 12002
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 12240
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 12478
+        - ticks: 96
+        - 38
+        - 117
+      - - ticks: 12480
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 12954
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 13437
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 13441
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 13918
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 13928
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 14165
+        - ticks: 96
+        - 41
+        - 96
+      - - ticks: 14403
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 14404
+        - ticks: 96
+        - 38
+        - 117
+      - - ticks: 14408
+        - ticks: 96
+        - 45
+        - 104
+      - - ticks: 14646
+        - ticks: 96
+        - 43
+        - 109
+      - - ticks: 14878
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 14882
+        - ticks: 96
+        - 43
+        - 109
+      - - ticks: 14885
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 15115
+        - ticks: 96
+        - 49
+        - 110
+      - - ticks: 15129
+        - ticks: 96
+        - 46
+        - 76
+      - - ticks: 15353
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 15361
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 15831
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 16067
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 16314
+        - ticks: 96
+        - 38
+        - 103
+      - - ticks: 16315
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 16795
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 17281
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 17281
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 17745
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 17763
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 18233
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 18247
+        - ticks: 96
+        - 38
+        - 103
+      - - ticks: 18713
+        - ticks: 96
+        - 36
+        - 98
+      - - ticks: 18715
+        - ticks: 96
+        - 42
+        - 63
+      - - ticks: 18959
+        - ticks: 96
+        - 46
+        - 68
+      - - ticks: 19198
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 19201
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 19686
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 19924
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 20159
+        - ticks: 96
+        - 38
+        - 112
+      - - ticks: 20159
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 20639
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 21122
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 21126
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 21599
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 21613
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 22078
+        - ticks: 96
+        - 38
+        - 112
+      - - ticks: 22091
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 22554
+        - ticks: 96
+        - 42
+        - 68
+      - - ticks: 22558
+        - ticks: 96
+        - 36
+        - 106
+      - - ticks: 22806
+        - ticks: 96
+        - 46
+        - 73
+      - - ticks: 23043
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 23047
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 23520
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 23759
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 23997
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 24001
+        - ticks: 96
+        - 38
+        - 108
+      - - ticks: 24480
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 24961
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 24962
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 25440
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 25446
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 25919
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 25924
+        - ticks: 96
+        - 38
+        - 108
+      - - ticks: 26390
+        - ticks: 96
+        - 36
+        - 102
+      - - ticks: 26397
+        - ticks: 96
+        - 42
+        - 66
+      - - ticks: 26636
+        - ticks: 96
+        - 46
+        - 71
+      - - ticks: 26882
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 26888
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 27360
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 27597
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 27839
+        - ticks: 96
+        - 38
+        - 117
+      - - ticks: 27841
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 28319
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 28792
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 28803
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 29275
+        - ticks: 96
+        - 36
+        - 110
+      - - ticks: 29276
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 29761
+        - ticks: 96
+        - 42
+        - 71
+      - - ticks: 29763
+        - ticks: 96
+        - 38
+        - 117
+    - id: drum_groove_1
+      at:
+        bar: 9
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 2.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 2
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 1
+          - 2
+          - 3
+          velocity: 67
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_groove_9
+      at:
+        bar: 17
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.75
+          - 2
+          - 2.5
+          - 3.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 67
+        - drum: open_hat
+          beats:
+          - 3.75
+          velocity: 72
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_groove_17
+      at:
+        bar: 25
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.5
+          - 1.5
+          - 2
+          - 2.75
+          - 3.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 67
+        - drum: open_hat
+          beats:
+          - 3.75
+          velocity: 72
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_groove_25
+      at:
+        bar: 33
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 76
+        - drum: open_hat
+          beats:
+          - 3.75
+          velocity: 72
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_groove_33
+      at:
+        bar: 41
+        beat: 1
+      duration:
+        bars: 8
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.75
+          - 2
+          - 2.5
+          - 3.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 67
+        - drum: open_hat
+          beats:
+          - 3.75
+          velocity: 72
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_groove_41
+      at:
+        bar: 49
+        beat: 1
+      duration:
+        bars: 7
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 0.94
+        - 1.02
+        - 0.98
+        - 1.06
+        fill_every_bars: 4
+        fill_mode: overlay
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.75
+          - 2
+          - 2.5
+          - 3.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          - 3.5
+          velocity: 67
+        - drum: open_hat
+          beats:
+          - 3.75
+          velocity: 72
+        fill_events:
+        - drum: floor_tom
+          beats:
+          - 2.75
+          velocity: 91
+        - drum: mid_tom
+          beats:
+          - 3
+          velocity: 98
+        - drum: low_tom
+          beats:
+          - 3.25
+          - 3.5
+          velocity: 103
+        - drum: crash
+          beats:
+          - 3.75
+          velocity: 104
+    - id: drum_loop_pickup_48
+      at:
+        bar: 56
+        beat: 1
+      duration:
+        bars: 1
+      generate:
+        kind: drums.pattern
+        bar_velocity_pattern:
+        - 1.06
+        events:
+        - drum: kick
+          beats:
+          - 0
+          - 0.75
+          - 2
+          - 2.5
+          velocity: 104
+        - drum: snare
+          beats:
+          - 1
+          - 3
+          velocity: 110
+        - drum: closed_hat
+          beats:
+          - 0
+          - 0.5
+          - 1
+          - 1.5
+          - 2
+          - 2.5
+          - 3
+          velocity: 67
+notes:
+- 'Playback: repeat ONLY adaptive/castle_loop/*.full.ogg (48 bars / 68.571 s), starting at the original piano opening.
+  The initial threshold section is render-only and is intentionally not played. It duplicates the loop ending at
+  MIDI-tick precision to prime sampled notes, amp/delay/reverb, and master state.'
+- Original piano motif, guitar bends, all 48 musical bars, and v6 mix settings are preserved. The final 16th-note
+  crash/open-hat was replaced by a drum turnaround which leaves air before the next downbeat. Do not loop the whole
+  full_soundtrack_preview.ogg.
+- 'v4 user direction: Salamander grand piano is the MAIN melodic voice. Guitar is deliberately foregrounded only
+  during the two solo sections. Bass is a quiet root-and-fifth foundation, not a counter-melody.'
+- 'Remove Secret Passage entirely: no F/C/Bb/A contrasting passage or hidden_walkway material. The castle hook repeats
+  without progressive instrumentation or an unrelated melodic detour.'
+- 'Guitar bends follow Carry the One MusicIR v3 technique: clip-local pitch_bend automation with a -1365 to 0 scooped
+  attack, smooth 1/64 resolution, and short +/- pitchbend vibrato. The user must verify actual bends in the workstation
+  render.'
+- Keep two stereo guitar chug groups, Emily single-note lead with Guitarix drive, Big Rusty drumkit, atmospheric
+  organ stabs, and supportive Growlybass. All content remains original, not a Nintendo melody transcription.
+materials:
+  castle_call:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - D5
+      - 103
+    - - 3/16
+      - 1/16
+      - F5
+      - 97
+    - - 1/4
+      - 19/80
+      - A5
+      - 110
+    - - 9/16
+      - 7/80
+      - Eb5
+      - 104
+    - - 53/80
+      - 1/10
+      - D5
+      - 104
+    - - 13/16
+      - 3/40
+      - C#5
+      - 96
+    - - '1'
+      - 3/16
+      - Eb5
+      - 102
+    - - 19/16
+      - 1/16
+      - G5
+      - 98
+    - - 5/4
+      - 1/5
+      - Bb5
+      - 111
+    - - 3/2
+      - 1/8
+      - Ab5
+      - 96
+    - - 13/8
+      - 1/8
+      - G5
+      - 103
+    - - 15/8
+      - 7/80
+      - Eb5
+      - 98
+    - - '2'
+      - 1/8
+      - D5
+      - 104
+    - - 17/8
+      - 1/8
+      - F5
+      - 99
+    - - 9/4
+      - 19/80
+      - A5
+      - 113
+    - - 41/16
+      - 7/80
+      - C6
+      - 105
+    - - 213/80
+      - 7/80
+      - Bb5
+      - 99
+    - - 11/4
+      - 13/80
+      - A5
+      - 109
+    - - '3'
+      - 1/8
+      - G5
+      - 101
+    - - 25/8
+      - 1/10
+      - E5
+      - 102
+    - - 13/4
+      - 9/40
+      - C#5
+      - 110
+    - - 57/16
+      - 1/10
+      - Bb4
+      - 96
+    - - 59/16
+      - 1/16
+      - C#5
+      - 104
+    - - 15/4
+      - 3/16
+      - E5
+      - 107
+  castle_answer:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - F5
+      - 102
+    - - 3/16
+      - 1/16
+      - D5
+      - 101
+    - - 1/4
+      - 1/4
+      - Bb4
+      - 110
+    - - 9/16
+      - 1/8
+      - D5
+      - 97
+    - - 3/4
+      - 3/16
+      - F5
+      - 105
+    - - '1'
+      - 3/16
+      - G5
+      - 104
+    - - 19/16
+      - 1/16
+      - Bb5
+      - 97
+    - - 5/4
+      - 1/4
+      - G5
+      - 111
+    - - 25/16
+      - 1/8
+      - F5
+      - 100
+    - - 7/4
+      - 3/20
+      - D5
+      - 103
+    - - '2'
+      - 1/8
+      - Eb5
+      - 104
+    - - 17/8
+      - 1/8
+      - G5
+      - 101
+    - - 9/4
+      - 1/4
+      - Bb5
+      - 110
+    - - 41/16
+      - 1/8
+      - Ab5
+      - 98
+    - - 11/4
+      - 7/80
+      - G5
+      - 99
+    - - 23/8
+      - 1/10
+      - F5
+      - 94
+    - - '3'
+      - 1/8
+      - E5
+      - 104
+    - - 25/8
+      - 1/8
+      - G5
+      - 106
+    - - 13/4
+      - 9/40
+      - C#6
+      - 109
+    - - 57/16
+      - 1/8
+      - Bb5
+      - 101
+    - - 15/4
+      - 7/40
+      - A5
+      - 112
+  solo_sing:
+    kind: events
+    events:
+    - - '0'
+      - 7/16
+      - A5
+      - 111
+    - - 1/2
+      - 1/8
+      - G5
+      - 104
+    - - 5/8
+      - 1/8
+      - F5
+      - 103
+    - - 3/4
+      - 1/8
+      - E5
+      - 103
+    - - 7/8
+      - 1/8
+      - D5
+      - 105
+    - - '1'
+      - 3/8
+      - G5
+      - 112
+    - - 23/16
+      - 1/16
+      - Bb5
+      - 105
+    - - 3/2
+      - 9/40
+      - Eb6
+      - 114
+    - - 29/16
+      - 1/16
+      - D6
+      - 105
+    - - 15/8
+      - 1/8
+      - Bb5
+      - 108
+    - - '2'
+      - 3/8
+      - A5
+      - 113
+    - - 39/16
+      - 1/16
+      - C6
+      - 103
+    - - 5/2
+      - 3/16
+      - D6
+      - 117
+    - - 11/4
+      - 1/16
+      - C6
+      - 106
+    - - 45/16
+      - 1/16
+      - Bb5
+      - 100
+    - - 23/8
+      - 1/8
+      - A5
+      - 107
+    - - '3'
+      - 9/40
+      - C#6
+      - 115
+    - - 13/4
+      - 3/16
+      - E6
+      - 116
+    - - 7/2
+      - 1/16
+      - G6
+      - 113
+    - - 57/16
+      - 1/16
+      - F6
+      - 108
+    - - 29/8
+      - 1/16
+      - E6
+      - 106
+    - - 59/16
+      - 1/16
+      - C#6
+      - 104
+    - - 15/4
+      - 3/16
+      - A5
+      - 111
+    - - '4'
+      - 7/20
+      - Bb5
+      - 114
+    - - 71/16
+      - 1/16
+      - A5
+      - 105
+    - - 9/2
+      - 1/8
+      - G5
+      - 101
+    - - 37/8
+      - 1/8
+      - F5
+      - 100
+    - - 19/4
+      - 3/16
+      - D5
+      - 105
+    - - '5'
+      - 3/8
+      - G5
+      - 111
+    - - 87/16
+      - 1/16
+      - Bb5
+      - 104
+    - - 11/2
+      - 9/40
+      - D6
+      - 114
+    - - 23/4
+      - 1/16
+      - Bb5
+      - 104
+    - - 93/16
+      - 1/16
+      - A5
+      - 105
+    - - 47/8
+      - 1/8
+      - G5
+      - 105
+    - - '6'
+      - 3/16
+      - Eb6
+      - 117
+    - - 25/4
+      - 3/16
+      - D6
+      - 107
+    - - 13/2
+      - 1/8
+      - Bb5
+      - 105
+    - - 53/8
+      - 1/8
+      - G5
+      - 104
+    - - 27/4
+      - 1/8
+      - F5
+      - 105
+    - - 55/8
+      - 1/8
+      - Eb5
+      - 103
+    - - '7'
+      - 3/16
+      - C#6
+      - 114
+    - - 29/4
+      - 1/8
+      - E6
+      - 112
+    - - 59/8
+      - 1/8
+      - G6
+      - 115
+    - - 15/2
+      - 1/8
+      - E6
+      - 110
+    - - 61/8
+      - 1/8
+      - C#6
+      - 106
+    - - 31/4
+      - 3/16
+      - A5
+      - 114
+  organ_intro:
+    kind: events
+    events:
+    - - '0'
+      - 3/8
+      - &id001
+        - D4
+        - F4
+        - A4
+      - 84
+    - - 11/16
+      - 3/16
+      - *id001
+      - 76
+    - - '1'
+      - 3/8
+      - &id002
+        - Eb4
+        - G4
+        - Bb4
+      - 84
+    - - 27/16
+      - 3/16
+      - *id002
+      - 76
+    - - '2'
+      - 3/8
+      - *id001
+      - 84
+    - - 43/16
+      - 3/16
+      - *id001
+      - 76
+    - - '3'
+      - 3/8
+      - &id003
+        - C#4
+        - E4
+        - A4
+      - 84
+    - - 59/16
+      - 3/16
+      - *id003
+      - 76
+    - - '4'
+      - 3/8
+      - &id004
+        - D4
+        - F4
+        - Bb4
+      - 84
+    - - 75/16
+      - 3/16
+      - *id004
+      - 76
+    - - '5'
+      - 3/8
+      - &id005
+        - D4
+        - G4
+        - Bb4
+      - 84
+    - - 91/16
+      - 3/16
+      - *id005
+      - 76
+    - - '6'
+      - 3/8
+      - *id002
+      - 84
+    - - 107/16
+      - 3/16
+      - *id002
+      - 76
+    - - '7'
+      - 3/8
+      - *id003
+      - 84
+    - - 123/16
+      - 3/16
+      - *id003
+      - 76
+  organ_riff:
+    kind: events
+    events:
+    - - '0'
+      - 11/80
+      - &id006
+        - D4
+        - F4
+        - A4
+      - 80
+    - - 5/8
+      - 9/80
+      - *id006
+      - 75
+    - - '1'
+      - 11/80
+      - &id007
+        - Eb4
+        - G4
+        - Bb4
+      - 80
+    - - 13/8
+      - 9/80
+      - *id007
+      - 75
+    - - '2'
+      - 11/80
+      - *id006
+      - 80
+    - - 21/8
+      - 9/80
+      - *id006
+      - 75
+    - - '3'
+      - 11/80
+      - &id008
+        - C#4
+        - E4
+        - A4
+      - 80
+    - - 29/8
+      - 9/80
+      - *id008
+      - 75
+    - - '4'
+      - 11/80
+      - &id009
+        - D4
+        - F4
+        - Bb4
+      - 80
+    - - 37/8
+      - 9/80
+      - *id009
+      - 75
+    - - '5'
+      - 11/80
+      - &id010
+        - D4
+        - G4
+        - Bb4
+      - 80
+    - - 45/8
+      - 9/80
+      - *id010
+      - 75
+    - - '6'
+      - 11/80
+      - *id007
+      - 80
+    - - 53/8
+      - 9/80
+      - *id007
+      - 75
+    - - '7'
+      - 11/80
+      - *id008
+      - 80
+    - - 61/8
+      - 9/80
+      - *id008
+      - 75
+  castle_call_soft:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - D5
+      - 80
+    - - 3/16
+      - 1/16
+      - F5
+      - 76
+    - - 1/4
+      - 19/80
+      - A5
+      - 86
+    - - 9/16
+      - 7/80
+      - Eb5
+      - 81
+    - - 53/80
+      - 1/10
+      - D5
+      - 81
+    - - 13/16
+      - 3/40
+      - C#5
+      - 75
+    - - '1'
+      - 3/16
+      - Eb5
+      - 80
+    - - 19/16
+      - 1/16
+      - G5
+      - 76
+    - - 5/4
+      - 1/5
+      - Bb5
+      - 87
+    - - 3/2
+      - 1/8
+      - Ab5
+      - 75
+    - - 13/8
+      - 1/8
+      - G5
+      - 80
+    - - 15/8
+      - 7/80
+      - Eb5
+      - 76
+    - - '2'
+      - 1/8
+      - D5
+      - 81
+    - - 17/8
+      - 1/8
+      - F5
+      - 77
+    - - 9/4
+      - 19/80
+      - A5
+      - 88
+    - - 41/16
+      - 7/80
+      - C6
+      - 82
+    - - 213/80
+      - 7/80
+      - Bb5
+      - 77
+    - - 11/4
+      - 13/80
+      - A5
+      - 85
+    - - '3'
+      - 1/8
+      - G5
+      - 79
+    - - 25/8
+      - 1/10
+      - E5
+      - 80
+    - - 13/4
+      - 9/40
+      - C#5
+      - 86
+    - - 57/16
+      - 1/10
+      - Bb4
+      - 75
+    - - 59/16
+      - 1/16
+      - C#5
+      - 81
+    - - 15/4
+      - 3/16
+      - E5
+      - 83
+  castle_answer_soft:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - F5
+      - 80
+    - - 3/16
+      - 1/16
+      - D5
+      - 79
+    - - 1/4
+      - 1/4
+      - Bb4
+      - 86
+    - - 9/16
+      - 1/8
+      - D5
+      - 76
+    - - 3/4
+      - 3/16
+      - F5
+      - 82
+    - - '1'
+      - 3/16
+      - G5
+      - 81
+    - - 19/16
+      - 1/16
+      - Bb5
+      - 76
+    - - 5/4
+      - 1/4
+      - G5
+      - 87
+    - - 25/16
+      - 1/8
+      - F5
+      - 78
+    - - 7/4
+      - 3/20
+      - D5
+      - 80
+    - - '2'
+      - 1/8
+      - Eb5
+      - 81
+    - - 17/8
+      - 1/8
+      - G5
+      - 79
+    - - 9/4
+      - 1/4
+      - Bb5
+      - 86
+    - - 41/16
+      - 1/8
+      - Ab5
+      - 76
+    - - 11/4
+      - 7/80
+      - G5
+      - 77
+    - - 23/8
+      - 1/10
+      - F5
+      - 73
+    - - '3'
+      - 1/8
+      - E5
+      - 81
+    - - 25/8
+      - 1/8
+      - G5
+      - 83
+    - - 13/4
+      - 9/40
+      - C#6
+      - 85
+    - - 57/16
+      - 1/8
+      - Bb5
+      - 79
+    - - 15/4
+      - 7/40
+      - A5
+      - 87
+  organ_under:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - &id011
+        - D4
+        - F4
+        - A4
+      - 69
+    - - '1'
+      - 3/16
+      - &id012
+        - Eb4
+        - G4
+        - Bb4
+      - 69
+    - - '2'
+      - 3/16
+      - *id011
+      - 69
+    - - '3'
+      - 3/16
+      - &id013
+        - C#4
+        - E4
+        - A4
+      - 69
+    - - '4'
+      - 3/16
+      - - D4
+        - F4
+        - Bb4
+      - 69
+    - - '5'
+      - 3/16
+      - - D4
+        - G4
+        - Bb4
+      - 69
+    - - '6'
+      - 3/16
+      - *id012
+      - 69
+    - - '7'
+      - 3/16
+      - *id013
+      - 69
+  bass_foundation:
+    kind: events
+    events:
+    - - '0'
+      - 33/80
+      - D2
+      - 72
+    - - 1/2
+      - 3/10
+      - A2
+      - 63
+    - - '1'
+      - 33/80
+      - Eb2
+      - 72
+    - - 3/2
+      - 3/10
+      - Bb2
+      - 63
+    - - '2'
+      - 33/80
+      - D2
+      - 72
+    - - 5/2
+      - 3/10
+      - A2
+      - 63
+    - - '3'
+      - 33/80
+      - A2
+      - 72
+    - - 7/2
+      - 3/10
+      - E3
+      - 63
+    - - '4'
+      - 33/80
+      - Bb2
+      - 72
+    - - 9/2
+      - 3/10
+      - F3
+      - 63
+    - - '5'
+      - 33/80
+      - G2
+      - 72
+    - - 11/2
+      - 3/10
+      - D3
+      - 63
+    - - '6'
+      - 33/80
+      - Eb2
+      - 72
+    - - 13/2
+      - 3/10
+      - Bb2
+      - 63
+    - - '7'
+      - 33/80
+      - A2
+      - 72
+    - - 15/2
+      - 3/10
+      - E3
+      - 63
+  piano_anchor:
+    kind: events
+    events:
+    - - '0'
+      - 3/16
+      - D5
+      - 72
+    - - 1/4
+      - 27/80
+      - F5
+      - 77
+    - - '2'
+      - 1/4
+      - A4
+      - 65
+    - - '4'
+      - 3/16
+      - Bb4
+      - 72
+    - - 17/4
+      - 27/80
+      - D5
+      - 77
+    - - '6'
+      - 1/4
+      - G4
+      - 65
+  solo_shred:
+    kind: events
+    events:
+    - - '0'
+      - 187/3840
+      - D5
+      - 103
+    - - 1/16
+      - 187/3840
+      - F5
+      - 106
+    - - 1/8
+      - 187/3840
+      - A5
+      - 109
+    - - 3/16
+      - 187/3840
+      - D6
+      - 112
+    - - 1/4
+      - 187/3840
+      - F6
+      - 103
+    - - 5/16
+      - 187/3840
+      - E6
+      - 106
+    - - 3/8
+      - 187/3840
+      - D6
+      - 109
+    - - 7/16
+      - 187/3840
+      - A5
+      - 112
+    - - 1/2
+      - 187/3840
+      - F5
+      - 103
+    - - 9/16
+      - 187/3840
+      - A5
+      - 106
+    - - 5/8
+      - 187/3840
+      - D6
+      - 109
+    - - 11/16
+      - 187/3840
+      - E6
+      - 112
+    - - 3/4
+      - 187/3840
+      - F6
+      - 103
+    - - 13/16
+      - 187/3840
+      - E6
+      - 106
+    - - 7/8
+      - 187/3840
+      - D6
+      - 109
+    - - 15/16
+      - 187/3840
+      - A5
+      - 112
+    - - '1'
+      - 3/10
+      - G5
+      - 117
+    - - 23/16
+      - 91/1920
+      - Eb5
+      - 103
+    - - 3/2
+      - 91/1920
+      - G5
+      - 106
+    - - 25/16
+      - 91/1920
+      - Bb5
+      - 109
+    - - 13/8
+      - 91/1920
+      - Eb6
+      - 112
+    - - 27/16
+      - 91/1920
+      - G6
+      - 103
+    - - 7/4
+      - 91/1920
+      - Eb6
+      - 106
+    - - 29/16
+      - 91/1920
+      - Bb5
+      - 109
+    - - 15/8
+      - 91/1920
+      - G5
+      - 112
+    - - '2'
+      - 187/3840
+      - D5
+      - 106
+    - - 33/16
+      - 187/3840
+      - F5
+      - 109
+    - - 17/8
+      - 187/3840
+      - A5
+      - 112
+    - - 35/16
+      - 187/3840
+      - D6
+      - 115
+    - - 9/4
+      - 187/3840
+      - F6
+      - 106
+    - - 37/16
+      - 187/3840
+      - D6
+      - 109
+    - - 19/8
+      - 187/3840
+      - A5
+      - 112
+    - - 39/16
+      - 187/3840
+      - F5
+      - 115
+    - - 5/2
+      - 187/3840
+      - D5
+      - 106
+    - - 41/16
+      - 187/3840
+      - F5
+      - 109
+    - - 21/8
+      - 187/3840
+      - A5
+      - 112
+    - - 43/16
+      - 187/3840
+      - D6
+      - 115
+    - - 11/4
+      - 187/3840
+      - F6
+      - 106
+    - - 45/16
+      - 187/3840
+      - D6
+      - 109
+    - - 23/8
+      - 187/3840
+      - A5
+      - 112
+    - - 47/16
+      - 187/3840
+      - F5
+      - 115
+    - - '3'
+      - 9/40
+      - C#6
+      - 116
+    - - 13/4
+      - 691/3840
+      - E6
+      - 112
+    - - 7/2
+      - 173/3840
+      - G5
+      - 102
+    - - 57/16
+      - 173/3840
+      - Bb5
+      - 105
+    - - 29/8
+      - 173/3840
+      - C#6
+      - 108
+    - - 59/16
+      - 173/3840
+      - E6
+      - 111
+    - - 15/4
+      - 173/3840
+      - G6
+      - 102
+    - - 61/16
+      - 173/3840
+      - E6
+      - 105
+    - - 31/8
+      - 173/3840
+      - C#6
+      - 108
+    - - 63/16
+      - 173/3840
+      - A5
+      - 111
+    - - '4'
+      - 3/16
+      - F5
+      - 113
+    - - 17/4
+      - 91/1920
+      - Bb4
+      - 103
+    - - 69/16
+      - 91/1920
+      - D5
+      - 106
+    - - 35/8
+      - 91/1920
+      - F5
+      - 109
+    - - 71/16
+      - 91/1920
+      - Bb5
+      - 112
+    - - 9/2
+      - 91/1920
+      - D6
+      - 103
+    - - 73/16
+      - 91/1920
+      - Bb5
+      - 106
+    - - 37/8
+      - 91/1920
+      - F5
+      - 109
+    - - 75/16
+      - 91/1920
+      - D5
+      - 112
+    - - 19/4
+      - 91/1920
+      - Bb4
+      - 103
+    - - 77/16
+      - 91/1920
+      - D5
+      - 106
+    - - 39/8
+      - 91/1920
+      - F5
+      - 109
+    - - 79/16
+      - 91/1920
+      - Bb5
+      - 112
+    - - '5'
+      - 187/3840
+      - G4
+      - 103
+    - - 81/16
+      - 187/3840
+      - Bb4
+      - 106
+    - - 41/8
+      - 187/3840
+      - D5
+      - 109
+    - - 83/16
+      - 187/3840
+      - G5
+      - 112
+    - - 21/4
+      - 187/3840
+      - Bb5
+      - 103
+    - - 85/16
+      - 187/3840
+      - D6
+      - 106
+    - - 43/8
+      - 187/3840
+      - Bb5
+      - 109
+    - - 87/16
+      - 187/3840
+      - G5
+      - 112
+    - - 11/2
+      - 187/3840
+      - D5
+      - 103
+    - - 89/16
+      - 187/3840
+      - G5
+      - 106
+    - - 45/8
+      - 187/3840
+      - Bb5
+      - 109
+    - - 91/16
+      - 187/3840
+      - D6
+      - 112
+    - - 23/4
+      - 187/3840
+      - G6
+      - 103
+    - - 93/16
+      - 187/3840
+      - D6
+      - 106
+    - - 47/8
+      - 187/3840
+      - Bb5
+      - 109
+    - - 95/16
+      - 187/3840
+      - G5
+      - 112
+    - - '6'
+      - 53/1920
+      - Eb5
+      - 109
+    - - 193/32
+      - 53/1920
+      - G5
+      - 112
+    - - 97/16
+      - 53/1920
+      - Bb5
+      - 115
+    - - 195/32
+      - 53/1920
+      - Eb6
+      - 118
+    - - 49/8
+      - 53/1920
+      - G6
+      - 109
+    - - 197/32
+      - 53/1920
+      - Eb6
+      - 112
+    - - 99/16
+      - 53/1920
+      - Bb5
+      - 115
+    - - 199/32
+      - 53/1920
+      - G5
+      - 118
+    - - 25/4
+      - 53/1920
+      - Bb5
+      - 109
+    - - 201/32
+      - 53/1920
+      - Eb6
+      - 112
+    - - 101/16
+      - 53/1920
+      - G6
+      - 115
+    - - 203/32
+      - 53/1920
+      - Eb6
+      - 118
+    - - 51/8
+      - 53/1920
+      - Bb5
+      - 109
+    - - 205/32
+      - 53/1920
+      - G5
+      - 112
+    - - 103/16
+      - 53/1920
+      - Eb5
+      - 115
+    - - 207/32
+      - 53/1920
+      - G5
+      - 118
+    - - 13/2
+      - 3/8
+      - Eb6
+      - 122
+    - - '7'
+      - 91/1920
+      - C#6
+      - 103
+    - - 113/16
+      - 91/1920
+      - E6
+      - 106
+    - - 57/8
+      - 91/1920
+      - G6
+      - 109
+    - - 115/16
+      - 91/1920
+      - E6
+      - 112
+    - - 29/4
+      - 91/1920
+      - C#6
+      - 103
+    - - 117/16
+      - 91/1920
+      - Bb5
+      - 106
+    - - 59/8
+      - 91/1920
+      - G5
+      - 109
+    - - 119/16
+      - 91/1920
+      - E5
+      - 112
+    - - 15/2
+      - 3/8
+      - A5
+      - 116
+playback:
+  mode: section_stem_matrix
+  loop_components:
+  - castle_loop
+state_map:
+  default:
+    section: castle_loop
+    stems:
+      piano_lead: 1.0
+      rhythm_l: 1.0
+      rhythm_r: 1.0
+      lead_guitar: 1.0
+      drums: 1.0
+      bass: 1.0
+      organ: 1.0
