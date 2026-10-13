@@ -16,7 +16,10 @@ notes:
   - 'The second part is in B flat major with long notes, a backbeat and a ride cymbal. Its second phrase comes home with the same three notes as the tune: F sharp, E flat, D.'
   - 'In the last part the bass has the tune for four bars, and the lead rests. Then the full band has the end of the tune, and a fill goes to the start.'
   - 'No lead note is above A5: Jon hears high lead lines as piercing. No short figure goes down in a silence and no chip arpeggio goes up: in level music these read as game events (a death, a pickup).'
-  - 'Instruments that Jon approved in other cues: the Growlybass Jazz Bass and the Naked Drums kit of Embedded Theme, with its square wave lead and quiet organ; the Shinyguitar archtop through a small clean amp, which he picked from a reel for Dinosaur Liberators. The guitar has short chords on the high strokes of the drum rhythm.'
+  - 'Jon, 2026-10-12, on the first render: "Change the bass instrument to a cleaner one in the new song. That bass is pretty intense. Maybe a standing bass might be fun." The first bass was the Growlybass Jazz Bass of Embedded Theme, with its staccato program and a presence boost. Its stem had as much energy above 1.5 kHz as in its low notes.'
+  - 'The bass is a double bass, pizzicato (Meatbass). The notes in this file are the notes of the sound. One program has the short notes and the long notes; the quiet second note of each bar is a soft pluck. The notes, the form, the tempo and the rest of the band did not change.'
+  - 'A plucked double bass has short notes high on its neck. In the last part, where the bass has the tune, the long A fades by about 13 dB in half a beat (the Jazz Bass faded by 3 dB). The rhythm of the tune is the same, but its long notes are not joined. A compressor does not change this much.'
+  - 'Instruments that Jon approved in other cues: the Naked Drums kit, the square wave lead and the quiet organ of Embedded Theme; the Shinyguitar archtop through a small clean amp, which he picked from a reel for Dinosaur Liberators. The guitar has short chords on the high strokes of the drum rhythm.'
   - 'Bar 2 of the tune has E flat for a beat and a half and then D, where the tune comes home. The harmony block has one chord for each bar, thus the arrangement audit reports that D as a note outside the chord. It is not.'
   - 'The file loops as a whole: bar 43 is bar 1. The last bar has no cymbal, and no note is longer than its bar.'
 seed: 20261013
@@ -41,32 +44,11 @@ instruments:
   - {name: lead_2, group: lead_2, program: lead_square, volume: 92, pan: 84, expression: 106}
   - name: bass
     group: bass
-    program: fingered_bass
+    program: acoustic_bass
     volume: 118
     pan: 64
     expression: 118
-    instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_dirty.sfz', settings: {fold_to_range: false}}
-  - name: bass_stac
-    group: bass
-    program: fingered_bass
-    volume: 118
-    pan: 64
-    expression: 118
-    instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_vicious.sfz', settings: {fold_to_range: false}}
-  - name: bass_hi
-    group: bass_hi
-    program: fingered_bass
-    volume: 118
-    pan: 64
-    expression: 118
-    instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_dirty.sfz', settings: {fold_to_range: false}}
-  - name: bass_hi_stac
-    group: bass_hi
-    program: fingered_bass
-    volume: 118
-    pan: 64
-    expression: 118
-    instrument_backend: {kind: sfz, sfz_glob: '**/Growlybass/Growlybass/growlybass_vicious.sfz', settings: {fold_to_range: false}}
+    instrument_backend: {kind: sfz, library_ref: bass.meatbass_pizz, required: true, settings: {fold_to_range: false}}
   - name: guitar
     group: guitar
     program: clean_guitar
@@ -253,229 +235,212 @@ materials:
       - [5/2, 9/40, G4, 88]
       - [11/4, 9/40, C5, 90]
       - [3/1, 19/40, F#4, 94]
-  # The bass has the drum rhythm: root, dead note, fifth, root (long), octave. Short notes are on the staccato program and long notes on the sustained program. The keys are one octave above the sound.
-  bass_vamp_short:
+  # The bass has the drum rhythm: root, a quiet root, fifth, root (long), octave. The notes are the notes of the sound.
+  bass_vamp:
     kind: events
     events:
-      - [0, 307/3840, D3, 112]
-      - [1/8, 173/3840, D3, 44]
-      - [3/8, 307/3840, A3, 100]
-      - [3/4, 307/3840, D4, 104]
-      - [7/8, 163/1920, A3, 98]
-      - [1/1, 307/3840, D3, 112]
-      - [9/8, 173/3840, D3, 44]
-      - [11/8, 307/3840, A3, 100]
-      - [7/4, 307/3840, D4, 104]
-      - [15/8, 163/1920, C4, 98]
-  bass_vamp_long:
+      - [0, 307/3840, D2, 112]
+      - [1/8, 173/3840, D2, 44]
+      - [3/8, 307/3840, A2, 100]
+      - [1/2, 1/5, D2, 104]
+      - [3/4, 307/3840, D3, 104]
+      - [7/8, 163/1920, A2, 98]
+      - [1/1, 307/3840, D2, 112]
+      - [9/8, 173/3840, D2, 44]
+      - [11/8, 307/3840, A2, 100]
+      - [3/2, 1/5, D2, 104]
+      - [7/4, 307/3840, D3, 104]
+      - [15/8, 163/1920, C3, 98]
+  # The bass of the tune, eight bars.
+  bass_a:
     kind: events
     events:
-      - [1/2, 1/5, D3, 104]
-      - [3/2, 1/5, D3, 104]
-  bass_a_short:
-    kind: events
-    events:
-      - [0, 307/3840, D3, 112]
-      - [1/8, 173/3840, D3, 44]
-      - [3/8, 307/3840, A3, 100]
-      - [3/4, 307/3840, D4, 104]
-      - [7/8, 163/1920, D4, 98]
-      - [1/1, 307/3840, D#3, 112]
-      - [9/8, 173/3840, D#3, 44]
-      - [11/8, 307/3840, D3, 104]
-      - [7/4, 307/3840, A3, 102]
-      - [15/8, 163/1920, C4, 98]
-      - [2/1, 307/3840, D3, 112]
-      - [17/8, 173/3840, D3, 44]
-      - [19/8, 307/3840, A3, 100]
-      - [11/4, 307/3840, D4, 104]
-      - [23/8, 163/1920, C4, 98]
-      - [3/1, 307/3840, C3, 112]
-      - [25/8, 173/3840, C3, 44]
-      - [27/8, 307/3840, G3, 100]
-      - [15/4, 307/3840, C4, 104]
-      - [31/8, 163/1920, G3, 98]
-      - [4/1, 307/3840, G3, 112]
-      - [33/8, 173/3840, G3, 44]
-      - [35/8, 307/3840, D4, 100]
-      - [19/4, 307/3840, G4, 104]
-      - [39/8, 163/1920, G3, 98]
-      - [5/1, 307/3840, F3, 112]
-      - [41/8, 173/3840, F3, 44]
-      - [43/8, 307/3840, C4, 100]
-      - [23/4, 307/3840, F4, 104]
-      - [47/8, 163/1920, F3, 98]
-      - [6/1, 307/3840, D#3, 112]
-      - [49/8, 173/3840, D#3, 44]
-      - [51/8, 307/3840, A#3, 100]
-      - [27/4, 307/3840, D#4, 104]
-      - [55/8, 163/1920, D#3, 98]
-      - [7/1, 307/3840, D3, 112]
-      - [57/8, 173/3840, D3, 44]
-      - [59/8, 307/3840, A3, 100]
-      - [31/4, 307/3840, A3, 100]
-      - [63/8, 163/1920, C4, 102]
-  bass_a_long:
-    kind: events
-    events:
-      - [1/2, 1/5, D3, 104]
-      - [3/2, 1/5, D3, 104]
-      - [5/2, 1/5, D3, 104]
-      - [7/2, 1/5, C3, 104]
-      - [9/2, 1/5, G3, 104]
-      - [11/2, 1/5, F3, 104]
-      - [13/2, 1/5, D#3, 104]
-      - [15/2, 1/5, D3, 104]
-  # The same eight bars; the last two notes go down to B flat.
-  bass_a_to_b_short:
-    kind: events
-    events:
-      - [0, 307/3840, D3, 112]
-      - [1/8, 173/3840, D3, 44]
-      - [3/8, 307/3840, A3, 100]
-      - [3/4, 307/3840, D4, 104]
-      - [7/8, 163/1920, D4, 98]
-      - [1/1, 307/3840, D#3, 112]
-      - [9/8, 173/3840, D#3, 44]
-      - [11/8, 307/3840, D3, 104]
-      - [7/4, 307/3840, A3, 102]
-      - [15/8, 163/1920, C4, 98]
-      - [2/1, 307/3840, D3, 112]
-      - [17/8, 173/3840, D3, 44]
-      - [19/8, 307/3840, A3, 100]
-      - [11/4, 307/3840, D4, 104]
-      - [23/8, 163/1920, C4, 98]
-      - [3/1, 307/3840, C3, 112]
-      - [25/8, 173/3840, C3, 44]
-      - [27/8, 307/3840, G3, 100]
-      - [15/4, 307/3840, C4, 104]
-      - [31/8, 163/1920, G3, 98]
-      - [4/1, 307/3840, G3, 112]
-      - [33/8, 173/3840, G3, 44]
-      - [35/8, 307/3840, D4, 100]
-      - [19/4, 307/3840, G4, 104]
-      - [39/8, 163/1920, G3, 98]
-      - [5/1, 307/3840, F3, 112]
-      - [41/8, 173/3840, F3, 44]
-      - [43/8, 307/3840, C4, 100]
-      - [23/4, 307/3840, F4, 104]
-      - [47/8, 163/1920, F3, 98]
-      - [6/1, 307/3840, D#3, 112]
-      - [49/8, 173/3840, D#3, 44]
-      - [51/8, 307/3840, A#3, 100]
-      - [27/4, 307/3840, D#4, 104]
-      - [55/8, 163/1920, D#3, 98]
-      - [7/1, 307/3840, D3, 112]
-      - [57/8, 173/3840, D3, 44]
-      - [59/8, 307/3840, A3, 100]
-      - [31/4, 307/3840, D3, 100]
+      - [0, 307/3840, D2, 112]
+      - [1/8, 173/3840, D2, 44]
+      - [3/8, 307/3840, A2, 100]
+      - [1/2, 1/5, D2, 104]
+      - [3/4, 307/3840, D3, 104]
+      - [7/8, 163/1920, D3, 98]
+      - [1/1, 307/3840, D#2, 112]
+      - [9/8, 173/3840, D#2, 44]
+      - [11/8, 307/3840, D2, 104]
+      - [3/2, 1/5, D2, 104]
+      - [7/4, 307/3840, A2, 102]
+      - [15/8, 163/1920, C3, 98]
+      - [2/1, 307/3840, D2, 112]
+      - [17/8, 173/3840, D2, 44]
+      - [19/8, 307/3840, A2, 100]
+      - [5/2, 1/5, D2, 104]
+      - [11/4, 307/3840, D3, 104]
+      - [23/8, 163/1920, C3, 98]
+      - [3/1, 307/3840, C2, 112]
+      - [25/8, 173/3840, C2, 44]
+      - [27/8, 307/3840, G2, 100]
+      - [7/2, 1/5, C2, 104]
+      - [15/4, 307/3840, C3, 104]
+      - [31/8, 163/1920, G2, 98]
+      - [4/1, 307/3840, G2, 112]
+      - [33/8, 173/3840, G2, 44]
+      - [35/8, 307/3840, D3, 100]
+      - [9/2, 1/5, G2, 104]
+      - [19/4, 307/3840, G3, 104]
+      - [39/8, 163/1920, G2, 98]
+      - [5/1, 307/3840, F2, 112]
+      - [41/8, 173/3840, F2, 44]
+      - [43/8, 307/3840, C3, 100]
+      - [11/2, 1/5, F2, 104]
+      - [23/4, 307/3840, F3, 104]
+      - [47/8, 163/1920, F2, 98]
+      - [6/1, 307/3840, D#2, 112]
+      - [49/8, 173/3840, D#2, 44]
+      - [51/8, 307/3840, A#2, 100]
+      - [13/2, 1/5, D#2, 104]
+      - [27/4, 307/3840, D#3, 104]
+      - [55/8, 163/1920, D#2, 98]
+      - [7/1, 307/3840, D2, 112]
+      - [57/8, 173/3840, D2, 44]
+      - [59/8, 307/3840, A2, 100]
+      - [15/2, 1/5, D2, 104]
+      - [31/4, 307/3840, A2, 100]
       - [63/8, 163/1920, C3, 102]
-  bass_a_to_b_long:
+  # The same eight bars; the last two notes go down to B flat.
+  bass_a_to_b:
     kind: events
     events:
-      - [1/2, 1/5, D3, 104]
-      - [3/2, 1/5, D3, 104]
-      - [5/2, 1/5, D3, 104]
-      - [7/2, 1/5, C3, 104]
-      - [9/2, 1/5, G3, 104]
-      - [11/2, 1/5, F3, 104]
-      - [13/2, 1/5, D#3, 104]
-      - [15/2, 1/5, D3, 104]
+      - [0, 307/3840, D2, 112]
+      - [1/8, 173/3840, D2, 44]
+      - [3/8, 307/3840, A2, 100]
+      - [1/2, 1/5, D2, 104]
+      - [3/4, 307/3840, D3, 104]
+      - [7/8, 163/1920, D3, 98]
+      - [1/1, 307/3840, D#2, 112]
+      - [9/8, 173/3840, D#2, 44]
+      - [11/8, 307/3840, D2, 104]
+      - [3/2, 1/5, D2, 104]
+      - [7/4, 307/3840, A2, 102]
+      - [15/8, 163/1920, C3, 98]
+      - [2/1, 307/3840, D2, 112]
+      - [17/8, 173/3840, D2, 44]
+      - [19/8, 307/3840, A2, 100]
+      - [5/2, 1/5, D2, 104]
+      - [11/4, 307/3840, D3, 104]
+      - [23/8, 163/1920, C3, 98]
+      - [3/1, 307/3840, C2, 112]
+      - [25/8, 173/3840, C2, 44]
+      - [27/8, 307/3840, G2, 100]
+      - [7/2, 1/5, C2, 104]
+      - [15/4, 307/3840, C3, 104]
+      - [31/8, 163/1920, G2, 98]
+      - [4/1, 307/3840, G2, 112]
+      - [33/8, 173/3840, G2, 44]
+      - [35/8, 307/3840, D3, 100]
+      - [9/2, 1/5, G2, 104]
+      - [19/4, 307/3840, G3, 104]
+      - [39/8, 163/1920, G2, 98]
+      - [5/1, 307/3840, F2, 112]
+      - [41/8, 173/3840, F2, 44]
+      - [43/8, 307/3840, C3, 100]
+      - [11/2, 1/5, F2, 104]
+      - [23/4, 307/3840, F3, 104]
+      - [47/8, 163/1920, F2, 98]
+      - [6/1, 307/3840, D#2, 112]
+      - [49/8, 173/3840, D#2, 44]
+      - [51/8, 307/3840, A#2, 100]
+      - [13/2, 1/5, D#2, 104]
+      - [27/4, 307/3840, D#3, 104]
+      - [55/8, 163/1920, D#2, 98]
+      - [7/1, 307/3840, D2, 112]
+      - [57/8, 173/3840, D2, 44]
+      - [59/8, 307/3840, A2, 100]
+      - [15/2, 1/5, D2, 104]
+      - [31/4, 307/3840, D2, 100]
+      - [63/8, 163/1920, C2, 102]
   # In the second part the bass has two long roots and two short notes in each bar.
-  bass_b_short:
+  bass_b:
     kind: events
     events:
-      - [3/4, 173/1920, F3, 98]
-      - [7/8, 173/1920, A#3, 96]
-      - [7/4, 173/1920, C3, 98]
-      - [15/8, 173/1920, F3, 96]
-      - [11/4, 173/1920, D3, 98]
-      - [23/8, 173/1920, G3, 96]
-      - [15/4, 173/1920, A3, 98]
-      - [31/8, 173/1920, D4, 96]
-      - [19/4, 173/1920, A#3, 98]
-      - [39/8, 173/1920, D#4, 96]
-      - [23/4, 173/1920, F3, 98]
-      - [47/8, 173/1920, A#3, 96]
-      - [27/4, 173/1920, G3, 98]
-      - [55/8, 173/1920, C4, 96]
-      - [61/8, 173/1920, D3, 96]
-      - [31/4, 173/1920, A3, 100]
-      - [63/8, 173/1920, C4, 104]
-  bass_b_long:
-    kind: events
-    events:
-      - [0, 13/40, A#2, 104]
-      - [3/8, 13/40, A#2, 98]
-      - [1/1, 13/40, F2, 104]
-      - [11/8, 13/40, F2, 98]
-      - [2/1, 13/40, G2, 104]
-      - [19/8, 13/40, G2, 98]
-      - [3/1, 13/40, D3, 104]
-      - [27/8, 13/40, D3, 98]
-      - [4/1, 13/40, D#3, 104]
-      - [35/8, 13/40, D#3, 98]
-      - [5/1, 13/40, A#2, 104]
-      - [43/8, 13/40, A#2, 98]
-      - [6/1, 13/40, C3, 104]
-      - [51/8, 13/40, C3, 98]
-      - [7/1, 19/40, D3, 106]
+      - [0, 13/40, A#1, 104]
+      - [3/8, 13/40, A#1, 98]
+      - [3/4, 173/1920, F2, 98]
+      - [7/8, 173/1920, A#2, 96]
+      - [1/1, 13/40, F1, 104]
+      - [11/8, 13/40, F1, 98]
+      - [7/4, 173/1920, C2, 98]
+      - [15/8, 173/1920, F2, 96]
+      - [2/1, 13/40, G1, 104]
+      - [19/8, 13/40, G1, 98]
+      - [11/4, 173/1920, D2, 98]
+      - [23/8, 173/1920, G2, 96]
+      - [3/1, 13/40, D2, 104]
+      - [27/8, 13/40, D2, 98]
+      - [15/4, 173/1920, A2, 98]
+      - [31/8, 173/1920, D3, 96]
+      - [4/1, 13/40, D#2, 104]
+      - [35/8, 13/40, D#2, 98]
+      - [19/4, 173/1920, A#2, 98]
+      - [39/8, 173/1920, D#3, 96]
+      - [5/1, 13/40, A#1, 104]
+      - [43/8, 13/40, A#1, 98]
+      - [23/4, 173/1920, F2, 98]
+      - [47/8, 173/1920, A#2, 96]
+      - [6/1, 13/40, C2, 104]
+      - [51/8, 13/40, C2, 98]
+      - [27/4, 173/1920, G2, 98]
+      - [55/8, 173/1920, C3, 96]
+      - [7/1, 19/40, D2, 106]
+      - [61/8, 173/1920, D2, 96]
+      - [31/4, 173/1920, A2, 100]
+      - [63/8, 173/1920, C3, 104]
   # Bars 5 to 8 of the tune.
-  bass_tail_short:
+  bass_tail:
     kind: events
     events:
-      - [0, 307/3840, G3, 112]
-      - [1/8, 173/3840, G3, 44]
-      - [3/8, 307/3840, D4, 100]
-      - [3/4, 307/3840, G4, 104]
-      - [7/8, 163/1920, G3, 98]
-      - [1/1, 307/3840, F3, 112]
-      - [9/8, 173/3840, F3, 44]
-      - [11/8, 307/3840, C4, 100]
-      - [7/4, 307/3840, F4, 104]
-      - [15/8, 163/1920, F3, 98]
-      - [2/1, 307/3840, D#3, 112]
-      - [17/8, 173/3840, D#3, 44]
-      - [19/8, 307/3840, A#3, 100]
-      - [11/4, 307/3840, D#4, 104]
-      - [23/8, 163/1920, D#3, 98]
-      - [3/1, 307/3840, D3, 112]
-      - [25/8, 173/3840, D3, 44]
-      - [27/8, 307/3840, A3, 100]
-      - [15/4, 307/3840, A3, 100]
-      - [31/8, 163/1920, C4, 102]
-  bass_tail_long:
+      - [0, 307/3840, G2, 112]
+      - [1/8, 173/3840, G2, 44]
+      - [3/8, 307/3840, D3, 100]
+      - [1/2, 1/5, G2, 104]
+      - [3/4, 307/3840, G3, 104]
+      - [7/8, 163/1920, G2, 98]
+      - [1/1, 307/3840, F2, 112]
+      - [9/8, 173/3840, F2, 44]
+      - [11/8, 307/3840, C3, 100]
+      - [3/2, 1/5, F2, 104]
+      - [7/4, 307/3840, F3, 104]
+      - [15/8, 163/1920, F2, 98]
+      - [2/1, 307/3840, D#2, 112]
+      - [17/8, 173/3840, D#2, 44]
+      - [19/8, 307/3840, A#2, 100]
+      - [5/2, 1/5, D#2, 104]
+      - [11/4, 307/3840, D#3, 104]
+      - [23/8, 163/1920, D#2, 98]
+      - [3/1, 307/3840, D2, 112]
+      - [25/8, 173/3840, D2, 44]
+      - [27/8, 307/3840, A2, 100]
+      - [7/2, 1/5, D2, 104]
+      - [15/4, 307/3840, A2, 100]
+      - [31/8, 163/1920, C3, 102]
+  # The bass has bars 1 to 4 of the tune, two octaves below the lead.
+  bass_tune:
     kind: events
     events:
-      - [1/2, 1/5, G3, 104]
-      - [3/2, 1/5, F3, 104]
-      - [5/2, 1/5, D#3, 104]
-      - [7/2, 1/5, D3, 104]
-  # The bass has bars 1 to 4 of the tune, one octave below the lead.
-  bass_tune_short:
-    kind: events
-    events:
-      - [0, 3/40, D4, 108]
-      - [1/8, 3/40, D4, 98]
-      - [3/8, 1/10, F#4, 102]
-      - [3/4, 1/10, G4, 100]
-      - [7/8, 403/3840, F#4, 98]
-      - [2/1, 3/40, D4, 108]
-      - [17/8, 3/40, D4, 98]
-      - [19/8, 1/10, F#4, 102]
-      - [11/4, 1/10, G4, 100]
-      - [23/8, 403/3840, A4, 100]
-      - [15/4, 1/10, C4, 98]
-      - [31/8, 403/3840, D4, 100]
-  bass_tune_long:
-    kind: events
-    events:
-      - [1/2, 9/40, A4, 104]
-      - [1/1, 13/40, D#4, 104]
-      - [11/8, 2/5, D4, 102]
-      - [5/2, 9/40, A4, 104]
-      - [3/1, 13/40, G4, 104]
-      - [27/8, 13/40, D#4, 102]
+      - [0, 3/40, D3, 104]
+      - [1/8, 3/40, D3, 94]
+      - [3/8, 1/10, F#3, 98]
+      - [1/2, 9/40, A3, 89]
+      - [3/4, 1/10, G3, 96]
+      - [7/8, 403/3840, F#3, 94]
+      - [1/1, 13/40, D#3, 89]
+      - [11/8, 2/5, D3, 88]
+      - [2/1, 3/40, D3, 104]
+      - [17/8, 3/40, D3, 94]
+      - [19/8, 1/10, F#3, 98]
+      - [5/2, 9/40, A3, 89]
+      - [11/4, 1/10, G3, 96]
+      - [23/8, 403/3840, A3, 96]
+      - [3/1, 13/40, G3, 89]
+      - [27/8, 13/40, D#3, 88]
+      - [15/4, 1/10, C3, 94]
+      - [31/8, 403/3840, D3, 96]
   # Guitar: short chords on the high strokes of the drum rhythm. Each string is 12 ticks after the string before it.
   guitar_vamp:
     kind: events
@@ -749,65 +714,27 @@ parts:
     voices:
       - id: bass_main
         clips:
-          - id: bass_vamp_long
+          - id: bass_vamp
             at: {bar: 1, beat: 1}
-            use: bass_vamp_long
-          - id: bass_tune_1_long
+            use: bass_vamp
+          - id: bass_tune_1
             at: {bar: 3, beat: 1}
-            use: bass_a_long
-          - id: bass_tune_2_long
+            use: bass_a
+          - id: bass_tune_2
             at: {bar: 11, beat: 1}
-            use: bass_a_to_b_long
-          - id: bass_bright_long
+            use: bass_a_to_b
+          - id: bass_bright
             at: {bar: 19, beat: 1}
-            use: bass_b_long
-          - id: bass_tune_3_long
+            use: bass_b
+          - id: bass_tune_3
             at: {bar: 27, beat: 1}
-            use: bass_a_long
-          - id: bass_end_long
-            at: {bar: 39, beat: 1}
-            use: bass_tail_long
-  - id: bass_stac_part
-    instrument: bass_stac
-    voices:
-      - id: bass_stac_main
-        clips:
-          - id: bass_vamp_short
-            at: {bar: 1, beat: 1}
-            use: bass_vamp_short
-          - id: bass_tune_1_short
-            at: {bar: 3, beat: 1}
-            use: bass_a_short
-          - id: bass_tune_2_short
-            at: {bar: 11, beat: 1}
-            use: bass_a_to_b_short
-          - id: bass_bright_short
-            at: {bar: 19, beat: 1}
-            use: bass_b_short
-          - id: bass_tune_3_short
-            at: {bar: 27, beat: 1}
-            use: bass_a_short
-          - id: bass_end_short
-            at: {bar: 39, beat: 1}
-            use: bass_tail_short
-  - id: bass_hi_part
-    instrument: bass_hi
-    voices:
-      - id: bass_hi_main
-        clips:
-          - id: bass_has_tune_long
+            use: bass_a
+          - id: bass_has_tune
             at: {bar: 35, beat: 1}
-            use: bass_tune_long
-            velocity_scale: 0.86
-  - id: bass_hi_stac_part
-    instrument: bass_hi_stac
-    voices:
-      - id: bass_hi_stac_main
-        clips:
-          - id: bass_has_tune_short
-            at: {bar: 35, beat: 1}
-            use: bass_tune_short
-            velocity_scale: 0.96
+            use: bass_tune
+          - id: bass_end
+            at: {bar: 39, beat: 1}
+            use: bass_tail
   - id: guitar_part
     instrument: guitar
     voices:
@@ -1033,20 +960,16 @@ processing:
   groups:
     bass:
       chain:
-        - {processor: highpass, cutoff_hz: 34}
+        - {processor: highpass, cutoff_hz: 40}
+        # The compressor makes the notes of the double bass equal in level: the samples differ by 9 dB from note to note.
+        - {processor: compressor, threshold_db: -30.0, ratio: 3.0, attack_ms: 20.0, release_ms: 140.0, makeup_db: 3.0}
+        # The middle of the range lets a small loudspeaker give the bass. The instrument has almost no sound above 1.5 kHz.
         - processor: parametric_eq
           bands:
-            - {type: peak, hz: 220, q: 1.0, db: -1.5}
-            - {type: peak, hz: 900, q: 0.9, db: 2.5}
-            - {type: peak, hz: 2400, q: 1.0, db: 3.0}
-        - {processor: compressor, threshold_db: -26.0, ratio: 4.0, attack_ms: 12.0, release_ms: 140.0, makeup_db: 5.0}
-        - {processor: gain, gain_db: -1.0}
-    bass_hi:
-      chain:
-        - {processor: highpass, cutoff_hz: 40}
-        - {processor: lowpass, cutoff_hz: 2200}
-        - {processor: compressor, threshold_db: -26.0, ratio: 4.0, attack_ms: 12.0, release_ms: 140.0, makeup_db: 5.0}
-        - {processor: gain, gain_db: 1.5}
+            - {type: peak, hz: 250, q: 0.8, db: 2.5}
+            - {type: peak, hz: 800, q: 0.8, db: 5.0}
+            - {type: peak, hz: 1800, q: 1.0, db: 3.0}
+        - {processor: gain, gain_db: -3.5}
     lead:
       chain:
         - {processor: highpass, cutoff_hz: 250}
