@@ -1,0 +1,588 @@
+schema: ambition.musicir.v3
+id: math_town_night
+title: Countably Many Stars
+description: >-
+  The night music of the central town of the Math dimension: the town is asleep, the lamps and a few
+  windows are lit, and there are more stars than anyone can count. D dorian, 64 BPM, sparse. A piano
+  ostinato and a slow night song; a celesta adds a few stars (1, 1, 2, 3 of them); a distant horn states
+  the Euclid Street motif and the piano answers with its inversion; the harp turns five notes against
+  eight; at the end the horn plays the premise and the celesta the conclusion. One of four cues for the
+  day and night of the town.
+notes:
+  - 'Jon, 2026-10-15: the central town of the Math dimension gets a day/night cycle, "so music for morning, daytime, evening, and nighttime is a good idea. Let''s build distinct new music for this." This is the night cue. It is a new composition: it does not use the motifs of standing_on_shoulders or shoulders_at_rest.'
+  - 'The family motif of the four town cues (Euclid Street): scale degrees 1 5 4 3 | 2 3 5, a premise and its conclusion. Here, in D minor: D | A G F- | E F A- on the horn in bars 17-19; the piano answers with the inversion in D dorian (D | G A B- | C B G-) in bars 20-22; the horn plays the conclusion (E F A) slowly in bars 23-24; in bars 36-37 the horn plays the premise and in bar 39 the celesta plays the conclusion.'
+  - 'No drums. No held note is above A5; the celesta plays a few short notes from D5 to A5, and the highest note of the piano is G5 (one beat). The B natural of D dorian is the colour of the night song.'
+  - 'Orbit (bars 25-32): the harp plays a cycle of five chord notes in eighth notes, so the cycle starts on a different eighth in each bar and comes back to the bar line after five bars.'
+  - 'The file loops as a whole: bar 41 is bar 1. The last bar is A7sus4 on the piano and the bass, and its notes stop before the last eighth note; bar 1 is the D minor of the ostinato.'
+seed: 2026101502
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 64
+key: {tonic: D, mode: dorian}
+end: {bar: 41, beat: 1}
+form:
+  - {id: lanterns_out, label: 'Lanterns out: the piano alone, then the bass', from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, role: loop_component, loopable: true}
+  - {id: first_stars, label: 'First stars: the night song on the piano, the celesta counts the stars', from: {bar: 9, beat: 1}, to: {bar: 17, beat: 1}, role: loop_component, loopable: true}
+  - {id: lamplight, label: 'Lamplight: a distant horn states the Euclid Street motif, the piano answers', from: {bar: 17, beat: 1}, to: {bar: 25, beat: 1}, role: loop_component, loopable: true}
+  - {id: orbit, label: 'Orbit: the harp turns five notes against eight', from: {bar: 25, beat: 1}, to: {bar: 33, beat: 1}, role: loop_component, loopable: true}
+  - {id: deep_night, label: 'Deep night: the song again, the motif once more, and the piano alone', from: {bar: 33, beat: 1}, to: {bar: 41, beat: 1}, role: loop_component, loopable: true}
+render:
+  backend: pretty-midi
+  sample_rate: 48000
+  ogg_quality: 7
+  metadata_markers:
+    - {bar: 1, id: m1, label: 'Lanterns out'}
+    - {bar: 9, id: m9, label: 'First stars'}
+    - {bar: 17, id: m17, label: 'Lamplight'}
+    - {bar: 25, id: m25, label: 'Orbit'}
+    - {bar: 33, id: m33, label: 'Deep night'}
+instruments:
+  - name: piano
+    group: piano
+    program: acoustic_grand_piano
+    volume: 100
+    pan: 64
+    expression: 104
+    instrument_backend: {kind: sfz, library_ref: freepats.salamander_grand}
+  - name: celesta
+    group: celesta
+    program: celesta
+    volume: 96
+    pan: 64
+    expression: 100
+    instrument_backend:
+      kind: sfz
+      # Sonatina Celeste (not in the instrument catalog): a plain velocity
+      # response. The VPO3 celesta needs CC1 dynamics and is silent at soft
+      # velocities.
+      sfz: "/data/audio-tools/sfz/Sonatina/SymphonicOrchestra/sso-4.0/Sonatina Symphonic Orchestra/Percussion/Celeste.sfz"
+  - name: horn
+    group: horn
+    program: french_horn
+    volume: 100
+    pan: 64
+    expression: 104
+    instrument_backend: {kind: sfz, library_ref: orchestra.horns_sustain}
+  - name: harp
+    group: harp
+    program: orchestral_harp
+    volume: 100
+    pan: 64
+    expression: 104
+    instrument_backend: {kind: sfz, library_ref: folk.harp}
+  - name: strings
+    group: strings
+    program: string_ensemble_1
+    volume: 84
+    pan: 64
+    expression: 92
+    # The mod wheel (CC1) sets the level of this VPO patch.
+    modulation: 48
+    instrument_backend: {kind: sfz, library_ref: vpo.strings}
+  - name: bass
+    group: bass
+    program: acoustic_bass
+    volume: 110
+    pan: 64
+    expression: 112
+    instrument_backend: {kind: sfz, library_ref: bass.meatbass_pizz, required: true, settings: {fold_to_range: false}}
+harmony:
+  events:
+    - {bar: 1, beat: 1, chord: 'Dm9'}
+    - {bar: 2, beat: 1, chord: 'G6/D'}
+    - {bar: 3, beat: 1, chord: 'Dm9'}
+    - {bar: 4, beat: 1, chord: 'C/D'}
+    - {bar: 5, beat: 1, chord: 'Dm9'}
+    - {bar: 6, beat: 1, chord: 'G6/D'}
+    - {bar: 7, beat: 1, chord: 'Gm6/D'}
+    - {bar: 8, beat: 1, chord: 'A7sus4'}
+    - {bar: 9, beat: 1, chord: 'Dm9'}
+    - {bar: 10, beat: 1, chord: 'Em7'}
+    - {bar: 11, beat: 1, chord: 'Fmaj7'}
+    - {bar: 12, beat: 1, chord: 'G6'}
+    - {bar: 13, beat: 1, chord: 'Bbmaj7#11'}
+    - {bar: 14, beat: 1, chord: 'Am7'}
+    - {bar: 15, beat: 1, chord: 'Gm6'}
+    - {bar: 16, beat: 1, chord: 'A7sus4'}
+    - {bar: 16, beat: 3, chord: 'A7'}
+    - {bar: 17, beat: 1, chord: 'Dm9'}
+    - {bar: 18, beat: 1, chord: 'Bbmaj7'}
+    - {bar: 19, beat: 1, chord: 'C/E'}
+    - {bar: 19, beat: 3, chord: 'Fmaj7'}
+    - {bar: 20, beat: 1, chord: 'Dm9'}
+    - {bar: 21, beat: 1, chord: 'G6'}
+    - {bar: 22, beat: 1, chord: 'Am7'}
+    - {bar: 23, beat: 1, chord: 'Bbmaj7#11'}
+    - {bar: 24, beat: 1, chord: 'A7sus4'}
+    - {bar: 24, beat: 3, chord: 'A7'}
+    - {bar: 25, beat: 1, chord: 'Bbmaj7#11'}
+    - {bar: 26, beat: 1, chord: 'Fmaj7/A'}
+    - {bar: 27, beat: 1, chord: 'Gm9'}
+    - {bar: 28, beat: 1, chord: 'Dm9'}
+    - {bar: 29, beat: 1, chord: 'Bbmaj7#11'}
+    - {bar: 30, beat: 1, chord: 'C/Bb'}
+    - {bar: 31, beat: 1, chord: 'Am7'}
+    - {bar: 32, beat: 1, chord: 'A7sus4'}
+    - {bar: 32, beat: 3, chord: 'A7'}
+    - {bar: 33, beat: 1, chord: 'Dm9'}
+    - {bar: 34, beat: 1, chord: 'Em7'}
+    - {bar: 35, beat: 1, chord: 'Fmaj7'}
+    - {bar: 36, beat: 1, chord: 'G6'}
+    - {bar: 37, beat: 1, chord: 'Dm9'}
+    - {bar: 38, beat: 1, chord: 'G6/D'}
+    - {bar: 39, beat: 1, chord: 'Dm9'}
+    - {bar: 40, beat: 1, chord: 'A7sus4'}
+materials:
+  piano_lanterns_out:
+    kind: events
+    events:
+      - {at: 0, dur: 77/80, pitches: [D2, A2], velocity: 55}
+      - [193/768, 7/10, F4, 46]
+      - [1447/3840, 23/40, A4, 47]
+      - [1927/3840, 37/80, E5, 56]
+      - {at: 1279/1280, dur: 77/80, pitches: [D2, A2], velocity: 52}
+      - [601/480, 7/10, G4, 45]
+      - [659/480, 23/40, B4, 46]
+      - [1921/1280, 37/80, D5, 56]
+      - {at: 1537/768, dur: 77/80, pitches: [D2, A2], velocity: 48}
+      - [2159/960, 7/10, F4, 45]
+      - [9119/3840, 23/40, A4, 46]
+      - [1921/768, 37/80, E5, 55]
+      - {at: 1921/640, dur: 77/80, pitches: [D2, A2], velocity: 48}
+      - [6241/1920, 7/10, E4, 48]
+      - [12967/3840, 23/40, G4, 46]
+      - [4481/1280, 37/80, C5, 52]
+      - {at: 3839/960, dur: 77/80, pitches: [D2, A2], velocity: 48}
+      - [3263/768, 7/10, F4, 44]
+      - [2801/640, 23/40, A4, 47]
+      - [8641/1920, 37/80, E5, 55]
+      - {at: 19207/3840, dur: 77/80, pitches: [D2, A2], velocity: 49}
+      - [6719/1280, 7/10, G4, 44]
+      - [20647/3840, 23/40, B4, 47]
+      - [3519/640, 37/80, E5, 53]
+      - {at: 11519/1920, dur: 77/80, pitches: [D2, A2], velocity: 52}
+      - [3999/640, 7/10, G4, 44]
+      - [24487/3840, 23/40, Bb4, 50]
+      - [6241/960, 37/80, D5, 53]
+      - {at: 13441/1920, dur: 77/80, pitches: [A1, E2], velocity: 49}
+      - [5569/768, 7/10, E4, 46]
+      - [9441/1280, 23/40, A4, 49]
+      - [3601/480, 19/80, D5, 55]
+      - [14881/1920, 9/40, Db5, 51]
+  piano_first_stars:
+    kind: events
+    events:
+      - [1/768, 1/2, A4, 64]
+      - {at: 1/160, dur: 19/20, pitches: [E3, F3, C4], velocity: 39}
+      - [639/1280, 1/4, D5, 62]
+      - [361/480, 1/4, E5, 64]
+      - [769/768, 3/8, D5, 63]
+      - {at: 1933/1920, dur: 19/20, pitches: [E3, G3, D4], velocity: 38}
+      - [659/480, 1/8, B4, 63]
+      - [5767/3840, 1/2, G4, 65]
+      - [1921/960, 1/4, A4, 61]
+      - {at: 513/256, dur: 19/20, pitches: [E3, A3, C4], velocity: 40}
+      - [8639/3840, 1/4, C5, 62]
+      - [1599/640, 1/2, E5, 68]
+      - [2305/768, 3/4, B4, 66]
+      - {at: 11539/3840, dur: 19/20, pitches: [E3, G3, B3], velocity: 37}
+      - {at: 15371/3840, dur: 19/20, pitches: [E3, A3, D4], velocity: 39}
+      - [15833/3840, 1/8, F4, 60]
+      - [16313/3840, 1/8, A4, 62]
+      - [16801/3840, 1/8, D5, 62]
+      - [3457/768, 1/2, E5, 66]
+      - [6399/1280, 3/8, C5, 64]
+      - {at: 1281/256, dur: 19/20, pitches: [E3, G3, C4], velocity: 36}
+      - [3439/640, 1/8, B4, 63]
+      - [5279/960, 1/2, A4, 63]
+      - [23047/3840, 1/4, Bb4, 60]
+      - {at: 23059/3840, dur: 19/20, pitches: [D3, E3, G3], velocity: 40}
+      - [25/4, 1/8, A4, 61]
+      - [3061/480, 1/8, G4, 62]
+      - [3119/480, 1/2, E4, 60]
+      - [8961/1280, 1/2, D4, 59]
+      - {at: 8967/1280, dur: 19/40, pitches: [D3, E3, G3], velocity: 37}
+      - [9601/1280, 1/2, Db4, 62]
+      - {at: 1201/160, dur: 19/40, pitches: [E3, G3, A3], velocity: 38}
+  piano_lamplight:
+    kind: events
+    events:
+      - [1799/480, 1/4, D5, 57]
+      - [3839/960, 1/4, G4, 54]
+      - [3263/768, 1/4, A4, 56]
+      - [4319/960, 1/2, B4, 56]
+      - [9601/1920, 1/4, C5, 57]
+      - [20167/3840, 1/4, B4, 55]
+      - [7039/1280, 1/2, G4, 55]
+      - [10239/1280, 3/8, D5, 61]
+  piano_orbit:
+    kind: events
+    events:
+      - [719/1920, 1/8, E5, 63]
+      - [1913/3840, 1/2, F5, 66]
+      - [481/480, 1/4, E5, 59]
+      - [599/480, 1/4, C5, 60]
+      - [961/640, 1/2, A4, 57]
+      - [1921/960, 3/8, Bb4, 60]
+      - [3039/1280, 1/8, A4, 56]
+      - [5/2, 1/2, D5, 64]
+      - [5761/1920, 3/4, E5, 61]
+      - [15359/3840, 3/8, D5, 61]
+      - [4199/960, 1/8, E5, 61]
+      - [17281/3840, 1/4, F5, 64]
+      - [18247/3840, 1/4, G5, 65]
+      - [3839/768, 1/2, E5, 65]
+      - [21113/3840, 1/4, C5, 61]
+      - [11041/1920, 1/4, G4, 58]
+      - [23041/3840, 3/8, A4, 57]
+      - [3061/480, 1/8, B4, 60]
+      - [12479/1920, 1/2, C5, 59]
+      - [13441/1920, 1/2, D5, 61]
+      - [9601/1280, 1/2, Db5, 60]
+  piano_deep_night:
+    kind: events
+    events:
+      - [1/1920, 1/2, A4, 59]
+      - {at: 23/3840, dur: 19/20, pitches: [E3, F3, C4], velocity: 37}
+      - [383/768, 1/4, D5, 57]
+      - [479/640, 1/4, E5, 62]
+      - [481/480, 3/8, D5, 61]
+      - {at: 257/256, dur: 19/20, pitches: [E3, G3, D4], velocity: 37}
+      - [659/480, 1/8, B4, 58]
+      - [5767/3840, 1/2, G4, 58]
+      - [961/480, 1/4, A4, 57]
+      - {at: 3847/1920, dur: 19/20, pitches: [E3, A3, C4], velocity: 39}
+      - [2161/960, 1/4, C5, 56]
+      - [9599/3840, 1/2, E5, 61]
+      - [11513/3840, 3/4, B4, 60]
+      - {at: 5767/1920, dur: 19/20, pitches: [E3, G3, B3], velocity: 37}
+      - {at: 3841/960, dur: 77/80, pitches: [D2, A2], velocity: 54}
+      - [2039/480, 7/10, F4, 44]
+      - [5599/1280, 23/40, A4, 49]
+      - [2159/480, 37/80, E5, 55]
+      - {at: 3199/640, dur: 77/80, pitches: [D2, A2], velocity: 52}
+      - [2521/480, 7/10, G4, 45]
+      - [10321/1920, 23/40, B4, 50]
+      - [4223/768, 37/80, D5, 53]
+      - {at: 7679/1280, dur: 77/80, pitches: [D2, A2], velocity: 50}
+      - {at: 13441/1920, dur: 9/10, pitches: [A1, E2], velocity: 50}
+      - [27841/3840, 13/20, E4, 45]
+      - [5663/768, 21/40, A4, 47]
+      - [4799/640, 2/5, D5, 53]
+  celesta_first_stars:
+    kind: events
+    events:
+      - [1559/960, 3/8, E5, 48]
+      - [2399/640, 3/8, G5, 51]
+      - [15361/3840, 3/8, A5, 48]
+      - [4321/768, 3/8, E5, 47]
+      - [5185/768, 3/8, D5, 52]
+      - [28319/3840, 3/8, A5, 53]
+      - [5951/768, 3/8, E5, 48]
+  celesta_orbit:
+    kind: events
+    events:
+      - [6959/1920, 3/8, A5, 47]
+      - [22079/3840, 3/8, G5, 51]
+      - [6359/960, 3/8, E5, 51]
+  celesta_deep_night:
+    kind: events
+    events:
+      - [5761/960, 1/4, E5, 54]
+      - [25/4, 1/4, F5, 54]
+      - [4159/640, 2/5, A5, 53]
+  horn_lamplight:
+    kind: events
+    events:
+      - [3/4, 19/80, D4, 60]
+      - [959/960, 19/80, A4, 64]
+      - [5/4, 19/80, G4, 63]
+      - [2881/1920, 19/40, F4, 64]
+      - [7681/3840, 19/80, E4, 61]
+      - [8639/3840, 19/80, F4, 62]
+      - [3201/1280, 19/40, A4, 60]
+      - [23039/3840, 1843/3840, E4, 60]
+      - [8321/1280, 1843/3840, F4, 56]
+      - [8959/1280, 553/640, A4, 56]
+  horn_deep_night:
+    kind: events
+    events:
+      - [4801/1280, 19/80, D4, 55]
+      - [3839/960, 19/80, A4, 56]
+      - [8161/1920, 19/80, G4, 54]
+      - [4319/960, 821/1920, F4, 53]
+  harp_orbit:
+    kind: events
+    events:
+      - [1/768, 2/5, Bb3, 43]
+      - [161/1280, 2/5, F4, 39]
+      - [319/1280, 2/5, A4, 40]
+      - [479/1280, 2/5, D5, 41]
+      - [481/960, 2/5, E5, 46]
+      - [479/768, 31/80, Bb3, 50]
+      - [481/640, 21/80, F4, 44]
+      - [561/640, 11/80, A4, 49]
+      - [1919/1920, 2/5, A4, 50]
+      - [721/640, 2/5, C5, 44]
+      - [4801/3840, 2/5, A3, 49]
+      - [1057/768, 2/5, E4, 47]
+      - [1151/768, 2/5, F4, 41]
+      - [3121/1920, 31/80, A4, 41]
+      - [6721/3840, 21/80, C5, 44]
+      - [7201/3840, 11/80, A3, 46]
+      - [3839/1920, 2/5, D4, 40]
+      - [1631/768, 2/5, F4, 43]
+      - [1441/640, 2/5, A4, 41]
+      - [3041/1280, 2/5, Bb4, 41]
+      - [2401/960, 2/5, G3, 46]
+      - [5039/1920, 31/80, D4, 42]
+      - [5281/1920, 21/80, F4, 48]
+      - [11039/3840, 11/80, A4, 49]
+      - [1919/640, 2/5, E5, 46]
+      - [11999/3840, 2/5, D4, 49]
+      - [2497/768, 2/5, F4, 43]
+      - [6479/1920, 2/5, A4, 42]
+      - [4479/1280, 2/5, C5, 46]
+      - [4641/1280, 31/80, E5, 46]
+      - [3599/960, 21/80, D4, 48]
+      - [14881/3840, 11/80, F4, 44]
+      - [7679/1920, 2/5, A4, 39]
+      - [7921/1920, 2/5, D5, 43]
+      - [8159/1920, 2/5, E5, 40]
+      - [3359/768, 2/5, Bb3, 47]
+      - [17281/3840, 2/5, F4, 47]
+      - [4439/960, 31/80, A4, 47]
+      - [4559/960, 21/80, D5, 45]
+      - [18721/3840, 11/80, E5, 45]
+      - [4801/960, 2/5, Bb3, 52]
+      - [3281/640, 2/5, E4, 45]
+      - [20161/3840, 2/5, G4, 47]
+      - [10319/1920, 2/5, C5, 46]
+      - [3521/640, 2/5, E5, 42]
+      - [10801/1920, 31/80, Bb3, 49]
+      - [7359/1280, 21/80, E4, 39]
+      - [5641/960, 11/80, G4, 39]
+      - [11519/1920, 2/5, B4, 39]
+      - [5881/960, 2/5, C5, 42]
+      - [6001/960, 2/5, A3, 43]
+      - [51/8, 2/5, E4, 41]
+      - [4161/640, 2/5, G4, 43]
+      - [53/8, 31/80, B4, 42]
+      - [25921/3840, 21/80, C5, 45]
+      - [26399/3840, 11/80, A3, 49]
+      - [4481/640, 2/5, D4, 46]
+      - [5473/768, 31/80, E4, 48]
+      - [29/4, 21/80, G4, 45]
+      - [9439/1280, 11/80, D5, 44]
+      - [4799/640, 2/5, A3, 44]
+      - [29281/3840, 31/80, Db4, 45]
+      - [29759/3840, 21/80, E4, 42]
+      - [30241/3840, 11/80, G4, 44]
+  strings_first_stars:
+    kind: events
+    events:
+      - {at: 4/1, dur: 37/40, pitches: [F3, A3, D4, E4], velocity: 36}
+      - {at: 5/1, dur: 37/40, pitches: [G3, A3, C4, E4], velocity: 35}
+      - {at: 6/1, dur: 37/40, pitches: [G3, Bb3, D4, E4], velocity: 35}
+      - {at: 7/1, dur: 17/40, pitches: [G3, A3, D4, E4], velocity: 36}
+      - {at: 15/2, dur: 17/40, pitches: [G3, A3, Db4, E4], velocity: 37}
+  strings_lamplight:
+    kind: events
+    events:
+      - {at: 0, dur: 37/40, pitches: [A3, C4, E4, F4], velocity: 40}
+      - {at: 1/1, dur: 37/40, pitches: [A3, Bb3, D4, F4], velocity: 39}
+      - {at: 2/1, dur: 17/40, pitches: [G3, C4, E4, G4], velocity: 40}
+      - {at: 5/2, dur: 17/40, pitches: [A3, C4, E4, F4], velocity: 39}
+      - {at: 3/1, dur: 37/40, pitches: [A3, C4, E4, F4], velocity: 40}
+      - {at: 4/1, dur: 37/40, pitches: [G3, B3, D4, E4], velocity: 41}
+      - {at: 5/1, dur: 37/40, pitches: [G3, A3, C4, E4], velocity: 40}
+      - {at: 6/1, dur: 37/40, pitches: [A3, D4, E4, F4], velocity: 39}
+      - {at: 7/1, dur: 17/40, pitches: [G3, A3, D4, E4], velocity: 41}
+      - {at: 15/2, dur: 17/40, pitches: [G3, A3, Db4, E4], velocity: 39}
+  strings_orbit:
+    kind: events
+    events:
+      - {at: 0, dur: 37/40, pitches: [A3, D4, E4, F4], velocity: 41}
+      - {at: 1/1, dur: 37/40, pitches: [A3, C4, E4, F4], velocity: 41}
+      - {at: 2/1, dur: 37/40, pitches: [A3, Bb3, D4, F4], velocity: 41}
+      - {at: 3/1, dur: 37/40, pitches: [A3, C4, D4, F4], velocity: 39}
+      - {at: 4/1, dur: 37/40, pitches: [A3, D4, E4, F4], velocity: 41}
+      - {at: 5/1, dur: 37/40, pitches: [G3, C4, E4, G4], velocity: 41}
+      - {at: 6/1, dur: 37/40, pitches: [A3, C4, E4, G4], velocity: 40}
+      - {at: 7/1, dur: 17/40, pitches: [A3, D4, E4, G4], velocity: 39}
+      - {at: 15/2, dur: 17/40, pitches: [A3, Db4, E4, G4], velocity: 41}
+  strings_deep_night:
+    kind: events
+    events:
+      - {at: 0, dur: 37/40, pitches: [A3, C4, E4, F4], velocity: 36}
+      - {at: 1/1, dur: 37/40, pitches: [G3, B3, D4, E4], velocity: 37}
+      - {at: 2/1, dur: 37/40, pitches: [A3, C4, E4, F4], velocity: 36}
+      - {at: 3/1, dur: 37/40, pitches: [G3, B3, D4, E4], velocity: 37}
+  bass_lanterns_out:
+    kind: events
+    events:
+      - [15359/3840, 17/20, D2, 76]
+      - [19199/3840, 17/20, D2, 74]
+      - [5761/960, 17/20, D2, 71]
+      - [13439/1920, 17/20, A1, 77]
+  bass_first_stars:
+    kind: events
+    events:
+      - [1/1280, 17/20, D2, 71]
+      - [961/960, 17/20, E2, 72]
+      - [3841/1920, 17/20, F2, 72]
+      - [5761/1920, 17/20, G2, 76]
+      - [15359/3840, 17/20, Bb1, 77]
+      - [4799/960, 17/20, A1, 76]
+      - [23039/3840, 17/20, G2, 72]
+      - [13439/1920, 19/40, A1, 72]
+      - [9601/1280, 19/40, A1, 77]
+  bass_lamplight:
+    kind: events
+    events:
+      - [1/1920, 17/20, D2, 73]
+      - [3839/3840, 17/20, Bb1, 77]
+      - [1919/960, 19/40, E2, 71]
+      - [5/2, 19/40, F2, 77]
+      - [2881/960, 17/20, D2, 75]
+      - [5119/1280, 17/20, G2, 75]
+      - [4799/960, 17/20, A1, 76]
+      - [5759/960, 17/20, Bb1, 74]
+      - [6721/960, 19/40, A1, 73]
+      - [28801/3840, 19/40, A1, 77]
+  bass_orbit:
+    kind: events
+    events:
+      - [1/1920, 17/20, Bb1, 74]
+      - [2399/3840, 3/10, F2, 55]
+      - [1/1, 17/20, A1, 72]
+      - [3121/1920, 3/10, C2, 61]
+      - [3841/1920, 17/20, G2, 75]
+      - [2521/960, 3/10, D2, 56]
+      - [2879/960, 17/20, D2, 71]
+      - [4639/1280, 3/10, A2, 56]
+      - [3841/960, 17/20, Bb1, 75]
+      - [4439/960, 3/10, F2, 55]
+      - [9601/1920, 17/20, Bb1, 72]
+      - [21601/3840, 3/10, G2, 59]
+      - [7679/1280, 17/20, A1, 77]
+      - [6361/960, 3/10, E2, 57]
+      - [8959/1280, 19/40, A1, 74]
+      - [7199/960, 19/40, A1, 74]
+  bass_deep_night:
+    kind: events
+    events:
+      - [1/1280, 17/20, D2, 75]
+      - [1279/1280, 17/20, E2, 71]
+      - [7681/3840, 17/20, F2, 71]
+      - [11519/3840, 17/20, G2, 77]
+      - [5119/1280, 17/20, D2, 72]
+      - [5/1, 17/20, D2, 73]
+      - [11521/1920, 17/20, D2, 73]
+      - [6721/960, 17/20, A1, 70]
+parts:
+  - id: piano_part
+    instrument: piano
+    voices:
+      - id: piano_main
+        clips:
+          - {id: piano_lanterns_out, at: {bar: 1, beat: 1}, use: piano_lanterns_out}
+          - {id: piano_first_stars, at: {bar: 9, beat: 1}, use: piano_first_stars}
+          - {id: piano_lamplight, at: {bar: 17, beat: 1}, use: piano_lamplight}
+          - {id: piano_orbit, at: {bar: 25, beat: 1}, use: piano_orbit}
+          - {id: piano_deep_night, at: {bar: 33, beat: 1}, use: piano_deep_night}
+  - id: celesta_part
+    instrument: celesta
+    voices:
+      - id: celesta_main
+        clips:
+          - {id: celesta_first_stars, at: {bar: 9, beat: 1}, use: celesta_first_stars}
+          - {id: celesta_orbit, at: {bar: 25, beat: 1}, use: celesta_orbit}
+          - {id: celesta_deep_night, at: {bar: 33, beat: 1}, use: celesta_deep_night}
+  - id: horn_part
+    instrument: horn
+    voices:
+      - id: horn_main
+        clips:
+          - {id: horn_lamplight, at: {bar: 17, beat: 1}, use: horn_lamplight}
+          - {id: horn_deep_night, at: {bar: 33, beat: 1}, use: horn_deep_night}
+  - id: harp_part
+    instrument: harp
+    voices:
+      - id: harp_main
+        clips:
+          - {id: harp_orbit, at: {bar: 25, beat: 1}, use: harp_orbit}
+  - id: strings_part
+    instrument: strings
+    voices:
+      - id: strings_main
+        clips:
+          - {id: strings_first_stars, at: {bar: 9, beat: 1}, use: strings_first_stars}
+          - {id: strings_lamplight, at: {bar: 17, beat: 1}, use: strings_lamplight}
+          - {id: strings_orbit, at: {bar: 25, beat: 1}, use: strings_orbit}
+          - {id: strings_deep_night, at: {bar: 33, beat: 1}, use: strings_deep_night}
+  - id: bass_part
+    instrument: bass
+    voices:
+      - id: bass_main
+        clips:
+          - {id: bass_lanterns_out, at: {bar: 1, beat: 1}, use: bass_lanterns_out}
+          - {id: bass_first_stars, at: {bar: 9, beat: 1}, use: bass_first_stars}
+          - {id: bass_lamplight, at: {bar: 17, beat: 1}, use: bass_lamplight}
+          - {id: bass_orbit, at: {bar: 25, beat: 1}, use: bass_orbit}
+          - {id: bass_deep_night, at: {bar: 33, beat: 1}, use: bass_deep_night}
+processing:
+  groups:
+    piano:
+      chain:
+        - {processor: highpass, cutoff_hz: 50}
+        - {processor: band_gain, low_hz: 2800, high_hz: 5500, gain_db: -3.0}
+        - {processor: lowpass, cutoff_hz: 6500}
+        - {processor: reverb, wet: 0.3, decay_seconds: 2.4, damping_hz: 3600}
+        - {processor: gain, gain_db: 14.0}
+        - {processor: balance, position: -0.2}
+    celesta:
+      chain:
+        - {processor: highpass, cutoff_hz: 300}
+        - {processor: band_gain, low_hz: 2500, high_hz: 6000, gain_db: -4.0}
+        - {processor: lowpass, cutoff_hz: 6000}
+        - {processor: reverb, wet: 0.38, decay_seconds: 2.6, damping_hz: 3500}
+        # The Sonatina celesta is quiet: its peaks were 27 dB under the piano at 0 dB.
+        - {processor: gain, gain_db: 18.0}
+        - {processor: balance, position: 0.45}
+    horn:
+      chain:
+        - {processor: highpass, cutoff_hz: 90}
+        - {processor: lowpass, cutoff_hz: 4000}
+        - {processor: reverb, wet: 0.45, decay_seconds: 2.8, damping_hz: 3000}
+        - {processor: gain, gain_db: 0.0}
+        - {processor: balance, position: 0.35}
+    harp:
+      chain:
+        - {processor: highpass, cutoff_hz: 100}
+        - {processor: lowpass, cutoff_hz: 6500}
+        - {processor: reverb, wet: 0.3, decay_seconds: 2.2, damping_hz: 3800}
+        - {processor: gain, gain_db: 13.0}
+        - {processor: balance, position: 0.3}
+    strings:
+      chain:
+        - {processor: highpass, cutoff_hz: 90}
+        - {processor: lowpass, cutoff_hz: 4500}
+        - {processor: reverb, wet: 0.34, decay_seconds: 2.4, damping_hz: 3200}
+        - {processor: gain, gain_db: 1.0}
+    bass:
+      chain:
+        - {processor: highpass, cutoff_hz: 34}
+        - {processor: compressor, threshold_db: -28.0, ratio: 2.5, attack_ms: 20.0, release_ms: 200.0, makeup_db: 2.0}
+        - processor: parametric_eq
+          bands:
+            - {type: peak, hz: 250, q: 0.8, db: 1.0}
+        - {processor: lowpass, cutoff_hz: 2500}
+        - {processor: reverb, wet: 0.12, decay_seconds: 1.8, damping_hz: 2500}
+        - {processor: gain, gain_db: -3.0}
+  master:
+    chain:
+      - {processor: highpass, cutoff_hz: 28}
+      - {processor: compressor, threshold_db: -22.0, ratio: 1.5, attack_ms: 30.0, release_ms: 220.0, makeup_db: 1.0, knee_db: 6.0}
+      - {processor: limiter, target_peak_db: -2.0, drive: 0.9, normalize: true}
+  adaptive_sections: {mode: composition_master}
