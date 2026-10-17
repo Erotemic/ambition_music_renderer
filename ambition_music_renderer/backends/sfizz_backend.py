@@ -15,6 +15,7 @@ from typing import Any
 import mido
 import numpy as np
 from ..audio_utils import coerce_stereo
+from ..instrument_libraries import is_transient_sfz_wrapper
 from ..subprocess_progress import communicate_with_heartbeat, wav_growth_status
 import pretty_midi
 import soundfile as sf
@@ -268,6 +269,11 @@ def _whole_sample_sfz(sfz: Path) -> Path | None:
     0.15 GB and 1.6 s.
     """
     import uuid
+    if is_transient_sfz_wrapper(sfz):
+        raise ValueError(
+            f"Cannot wrap a temporary SFZ program: {sfz}. "
+            "Use the original SFZ program."
+        )
     wrapper = sfz.with_name(f".{sfz.stem}.whole_samples.{uuid.uuid4().hex}.sfz")
     try:
         wrapper.write_text(
@@ -690,6 +696,12 @@ def render_sfizz(
     """
     settings = settings or {}
     sfz = resolve_path(sfz_path, base_dir=base_dir)
+    if is_transient_sfz_wrapper(sfz):
+        raise ValueError(
+            f"SFZ instrument is a temporary whole-sample wrapper: {sfz}. "
+            "A parallel stem may have deleted it. "
+            "Select the original SFZ, not a .whole_samples wrapper."
+        )
     if not sfz.exists():
         raise FileNotFoundError(f"SFZ instrument does not exist: {sfz}")
     renderer = str(settings.get("renderer", "auto")).lower().strip()

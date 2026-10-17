@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pretty_midi
+import pytest
 import soundfile as sf
 
 from ambition_music_renderer.backends import sfizz_backend
@@ -198,3 +199,40 @@ def test_sfizz_cli_streams_when_the_library_is_read_only(tmp_path, monkeypatch):
     sfz = _render_probe(tmp_path, monkeypatch, {}, seen)
 
     assert seen[0][0] == sfz
+
+
+def test_sfizz_refuses_renderer_generated_program(tmp_path):
+    # The missing temporary wrapper must fail with a cause, not a generic path error.
+    wrapper = tmp_path / ".electric_five.whole_samples.0123456789abcdef0123456789abcdef.sfz"
+    with pytest.raises(ValueError, match="temporary whole-sample wrapper"):
+        sfizz_backend.render_sfizz(
+            _minimal_pm(),
+            sfz_path=wrapper,
+            sample_rate=48000,
+            tempdir=tmp_path,
+            output_name="probe",
+        )
+
+
+def test_sfizz_does_not_wrap_a_renderer_generated_program_twice(tmp_path):
+    wrapper = tmp_path / ".electric_five.whole_samples.0123456789abcdef0123456789abcdef.sfz"
+    wrapper.write_text("<control> hint_ram_based=1\n", encoding="utf8")
+    with pytest.raises(ValueError, match="Cannot wrap a temporary SFZ program"):
+        sfizz_backend._whole_sample_sfz(wrapper)
+    assert list(tmp_path.glob("*.sfz")) == [wrapper]
+
+
+def test_live_sfizz_wrapper_is_excluded_from_instrument_discovery(tmp_path):
+    from ambition_music_renderer.instrument_libraries import discover_sfz_files
+
+    library = tmp_path / "sfz"
+    library.mkdir()
+    program = library / "electric_five.sfz"
+    program.write_text("<region> key=60\n", encoding="utf8")
+    wrapper = sfizz_backend._whole_sample_sfz(program)
+    assert wrapper is not None
+    try:
+        assert wrapper.is_file()
+        assert discover_sfz_files([library]) == [program.resolve()]
+    finally:
+        wrapper.unlink()

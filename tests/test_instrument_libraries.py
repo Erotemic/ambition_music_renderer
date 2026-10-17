@@ -2,8 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from ambition_music_renderer.instrument_libraries import (
     collect_sfz_library_diagnostics,
+    discover_sfz_files,
+    is_transient_sfz_wrapper,
     resolve_sfz_reference,
     resolve_soundfont_reference,
 )
@@ -355,3 +359,52 @@ def test_resolve_catalog_soundfont_library_ref(tmp_path: Path):
     sf2.parent.mkdir(parents=True)
     sf2.write_bytes(b"RIFF-test-sf2")
     assert resolve_soundfont_reference(library_ref="japan.shamisen", roots=[root]) == sf2.resolve()
+
+
+def test_whole_sample_render_wrappers_never_become_library_candidates(tmp_path: Path):
+    # A worker creates a sibling program while other workers scan the library.
+    root = tmp_path / "sfz"
+    program = root / "Karoryfer" / "Shinyguitar" / "Programs" / "electric_five.sfz"
+    program.parent.mkdir(parents=True)
+    program.write_text("<region> key=60\n", encoding="utf8")
+    token1 = "4d306f87a107402fb6ce6f97a9f04105"
+    token2 = "a48d2280822e4b2bb882995c326005f7"
+    wrapper = program.with_name(f".{program.stem}.whole_samples.{token1}.sfz")
+    nested = program.with_name(
+        f"..{program.stem}.whole_samples.{token1}.whole_samples.{token2}.sfz"
+    )
+    wrapper.write_text(f'#include "{program.name}"\n', encoding="utf8")
+    nested.write_text(f'#include "{wrapper.name}"\n', encoding="utf8")
+    assert is_transient_sfz_wrapper(wrapper)
+    assert is_transient_sfz_wrapper(nested)
+    assert not is_transient_sfz_wrapper(program)
+
+    # Named discovery and explicit globbing must both select the real program.
+    assert discover_sfz_files([root]) == [program.resolve()]
+    assert resolve_sfz_reference(
+        library_ref="guitar.electric_lead", roots=[root], prefer=["whole_samples"]
+    ) == program.resolve()
+    assert resolve_sfz_reference(
+        "**/*.sfz", roots=[root], prefer=["whole_samples"]
+    ) == program.resolve()
+
+    # A cached scan must not retain a wrapper after a render removes it.
+    wrapper.unlink()
+    nested.unlink()
+    assert discover_sfz_files([root]) == [program.resolve()]
+
+
+def test_whole_sample_wrapper_is_not_an_explicit_library_reference(tmp_path: Path):
+    root = tmp_path / "sfz"
+    root.mkdir()
+    wrapper = root / ".electric_five.whole_samples.0123456789abcdef0123456789abcdef.sfz"
+    wrapper.write_text("<control> hint_ram_based=1\n", encoding="utf8")
+    assert discover_sfz_files([root]) == []
+    with pytest.raises(ValueError, match="temporary renderer wrapper"):
+        resolve_sfz_reference(wrapper, roots=[root])
+
+
+def test_non_generated_hidden_sfz_is_not_filtered(tmp_path: Path):
+    path = tmp_path / ".legitimate.sfz"
+    path.write_text("<group>\n", encoding="utf8")
+    assert discover_sfz_files([tmp_path]) == [path.resolve()]

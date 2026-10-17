@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import functools
 import os
+import re
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -20,6 +21,18 @@ from .instrument_catalog import (
     instrument_catalog,
     instrument_source_catalog,
 )
+
+
+# The renderer writes these programs next to the source SFZ during audio export.
+# They are not installed instruments. A different worker can delete them.
+_WHOLE_SAMPLE_WRAPPER_NAME_RE = re.compile(
+    r"^\..*\.whole_samples\.[0-9a-f]{32}\.sfz$", re.IGNORECASE
+)
+
+
+def is_transient_sfz_wrapper(path: str | Path) -> bool:
+    """Identify temporary whole-sample programs created by sfizz rendering."""
+    return _WHOLE_SAMPLE_WRAPPER_NAME_RE.fullmatch(Path(path).name) is not None
 
 
 DEFAULT_AUDIO_TOOLS_ROOTS = (
@@ -119,7 +132,11 @@ def _discover_sfz_files_cached(root_keys: tuple[str, ...]) -> tuple[Path, ...]:
         if not root.exists():
             continue
         try:
-            out.extend(path.resolve() for path in root.rglob("*.sfz") if path.is_file())
+            out.extend(
+                path.resolve()
+                for path in root.rglob("*.sfz")
+                if path.is_file() and not is_transient_sfz_wrapper(path)
+            )
         except OSError:
             continue
     return tuple(sorted(set(out), key=lambda p: str(p).lower()))
@@ -273,6 +290,11 @@ def resolve_sfz_reference(
     search_roots = configured_sfz_roots(roots)
     if explicit:
         p = Path(explicit).expanduser()
+        if is_transient_sfz_wrapper(p):
+            raise ValueError(
+                f"SFZ reference is a temporary renderer wrapper: {p}. "
+                "Select the original SFZ program instead."
+            )
         direct_candidates: list[Path] = []
         if not p.is_absolute() and base_dir is not None:
             direct_candidates.append((base_dir / p).resolve())
@@ -286,7 +308,11 @@ def resolve_sfz_reference(
             for root in search_roots:
                 if root.exists():
                     glob_candidates.extend(path.resolve() for path in root.glob(explicit))
-            glob_candidates = [p for p in glob_candidates if p.is_file() and p.suffix.lower() == ".sfz"]
+            glob_candidates = [
+                p for p in glob_candidates
+                if p.is_file() and p.suffix.lower() == ".sfz"
+                and not is_transient_sfz_wrapper(p)
+            ]
             if glob_candidates:
                 return sorted(
                     glob_candidates,
