@@ -32,6 +32,7 @@ from ..music_timeline import write_render_authoring_artifacts
 from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio
+from .worker_failures import read_worker_failure, worker_failure_path
 from .playback_layers import playback_layer_plan, write_playback_layers
 from .foreground_protection import apply_foreground_protection, foreground_protection_mode
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
@@ -228,9 +229,17 @@ def run_worker_direct(worker_command: KwconfCommand, plan: RenderWorkerPlan, gro
 
 @profile
 def run_worker_subprocess(worker_command: KwconfCommand, plan: RenderWorkerPlan, group: str) -> None:
+    # Avoid reading a failure report left over from an earlier --force render.
+    worker_failure_path(plan.outdir, group).unlink(missing_ok=True)
     proc = worker_command.run_subprocess(data=worker_data(plan, group))
     if proc.returncode != 0:
-        raise subprocess.CalledProcessError(proc.returncode, proc.args)
+        cause, report = read_worker_failure(plan.outdir, group)
+        if cause is None:
+            cause = "worker exited without recording an exception (inspect render_isolated.stderr.txt)"
+        raise RuntimeError(
+            f"render group {group!r} FAILED (exit code {proc.returncode}): {cause}\n"
+            f"Full traceback, if recorded: {report}"
+        )
 
 def adaptive_section_mastering_config(spec: dict) -> dict[str, object]:
     """Compatibility view of the canonical mastering policy.
@@ -806,13 +815,26 @@ def _render_main(ns) -> int:
                     pool.submit(run_worker_subprocess, worker_command, worker_plan, group): (group, _time.perf_counter())
                     for group in groups_to_render
                 }
+                failed_groups: list[str] = []
                 for future, (group, start_group) in futures.items():
-                    future.result()
-                    timings.add(
-                        "render_group_worker",
-                        _time.perf_counter() - start_group,
-                        group=group,
-                        mode=worker_mode,
+                    try:
+                        future.result()
+                    except Exception as ex:
+                        # Every worker is already running; collect all failures
+                        # so one broken score does not require repeated full
+                        # renders to discover the next silent instrument.
+                        failed_groups.append(str(ex))
+                    else:
+                        timings.add(
+                            "render_group_worker",
+                            _time.perf_counter() - start_group,
+                            group=group,
+                            mode=worker_mode,
+                        )
+                if failed_groups:
+                    raise RuntimeError(
+                        f"{len(failed_groups)} music stem worker(s) failed:\n" +
+                        "\n".join(failed_groups)
                     )
 
     if stem_cache_enabled and cache_dir is not None:

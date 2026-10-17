@@ -201,6 +201,9 @@ instruments:
   volume: 112
   pan: 31
   expression: 110
+  controls:
+    100: 64  # Shinyguitar electric: blended electric pickup signal
+    107: 127 # electric_five.sfz: activate five-voice sustain mapping
   mix_gain_db: 0
   instrument_backend:
     kind: sfz
@@ -251,6 +254,9 @@ instruments:
   volume: 109
   pan: 62
   expression: 110
+  controls:
+    100: 64  # Shinyguitar electric: blended electric pickup signal
+    107: 127 # electric_five.sfz: activate five-voice sustain mapping
   mix_gain_db: 1.0
   instrument_backend:
     kind: sfz

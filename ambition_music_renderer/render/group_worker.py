@@ -10,6 +10,7 @@ import json
 import math
 import sys
 import time
+import traceback
 from contextlib import contextmanager
 import tempfile
 from pathlib import Path
@@ -19,6 +20,7 @@ import yaml
 from .effects import post_process
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import ensure_audio_length, render_group_audio, slice_audio
+from .worker_failures import worker_failure_path
 from .score_core import choose_soundfont
 from ..musicir.compile import compile_score
 from ..musicir.timing import initial_bpm
@@ -37,9 +39,41 @@ def _visible_phase(group: str, phase: str, **fields: object):
     print(f"{prefix} start", file=sys.stderr, flush=True)
     try:
         yield
-    finally:
+    except BaseException:
+        elapsed = time.perf_counter() - started
+        print(f"{prefix} FAILED elapsed={elapsed:.1f}s", file=sys.stderr, flush=True)
+        raise
+    else:
         elapsed = time.perf_counter() - started
         print(f"{prefix} done elapsed={elapsed:.1f}s", file=sys.stderr, flush=True)
+
+
+def _run_with_failure_report(config) -> int:
+    """Persist the real exception before the caller sees a subprocess exit code."""
+    report = worker_failure_path(config.outdir, config.group)
+    report.unlink(missing_ok=True)
+    try:
+        return _worker_main(config)
+    except Exception as exc:
+        try:
+            report.parent.mkdir(parents=True, exist_ok=True)
+            report.write_text(
+                f"group: {config.group}\n"
+                f"source: {config.spec}\n"
+                f"exception: {type(exc).__name__}: {exc}\n\n"
+                + traceback.format_exc(),
+                encoding="utf8",
+            )
+        except OSError as log_error:
+            print(f"[music render] could not save worker failure report: {log_error}", file=sys.stderr, flush=True)
+        print(
+            f"[music render] FAILED group={config.group} "
+            f"cause={type(exc).__name__}: {exc}\n"
+            f"[music render] worker traceback: {report}",
+            file=sys.stderr,
+            flush=True,
+        )
+        raise
 
 
 class RenderGroupWorkerConfig(kwconf.Config):
@@ -80,7 +114,7 @@ class RenderGroupWorkerConfig(kwconf.Config):
         config = cls.cli(argv=argv, data=kwargs)
         if config.profile_out is not None:
             print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
-        return _worker_main(config)
+        return _run_with_failure_report(config)
 
 
 
@@ -196,7 +230,7 @@ def render_group_worker_main(
     config = RenderGroupWorkerConfig.cli(argv=argv, data=kwargs)
     if config.profile_out is not None:
         print("render_group_worker: --profile-out is deprecated; use LINE_PROFILE=1 for line_profiler", file=sys.stderr)
-    return _worker_main(config)
+    return _run_with_failure_report(config)
 
 
 @profile

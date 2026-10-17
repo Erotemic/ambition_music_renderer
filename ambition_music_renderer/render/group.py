@@ -358,9 +358,14 @@ def render_group_audio(
                             settings=settings,
                         )
                         if _instrument_has_notes(sfz_pm) and _is_effectively_silent(audio):
+                            from .sfz_diagnostics import silent_sfz_diagnostic
+
                             raise RuntimeError(
-                                f"instrument {inst.name!r} SFZ {sfz_path} rendered SILENCE despite "
-                                "active notes (missing samples, or an unmet keyswitch/CC/range)"
+                                silent_sfz_diagnostic(
+                                    sfz_pm.instruments[0],
+                                    sfz_path,
+                                    library_ref=plan.library_ref,
+                                )
                             )
                         lane_audio.append(audio)
                 except Exception as ex:
