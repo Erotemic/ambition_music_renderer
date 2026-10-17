@@ -1,16 +1,14 @@
-# Shatter the Iron Sky - reference guitar tones.
-# Rhythm: sampled Shinyguitar electric_five + electric_four, copied from the
-# Standing on Shoulders extended-boss high-fidelity score (giant_riff).
-# Leads: Emilyguitar basic + Black And Green black_keyswitch, from Carry the One.
-# Both TS9/JCM800 chains use Carry the One's established parameters.
-# Notes, timing, choir, orchestration, and six intensity layers are untouched.
+# Shatter the Iron Sky - doom-wail lead revision.
+# 64-bar E minor battle metal; Locrian b2 and b5 interruptions.
+# Emilyguitar single-note lead, controlled bends, long sustain, two shred solos.
+# Male/female choir, underlying riffs, and intensity-layer membership unchanged.
+# Render-only bars 1-8 exactly mirror final combat bars 65-72.
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
 title: Shatter the Iron Sky (Iron Cathedral)
-description: Heavy E-minor combat metal built on chugging sampled electric guitars, with F and B-flat threat motifs,
-  powerful drums and sustained ritual choirs. The rhythm-guitar timbres follow Standing on Shoulders extended-boss
-  high-fidelity guitar programs, and the main/counter leads follow Carry the One. Six independent intensity layers
-  retain the complete 64-bar combat form.
+description: Doom-rooted E minor battle metal with F-natural and B-flat threat motifs, substantial electric rhythm
+  guitars, low blues-influenced wailing Emilyguitar lead, and virtuoso runs erupting between held bends. Sustained
+  ritual choirs remain central. Six individually mixable intensity layers over the complete 64-bar combat loop.
 seed: 17001987
 timebase:
   ppq: 960
@@ -255,10 +253,10 @@ instruments:
 - name: lead_guitar
   group: lead_guitar
   program: clean_guitar
-  volume: 104
+  volume: 105
   pan: 64
-  expression: 112
-  mix_gain_db: 3.0
+  expression: 113
+  mix_gain_db: 3.6
   instrument_backend:
     kind: sfz
     sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
@@ -490,62 +488,70 @@ processing:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 12.0
+          gain_db: 11.0
         - effect: compressor
-          threshold_db: -24.0
-          ratio: 2.4
-          attack_ms: 8.0
-          release_ms: 110.0
+          threshold_db: -29.0
+          ratio: 3.2
+          attack_ms: 7.0
+          release_ms: 175.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
         binary: lv2apply
         channel_mode: dual_mono
-        wet_mix: 0.52
+        wet_mix: 0.88
         params:
-          fslider0_: -4.0
-          fslider1_: 680.0
-          fslider2_: 0.68
-          BYPASS: 1.0
+          fslider0_: -3.0
+          fslider1_: 630.0
+          fslider2_: 0.76
+          BYPASS: 0.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.58
+        wet_mix: 0.86
         params:
-          P6v: 0.74
-          Middle: 0.68
-          Bass: 0.48
-          Treble: 0.6
-          WET_DRY: 60.0
-          GAIN: -2.0
+          P6v: 0.84
+          Middle: 0.78
+          Bass: 0.57
+          Treble: 0.58
+          WET_DRY: 82.0
+          GAIN: -1.0
       - processor: highpass
-        cutoff_hz: 110
+        cutoff_hz: 86
       - processor: parametric_eq
         bands:
         - type: peak
-          hz: 4130
-          q: 3.0
-          db: -3.0
+          hz: 290
+          q: 0.9
+          db: -1.3
         - type: peak
-          hz: 4920
-          q: 3.0
-          db: -3.0
+          hz: 720
+          q: 0.85
+          db: 2.3
+        - type: peak
+          hz: 1750
+          q: 0.9
+          db: 2.0
+        - type: peak
+          hz: 4150
+          q: 2.7
+          db: -2.5
         - type: peak
           hz: 6200
-          q: 3.5
-          db: -4.0
+          q: 3.0
+          db: -2.8
       - processor: lowpass
-        cutoff_hz: 8200
+        cutoff_hz: 7800
       - processor: compressor
-        threshold_db: -22.0
-        ratio: 2.0
-        attack_ms: 7.0
-        release_ms: 90.0
+        threshold_db: -25.0
+        ratio: 2.8
+        attack_ms: 10.0
+        release_ms: 165.0
       - processor: pedalboard
         effects:
         - effect: delay
-          delay_ms: 296
-          feedback: 0.18
-          mix: 0.12
+          delay_ms: 360
+          feedback: 0.2
+          mix: 0.13
       - processor: balance
         position: -0.2
     counter_guitar:
@@ -11339,647 +11345,5696 @@ parts:
         bar: 1
         beat: 1
       events:
-      - - '1'
-        - 27/80
-        - F4
-        - 113
-      - - 3/2
-        - 9/40
-        - A4
-        - 117
-      - - 29/16
-        - 27/160
-        - Bb4
+      - - '0'
+        - ticks: 3725
+        - E3
         - 116
+      - - '1'
+        - ticks: 3026
+        - F3
+        - 119
+      - - '2'
+        - ticks: 3725
+        - E4
+        - 120
       - - '3'
-        - 9/32
-        - Bb4
-        - 119
-      - - 55/16
-        - 9/40
-        - F4
-        - 113
-      - - 15/4
-        - 9/40
-        - G4
-        - 115
-      - - '5'
-        - 27/160
-        - B4
-        - 115
-      - - 21/4
-        - 9/32
-        - Bb4
-        - 114
-      - - 91/16
-        - 9/32
-        - F4
+        - ticks: 3026
+        - Bb3
+        - 121
+      - - '4'
+        - ticks: 3026
+        - G3
         - 117
-      - - '7'
-        - 27/80
-        - D#5
-        - 118
-      - - 15/2
-        - 9/40
-        - C5
+      - - '5'
+        - ticks: 3026
+        - F4
+        - 120
+      - - '6'
+        - ticks: 2561
+        - D#4
         - 119
-      - - 125/16
-        - 27/160
-        - B4
-        - 115
+      - - 27/4
+        - ticks: 931
+        - C4
+        - 111
+      - - '7'
+        - ticks: 2328
+        - B3
+        - 119
+      - - 123/16
+        - ticks: 1164
+        - E3
+        - 112
+      automation:
+      - id: wail_7_0
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 335
+          value: 0
+        - at:
+            ticks: 1527
+          value: 683
+        - at:
+            ticks: 1713
+          value: 683
+        - at:
+            ticks: 1781
+          value: 765
+        - at:
+            ticks: 1849
+          value: 786
+        - at:
+            ticks: 1917
+          value: 731
+        - at:
+            ticks: 1985
+          value: 640
+        - at:
+            ticks: 2053
+          value: 580
+        - at:
+            ticks: 2121
+          value: 597
+        - at:
+            ticks: 2189
+          value: 677
+        - at:
+            ticks: 2257
+          value: 761
+        - at:
+            ticks: 2325
+          value: 787
+        - at:
+            ticks: 2393
+          value: 736
+        - at:
+            ticks: 2461
+          value: 645
+        - at:
+            ticks: 2529
+          value: 582
+        - at:
+            ticks: 2597
+          value: 594
+        - at:
+            ticks: 2665
+          value: 672
+        - at:
+            ticks: 2733
+          value: 757
+        - at:
+            ticks: 2801
+          value: 788
+        - at:
+            ticks: 2869
+          value: 740
+        - at:
+            ticks: 2937
+          value: 650
+        - at:
+            ticks: 3005
+          value: 584
+        - at:
+            ticks: 3073
+          value: 591
+        - at:
+            ticks: 3141
+          value: 666
+        - at:
+            ticks: 3167
+          value: 683
+        - at:
+            ticks: 3695
+          value: 0
+        - at:
+            ticks: 3731
+          value: 0
+      - id: wail_7_1
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4112
+          value: 0
+        - at:
+            ticks: 5080
+          value: 1365
+        - at:
+            ticks: 5231
+          value: 1365
+        - at:
+            ticks: 5299
+          value: 1448
+        - at:
+            ticks: 5367
+          value: 1469
+        - at:
+            ticks: 5435
+          value: 1413
+        - at:
+            ticks: 5503
+          value: 1322
+        - at:
+            ticks: 5571
+          value: 1263
+        - at:
+            ticks: 5639
+          value: 1280
+        - at:
+            ticks: 5707
+          value: 1360
+        - at:
+            ticks: 5775
+          value: 1444
+        - at:
+            ticks: 5843
+          value: 1470
+        - at:
+            ticks: 5911
+          value: 1418
+        - at:
+            ticks: 5979
+          value: 1327
+        - at:
+            ticks: 6047
+          value: 1265
+        - at:
+            ticks: 6115
+          value: 1277
+        - at:
+            ticks: 6183
+          value: 1354
+        - at:
+            ticks: 6251
+          value: 1440
+        - at:
+            ticks: 6319
+          value: 1471
+        - at:
+            ticks: 6387
+          value: 1423
+        - at:
+            ticks: 6413
+          value: 1365
+        - at:
+            ticks: 6836
+          value: 0
+        - at:
+            ticks: 6872
+          value: 0
+      - id: wail_7_2
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 8015
+          value: 0
+        - at:
+            ticks: 9207
+          value: 683
+        - at:
+            ticks: 9393
+          value: 683
+        - at:
+            ticks: 9461
+          value: 765
+        - at:
+            ticks: 9529
+          value: 786
+        - at:
+            ticks: 9597
+          value: 731
+        - at:
+            ticks: 9665
+          value: 640
+        - at:
+            ticks: 9733
+          value: 580
+        - at:
+            ticks: 9801
+          value: 597
+        - at:
+            ticks: 9869
+          value: 677
+        - at:
+            ticks: 9937
+          value: 761
+        - at:
+            ticks: 10005
+          value: 787
+        - at:
+            ticks: 10073
+          value: 736
+        - at:
+            ticks: 10141
+          value: 645
+        - at:
+            ticks: 10209
+          value: 582
+        - at:
+            ticks: 10277
+          value: 594
+        - at:
+            ticks: 10345
+          value: 672
+        - at:
+            ticks: 10413
+          value: 757
+        - at:
+            ticks: 10481
+          value: 788
+        - at:
+            ticks: 10549
+          value: 740
+        - at:
+            ticks: 10617
+          value: 650
+        - at:
+            ticks: 10685
+          value: 584
+        - at:
+            ticks: 10753
+          value: 591
+        - at:
+            ticks: 10821
+          value: 666
+        - at:
+            ticks: 10847
+          value: 683
+        - at:
+            ticks: 11375
+          value: 0
+        - at:
+            ticks: 11411
+          value: 0
+      - id: wail_7_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11792
+          value: 0
+        - at:
+            ticks: 12760
+          value: 683
+        - at:
+            ticks: 12911
+          value: 683
+        - at:
+            ticks: 12979
+          value: 765
+        - at:
+            ticks: 13047
+          value: 786
+        - at:
+            ticks: 13115
+          value: 731
+        - at:
+            ticks: 13183
+          value: 640
+        - at:
+            ticks: 13251
+          value: 580
+        - at:
+            ticks: 13319
+          value: 597
+        - at:
+            ticks: 13387
+          value: 677
+        - at:
+            ticks: 13455
+          value: 761
+        - at:
+            ticks: 13523
+          value: 787
+        - at:
+            ticks: 13591
+          value: 736
+        - at:
+            ticks: 13659
+          value: 645
+        - at:
+            ticks: 13727
+          value: 582
+        - at:
+            ticks: 13795
+          value: 594
+        - at:
+            ticks: 13863
+          value: 672
+        - at:
+            ticks: 13931
+          value: 757
+        - at:
+            ticks: 13999
+          value: 788
+        - at:
+            ticks: 14067
+          value: 740
+        - at:
+            ticks: 14093
+          value: 683
+        - at:
+            ticks: 14516
+          value: 0
+        - at:
+            ticks: 14552
+          value: 0
+      - id: wail_7_4
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15632
+          value: 0
+        - at:
+            ticks: 16600
+          value: 1365
+        - at:
+            ticks: 16751
+          value: 1365
+        - at:
+            ticks: 16819
+          value: 1448
+        - at:
+            ticks: 16887
+          value: 1469
+        - at:
+            ticks: 16955
+          value: 1413
+        - at:
+            ticks: 17023
+          value: 1322
+        - at:
+            ticks: 17091
+          value: 1263
+        - at:
+            ticks: 17159
+          value: 1280
+        - at:
+            ticks: 17227
+          value: 1360
+        - at:
+            ticks: 17295
+          value: 1444
+        - at:
+            ticks: 17363
+          value: 1470
+        - at:
+            ticks: 17431
+          value: 1418
+        - at:
+            ticks: 17499
+          value: 1327
+        - at:
+            ticks: 17567
+          value: 1265
+        - at:
+            ticks: 17635
+          value: 1277
+        - at:
+            ticks: 17703
+          value: 1354
+        - at:
+            ticks: 17771
+          value: 1440
+        - at:
+            ticks: 17839
+          value: 1471
+        - at:
+            ticks: 17907
+          value: 1423
+        - at:
+            ticks: 17933
+          value: 1365
+        - at:
+            ticks: 18356
+          value: 0
+        - at:
+            ticks: 18392
+          value: 0
+      - id: wail_7_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19472
+          value: 0
+        - at:
+            ticks: 20440
+          value: 1365
+        - at:
+            ticks: 20591
+          value: 1365
+        - at:
+            ticks: 20659
+          value: 1448
+        - at:
+            ticks: 20727
+          value: 1469
+        - at:
+            ticks: 20795
+          value: 1413
+        - at:
+            ticks: 20863
+          value: 1322
+        - at:
+            ticks: 20931
+          value: 1263
+        - at:
+            ticks: 20999
+          value: 1280
+        - at:
+            ticks: 21067
+          value: 1360
+        - at:
+            ticks: 21135
+          value: 1444
+        - at:
+            ticks: 21203
+          value: 1470
+        - at:
+            ticks: 21271
+          value: 1418
+        - at:
+            ticks: 21339
+          value: 1327
+        - at:
+            ticks: 21407
+          value: 1265
+        - at:
+            ticks: 21475
+          value: 1277
+        - at:
+            ticks: 21543
+          value: 1354
+        - at:
+            ticks: 21611
+          value: 1440
+        - at:
+            ticks: 21679
+          value: 1471
+        - at:
+            ticks: 21747
+          value: 1423
+        - at:
+            ticks: 21773
+          value: 1365
+        - at:
+            ticks: 22196
+          value: 0
+        - at:
+            ticks: 22232
+          value: 0
+      - id: wail_7_6
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23270
+          value: 0
+        - at:
+            ticks: 24090
+          value: 683
+        - at:
+            ticks: 24218
+          value: 683
+        - at:
+            ticks: 24286
+          value: 765
+        - at:
+            ticks: 24354
+          value: 786
+        - at:
+            ticks: 24422
+          value: 731
+        - at:
+            ticks: 24490
+          value: 640
+        - at:
+            ticks: 24558
+          value: 580
+        - at:
+            ticks: 24626
+          value: 597
+        - at:
+            ticks: 24694
+          value: 677
+        - at:
+            ticks: 24762
+          value: 761
+        - at:
+            ticks: 24830
+          value: 787
+        - at:
+            ticks: 24898
+          value: 736
+        - at:
+            ticks: 24966
+          value: 645
+        - at:
+            ticks: 25034
+          value: 582
+        - at:
+            ticks: 25102
+          value: 594
+        - at:
+            ticks: 25170
+          value: 672
+        - at:
+            ticks: 25217
+          value: 683
+        - at:
+            ticks: 25571
+          value: 0
+        - at:
+            ticks: 25607
+          value: 0
+      - id: wail_7_8
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27089
+          value: 0
+        - at:
+            ticks: 27834
+          value: 683
+        - at:
+            ticks: 27950
+          value: 683
+        - at:
+            ticks: 28018
+          value: 765
+        - at:
+            ticks: 28086
+          value: 786
+        - at:
+            ticks: 28154
+          value: 731
+        - at:
+            ticks: 28222
+          value: 640
+        - at:
+            ticks: 28290
+          value: 580
+        - at:
+            ticks: 28358
+          value: 597
+        - at:
+            ticks: 28426
+          value: 677
+        - at:
+            ticks: 28494
+          value: 761
+        - at:
+            ticks: 28562
+          value: 787
+        - at:
+            ticks: 28630
+          value: 736
+        - at:
+            ticks: 28698
+          value: 645
+        - at:
+            ticks: 28766
+          value: 582
+        - at:
+            ticks: 28834
+          value: 594
+        - at:
+            ticks: 28859
+          value: 683
+        - at:
+            ticks: 29178
+          value: 0
+        - at:
+            ticks: 29214
+          value: 0
     - id: lead_guitar_iron_gate
       at:
         bar: 9
         beat: 1
       events:
-      - - 1/4
-        - 9/40
-        - B4
-        - 112
-      - - 9/16
-        - 27/160
-        - Bb4
-        - 110
-      - - 3/4
-        - 9/40
-        - G4
-        - 108
+      - - '0'
+        - ticks: 2794
+        - E4
+        - 118
       - - '1'
-        - 63/160
+        - ticks: 1862
+        - G3
+        - 114
+      - - 25/16
+        - ticks: 1630
+        - E4
+        - 115
+      - - '2'
+        - ticks: 2794
+        - F4
+        - 118
+      - - 45/16
+        - ticks: 698
+        - E4
+        - 105
+      - - '3'
+        - ticks: 2794
+        - Bb3
+        - 122
+      - - 15/4
+        - ticks: 233
         - E4
         - 117
-      - - 25/16
-        - 27/160
-        - F4
-        - 107
-      - - 29/16
-        - 27/160
-        - E4
-        - 116
-      - - '2'
-        - 9/40
+      - - 61/16
+        - ticks: 233
         - F4
         - 111
-      - - 19/8
-        - 27/160
-        - A4
-        - 107
-      - - 21/8
-        - 27/80
-        - C5
-        - 115
-      - - 33/8
-        - 9/32
-        - B4
-        - 112
-      - - 9/2
-        - 27/160
-        - Bb4
-        - 112
-      - - 19/4
-        - 9/40
+      - - 31/8
+        - ticks: 233
         - G4
         - 108
-      - - '5'
-        - 27/80
-        - Bb4
-        - 117
-      - - 11/2
-        - 27/160
-        - F4
-        - 106
-      - - 23/4
-        - 9/40
+      - - 63/16
+        - ticks: 233
         - E4
-        - 116
+        - 105
+      - - '4'
+        - ticks: 2561
+        - E4
+        - 120
+      - - 19/4
+        - ticks: 931
+        - B3
+        - 110
+      - - '5'
+        - ticks: 2561
+        - F4
+        - 118
+      - - 23/4
+        - ticks: 931
+        - E4
+        - 112
       - - '6'
-        - 27/80
-        - D#5
-        - 114
-      - - 13/2
-        - 9/32
-        - C5
-        - 118
+        - ticks: 2328
+        - D#4
+        - 116
+      - - 107/16
+        - ticks: 1164
+        - C4
+        - 112
       - - '7'
-        - 27/80
-        - E5
+        - ticks: 2328
+        - B3
         - 118
-      - - 15/2
-        - 9/80
-        - Bb4
-        - 111
-      - - 123/16
-        - 9/32
-        - B4
-        - 114
+      - - 31/4
+        - ticks: 233
+        - Bb3
+        - 109
+      - - 125/16
+        - ticks: 233
+        - G3
+        - 103
+      - - 63/8
+        - ticks: 233
+        - F3
+        - 100
+      - - 127/16
+        - ticks: 233
+        - E3
+        - 97
       automation:
-      - id: b2_n2_bend0
-        at:
-          ticks: 10793
-        pitch_bend: 310
-      - id: b2_n2_bend1
-        at:
-          ticks: 11052
-        pitch_bend: -155
-      - id: b2_n2_bend2
-        at:
-          ticks: 11246
-        pitch_bend: 103
-      - id: b2_n2_bend3
-        at:
-          ticks: 11350
+      - id: wail_0_0
         pitch_bend: 0
-      - id: b6_n0_bend0
-        at:
-          ticks: 23753
-        pitch_bend: 240
-      - id: b6_n0_bend1
-        at:
-          ticks: 24012
-        pitch_bend: -120
-      - id: b6_n0_bend2
-        at:
-          ticks: 24206
-        pitch_bend: 80
-      - id: b6_n0_bend3
-        at:
-          ticks: 24310
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 251
+          value: 0
+        - at:
+            ticks: 1145
+          value: 683
+        - at:
+            ticks: 1285
+          value: 683
+        - at:
+            ticks: 1353
+          value: 765
+        - at:
+            ticks: 1421
+          value: 786
+        - at:
+            ticks: 1489
+          value: 731
+        - at:
+            ticks: 1557
+          value: 640
+        - at:
+            ticks: 1625
+          value: 580
+        - at:
+            ticks: 1693
+          value: 597
+        - at:
+            ticks: 1761
+          value: 677
+        - at:
+            ticks: 1829
+          value: 761
+        - at:
+            ticks: 1897
+          value: 787
+        - at:
+            ticks: 1965
+          value: 736
+        - at:
+            ticks: 2033
+          value: 645
+        - at:
+            ticks: 2101
+          value: 582
+        - at:
+            ticks: 2169
+          value: 594
+        - at:
+            ticks: 2237
+          value: 672
+        - at:
+            ticks: 2305
+          value: 757
+        - at:
+            ticks: 2373
+          value: 788
+        - at:
+            ticks: 2375
+          value: 683
+        - at:
+            ticks: 2764
+          value: 0
+        - at:
+            ticks: 2800
+          value: 0
+      - id: wail_0_1
         pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4007
+          value: 0
+        - at:
+            ticks: 4603
+          value: 1365
+        - at:
+            ticks: 4696
+          value: 1365
+        - at:
+            ticks: 4764
+          value: 1448
+        - at:
+            ticks: 4832
+          value: 1469
+        - at:
+            ticks: 4900
+          value: 1413
+        - at:
+            ticks: 4968
+          value: 1322
+        - at:
+            ticks: 5036
+          value: 1263
+        - at:
+            ticks: 5104
+          value: 1280
+        - at:
+            ticks: 5172
+          value: 1360
+        - at:
+            ticks: 5240
+          value: 1444
+        - at:
+            ticks: 5308
+          value: 1470
+        - at:
+            ticks: 5376
+          value: 1418
+        - at:
+            ticks: 5423
+          value: 1365
+        - at:
+            ticks: 5672
+          value: 0
+        - at:
+            ticks: 5708
+          value: 0
+      - id: wail_0_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 7931
+          value: 0
+        - at:
+            ticks: 8825
+          value: 1365
+        - at:
+            ticks: 8965
+          value: 1365
+        - at:
+            ticks: 9033
+          value: 1448
+        - at:
+            ticks: 9101
+          value: 1469
+        - at:
+            ticks: 9169
+          value: 1413
+        - at:
+            ticks: 9237
+          value: 1322
+        - at:
+            ticks: 9305
+          value: 1263
+        - at:
+            ticks: 9373
+          value: 1280
+        - at:
+            ticks: 9441
+          value: 1360
+        - at:
+            ticks: 9509
+          value: 1444
+        - at:
+            ticks: 9577
+          value: 1470
+        - at:
+            ticks: 9645
+          value: 1418
+        - at:
+            ticks: 9713
+          value: 1327
+        - at:
+            ticks: 9781
+          value: 1265
+        - at:
+            ticks: 9849
+          value: 1277
+        - at:
+            ticks: 9917
+          value: 1354
+        - at:
+            ticks: 9985
+          value: 1440
+        - at:
+            ticks: 10053
+          value: 1471
+        - at:
+            ticks: 10055
+          value: 1365
+        - at:
+            ticks: 10444
+          value: 0
+        - at:
+            ticks: 10480
+          value: 0
+      - id: wail_0_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11771
+          value: 0
+        - at:
+            ticks: 12665
+          value: 683
+        - at:
+            ticks: 12805
+          value: 683
+        - at:
+            ticks: 12873
+          value: 765
+        - at:
+            ticks: 12941
+          value: 786
+        - at:
+            ticks: 13009
+          value: 731
+        - at:
+            ticks: 13077
+          value: 640
+        - at:
+            ticks: 13145
+          value: 580
+        - at:
+            ticks: 13213
+          value: 597
+        - at:
+            ticks: 13281
+          value: 677
+        - at:
+            ticks: 13349
+          value: 761
+        - at:
+            ticks: 13417
+          value: 787
+        - at:
+            ticks: 13485
+          value: 736
+        - at:
+            ticks: 13553
+          value: 645
+        - at:
+            ticks: 13621
+          value: 582
+        - at:
+            ticks: 13689
+          value: 594
+        - at:
+            ticks: 13757
+          value: 672
+        - at:
+            ticks: 13825
+          value: 757
+        - at:
+            ticks: 13893
+          value: 788
+        - at:
+            ticks: 13895
+          value: 683
+        - at:
+            ticks: 14284
+          value: 0
+        - at:
+            ticks: 14320
+          value: 0
+      - id: wail_0_10
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15590
+          value: 0
+        - at:
+            ticks: 16410
+          value: 683
+        - at:
+            ticks: 16538
+          value: 683
+        - at:
+            ticks: 16606
+          value: 765
+        - at:
+            ticks: 16674
+          value: 786
+        - at:
+            ticks: 16742
+          value: 731
+        - at:
+            ticks: 16810
+          value: 640
+        - at:
+            ticks: 16878
+          value: 580
+        - at:
+            ticks: 16946
+          value: 597
+        - at:
+            ticks: 17014
+          value: 677
+        - at:
+            ticks: 17082
+          value: 761
+        - at:
+            ticks: 17150
+          value: 787
+        - at:
+            ticks: 17218
+          value: 736
+        - at:
+            ticks: 17286
+          value: 645
+        - at:
+            ticks: 17354
+          value: 582
+        - at:
+            ticks: 17422
+          value: 594
+        - at:
+            ticks: 17490
+          value: 672
+        - at:
+            ticks: 17537
+          value: 683
+        - at:
+            ticks: 17891
+          value: 0
+        - at:
+            ticks: 17927
+          value: 0
+      - id: wail_0_12
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19430
+          value: 0
+        - at:
+            ticks: 20250
+          value: 1365
+        - at:
+            ticks: 20378
+          value: 1365
+        - at:
+            ticks: 20446
+          value: 1448
+        - at:
+            ticks: 20514
+          value: 1469
+        - at:
+            ticks: 20582
+          value: 1413
+        - at:
+            ticks: 20650
+          value: 1322
+        - at:
+            ticks: 20718
+          value: 1263
+        - at:
+            ticks: 20786
+          value: 1280
+        - at:
+            ticks: 20854
+          value: 1360
+        - at:
+            ticks: 20922
+          value: 1444
+        - at:
+            ticks: 20990
+          value: 1470
+        - at:
+            ticks: 21058
+          value: 1418
+        - at:
+            ticks: 21126
+          value: 1327
+        - at:
+            ticks: 21194
+          value: 1265
+        - at:
+            ticks: 21262
+          value: 1277
+        - at:
+            ticks: 21330
+          value: 1354
+        - at:
+            ticks: 21377
+          value: 1365
+        - at:
+            ticks: 21731
+          value: 0
+        - at:
+            ticks: 21767
+          value: 0
+      - id: wail_0_14
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23249
+          value: 0
+        - at:
+            ticks: 23994
+          value: 683
+        - at:
+            ticks: 24110
+          value: 683
+        - at:
+            ticks: 24178
+          value: 765
+        - at:
+            ticks: 24246
+          value: 786
+        - at:
+            ticks: 24314
+          value: 731
+        - at:
+            ticks: 24382
+          value: 640
+        - at:
+            ticks: 24450
+          value: 580
+        - at:
+            ticks: 24518
+          value: 597
+        - at:
+            ticks: 24586
+          value: 677
+        - at:
+            ticks: 24654
+          value: 761
+        - at:
+            ticks: 24722
+          value: 787
+        - at:
+            ticks: 24790
+          value: 736
+        - at:
+            ticks: 24858
+          value: 645
+        - at:
+            ticks: 24926
+          value: 582
+        - at:
+            ticks: 24994
+          value: 594
+        - at:
+            ticks: 25019
+          value: 683
+        - at:
+            ticks: 25338
+          value: 0
+        - at:
+            ticks: 25374
+          value: 0
+      - id: wail_0_16
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27089
+          value: 0
+        - at:
+            ticks: 27834
+          value: 683
+        - at:
+            ticks: 27950
+          value: 683
+        - at:
+            ticks: 28018
+          value: 765
+        - at:
+            ticks: 28086
+          value: 786
+        - at:
+            ticks: 28154
+          value: 731
+        - at:
+            ticks: 28222
+          value: 640
+        - at:
+            ticks: 28290
+          value: 580
+        - at:
+            ticks: 28358
+          value: 597
+        - at:
+            ticks: 28426
+          value: 677
+        - at:
+            ticks: 28494
+          value: 761
+        - at:
+            ticks: 28562
+          value: 787
+        - at:
+            ticks: 28630
+          value: 736
+        - at:
+            ticks: 28698
+          value: 645
+        - at:
+            ticks: 28766
+          value: 582
+        - at:
+            ticks: 28834
+          value: 594
+        - at:
+            ticks: 28859
+          value: 683
+        - at:
+            ticks: 29178
+          value: 0
+        - at:
+            ticks: 29214
+          value: 0
     - id: lead_guitar_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
-      - - 5/4
-        - 27/80
-        - G4
-        - 112
-      - - 27/16
-        - 9/32
-        - F4
-        - 110
-      - - '2'
-        - 9/40
+      - - 1/2
+        - ticks: 1862
+        - E3
+        - 115
+      - - '1'
+        - ticks: 3259
         - E4
-        - 111
-      - - 19/8
-        - 27/160
-        - G4
-        - 105
-      - - 43/16
-        - 9/32
-        - Bb4
-        - 118
-      - - 25/8
-        - 63/160
-        - A4
-        - 112
-      - - 59/16
-        - 9/32
-        - F4
+        - 120
+      - - '2'
+        - ticks: 2561
+        - F3
+        - 117
+      - - 11/4
+        - ticks: 931
+        - A3
+        - 108
+      - - '3'
+        - ticks: 3725
+        - G3
+        - 117
+      - - 17/4
+        - ticks: 2794
+        - E4
         - 117
       - - '5'
-        - 9/32
-        - Bb4
-        - 113
-      - - 11/2
-        - 9/40
-        - G4
-        - 109
-      - - 93/16
-        - 27/160
-        - F4
-        - 104
+        - ticks: 3259
+        - Bb3
+        - 120
       - - '6'
-        - 9/32
-        - Bb4
-        - 117
-      - - 13/2
-        - 9/40
-        - F4
-        - 110
-      - - 29/4
-        - 9/40
-        - D#5
-        - 116
-      - - 61/8
-        - 9/32
-        - C5
-        - 118
+        - ticks: 233
+        - B3
+        - 120
+      - - 97/16
+        - ticks: 233
+        - C4
+        - 114
+      - - 49/8
+        - ticks: 233
+        - D4
+        - 111
+      - - 99/16
+        - ticks: 233
+        - D#4
+        - 108
+      - - 101/16
+        - ticks: 2561
+        - D#4
+        - 119
+      - - '7'
+        - ticks: 3725
+        - E4
+        - 121
+      automation:
+      - id: wail_1_0
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 1920
+          value: 0
+        - at:
+            ticks: 2087
+          value: 0
+        - at:
+            ticks: 2683
+          value: 341
+        - at:
+            ticks: 2776
+          value: 341
+        - at:
+            ticks: 2844
+          value: 424
+        - at:
+            ticks: 2912
+          value: 445
+        - at:
+            ticks: 2980
+          value: 389
+        - at:
+            ticks: 3048
+          value: 298
+        - at:
+            ticks: 3116
+          value: 239
+        - at:
+            ticks: 3184
+          value: 256
+        - at:
+            ticks: 3252
+          value: 336
+        - at:
+            ticks: 3320
+          value: 420
+        - at:
+            ticks: 3388
+          value: 446
+        - at:
+            ticks: 3456
+          value: 394
+        - at:
+            ticks: 3503
+          value: 341
+        - at:
+            ticks: 3752
+          value: 0
+        - at:
+            ticks: 3788
+          value: 0
+      - id: wail_1_1
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4133
+          value: 0
+        - at:
+            ticks: 5176
+          value: 683
+        - at:
+            ticks: 5339
+          value: 683
+        - at:
+            ticks: 5407
+          value: 765
+        - at:
+            ticks: 5475
+          value: 786
+        - at:
+            ticks: 5543
+          value: 731
+        - at:
+            ticks: 5611
+          value: 640
+        - at:
+            ticks: 5679
+          value: 580
+        - at:
+            ticks: 5747
+          value: 597
+        - at:
+            ticks: 5815
+          value: 677
+        - at:
+            ticks: 5883
+          value: 761
+        - at:
+            ticks: 5951
+          value: 787
+        - at:
+            ticks: 6019
+          value: 736
+        - at:
+            ticks: 6087
+          value: 645
+        - at:
+            ticks: 6155
+          value: 582
+        - at:
+            ticks: 6223
+          value: 594
+        - at:
+            ticks: 6291
+          value: 672
+        - at:
+            ticks: 6359
+          value: 757
+        - at:
+            ticks: 6427
+          value: 788
+        - at:
+            ticks: 6495
+          value: 740
+        - at:
+            ticks: 6563
+          value: 650
+        - at:
+            ticks: 6611
+          value: 683
+        - at:
+            ticks: 7069
+          value: 0
+        - at:
+            ticks: 7105
+          value: 0
+      - id: wail_1_2
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 7910
+          value: 0
+        - at:
+            ticks: 8730
+          value: 683
+        - at:
+            ticks: 8858
+          value: 683
+        - at:
+            ticks: 8926
+          value: 765
+        - at:
+            ticks: 8994
+          value: 786
+        - at:
+            ticks: 9062
+          value: 731
+        - at:
+            ticks: 9130
+          value: 640
+        - at:
+            ticks: 9198
+          value: 580
+        - at:
+            ticks: 9266
+          value: 597
+        - at:
+            ticks: 9334
+          value: 677
+        - at:
+            ticks: 9402
+          value: 761
+        - at:
+            ticks: 9470
+          value: 787
+        - at:
+            ticks: 9538
+          value: 736
+        - at:
+            ticks: 9606
+          value: 645
+        - at:
+            ticks: 9674
+          value: 582
+        - at:
+            ticks: 9742
+          value: 594
+        - at:
+            ticks: 9810
+          value: 672
+        - at:
+            ticks: 9857
+          value: 683
+        - at:
+            ticks: 10211
+          value: 0
+        - at:
+            ticks: 10247
+          value: 0
+      - id: wail_1_4
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11855
+          value: 0
+        - at:
+            ticks: 13047
+          value: 1365
+        - at:
+            ticks: 13233
+          value: 1365
+        - at:
+            ticks: 13301
+          value: 1448
+        - at:
+            ticks: 13369
+          value: 1469
+        - at:
+            ticks: 13437
+          value: 1413
+        - at:
+            ticks: 13505
+          value: 1322
+        - at:
+            ticks: 13573
+          value: 1263
+        - at:
+            ticks: 13641
+          value: 1280
+        - at:
+            ticks: 13709
+          value: 1360
+        - at:
+            ticks: 13777
+          value: 1444
+        - at:
+            ticks: 13845
+          value: 1470
+        - at:
+            ticks: 13913
+          value: 1418
+        - at:
+            ticks: 13981
+          value: 1327
+        - at:
+            ticks: 14049
+          value: 1265
+        - at:
+            ticks: 14117
+          value: 1277
+        - at:
+            ticks: 14185
+          value: 1354
+        - at:
+            ticks: 14253
+          value: 1440
+        - at:
+            ticks: 14321
+          value: 1471
+        - at:
+            ticks: 14389
+          value: 1423
+        - at:
+            ticks: 14457
+          value: 1333
+        - at:
+            ticks: 14525
+          value: 1267
+        - at:
+            ticks: 14593
+          value: 1274
+        - at:
+            ticks: 14661
+          value: 1349
+        - at:
+            ticks: 14687
+          value: 1365
+        - at:
+            ticks: 15215
+          value: 0
+        - at:
+            ticks: 15251
+          value: 0
+      - id: wail_1_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 16320
+          value: 0
+        - at:
+            ticks: 16571
+          value: 0
+        - at:
+            ticks: 17465
+          value: 683
+        - at:
+            ticks: 17605
+          value: 683
+        - at:
+            ticks: 17673
+          value: 765
+        - at:
+            ticks: 17741
+          value: 786
+        - at:
+            ticks: 17809
+          value: 731
+        - at:
+            ticks: 17877
+          value: 640
+        - at:
+            ticks: 17945
+          value: 580
+        - at:
+            ticks: 18013
+          value: 597
+        - at:
+            ticks: 18081
+          value: 677
+        - at:
+            ticks: 18149
+          value: 761
+        - at:
+            ticks: 18217
+          value: 787
+        - at:
+            ticks: 18285
+          value: 736
+        - at:
+            ticks: 18353
+          value: 645
+        - at:
+            ticks: 18421
+          value: 582
+        - at:
+            ticks: 18489
+          value: 594
+        - at:
+            ticks: 18557
+          value: 672
+        - at:
+            ticks: 18625
+          value: 757
+        - at:
+            ticks: 18693
+          value: 788
+        - at:
+            ticks: 18695
+          value: 683
+        - at:
+            ticks: 19084
+          value: 0
+        - at:
+            ticks: 19120
+          value: 0
+      - id: wail_1_6
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19493
+          value: 0
+        - at:
+            ticks: 20536
+          value: 683
+        - at:
+            ticks: 20699
+          value: 683
+        - at:
+            ticks: 20767
+          value: 765
+        - at:
+            ticks: 20835
+          value: 786
+        - at:
+            ticks: 20903
+          value: 731
+        - at:
+            ticks: 20971
+          value: 640
+        - at:
+            ticks: 21039
+          value: 580
+        - at:
+            ticks: 21107
+          value: 597
+        - at:
+            ticks: 21175
+          value: 677
+        - at:
+            ticks: 21243
+          value: 761
+        - at:
+            ticks: 21311
+          value: 787
+        - at:
+            ticks: 21379
+          value: 736
+        - at:
+            ticks: 21447
+          value: 645
+        - at:
+            ticks: 21515
+          value: 582
+        - at:
+            ticks: 21583
+          value: 594
+        - at:
+            ticks: 21651
+          value: 672
+        - at:
+            ticks: 21719
+          value: 757
+        - at:
+            ticks: 21787
+          value: 788
+        - at:
+            ticks: 21855
+          value: 740
+        - at:
+            ticks: 21923
+          value: 650
+        - at:
+            ticks: 21971
+          value: 683
+        - at:
+            ticks: 22429
+          value: 0
+        - at:
+            ticks: 22465
+          value: 0
+      - id: wail_1_11
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 24240
+          value: 0
+        - at:
+            ticks: 24470
+          value: 0
+        - at:
+            ticks: 25290
+          value: 683
+        - at:
+            ticks: 25418
+          value: 683
+        - at:
+            ticks: 25486
+          value: 765
+        - at:
+            ticks: 25554
+          value: 786
+        - at:
+            ticks: 25622
+          value: 731
+        - at:
+            ticks: 25690
+          value: 640
+        - at:
+            ticks: 25758
+          value: 580
+        - at:
+            ticks: 25826
+          value: 597
+        - at:
+            ticks: 25894
+          value: 677
+        - at:
+            ticks: 25962
+          value: 761
+        - at:
+            ticks: 26030
+          value: 787
+        - at:
+            ticks: 26098
+          value: 736
+        - at:
+            ticks: 26166
+          value: 645
+        - at:
+            ticks: 26234
+          value: 582
+        - at:
+            ticks: 26302
+          value: 594
+        - at:
+            ticks: 26370
+          value: 672
+        - at:
+            ticks: 26417
+          value: 683
+        - at:
+            ticks: 26771
+          value: 0
+        - at:
+            ticks: 26807
+          value: 0
+      - id: wail_1_12
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27215
+          value: 0
+        - at:
+            ticks: 28407
+          value: 683
+        - at:
+            ticks: 28593
+          value: 683
+        - at:
+            ticks: 28661
+          value: 765
+        - at:
+            ticks: 28729
+          value: 786
+        - at:
+            ticks: 28797
+          value: 731
+        - at:
+            ticks: 28865
+          value: 640
+        - at:
+            ticks: 28933
+          value: 580
+        - at:
+            ticks: 29001
+          value: 597
+        - at:
+            ticks: 29069
+          value: 677
+        - at:
+            ticks: 29137
+          value: 761
+        - at:
+            ticks: 29205
+          value: 787
+        - at:
+            ticks: 29273
+          value: 736
+        - at:
+            ticks: 29341
+          value: 645
+        - at:
+            ticks: 29409
+          value: 582
+        - at:
+            ticks: 29477
+          value: 594
+        - at:
+            ticks: 29545
+          value: 672
+        - at:
+            ticks: 29613
+          value: 757
+        - at:
+            ticks: 29681
+          value: 788
+        - at:
+            ticks: 29749
+          value: 740
+        - at:
+            ticks: 29817
+          value: 650
+        - at:
+            ticks: 29885
+          value: 584
+        - at:
+            ticks: 29953
+          value: 591
+        - at:
+            ticks: 30021
+          value: 666
+        - at:
+            ticks: 30047
+          value: 683
+        - at:
+            ticks: 30575
+          value: 0
+        - at:
+            ticks: 30611
+          value: 0
     - id: lead_guitar_war_machine
       at:
         bar: 25
         beat: 1
       events:
-      - - 3/2
-        - 9/32
-        - F4
-        - 109
-      - - 29/16
-        - 27/160
+      - - 9/16
+        - ticks: 1630
         - E4
-        - 118
-      - - 13/4
-        - 9/32
-        - B4
-        - 114
-      - - 59/16
-        - 9/32
-        - G4
+        - 107
+      - - '1'
+        - ticks: 3259
+        - F3
+        - 117
+      - - 43/16
+        - ticks: 1164
+        - A3
+        - 109
+      - - 7/2
+        - ticks: 1862
+        - E4
         - 112
-      - - 11/2
-        - 27/160
-        - Bb4
-        - 114
-      - - 23/4
-        - 9/40
-        - G4
-        - 111
-      - - 15/2
-        - 9/32
-        - D#5
-        - 114
-      - - 125/16
-        - 27/160
-        - C5
+      - - 9/2
+        - ticks: 1630
+        - B3
+        - 109
+      - - '5'
+        - ticks: 3259
+        - Bb3
         - 118
+      - - 53/8
+        - ticks: 1397
+        - D#4
+        - 115
+      - - '7'
+        - ticks: 2794
+        - B3
+        - 113
+      automation:
+      - id: wail_2_1
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4133
+          value: 0
+        - at:
+            ticks: 5176
+          value: 1365
+        - at:
+            ticks: 5339
+          value: 1365
+        - at:
+            ticks: 5407
+          value: 1448
+        - at:
+            ticks: 5475
+          value: 1469
+        - at:
+            ticks: 5543
+          value: 1413
+        - at:
+            ticks: 5611
+          value: 1322
+        - at:
+            ticks: 5679
+          value: 1263
+        - at:
+            ticks: 5747
+          value: 1280
+        - at:
+            ticks: 5815
+          value: 1360
+        - at:
+            ticks: 5883
+          value: 1444
+        - at:
+            ticks: 5951
+          value: 1470
+        - at:
+            ticks: 6019
+          value: 1418
+        - at:
+            ticks: 6087
+          value: 1327
+        - at:
+            ticks: 6155
+          value: 1265
+        - at:
+            ticks: 6223
+          value: 1277
+        - at:
+            ticks: 6291
+          value: 1354
+        - at:
+            ticks: 6359
+          value: 1440
+        - at:
+            ticks: 6427
+          value: 1471
+        - at:
+            ticks: 6495
+          value: 1423
+        - at:
+            ticks: 6563
+          value: 1333
+        - at:
+            ticks: 6611
+          value: 1365
+        - at:
+            ticks: 7069
+          value: 0
+        - at:
+            ticks: 7105
+          value: 0
+      - id: wail_2_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 13440
+          value: 0
+        - at:
+            ticks: 13607
+          value: 0
+        - at:
+            ticks: 14203
+          value: 683
+        - at:
+            ticks: 14296
+          value: 683
+        - at:
+            ticks: 14364
+          value: 765
+        - at:
+            ticks: 14432
+          value: 786
+        - at:
+            ticks: 14500
+          value: 731
+        - at:
+            ticks: 14568
+          value: 640
+        - at:
+            ticks: 14636
+          value: 580
+        - at:
+            ticks: 14704
+          value: 597
+        - at:
+            ticks: 14772
+          value: 677
+        - at:
+            ticks: 14840
+          value: 761
+        - at:
+            ticks: 14908
+          value: 787
+        - at:
+            ticks: 14976
+          value: 736
+        - at:
+            ticks: 15023
+          value: 683
+        - at:
+            ticks: 15272
+          value: 0
+        - at:
+            ticks: 15308
+          value: 0
+      - id: wail_2_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19493
+          value: 0
+        - at:
+            ticks: 20536
+          value: 683
+        - at:
+            ticks: 20699
+          value: 683
+        - at:
+            ticks: 20767
+          value: 765
+        - at:
+            ticks: 20835
+          value: 786
+        - at:
+            ticks: 20903
+          value: 731
+        - at:
+            ticks: 20971
+          value: 640
+        - at:
+            ticks: 21039
+          value: 580
+        - at:
+            ticks: 21107
+          value: 597
+        - at:
+            ticks: 21175
+          value: 677
+        - at:
+            ticks: 21243
+          value: 761
+        - at:
+            ticks: 21311
+          value: 787
+        - at:
+            ticks: 21379
+          value: 736
+        - at:
+            ticks: 21447
+          value: 645
+        - at:
+            ticks: 21515
+          value: 582
+        - at:
+            ticks: 21583
+          value: 594
+        - at:
+            ticks: 21651
+          value: 672
+        - at:
+            ticks: 21719
+          value: 757
+        - at:
+            ticks: 21787
+          value: 788
+        - at:
+            ticks: 21855
+          value: 740
+        - at:
+            ticks: 21923
+          value: 650
+        - at:
+            ticks: 21971
+          value: 683
+        - at:
+            ticks: 22429
+          value: 0
+        - at:
+            ticks: 22465
+          value: 0
+      - id: wail_2_7
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27131
+          value: 0
+        - at:
+            ticks: 28025
+          value: 683
+        - at:
+            ticks: 28165
+          value: 683
+        - at:
+            ticks: 28233
+          value: 765
+        - at:
+            ticks: 28301
+          value: 786
+        - at:
+            ticks: 28369
+          value: 731
+        - at:
+            ticks: 28437
+          value: 640
+        - at:
+            ticks: 28505
+          value: 580
+        - at:
+            ticks: 28573
+          value: 597
+        - at:
+            ticks: 28641
+          value: 677
+        - at:
+            ticks: 28709
+          value: 761
+        - at:
+            ticks: 28777
+          value: 787
+        - at:
+            ticks: 28845
+          value: 736
+        - at:
+            ticks: 28913
+          value: 645
+        - at:
+            ticks: 28981
+          value: 582
+        - at:
+            ticks: 29049
+          value: 594
+        - at:
+            ticks: 29117
+          value: 672
+        - at:
+            ticks: 29185
+          value: 757
+        - at:
+            ticks: 29253
+          value: 788
+        - at:
+            ticks: 29255
+          value: 683
+        - at:
+            ticks: 29644
+          value: 0
+        - at:
+            ticks: 29680
+          value: 0
     - id: lead_guitar_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - '1'
-        - 27/160
-        - F4
-        - 111
-      - - 5/4
-        - 9/80
-        - G4
-        - 114
-      - - 11/8
-        - 27/160
-        - Bb4
-        - 118
-      - - 13/8
-        - 27/80
-        - A4
-        - 114
-      - - '3'
-        - 27/80
-        - E5
-        - 118
-      - - 7/2
-        - 27/160
-        - D5
-        - 111
-      - - 15/4
-        - 9/40
-        - Bb4
+      - - '0'
+        - ticks: 1862
+        - G3
+        - 119
+      - - 1/2
+        - ticks: 233
+        - B3
+        - 119
+      - - 9/16
+        - ticks: 233
+        - C4
         - 113
-      - - 81/16
-        - 9/80
+      - - 5/8
+        - ticks: 233
+        - D4
+        - 110
+      - - 11/16
+        - ticks: 233
+        - D#4
+        - 107
+      - - 3/4
+        - ticks: 233
+        - E4
+        - 116
+      - - 13/16
+        - ticks: 233
         - F4
+        - 116
+      - - 7/8
+        - ticks: 233
+        - G4
+        - 110
+      - - 15/16
+        - ticks: 233
+        - A4
+        - 107
+      - - '1'
+        - ticks: 2095
+        - Bb4
+        - 124
+      - - 27/16
+        - ticks: 233
+        - E4
+        - 118
+      - - 7/4
+        - ticks: 233
+        - F4
+        - 112
+      - - 29/16
+        - ticks: 233
+        - G4
+        - 109
+      - - 15/8
+        - ticks: 233
+        - A4
+        - 106
+      - - 31/16
+        - ticks: 233
+        - Bb4
+        - 115
+      - - '2'
+        - ticks: 1862
+        - E4
+        - 121
+      - - 5/2
+        - ticks: 233
+        - E4
+        - 119
+      - - 41/16
+        - ticks: 233
+        - F4
+        - 113
+      - - 21/8
+        - ticks: 233
+        - G4
+        - 110
+      - - 43/16
+        - ticks: 233
+        - A4
+        - 107
+      - - 11/4
+        - ticks: 233
+        - Bb4
+        - 116
+      - - 45/16
+        - ticks: 233
+        - B4
+        - 116
+      - - 23/8
+        - ticks: 233
+        - D5
+        - 110
+      - - 47/16
+        - ticks: 233
+        - E5
+        - 107
+      - - '3'
+        - ticks: 3259
+        - E5
+        - 124
+      - - '4'
+        - ticks: 2794
+        - G4
+        - 122
+      - - 77/16
+        - ticks: 698
+        - E4
+        - 108
+      - - '5'
+        - ticks: 233
+        - E5
+        - 122
+      - - 81/16
+        - ticks: 233
+        - D5
+        - 116
+      - - 41/8
+        - ticks: 233
+        - C5
+        - 113
+      - - 83/16
+        - ticks: 233
+        - B4
         - 110
       - - 21/4
-        - 9/80
-        - A4
-        - 112
-      - - 87/16
-        - 27/160
+        - ticks: 233
         - Bb4
-        - 120
-      - - 23/4
-        - 9/40
-        - F4
-        - 114
-      - - '7'
-        - 9/32
-        - B4
-        - 111
-      - - 119/16
-        - 27/160
-        - D#5
-        - 116
-      - - 123/16
-        - 9/32
-        - C5
         - 119
+      - - 85/16
+        - ticks: 233
+        - A4
+        - 119
+      - - 43/8
+        - ticks: 233
+        - G4
+        - 113
+      - - 87/16
+        - ticks: 233
+        - F4
+        - 110
+      - - 11/2
+        - ticks: 233
+        - E4
+        - 119
+      - - 89/16
+        - ticks: 233
+        - D4
+        - 116
+      - - 45/8
+        - ticks: 233
+        - C4
+        - 116
+      - - 91/16
+        - ticks: 233
+        - B3
+        - 110
+      - - 23/4
+        - ticks: 233
+        - Bb3
+        - 119
+      - - 93/16
+        - ticks: 233
+        - G3
+        - 116
+      - - 47/8
+        - ticks: 233
+        - F3
+        - 113
+      - - 95/16
+        - ticks: 233
+        - E3
+        - 113
+      - - '6'
+        - ticks: 3725
+        - E4
+        - 122
+      - - '7'
+        - ticks: 1862
+        - D#4
+        - 115
+      - - 121/16
+        - ticks: 1630
+        - B3
+        - 112
       automation:
-      - id: b1_n3_bend0
-        at:
-          ticks: 6953
-        pitch_bend: 275
-      - id: b1_n3_bend1
-        at:
-          ticks: 7212
-        pitch_bend: -138
-      - id: b1_n3_bend2
-        at:
-          ticks: 7406
-        pitch_bend: 91
-      - id: b1_n3_bend3
-        at:
-          ticks: 7510
+      - id: wail_3_0
         pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 167
+          value: 0
+        - at:
+            ticks: 763
+          value: 1365
+        - at:
+            ticks: 856
+          value: 1365
+        - at:
+            ticks: 924
+          value: 1448
+        - at:
+            ticks: 992
+          value: 1469
+        - at:
+            ticks: 1060
+          value: 1413
+        - at:
+            ticks: 1128
+          value: 1322
+        - at:
+            ticks: 1196
+          value: 1263
+        - at:
+            ticks: 1264
+          value: 1280
+        - at:
+            ticks: 1332
+          value: 1360
+        - at:
+            ticks: 1400
+          value: 1444
+        - at:
+            ticks: 1468
+          value: 1470
+        - at:
+            ticks: 1536
+          value: 1418
+        - at:
+            ticks: 1583
+          value: 1365
+        - at:
+            ticks: 1832
+          value: 0
+        - at:
+            ticks: 1868
+          value: 0
+      - id: wail_3_9
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4028
+          value: 0
+        - at:
+            ticks: 4698
+          value: 683
+        - at:
+            ticks: 4803
+          value: 683
+        - at:
+            ticks: 4871
+          value: 765
+        - at:
+            ticks: 4939
+          value: 786
+        - at:
+            ticks: 5007
+          value: 731
+        - at:
+            ticks: 5075
+          value: 640
+        - at:
+            ticks: 5143
+          value: 580
+        - at:
+            ticks: 5211
+          value: 597
+        - at:
+            ticks: 5279
+          value: 677
+        - at:
+            ticks: 5347
+          value: 761
+        - at:
+            ticks: 5415
+          value: 787
+        - at:
+            ticks: 5483
+          value: 736
+        - at:
+            ticks: 5551
+          value: 645
+        - at:
+            ticks: 5619
+          value: 582
+        - at:
+            ticks: 5621
+          value: 683
+        - at:
+            ticks: 5905
+          value: 0
+        - at:
+            ticks: 5941
+          value: 0
+      - id: wail_3_15
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 7847
+          value: 0
+        - at:
+            ticks: 8443
+          value: 683
+        - at:
+            ticks: 8536
+          value: 683
+        - at:
+            ticks: 8604
+          value: 765
+        - at:
+            ticks: 8672
+          value: 786
+        - at:
+            ticks: 8740
+          value: 731
+        - at:
+            ticks: 8808
+          value: 640
+        - at:
+            ticks: 8876
+          value: 580
+        - at:
+            ticks: 8944
+          value: 597
+        - at:
+            ticks: 9012
+          value: 677
+        - at:
+            ticks: 9080
+          value: 761
+        - at:
+            ticks: 9148
+          value: 787
+        - at:
+            ticks: 9216
+          value: 736
+        - at:
+            ticks: 9263
+          value: 683
+        - at:
+            ticks: 9512
+          value: 0
+        - at:
+            ticks: 9548
+          value: 0
+      - id: wail_3_24
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11813
+          value: 0
+        - at:
+            ticks: 12856
+          value: 1365
+        - at:
+            ticks: 13019
+          value: 1365
+        - at:
+            ticks: 13087
+          value: 1448
+        - at:
+            ticks: 13155
+          value: 1469
+        - at:
+            ticks: 13223
+          value: 1413
+        - at:
+            ticks: 13291
+          value: 1322
+        - at:
+            ticks: 13359
+          value: 1263
+        - at:
+            ticks: 13427
+          value: 1280
+        - at:
+            ticks: 13495
+          value: 1360
+        - at:
+            ticks: 13563
+          value: 1444
+        - at:
+            ticks: 13631
+          value: 1470
+        - at:
+            ticks: 13699
+          value: 1418
+        - at:
+            ticks: 13767
+          value: 1327
+        - at:
+            ticks: 13835
+          value: 1265
+        - at:
+            ticks: 13903
+          value: 1277
+        - at:
+            ticks: 13971
+          value: 1354
+        - at:
+            ticks: 14039
+          value: 1440
+        - at:
+            ticks: 14107
+          value: 1471
+        - at:
+            ticks: 14175
+          value: 1423
+        - at:
+            ticks: 14243
+          value: 1333
+        - at:
+            ticks: 14291
+          value: 1365
+        - at:
+            ticks: 14749
+          value: 0
+        - at:
+            ticks: 14785
+          value: 0
+      - id: wail_3_25
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15611
+          value: 0
+        - at:
+            ticks: 16505
+          value: 1365
+        - at:
+            ticks: 16645
+          value: 1365
+        - at:
+            ticks: 16713
+          value: 1448
+        - at:
+            ticks: 16781
+          value: 1469
+        - at:
+            ticks: 16849
+          value: 1413
+        - at:
+            ticks: 16917
+          value: 1322
+        - at:
+            ticks: 16985
+          value: 1263
+        - at:
+            ticks: 17053
+          value: 1280
+        - at:
+            ticks: 17121
+          value: 1360
+        - at:
+            ticks: 17189
+          value: 1444
+        - at:
+            ticks: 17257
+          value: 1470
+        - at:
+            ticks: 17325
+          value: 1418
+        - at:
+            ticks: 17393
+          value: 1327
+        - at:
+            ticks: 17461
+          value: 1265
+        - at:
+            ticks: 17529
+          value: 1277
+        - at:
+            ticks: 17597
+          value: 1354
+        - at:
+            ticks: 17665
+          value: 1440
+        - at:
+            ticks: 17733
+          value: 1471
+        - at:
+            ticks: 17735
+          value: 1365
+        - at:
+            ticks: 18124
+          value: 0
+        - at:
+            ticks: 18160
+          value: 0
+      - id: wail_3_43
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23375
+          value: 0
+        - at:
+            ticks: 24567
+          value: 683
+        - at:
+            ticks: 24753
+          value: 683
+        - at:
+            ticks: 24821
+          value: 765
+        - at:
+            ticks: 24889
+          value: 786
+        - at:
+            ticks: 24957
+          value: 731
+        - at:
+            ticks: 25025
+          value: 640
+        - at:
+            ticks: 25093
+          value: 580
+        - at:
+            ticks: 25161
+          value: 597
+        - at:
+            ticks: 25229
+          value: 677
+        - at:
+            ticks: 25297
+          value: 761
+        - at:
+            ticks: 25365
+          value: 787
+        - at:
+            ticks: 25433
+          value: 736
+        - at:
+            ticks: 25501
+          value: 645
+        - at:
+            ticks: 25569
+          value: 582
+        - at:
+            ticks: 25637
+          value: 594
+        - at:
+            ticks: 25705
+          value: 672
+        - at:
+            ticks: 25773
+          value: 757
+        - at:
+            ticks: 25841
+          value: 788
+        - at:
+            ticks: 25909
+          value: 740
+        - at:
+            ticks: 25977
+          value: 650
+        - at:
+            ticks: 26045
+          value: 584
+        - at:
+            ticks: 26113
+          value: 591
+        - at:
+            ticks: 26181
+          value: 666
+        - at:
+            ticks: 26207
+          value: 683
+        - at:
+            ticks: 26735
+          value: 0
+        - at:
+            ticks: 26771
+          value: 0
+      - id: wail_3_44
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27047
+          value: 0
+        - at:
+            ticks: 27643
+          value: 683
+        - at:
+            ticks: 27736
+          value: 683
+        - at:
+            ticks: 27804
+          value: 765
+        - at:
+            ticks: 27872
+          value: 786
+        - at:
+            ticks: 27940
+          value: 731
+        - at:
+            ticks: 28008
+          value: 640
+        - at:
+            ticks: 28076
+          value: 580
+        - at:
+            ticks: 28144
+          value: 597
+        - at:
+            ticks: 28212
+          value: 677
+        - at:
+            ticks: 28280
+          value: 761
+        - at:
+            ticks: 28348
+          value: 787
+        - at:
+            ticks: 28416
+          value: 736
+        - at:
+            ticks: 28463
+          value: 683
+        - at:
+            ticks: 28712
+          value: 0
+        - at:
+            ticks: 28748
+          value: 0
     - id: lead_guitar_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - '3'
-        - 9/20
-        - Bb4
-        - 119
-      - - 29/8
-        - 27/80
-        - A4
-        - 109
-      - - '6'
-        - 9/20
-        - F4
-        - 113
-      - - 53/8
-        - 27/80
-        - E4
-        - 119
-      - - '7'
-        - 63/160
-        - C5
+      - - '0'
+        - ticks: 5587
+        - E3
+        - 111
+      - - '2'
+        - ticks: 3026
+        - F3
         - 115
-      - - 121/16
-        - 63/160
-        - B4
-        - 117
+      - - '3'
+        - ticks: 3725
+        - E3
+        - 113
+      - - '4'
+        - ticks: 3259
+        - E4
+        - 118
+      - - '5'
+        - ticks: 3725
+        - Bb3
+        - 120
+      - - '6'
+        - ticks: 4656
+        - E4
+        - 121
+      - - 117/16
+        - ticks: 2561
+        - D#4
+        - 118
       automation:
-      - id: b3_n1_bend0
-        at:
-          ticks: 14633
-        pitch_bend: 240
-      - id: b3_n1_bend1
-        at:
-          ticks: 14892
-        pitch_bend: -120
-      - id: b3_n1_bend2
-        at:
-          ticks: 15086
-        pitch_bend: 80
-      - id: b3_n1_bend3
-        at:
-          ticks: 15190
+      - id: wail_4_0
         pitch_bend: 0
-      - id: b6_n0_bend0
-        at:
-          ticks: 23990
-        pitch_bend: 240
-      - id: b6_n0_bend1
-        at:
-          ticks: 24336
-        pitch_bend: -120
-      - id: b6_n0_bend2
-        at:
-          ticks: 24595
-        pitch_bend: 80
-      - id: b6_n0_bend3
-        at:
-          ticks: 24733
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 502
+          value: 0
+        - at:
+            ticks: 2290
+          value: 683
+        - at:
+            ticks: 2570
+          value: 683
+        - at:
+            ticks: 2638
+          value: 765
+        - at:
+            ticks: 2706
+          value: 786
+        - at:
+            ticks: 2774
+          value: 731
+        - at:
+            ticks: 2842
+          value: 640
+        - at:
+            ticks: 2910
+          value: 580
+        - at:
+            ticks: 2978
+          value: 597
+        - at:
+            ticks: 3046
+          value: 677
+        - at:
+            ticks: 3114
+          value: 761
+        - at:
+            ticks: 3182
+          value: 787
+        - at:
+            ticks: 3250
+          value: 736
+        - at:
+            ticks: 3318
+          value: 645
+        - at:
+            ticks: 3386
+          value: 582
+        - at:
+            ticks: 3454
+          value: 594
+        - at:
+            ticks: 3522
+          value: 672
+        - at:
+            ticks: 3590
+          value: 757
+        - at:
+            ticks: 3658
+          value: 788
+        - at:
+            ticks: 3726
+          value: 740
+        - at:
+            ticks: 3794
+          value: 650
+        - at:
+            ticks: 3862
+          value: 584
+        - at:
+            ticks: 3930
+          value: 591
+        - at:
+            ticks: 3998
+          value: 666
+        - at:
+            ticks: 4066
+          value: 753
+        - at:
+            ticks: 4134
+          value: 788
+        - at:
+            ticks: 4202
+          value: 745
+        - at:
+            ticks: 4270
+          value: 655
+        - at:
+            ticks: 4338
+          value: 586
+        - at:
+            ticks: 4406
+          value: 588
+        - at:
+            ticks: 4474
+          value: 661
+        - at:
+            ticks: 4542
+          value: 749
+        - at:
+            ticks: 4610
+          value: 788
+        - at:
+            ticks: 4678
+          value: 749
+        - at:
+            ticks: 4746
+          value: 661
+        - at:
+            ticks: 4749
+          value: 683
+        - at:
+            ticks: 5557
+          value: 0
+        - at:
+            ticks: 5593
+          value: 0
+      - id: wail_4_1
         pitch_bend: 0
-      - id: b7_n1_bend0
-        at:
-          ticks: 29872
-        pitch_bend: 275
-      - id: b7_n1_bend1
-        at:
-          ticks: 30174
-        pitch_bend: -138
-      - id: b7_n1_bend2
-        at:
-          ticks: 30401
-        pitch_bend: 91
-      - id: b7_n1_bend3
-        at:
-          ticks: 30522
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 7952
+          value: 0
+        - at:
+            ticks: 8920
+          value: 1365
+        - at:
+            ticks: 9071
+          value: 1365
+        - at:
+            ticks: 9139
+          value: 1448
+        - at:
+            ticks: 9207
+          value: 1469
+        - at:
+            ticks: 9275
+          value: 1413
+        - at:
+            ticks: 9343
+          value: 1322
+        - at:
+            ticks: 9411
+          value: 1263
+        - at:
+            ticks: 9479
+          value: 1280
+        - at:
+            ticks: 9547
+          value: 1360
+        - at:
+            ticks: 9615
+          value: 1444
+        - at:
+            ticks: 9683
+          value: 1470
+        - at:
+            ticks: 9751
+          value: 1418
+        - at:
+            ticks: 9819
+          value: 1327
+        - at:
+            ticks: 9887
+          value: 1265
+        - at:
+            ticks: 9955
+          value: 1277
+        - at:
+            ticks: 10023
+          value: 1354
+        - at:
+            ticks: 10091
+          value: 1440
+        - at:
+            ticks: 10159
+          value: 1471
+        - at:
+            ticks: 10227
+          value: 1423
+        - at:
+            ticks: 10253
+          value: 1365
+        - at:
+            ticks: 10676
+          value: 0
+        - at:
+            ticks: 10712
+          value: 0
+      - id: wail_4_2
         pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11855
+          value: 0
+        - at:
+            ticks: 13047
+          value: 683
+        - at:
+            ticks: 13233
+          value: 683
+        - at:
+            ticks: 13301
+          value: 765
+        - at:
+            ticks: 13369
+          value: 786
+        - at:
+            ticks: 13437
+          value: 731
+        - at:
+            ticks: 13505
+          value: 640
+        - at:
+            ticks: 13573
+          value: 580
+        - at:
+            ticks: 13641
+          value: 597
+        - at:
+            ticks: 13709
+          value: 677
+        - at:
+            ticks: 13777
+          value: 761
+        - at:
+            ticks: 13845
+          value: 787
+        - at:
+            ticks: 13913
+          value: 736
+        - at:
+            ticks: 13981
+          value: 645
+        - at:
+            ticks: 14049
+          value: 582
+        - at:
+            ticks: 14117
+          value: 594
+        - at:
+            ticks: 14185
+          value: 672
+        - at:
+            ticks: 14253
+          value: 757
+        - at:
+            ticks: 14321
+          value: 788
+        - at:
+            ticks: 14389
+          value: 740
+        - at:
+            ticks: 14457
+          value: 650
+        - at:
+            ticks: 14525
+          value: 584
+        - at:
+            ticks: 14593
+          value: 591
+        - at:
+            ticks: 14661
+          value: 666
+        - at:
+            ticks: 14687
+          value: 683
+        - at:
+            ticks: 15215
+          value: 0
+        - at:
+            ticks: 15251
+          value: 0
+      - id: wail_4_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15653
+          value: 0
+        - at:
+            ticks: 16696
+          value: 683
+        - at:
+            ticks: 16859
+          value: 683
+        - at:
+            ticks: 16927
+          value: 765
+        - at:
+            ticks: 16995
+          value: 786
+        - at:
+            ticks: 17063
+          value: 731
+        - at:
+            ticks: 17131
+          value: 640
+        - at:
+            ticks: 17199
+          value: 580
+        - at:
+            ticks: 17267
+          value: 597
+        - at:
+            ticks: 17335
+          value: 677
+        - at:
+            ticks: 17403
+          value: 761
+        - at:
+            ticks: 17471
+          value: 787
+        - at:
+            ticks: 17539
+          value: 736
+        - at:
+            ticks: 17607
+          value: 645
+        - at:
+            ticks: 17675
+          value: 582
+        - at:
+            ticks: 17743
+          value: 594
+        - at:
+            ticks: 17811
+          value: 672
+        - at:
+            ticks: 17879
+          value: 757
+        - at:
+            ticks: 17947
+          value: 788
+        - at:
+            ticks: 18015
+          value: 740
+        - at:
+            ticks: 18083
+          value: 650
+        - at:
+            ticks: 18131
+          value: 683
+        - at:
+            ticks: 18589
+          value: 0
+        - at:
+            ticks: 18625
+          value: 0
+      - id: wail_4_4
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19535
+          value: 0
+        - at:
+            ticks: 20727
+          value: 683
+        - at:
+            ticks: 20913
+          value: 683
+        - at:
+            ticks: 20981
+          value: 765
+        - at:
+            ticks: 21049
+          value: 786
+        - at:
+            ticks: 21117
+          value: 731
+        - at:
+            ticks: 21185
+          value: 640
+        - at:
+            ticks: 21253
+          value: 580
+        - at:
+            ticks: 21321
+          value: 597
+        - at:
+            ticks: 21389
+          value: 677
+        - at:
+            ticks: 21457
+          value: 761
+        - at:
+            ticks: 21525
+          value: 787
+        - at:
+            ticks: 21593
+          value: 736
+        - at:
+            ticks: 21661
+          value: 645
+        - at:
+            ticks: 21729
+          value: 582
+        - at:
+            ticks: 21797
+          value: 594
+        - at:
+            ticks: 21865
+          value: 672
+        - at:
+            ticks: 21933
+          value: 757
+        - at:
+            ticks: 22001
+          value: 788
+        - at:
+            ticks: 22069
+          value: 740
+        - at:
+            ticks: 22137
+          value: 650
+        - at:
+            ticks: 22205
+          value: 584
+        - at:
+            ticks: 22273
+          value: 591
+        - at:
+            ticks: 22341
+          value: 666
+        - at:
+            ticks: 22367
+          value: 683
+        - at:
+            ticks: 22895
+          value: 0
+        - at:
+            ticks: 22931
+          value: 0
+      - id: wail_4_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23459
+          value: 0
+        - at:
+            ticks: 24948
+          value: 683
+        - at:
+            ticks: 25181
+          value: 683
+        - at:
+            ticks: 25249
+          value: 765
+        - at:
+            ticks: 25317
+          value: 786
+        - at:
+            ticks: 25385
+          value: 731
+        - at:
+            ticks: 25453
+          value: 640
+        - at:
+            ticks: 25521
+          value: 580
+        - at:
+            ticks: 25589
+          value: 597
+        - at:
+            ticks: 25657
+          value: 677
+        - at:
+            ticks: 25725
+          value: 761
+        - at:
+            ticks: 25793
+          value: 787
+        - at:
+            ticks: 25861
+          value: 736
+        - at:
+            ticks: 25929
+          value: 645
+        - at:
+            ticks: 25997
+          value: 582
+        - at:
+            ticks: 26065
+          value: 594
+        - at:
+            ticks: 26133
+          value: 672
+        - at:
+            ticks: 26201
+          value: 757
+        - at:
+            ticks: 26269
+          value: 788
+        - at:
+            ticks: 26337
+          value: 740
+        - at:
+            ticks: 26405
+          value: 650
+        - at:
+            ticks: 26473
+          value: 584
+        - at:
+            ticks: 26541
+          value: 591
+        - at:
+            ticks: 26609
+          value: 666
+        - at:
+            ticks: 26677
+          value: 753
+        - at:
+            ticks: 26745
+          value: 788
+        - at:
+            ticks: 26813
+          value: 745
+        - at:
+            ticks: 26881
+          value: 655
+        - at:
+            ticks: 26949
+          value: 586
+        - at:
+            ticks: 26998
+          value: 683
+        - at:
+            ticks: 27666
+          value: 0
+        - at:
+            ticks: 27702
+          value: 0
+      - id: wail_4_6
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 28080
+          value: 0
+        - at:
+            ticks: 28310
+          value: 0
+        - at:
+            ticks: 29130
+          value: 683
+        - at:
+            ticks: 29258
+          value: 683
+        - at:
+            ticks: 29326
+          value: 765
+        - at:
+            ticks: 29394
+          value: 786
+        - at:
+            ticks: 29462
+          value: 731
+        - at:
+            ticks: 29530
+          value: 640
+        - at:
+            ticks: 29598
+          value: 580
+        - at:
+            ticks: 29666
+          value: 597
+        - at:
+            ticks: 29734
+          value: 677
+        - at:
+            ticks: 29802
+          value: 761
+        - at:
+            ticks: 29870
+          value: 787
+        - at:
+            ticks: 29938
+          value: 736
+        - at:
+            ticks: 30006
+          value: 645
+        - at:
+            ticks: 30074
+          value: 582
+        - at:
+            ticks: 30142
+          value: 594
+        - at:
+            ticks: 30210
+          value: 672
+        - at:
+            ticks: 30257
+          value: 683
+        - at:
+            ticks: 30611
+          value: 0
+        - at:
+            ticks: 30647
+          value: 0
     - id: lead_guitar_breaking_the_columns
       at:
         bar: 49
         beat: 1
       events:
       - - '0'
-        - 27/160
-        - B4
-        - 112
-      - - 1/4
-        - 9/80
-        - Bb4
-        - 111
-      - - 7/16
-        - 9/80
-        - G4
-        - 108
-      - - 5/8
-        - 27/80
-        - E5
-        - 121
-      - - 35/16
-        - 9/80
-        - E5
-        - 115
-      - - 19/8
-        - 27/160
-        - D5
-        - 110
-      - - 21/8
-        - 27/80
-        - Bb4
-        - 116
-      - - '3'
-        - 9/40
-        - G4
-        - 108
-      - - 27/8
-        - 9/80
-        - F4
-        - 108
-      - - 57/16
-        - 63/160
+        - ticks: 1862
         - E4
         - 119
-      - - '5'
-        - 27/160
-        - Bb4
-        - 116
-      - - 21/4
-        - 9/80
-        - C5
-        - 112
-      - - 87/16
-        - 27/160
-        - Bb4
-        - 118
-      - - 91/16
-        - 9/32
+      - - 1/2
+        - ticks: 233
         - F4
-        - 110
-      - - '6'
-        - 9/32
-        - E5
         - 120
-      - - 103/16
-        - 9/40
+      - - 9/16
+        - ticks: 233
+        - G4
+        - 114
+      - - 5/8
+        - ticks: 233
+        - A4
+        - 111
+      - - 11/16
+        - ticks: 233
+        - Bb4
+        - 108
+      - - 3/4
+        - ticks: 233
+        - B4
+        - 117
+      - - 13/16
+        - ticks: 233
         - D5
+        - 117
+      - - 7/8
+        - ticks: 233
+        - E5
+        - 111
+      - - 15/16
+        - ticks: 233
+        - D5
+        - 108
+      - - '1'
+        - ticks: 3259
+        - F4
+        - 123
+      - - '2'
+        - ticks: 233
+        - E3
+        - 121
+      - - 33/16
+        - ticks: 233
+        - G3
+        - 115
+      - - 17/8
+        - ticks: 233
+        - A3
         - 112
-      - - 27/4
-        - 9/40
+      - - 35/16
+        - ticks: 233
+        - Bb3
+        - 109
+      - - 9/4
+        - ticks: 233
+        - B3
+        - 118
+      - - 37/16
+        - ticks: 233
+        - D4
+        - 118
+      - - 19/8
+        - ticks: 233
+        - E4
+        - 112
+      - - 39/16
+        - ticks: 233
+        - G4
+        - 109
+      - - 5/2
+        - ticks: 233
+        - A4
+        - 118
+      - - 41/16
+        - ticks: 233
+        - Bb4
+        - 115
+      - - 21/8
+        - ticks: 233
+        - B4
+        - 115
+      - - 43/16
+        - ticks: 233
+        - D5
+        - 109
+      - - 11/4
+        - ticks: 233
+        - E5
+        - 118
+      - - 45/16
+        - ticks: 233
+        - D5
+        - 115
+      - - 23/8
+        - ticks: 233
+        - B4
+        - 112
+      - - 47/16
+        - ticks: 233
         - G4
         - 112
-      - - '7'
-        - 9/40
-        - D#5
+      - - '3'
+        - ticks: 3492
+        - E4
+        - 122
+      - - '4'
+        - ticks: 2794
+        - Bb3
+        - 120
+      - - 77/16
+        - ticks: 698
+        - G3
+        - 111
+      - - '5'
+        - ticks: 3026
+        - F4
+        - 120
+      - - '6'
+        - ticks: 233
+        - E4
+        - 120
+      - - 97/16
+        - ticks: 233
+        - G4
         - 114
-      - - 59/8
-        - 9/40
-        - C5
+      - - 49/8
+        - ticks: 233
+        - A4
+        - 111
+      - - 99/16
+        - ticks: 233
+        - Bb4
+        - 108
+      - - 25/4
+        - ticks: 233
+        - B4
+        - 117
+      - - 101/16
+        - ticks: 233
+        - Bb4
+        - 117
+      - - 51/8
+        - ticks: 233
+        - A4
+        - 111
+      - - 103/16
+        - ticks: 233
+        - G4
+        - 108
+      - - 13/2
+        - ticks: 1862
+        - E4
+        - 117
+      - - '7'
+        - ticks: 2328
+        - D#4
         - 119
       - - 123/16
-        - 9/32
-        - B4
-        - 116
+        - ticks: 1164
+        - B3
+        - 111
       automation:
-      - id: b2_n2_bend0
-        at:
-          ticks: 10793
-        pitch_bend: 310
-      - id: b2_n2_bend1
-        at:
-          ticks: 11052
-        pitch_bend: -155
-      - id: b2_n2_bend2
-        at:
-          ticks: 11246
-        pitch_bend: 103
-      - id: b2_n2_bend3
-        at:
-          ticks: 11350
+      - id: wail_5_0
         pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 167
+          value: 0
+        - at:
+            ticks: 763
+          value: 683
+        - at:
+            ticks: 856
+          value: 683
+        - at:
+            ticks: 924
+          value: 765
+        - at:
+            ticks: 992
+          value: 786
+        - at:
+            ticks: 1060
+          value: 731
+        - at:
+            ticks: 1128
+          value: 640
+        - at:
+            ticks: 1196
+          value: 580
+        - at:
+            ticks: 1264
+          value: 597
+        - at:
+            ticks: 1332
+          value: 677
+        - at:
+            ticks: 1400
+          value: 761
+        - at:
+            ticks: 1468
+          value: 787
+        - at:
+            ticks: 1536
+          value: 736
+        - at:
+            ticks: 1583
+          value: 683
+        - at:
+            ticks: 1832
+          value: 0
+        - at:
+            ticks: 1868
+          value: 0
+      - id: wail_5_9
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4133
+          value: 0
+        - at:
+            ticks: 5176
+          value: 1365
+        - at:
+            ticks: 5339
+          value: 1365
+        - at:
+            ticks: 5407
+          value: 1448
+        - at:
+            ticks: 5475
+          value: 1469
+        - at:
+            ticks: 5543
+          value: 1413
+        - at:
+            ticks: 5611
+          value: 1322
+        - at:
+            ticks: 5679
+          value: 1263
+        - at:
+            ticks: 5747
+          value: 1280
+        - at:
+            ticks: 5815
+          value: 1360
+        - at:
+            ticks: 5883
+          value: 1444
+        - at:
+            ticks: 5951
+          value: 1470
+        - at:
+            ticks: 6019
+          value: 1418
+        - at:
+            ticks: 6087
+          value: 1327
+        - at:
+            ticks: 6155
+          value: 1265
+        - at:
+            ticks: 6223
+          value: 1277
+        - at:
+            ticks: 6291
+          value: 1354
+        - at:
+            ticks: 6359
+          value: 1440
+        - at:
+            ticks: 6427
+          value: 1471
+        - at:
+            ticks: 6495
+          value: 1423
+        - at:
+            ticks: 6563
+          value: 1333
+        - at:
+            ticks: 6611
+          value: 1365
+        - at:
+            ticks: 7069
+          value: 0
+        - at:
+            ticks: 7105
+          value: 0
+      - id: wail_5_26
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11834
+          value: 0
+        - at:
+            ticks: 12951
+          value: 683
+        - at:
+            ticks: 13126
+          value: 683
+        - at:
+            ticks: 13194
+          value: 765
+        - at:
+            ticks: 13262
+          value: 786
+        - at:
+            ticks: 13330
+          value: 731
+        - at:
+            ticks: 13398
+          value: 640
+        - at:
+            ticks: 13466
+          value: 580
+        - at:
+            ticks: 13534
+          value: 597
+        - at:
+            ticks: 13602
+          value: 677
+        - at:
+            ticks: 13670
+          value: 761
+        - at:
+            ticks: 13738
+          value: 787
+        - at:
+            ticks: 13806
+          value: 736
+        - at:
+            ticks: 13874
+          value: 645
+        - at:
+            ticks: 13942
+          value: 582
+        - at:
+            ticks: 14010
+          value: 594
+        - at:
+            ticks: 14078
+          value: 672
+        - at:
+            ticks: 14146
+          value: 757
+        - at:
+            ticks: 14214
+          value: 788
+        - at:
+            ticks: 14282
+          value: 740
+        - at:
+            ticks: 14350
+          value: 650
+        - at:
+            ticks: 14418
+          value: 584
+        - at:
+            ticks: 14486
+          value: 591
+        - at:
+            ticks: 14489
+          value: 683
+        - at:
+            ticks: 14982
+          value: 0
+        - at:
+            ticks: 15018
+          value: 0
+      - id: wail_5_27
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15611
+          value: 0
+        - at:
+            ticks: 16505
+          value: 683
+        - at:
+            ticks: 16645
+          value: 683
+        - at:
+            ticks: 16713
+          value: 765
+        - at:
+            ticks: 16781
+          value: 786
+        - at:
+            ticks: 16849
+          value: 731
+        - at:
+            ticks: 16917
+          value: 640
+        - at:
+            ticks: 16985
+          value: 580
+        - at:
+            ticks: 17053
+          value: 597
+        - at:
+            ticks: 17121
+          value: 677
+        - at:
+            ticks: 17189
+          value: 761
+        - at:
+            ticks: 17257
+          value: 787
+        - at:
+            ticks: 17325
+          value: 736
+        - at:
+            ticks: 17393
+          value: 645
+        - at:
+            ticks: 17461
+          value: 582
+        - at:
+            ticks: 17529
+          value: 594
+        - at:
+            ticks: 17597
+          value: 672
+        - at:
+            ticks: 17665
+          value: 757
+        - at:
+            ticks: 17733
+          value: 788
+        - at:
+            ticks: 17735
+          value: 683
+        - at:
+            ticks: 18124
+          value: 0
+        - at:
+            ticks: 18160
+          value: 0
+      - id: wail_5_29
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19472
+          value: 0
+        - at:
+            ticks: 20440
+          value: 1365
+        - at:
+            ticks: 20591
+          value: 1365
+        - at:
+            ticks: 20659
+          value: 1448
+        - at:
+            ticks: 20727
+          value: 1469
+        - at:
+            ticks: 20795
+          value: 1413
+        - at:
+            ticks: 20863
+          value: 1322
+        - at:
+            ticks: 20931
+          value: 1263
+        - at:
+            ticks: 20999
+          value: 1280
+        - at:
+            ticks: 21067
+          value: 1360
+        - at:
+            ticks: 21135
+          value: 1444
+        - at:
+            ticks: 21203
+          value: 1470
+        - at:
+            ticks: 21271
+          value: 1418
+        - at:
+            ticks: 21339
+          value: 1327
+        - at:
+            ticks: 21407
+          value: 1265
+        - at:
+            ticks: 21475
+          value: 1277
+        - at:
+            ticks: 21543
+          value: 1354
+        - at:
+            ticks: 21611
+          value: 1440
+        - at:
+            ticks: 21679
+          value: 1471
+        - at:
+            ticks: 21747
+          value: 1423
+        - at:
+            ticks: 21773
+          value: 1365
+        - at:
+            ticks: 22196
+          value: 0
+        - at:
+            ticks: 22232
+          value: 0
+      - id: wail_5_38
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 24960
+          value: 0
+        - at:
+            ticks: 25127
+          value: 0
+        - at:
+            ticks: 25723
+          value: 683
+        - at:
+            ticks: 25816
+          value: 683
+        - at:
+            ticks: 25884
+          value: 765
+        - at:
+            ticks: 25952
+          value: 786
+        - at:
+            ticks: 26020
+          value: 731
+        - at:
+            ticks: 26088
+          value: 640
+        - at:
+            ticks: 26156
+          value: 580
+        - at:
+            ticks: 26224
+          value: 597
+        - at:
+            ticks: 26292
+          value: 677
+        - at:
+            ticks: 26360
+          value: 761
+        - at:
+            ticks: 26428
+          value: 787
+        - at:
+            ticks: 26496
+          value: 736
+        - at:
+            ticks: 26543
+          value: 683
+        - at:
+            ticks: 26792
+          value: 0
+        - at:
+            ticks: 26828
+          value: 0
+      - id: wail_5_39
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27089
+          value: 0
+        - at:
+            ticks: 27834
+          value: 683
+        - at:
+            ticks: 27950
+          value: 683
+        - at:
+            ticks: 28018
+          value: 765
+        - at:
+            ticks: 28086
+          value: 786
+        - at:
+            ticks: 28154
+          value: 731
+        - at:
+            ticks: 28222
+          value: 640
+        - at:
+            ticks: 28290
+          value: 580
+        - at:
+            ticks: 28358
+          value: 597
+        - at:
+            ticks: 28426
+          value: 677
+        - at:
+            ticks: 28494
+          value: 761
+        - at:
+            ticks: 28562
+          value: 787
+        - at:
+            ticks: 28630
+          value: 736
+        - at:
+            ticks: 28698
+          value: 645
+        - at:
+            ticks: 28766
+          value: 582
+        - at:
+            ticks: 28834
+          value: 594
+        - at:
+            ticks: 28859
+          value: 683
+        - at:
+            ticks: 29178
+          value: 0
+        - at:
+            ticks: 29214
+          value: 0
     - id: lead_guitar_no_throne
       at:
         bar: 57
         beat: 1
       events:
-      - - '1'
-        - 27/80
-        - B4
-        - 117
-      - - 25/16
-        - 27/160
-        - Bb4
-        - 115
-      - - 29/16
-        - 27/160
-        - G4
-        - 112
-      - - '3'
-        - 9/20
-        - E5
-        - 122
-      - - 29/8
-        - 27/80
-        - B4
-        - 114
-      - - 41/8
-        - 9/32
-        - Bb4
-        - 120
-      - - 11/2
-        - 9/40
-        - A4
-        - 111
-      - - 93/16
-        - 27/160
-        - F4
-        - 111
-      - - '7'
-        - 27/80
-        - G4
-        - 111
-      - - 15/2
-        - 27/160
-        - F4
-        - 111
-      - - 31/4
-        - 9/40
+      - - '0'
+        - ticks: 3725
         - E4
         - 121
+      - - '1'
+        - ticks: 2794
+        - G3
+        - 114
+      - - 29/16
+        - ticks: 698
+        - E4
+        - 109
+      - - '2'
+        - ticks: 2794
+        - F4
+        - 120
+      - - '3'
+        - ticks: 3026
+        - E4
+        - 119
+      - - '4'
+        - ticks: 3725
+        - E3
+        - 116
+      - - '5'
+        - ticks: 3259
+        - Bb3
+        - 121
+      - - '6'
+        - ticks: 2561
+        - D#4
+        - 120
+      - - 27/4
+        - ticks: 931
+        - C4
+        - 111
+      - - '7'
+        - ticks: 3725
+        - E4
+        - 123
       automation:
-      - id: b3_n1_bend0
-        at:
-          ticks: 14633
-        pitch_bend: 240
-      - id: b3_n1_bend1
-        at:
-          ticks: 14892
-        pitch_bend: -120
-      - id: b3_n1_bend2
-        at:
-          ticks: 15086
-        pitch_bend: 80
-      - id: b3_n1_bend3
-        at:
-          ticks: 15190
+      - id: wail_6_0
         pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 335
+          value: 0
+        - at:
+            ticks: 1527
+          value: 683
+        - at:
+            ticks: 1713
+          value: 683
+        - at:
+            ticks: 1781
+          value: 765
+        - at:
+            ticks: 1849
+          value: 786
+        - at:
+            ticks: 1917
+          value: 731
+        - at:
+            ticks: 1985
+          value: 640
+        - at:
+            ticks: 2053
+          value: 580
+        - at:
+            ticks: 2121
+          value: 597
+        - at:
+            ticks: 2189
+          value: 677
+        - at:
+            ticks: 2257
+          value: 761
+        - at:
+            ticks: 2325
+          value: 787
+        - at:
+            ticks: 2393
+          value: 736
+        - at:
+            ticks: 2461
+          value: 645
+        - at:
+            ticks: 2529
+          value: 582
+        - at:
+            ticks: 2597
+          value: 594
+        - at:
+            ticks: 2665
+          value: 672
+        - at:
+            ticks: 2733
+          value: 757
+        - at:
+            ticks: 2801
+          value: 788
+        - at:
+            ticks: 2869
+          value: 740
+        - at:
+            ticks: 2937
+          value: 650
+        - at:
+            ticks: 3005
+          value: 584
+        - at:
+            ticks: 3073
+          value: 591
+        - at:
+            ticks: 3141
+          value: 666
+        - at:
+            ticks: 3167
+          value: 683
+        - at:
+            ticks: 3695
+          value: 0
+        - at:
+            ticks: 3731
+          value: 0
+      - id: wail_6_1
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4091
+          value: 0
+        - at:
+            ticks: 4985
+          value: 1365
+        - at:
+            ticks: 5125
+          value: 1365
+        - at:
+            ticks: 5193
+          value: 1448
+        - at:
+            ticks: 5261
+          value: 1469
+        - at:
+            ticks: 5329
+          value: 1413
+        - at:
+            ticks: 5397
+          value: 1322
+        - at:
+            ticks: 5465
+          value: 1263
+        - at:
+            ticks: 5533
+          value: 1280
+        - at:
+            ticks: 5601
+          value: 1360
+        - at:
+            ticks: 5669
+          value: 1444
+        - at:
+            ticks: 5737
+          value: 1470
+        - at:
+            ticks: 5805
+          value: 1418
+        - at:
+            ticks: 5873
+          value: 1327
+        - at:
+            ticks: 5941
+          value: 1265
+        - at:
+            ticks: 6009
+          value: 1277
+        - at:
+            ticks: 6077
+          value: 1354
+        - at:
+            ticks: 6145
+          value: 1440
+        - at:
+            ticks: 6213
+          value: 1471
+        - at:
+            ticks: 6215
+          value: 1365
+        - at:
+            ticks: 6604
+          value: 0
+        - at:
+            ticks: 6640
+          value: 0
+      - id: wail_6_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 7931
+          value: 0
+        - at:
+            ticks: 8825
+          value: 1365
+        - at:
+            ticks: 8965
+          value: 1365
+        - at:
+            ticks: 9033
+          value: 1448
+        - at:
+            ticks: 9101
+          value: 1469
+        - at:
+            ticks: 9169
+          value: 1413
+        - at:
+            ticks: 9237
+          value: 1322
+        - at:
+            ticks: 9305
+          value: 1263
+        - at:
+            ticks: 9373
+          value: 1280
+        - at:
+            ticks: 9441
+          value: 1360
+        - at:
+            ticks: 9509
+          value: 1444
+        - at:
+            ticks: 9577
+          value: 1470
+        - at:
+            ticks: 9645
+          value: 1418
+        - at:
+            ticks: 9713
+          value: 1327
+        - at:
+            ticks: 9781
+          value: 1265
+        - at:
+            ticks: 9849
+          value: 1277
+        - at:
+            ticks: 9917
+          value: 1354
+        - at:
+            ticks: 9985
+          value: 1440
+        - at:
+            ticks: 10053
+          value: 1471
+        - at:
+            ticks: 10055
+          value: 1365
+        - at:
+            ticks: 10444
+          value: 0
+        - at:
+            ticks: 10480
+          value: 0
+      - id: wail_6_4
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11792
+          value: 0
+        - at:
+            ticks: 12760
+          value: 683
+        - at:
+            ticks: 12911
+          value: 683
+        - at:
+            ticks: 12979
+          value: 765
+        - at:
+            ticks: 13047
+          value: 786
+        - at:
+            ticks: 13115
+          value: 731
+        - at:
+            ticks: 13183
+          value: 640
+        - at:
+            ticks: 13251
+          value: 580
+        - at:
+            ticks: 13319
+          value: 597
+        - at:
+            ticks: 13387
+          value: 677
+        - at:
+            ticks: 13455
+          value: 761
+        - at:
+            ticks: 13523
+          value: 787
+        - at:
+            ticks: 13591
+          value: 736
+        - at:
+            ticks: 13659
+          value: 645
+        - at:
+            ticks: 13727
+          value: 582
+        - at:
+            ticks: 13795
+          value: 594
+        - at:
+            ticks: 13863
+          value: 672
+        - at:
+            ticks: 13931
+          value: 757
+        - at:
+            ticks: 13999
+          value: 788
+        - at:
+            ticks: 14067
+          value: 740
+        - at:
+            ticks: 14093
+          value: 683
+        - at:
+            ticks: 14516
+          value: 0
+        - at:
+            ticks: 14552
+          value: 0
+      - id: wail_6_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15695
+          value: 0
+        - at:
+            ticks: 16887
+          value: 683
+        - at:
+            ticks: 17073
+          value: 683
+        - at:
+            ticks: 17141
+          value: 765
+        - at:
+            ticks: 17209
+          value: 786
+        - at:
+            ticks: 17277
+          value: 731
+        - at:
+            ticks: 17345
+          value: 640
+        - at:
+            ticks: 17413
+          value: 580
+        - at:
+            ticks: 17481
+          value: 597
+        - at:
+            ticks: 17549
+          value: 677
+        - at:
+            ticks: 17617
+          value: 761
+        - at:
+            ticks: 17685
+          value: 787
+        - at:
+            ticks: 17753
+          value: 736
+        - at:
+            ticks: 17821
+          value: 645
+        - at:
+            ticks: 17889
+          value: 582
+        - at:
+            ticks: 17957
+          value: 594
+        - at:
+            ticks: 18025
+          value: 672
+        - at:
+            ticks: 18093
+          value: 757
+        - at:
+            ticks: 18161
+          value: 788
+        - at:
+            ticks: 18229
+          value: 740
+        - at:
+            ticks: 18297
+          value: 650
+        - at:
+            ticks: 18365
+          value: 584
+        - at:
+            ticks: 18433
+          value: 591
+        - at:
+            ticks: 18501
+          value: 666
+        - at:
+            ticks: 18527
+          value: 683
+        - at:
+            ticks: 19055
+          value: 0
+        - at:
+            ticks: 19091
+          value: 0
+      - id: wail_6_6
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19493
+          value: 0
+        - at:
+            ticks: 20536
+          value: 683
+        - at:
+            ticks: 20699
+          value: 683
+        - at:
+            ticks: 20767
+          value: 765
+        - at:
+            ticks: 20835
+          value: 786
+        - at:
+            ticks: 20903
+          value: 731
+        - at:
+            ticks: 20971
+          value: 640
+        - at:
+            ticks: 21039
+          value: 580
+        - at:
+            ticks: 21107
+          value: 597
+        - at:
+            ticks: 21175
+          value: 677
+        - at:
+            ticks: 21243
+          value: 761
+        - at:
+            ticks: 21311
+          value: 787
+        - at:
+            ticks: 21379
+          value: 736
+        - at:
+            ticks: 21447
+          value: 645
+        - at:
+            ticks: 21515
+          value: 582
+        - at:
+            ticks: 21583
+          value: 594
+        - at:
+            ticks: 21651
+          value: 672
+        - at:
+            ticks: 21719
+          value: 757
+        - at:
+            ticks: 21787
+          value: 788
+        - at:
+            ticks: 21855
+          value: 740
+        - at:
+            ticks: 21923
+          value: 650
+        - at:
+            ticks: 21971
+          value: 683
+        - at:
+            ticks: 22429
+          value: 0
+        - at:
+            ticks: 22465
+          value: 0
+      - id: wail_6_7
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23270
+          value: 0
+        - at:
+            ticks: 24090
+          value: 683
+        - at:
+            ticks: 24218
+          value: 683
+        - at:
+            ticks: 24286
+          value: 765
+        - at:
+            ticks: 24354
+          value: 786
+        - at:
+            ticks: 24422
+          value: 731
+        - at:
+            ticks: 24490
+          value: 640
+        - at:
+            ticks: 24558
+          value: 580
+        - at:
+            ticks: 24626
+          value: 597
+        - at:
+            ticks: 24694
+          value: 677
+        - at:
+            ticks: 24762
+          value: 761
+        - at:
+            ticks: 24830
+          value: 787
+        - at:
+            ticks: 24898
+          value: 736
+        - at:
+            ticks: 24966
+          value: 645
+        - at:
+            ticks: 25034
+          value: 582
+        - at:
+            ticks: 25102
+          value: 594
+        - at:
+            ticks: 25170
+          value: 672
+        - at:
+            ticks: 25217
+          value: 683
+        - at:
+            ticks: 25571
+          value: 0
+        - at:
+            ticks: 25607
+          value: 0
+      - id: wail_6_9
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27215
+          value: 0
+        - at:
+            ticks: 28407
+          value: 683
+        - at:
+            ticks: 28593
+          value: 683
+        - at:
+            ticks: 28661
+          value: 765
+        - at:
+            ticks: 28729
+          value: 786
+        - at:
+            ticks: 28797
+          value: 731
+        - at:
+            ticks: 28865
+          value: 640
+        - at:
+            ticks: 28933
+          value: 580
+        - at:
+            ticks: 29001
+          value: 597
+        - at:
+            ticks: 29069
+          value: 677
+        - at:
+            ticks: 29137
+          value: 761
+        - at:
+            ticks: 29205
+          value: 787
+        - at:
+            ticks: 29273
+          value: 736
+        - at:
+            ticks: 29341
+          value: 645
+        - at:
+            ticks: 29409
+          value: 582
+        - at:
+            ticks: 29477
+          value: 594
+        - at:
+            ticks: 29545
+          value: 672
+        - at:
+            ticks: 29613
+          value: 757
+        - at:
+            ticks: 29681
+          value: 788
+        - at:
+            ticks: 29749
+          value: 740
+        - at:
+            ticks: 29817
+          value: 650
+        - at:
+            ticks: 29885
+          value: 584
+        - at:
+            ticks: 29953
+          value: 591
+        - at:
+            ticks: 30021
+          value: 666
+        - at:
+            ticks: 30047
+          value: 683
+        - at:
+            ticks: 30575
+          value: 0
+        - at:
+            ticks: 30611
+          value: 0
     - id: lead_guitar_iron_sky_falls
       at:
         bar: 65
         beat: 1
       events:
-      - - '1'
-        - 27/80
-        - F4
-        - 113
-      - - 3/2
-        - 9/40
-        - A4
-        - 117
-      - - 29/16
-        - 27/160
-        - Bb4
+      - - '0'
+        - ticks: 3725
+        - E3
         - 116
+      - - '1'
+        - ticks: 3026
+        - F3
+        - 119
+      - - '2'
+        - ticks: 3725
+        - E4
+        - 120
       - - '3'
-        - 9/32
-        - Bb4
-        - 119
-      - - 55/16
-        - 9/40
-        - F4
-        - 113
-      - - 15/4
-        - 9/40
-        - G4
-        - 115
-      - - '5'
-        - 27/160
-        - B4
-        - 115
-      - - 21/4
-        - 9/32
-        - Bb4
-        - 114
-      - - 91/16
-        - 9/32
-        - F4
+        - ticks: 3026
+        - Bb3
+        - 121
+      - - '4'
+        - ticks: 3026
+        - G3
         - 117
-      - - '7'
-        - 27/80
-        - D#5
-        - 118
-      - - 15/2
-        - 9/40
-        - C5
+      - - '5'
+        - ticks: 3026
+        - F4
+        - 120
+      - - '6'
+        - ticks: 2561
+        - D#4
         - 119
-      - - 125/16
-        - 27/160
-        - B4
-        - 115
+      - - 27/4
+        - ticks: 931
+        - C4
+        - 111
+      - - '7'
+        - ticks: 2328
+        - B3
+        - 119
+      - - 123/16
+        - ticks: 1164
+        - E3
+        - 112
+      automation:
+      - id: wail_7_0
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 335
+          value: 0
+        - at:
+            ticks: 1527
+          value: 683
+        - at:
+            ticks: 1713
+          value: 683
+        - at:
+            ticks: 1781
+          value: 765
+        - at:
+            ticks: 1849
+          value: 786
+        - at:
+            ticks: 1917
+          value: 731
+        - at:
+            ticks: 1985
+          value: 640
+        - at:
+            ticks: 2053
+          value: 580
+        - at:
+            ticks: 2121
+          value: 597
+        - at:
+            ticks: 2189
+          value: 677
+        - at:
+            ticks: 2257
+          value: 761
+        - at:
+            ticks: 2325
+          value: 787
+        - at:
+            ticks: 2393
+          value: 736
+        - at:
+            ticks: 2461
+          value: 645
+        - at:
+            ticks: 2529
+          value: 582
+        - at:
+            ticks: 2597
+          value: 594
+        - at:
+            ticks: 2665
+          value: 672
+        - at:
+            ticks: 2733
+          value: 757
+        - at:
+            ticks: 2801
+          value: 788
+        - at:
+            ticks: 2869
+          value: 740
+        - at:
+            ticks: 2937
+          value: 650
+        - at:
+            ticks: 3005
+          value: 584
+        - at:
+            ticks: 3073
+          value: 591
+        - at:
+            ticks: 3141
+          value: 666
+        - at:
+            ticks: 3167
+          value: 683
+        - at:
+            ticks: 3695
+          value: 0
+        - at:
+            ticks: 3731
+          value: 0
+      - id: wail_7_1
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4112
+          value: 0
+        - at:
+            ticks: 5080
+          value: 1365
+        - at:
+            ticks: 5231
+          value: 1365
+        - at:
+            ticks: 5299
+          value: 1448
+        - at:
+            ticks: 5367
+          value: 1469
+        - at:
+            ticks: 5435
+          value: 1413
+        - at:
+            ticks: 5503
+          value: 1322
+        - at:
+            ticks: 5571
+          value: 1263
+        - at:
+            ticks: 5639
+          value: 1280
+        - at:
+            ticks: 5707
+          value: 1360
+        - at:
+            ticks: 5775
+          value: 1444
+        - at:
+            ticks: 5843
+          value: 1470
+        - at:
+            ticks: 5911
+          value: 1418
+        - at:
+            ticks: 5979
+          value: 1327
+        - at:
+            ticks: 6047
+          value: 1265
+        - at:
+            ticks: 6115
+          value: 1277
+        - at:
+            ticks: 6183
+          value: 1354
+        - at:
+            ticks: 6251
+          value: 1440
+        - at:
+            ticks: 6319
+          value: 1471
+        - at:
+            ticks: 6387
+          value: 1423
+        - at:
+            ticks: 6413
+          value: 1365
+        - at:
+            ticks: 6836
+          value: 0
+        - at:
+            ticks: 6872
+          value: 0
+      - id: wail_7_2
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 8015
+          value: 0
+        - at:
+            ticks: 9207
+          value: 683
+        - at:
+            ticks: 9393
+          value: 683
+        - at:
+            ticks: 9461
+          value: 765
+        - at:
+            ticks: 9529
+          value: 786
+        - at:
+            ticks: 9597
+          value: 731
+        - at:
+            ticks: 9665
+          value: 640
+        - at:
+            ticks: 9733
+          value: 580
+        - at:
+            ticks: 9801
+          value: 597
+        - at:
+            ticks: 9869
+          value: 677
+        - at:
+            ticks: 9937
+          value: 761
+        - at:
+            ticks: 10005
+          value: 787
+        - at:
+            ticks: 10073
+          value: 736
+        - at:
+            ticks: 10141
+          value: 645
+        - at:
+            ticks: 10209
+          value: 582
+        - at:
+            ticks: 10277
+          value: 594
+        - at:
+            ticks: 10345
+          value: 672
+        - at:
+            ticks: 10413
+          value: 757
+        - at:
+            ticks: 10481
+          value: 788
+        - at:
+            ticks: 10549
+          value: 740
+        - at:
+            ticks: 10617
+          value: 650
+        - at:
+            ticks: 10685
+          value: 584
+        - at:
+            ticks: 10753
+          value: 591
+        - at:
+            ticks: 10821
+          value: 666
+        - at:
+            ticks: 10847
+          value: 683
+        - at:
+            ticks: 11375
+          value: 0
+        - at:
+            ticks: 11411
+          value: 0
+      - id: wail_7_3
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11792
+          value: 0
+        - at:
+            ticks: 12760
+          value: 683
+        - at:
+            ticks: 12911
+          value: 683
+        - at:
+            ticks: 12979
+          value: 765
+        - at:
+            ticks: 13047
+          value: 786
+        - at:
+            ticks: 13115
+          value: 731
+        - at:
+            ticks: 13183
+          value: 640
+        - at:
+            ticks: 13251
+          value: 580
+        - at:
+            ticks: 13319
+          value: 597
+        - at:
+            ticks: 13387
+          value: 677
+        - at:
+            ticks: 13455
+          value: 761
+        - at:
+            ticks: 13523
+          value: 787
+        - at:
+            ticks: 13591
+          value: 736
+        - at:
+            ticks: 13659
+          value: 645
+        - at:
+            ticks: 13727
+          value: 582
+        - at:
+            ticks: 13795
+          value: 594
+        - at:
+            ticks: 13863
+          value: 672
+        - at:
+            ticks: 13931
+          value: 757
+        - at:
+            ticks: 13999
+          value: 788
+        - at:
+            ticks: 14067
+          value: 740
+        - at:
+            ticks: 14093
+          value: 683
+        - at:
+            ticks: 14516
+          value: 0
+        - at:
+            ticks: 14552
+          value: 0
+      - id: wail_7_4
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 15632
+          value: 0
+        - at:
+            ticks: 16600
+          value: 1365
+        - at:
+            ticks: 16751
+          value: 1365
+        - at:
+            ticks: 16819
+          value: 1448
+        - at:
+            ticks: 16887
+          value: 1469
+        - at:
+            ticks: 16955
+          value: 1413
+        - at:
+            ticks: 17023
+          value: 1322
+        - at:
+            ticks: 17091
+          value: 1263
+        - at:
+            ticks: 17159
+          value: 1280
+        - at:
+            ticks: 17227
+          value: 1360
+        - at:
+            ticks: 17295
+          value: 1444
+        - at:
+            ticks: 17363
+          value: 1470
+        - at:
+            ticks: 17431
+          value: 1418
+        - at:
+            ticks: 17499
+          value: 1327
+        - at:
+            ticks: 17567
+          value: 1265
+        - at:
+            ticks: 17635
+          value: 1277
+        - at:
+            ticks: 17703
+          value: 1354
+        - at:
+            ticks: 17771
+          value: 1440
+        - at:
+            ticks: 17839
+          value: 1471
+        - at:
+            ticks: 17907
+          value: 1423
+        - at:
+            ticks: 17933
+          value: 1365
+        - at:
+            ticks: 18356
+          value: 0
+        - at:
+            ticks: 18392
+          value: 0
+      - id: wail_7_5
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19472
+          value: 0
+        - at:
+            ticks: 20440
+          value: 1365
+        - at:
+            ticks: 20591
+          value: 1365
+        - at:
+            ticks: 20659
+          value: 1448
+        - at:
+            ticks: 20727
+          value: 1469
+        - at:
+            ticks: 20795
+          value: 1413
+        - at:
+            ticks: 20863
+          value: 1322
+        - at:
+            ticks: 20931
+          value: 1263
+        - at:
+            ticks: 20999
+          value: 1280
+        - at:
+            ticks: 21067
+          value: 1360
+        - at:
+            ticks: 21135
+          value: 1444
+        - at:
+            ticks: 21203
+          value: 1470
+        - at:
+            ticks: 21271
+          value: 1418
+        - at:
+            ticks: 21339
+          value: 1327
+        - at:
+            ticks: 21407
+          value: 1265
+        - at:
+            ticks: 21475
+          value: 1277
+        - at:
+            ticks: 21543
+          value: 1354
+        - at:
+            ticks: 21611
+          value: 1440
+        - at:
+            ticks: 21679
+          value: 1471
+        - at:
+            ticks: 21747
+          value: 1423
+        - at:
+            ticks: 21773
+          value: 1365
+        - at:
+            ticks: 22196
+          value: 0
+        - at:
+            ticks: 22232
+          value: 0
+      - id: wail_7_6
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23270
+          value: 0
+        - at:
+            ticks: 24090
+          value: 683
+        - at:
+            ticks: 24218
+          value: 683
+        - at:
+            ticks: 24286
+          value: 765
+        - at:
+            ticks: 24354
+          value: 786
+        - at:
+            ticks: 24422
+          value: 731
+        - at:
+            ticks: 24490
+          value: 640
+        - at:
+            ticks: 24558
+          value: 580
+        - at:
+            ticks: 24626
+          value: 597
+        - at:
+            ticks: 24694
+          value: 677
+        - at:
+            ticks: 24762
+          value: 761
+        - at:
+            ticks: 24830
+          value: 787
+        - at:
+            ticks: 24898
+          value: 736
+        - at:
+            ticks: 24966
+          value: 645
+        - at:
+            ticks: 25034
+          value: 582
+        - at:
+            ticks: 25102
+          value: 594
+        - at:
+            ticks: 25170
+          value: 672
+        - at:
+            ticks: 25217
+          value: 683
+        - at:
+            ticks: 25571
+          value: 0
+        - at:
+            ticks: 25607
+          value: 0
+      - id: wail_7_8
+        pitch_bend: 0
+        interpolation: smooth
+        resolution:
+          ticks: 60
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27089
+          value: 0
+        - at:
+            ticks: 27834
+          value: 683
+        - at:
+            ticks: 27950
+          value: 683
+        - at:
+            ticks: 28018
+          value: 765
+        - at:
+            ticks: 28086
+          value: 786
+        - at:
+            ticks: 28154
+          value: 731
+        - at:
+            ticks: 28222
+          value: 640
+        - at:
+            ticks: 28290
+          value: 580
+        - at:
+            ticks: 28358
+          value: 597
+        - at:
+            ticks: 28426
+          value: 677
+        - at:
+            ticks: 28494
+          value: 761
+        - at:
+            ticks: 28562
+          value: 787
+        - at:
+            ticks: 28630
+          value: 736
+        - at:
+            ticks: 28698
+          value: 645
+        - at:
+            ticks: 28766
+          value: 582
+        - at:
+            ticks: 28834
+          value: 594
+        - at:
+            ticks: 28859
+          value: 683
+        - at:
+            ticks: 29178
+          value: 0
+        - at:
+            ticks: 29214
+          value: 0
 - id: drum_ornaments_part
   instrument: kit_ornaments
   voices:
