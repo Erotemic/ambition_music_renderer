@@ -645,6 +645,21 @@ instrument_backend:
 The procedural FM path is a reusable synth primitive, not a cue-specific hook.
 Improve it generically if a composition exposes a real missing capability.
 
+A voice can also move its pitch continuously (a theremin, a siren, a
+portamento lead). Each of these is opt-in; a voice with none of them keeps a
+fixed pitch per note:
+
+```yaml
+instrument_backend:
+  kind: procedural_fm
+  carrier: {waveform: sine, harmonics: 1}
+  follow_pitch_bend: true          # follow the instrument's pitch bends
+  pitch_bend_range_semitones: 12   # what a full bend is worth
+  glide_ms: 180                    # slide in from the note before...
+  glide_gap_ms: 120                # ...when it ended at most this long ago
+  vibrato: {rate_hz: 5.5, depth_cents: 35, delay_ms: 150, rise_ms: 300}
+```
+
 ## Mix and effects
 
 MusicIR separates musical authoring from mix stages:

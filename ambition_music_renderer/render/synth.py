@@ -383,6 +383,41 @@ def _adsr_envelope(
     return env
 
 
+def _bend_semitones(inst: pretty_midi.Instrument, times: np.ndarray, bend_range: float) -> np.ndarray:
+    """The instrument's pitch bend at each of ``times``, in semitones (the last
+    bend at or before each time; none before the first)."""
+    bends = sorted(inst.pitch_bends, key=lambda b: float(b.time))
+    if not bends:
+        return np.zeros_like(times)
+    at = np.array([float(b.time) for b in bends])
+    value = np.array([float(b.pitch) / 8192.0 * bend_range for b in bends])
+    index = np.searchsorted(at, times, side="right") - 1
+    return np.where(index >= 0, value[np.clip(index, 0, None)], 0.0)
+
+
+def _pitch_motion(backend_spec: dict[str, Any]) -> dict[str, float] | None:
+    """The opt-in continuous pitch of a procedural voice, or ``None``.
+
+    ``follow_pitch_bend`` (with ``pitch_bend_range_semitones``) follows the
+    instrument's pitch bends, ``glide_ms`` slides from the note before into a
+    note that starts within ``glide_gap_ms`` of its end, and ``vibrato``
+    (``rate_hz``, ``depth_cents``, ``delay_ms``, ``rise_ms``) wobbles it. A
+    voice with none of them is the fixed-pitch oscillator it always was."""
+    vibrato = dict(backend_spec.get("vibrato") or {})
+    motion = {
+        "follow": 1.0 if backend_spec.get("follow_pitch_bend") else 0.0,
+        "bend_range": float(backend_spec.get("pitch_bend_range_semitones", 2.0)),
+        "glide_s": max(0.0, float(backend_spec.get("glide_ms", 0.0)) / 1000.0),
+        "glide_gap_s": max(0.0, float(backend_spec.get("glide_gap_ms", 120.0)) / 1000.0),
+        "vib_rate": max(0.0, float(vibrato.get("rate_hz", 0.0))),
+        "vib_cents": max(0.0, float(vibrato.get("depth_cents", 0.0))),
+        "vib_delay_s": max(0.0, float(vibrato.get("delay_ms", 0.0)) / 1000.0),
+        "vib_rise_s": max(1e-3, float(vibrato.get("rise_ms", 250.0)) / 1000.0),
+    }
+    moving = motion["follow"] > 0.0 or motion["glide_s"] > 0.0 or (motion["vib_rate"] > 0.0 and motion["vib_cents"] > 0.0)
+    return motion if moving else None
+
+
 @profile
 def render_procedural_fm(
     pm: pretty_midi.PrettyMIDI,
@@ -422,14 +457,16 @@ def render_procedural_fm(
     output_gain_db = float(backend_spec.get("output_gain_db", -7.0))
     output_gain = 10.0 ** (output_gain_db / 20.0)
 
+    motion = _pitch_motion(backend_spec)
     for inst in active:
+        previous: pretty_midi.Note | None = None
         volume = _initial_cc_value(inst, 7, 100) / 127.0
         expression = _initial_cc_value(inst, 11, 127) / 127.0
         pan = _initial_cc_value(inst, 10, 64) / 127.0
         pan_angle = pan * (np.pi / 2.0)
         pan_l = math.cos(pan_angle)
         pan_r = math.sin(pan_angle)
-        for note in inst.notes:
+        for note in sorted(inst.notes, key=lambda n: (float(n.start), int(n.pitch))) if motion else inst.notes:
             start = max(0, int(round(float(note.start) * sample_rate)))
             sustain_samples = max(1, int(round((float(note.end) - float(note.start)) * sample_rate)))
             release_samples = max(0, int(round(release_s * sample_rate)))
@@ -441,8 +478,30 @@ def render_procedural_fm(
             release_samples = max(0, n - sustain_samples)
             t = np.arange(n, dtype=np.float64) / float(sample_rate)
             freq = pretty_midi.note_number_to_hz(int(note.pitch))
-            carrier_phase = 2.0 * np.pi * freq * t
-            mod_phase = 2.0 * np.pi * (freq * ratio) * t
+            if motion is None:
+                carrier_phase = 2.0 * np.pi * freq * t
+                mod_phase = 2.0 * np.pi * (freq * ratio) * t
+            else:
+                # The pitch moves: integrate the frequency for the phase.
+                semis = np.zeros(n, dtype=np.float64)
+                if motion["follow"] > 0.0:
+                    semis += _bend_semitones(inst, float(note.start) + t, motion["bend_range"])
+                if (
+                    motion["glide_s"] > 0.0
+                    and previous is not None
+                    and float(note.start) - float(previous.end) <= motion["glide_gap_s"]
+                ):
+                    from_semis = float(previous.pitch) - float(note.pitch)
+                    k = np.clip(t / motion["glide_s"], 0.0, 1.0)
+                    # Ease out: fast off the old note, settling on the new.
+                    semis += from_semis * (1.0 - k) ** 2
+                if motion["vib_rate"] > 0.0 and motion["vib_cents"] > 0.0:
+                    depth = np.clip((t - motion["vib_delay_s"]) / motion["vib_rise_s"], 0.0, 1.0)
+                    semis += (motion["vib_cents"] / 100.0) * depth * np.sin(2.0 * np.pi * motion["vib_rate"] * t)
+                inst_freq = freq * np.power(2.0, semis / 12.0)
+                carrier_phase = 2.0 * np.pi * np.cumsum(inst_freq) / float(sample_rate)
+                mod_phase = carrier_phase * ratio
+                previous = note
             mod = _fm_modulator(mod_phase, mod_waveform)
             modulated_phase = carrier_phase + index * mod
             # Limit Fourier content against the note's base frequency.  The
