@@ -1,15 +1,16 @@
-# Shatter the Iron Sky - Iron Cathedral.
-# E minor metal: F-natural b2 and B-flat b5 threat gestures.
-# Single-voice Black And Green twang leads over staccato Black And Green rhythms.
-# Male/female choir remains the dramatic foil to the lead.
-# Bars 1-8 repeat bars 65-72 for render-only preroll.
+# Shatter the Iron Sky - reference guitar tones.
+# Rhythm: sampled Shinyguitar electric_five + electric_four, copied from the
+# Standing on Shoulders extended-boss high-fidelity score (giant_riff).
+# Leads: Emilyguitar basic + Black And Green black_keyswitch, from Carry the One.
+# Both TS9/JCM800 chains use Carry the One's established parameters.
+# Notes, timing, choir, orchestration, and six intensity layers are untouched.
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
 title: Shatter the Iron Sky (Iron Cathedral)
-description: Industrial heavy-metal combat piece with twin staccato rhythm guitars, a focused picked guitar lead,
-  low-E pedal riffs, F-natural and B-flat threat figures, and an unresolved B7(b9) turnaround. Male/female choir drones
-  remain central to the ritual and war-machine phrases, with call-and-response lead rests. Full arrangement separates
-  into six independently subtractive combat layers.
+description: Heavy E-minor combat metal built on chugging sampled electric guitars, with F and B-flat threat motifs,
+  powerful drums and sustained ritual choirs. The rhythm-guitar timbres follow Standing on Shoulders extended-boss
+  high-fidelity guitar programs, and the main/counter leads follow Carry the One. Six independent intensity layers
+  retain the complete 64-bar combat form.
 seed: 17001987
 timebase:
   ppq: 960
@@ -193,32 +194,38 @@ render:
 instruments:
 - name: rhythm_left
   group: rhythm_left
-  program: overdrive_guitar
-  volume: 115
-  pan: 31
-  expression: 110
+  program: clean_guitar
+  volume: 98
+  pan: 64
+  expression: 108
   controls:
-    101: 127
-    114: 40
-  mix_gain_db: 3.0
+    100: 64
+    107: 114
+  mix_gain_db: 1.1
   instrument_backend:
     kind: sfz
-    sfz: '**/BlackAndGreenGuitars/Programs/05-green_staccato.sfz'
+    sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_five.sfz'
+    prefer:
+    - shinyguitar
+    - electric_five
     settings:
       fold_to_range: false
 - name: rhythm_right
   group: rhythm_right
-  program: overdrive_guitar
-  volume: 115
-  pan: 98
-  expression: 110
+  program: clean_guitar
+  volume: 96
+  pan: 64
+  expression: 106
   controls:
-    101: 127
-    114: 40
-  mix_gain_db: 2.5
+    100: 64
+    107: 88
+  mix_gain_db: 0.6
   instrument_backend:
     kind: sfz
-    sfz: '**/BlackAndGreenGuitars/Programs/08-black_staccato.sfz'
+    sfz_glob: '**/Shinyguitar/Shinyguitar/Programs/electric_four.sfz'
+    prefer:
+    - shinyguitar
+    - electric_four
     settings:
       fold_to_range: false
 - name: bass
@@ -247,21 +254,14 @@ instruments:
       fold_to_range: false
 - name: lead_guitar
   group: lead_guitar
-  program: overdrive_guitar
-  volume: 107
-  pan: 62
-  expression: 110
-  controls:
-    27: 31
-    29: 0
-    70: 0
-    100: 0
-    101: 127
-    114: 40
-  mix_gain_db: 1.0
+  program: clean_guitar
+  volume: 104
+  pan: 64
+  expression: 112
+  mix_gain_db: 3.0
   instrument_backend:
     kind: sfz
-    sfz: '**/BlackAndGreenGuitars/Programs/04-green_twang.sfz'
+    sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
     settings:
       fold_to_range: false
 - name: kit_ornaments
@@ -338,21 +338,18 @@ instruments:
       fold_to_range: false
 - name: counter_guitar
   group: counter_guitar
-  program: overdrive_guitar
-  volume: 98
-  pan: 74
-  expression: 110
+  program: clean_guitar
+  volume: 104
+  pan: 64
+  expression: 112
   controls:
-    27: 31
-    29: 0
-    70: 0
-    100: 0
-    101: 127
-    114: 40
-  mix_gain_db: -3.0
+    111: 0
+    114: 52
+    116: 20
+  mix_gain_db: 7.0
   instrument_backend:
     kind: sfz
-    sfz: '**/BlackAndGreenGuitars/Programs/07-black_twang.sfz'
+    sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
     settings:
       fold_to_range: false
 - name: solo_violin
@@ -387,253 +384,233 @@ processing:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 6.5
-        - effect: distortion
-          drive_db: 13.0
+          gain_db: 8.0
         - effect: compressor
-          threshold_db: -25
-          ratio: 2
-          attack_ms: 12
-          release_ms: 100
+          threshold_db: -23.0
+          ratio: 2.2
+          attack_ms: 8.0
+          release_ms: 95.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
         binary: lv2apply
         channel_mode: dual_mono
-        wet_mix: 0.96
+        wet_mix: 0.48
         params:
-          fslider0_: -4.5
-          fslider1_: 650
-          fslider2_: 0.66
-          BYPASS: 0.0
+          fslider0_: -5.0
+          fslider1_: 640.0
+          fslider2_: 0.62
+          BYPASS: 1.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.98
+        wet_mix: 0.52
         params:
-          P6v: 0.7
-          Middle: 0.66
-          Bass: 0.37
-          Treble: 0.64
-          WET_DRY: 98.0
-          GAIN: -0.5
+          P6v: 0.68
+          Middle: 0.64
+          Bass: 0.52
+          Treble: 0.58
+          WET_DRY: 58.0
+          GAIN: -3.0
       - processor: highpass
-        cutoff_hz: 72
+        cutoff_hz: 75
       - processor: parametric_eq
         bands:
         - type: peak
-          hz: 285
+          hz: 260
           q: 0.9
-          db: -3.4
+          db: -1.2
         - type: peak
-          hz: 1800
-          q: 0.8
-          db: 2.6
-        - type: peak
-          hz: 4800
-          q: 1.8
-          db: -1.4
+          hz: 3200
+          q: 1.0
+          db: 0.7
       - processor: lowpass
-        cutoff_hz: 7800
+        cutoff_hz: 9800
       - processor: compressor
-        threshold_db: -23
-        ratio: 1.9
-        attack_ms: 9
-        release_ms: 100
+        threshold_db: -22.0
+        ratio: 2.1
+        attack_ms: 8.0
+        release_ms: 90.0
       - processor: balance
-        position: -0.81
+        position: -0.8
     rhythm_right:
       chain:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 6.5
-        - effect: distortion
-          drive_db: 12.5
+          gain_db: 8.0
         - effect: compressor
-          threshold_db: -25
-          ratio: 2
-          attack_ms: 12
-          release_ms: 100
+          threshold_db: -23.0
+          ratio: 2.2
+          attack_ms: 8.0
+          release_ms: 95.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
         binary: lv2apply
         channel_mode: dual_mono
-        wet_mix: 0.96
+        wet_mix: 0.48
         params:
-          fslider0_: -4.5
-          fslider1_: 650
-          fslider2_: 0.66
-          BYPASS: 0.0
+          fslider0_: -5.0
+          fslider1_: 640.0
+          fslider2_: 0.62
+          BYPASS: 1.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.98
+        wet_mix: 0.52
         params:
-          P6v: 0.7
-          Middle: 0.66
-          Bass: 0.37
-          Treble: 0.64
-          WET_DRY: 98.0
-          GAIN: -0.5
+          P6v: 0.68
+          Middle: 0.64
+          Bass: 0.52
+          Treble: 0.58
+          WET_DRY: 58.0
+          GAIN: -3.0
       - processor: highpass
-        cutoff_hz: 72
+        cutoff_hz: 75
       - processor: parametric_eq
         bands:
         - type: peak
-          hz: 285
+          hz: 260
           q: 0.9
-          db: -3.4
+          db: -1.2
         - type: peak
-          hz: 1800
-          q: 0.8
-          db: 2.6
-        - type: peak
-          hz: 4800
-          q: 1.8
-          db: -1.4
+          hz: 3200
+          q: 1.0
+          db: 0.7
       - processor: lowpass
-        cutoff_hz: 7800
+        cutoff_hz: 9800
       - processor: compressor
-        threshold_db: -23
-        ratio: 1.9
-        attack_ms: 9
-        release_ms: 100
+        threshold_db: -22.0
+        ratio: 2.1
+        attack_ms: 8.0
+        release_ms: 90.0
       - processor: balance
-        position: 0.81
+        position: 0.8
     lead_guitar:
       chain:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 4.0
-        - effect: distortion
-          drive_db: 5.0
+          gain_db: 12.0
         - effect: compressor
-          threshold_db: -25
-          ratio: 2.0
-          attack_ms: 12
-          release_ms: 100
+          threshold_db: -24.0
+          ratio: 2.4
+          attack_ms: 8.0
+          release_ms: 110.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
         binary: lv2apply
         channel_mode: dual_mono
-        wet_mix: 0.85
+        wet_mix: 0.52
         params:
-          fslider0_: -4.5
-          fslider1_: 650
-          fslider2_: 0.66
-          BYPASS: 0.0
+          fslider0_: -4.0
+          fslider1_: 680.0
+          fslider2_: 0.68
+          BYPASS: 1.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.98
+        wet_mix: 0.58
         params:
-          P6v: 0.7
-          Middle: 0.74
-          Bass: 0.34
+          P6v: 0.74
+          Middle: 0.68
+          Bass: 0.48
           Treble: 0.6
-          WET_DRY: 98.0
-          GAIN: -1.2
+          WET_DRY: 60.0
+          GAIN: -2.0
       - processor: highpass
-        cutoff_hz: 145
+        cutoff_hz: 110
       - processor: parametric_eq
         bands:
         - type: peak
-          hz: 340
-          q: 0.9
-          db: -2.4
+          hz: 4130
+          q: 3.0
+          db: -3.0
         - type: peak
-          hz: 1650
-          q: 0.85
-          db: 2.2
+          hz: 4920
+          q: 3.0
+          db: -3.0
         - type: peak
-          hz: 3300
-          q: 1.2
-          db: 1.0
-        - type: peak
-          hz: 5200
-          q: 2.0
-          db: -1.1
+          hz: 6200
+          q: 3.5
+          db: -4.0
       - processor: lowpass
-        cutoff_hz: 7800
+        cutoff_hz: 8200
       - processor: compressor
-        threshold_db: -23
-        ratio: 1.9
-        attack_ms: 13
-        release_ms: 116
+        threshold_db: -22.0
+        ratio: 2.0
+        attack_ms: 7.0
+        release_ms: 90.0
       - processor: pedalboard
         effects:
         - effect: delay
-          delay_ms: 192
-          feedback: 0.12
-          mix: 0.055
+          delay_ms: 296
+          feedback: 0.18
+          mix: 0.12
+      - processor: balance
+        position: -0.2
     counter_guitar:
       chain:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 3.2
-        - effect: distortion
-          drive_db: 4.0
+          gain_db: 12.0
         - effect: compressor
-          threshold_db: -25
-          ratio: 2.0
-          attack_ms: 12
-          release_ms: 100
+          threshold_db: -24.0
+          ratio: 2.4
+          attack_ms: 8.0
+          release_ms: 110.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
         binary: lv2apply
         channel_mode: dual_mono
-        wet_mix: 0.85
+        wet_mix: 0.52
         params:
-          fslider0_: -4.5
-          fslider1_: 650
-          fslider2_: 0.66
-          BYPASS: 0.0
+          fslider0_: -4.0
+          fslider1_: 680.0
+          fslider2_: 0.68
+          BYPASS: 1.0
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.98
+        wet_mix: 0.58
         params:
-          P6v: 0.7
-          Middle: 0.74
-          Bass: 0.34
+          P6v: 0.74
+          Middle: 0.68
+          Bass: 0.48
           Treble: 0.6
-          WET_DRY: 98.0
-          GAIN: -1.2
+          WET_DRY: 60.0
+          GAIN: -2.0
       - processor: highpass
-        cutoff_hz: 145
+        cutoff_hz: 110
       - processor: parametric_eq
         bands:
         - type: peak
-          hz: 340
-          q: 0.9
-          db: -2.4
+          hz: 4130
+          q: 3.0
+          db: -3.0
         - type: peak
-          hz: 1650
-          q: 0.85
-          db: 2.2
+          hz: 4920
+          q: 3.0
+          db: -3.0
         - type: peak
-          hz: 3300
-          q: 1.2
-          db: 1.0
-        - type: peak
-          hz: 5200
-          q: 2.0
-          db: -1.1
+          hz: 6200
+          q: 3.5
+          db: -4.0
       - processor: lowpass
-        cutoff_hz: 7800
+        cutoff_hz: 8200
       - processor: compressor
-        threshold_db: -23
-        ratio: 1.9
-        attack_ms: 13
-        release_ms: 116
+        threshold_db: -22.0
+        ratio: 2.0
+        attack_ms: 7.0
+        release_ms: 90.0
       - processor: pedalboard
         effects:
         - effect: delay
-          delay_ms: 192
-          feedback: 0.12
-          mix: 0.055
+          delay_ms: 296
+          feedback: 0.18
+          mix: 0.12
+      - processor: balance
+        position: 0.3
     bass:
       chain:
       - processor: highpass
