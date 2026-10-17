@@ -1,14 +1,13 @@
-# Shatter the Iron Sky - Iron Verdict arrangement.
-# Revised riff, differentiated rhythm guitars, bass, kick and low orchestral notes,
-# lead phrases and controlled bend curves. Sampled instrument patches remain.
-# Choir male/female and all six layer memberships are unchanged.
-# Eight-bar render-only preroll copies the final combat eight bars exactly.
+# Shatter the Iron Sky - Devil Duel arrangement.
+# Rebuilt Emilyguitar and distorted VPO solo-violin parts as traded phrases.
+# Metal rhythm section and both choir parts retain their note events.
+# Eight-bar render-only preroll mirrors the final eight bars, including solos.
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
-title: Shatter the Iron Sky (Iron Verdict)
-description: E minor heavy-metal battle loop with a two-bar low-guitar verdict riff, Phrygian b2 and tritone interruptions,
-  evolving bass and kick interlocks, two distinct escalating solos, long pitch-stable wails, and retained ritual male/female
-  choir. Eight orchestral phrases and six adaptive playback layers.
+title: Shatter the Iron Sky (Devil Duel)
+description: E-minor heavy-metal combat loop with a distorted fiddle versus Emilyguitar solo duel, traded calls, bowed swells,
+  restrained pitch bends, and two escalating shred contests. The choir and metal rhythm bed are preserved; an eight-bar preroll
+  mirrors the final loop bars.
 seed: 17001987
 timebase:
   ppq: 960
@@ -28,7 +27,7 @@ form:
     beat: 1
   energy: 0.95
   density: 0.86
-  role: Render-only copy of final 8 bars for loop FX-state warmup
+  role: Render-only copy of final eight bars, including guitar-fiddle duel, for loop FX-state warmup
 - id: iron_gate
   from:
     bar: 9
@@ -38,7 +37,8 @@ form:
     beat: 1
   energy: 0.94
   density: 0.76
-  role: 'Verdict riff: E pedal, split guitar accents and F/Bb threat replies'
+  role: 'Verdict riff: E pedal, split guitar accents and F/Bb threat replies; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: shattered_orders
   from:
     bar: 17
@@ -48,7 +48,8 @@ form:
     beat: 1
   energy: 0.92
   density: 0.74
-  role: 'Pursuit: displaced syncopation, riff/bass responses and gaps for lead'
+  role: 'Pursuit: displaced syncopation, riff/bass responses and gaps for lead; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: war_machine
   from:
     bar: 25
@@ -58,7 +59,8 @@ form:
     beat: 1
   energy: 0.97
   density: 0.85
-  role: 'Cathedral: spacious hammer hits between male/female choir pillars'
+  role: 'Cathedral: spacious hammer hits between male/female choir pillars; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: counterattack
   from:
     bar: 33
@@ -68,7 +70,8 @@ form:
     beat: 1
   energy: 1.0
   density: 0.94
-  role: 'Hunt: interlocking kick and chug assault under the first fast solo'
+  role: 'Hunt: interlocking kick and chug assault under the first fast solo; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: the_false_triumph
   from:
     bar: 41
@@ -78,7 +81,8 @@ form:
     beat: 1
   energy: 0.78
   density: 0.51
-  role: 'Ritual: halftime drums, long minor-second tension and wailing guitar'
+  role: 'Ritual: halftime drums, long minor-second tension and wailing guitar; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: breaking_the_columns
   from:
     bar: 49
@@ -88,7 +92,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.94
-  role: 'Collapse: urgent gallops and a rising second guitar solo'
+  role: 'Collapse: urgent gallops and a rising second guitar solo; guitar/fiddle antiphony and selective climactic overlap'
 - id: no_throne
   from:
     bar: 57
@@ -98,7 +102,7 @@ form:
     beat: 1
   energy: 0.98
   density: 0.82
-  role: 'Return: verdict riff answered by the now-established choir'
+  role: 'Return: verdict riff answered by the now-established choir; guitar/fiddle antiphony and selective climactic overlap'
 - id: iron_sky_falls
   from:
     bar: 65
@@ -108,7 +112,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.89
-  role: 'Sky falls: slower blows, choir, and B7(b9) into the looped E'
+  role: 'Sky falls: slower blows, choir, and B7(b9) into the looped E; guitar/fiddle antiphony and selective climactic overlap'
 harmony:
   every_bars: 1
   cycle: false
@@ -256,7 +260,7 @@ instruments:
   volume: 105
   pan: 64
   expression: 113
-  mix_gain_db: 5.1
+  mix_gain_db: 8.2
   instrument_backend:
     kind: sfz
     sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
@@ -344,7 +348,7 @@ instruments:
     111: 0
     114: 52
     116: 20
-  mix_gain_db: 7.0
+  mix_gain_db: 4.5
   instrument_backend:
     kind: sfz
     sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
@@ -353,16 +357,16 @@ instruments:
 - name: solo_violin
   group: violins
   program: violin
-  volume: 99
-  pan: 84
+  volume: 105
+  pan: 73
   expression: 110
-  mix_gain_db: 2.0
+  mix_gain_db: 8.0
   instrument_backend:
     kind: sfz
     library_ref: vpo.violin_solo_perf
     settings:
       fold_to_range: false
-  modulation: 96
+  modulation: 88
 - name: timpani
   group: timpani
   program: timpani
@@ -421,6 +425,10 @@ processing:
           hz: 3200
           q: 1.0
           db: 0.7
+        - type: peak
+          hz: 2200
+          q: 0.85
+          db: -1.3
       - processor: lowpass
         cutoff_hz: 9800
       - processor: compressor
@@ -474,6 +482,10 @@ processing:
           hz: 3200
           q: 1.0
           db: 0.7
+        - type: peak
+          hz: 2200
+          q: 0.85
+          db: -1.3
       - processor: lowpass
         cutoff_hz: 9800
       - processor: compressor
@@ -488,7 +500,7 @@ processing:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 11.0
+          gain_db: 12.5
         - effect: compressor
           threshold_db: -29.0
           ratio: 3.2
@@ -526,11 +538,11 @@ processing:
         - type: peak
           hz: 720
           q: 0.85
-          db: 2.3
+          db: 1.5
         - type: peak
           hz: 1750
           q: 0.9
-          db: 2.0
+          db: 3.3
         - type: peak
           hz: 4150
           q: 2.7
@@ -693,10 +705,47 @@ processing:
     violins:
       chain:
       - processor: highpass
-        cutoff_hz: 250
-      - processor: reverb
-        wet: 0.055
-        decay_seconds: 0.9
+        cutoff_hz: 145
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 5.0
+        - effect: compressor
+          threshold_db: -26.0
+          ratio: 2.8
+          attack_ms: 14.0
+          release_ms: 155.0
+        - effect: distortion
+          drive_db: 9.0
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 460
+          q: 1.0
+          db: -2.2
+        - type: peak
+          hz: 1700
+          q: 0.9
+          db: 2.6
+        - type: peak
+          hz: 3300
+          q: 1.1
+          db: 1.4
+      - processor: lowpass
+        cutoff_hz: 7900
+      - processor: compressor
+        threshold_db: -22.0
+        ratio: 2.3
+        attack_ms: 18.0
+        release_ms: 135.0
+      - processor: pedalboard
+        effects:
+        - effect: delay
+          delay_ms: 175
+          feedback: 0.13
+          mix: 0.08
+      - processor: balance
+        position: 0.27
     timpani:
       chain:
       - processor: highpass
@@ -8652,669 +8701,146 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 4147
-        - E3
-        - 115
-      - - 9/8
-        - ticks: 2765
-        - F4
-        - 117
-      - - '2'
-        - ticks: 3226
-        - G4
-        - 121
-      - - 25/8
-        - ticks: 2765
-        - Bb3
-        - 121
-      - - '4'
-        - ticks: 3226
-        - E4
-        - 120
-      - - '5'
-        - ticks: 2995
-        - F4
-        - 120
-      - - '6'
-        - ticks: 2765
-        - D#4
-        - 121
-      - - '7'
-        - ticks: 1843
-        - B3
-        - 116
-      - - 15/2
-        - ticks: 1152
+        - ticks: 1968
         - E4
         - 119
-      - - 63/8
-        - ticks: 461
+      - - 23/40
+        - ticks: 586
+        - Bb3
+        - 111
+      - - 61/80
+        - ticks: 816
+        - F3
+        - 110
+      - - '2'
+        - ticks: 1536
         - F4
+        - 114
+      - - 1897/768
+        - ticks: 461
+        - E4
+        - 100
+      - - 211/80
+        - ticks: 624
+        - Bb3
+        - 111
+      - - 113/40
+        - ticks: 528
+        - G3
+        - 104
+      - - '4'
+        - ticks: 2285
+        - D#4
+        - 119
+      - - 373/80
+        - ticks: 432
+        - G4
         - 105
+      - - 24/5
+        - ticks: 595
+        - F4
+        - 111
+      - - '6'
+        - ticks: 1181
+        - B3
+        - 115
+      - - 24403/3840
+        - ticks: 816
+        - D#4
+        - 113
+      - - 25411/3840
+        - ticks: 624
+        - F4
+        - 104
+      - - 26189/3840
+        - ticks: 509
+        - E4
+        - 112
+      - - 29587/3840
+        - ticks: 797
+        - B3
+        - 117
       automation:
-      - id: iron_verdict_7_0
+      - id: duel_preroll_g_3
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 0
-          value: 0
-        - at:
-            ticks: 498
-          value: 0
-        - at:
-            ticks: 1783
-          value: 0
-        - at:
-            ticks: 1858
-          value: 44
-        - at:
-            ticks: 1933
-          value: 52
-        - at:
-            ticks: 2008
-          value: 17
-        - at:
-            ticks: 2083
-          value: -32
-        - at:
-            ticks: 2158
-          value: -55
-        - at:
-            ticks: 2233
-          value: -32
-        - at:
-            ticks: 2308
-          value: 17
-        - at:
-            ticks: 2383
-          value: 52
-        - at:
-            ticks: 2458
-          value: 44
-        - at:
-            ticks: 2533
-          value: -1
-        - at:
-            ticks: 2608
-          value: -45
-        - at:
-            ticks: 2683
-          value: -52
-        - at:
-            ticks: 2758
-          value: -16
-        - at:
-            ticks: 2833
-          value: 33
-        - at:
-            ticks: 2908
-          value: 55
-        - at:
-            ticks: 2983
-          value: 31
-        - at:
-            ticks: 3058
-          value: -18
-        - at:
-            ticks: 3133
-          value: -52
-        - at:
-            ticks: 3208
-          value: -43
-        - at:
-            ticks: 3283
-          value: 2
-        - at:
-            ticks: 3358
-          value: 45
-        - at:
-            ticks: 3433
-          value: 51
-        - at:
-            ticks: 3508
-          value: 15
-        - at:
-            ticks: 3583
-          value: -34
-        - at:
-            ticks: 3658
-          value: -55
-        - at:
-            ticks: 3733
-          value: -30
-        - at:
-            ticks: 3808
-          value: 19
-        - at:
-            ticks: 3883
-          value: 53
-        - at:
-            ticks: 3958
-          value: 43
-        - at:
-            ticks: 4033
-          value: -2
-        - at:
-            ticks: 4122
-          value: 0
-        - at:
-            ticks: 4149
-          value: 0
-      - id: iron_verdict_7_1
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 4320
-          value: 0
-        - at:
-            ticks: 4652
-          value: 0
-        - at:
-            ticks: 5508
-          value: -1
-        - at:
-            ticks: 5583
-          value: 44
-        - at:
-            ticks: 5658
-          value: 52
-        - at:
-            ticks: 5733
-          value: 17
-        - at:
-            ticks: 5808
-          value: -32
-        - at:
-            ticks: 5883
-          value: -55
-        - at:
-            ticks: 5958
-          value: -32
-        - at:
-            ticks: 6033
-          value: 17
-        - at:
-            ticks: 6108
-          value: 52
-        - at:
-            ticks: 6183
-          value: 44
-        - at:
-            ticks: 6258
-          value: 0
-        - at:
-            ticks: 6333
-          value: -44
-        - at:
-            ticks: 6408
-          value: -52
-        - at:
-            ticks: 6483
-          value: -16
-        - at:
-            ticks: 6558
-          value: 33
-        - at:
-            ticks: 6633
-          value: 55
-        - at:
-            ticks: 6708
-          value: 32
-        - at:
-            ticks: 6783
-          value: -18
-        - at:
-            ticks: 6858
-          value: -52
-        - at:
-            ticks: 6933
-          value: -44
-        - at:
-            ticks: 7008
-          value: 1
-        - at:
-            ticks: 7060
-          value: 0
-        - at:
-            ticks: 7087
-          value: 0
-      - id: iron_verdict_7_2
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 7680
           value: 0
         - at:
-            ticks: 8067
+            ticks: 7864
           value: 0
         - at:
-            ticks: 9067
+            ticks: 8448
+          value: -683
+        - at:
+            ticks: 8632
+          value: -643
+        - at:
+            ticks: 8785
+          value: -715
+        - at:
+            ticks: 9178
+          value: -683
+        - at:
+            ticks: 9218
           value: 0
-        - at:
-            ticks: 9142
-          value: 44
-        - at:
-            ticks: 9217
-          value: 52
-        - at:
-            ticks: 9292
-          value: 17
-        - at:
-            ticks: 9367
-          value: -32
-        - at:
-            ticks: 9442
-          value: -55
-        - at:
-            ticks: 9517
-          value: -32
-        - at:
-            ticks: 9592
-          value: 17
-        - at:
-            ticks: 9667
-          value: 52
-        - at:
-            ticks: 9742
-          value: 44
-        - at:
-            ticks: 9817
-          value: -1
-        - at:
-            ticks: 9892
-          value: -45
-        - at:
-            ticks: 9967
-          value: -52
-        - at:
-            ticks: 10042
-          value: -16
-        - at:
-            ticks: 10117
-          value: 33
-        - at:
-            ticks: 10192
-          value: 55
-        - at:
-            ticks: 10267
-          value: 31
-        - at:
-            ticks: 10342
-          value: -18
-        - at:
-            ticks: 10417
-          value: -52
-        - at:
-            ticks: 10492
-          value: -43
-        - at:
-            ticks: 10567
-          value: 2
-        - at:
-            ticks: 10642
-          value: 45
-        - at:
-            ticks: 10717
-          value: 51
-        - at:
-            ticks: 10792
-          value: 15
-        - at:
-            ticks: 10881
-          value: 0
-        - at:
-            ticks: 10908
-          value: 0
-      - id: iron_verdict_7_3
+      - id: duel_preroll_g_7
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12000
-          value: 0
-        - at:
-            ticks: 12332
-          value: 0
-        - at:
-            ticks: 12857
-          value: 683
-        - at:
-            ticks: 13188
-          value: 682
-        - at:
-            ticks: 13263
-          value: 727
-        - at:
-            ticks: 13338
-          value: 735
-        - at:
-            ticks: 13413
-          value: 700
-        - at:
-            ticks: 13488
-          value: 651
-        - at:
-            ticks: 13563
-          value: 628
-        - at:
-            ticks: 13638
-          value: 650
-        - at:
-            ticks: 13713
-          value: 699
-        - at:
-            ticks: 13788
-          value: 735
-        - at:
-            ticks: 13863
-          value: 727
-        - at:
-            ticks: 13938
-          value: 682
-        - at:
-            ticks: 14013
-          value: 638
-        - at:
-            ticks: 14088
-          value: 631
-        - at:
-            ticks: 14163
-          value: 666
-        - at:
-            ticks: 14238
-          value: 715
-        - at:
-            ticks: 14313
-          value: 737
-        - at:
-            ticks: 14388
-          value: 714
-        - at:
-            ticks: 14463
-          value: 665
-        - at:
-            ticks: 14538
-          value: 630
-        - at:
-            ticks: 14613
-          value: 639
-        - at:
-            ticks: 14688
-          value: 684
-        - at:
-            ticks: 14740
-          value: 683
-        - at:
-            ticks: 14767
-          value: 0
-      - id: iron_verdict_7_4
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15747
+            ticks: 15634
           value: 0
         - at:
-            ticks: 16747
-          value: 0
-        - at:
-            ticks: 16822
-          value: 44
-        - at:
-            ticks: 16897
-          value: 52
-        - at:
-            ticks: 16972
-          value: 17
-        - at:
-            ticks: 17047
-          value: -32
-        - at:
-            ticks: 17122
-          value: -55
-        - at:
-            ticks: 17197
-          value: -32
-        - at:
-            ticks: 17272
-          value: 17
-        - at:
-            ticks: 17347
-          value: 52
-        - at:
-            ticks: 17422
-          value: 44
-        - at:
-            ticks: 17497
-          value: -1
-        - at:
-            ticks: 17572
-          value: -45
-        - at:
-            ticks: 17647
-          value: -52
-        - at:
-            ticks: 17722
-          value: -16
-        - at:
-            ticks: 17797
-          value: 33
-        - at:
-            ticks: 17872
-          value: 55
-        - at:
-            ticks: 17947
-          value: 31
-        - at:
-            ticks: 18022
-          value: -18
-        - at:
-            ticks: 18097
-          value: -52
-        - at:
-            ticks: 18172
-          value: -43
-        - at:
-            ticks: 18247
-          value: 2
-        - at:
-            ticks: 18322
-          value: 45
-        - at:
-            ticks: 18397
-          value: 51
-        - at:
-            ticks: 18472
-          value: 15
-        - at:
-            ticks: 18561
-          value: 0
-        - at:
-            ticks: 18588
-          value: 0
-      - id: iron_verdict_7_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19200
-          value: 0
-        - at:
-            ticks: 19559
-          value: 0
-        - at:
-            ticks: 20487
-          value: -1
-        - at:
-            ticks: 20562
-          value: 44
-        - at:
-            ticks: 20637
-          value: 52
-        - at:
-            ticks: 20712
-          value: 17
-        - at:
-            ticks: 20787
-          value: -32
-        - at:
-            ticks: 20862
-          value: -55
-        - at:
-            ticks: 20937
-          value: -32
-        - at:
-            ticks: 21012
-          value: 17
-        - at:
-            ticks: 21087
-          value: 52
-        - at:
-            ticks: 21162
-          value: 44
-        - at:
-            ticks: 21237
-          value: 0
-        - at:
-            ticks: 21312
-          value: -44
-        - at:
-            ticks: 21387
-          value: -52
-        - at:
-            ticks: 21462
-          value: -16
-        - at:
-            ticks: 21537
-          value: 33
-        - at:
-            ticks: 21612
-          value: 55
-        - at:
-            ticks: 21687
-          value: 32
-        - at:
-            ticks: 21762
-          value: -18
-        - at:
-            ticks: 21837
-          value: -52
-        - at:
-            ticks: 21912
-          value: -44
-        - at:
-            ticks: 21987
-          value: 1
-        - at:
-            ticks: 22062
-          value: 45
-        - at:
-            ticks: 22170
-          value: 0
-        - at:
-            ticks: 22197
-          value: 0
-      - id: iron_verdict_7_6
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23372
-          value: 0
-        - at:
-            ticks: 23897
+            ticks: 16502
           value: 683
         - at:
-            ticks: 24228
-          value: 682
+            ticks: 16776
+          value: 723
         - at:
-            ticks: 24303
-          value: 727
-        - at:
-            ticks: 24378
-          value: 735
-        - at:
-            ticks: 24453
-          value: 700
-        - at:
-            ticks: 24528
+            ticks: 17004
           value: 651
         - at:
-            ticks: 24603
-          value: 628
-        - at:
-            ticks: 24678
-          value: 650
-        - at:
-            ticks: 24753
-          value: 699
-        - at:
-            ticks: 24828
-          value: 735
-        - at:
-            ticks: 24903
-          value: 727
-        - at:
-            ticks: 24978
-          value: 682
-        - at:
-            ticks: 25053
-          value: 638
-        - at:
-            ticks: 25128
-          value: 631
-        - at:
-            ticks: 25203
-          value: 666
-        - at:
-            ticks: 25278
-          value: 715
-        - at:
-            ticks: 25353
-          value: 737
-        - at:
-            ticks: 25428
-          value: 714
-        - at:
-            ticks: 25503
-          value: 665
-        - at:
-            ticks: 25578
-          value: 630
-        - at:
-            ticks: 25653
-          value: 639
-        - at:
-            ticks: 25728
-          value: 684
-        - at:
-            ticks: 25780
+            ticks: 17607
           value: 683
         - at:
-            ticks: 25807
+            ticks: 17647
+          value: 0
+      - id: duel_preroll_g_11
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 24403
+          value: 0
+        - at:
+            ticks: 24500
+          value: 0
+        - at:
+            ticks: 24811
+          value: 683
+        - at:
+            ticks: 24908
+          value: 723
+        - at:
+            ticks: 24990
+          value: 651
+        - at:
+            ticks: 25181
+          value: 683
+        - at:
+            ticks: 25221
           value: 0
     - id: lead_guitar_iron_gate
       at:
@@ -9322,3480 +8848,997 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 2765
+        - ticks: 1584
         - E4
-        - 121
-      - - 13/16
-        - ticks: 691
-        - G4
-        - 110
-      - - '1'
-        - ticks: 2304
-        - F4
-        - 116
-      - - 27/16
-        - ticks: 1152
-        - E4
-        - 109
-      - - '2'
-        - ticks: 2995
-        - F4
-        - 119
-      - - 13/4
-        - ticks: 2304
+        - 115
+      - - 19/40
+        - ticks: 480
+        - G3
+        - 100
+      - - 5/8
+        - ticks: 864
         - Bb3
-        - 120
-      - - 63/16
-        - ticks: 230
+        - 116
+      - - 3379/3840
+        - ticks: 365
+        - E4
+        - 104
+      - - '2'
+        - ticks: 1344
+        - B3
+        - 113
+      - - 12/5
+        - ticks: 528
+        - G3
+        - 103
+      - - 9811/3840
+        - ticks: 768
+        - F3
+        - 108
+      - - 10733/3840
+        - ticks: 624
+        - E3
+        - 114
+      - - '4'
+        - ticks: 1536
+        - F4
+        - 114
+      - - 3433/768
+        - ticks: 461
+        - E4
+        - 100
+      - - 371/80
+        - ticks: 624
+        - Bb3
+        - 111
+      - - 193/40
+        - ticks: 528
+        - G3
+        - 104
+      - - '6'
+        - ticks: 1181
+        - B3
+        - 115
+      - - 24403/3840
+        - ticks: 816
+        - D#4
+        - 113
+      - - 25411/3840
+        - ticks: 624
+        - F4
+        - 104
+      - - 26189/3840
+        - ticks: 509
         - E4
         - 112
-      - - '4'
-        - ticks: 3226
-        - E4
-        - 122
-      - - '5'
-        - ticks: 2534
-        - Bb3
-        - 117
-      - - 23/4
-        - ticks: 922
-        - G3
-        - 106
-      - - '6'
-        - ticks: 2765
-        - D#4
-        - 118
-      - - '7'
-        - ticks: 3226
-        - E4
-        - 122
-      - - 63/8
-        - ticks: 461
-        - B3
-        - 105
       automation:
-      - id: iron_verdict_0_0
+      - id: duel_iron_gate_g_2
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 0
+            ticks: 2400
           value: 0
         - at:
-            ticks: 332
+            ticks: 2503
           value: 0
         - at:
-            ticks: 1188
-          value: -1
-        - at:
-            ticks: 1263
-          value: 44
-        - at:
-            ticks: 1338
-          value: 52
-        - at:
-            ticks: 1413
-          value: 17
-        - at:
-            ticks: 1488
-          value: -32
-        - at:
-            ticks: 1563
-          value: -55
-        - at:
-            ticks: 1638
-          value: -32
-        - at:
-            ticks: 1713
-          value: 17
-        - at:
-            ticks: 1788
-          value: 52
-        - at:
-            ticks: 1863
-          value: 44
-        - at:
-            ticks: 1938
-          value: 0
-        - at:
-            ticks: 2013
-          value: -44
-        - at:
-            ticks: 2088
-          value: -52
-        - at:
-            ticks: 2163
-          value: -16
-        - at:
-            ticks: 2238
-          value: 33
-        - at:
-            ticks: 2313
-          value: 55
-        - at:
-            ticks: 2388
-          value: 32
-        - at:
-            ticks: 2463
-          value: -18
-        - at:
-            ticks: 2538
-          value: -52
-        - at:
-            ticks: 2613
-          value: -44
-        - at:
-            ticks: 2688
-          value: 1
-        - at:
-            ticks: 2740
-          value: 0
-        - at:
-            ticks: 2767
-          value: 0
-      - id: iron_verdict_0_2
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 3840
-          value: 0
-        - at:
-            ticks: 4116
-          value: 0
-        - at:
-            ticks: 4830
-          value: 0
-        - at:
-            ticks: 4905
-          value: 44
-        - at:
-            ticks: 4980
-          value: 52
-        - at:
-            ticks: 5055
-          value: 17
-        - at:
-            ticks: 5130
-          value: -32
-        - at:
-            ticks: 5205
-          value: -55
-        - at:
-            ticks: 5280
-          value: -32
-        - at:
-            ticks: 5355
-          value: 17
-        - at:
-            ticks: 5430
-          value: 52
-        - at:
-            ticks: 5505
-          value: 44
-        - at:
-            ticks: 5580
-          value: 0
-        - at:
-            ticks: 5655
-          value: -44
-        - at:
-            ticks: 5730
-          value: -52
-        - at:
-            ticks: 5805
-          value: -16
-        - at:
-            ticks: 5880
-          value: 33
-        - at:
-            ticks: 5955
-          value: 55
-        - at:
-            ticks: 6030
-          value: 31
-        - at:
-            ticks: 6119
-          value: 0
-        - at:
-            ticks: 6146
-          value: 0
-      - id: iron_verdict_0_4
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 7680
-          value: 0
-        - at:
-            ticks: 8039
-          value: 0
-        - at:
-            ticks: 8967
-          value: -1
-        - at:
-            ticks: 9042
-          value: 44
-        - at:
-            ticks: 9117
-          value: 52
-        - at:
-            ticks: 9192
-          value: 17
-        - at:
-            ticks: 9267
-          value: -32
-        - at:
-            ticks: 9342
-          value: -55
-        - at:
-            ticks: 9417
-          value: -32
-        - at:
-            ticks: 9492
-          value: 17
-        - at:
-            ticks: 9567
-          value: 52
-        - at:
-            ticks: 9642
-          value: 44
-        - at:
-            ticks: 9717
-          value: 0
-        - at:
-            ticks: 9792
-          value: -44
-        - at:
-            ticks: 9867
-          value: -52
-        - at:
-            ticks: 9942
-          value: -16
-        - at:
-            ticks: 10017
-          value: 33
-        - at:
-            ticks: 10092
-          value: 55
-        - at:
-            ticks: 10167
-          value: 32
-        - at:
-            ticks: 10242
-          value: -18
-        - at:
-            ticks: 10317
-          value: -52
-        - at:
-            ticks: 10392
-          value: -44
-        - at:
-            ticks: 10467
-          value: 1
-        - at:
-            ticks: 10542
-          value: 45
-        - at:
-            ticks: 10650
-          value: 0
-        - at:
-            ticks: 10677
-          value: 0
-      - id: iron_verdict_0_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12480
-          value: 0
-        - at:
-            ticks: 12756
-          value: 0
-        - at:
-            ticks: 13194
+            ticks: 2832
           value: 683
         - at:
-            ticks: 13470
-          value: 682
+            ticks: 2935
+          value: 723
         - at:
-            ticks: 13545
-          value: 727
-        - at:
-            ticks: 13620
-          value: 735
-        - at:
-            ticks: 13695
-          value: 700
-        - at:
-            ticks: 13770
+            ticks: 3022
           value: 651
         - at:
-            ticks: 13845
-          value: 628
-        - at:
-            ticks: 13920
-          value: 651
-        - at:
-            ticks: 13995
-          value: 700
-        - at:
-            ticks: 14070
-          value: 735
-        - at:
-            ticks: 14145
-          value: 727
-        - at:
-            ticks: 14220
-          value: 682
-        - at:
-            ticks: 14295
-          value: 638
-        - at:
-            ticks: 14370
-          value: 631
-        - at:
-            ticks: 14445
-          value: 666
-        - at:
-            ticks: 14520
-          value: 715
-        - at:
-            ticks: 14595
-          value: 737
-        - at:
-            ticks: 14670
-          value: 714
-        - at:
-            ticks: 14759
+            ticks: 3226
           value: 683
         - at:
-            ticks: 14786
+            ticks: 3266
           value: 0
-      - id: iron_verdict_0_7
+      - id: duel_iron_gate_g_8
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15747
+            ticks: 15544
           value: 0
         - at:
-            ticks: 16747
+            ticks: 16128
+          value: -683
+        - at:
+            ticks: 16312
+          value: -643
+        - at:
+            ticks: 16465
+          value: -715
+        - at:
+            ticks: 16858
+          value: -683
+        - at:
+            ticks: 16898
           value: 0
-        - at:
-            ticks: 16822
-          value: 44
-        - at:
-            ticks: 16897
-          value: 52
-        - at:
-            ticks: 16972
-          value: 17
-        - at:
-            ticks: 17047
-          value: -32
-        - at:
-            ticks: 17122
-          value: -55
-        - at:
-            ticks: 17197
-          value: -32
-        - at:
-            ticks: 17272
-          value: 17
-        - at:
-            ticks: 17347
-          value: 52
-        - at:
-            ticks: 17422
-          value: 44
-        - at:
-            ticks: 17497
-          value: -1
-        - at:
-            ticks: 17572
-          value: -45
-        - at:
-            ticks: 17647
-          value: -52
-        - at:
-            ticks: 17722
-          value: -16
-        - at:
-            ticks: 17797
-          value: 33
-        - at:
-            ticks: 17872
-          value: 55
-        - at:
-            ticks: 17947
-          value: 31
-        - at:
-            ticks: 18022
-          value: -18
-        - at:
-            ticks: 18097
-          value: -52
-        - at:
-            ticks: 18172
-          value: -43
-        - at:
-            ticks: 18247
-          value: 2
-        - at:
-            ticks: 18322
-          value: 45
-        - at:
-            ticks: 18397
-          value: 51
-        - at:
-            ticks: 18472
-          value: 15
-        - at:
-            ticks: 18561
-          value: 0
-        - at:
-            ticks: 18588
-          value: 0
-      - id: iron_verdict_0_8
+      - id: duel_iron_gate_g_13
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 19200
+            ticks: 24403
           value: 0
         - at:
-            ticks: 19504
+            ticks: 24500
           value: 0
         - at:
-            ticks: 20289
-          value: 0
-        - at:
-            ticks: 20364
-          value: 44
-        - at:
-            ticks: 20439
-          value: 52
-        - at:
-            ticks: 20514
-          value: 17
-        - at:
-            ticks: 20589
-          value: -32
-        - at:
-            ticks: 20664
-          value: -55
-        - at:
-            ticks: 20739
-          value: -32
-        - at:
-            ticks: 20814
-          value: 17
-        - at:
-            ticks: 20889
-          value: 52
-        - at:
-            ticks: 20964
-          value: 44
-        - at:
-            ticks: 21039
-          value: 0
-        - at:
-            ticks: 21114
-          value: -44
-        - at:
-            ticks: 21189
-          value: -52
-        - at:
-            ticks: 21264
-          value: -16
-        - at:
-            ticks: 21339
-          value: 33
-        - at:
-            ticks: 21414
-          value: 55
-        - at:
-            ticks: 21489
-          value: 31
-        - at:
-            ticks: 21564
-          value: -18
-        - at:
-            ticks: 21639
-          value: -52
-        - at:
-            ticks: 21709
-          value: 0
-        - at:
-            ticks: 21736
-          value: 0
-      - id: iron_verdict_0_10
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23372
-          value: 0
-        - at:
-            ticks: 23897
+            ticks: 24811
           value: 683
         - at:
-            ticks: 24228
-          value: 682
+            ticks: 24908
+          value: 723
         - at:
-            ticks: 24303
-          value: 727
-        - at:
-            ticks: 24378
-          value: 735
-        - at:
-            ticks: 24453
-          value: 700
-        - at:
-            ticks: 24528
+            ticks: 24990
           value: 651
         - at:
-            ticks: 24603
-          value: 628
-        - at:
-            ticks: 24678
-          value: 650
-        - at:
-            ticks: 24753
-          value: 699
-        - at:
-            ticks: 24828
-          value: 735
-        - at:
-            ticks: 24903
-          value: 727
-        - at:
-            ticks: 24978
-          value: 682
-        - at:
-            ticks: 25053
-          value: 638
-        - at:
-            ticks: 25128
-          value: 631
-        - at:
-            ticks: 25203
-          value: 666
-        - at:
-            ticks: 25278
-          value: 715
-        - at:
-            ticks: 25353
-          value: 737
-        - at:
-            ticks: 25428
-          value: 714
-        - at:
-            ticks: 25503
-          value: 665
-        - at:
-            ticks: 25578
-          value: 630
-        - at:
-            ticks: 25653
-          value: 639
-        - at:
-            ticks: 25728
-          value: 684
-        - at:
-            ticks: 25780
+            ticks: 25181
           value: 683
         - at:
-            ticks: 25807
-          value: 0
-      - id: iron_verdict_0_11
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27267
-          value: 0
-        - at:
-            ticks: 28267
-          value: 0
-        - at:
-            ticks: 28342
-          value: 44
-        - at:
-            ticks: 28417
-          value: 52
-        - at:
-            ticks: 28492
-          value: 17
-        - at:
-            ticks: 28567
-          value: -32
-        - at:
-            ticks: 28642
-          value: -55
-        - at:
-            ticks: 28717
-          value: -32
-        - at:
-            ticks: 28792
-          value: 17
-        - at:
-            ticks: 28867
-          value: 52
-        - at:
-            ticks: 28942
-          value: 44
-        - at:
-            ticks: 29017
-          value: -1
-        - at:
-            ticks: 29092
-          value: -45
-        - at:
-            ticks: 29167
-          value: -52
-        - at:
-            ticks: 29242
-          value: -16
-        - at:
-            ticks: 29317
-          value: 33
-        - at:
-            ticks: 29392
-          value: 55
-        - at:
-            ticks: 29467
-          value: 31
-        - at:
-            ticks: 29542
-          value: -18
-        - at:
-            ticks: 29617
-          value: -52
-        - at:
-            ticks: 29692
-          value: -43
-        - at:
-            ticks: 29767
-          value: 2
-        - at:
-            ticks: 29842
-          value: 45
-        - at:
-            ticks: 29917
-          value: 51
-        - at:
-            ticks: 29992
-          value: 15
-        - at:
-            ticks: 30081
-          value: 0
-        - at:
-            ticks: 30108
+            ticks: 25221
           value: 0
     - id: lead_guitar_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
-      - - 1/2
-        - ticks: 1843
-        - E4
-        - 114
-      - - 9/8
-        - ticks: 2765
-        - G4
-        - 121
-      - - 21/8
-        - ticks: 1382
-        - E4
+      - - '1'
+        - ticks: 528
+        - E3
         - 112
-      - - '3'
-        - ticks: 2765
-        - F4
-        - 118
-      - - 61/16
-        - ticks: 691
+      - - 47/40
+        - ticks: 384
         - E4
         - 106
-      - - 9/2
-        - ticks: 1843
+      - - 13/10
+        - ticks: 422
+        - F4
+        - 118
+      - - 5549/3840
+        - ticks: 403
+        - G4
+        - 106
+      - - 1225/768
+        - ticks: 1373
+        - Bb3
+        - 118
+      - - '3'
+        - ticks: 1344
         - B3
+        - 113
+      - - 17/5
+        - ticks: 528
+        - G3
+        - 103
+      - - 13651/3840
+        - ticks: 768
+        - F3
+        - 108
+      - - 14573/3840
+        - ticks: 624
+        - E3
         - 114
       - - '5'
-        - ticks: 2765
-        - G4
-        - 120
-      - - '6'
-        - ticks: 2304
-        - Bb3
-        - 120
-      - - 27/4
-        - ticks: 922
-        - F4
-        - 108
-      - - '7'
-        - ticks: 2765
+        - ticks: 2285
         - D#4
         - 119
+      - - 453/80
+        - ticks: 432
+        - G4
+        - 105
+      - - 29/5
+        - ticks: 595
+        - F4
+        - 111
+      - - '7'
+        - ticks: 1968
+        - E4
+        - 119
+      - - 303/40
+        - ticks: 586
+        - Bb3
+        - 111
+      - - 621/80
+        - ticks: 816
+        - F3
+        - 110
       automation:
-      - id: iron_verdict_1_1
+      - id: duel_shattered_orders_g_4
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 4320
+            ticks: 6125
           value: 0
         - at:
-            ticks: 4652
+            ticks: 6289
           value: 0
         - at:
-            ticks: 5508
-          value: -1
+            ticks: 6811
+          value: 683
         - at:
-            ticks: 5583
-          value: 44
+            ticks: 6975
+          value: 723
         - at:
-            ticks: 5658
-          value: 52
+            ticks: 7113
+          value: 651
         - at:
-            ticks: 5733
-          value: 17
+            ticks: 7460
+          value: 683
         - at:
-            ticks: 5808
-          value: -32
-        - at:
-            ticks: 5883
-          value: -55
-        - at:
-            ticks: 5958
-          value: -32
-        - at:
-            ticks: 6033
-          value: 17
-        - at:
-            ticks: 6108
-          value: 52
-        - at:
-            ticks: 6183
-          value: 44
-        - at:
-            ticks: 6258
+            ticks: 7500
           value: 0
-        - at:
-            ticks: 6333
-          value: -44
-        - at:
-            ticks: 6408
-          value: -52
-        - at:
-            ticks: 6483
-          value: -16
-        - at:
-            ticks: 6558
-          value: 33
-        - at:
-            ticks: 6633
-          value: 55
-        - at:
-            ticks: 6708
-          value: 32
-        - at:
-            ticks: 6783
-          value: -18
-        - at:
-            ticks: 6858
-          value: -52
-        - at:
-            ticks: 6933
-          value: -44
-        - at:
-            ticks: 7008
-          value: 1
-        - at:
-            ticks: 7060
-          value: 0
-        - at:
-            ticks: 7087
-          value: 0
-      - id: iron_verdict_1_3
+      - id: duel_shattered_orders_g_9
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 11520
-          value: 0
-        - at:
-            ticks: 11852
-          value: 0
-        - at:
-            ticks: 12708
-          value: -1
-        - at:
-            ticks: 12783
-          value: 44
-        - at:
-            ticks: 12858
-          value: 52
-        - at:
-            ticks: 12933
-          value: 17
-        - at:
-            ticks: 13008
-          value: -32
-        - at:
-            ticks: 13083
-          value: -55
-        - at:
-            ticks: 13158
-          value: -32
-        - at:
-            ticks: 13233
-          value: 17
-        - at:
-            ticks: 13308
-          value: 52
-        - at:
-            ticks: 13383
-          value: 44
-        - at:
-            ticks: 13458
-          value: 0
-        - at:
-            ticks: 13533
-          value: -44
-        - at:
-            ticks: 13608
-          value: -52
-        - at:
-            ticks: 13683
-          value: -16
-        - at:
-            ticks: 13758
-          value: 33
-        - at:
-            ticks: 13833
-          value: 55
-        - at:
-            ticks: 13908
-          value: 32
-        - at:
-            ticks: 13983
-          value: -18
-        - at:
-            ticks: 14058
-          value: -52
-        - at:
-            ticks: 14133
-          value: -44
-        - at:
-            ticks: 14208
-          value: 1
-        - at:
-            ticks: 14260
-          value: 0
-        - at:
-            ticks: 14287
-          value: 0
-      - id: iron_verdict_1_6
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 19200
           value: 0
         - at:
-            ticks: 19532
+            ticks: 19474
           value: 0
         - at:
-            ticks: 20388
-          value: -1
-        - at:
-            ticks: 20463
-          value: 44
-        - at:
-            ticks: 20538
-          value: 52
-        - at:
-            ticks: 20613
-          value: 17
-        - at:
-            ticks: 20688
-          value: -32
-        - at:
-            ticks: 20763
-          value: -55
-        - at:
-            ticks: 20838
-          value: -32
-        - at:
-            ticks: 20913
-          value: 17
-        - at:
-            ticks: 20988
-          value: 52
-        - at:
-            ticks: 21063
-          value: 44
-        - at:
-            ticks: 21138
-          value: 0
-        - at:
-            ticks: 21213
-          value: -44
-        - at:
-            ticks: 21288
-          value: -52
-        - at:
-            ticks: 21363
-          value: -16
-        - at:
-            ticks: 21438
-          value: 33
-        - at:
-            ticks: 21513
-          value: 55
-        - at:
-            ticks: 21588
-          value: 32
-        - at:
-            ticks: 21663
-          value: -18
-        - at:
-            ticks: 21738
-          value: -52
-        - at:
-            ticks: 21813
-          value: -44
-        - at:
-            ticks: 21888
-          value: 1
-        - at:
-            ticks: 21940
-          value: 0
-        - at:
-            ticks: 21967
-          value: 0
-      - id: iron_verdict_1_7
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23316
-          value: 0
-        - at:
-            ticks: 23754
+            ticks: 20342
           value: 683
         - at:
-            ticks: 24030
-          value: 682
+            ticks: 20616
+          value: 723
         - at:
-            ticks: 24105
-          value: 727
-        - at:
-            ticks: 24180
-          value: 735
-        - at:
-            ticks: 24255
-          value: 700
-        - at:
-            ticks: 24330
+            ticks: 20844
           value: 651
         - at:
-            ticks: 24405
-          value: 628
-        - at:
-            ticks: 24480
-          value: 651
-        - at:
-            ticks: 24555
-          value: 700
-        - at:
-            ticks: 24630
-          value: 735
-        - at:
-            ticks: 24705
-          value: 727
-        - at:
-            ticks: 24780
-          value: 682
-        - at:
-            ticks: 24855
-          value: 638
-        - at:
-            ticks: 24930
-          value: 631
-        - at:
-            ticks: 25005
-          value: 666
-        - at:
-            ticks: 25080
-          value: 715
-        - at:
-            ticks: 25155
-          value: 737
-        - at:
-            ticks: 25230
-          value: 714
-        - at:
-            ticks: 25319
+            ticks: 21447
           value: 683
         - at:
-            ticks: 25346
-          value: 0
-      - id: iron_verdict_1_9
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27212
-          value: 0
-        - at:
-            ticks: 27737
-          value: 683
-        - at:
-            ticks: 28068
-          value: 682
-        - at:
-            ticks: 28143
-          value: 727
-        - at:
-            ticks: 28218
-          value: 735
-        - at:
-            ticks: 28293
-          value: 700
-        - at:
-            ticks: 28368
-          value: 651
-        - at:
-            ticks: 28443
-          value: 628
-        - at:
-            ticks: 28518
-          value: 650
-        - at:
-            ticks: 28593
-          value: 699
-        - at:
-            ticks: 28668
-          value: 735
-        - at:
-            ticks: 28743
-          value: 727
-        - at:
-            ticks: 28818
-          value: 682
-        - at:
-            ticks: 28893
-          value: 638
-        - at:
-            ticks: 28968
-          value: 631
-        - at:
-            ticks: 29043
-          value: 666
-        - at:
-            ticks: 29118
-          value: 715
-        - at:
-            ticks: 29193
-          value: 737
-        - at:
-            ticks: 29268
-          value: 714
-        - at:
-            ticks: 29343
-          value: 665
-        - at:
-            ticks: 29418
-          value: 630
-        - at:
-            ticks: 29493
-          value: 639
-        - at:
-            ticks: 29568
-          value: 684
-        - at:
-            ticks: 29620
-          value: 683
-        - at:
-            ticks: 29647
+            ticks: 21487
           value: 0
     - id: lead_guitar_war_machine
       at:
         bar: 25
         beat: 1
       events:
-      - - 11/16
-        - ticks: 1152
-        - B3
-        - 109
-      - - 19/16
-        - ticks: 2304
+      - - '0'
+        - ticks: 1968
         - E4
-        - 117
-      - - 11/4
-        - ticks: 922
-        - E4
-        - 111
-      - - 25/8
-        - ticks: 2534
-        - F4
-        - 120
-      - - 75/16
-        - ticks: 1152
+        - 119
+      - - 23/40
+        - ticks: 586
         - Bb3
-        - 109
-      - - 83/16
-        - ticks: 2534
+        - 111
+      - - 61/80
+        - ticks: 816
+        - F3
+        - 110
+      - - '2'
+        - ticks: 2285
+        - D#4
+        - 119
+      - - 213/80
+        - ticks: 432
         - G4
-        - 117
-      - - 27/4
-        - ticks: 922
+        - 105
+      - - 14/5
+        - ticks: 595
         - F4
         - 111
-      - - 29/4
-        - ticks: 2534
+      - - '4'
+        - ticks: 2189
+        - E3
+        - 118
+      - - 37/8
+        - ticks: 499
+        - F3
+        - 107
+      - - 3671/768
+        - ticks: 720
+        - Bb3
+        - 119
+      - - '6'
+        - ticks: 1181
+        - B3
+        - 115
+      - - 24403/3840
+        - ticks: 816
         - D#4
-        - 120
+        - 113
+      - - 25411/3840
+        - ticks: 624
+        - F4
+        - 104
+      - - 26189/3840
+        - ticks: 509
+        - E4
+        - 112
+      - - 613/80
+        - ticks: 883
+        - E4
+        - 113
       automation:
-      - id: iron_verdict_2_1
+      - id: duel_war_machine_g_3
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 4560
+            ticks: 7680
           value: 0
         - at:
-            ticks: 4836
+            ticks: 7954
           value: 0
         - at:
-            ticks: 5550
-          value: 0
-        - at:
-            ticks: 5625
-          value: 44
-        - at:
-            ticks: 5700
-          value: 52
-        - at:
-            ticks: 5775
-          value: 17
-        - at:
-            ticks: 5850
-          value: -32
-        - at:
-            ticks: 5925
-          value: -55
-        - at:
-            ticks: 6000
-          value: -32
-        - at:
-            ticks: 6075
-          value: 17
-        - at:
-            ticks: 6150
-          value: 52
-        - at:
-            ticks: 6225
-          value: 44
-        - at:
-            ticks: 6300
-          value: 0
-        - at:
-            ticks: 6375
-          value: -44
-        - at:
-            ticks: 6450
-          value: -52
-        - at:
-            ticks: 6525
-          value: -16
-        - at:
-            ticks: 6600
-          value: 33
-        - at:
-            ticks: 6675
-          value: 55
-        - at:
-            ticks: 6750
-          value: 31
-        - at:
-            ticks: 6839
-          value: 0
-        - at:
-            ticks: 6866
-          value: 0
-      - id: iron_verdict_2_3
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12000
-          value: 0
-        - at:
-            ticks: 12304
-          value: 0
-        - at:
-            ticks: 13089
-          value: 0
-        - at:
-            ticks: 13164
-          value: 44
-        - at:
-            ticks: 13239
-          value: 52
-        - at:
-            ticks: 13314
-          value: 17
-        - at:
-            ticks: 13389
-          value: -32
-        - at:
-            ticks: 13464
-          value: -55
-        - at:
-            ticks: 13539
-          value: -32
-        - at:
-            ticks: 13614
-          value: 17
-        - at:
-            ticks: 13689
-          value: 52
-        - at:
-            ticks: 13764
-          value: 44
-        - at:
-            ticks: 13839
-          value: 0
-        - at:
-            ticks: 13914
-          value: -44
-        - at:
-            ticks: 13989
-          value: -52
-        - at:
-            ticks: 14064
-          value: -16
-        - at:
-            ticks: 14139
-          value: 33
-        - at:
-            ticks: 14214
-          value: 55
-        - at:
-            ticks: 14289
-          value: 31
-        - at:
-            ticks: 14364
-          value: -18
-        - at:
-            ticks: 14439
-          value: -52
-        - at:
-            ticks: 14509
-          value: 0
-        - at:
-            ticks: 14536
-          value: 0
-      - id: iron_verdict_2_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19920
-          value: 0
-        - at:
-            ticks: 20224
-          value: 0
-        - at:
-            ticks: 21009
-          value: 0
-        - at:
-            ticks: 21084
-          value: 44
-        - at:
-            ticks: 21159
-          value: 52
-        - at:
-            ticks: 21234
-          value: 17
-        - at:
-            ticks: 21309
-          value: -32
-        - at:
-            ticks: 21384
-          value: -55
-        - at:
-            ticks: 21459
-          value: -32
-        - at:
-            ticks: 21534
-          value: 17
-        - at:
-            ticks: 21609
-          value: 52
-        - at:
-            ticks: 21684
-          value: 44
-        - at:
-            ticks: 21759
-          value: 0
-        - at:
-            ticks: 21834
-          value: -44
-        - at:
-            ticks: 21909
-          value: -52
-        - at:
-            ticks: 21984
-          value: -16
-        - at:
-            ticks: 22059
-          value: 33
-        - at:
-            ticks: 22134
-          value: 55
-        - at:
-            ticks: 22209
-          value: 31
-        - at:
-            ticks: 22284
-          value: -18
-        - at:
-            ticks: 22359
-          value: -52
-        - at:
-            ticks: 22429
-          value: 0
-        - at:
-            ticks: 22456
-          value: 0
-      - id: iron_verdict_2_7
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 27840
-          value: 0
-        - at:
-            ticks: 28144
-          value: 0
-        - at:
-            ticks: 28626
+            ticks: 8822
           value: 683
         - at:
-            ticks: 28929
-          value: 682
+            ticks: 9096
+          value: 723
         - at:
-            ticks: 29004
-          value: 727
-        - at:
-            ticks: 29079
-          value: 735
-        - at:
-            ticks: 29154
-          value: 700
-        - at:
-            ticks: 29229
+            ticks: 9324
           value: 651
         - at:
-            ticks: 29304
-          value: 628
-        - at:
-            ticks: 29379
-          value: 651
-        - at:
-            ticks: 29454
-          value: 700
-        - at:
-            ticks: 29529
-          value: 735
-        - at:
-            ticks: 29604
-          value: 727
-        - at:
-            ticks: 29679
-          value: 682
-        - at:
-            ticks: 29754
-          value: 638
-        - at:
-            ticks: 29829
-          value: 631
-        - at:
-            ticks: 29904
-          value: 666
-        - at:
-            ticks: 29979
-          value: 715
-        - at:
-            ticks: 30054
-          value: 737
-        - at:
-            ticks: 30129
-          value: 714
-        - at:
-            ticks: 30204
-          value: 665
-        - at:
-            ticks: 30279
-          value: 630
-        - at:
-            ticks: 30349
+            ticks: 9927
           value: 683
         - at:
-            ticks: 30376
+            ticks: 9967
+          value: 0
+      - id: duel_war_machine_g_8
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 18355
+          value: 0
+        - at:
+            ticks: 18441
+          value: 0
+        - at:
+            ticks: 18715
+          value: 683
+        - at:
+            ticks: 18801
+          value: 723
+        - at:
+            ticks: 18875
+          value: 651
+        - at:
+            ticks: 19037
+          value: 683
+        - at:
+            ticks: 19077
+          value: 0
+      - id: duel_war_machine_g_10
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 24403
+          value: 0
+        - at:
+            ticks: 24500
+          value: 0
+        - at:
+            ticks: 24811
+          value: 683
+        - at:
+            ticks: 24908
+          value: 723
+        - at:
+            ticks: 24990
+          value: 651
+        - at:
+            ticks: 25181
+          value: 683
+        - at:
+            ticks: 25221
           value: 0
     - id: lead_guitar_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - '0'
-        - ticks: 2304
+      - - 1/40
+        - ticks: 206
         - E4
-        - 119
-      - - 5/8
-        - ticks: 230
+        - 104
+      - - 7/80
+        - ticks: 206
         - G4
-        - 119
-      - - 11/16
-        - ticks: 230
+        - 107
+      - - 3/20
+        - ticks: 206
         - A4
-        - 114
-      - - 3/4
-        - ticks: 230
-        - Bb4
-        - 111
-      - - 13/16
-        - ticks: 230
-        - B4
-        - 108
-      - - 7/8
-        - ticks: 230
-        - D5
-        - 117
-      - - 15/16
-        - ticks: 230
-        - E5
-        - 116
-      - - '1'
-        - ticks: 2765
-        - E5
-        - 123
-      - - 7/4
-        - ticks: 230
-        - D5
-        - 115
-      - - 29/16
-        - ticks: 230
-        - B4
         - 110
-      - - 15/8
-        - ticks: 230
+      - - 17/80
+        - ticks: 206
+        - Bb4
+        - 113
+      - - 11/40
+        - ticks: 206
+        - B4
+        - 104
+      - - 27/80
+        - ticks: 206
         - Bb4
         - 107
-      - - 31/16
-        - ticks: 230
+      - - 2/5
+        - ticks: 206
+        - A4
+        - 110
+      - - 37/80
+        - ticks: 206
+        - G4
+        - 113
+      - - 21/40
+        - ticks: 206
+        - E4
+        - 104
+      - - 47/80
+        - ticks: 206
+        - D4
+        - 107
+      - - 13/20
+        - ticks: 206
+        - B3
+        - 110
+      - - 57/80
+        - ticks: 206
+        - G3
+        - 113
+      - - 313/384
+        - ticks: 586
+        - E4
+        - 119
+      - - '2'
+        - ticks: 2285
+        - D#4
+        - 119
+      - - 213/80
+        - ticks: 432
+        - G4
+        - 105
+      - - 14/5
+        - ticks: 595
+        - F4
+        - 111
+      - - 161/40
+        - ticks: 206
+        - E4
+        - 104
+      - - 327/80
+        - ticks: 206
+        - F4
+        - 107
+      - - 83/20
+        - ticks: 206
+        - G4
+        - 110
+      - - 337/80
+        - ticks: 206
+        - A4
+        - 113
+      - - 171/40
+        - ticks: 206
+        - Bb4
+        - 104
+      - - 347/80
+        - ticks: 206
+        - B4
+        - 107
+      - - 22/5
+        - ticks: 206
+        - D5
+        - 110
+      - - 357/80
+        - ticks: 206
+        - E5
+        - 113
+      - - 181/40
+        - ticks: 206
+        - D5
+        - 104
+      - - 367/80
+        - ticks: 206
+        - B4
+        - 107
+      - - 93/20
+        - ticks: 206
+        - Bb4
+        - 110
+      - - 377/80
+        - ticks: 206
+        - G4
+        - 113
+      - - 1849/384
+        - ticks: 586
+        - E4
+        - 119
+      - - 241/40
+        - ticks: 206
+        - B3
+        - 104
+      - - 487/80
+        - ticks: 206
+        - D4
+        - 107
+      - - 123/20
+        - ticks: 206
+        - E4
+        - 110
+      - - 497/80
+        - ticks: 206
+        - F4
+        - 113
+      - - 251/40
+        - ticks: 206
         - G4
         - 104
-      - - '2'
-        - ticks: 1843
-        - G4
-        - 120
-      - - 5/2
-        - ticks: 230
+      - - 507/80
+        - ticks: 206
         - F4
-        - 119
-      - - 41/16
-        - ticks: 230
+        - 107
+      - - 32/5
+        - ticks: 206
         - E4
-        - 114
-      - - 21/8
-        - ticks: 230
+        - 110
+      - - 517/80
+        - ticks: 206
         - D4
-        - 111
-      - - 43/16
-        - ticks: 230
+        - 113
+      - - 261/40
+        - ticks: 206
         - B3
-        - 108
-      - - 11/4
-        - ticks: 230
+        - 104
+      - - 527/80
+        - ticks: 206
         - Bb3
-        - 117
-      - - 45/16
-        - ticks: 230
+        - 107
+      - - 133/20
+        - ticks: 206
         - G3
-        - 116
-      - - 23/8
-        - ticks: 230
-        - F3
-        - 111
-      - - 47/16
-        - ticks: 230
+        - 110
+      - - 537/80
+        - ticks: 206
         - E3
-        - 108
-      - - '3'
-        - ticks: 3226
-        - Bb3
-        - 119
-      - - '4'
-        - ticks: 2765
-        - E4
-        - 121
-      - - 19/4
-        - ticks: 230
-        - F4
-        - 116
-      - - 77/16
-        - ticks: 230
-        - G4
-        - 111
-      - - 39/8
-        - ticks: 230
-        - A4
-        - 108
-      - - 79/16
-        - ticks: 230
-        - Bb4
-        - 105
-      - - '5'
-        - ticks: 2995
-        - E5
-        - 123
-      - - '6'
-        - ticks: 230
-        - E5
-        - 121
-      - - 97/16
-        - ticks: 230
-        - D5
-        - 116
-      - - 49/8
-        - ticks: 230
-        - B4
         - 113
-      - - 99/16
-        - ticks: 230
-        - Bb4
-        - 110
-      - - 25/4
-        - ticks: 230
-        - A4
-        - 119
-      - - 101/16
-        - ticks: 230
-        - G4
-        - 118
-      - - 51/8
-        - ticks: 230
-        - F4
-        - 113
-      - - 103/16
-        - ticks: 230
+      - - 2617/384
+        - ticks: 586
         - E4
-        - 110
-      - - 13/2
-        - ticks: 230
-        - D4
         - 119
-      - - 105/16
-        - ticks: 230
+      - - 3001/384
+        - ticks: 528
         - B3
-        - 116
-      - - 53/8
-        - ticks: 230
-        - Bb3
-        - 115
-      - - 107/16
-        - ticks: 230
-        - G3
-        - 110
-      - - 27/4
-        - ticks: 230
-        - F3
-        - 119
-      - - 109/16
-        - ticks: 230
-        - E3
-        - 116
-      - - 55/8
-        - ticks: 230
-        - G3
-        - 113
-      - - 111/16
-        - ticks: 230
-        - B3
-        - 112
-      - - '7'
-        - ticks: 2765
-        - D#4
-        - 121
-      - - 31/4
-        - ticks: 922
-        - E4
         - 114
       automation:
-      - id: iron_verdict_3_0
+      - id: duel_counterattack_g_13
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 0
+            ticks: 7680
           value: 0
         - at:
-            ticks: 276
+            ticks: 7954
           value: 0
         - at:
-            ticks: 990
-          value: 0
-        - at:
-            ticks: 1065
-          value: 44
-        - at:
-            ticks: 1140
-          value: 52
-        - at:
-            ticks: 1215
-          value: 17
-        - at:
-            ticks: 1290
-          value: -32
-        - at:
-            ticks: 1365
-          value: -55
-        - at:
-            ticks: 1440
-          value: -32
-        - at:
-            ticks: 1515
-          value: 17
-        - at:
-            ticks: 1590
-          value: 52
-        - at:
-            ticks: 1665
-          value: 44
-        - at:
-            ticks: 1740
-          value: 0
-        - at:
-            ticks: 1815
-          value: -44
-        - at:
-            ticks: 1890
-          value: -52
-        - at:
-            ticks: 1965
-          value: -16
-        - at:
-            ticks: 2040
-          value: 33
-        - at:
-            ticks: 2115
-          value: 55
-        - at:
-            ticks: 2190
-          value: 31
-        - at:
-            ticks: 2279
-          value: 0
-        - at:
-            ticks: 2306
-          value: 0
-      - id: iron_verdict_3_7
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 3840
-          value: 0
-        - at:
-            ticks: 4172
-          value: 0
-        - at:
-            ticks: 5028
-          value: -1
-        - at:
-            ticks: 5103
-          value: 44
-        - at:
-            ticks: 5178
-          value: 52
-        - at:
-            ticks: 5253
-          value: 17
-        - at:
-            ticks: 5328
-          value: -32
-        - at:
-            ticks: 5403
-          value: -55
-        - at:
-            ticks: 5478
-          value: -32
-        - at:
-            ticks: 5553
-          value: 17
-        - at:
-            ticks: 5628
-          value: 52
-        - at:
-            ticks: 5703
-          value: 44
-        - at:
-            ticks: 5778
-          value: 0
-        - at:
-            ticks: 5853
-          value: -44
-        - at:
-            ticks: 5928
-          value: -52
-        - at:
-            ticks: 6003
-          value: -16
-        - at:
-            ticks: 6078
-          value: 33
-        - at:
-            ticks: 6153
-          value: 55
-        - at:
-            ticks: 6228
-          value: 32
-        - at:
-            ticks: 6303
-          value: -18
-        - at:
-            ticks: 6378
-          value: -52
-        - at:
-            ticks: 6453
-          value: -44
-        - at:
-            ticks: 6528
-          value: 1
-        - at:
-            ticks: 6580
-          value: 0
-        - at:
-            ticks: 6607
-          value: 0
-      - id: iron_verdict_3_21
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 11520
-          value: 0
-        - at:
-            ticks: 11907
-          value: 0
-        - at:
-            ticks: 12520
+            ticks: 8822
           value: 683
         - at:
-            ticks: 12907
-          value: 683
+            ticks: 9096
+          value: 723
         - at:
-            ticks: 12982
-          value: 727
-        - at:
-            ticks: 13057
-          value: 735
-        - at:
-            ticks: 13132
-          value: 699
-        - at:
-            ticks: 13207
-          value: 650
-        - at:
-            ticks: 13282
-          value: 628
-        - at:
-            ticks: 13357
+            ticks: 9324
           value: 651
         - at:
-            ticks: 13432
-          value: 700
-        - at:
-            ticks: 13507
-          value: 735
-        - at:
-            ticks: 13582
-          value: 726
-        - at:
-            ticks: 13657
-          value: 682
-        - at:
-            ticks: 13732
-          value: 638
-        - at:
-            ticks: 13807
-          value: 631
-        - at:
-            ticks: 13882
-          value: 667
-        - at:
-            ticks: 13957
-          value: 716
-        - at:
-            ticks: 14032
-          value: 737
-        - at:
-            ticks: 14107
-          value: 714
-        - at:
-            ticks: 14182
-          value: 665
-        - at:
-            ticks: 14257
-          value: 630
-        - at:
-            ticks: 14332
-          value: 639
-        - at:
-            ticks: 14407
-          value: 684
-        - at:
-            ticks: 14482
-          value: 728
-        - at:
-            ticks: 14557
-          value: 734
-        - at:
-            ticks: 14632
-          value: 698
-        - at:
-            ticks: 14721
+            ticks: 9927
           value: 683
         - at:
-            ticks: 14748
-          value: 0
-      - id: iron_verdict_3_22
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 15360
-          value: 0
-        - at:
-            ticks: 15692
-          value: 0
-        - at:
-            ticks: 16548
-          value: -1
-        - at:
-            ticks: 16623
-          value: 44
-        - at:
-            ticks: 16698
-          value: 52
-        - at:
-            ticks: 16773
-          value: 17
-        - at:
-            ticks: 16848
-          value: -32
-        - at:
-            ticks: 16923
-          value: -55
-        - at:
-            ticks: 16998
-          value: -32
-        - at:
-            ticks: 17073
-          value: 17
-        - at:
-            ticks: 17148
-          value: 52
-        - at:
-            ticks: 17223
-          value: 44
-        - at:
-            ticks: 17298
-          value: 0
-        - at:
-            ticks: 17373
-          value: -44
-        - at:
-            ticks: 17448
-          value: -52
-        - at:
-            ticks: 17523
-          value: -16
-        - at:
-            ticks: 17598
-          value: 33
-        - at:
-            ticks: 17673
-          value: 55
-        - at:
-            ticks: 17748
-          value: 32
-        - at:
-            ticks: 17823
-          value: -18
-        - at:
-            ticks: 17898
-          value: -52
-        - at:
-            ticks: 17973
-          value: -44
-        - at:
-            ticks: 18048
-          value: 1
-        - at:
-            ticks: 18100
-          value: 0
-        - at:
-            ticks: 18127
-          value: 0
-      - id: iron_verdict_3_27
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19200
-          value: 0
-        - at:
-            ticks: 19559
-          value: 0
-        - at:
-            ticks: 20487
-          value: -1
-        - at:
-            ticks: 20562
-          value: 44
-        - at:
-            ticks: 20637
-          value: 52
-        - at:
-            ticks: 20712
-          value: 17
-        - at:
-            ticks: 20787
-          value: -32
-        - at:
-            ticks: 20862
-          value: -55
-        - at:
-            ticks: 20937
-          value: -32
-        - at:
-            ticks: 21012
-          value: 17
-        - at:
-            ticks: 21087
-          value: 52
-        - at:
-            ticks: 21162
-          value: 44
-        - at:
-            ticks: 21237
-          value: 0
-        - at:
-            ticks: 21312
-          value: -44
-        - at:
-            ticks: 21387
-          value: -52
-        - at:
-            ticks: 21462
-          value: -16
-        - at:
-            ticks: 21537
-          value: 33
-        - at:
-            ticks: 21612
-          value: 55
-        - at:
-            ticks: 21687
-          value: 32
-        - at:
-            ticks: 21762
-          value: -18
-        - at:
-            ticks: 21837
-          value: -52
-        - at:
-            ticks: 21912
-          value: -44
-        - at:
-            ticks: 21987
-          value: 1
-        - at:
-            ticks: 22062
-          value: 45
-        - at:
-            ticks: 22170
-          value: 0
-        - at:
-            ticks: 22197
-          value: 0
-      - id: iron_verdict_3_44
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27212
-          value: 0
-        - at:
-            ticks: 27737
-          value: 683
-        - at:
-            ticks: 28068
-          value: 682
-        - at:
-            ticks: 28143
-          value: 727
-        - at:
-            ticks: 28218
-          value: 735
-        - at:
-            ticks: 28293
-          value: 700
-        - at:
-            ticks: 28368
-          value: 651
-        - at:
-            ticks: 28443
-          value: 628
-        - at:
-            ticks: 28518
-          value: 650
-        - at:
-            ticks: 28593
-          value: 699
-        - at:
-            ticks: 28668
-          value: 735
-        - at:
-            ticks: 28743
-          value: 727
-        - at:
-            ticks: 28818
-          value: 682
-        - at:
-            ticks: 28893
-          value: 638
-        - at:
-            ticks: 28968
-          value: 631
-        - at:
-            ticks: 29043
-          value: 666
-        - at:
-            ticks: 29118
-          value: 715
-        - at:
-            ticks: 29193
-          value: 737
-        - at:
-            ticks: 29268
-          value: 714
-        - at:
-            ticks: 29343
-          value: 665
-        - at:
-            ticks: 29418
-          value: 630
-        - at:
-            ticks: 29493
-          value: 639
-        - at:
-            ticks: 29568
-          value: 684
-        - at:
-            ticks: 29620
-          value: 683
-        - at:
-            ticks: 29647
+            ticks: 9967
           value: 0
     - id: lead_guitar_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - '0'
-        - ticks: 5069
+      - - '1'
+        - ticks: 2189
         - E3
-        - 112
-      - - 13/8
-        - ticks: 1382
-        - G3
-        - 110
-      - - '2'
-        - ticks: 2995
-        - F3
-        - 115
-      - - 13/4
-        - ticks: 2304
-        - Bb3
-        - 120
-      - - '4'
-        - ticks: 5069
-        - E4
-        - 121
-      - - 45/8
-        - ticks: 1382
-        - G3
-        - 108
-      - - '6'
-        - ticks: 3456
-        - F4
-        - 119
-      - - '7'
-        - ticks: 2765
-        - D#4
         - 118
-      - - 31/4
-        - ticks: 922
+      - - 13/8
+        - ticks: 499
+        - F3
+        - 107
+      - - 1367/768
+        - ticks: 720
+        - Bb3
+        - 119
+      - - '3'
+        - ticks: 1536
+        - F4
+        - 114
+      - - 2665/768
+        - ticks: 461
+        - E4
+        - 100
+      - - 291/80
+        - ticks: 624
+        - Bb3
+        - 111
+      - - 153/40
+        - ticks: 528
+        - G3
+        - 104
+      - - '5'
+        - ticks: 2285
+        - D#4
+        - 119
+      - - 453/80
+        - ticks: 432
+        - G4
+        - 105
+      - - 29/5
+        - ticks: 595
+        - F4
+        - 111
+      - - 2569/384
+        - ticks: 845
+        - E3
+        - 114
+      - - '7'
+        - ticks: 1181
         - B3
-        - 108
+        - 115
+      - - 28243/3840
+        - ticks: 816
+        - D#4
+        - 113
+      - - 29251/3840
+        - ticks: 624
+        - F4
+        - 104
+      - - 30029/3840
+        - ticks: 509
+        - E4
+        - 112
       automation:
-      - id: iron_verdict_4_0
+      - id: duel_the_false_triumph_g_2
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 0
+            ticks: 6835
           value: 0
         - at:
-            ticks: 608
+            ticks: 6921
           value: 0
         - at:
-            ticks: 2179
-          value: 0
-        - at:
-            ticks: 2254
-          value: 44
-        - at:
-            ticks: 2329
-          value: 52
-        - at:
-            ticks: 2404
-          value: 17
-        - at:
-            ticks: 2479
-          value: -32
-        - at:
-            ticks: 2554
-          value: -55
-        - at:
-            ticks: 2629
-          value: -32
-        - at:
-            ticks: 2704
-          value: 17
-        - at:
-            ticks: 2779
-          value: 52
-        - at:
-            ticks: 2854
-          value: 44
-        - at:
-            ticks: 2929
-          value: 0
-        - at:
-            ticks: 3004
-          value: -44
-        - at:
-            ticks: 3079
-          value: -52
-        - at:
-            ticks: 3154
-          value: -16
-        - at:
-            ticks: 3229
-          value: 33
-        - at:
-            ticks: 3304
-          value: 55
-        - at:
-            ticks: 3379
-          value: 31
-        - at:
-            ticks: 3454
-          value: -18
-        - at:
-            ticks: 3529
-          value: -52
-        - at:
-            ticks: 3604
-          value: -44
-        - at:
-            ticks: 3679
-          value: 1
-        - at:
-            ticks: 3754
-          value: 45
-        - at:
-            ticks: 3829
-          value: 52
-        - at:
-            ticks: 3904
-          value: 16
-        - at:
-            ticks: 3979
-          value: -33
-        - at:
-            ticks: 4054
-          value: -55
-        - at:
-            ticks: 4129
-          value: -31
-        - at:
-            ticks: 4204
-          value: 19
-        - at:
-            ticks: 4279
-          value: 52
-        - at:
-            ticks: 4354
-          value: 43
-        - at:
-            ticks: 4429
-          value: -2
-        - at:
-            ticks: 4504
-          value: -45
-        - at:
-            ticks: 4579
-          value: -51
-        - at:
-            ticks: 4654
-          value: -15
-        - at:
-            ticks: 4729
-          value: 34
-        - at:
-            ticks: 4804
-          value: 55
-        - at:
-            ticks: 4879
-          value: 30
-        - at:
-            ticks: 4954
-          value: -19
-        - at:
-            ticks: 5044
-          value: 0
-        - at:
-            ticks: 5071
-          value: 0
-      - id: iron_verdict_4_2
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 7680
-          value: 0
-        - at:
-            ticks: 8039
-          value: 0
-        - at:
-            ticks: 8967
-          value: -1
-        - at:
-            ticks: 9042
-          value: 44
-        - at:
-            ticks: 9117
-          value: 52
-        - at:
-            ticks: 9192
-          value: 17
-        - at:
-            ticks: 9267
-          value: -32
-        - at:
-            ticks: 9342
-          value: -55
-        - at:
-            ticks: 9417
-          value: -32
-        - at:
-            ticks: 9492
-          value: 17
-        - at:
-            ticks: 9567
-          value: 52
-        - at:
-            ticks: 9642
-          value: 44
-        - at:
-            ticks: 9717
-          value: 0
-        - at:
-            ticks: 9792
-          value: -44
-        - at:
-            ticks: 9867
-          value: -52
-        - at:
-            ticks: 9942
-          value: -16
-        - at:
-            ticks: 10017
-          value: 33
-        - at:
-            ticks: 10092
-          value: 55
-        - at:
-            ticks: 10167
-          value: 32
-        - at:
-            ticks: 10242
-          value: -18
-        - at:
-            ticks: 10317
-          value: -52
-        - at:
-            ticks: 10392
-          value: -44
-        - at:
-            ticks: 10467
-          value: 1
-        - at:
-            ticks: 10542
-          value: 45
-        - at:
-            ticks: 10650
-          value: 0
-        - at:
-            ticks: 10677
-          value: 0
-      - id: iron_verdict_4_3
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12480
-          value: 0
-        - at:
-            ticks: 12756
-          value: 0
-        - at:
-            ticks: 13194
+            ticks: 7195
           value: 683
         - at:
-            ticks: 13470
-          value: 682
+            ticks: 7281
+          value: 723
         - at:
-            ticks: 13545
-          value: 727
-        - at:
-            ticks: 13620
-          value: 735
-        - at:
-            ticks: 13695
-          value: 700
-        - at:
-            ticks: 13770
+            ticks: 7355
           value: 651
         - at:
-            ticks: 13845
-          value: 628
+            ticks: 7517
+          value: 683
         - at:
-            ticks: 13920
+            ticks: 7557
+          value: 0
+      - id: duel_the_false_triumph_g_3
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 11704
+          value: 0
+        - at:
+            ticks: 12288
+          value: -683
+        - at:
+            ticks: 12472
+          value: -643
+        - at:
+            ticks: 12625
+          value: -715
+        - at:
+            ticks: 13018
+          value: -683
+        - at:
+            ticks: 13058
+          value: 0
+      - id: duel_the_false_triumph_g_7
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19474
+          value: 0
+        - at:
+            ticks: 20342
+          value: 683
+        - at:
+            ticks: 20616
+          value: 723
+        - at:
+            ticks: 20844
           value: 651
         - at:
-            ticks: 13995
-          value: 700
-        - at:
-            ticks: 14070
-          value: 735
-        - at:
-            ticks: 14145
-          value: 727
-        - at:
-            ticks: 14220
-          value: 682
-        - at:
-            ticks: 14295
-          value: 638
-        - at:
-            ticks: 14370
-          value: 631
-        - at:
-            ticks: 14445
-          value: 666
-        - at:
-            ticks: 14520
-          value: 715
-        - at:
-            ticks: 14595
-          value: 737
-        - at:
-            ticks: 14670
-          value: 714
-        - at:
-            ticks: 14759
+            ticks: 21447
           value: 683
         - at:
-            ticks: 14786
+            ticks: 21487
           value: 0
-      - id: iron_verdict_4_4
+      - id: duel_the_false_triumph_g_12
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 15360
+            ticks: 28243
           value: 0
         - at:
-            ticks: 15968
+            ticks: 28340
           value: 0
         - at:
-            ticks: 17539
-          value: 0
-        - at:
-            ticks: 17614
-          value: 44
-        - at:
-            ticks: 17689
-          value: 52
-        - at:
-            ticks: 17764
-          value: 17
-        - at:
-            ticks: 17839
-          value: -32
-        - at:
-            ticks: 17914
-          value: -55
-        - at:
-            ticks: 17989
-          value: -32
-        - at:
-            ticks: 18064
-          value: 17
-        - at:
-            ticks: 18139
-          value: 52
-        - at:
-            ticks: 18214
-          value: 44
-        - at:
-            ticks: 18289
-          value: 0
-        - at:
-            ticks: 18364
-          value: -44
-        - at:
-            ticks: 18439
-          value: -52
-        - at:
-            ticks: 18514
-          value: -16
-        - at:
-            ticks: 18589
-          value: 33
-        - at:
-            ticks: 18664
-          value: 55
-        - at:
-            ticks: 18739
-          value: 31
-        - at:
-            ticks: 18814
-          value: -18
-        - at:
-            ticks: 18889
-          value: -52
-        - at:
-            ticks: 18964
-          value: -44
-        - at:
-            ticks: 19039
-          value: 1
-        - at:
-            ticks: 19114
-          value: 45
-        - at:
-            ticks: 19189
-          value: 52
-        - at:
-            ticks: 19264
-          value: 16
-        - at:
-            ticks: 19339
-          value: -33
-        - at:
-            ticks: 19414
-          value: -55
-        - at:
-            ticks: 19489
-          value: -31
-        - at:
-            ticks: 19564
-          value: 19
-        - at:
-            ticks: 19639
-          value: 52
-        - at:
-            ticks: 19714
-          value: 43
-        - at:
-            ticks: 19789
-          value: -2
-        - at:
-            ticks: 19864
-          value: -45
-        - at:
-            ticks: 19939
-          value: -51
-        - at:
-            ticks: 20014
-          value: -15
-        - at:
-            ticks: 20089
-          value: 34
-        - at:
-            ticks: 20164
-          value: 55
-        - at:
-            ticks: 20239
-          value: 30
-        - at:
-            ticks: 20314
-          value: -19
-        - at:
-            ticks: 20404
-          value: 0
-        - at:
-            ticks: 20431
-          value: 0
-      - id: iron_verdict_4_6
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23455
-          value: 0
-        - at:
-            ticks: 24526
-          value: 0
-        - at:
-            ticks: 24601
-          value: 44
-        - at:
-            ticks: 24676
-          value: 52
-        - at:
-            ticks: 24751
-          value: 17
-        - at:
-            ticks: 24826
-          value: -32
-        - at:
-            ticks: 24901
-          value: -55
-        - at:
-            ticks: 24976
-          value: -32
-        - at:
-            ticks: 25051
-          value: 17
-        - at:
-            ticks: 25126
-          value: 52
-        - at:
-            ticks: 25201
-          value: 44
-        - at:
-            ticks: 25276
-          value: -1
-        - at:
-            ticks: 25351
-          value: -45
-        - at:
-            ticks: 25426
-          value: -52
-        - at:
-            ticks: 25501
-          value: -16
-        - at:
-            ticks: 25576
-          value: 33
-        - at:
-            ticks: 25651
-          value: 55
-        - at:
-            ticks: 25726
-          value: 31
-        - at:
-            ticks: 25801
-          value: -18
-        - at:
-            ticks: 25876
-          value: -52
-        - at:
-            ticks: 25951
-          value: -43
-        - at:
-            ticks: 26026
-          value: 2
-        - at:
-            ticks: 26101
-          value: 45
-        - at:
-            ticks: 26176
-          value: 51
-        - at:
-            ticks: 26251
-          value: 15
-        - at:
-            ticks: 26326
-          value: -34
-        - at:
-            ticks: 26401
-          value: -55
-        - at:
-            ticks: 26471
-          value: 0
-        - at:
-            ticks: 26498
-          value: 0
-      - id: iron_verdict_4_7
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27212
-          value: 0
-        - at:
-            ticks: 27737
+            ticks: 28651
           value: 683
         - at:
-            ticks: 28068
-          value: 682
+            ticks: 28748
+          value: 723
         - at:
-            ticks: 28143
-          value: 727
-        - at:
-            ticks: 28218
-          value: 735
-        - at:
-            ticks: 28293
-          value: 700
-        - at:
-            ticks: 28368
+            ticks: 28830
           value: 651
         - at:
-            ticks: 28443
-          value: 628
-        - at:
-            ticks: 28518
-          value: 650
-        - at:
-            ticks: 28593
-          value: 699
-        - at:
-            ticks: 28668
-          value: 735
-        - at:
-            ticks: 28743
-          value: 727
-        - at:
-            ticks: 28818
-          value: 682
-        - at:
-            ticks: 28893
-          value: 638
-        - at:
-            ticks: 28968
-          value: 631
-        - at:
-            ticks: 29043
-          value: 666
-        - at:
-            ticks: 29118
-          value: 715
-        - at:
-            ticks: 29193
-          value: 737
-        - at:
-            ticks: 29268
-          value: 714
-        - at:
-            ticks: 29343
-          value: 665
-        - at:
-            ticks: 29418
-          value: 630
-        - at:
-            ticks: 29493
-          value: 639
-        - at:
-            ticks: 29568
-          value: 684
-        - at:
-            ticks: 29620
+            ticks: 29021
           value: 683
         - at:
-            ticks: 29647
+            ticks: 29061
           value: 0
     - id: lead_guitar_breaking_the_columns
       at:
         bar: 49
         beat: 1
       events:
-      - - '0'
-        - ticks: 2765
+      - - 1/40
+        - ticks: 206
         - E4
-        - 121
-      - - 3/4
-        - ticks: 230
-        - E4
-        - 116
-      - - 13/16
-        - ticks: 230
-        - G4
-        - 111
-      - - 7/8
-        - ticks: 230
-        - A4
-        - 108
-      - - 15/16
-        - ticks: 230
-        - Bb4
-        - 105
-      - - '1'
-        - ticks: 2765
+        - 104
+      - - 7/80
+        - ticks: 206
         - F4
-        - 120
-      - - 7/4
-        - ticks: 230
+        - 107
+      - - 3/20
+        - ticks: 206
         - G4
-        - 118
-      - - 29/16
-        - ticks: 230
+        - 110
+      - - 17/80
+        - ticks: 206
         - A4
         - 113
-      - - 15/8
-        - ticks: 230
+      - - 11/40
+        - ticks: 206
         - Bb4
-        - 110
-      - - 31/16
-        - ticks: 230
+        - 104
+      - - 27/80
+        - ticks: 206
         - B4
         - 107
-      - - '2'
-        - ticks: 230
-        - E3
-        - 119
-      - - 33/16
-        - ticks: 230
-        - G3
-        - 114
-      - - 17/8
-        - ticks: 230
-        - Bb3
-        - 111
-      - - 35/16
-        - ticks: 230
-        - B3
-        - 108
-      - - 9/4
-        - ticks: 230
-        - D4
-        - 117
-      - - 37/16
-        - ticks: 230
-        - E4
-        - 116
-      - - 19/8
-        - ticks: 230
-        - G4
-        - 111
-      - - 39/16
-        - ticks: 230
-        - A4
-        - 108
-      - - 5/2
-        - ticks: 230
-        - Bb4
-        - 117
-      - - 41/16
-        - ticks: 230
-        - B4
-        - 114
-      - - 21/8
-        - ticks: 230
+      - - 2/5
+        - ticks: 206
         - D5
+        - 110
+      - - 37/80
+        - ticks: 206
+        - E5
         - 113
-      - - 43/16
-        - ticks: 230
-        - E5
-        - 108
-      - - 11/4
-        - ticks: 230
+      - - 21/40
+        - ticks: 206
         - D5
-        - 117
-      - - 45/16
-        - ticks: 230
+        - 104
+      - - 47/80
+        - ticks: 206
         - B4
-        - 114
-      - - 23/8
-        - ticks: 230
+        - 107
+      - - 13/20
+        - ticks: 206
         - Bb4
-        - 111
-      - - 47/16
-        - ticks: 230
-        - G4
         - 110
-      - - '3'
-        - ticks: 3456
-        - E5
-        - 124
-      - - '4'
-        - ticks: 2304
-        - Bb3
-        - 122
-      - - 75/16
-        - ticks: 1152
+      - - 57/80
+        - ticks: 206
+        - G4
+        - 113
+      - - 313/384
+        - ticks: 586
+        - E4
+        - 119
+      - - 81/40
+        - ticks: 206
+        - B3
+        - 104
+      - - 167/80
+        - ticks: 206
+        - D4
+        - 107
+      - - 43/20
+        - ticks: 206
+        - E4
+        - 110
+      - - 177/80
+        - ticks: 206
         - F4
-        - 110
-      - - '5'
-        - ticks: 3226
+        - 113
+      - - 91/40
+        - ticks: 206
         - G4
+        - 104
+      - - 187/80
+        - ticks: 206
+        - F4
+        - 107
+      - - 12/5
+        - ticks: 206
+        - E4
+        - 110
+      - - 197/80
+        - ticks: 206
+        - D4
+        - 113
+      - - 101/40
+        - ticks: 206
+        - B3
+        - 104
+      - - 207/80
+        - ticks: 206
+        - Bb3
+        - 107
+      - - 53/20
+        - ticks: 206
+        - G3
+        - 110
+      - - 217/80
+        - ticks: 206
+        - E3
+        - 113
+      - - 1081/384
+        - ticks: 586
+        - E4
+        - 119
+      - - 161/40
+        - ticks: 206
+        - E4
+        - 104
+      - - 327/80
+        - ticks: 206
+        - G4
+        - 107
+      - - 83/20
+        - ticks: 206
+        - A4
+        - 110
+      - - 337/80
+        - ticks: 206
+        - Bb4
+        - 113
+      - - 171/40
+        - ticks: 206
+        - B4
+        - 104
+      - - 347/80
+        - ticks: 206
+        - Bb4
+        - 107
+      - - 22/5
+        - ticks: 206
+        - A4
+        - 110
+      - - 357/80
+        - ticks: 206
+        - G4
+        - 113
+      - - 181/40
+        - ticks: 206
+        - E4
+        - 104
+      - - 367/80
+        - ticks: 206
+        - D4
+        - 107
+      - - 93/20
+        - ticks: 206
+        - B3
+        - 110
+      - - 377/80
+        - ticks: 206
+        - G3
+        - 113
+      - - 1849/384
+        - ticks: 586
+        - E4
         - 119
       - - '6'
-        - ticks: 230
-        - E4
-        - 119
-      - - 97/16
-        - ticks: 230
-        - G4
-        - 114
-      - - 49/8
-        - ticks: 230
-        - A4
-        - 111
-      - - 99/16
-        - ticks: 230
-        - Bb4
-        - 108
-      - - 25/4
-        - ticks: 230
-        - B4
-        - 117
-      - - 101/16
-        - ticks: 230
-        - D5
-        - 116
-      - - 51/8
-        - ticks: 230
-        - E5
-        - 111
-      - - 103/16
-        - ticks: 230
-        - D5
-        - 108
-      - - 13/2
-        - ticks: 1843
-        - E5
-        - 120
-      - - '7'
-        - ticks: 2765
+        - ticks: 2285
         - D#4
-        - 121
-      - - 125/16
-        - ticks: 691
-        - C4
-        - 110
+        - 119
+      - - 533/80
+        - ticks: 432
+        - G4
+        - 105
+      - - 34/5
+        - ticks: 595
+        - F4
+        - 111
+      - - 307/40
+        - ticks: 864
+        - E4
+        - 118
       automation:
-      - id: iron_verdict_5_0
+      - id: duel_breaking_the_columns_g_39
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 0
+            ticks: 23040
           value: 0
         - at:
-            ticks: 332
+            ticks: 23314
           value: 0
         - at:
-            ticks: 1188
-          value: -1
-        - at:
-            ticks: 1263
-          value: 44
-        - at:
-            ticks: 1338
-          value: 52
-        - at:
-            ticks: 1413
-          value: 17
-        - at:
-            ticks: 1488
-          value: -32
-        - at:
-            ticks: 1563
-          value: -55
-        - at:
-            ticks: 1638
-          value: -32
-        - at:
-            ticks: 1713
-          value: 17
-        - at:
-            ticks: 1788
-          value: 52
-        - at:
-            ticks: 1863
-          value: 44
-        - at:
-            ticks: 1938
-          value: 0
-        - at:
-            ticks: 2013
-          value: -44
-        - at:
-            ticks: 2088
-          value: -52
-        - at:
-            ticks: 2163
-          value: -16
-        - at:
-            ticks: 2238
-          value: 33
-        - at:
-            ticks: 2313
-          value: 55
-        - at:
-            ticks: 2388
-          value: 32
-        - at:
-            ticks: 2463
-          value: -18
-        - at:
-            ticks: 2538
-          value: -52
-        - at:
-            ticks: 2613
-          value: -44
-        - at:
-            ticks: 2688
-          value: 1
-        - at:
-            ticks: 2740
-          value: 0
-        - at:
-            ticks: 2767
-          value: 0
-      - id: iron_verdict_5_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 3840
-          value: 0
-        - at:
-            ticks: 4172
-          value: 0
-        - at:
-            ticks: 5028
-          value: -1
-        - at:
-            ticks: 5103
-          value: 44
-        - at:
-            ticks: 5178
-          value: 52
-        - at:
-            ticks: 5253
-          value: 17
-        - at:
-            ticks: 5328
-          value: -32
-        - at:
-            ticks: 5403
-          value: -55
-        - at:
-            ticks: 5478
-          value: -32
-        - at:
-            ticks: 5553
-          value: 17
-        - at:
-            ticks: 5628
-          value: 52
-        - at:
-            ticks: 5703
-          value: 44
-        - at:
-            ticks: 5778
-          value: 0
-        - at:
-            ticks: 5853
-          value: -44
-        - at:
-            ticks: 5928
-          value: -52
-        - at:
-            ticks: 6003
-          value: -16
-        - at:
-            ticks: 6078
-          value: 33
-        - at:
-            ticks: 6153
-          value: 55
-        - at:
-            ticks: 6228
-          value: 32
-        - at:
-            ticks: 6303
-          value: -18
-        - at:
-            ticks: 6378
-          value: -52
-        - at:
-            ticks: 6453
-          value: -44
-        - at:
-            ticks: 6528
-          value: 1
-        - at:
-            ticks: 6580
-          value: 0
-        - at:
-            ticks: 6607
-          value: 0
-      - id: iron_verdict_5_26
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 11520
-          value: 0
-        - at:
-            ticks: 11935
-          value: 0
-        - at:
-            ticks: 13006
-          value: 0
-        - at:
-            ticks: 13081
-          value: 44
-        - at:
-            ticks: 13156
-          value: 52
-        - at:
-            ticks: 13231
-          value: 17
-        - at:
-            ticks: 13306
-          value: -32
-        - at:
-            ticks: 13381
-          value: -55
-        - at:
-            ticks: 13456
-          value: -32
-        - at:
-            ticks: 13531
-          value: 17
-        - at:
-            ticks: 13606
-          value: 52
-        - at:
-            ticks: 13681
-          value: 44
-        - at:
-            ticks: 13756
-          value: -1
-        - at:
-            ticks: 13831
-          value: -45
-        - at:
-            ticks: 13906
-          value: -52
-        - at:
-            ticks: 13981
-          value: -16
-        - at:
-            ticks: 14056
-          value: 33
-        - at:
-            ticks: 14131
-          value: 55
-        - at:
-            ticks: 14206
-          value: 31
-        - at:
-            ticks: 14281
-          value: -18
-        - at:
-            ticks: 14356
-          value: -52
-        - at:
-            ticks: 14431
-          value: -43
-        - at:
-            ticks: 14506
-          value: 2
-        - at:
-            ticks: 14581
-          value: 45
-        - at:
-            ticks: 14656
-          value: 51
-        - at:
-            ticks: 14731
-          value: 15
-        - at:
-            ticks: 14806
-          value: -34
-        - at:
-            ticks: 14881
-          value: -55
-        - at:
-            ticks: 14951
-          value: 0
-        - at:
-            ticks: 14978
-          value: 0
-      - id: iron_verdict_5_27
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 15360
-          value: 0
-        - at:
-            ticks: 15636
-          value: 0
-        - at:
-            ticks: 16074
+            ticks: 24182
           value: 683
         - at:
-            ticks: 16350
-          value: 682
+            ticks: 24456
+          value: 723
         - at:
-            ticks: 16425
-          value: 727
-        - at:
-            ticks: 16500
-          value: 735
-        - at:
-            ticks: 16575
-          value: 700
-        - at:
-            ticks: 16650
+            ticks: 24684
           value: 651
         - at:
-            ticks: 16725
-          value: 628
-        - at:
-            ticks: 16800
-          value: 651
-        - at:
-            ticks: 16875
-          value: 700
-        - at:
-            ticks: 16950
-          value: 735
-        - at:
-            ticks: 17025
-          value: 727
-        - at:
-            ticks: 17100
-          value: 682
-        - at:
-            ticks: 17175
-          value: 638
-        - at:
-            ticks: 17250
-          value: 631
-        - at:
-            ticks: 17325
-          value: 666
-        - at:
-            ticks: 17400
-          value: 715
-        - at:
-            ticks: 17475
-          value: 737
-        - at:
-            ticks: 17550
-          value: 714
-        - at:
-            ticks: 17639
+            ticks: 25287
           value: 683
         - at:
-            ticks: 17666
-          value: 0
-      - id: iron_verdict_5_29
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19200
-          value: 0
-        - at:
-            ticks: 19587
-          value: 0
-        - at:
-            ticks: 20587
-          value: 0
-        - at:
-            ticks: 20662
-          value: 44
-        - at:
-            ticks: 20737
-          value: 52
-        - at:
-            ticks: 20812
-          value: 17
-        - at:
-            ticks: 20887
-          value: -32
-        - at:
-            ticks: 20962
-          value: -55
-        - at:
-            ticks: 21037
-          value: -32
-        - at:
-            ticks: 21112
-          value: 17
-        - at:
-            ticks: 21187
-          value: 52
-        - at:
-            ticks: 21262
-          value: 44
-        - at:
-            ticks: 21337
-          value: -1
-        - at:
-            ticks: 21412
-          value: -45
-        - at:
-            ticks: 21487
-          value: -52
-        - at:
-            ticks: 21562
-          value: -16
-        - at:
-            ticks: 21637
-          value: 33
-        - at:
-            ticks: 21712
-          value: 55
-        - at:
-            ticks: 21787
-          value: 31
-        - at:
-            ticks: 21862
-          value: -18
-        - at:
-            ticks: 21937
-          value: -52
-        - at:
-            ticks: 22012
-          value: -43
-        - at:
-            ticks: 22087
-          value: 2
-        - at:
-            ticks: 22162
-          value: 45
-        - at:
-            ticks: 22237
-          value: 51
-        - at:
-            ticks: 22312
-          value: 15
-        - at:
-            ticks: 22401
-          value: 0
-        - at:
-            ticks: 22428
-          value: 0
-      - id: iron_verdict_5_39
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27212
-          value: 0
-        - at:
-            ticks: 27737
-          value: 683
-        - at:
-            ticks: 28068
-          value: 682
-        - at:
-            ticks: 28143
-          value: 727
-        - at:
-            ticks: 28218
-          value: 735
-        - at:
-            ticks: 28293
-          value: 700
-        - at:
-            ticks: 28368
-          value: 651
-        - at:
-            ticks: 28443
-          value: 628
-        - at:
-            ticks: 28518
-          value: 650
-        - at:
-            ticks: 28593
-          value: 699
-        - at:
-            ticks: 28668
-          value: 735
-        - at:
-            ticks: 28743
-          value: 727
-        - at:
-            ticks: 28818
-          value: 682
-        - at:
-            ticks: 28893
-          value: 638
-        - at:
-            ticks: 28968
-          value: 631
-        - at:
-            ticks: 29043
-          value: 666
-        - at:
-            ticks: 29118
-          value: 715
-        - at:
-            ticks: 29193
-          value: 737
-        - at:
-            ticks: 29268
-          value: 714
-        - at:
-            ticks: 29343
-          value: 665
-        - at:
-            ticks: 29418
-          value: 630
-        - at:
-            ticks: 29493
-          value: 639
-        - at:
-            ticks: 29568
-          value: 684
-        - at:
-            ticks: 29620
-          value: 683
-        - at:
-            ticks: 29647
+            ticks: 25327
           value: 0
     - id: lead_guitar_no_throne
       at:
@@ -12803,731 +9846,127 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 3686
+        - ticks: 1584
         - E4
-        - 122
-      - - 9/8
-        - ticks: 2304
+        - 115
+      - - 19/40
+        - ticks: 480
         - G3
-        - 116
-      - - '2'
-        - ticks: 2765
-        - F4
-        - 118
-      - - 13/4
-        - ticks: 2765
-        - E4
-        - 120
-      - - '4'
-        - ticks: 3226
-        - E3
-        - 117
-      - - '5'
-        - ticks: 3226
+        - 100
+      - - 5/8
+        - ticks: 864
         - Bb3
-        - 120
-      - - '6'
-        - ticks: 2765
-        - D#4
-        - 119
-      - - 109/16
-        - ticks: 691
-        - F4
-        - 106
-      - - '7'
-        - ticks: 3226
+        - 116
+      - - 3379/3840
+        - ticks: 365
         - E4
-        - 121
+        - 104
+      - - '2'
+        - ticks: 1968
+        - E4
+        - 119
+      - - 103/40
+        - ticks: 586
+        - Bb3
+        - 111
+      - - 221/80
+        - ticks: 816
+        - F3
+        - 110
+      - - '4'
+        - ticks: 1536
+        - F4
+        - 114
+      - - 3433/768
+        - ticks: 461
+        - E4
+        - 100
+      - - 371/80
+        - ticks: 624
+        - Bb3
+        - 111
+      - - 193/40
+        - ticks: 528
+        - G3
+        - 104
+      - - '6'
+        - ticks: 557
+        - G3
+        - 102
+      - - 247/40
+        - ticks: 490
+        - A3
+        - 106
+      - - 24307/3840
+        - ticks: 499
+        - B3
+        - 107
+      - - 13/2
+        - ticks: 490
+        - D4
+        - 110
+      - - 25613/3840
+        - ticks: 1075
+        - E4
+        - 117
+      - - 617/80
+        - ticks: 787
+        - B3
+        - 113
       automation:
-      - id: iron_verdict_6_0
+      - id: duel_no_throne_g_2
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
-            ticks: 0
+            ticks: 2400
           value: 0
         - at:
-            ticks: 442
+            ticks: 2503
           value: 0
         - at:
-            ticks: 1584
-          value: -1
+            ticks: 2832
+          value: 683
         - at:
-            ticks: 1659
-          value: 44
+            ticks: 2935
+          value: 723
         - at:
-            ticks: 1734
-          value: 52
+            ticks: 3022
+          value: 651
         - at:
-            ticks: 1809
-          value: 17
+            ticks: 3226
+          value: 683
         - at:
-            ticks: 1884
-          value: -32
-        - at:
-            ticks: 1959
-          value: -55
-        - at:
-            ticks: 2034
-          value: -32
-        - at:
-            ticks: 2109
-          value: 17
-        - at:
-            ticks: 2184
-          value: 52
-        - at:
-            ticks: 2259
-          value: 44
-        - at:
-            ticks: 2334
+            ticks: 3266
           value: 0
-        - at:
-            ticks: 2409
-          value: -44
-        - at:
-            ticks: 2484
-          value: -52
-        - at:
-            ticks: 2559
-          value: -16
-        - at:
-            ticks: 2634
-          value: 32
-        - at:
-            ticks: 2709
-          value: 55
-        - at:
-            ticks: 2784
-          value: 32
-        - at:
-            ticks: 2859
-          value: -18
-        - at:
-            ticks: 2934
-          value: -52
-        - at:
-            ticks: 3009
-          value: -44
-        - at:
-            ticks: 3084
-          value: 1
-        - at:
-            ticks: 3159
-          value: 45
-        - at:
-            ticks: 3234
-          value: 52
-        - at:
-            ticks: 3309
-          value: 16
-        - at:
-            ticks: 3384
-          value: -33
-        - at:
-            ticks: 3459
-          value: -55
-        - at:
-            ticks: 3534
-          value: -31
-        - at:
-            ticks: 3609
-          value: 18
-        - at:
-            ticks: 3661
-          value: 0
-        - at:
-            ticks: 3688
-          value: 0
-      - id: iron_verdict_6_1
+      - id: duel_no_throne_g_7
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 4320
-          value: 0
-        - at:
-            ticks: 4596
-          value: 0
-        - at:
-            ticks: 5310
-          value: 0
-        - at:
-            ticks: 5385
-          value: 44
-        - at:
-            ticks: 5460
-          value: 52
-        - at:
-            ticks: 5535
-          value: 17
-        - at:
-            ticks: 5610
-          value: -32
-        - at:
-            ticks: 5685
-          value: -55
-        - at:
-            ticks: 5760
-          value: -32
-        - at:
-            ticks: 5835
-          value: 17
-        - at:
-            ticks: 5910
-          value: 52
-        - at:
-            ticks: 5985
-          value: 44
-        - at:
-            ticks: 6060
-          value: 0
-        - at:
-            ticks: 6135
-          value: -44
-        - at:
-            ticks: 6210
-          value: -52
-        - at:
-            ticks: 6285
-          value: -16
-        - at:
-            ticks: 6360
-          value: 33
-        - at:
-            ticks: 6435
-          value: 55
-        - at:
-            ticks: 6510
-          value: 31
-        - at:
-            ticks: 6599
-          value: 0
-        - at:
-            ticks: 6626
-          value: 0
-      - id: iron_verdict_6_2
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 7680
-          value: 0
-        - at:
-            ticks: 8012
-          value: 0
-        - at:
-            ticks: 8868
-          value: -1
-        - at:
-            ticks: 8943
-          value: 44
-        - at:
-            ticks: 9018
-          value: 52
-        - at:
-            ticks: 9093
-          value: 17
-        - at:
-            ticks: 9168
-          value: -32
-        - at:
-            ticks: 9243
-          value: -55
-        - at:
-            ticks: 9318
-          value: -32
-        - at:
-            ticks: 9393
-          value: 17
-        - at:
-            ticks: 9468
-          value: 52
-        - at:
-            ticks: 9543
-          value: 44
-        - at:
-            ticks: 9618
-          value: 0
-        - at:
-            ticks: 9693
-          value: -44
-        - at:
-            ticks: 9768
-          value: -52
-        - at:
-            ticks: 9843
-          value: -16
-        - at:
-            ticks: 9918
-          value: 33
-        - at:
-            ticks: 9993
-          value: 55
-        - at:
-            ticks: 10068
-          value: 32
-        - at:
-            ticks: 10143
-          value: -18
-        - at:
-            ticks: 10218
-          value: -52
-        - at:
-            ticks: 10293
-          value: -44
-        - at:
-            ticks: 10368
-          value: 1
-        - at:
-            ticks: 10420
-          value: 0
-        - at:
-            ticks: 10447
-          value: 0
-      - id: iron_verdict_6_3
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12480
-          value: 0
-        - at:
-            ticks: 12812
-          value: 0
-        - at:
-            ticks: 13668
-          value: -1
-        - at:
-            ticks: 13743
-          value: 44
-        - at:
-            ticks: 13818
-          value: 52
-        - at:
-            ticks: 13893
-          value: 17
-        - at:
-            ticks: 13968
-          value: -32
-        - at:
-            ticks: 14043
-          value: -55
-        - at:
-            ticks: 14118
-          value: -32
-        - at:
-            ticks: 14193
-          value: 17
-        - at:
-            ticks: 14268
-          value: 52
-        - at:
-            ticks: 14343
-          value: 44
-        - at:
-            ticks: 14418
-          value: 0
-        - at:
-            ticks: 14493
-          value: -44
-        - at:
-            ticks: 14568
-          value: -52
-        - at:
-            ticks: 14643
-          value: -16
-        - at:
-            ticks: 14718
-          value: 33
-        - at:
-            ticks: 14793
-          value: 55
-        - at:
-            ticks: 14868
-          value: 32
-        - at:
-            ticks: 14943
-          value: -18
-        - at:
-            ticks: 15018
-          value: -52
-        - at:
-            ticks: 15093
-          value: -44
-        - at:
-            ticks: 15168
-          value: 1
-        - at:
-            ticks: 15220
-          value: 0
-        - at:
-            ticks: 15247
-          value: 0
-      - id: iron_verdict_6_4
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15747
+            ticks: 15544
           value: 0
         - at:
-            ticks: 16747
-          value: 0
+            ticks: 16128
+          value: -683
         - at:
-            ticks: 16822
-          value: 44
+            ticks: 16312
+          value: -643
         - at:
-            ticks: 16897
-          value: 52
+            ticks: 16465
+          value: -715
         - at:
-            ticks: 16972
-          value: 17
+            ticks: 16858
+          value: -683
         - at:
-            ticks: 17047
-          value: -32
-        - at:
-            ticks: 17122
-          value: -55
-        - at:
-            ticks: 17197
-          value: -32
-        - at:
-            ticks: 17272
-          value: 17
-        - at:
-            ticks: 17347
-          value: 52
-        - at:
-            ticks: 17422
-          value: 44
-        - at:
-            ticks: 17497
-          value: -1
-        - at:
-            ticks: 17572
-          value: -45
-        - at:
-            ticks: 17647
-          value: -52
-        - at:
-            ticks: 17722
-          value: -16
-        - at:
-            ticks: 17797
-          value: 33
-        - at:
-            ticks: 17872
-          value: 55
-        - at:
-            ticks: 17947
-          value: 31
-        - at:
-            ticks: 18022
-          value: -18
-        - at:
-            ticks: 18097
-          value: -52
-        - at:
-            ticks: 18172
-          value: -43
-        - at:
-            ticks: 18247
-          value: 2
-        - at:
-            ticks: 18322
-          value: 45
-        - at:
-            ticks: 18397
-          value: 51
-        - at:
-            ticks: 18472
-          value: 15
-        - at:
-            ticks: 18561
-          value: 0
-        - at:
-            ticks: 18588
-          value: 0
-      - id: iron_verdict_6_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19200
-          value: 0
-        - at:
-            ticks: 19587
-          value: 0
-        - at:
-            ticks: 20200
-          value: 683
-        - at:
-            ticks: 20587
-          value: 683
-        - at:
-            ticks: 20662
-          value: 727
-        - at:
-            ticks: 20737
-          value: 735
-        - at:
-            ticks: 20812
-          value: 699
-        - at:
-            ticks: 20887
-          value: 650
-        - at:
-            ticks: 20962
-          value: 628
-        - at:
-            ticks: 21037
-          value: 651
-        - at:
-            ticks: 21112
-          value: 700
-        - at:
-            ticks: 21187
-          value: 735
-        - at:
-            ticks: 21262
-          value: 726
-        - at:
-            ticks: 21337
-          value: 682
-        - at:
-            ticks: 21412
-          value: 638
-        - at:
-            ticks: 21487
-          value: 631
-        - at:
-            ticks: 21562
-          value: 667
-        - at:
-            ticks: 21637
-          value: 716
-        - at:
-            ticks: 21712
-          value: 737
-        - at:
-            ticks: 21787
-          value: 714
-        - at:
-            ticks: 21862
-          value: 665
-        - at:
-            ticks: 21937
-          value: 630
-        - at:
-            ticks: 22012
-          value: 639
-        - at:
-            ticks: 22087
-          value: 684
-        - at:
-            ticks: 22162
-          value: 728
-        - at:
-            ticks: 22237
-          value: 734
-        - at:
-            ticks: 22312
-          value: 698
-        - at:
-            ticks: 22401
-          value: 683
-        - at:
-            ticks: 22428
-          value: 0
-      - id: iron_verdict_6_6
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23372
-          value: 0
-        - at:
-            ticks: 23897
-          value: 683
-        - at:
-            ticks: 24228
-          value: 682
-        - at:
-            ticks: 24303
-          value: 727
-        - at:
-            ticks: 24378
-          value: 735
-        - at:
-            ticks: 24453
-          value: 700
-        - at:
-            ticks: 24528
-          value: 651
-        - at:
-            ticks: 24603
-          value: 628
-        - at:
-            ticks: 24678
-          value: 650
-        - at:
-            ticks: 24753
-          value: 699
-        - at:
-            ticks: 24828
-          value: 735
-        - at:
-            ticks: 24903
-          value: 727
-        - at:
-            ticks: 24978
-          value: 682
-        - at:
-            ticks: 25053
-          value: 638
-        - at:
-            ticks: 25128
-          value: 631
-        - at:
-            ticks: 25203
-          value: 666
-        - at:
-            ticks: 25278
-          value: 715
-        - at:
-            ticks: 25353
-          value: 737
-        - at:
-            ticks: 25428
-          value: 714
-        - at:
-            ticks: 25503
-          value: 665
-        - at:
-            ticks: 25578
-          value: 630
-        - at:
-            ticks: 25653
-          value: 639
-        - at:
-            ticks: 25728
-          value: 684
-        - at:
-            ticks: 25780
-          value: 683
-        - at:
-            ticks: 25807
-          value: 0
-      - id: iron_verdict_6_8
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 26880
-          value: 0
-        - at:
-            ticks: 27267
-          value: 0
-        - at:
-            ticks: 28267
-          value: 0
-        - at:
-            ticks: 28342
-          value: 44
-        - at:
-            ticks: 28417
-          value: 52
-        - at:
-            ticks: 28492
-          value: 17
-        - at:
-            ticks: 28567
-          value: -32
-        - at:
-            ticks: 28642
-          value: -55
-        - at:
-            ticks: 28717
-          value: -32
-        - at:
-            ticks: 28792
-          value: 17
-        - at:
-            ticks: 28867
-          value: 52
-        - at:
-            ticks: 28942
-          value: 44
-        - at:
-            ticks: 29017
-          value: -1
-        - at:
-            ticks: 29092
-          value: -45
-        - at:
-            ticks: 29167
-          value: -52
-        - at:
-            ticks: 29242
-          value: -16
-        - at:
-            ticks: 29317
-          value: 33
-        - at:
-            ticks: 29392
-          value: 55
-        - at:
-            ticks: 29467
-          value: 31
-        - at:
-            ticks: 29542
-          value: -18
-        - at:
-            ticks: 29617
-          value: -52
-        - at:
-            ticks: 29692
-          value: -43
-        - at:
-            ticks: 29767
-          value: 2
-        - at:
-            ticks: 29842
-          value: 45
-        - at:
-            ticks: 29917
-          value: 51
-        - at:
-            ticks: 29992
-          value: 15
-        - at:
-            ticks: 30081
-          value: 0
-        - at:
-            ticks: 30108
+            ticks: 16898
           value: 0
     - id: lead_guitar_iron_sky_falls
       at:
@@ -13535,669 +9974,146 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 4147
-        - E3
-        - 115
-      - - 9/8
-        - ticks: 2765
-        - F4
-        - 117
-      - - '2'
-        - ticks: 3226
-        - G4
-        - 121
-      - - 25/8
-        - ticks: 2765
-        - Bb3
-        - 121
-      - - '4'
-        - ticks: 3226
-        - E4
-        - 120
-      - - '5'
-        - ticks: 2995
-        - F4
-        - 120
-      - - '6'
-        - ticks: 2765
-        - D#4
-        - 121
-      - - '7'
-        - ticks: 1843
-        - B3
-        - 116
-      - - 15/2
-        - ticks: 1152
+        - ticks: 1968
         - E4
         - 119
-      - - 63/8
-        - ticks: 461
+      - - 23/40
+        - ticks: 586
+        - Bb3
+        - 111
+      - - 61/80
+        - ticks: 816
+        - F3
+        - 110
+      - - '2'
+        - ticks: 1536
         - F4
+        - 114
+      - - 1897/768
+        - ticks: 461
+        - E4
+        - 100
+      - - 211/80
+        - ticks: 624
+        - Bb3
+        - 111
+      - - 113/40
+        - ticks: 528
+        - G3
+        - 104
+      - - '4'
+        - ticks: 2285
+        - D#4
+        - 119
+      - - 373/80
+        - ticks: 432
+        - G4
         - 105
+      - - 24/5
+        - ticks: 595
+        - F4
+        - 111
+      - - '6'
+        - ticks: 1181
+        - B3
+        - 115
+      - - 24403/3840
+        - ticks: 816
+        - D#4
+        - 113
+      - - 25411/3840
+        - ticks: 624
+        - F4
+        - 104
+      - - 26189/3840
+        - ticks: 509
+        - E4
+        - 112
+      - - 29587/3840
+        - ticks: 797
+        - B3
+        - 117
       automation:
-      - id: iron_verdict_7_0
+      - id: duel_iron_sky_falls_g_3
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 0
-          value: 0
-        - at:
-            ticks: 498
-          value: 0
-        - at:
-            ticks: 1783
-          value: 0
-        - at:
-            ticks: 1858
-          value: 44
-        - at:
-            ticks: 1933
-          value: 52
-        - at:
-            ticks: 2008
-          value: 17
-        - at:
-            ticks: 2083
-          value: -32
-        - at:
-            ticks: 2158
-          value: -55
-        - at:
-            ticks: 2233
-          value: -32
-        - at:
-            ticks: 2308
-          value: 17
-        - at:
-            ticks: 2383
-          value: 52
-        - at:
-            ticks: 2458
-          value: 44
-        - at:
-            ticks: 2533
-          value: -1
-        - at:
-            ticks: 2608
-          value: -45
-        - at:
-            ticks: 2683
-          value: -52
-        - at:
-            ticks: 2758
-          value: -16
-        - at:
-            ticks: 2833
-          value: 33
-        - at:
-            ticks: 2908
-          value: 55
-        - at:
-            ticks: 2983
-          value: 31
-        - at:
-            ticks: 3058
-          value: -18
-        - at:
-            ticks: 3133
-          value: -52
-        - at:
-            ticks: 3208
-          value: -43
-        - at:
-            ticks: 3283
-          value: 2
-        - at:
-            ticks: 3358
-          value: 45
-        - at:
-            ticks: 3433
-          value: 51
-        - at:
-            ticks: 3508
-          value: 15
-        - at:
-            ticks: 3583
-          value: -34
-        - at:
-            ticks: 3658
-          value: -55
-        - at:
-            ticks: 3733
-          value: -30
-        - at:
-            ticks: 3808
-          value: 19
-        - at:
-            ticks: 3883
-          value: 53
-        - at:
-            ticks: 3958
-          value: 43
-        - at:
-            ticks: 4033
-          value: -2
-        - at:
-            ticks: 4122
-          value: 0
-        - at:
-            ticks: 4149
-          value: 0
-      - id: iron_verdict_7_1
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 4320
-          value: 0
-        - at:
-            ticks: 4652
-          value: 0
-        - at:
-            ticks: 5508
-          value: -1
-        - at:
-            ticks: 5583
-          value: 44
-        - at:
-            ticks: 5658
-          value: 52
-        - at:
-            ticks: 5733
-          value: 17
-        - at:
-            ticks: 5808
-          value: -32
-        - at:
-            ticks: 5883
-          value: -55
-        - at:
-            ticks: 5958
-          value: -32
-        - at:
-            ticks: 6033
-          value: 17
-        - at:
-            ticks: 6108
-          value: 52
-        - at:
-            ticks: 6183
-          value: 44
-        - at:
-            ticks: 6258
-          value: 0
-        - at:
-            ticks: 6333
-          value: -44
-        - at:
-            ticks: 6408
-          value: -52
-        - at:
-            ticks: 6483
-          value: -16
-        - at:
-            ticks: 6558
-          value: 33
-        - at:
-            ticks: 6633
-          value: 55
-        - at:
-            ticks: 6708
-          value: 32
-        - at:
-            ticks: 6783
-          value: -18
-        - at:
-            ticks: 6858
-          value: -52
-        - at:
-            ticks: 6933
-          value: -44
-        - at:
-            ticks: 7008
-          value: 1
-        - at:
-            ticks: 7060
-          value: 0
-        - at:
-            ticks: 7087
-          value: 0
-      - id: iron_verdict_7_2
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 7680
           value: 0
         - at:
-            ticks: 8067
+            ticks: 7864
           value: 0
         - at:
-            ticks: 9067
+            ticks: 8448
+          value: -683
+        - at:
+            ticks: 8632
+          value: -643
+        - at:
+            ticks: 8785
+          value: -715
+        - at:
+            ticks: 9178
+          value: -683
+        - at:
+            ticks: 9218
           value: 0
-        - at:
-            ticks: 9142
-          value: 44
-        - at:
-            ticks: 9217
-          value: 52
-        - at:
-            ticks: 9292
-          value: 17
-        - at:
-            ticks: 9367
-          value: -32
-        - at:
-            ticks: 9442
-          value: -55
-        - at:
-            ticks: 9517
-          value: -32
-        - at:
-            ticks: 9592
-          value: 17
-        - at:
-            ticks: 9667
-          value: 52
-        - at:
-            ticks: 9742
-          value: 44
-        - at:
-            ticks: 9817
-          value: -1
-        - at:
-            ticks: 9892
-          value: -45
-        - at:
-            ticks: 9967
-          value: -52
-        - at:
-            ticks: 10042
-          value: -16
-        - at:
-            ticks: 10117
-          value: 33
-        - at:
-            ticks: 10192
-          value: 55
-        - at:
-            ticks: 10267
-          value: 31
-        - at:
-            ticks: 10342
-          value: -18
-        - at:
-            ticks: 10417
-          value: -52
-        - at:
-            ticks: 10492
-          value: -43
-        - at:
-            ticks: 10567
-          value: 2
-        - at:
-            ticks: 10642
-          value: 45
-        - at:
-            ticks: 10717
-          value: 51
-        - at:
-            ticks: 10792
-          value: 15
-        - at:
-            ticks: 10881
-          value: 0
-        - at:
-            ticks: 10908
-          value: 0
-      - id: iron_verdict_7_3
+      - id: duel_iron_sky_falls_g_7
         pitch_bend: 0
-        interpolation: smooth
+        interpolation: linear
         resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 12000
-          value: 0
-        - at:
-            ticks: 12332
-          value: 0
-        - at:
-            ticks: 12857
-          value: 683
-        - at:
-            ticks: 13188
-          value: 682
-        - at:
-            ticks: 13263
-          value: 727
-        - at:
-            ticks: 13338
-          value: 735
-        - at:
-            ticks: 13413
-          value: 700
-        - at:
-            ticks: 13488
-          value: 651
-        - at:
-            ticks: 13563
-          value: 628
-        - at:
-            ticks: 13638
-          value: 650
-        - at:
-            ticks: 13713
-          value: 699
-        - at:
-            ticks: 13788
-          value: 735
-        - at:
-            ticks: 13863
-          value: 727
-        - at:
-            ticks: 13938
-          value: 682
-        - at:
-            ticks: 14013
-          value: 638
-        - at:
-            ticks: 14088
-          value: 631
-        - at:
-            ticks: 14163
-          value: 666
-        - at:
-            ticks: 14238
-          value: 715
-        - at:
-            ticks: 14313
-          value: 737
-        - at:
-            ticks: 14388
-          value: 714
-        - at:
-            ticks: 14463
-          value: 665
-        - at:
-            ticks: 14538
-          value: 630
-        - at:
-            ticks: 14613
-          value: 639
-        - at:
-            ticks: 14688
-          value: 684
-        - at:
-            ticks: 14740
-          value: 683
-        - at:
-            ticks: 14767
-          value: 0
-      - id: iron_verdict_7_4
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
+          ticks: 40
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15747
+            ticks: 15634
           value: 0
         - at:
-            ticks: 16747
-          value: 0
-        - at:
-            ticks: 16822
-          value: 44
-        - at:
-            ticks: 16897
-          value: 52
-        - at:
-            ticks: 16972
-          value: 17
-        - at:
-            ticks: 17047
-          value: -32
-        - at:
-            ticks: 17122
-          value: -55
-        - at:
-            ticks: 17197
-          value: -32
-        - at:
-            ticks: 17272
-          value: 17
-        - at:
-            ticks: 17347
-          value: 52
-        - at:
-            ticks: 17422
-          value: 44
-        - at:
-            ticks: 17497
-          value: -1
-        - at:
-            ticks: 17572
-          value: -45
-        - at:
-            ticks: 17647
-          value: -52
-        - at:
-            ticks: 17722
-          value: -16
-        - at:
-            ticks: 17797
-          value: 33
-        - at:
-            ticks: 17872
-          value: 55
-        - at:
-            ticks: 17947
-          value: 31
-        - at:
-            ticks: 18022
-          value: -18
-        - at:
-            ticks: 18097
-          value: -52
-        - at:
-            ticks: 18172
-          value: -43
-        - at:
-            ticks: 18247
-          value: 2
-        - at:
-            ticks: 18322
-          value: 45
-        - at:
-            ticks: 18397
-          value: 51
-        - at:
-            ticks: 18472
-          value: 15
-        - at:
-            ticks: 18561
-          value: 0
-        - at:
-            ticks: 18588
-          value: 0
-      - id: iron_verdict_7_5
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 19200
-          value: 0
-        - at:
-            ticks: 19559
-          value: 0
-        - at:
-            ticks: 20487
-          value: -1
-        - at:
-            ticks: 20562
-          value: 44
-        - at:
-            ticks: 20637
-          value: 52
-        - at:
-            ticks: 20712
-          value: 17
-        - at:
-            ticks: 20787
-          value: -32
-        - at:
-            ticks: 20862
-          value: -55
-        - at:
-            ticks: 20937
-          value: -32
-        - at:
-            ticks: 21012
-          value: 17
-        - at:
-            ticks: 21087
-          value: 52
-        - at:
-            ticks: 21162
-          value: 44
-        - at:
-            ticks: 21237
-          value: 0
-        - at:
-            ticks: 21312
-          value: -44
-        - at:
-            ticks: 21387
-          value: -52
-        - at:
-            ticks: 21462
-          value: -16
-        - at:
-            ticks: 21537
-          value: 33
-        - at:
-            ticks: 21612
-          value: 55
-        - at:
-            ticks: 21687
-          value: 32
-        - at:
-            ticks: 21762
-          value: -18
-        - at:
-            ticks: 21837
-          value: -52
-        - at:
-            ticks: 21912
-          value: -44
-        - at:
-            ticks: 21987
-          value: 1
-        - at:
-            ticks: 22062
-          value: 45
-        - at:
-            ticks: 22170
-          value: 0
-        - at:
-            ticks: 22197
-          value: 0
-      - id: iron_verdict_7_6
-        pitch_bend: 0
-        interpolation: smooth
-        resolution:
-          ticks: 60
-        points:
-        - at:
-            ticks: 23040
-          value: 0
-        - at:
-            ticks: 23372
-          value: 0
-        - at:
-            ticks: 23897
+            ticks: 16502
           value: 683
         - at:
-            ticks: 24228
-          value: 682
+            ticks: 16776
+          value: 723
         - at:
-            ticks: 24303
-          value: 727
-        - at:
-            ticks: 24378
-          value: 735
-        - at:
-            ticks: 24453
-          value: 700
-        - at:
-            ticks: 24528
+            ticks: 17004
           value: 651
         - at:
-            ticks: 24603
-          value: 628
-        - at:
-            ticks: 24678
-          value: 650
-        - at:
-            ticks: 24753
-          value: 699
-        - at:
-            ticks: 24828
-          value: 735
-        - at:
-            ticks: 24903
-          value: 727
-        - at:
-            ticks: 24978
-          value: 682
-        - at:
-            ticks: 25053
-          value: 638
-        - at:
-            ticks: 25128
-          value: 631
-        - at:
-            ticks: 25203
-          value: 666
-        - at:
-            ticks: 25278
-          value: 715
-        - at:
-            ticks: 25353
-          value: 737
-        - at:
-            ticks: 25428
-          value: 714
-        - at:
-            ticks: 25503
-          value: 665
-        - at:
-            ticks: 25578
-          value: 630
-        - at:
-            ticks: 25653
-          value: 639
-        - at:
-            ticks: 25728
-          value: 684
-        - at:
-            ticks: 25780
+            ticks: 17607
           value: 683
         - at:
-            ticks: 25807
+            ticks: 17647
+          value: 0
+      - id: duel_iron_sky_falls_g_11
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 40
+        points:
+        - at:
+            ticks: 24403
+          value: 0
+        - at:
+            ticks: 24500
+          value: 0
+        - at:
+            ticks: 24811
+          value: 683
+        - at:
+            ticks: 24908
+          value: 723
+        - at:
+            ticks: 24990
+          value: 651
+        - at:
+            ticks: 25181
+          value: 683
+        - at:
+            ticks: 25221
           value: 0
 - id: drum_ornaments_part
   instrument: kit_ornaments
@@ -16621,206 +12537,2107 @@ parts:
         bar: 1
         beat: 1
       events:
-      - - 3/2
-        - 1/8
-        - F5
-        - 94
-      - - 13/8
-        - 1/8
+      - - '1'
+        - ticks: 2141
         - E5
-        - 92
-      - - 7/2
-        - 1/8
+        - 118
+      - - 3149/1920
+        - ticks: 509
         - F5
-        - 94
-      - - 29/8
-        - 1/8
+        - 112
+      - - 6941/3840
+        - ticks: 605
         - E5
-        - 92
-      - - 11/2
-        - 1/8
-        - F5
-        - 94
-      - - 45/8
-        - 1/8
-        - E5
-        - 92
-      - - 15/2
-        - 1/8
-        - F5
-        - 94
-      - - 61/8
-        - 1/8
-        - E5
-        - 92
-      - - 125/16
-        - 3/16
+        - 110
+      - - '3'
+        - ticks: 1190
         - Bb4
-        - 97
+        - 116
+      - - 12931/3840
+        - ticks: 538
+        - B4
+        - 111
+      - - 283/80
+        - ticks: 634
+        - D5
+        - 108
+      - - 1439/384
+        - ticks: 797
+        - E5
+        - 115
+      - - '5'
+        - ticks: 1728
+        - F5
+        - 119
+      - - 11/2
+        - ticks: 576
+        - Bb4
+        - 109
+      - - 21859/3840
+        - ticks: 912
+        - B4
+        - 119
+      - - 67/10
+        - ticks: 874
+        - F5
+        - 114
+      - - '7'
+        - ticks: 461
+        - B4
+        - 103
+      - - 13723/1920
+        - ticks: 451
+        - D5
+        - 110
+      - - 14011/1920
+        - ticks: 451
+        - E5
+        - 114
+      - - 14333/1920
+        - ticks: 768
+        - F5
+        - 118
+      - - 14803/1920
+        - ticks: 902
+        - E5
+        - 111
+      automation:
+      - id: duel_preroll_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3840
+          - 77
+        - - ticks: 4610
+          - 109
+        - - ticks: 5488
+          - 101
+        - - ticks: 5969
+          - 88
+        - - ticks: 6298
+          - 77
+        - - ticks: 6481
+          - 109
+        - - ticks: 6689
+          - 101
+        - - ticks: 6795
+          - 88
+        - - ticks: 6941
+          - 77
+        - - ticks: 7158
+          - 109
+        - - ticks: 7406
+          - 101
+        - - ticks: 7534
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 11948
+          - 109
+        - - ticks: 12436
+          - 101
+        - - ticks: 12698
+          - 88
+        - - ticks: 12931
+          - 77
+        - - ticks: 13124
+          - 109
+        - - ticks: 13345
+          - 101
+        - - ticks: 13457
+          - 88
+        - - ticks: 13584
+          - 77
+        - - ticks: 13812
+          - 109
+        - - ticks: 14072
+          - 101
+        - - ticks: 14206
+          - 88
+        - - ticks: 14390
+          - 77
+        - - ticks: 14676
+          - 109
+        - - ticks: 15003
+          - 101
+        - - ticks: 15175
+          - 88
+        - - ticks: 19200
+          - 77
+        - - ticks: 19822
+          - 109
+        - - ticks: 20530
+          - 101
+        - - ticks: 20916
+          - 88
+        - - ticks: 21120
+          - 77
+        - - ticks: 21327
+          - 109
+        - - ticks: 21563
+          - 101
+        - - ticks: 21684
+          - 88
+        - - ticks: 21859
+          - 77
+        - - ticks: 22187
+          - 109
+        - - ticks: 22561
+          - 101
+        - - ticks: 22759
+          - 88
+        - - ticks: 25728
+          - 77
+        - - ticks: 26042
+          - 109
+        - - ticks: 26400
+          - 101
+        - - ticks: 26590
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27045
+          - 109
+        - - ticks: 27234
+          - 101
+        - - ticks: 27329
+          - 88
+        - - ticks: 27446
+          - 77
+        - - ticks: 27608
+          - 109
+        - - ticks: 27793
+          - 101
+        - - ticks: 27885
+          - 88
+        - - ticks: 28022
+          - 77
+        - - ticks: 28184
+          - 109
+        - - ticks: 28369
+          - 101
+        - - ticks: 28461
+          - 88
+        - - ticks: 28666
+          - 77
+        - - ticks: 28942
+          - 109
+        - - ticks: 29257
+          - 101
+        - - ticks: 29422
+          - 88
+        - - ticks: 29606
+          - 77
+        - - ticks: 29930
+          - 109
+        - - ticks: 30300
+          - 101
+        - - ticks: 30496
+          - 88
+    - id: solo_violin_iron_gate
+      at:
+        bar: 9
+        beat: 1
+      events:
+      - - '1'
+        - ticks: 1248
+        - F5
+        - 108
+      - - 5309/3840
+        - ticks: 864
+        - E5
+        - 108
+      - - 6307/3840
+        - ticks: 547
+        - G5
+        - 111
+      - - 3509/1920
+        - ticks: 490
+        - F5
+        - 104
+      - - '3'
+        - ticks: 1190
+        - Bb4
+        - 116
+      - - 12931/3840
+        - ticks: 538
+        - B4
+        - 111
+      - - 283/80
+        - ticks: 634
+        - D5
+        - 108
+      - - 1439/384
+        - ticks: 797
+        - E5
+        - 115
+      - - '5'
+        - ticks: 1181
+        - Bb4
+        - 114
+      - - 107/20
+        - ticks: 1018
+        - E5
+        - 112
+      - - 21763/3840
+        - ticks: 461
+        - F5
+        - 110
+      - - 2233/384
+        - ticks: 490
+        - E5
+        - 113
+      - - '7'
+        - ticks: 2141
+        - E5
+        - 118
+      - - 14669/1920
+        - ticks: 509
+        - F5
+        - 112
+      - - 29981/3840
+        - ticks: 605
+        - E5
+        - 110
+      automation:
+      - id: duel_iron_gate_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3840
+          - 77
+        - - ticks: 4289
+          - 109
+        - - ticks: 4800
+          - 101
+        - - ticks: 5076
+          - 88
+        - - ticks: 5309
+          - 77
+        - - ticks: 5620
+          - 109
+        - - ticks: 5974
+          - 101
+        - - ticks: 6161
+          - 88
+        - - ticks: 6307
+          - 77
+        - - ticks: 6503
+          - 109
+        - - ticks: 6728
+          - 101
+        - - ticks: 6842
+          - 88
+        - - ticks: 7018
+          - 77
+        - - ticks: 7194
+          - 109
+        - - ticks: 7395
+          - 101
+        - - ticks: 7496
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 11948
+          - 109
+        - - ticks: 12436
+          - 101
+        - - ticks: 12698
+          - 88
+        - - ticks: 12931
+          - 77
+        - - ticks: 13124
+          - 109
+        - - ticks: 13345
+          - 101
+        - - ticks: 13457
+          - 88
+        - - ticks: 13584
+          - 77
+        - - ticks: 13812
+          - 109
+        - - ticks: 14072
+          - 101
+        - - ticks: 14206
+          - 88
+        - - ticks: 14390
+          - 77
+        - - ticks: 14676
+          - 109
+        - - ticks: 15003
+          - 101
+        - - ticks: 15175
+          - 88
+        - - ticks: 19200
+          - 77
+        - - ticks: 19625
+          - 109
+        - - ticks: 20109
+          - 101
+        - - ticks: 20369
+          - 88
+        - - ticks: 20544
+          - 77
+        - - ticks: 20910
+          - 109
+        - - ticks: 21327
+          - 101
+        - - ticks: 21550
+          - 88
+        - - ticks: 21763
+          - 77
+        - - ticks: 21928
+          - 109
+        - - ticks: 22117
+          - 101
+        - - ticks: 22212
+          - 88
+        - - ticks: 22330
+          - 77
+        - - ticks: 22506
+          - 109
+        - - ticks: 22707
+          - 101
+        - - ticks: 22808
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27650
+          - 109
+        - - ticks: 28528
+          - 101
+        - - ticks: 29009
+          - 88
+        - - ticks: 29338
+          - 77
+        - - ticks: 29521
+          - 109
+        - - ticks: 29729
+          - 101
+        - - ticks: 29835
+          - 88
+        - - ticks: 29981
+          - 77
+        - - ticks: 30198
+          - 109
+        - - ticks: 30446
+          - 101
+        - - ticks: 30574
+          - 88
+    - id: solo_violin_shattered_orders
+      at:
+        bar: 17
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 1190
+        - Bb4
+        - 116
+      - - 1411/3840
+        - ticks: 538
+        - B4
+        - 111
+      - - 43/80
+        - ticks: 634
+        - D5
+        - 108
+      - - 287/384
+        - ticks: 797
+        - E5
+        - 115
+      - - '2'
+        - ticks: 1248
+        - F5
+        - 108
+      - - 9149/3840
+        - ticks: 864
+        - E5
+        - 108
+      - - 10147/3840
+        - ticks: 547
+        - G5
+        - 111
+      - - 5429/1920
+        - ticks: 490
+        - F5
+        - 104
+      - - '4'
+        - ticks: 442
+        - G4
+        - 105
+      - - 7949/1920
+        - ticks: 413
+        - A4
+        - 107
+      - - 8189/1920
+        - ticks: 413
+        - B4
+        - 109
+      - - 16877/3840
+        - ticks: 413
+        - D5
+        - 111
+      - - 3481/768
+        - ticks: 509
+        - E5
+        - 116
+      - - 9043/1920
+        - ticks: 941
+        - G5
+        - 120
+      - - '6'
+        - ticks: 461
+        - G5
+        - 112
+      - - 11789/1920
+        - ticks: 432
+        - F5
+        - 107
+      - - 4823/768
+        - ticks: 403
+        - E5
+        - 109
+      - - 12307/1920
+        - ticks: 403
+        - D5
+        - 108
+      - - 131/20
+        - ticks: 384
+        - B4
+        - 106
+      - - 25661/3840
+        - ticks: 979
+        - E5
+        - 117
+      automation:
+      - id: duel_shattered_orders_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 428
+          - 109
+        - - ticks: 916
+          - 101
+        - - ticks: 1178
+          - 88
+        - - ticks: 1411
+          - 77
+        - - ticks: 1604
+          - 109
+        - - ticks: 1825
+          - 101
+        - - ticks: 1937
+          - 88
+        - - ticks: 2064
+          - 77
+        - - ticks: 2292
+          - 109
+        - - ticks: 2552
+          - 101
+        - - ticks: 2686
+          - 88
+        - - ticks: 2870
+          - 77
+        - - ticks: 3156
+          - 109
+        - - ticks: 3483
+          - 101
+        - - ticks: 3655
+          - 88
+        - - ticks: 7680
+          - 77
+        - - ticks: 8129
+          - 109
+        - - ticks: 8640
+          - 101
+        - - ticks: 8916
+          - 88
+        - - ticks: 9149
+          - 77
+        - - ticks: 9460
+          - 109
+        - - ticks: 9814
+          - 101
+        - - ticks: 10001
+          - 88
+        - - ticks: 10147
+          - 77
+        - - ticks: 10343
+          - 109
+        - - ticks: 10568
+          - 101
+        - - ticks: 10682
+          - 88
+        - - ticks: 10858
+          - 77
+        - - ticks: 11034
+          - 109
+        - - ticks: 11235
+          - 101
+        - - ticks: 11336
+          - 88
+        - - ticks: 15360
+          - 77
+        - - ticks: 15519
+          - 109
+        - - ticks: 15700
+          - 101
+        - - ticks: 15790
+          - 88
+        - - ticks: 15898
+          - 77
+        - - ticks: 16046
+          - 109
+        - - ticks: 16216
+          - 101
+        - - ticks: 16299
+          - 88
+        - - ticks: 16378
+          - 77
+        - - ticks: 16526
+          - 109
+        - - ticks: 16696
+          - 101
+        - - ticks: 16779
+          - 88
+        - - ticks: 16877
+          - 77
+        - - ticks: 17025
+          - 109
+        - - ticks: 17195
+          - 101
+        - - ticks: 17278
+          - 88
+        - - ticks: 17405
+          - 77
+        - - ticks: 17588
+          - 109
+        - - ticks: 17796
+          - 101
+        - - ticks: 17902
+          - 88
+        - - ticks: 18086
+          - 77
+        - - ticks: 18424
+          - 109
+        - - ticks: 18810
+          - 101
+        - - ticks: 19015
+          - 88
+        - - ticks: 23040
+          - 77
+        - - ticks: 23205
+          - 109
+        - - ticks: 23394
+          - 101
+        - - ticks: 23489
+          - 88
+        - - ticks: 23578
+          - 77
+        - - ticks: 23733
+          - 109
+        - - ticks: 23910
+          - 101
+        - - ticks: 23998
+          - 88
+        - - ticks: 24115
+          - 77
+        - - ticks: 24260
+          - 109
+        - - ticks: 24425
+          - 101
+        - - ticks: 24506
+          - 88
+        - - ticks: 24614
+          - 77
+        - - ticks: 24759
+          - 109
+        - - ticks: 24924
+          - 101
+        - - ticks: 25005
+          - 88
+        - - ticks: 25152
+          - 77
+        - - ticks: 25290
+          - 109
+        - - ticks: 25447
+          - 101
+        - - ticks: 25524
+          - 88
+        - - ticks: 25661
+          - 77
+        - - ticks: 26013
+          - 109
+        - - ticks: 26414
+          - 101
+        - - ticks: 26628
+          - 88
+    - id: solo_violin_war_machine
+      at:
+        bar: 25
+        beat: 1
+      events:
+      - - '1'
+        - ticks: 2592
+        - G5
+        - 118
+      - - 3283/1920
+        - ticks: 883
+        - F5
+        - 115
+      - - '3'
+        - ticks: 2141
+        - E5
+        - 118
+      - - 6989/1920
+        - ticks: 509
+        - F5
+        - 112
+      - - 14621/3840
+        - ticks: 605
+        - E5
+        - 110
+      - - '5'
+        - ticks: 1181
+        - Bb4
+        - 114
+      - - 107/20
+        - ticks: 1018
+        - E5
+        - 112
+      - - 21763/3840
+        - ticks: 461
+        - F5
+        - 110
+      - - 2233/384
+        - ticks: 490
+        - E5
+        - 113
+      - - 25709/3840
+        - ticks: 922
+        - E5
+        - 112
+      - - '7'
+        - ticks: 1728
+        - F5
+        - 119
+      - - 15/2
+        - ticks: 576
+        - Bb4
+        - 109
+      - - 29539/3840
+        - ticks: 912
+        - B4
+        - 119
+      automation:
+      - id: duel_war_machine_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3840
+          - 77
+        - - ticks: 4773
+          - 109
+        - - ticks: 5835
+          - 101
+        - - ticks: 6420
+          - 88
+        - - ticks: 6566
+          - 77
+        - - ticks: 6883
+          - 109
+        - - ticks: 7245
+          - 101
+        - - ticks: 7437
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 12290
+          - 109
+        - - ticks: 13168
+          - 101
+        - - ticks: 13649
+          - 88
+        - - ticks: 13978
+          - 77
+        - - ticks: 14161
+          - 109
+        - - ticks: 14369
+          - 101
+        - - ticks: 14475
+          - 88
+        - - ticks: 14621
+          - 77
+        - - ticks: 14838
+          - 109
+        - - ticks: 15086
+          - 101
+        - - ticks: 15214
+          - 88
+        - - ticks: 19200
+          - 77
+        - - ticks: 19625
+          - 109
+        - - ticks: 20109
+          - 101
+        - - ticks: 20369
+          - 88
+        - - ticks: 20544
+          - 77
+        - - ticks: 20910
+          - 109
+        - - ticks: 21327
+          - 101
+        - - ticks: 21550
+          - 88
+        - - ticks: 21763
+          - 77
+        - - ticks: 21928
+          - 109
+        - - ticks: 22117
+          - 101
+        - - ticks: 22212
+          - 88
+        - - ticks: 22330
+          - 77
+        - - ticks: 22506
+          - 109
+        - - ticks: 22707
+          - 101
+        - - ticks: 22808
+          - 88
+        - - ticks: 25709
+          - 77
+        - - ticks: 26040
+          - 109
+        - - ticks: 26418
+          - 101
+        - - ticks: 26619
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27502
+          - 109
+        - - ticks: 28210
+          - 101
+        - - ticks: 28596
+          - 88
+        - - ticks: 28800
+          - 77
+        - - ticks: 29007
+          - 109
+        - - ticks: 29243
+          - 101
+        - - ticks: 29364
+          - 88
+        - - ticks: 29539
+          - 77
+        - - ticks: 29867
+          - 109
+        - - ticks: 30241
+          - 101
+        - - ticks: 30439
+          - 88
     - id: solo_violin_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - 3/2
-        - 1/8
-        - F5
-        - 94
-      - - 13/8
-        - 1/8
+      - - 41/40
+        - ticks: 211
         - E5
-        - 92
-      - - 7/2
-        - 1/8
+        - 104
+      - - 87/80
+        - ticks: 211
         - F5
-        - 94
-      - - 29/8
-        - 1/8
-        - E5
-        - 92
-      - - 11/2
-        - 1/8
+        - 107
+      - - 23/20
+        - ticks: 211
+        - G5
+        - 110
+      - - 97/80
+        - ticks: 211
         - F5
-        - 94
-      - - 45/8
-        - 1/8
+        - 113
+      - - 51/40
+        - ticks: 211
         - E5
-        - 92
-      - - 15/2
-        - 1/8
+        - 104
+      - - 107/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 7/5
+        - ticks: 211
+        - B4
+        - 110
+      - - 117/80
+        - ticks: 211
+        - D5
+        - 113
+      - - 61/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 127/80
+        - ticks: 211
+        - G5
+        - 107
+      - - 649/384
+        - ticks: 1066
+        - E5
+        - 119
+      - - '3'
+        - ticks: 442
+        - G4
+        - 105
+      - - 6029/1920
+        - ticks: 413
+        - A4
+        - 107
+      - - 6269/1920
+        - ticks: 413
+        - B4
+        - 109
+      - - 13037/3840
+        - ticks: 413
+        - D5
+        - 111
+      - - 2713/768
+        - ticks: 509
+        - E5
+        - 116
+      - - 7123/1920
+        - ticks: 941
+        - G5
+        - 120
+      - - 201/40
+        - ticks: 211
+        - B4
+        - 104
+      - - 407/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 103/20
+        - ticks: 211
+        - E5
+        - 110
+      - - 417/80
+        - ticks: 211
         - F5
-        - 94
-      - - 61/8
-        - 1/8
+        - 113
+      - - 211/40
+        - ticks: 211
+        - G5
+        - 104
+      - - 427/80
+        - ticks: 211
+        - A5
+        - 107
+      - - 27/5
+        - ticks: 211
+        - G5
+        - 110
+      - - 437/80
+        - ticks: 211
+        - F5
+        - 113
+      - - 221/40
+        - ticks: 211
         - E5
-        - 92
-      - - 125/16
-        - 3/16
+        - 104
+      - - 447/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 2185/384
+        - ticks: 1066
+        - E5
+        - 119
+      - - 26131/3840
+        - ticks: 576
         - Bb4
-        - 97
+        - 115
+      - - '7'
+        - ticks: 461
+        - G5
+        - 112
+      - - 13709/1920
+        - ticks: 432
+        - F5
+        - 107
+      - - 5591/768
+        - ticks: 403
+        - E5
+        - 109
+      - - 14227/1920
+        - ticks: 403
+        - D5
+        - 108
+      - - 151/20
+        - ticks: 384
+        - B4
+        - 106
+      - - 29501/3840
+        - ticks: 979
+        - E5
+        - 117
+      automation:
+      - id: duel_counterattack_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3936
+          - 92
+        - - ticks: 4142
+          - 92
+        - - ticks: 4176
+          - 92
+        - - ticks: 4382
+          - 92
+        - - ticks: 4416
+          - 92
+        - - ticks: 4622
+          - 92
+        - - ticks: 4656
+          - 92
+        - - ticks: 4862
+          - 92
+        - - ticks: 4896
+          - 92
+        - - ticks: 5102
+          - 92
+        - - ticks: 5136
+          - 92
+        - - ticks: 5342
+          - 92
+        - - ticks: 5376
+          - 92
+        - - ticks: 5582
+          - 92
+        - - ticks: 5616
+          - 92
+        - - ticks: 5822
+          - 92
+        - - ticks: 5856
+          - 92
+        - - ticks: 6062
+          - 92
+        - - ticks: 6096
+          - 92
+        - - ticks: 6302
+          - 92
+        - - ticks: 6490
+          - 77
+        - - ticks: 6873
+          - 109
+        - - ticks: 7310
+          - 101
+        - - ticks: 7544
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 11679
+          - 109
+        - - ticks: 11860
+          - 101
+        - - ticks: 11950
+          - 88
+        - - ticks: 12058
+          - 77
+        - - ticks: 12206
+          - 109
+        - - ticks: 12376
+          - 101
+        - - ticks: 12459
+          - 88
+        - - ticks: 12538
+          - 77
+        - - ticks: 12686
+          - 109
+        - - ticks: 12856
+          - 101
+        - - ticks: 12939
+          - 88
+        - - ticks: 13037
+          - 77
+        - - ticks: 13185
+          - 109
+        - - ticks: 13355
+          - 101
+        - - ticks: 13438
+          - 88
+        - - ticks: 13565
+          - 77
+        - - ticks: 13748
+          - 109
+        - - ticks: 13956
+          - 101
+        - - ticks: 14062
+          - 88
+        - - ticks: 14246
+          - 77
+        - - ticks: 14584
+          - 109
+        - - ticks: 14970
+          - 101
+        - - ticks: 15175
+          - 88
+        - - ticks: 19296
+          - 92
+        - - ticks: 19502
+          - 92
+        - - ticks: 19536
+          - 92
+        - - ticks: 19742
+          - 92
+        - - ticks: 19776
+          - 92
+        - - ticks: 19982
+          - 92
+        - - ticks: 20016
+          - 92
+        - - ticks: 20222
+          - 92
+        - - ticks: 20256
+          - 92
+        - - ticks: 20462
+          - 92
+        - - ticks: 20496
+          - 92
+        - - ticks: 20702
+          - 92
+        - - ticks: 20736
+          - 92
+        - - ticks: 20942
+          - 92
+        - - ticks: 20976
+          - 92
+        - - ticks: 21182
+          - 92
+        - - ticks: 21216
+          - 92
+        - - ticks: 21422
+          - 92
+        - - ticks: 21456
+          - 92
+        - - ticks: 21662
+          - 92
+        - - ticks: 21850
+          - 77
+        - - ticks: 22233
+          - 109
+        - - ticks: 22670
+          - 101
+        - - ticks: 22904
+          - 88
+        - - ticks: 26131
+          - 77
+        - - ticks: 26338
+          - 109
+        - - ticks: 26574
+          - 101
+        - - ticks: 26695
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27045
+          - 109
+        - - ticks: 27234
+          - 101
+        - - ticks: 27329
+          - 88
+        - - ticks: 27418
+          - 77
+        - - ticks: 27573
+          - 109
+        - - ticks: 27750
+          - 101
+        - - ticks: 27838
+          - 88
+        - - ticks: 27955
+          - 77
+        - - ticks: 28100
+          - 109
+        - - ticks: 28265
+          - 101
+        - - ticks: 28346
+          - 88
+        - - ticks: 28454
+          - 77
+        - - ticks: 28599
+          - 109
+        - - ticks: 28764
+          - 101
+        - - ticks: 28845
+          - 88
+        - - ticks: 28992
+          - 77
+        - - ticks: 29130
+          - 109
+        - - ticks: 29287
+          - 101
+        - - ticks: 29364
+          - 88
+        - - ticks: 29501
+          - 77
+        - - ticks: 29853
+          - 109
+        - - ticks: 30254
+          - 101
+        - - ticks: 30468
+          - 88
     - id: solo_violin_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - 3/2
-        - 1/8
+      - - '0'
+        - ticks: 2592
+        - G5
+        - 118
+      - - 1363/1920
+        - ticks: 883
         - F5
-        - 94
-      - - 13/8
-        - 1/8
+        - 115
+      - - '2'
+        - ticks: 2141
         - E5
-        - 92
-      - - 7/2
-        - 1/8
+        - 118
+      - - 5069/1920
+        - ticks: 509
         - F5
-        - 94
-      - - 29/8
-        - 1/8
+        - 112
+      - - 10781/3840
+        - ticks: 605
         - E5
-        - 92
-      - - 11/2
-        - 1/8
+        - 110
+      - - '4'
+        - ticks: 1728
         - F5
-        - 94
-      - - 45/8
-        - 1/8
-        - E5
-        - 92
-      - - 15/2
-        - 1/8
-        - F5
-        - 94
-      - - 61/8
-        - 1/8
-        - E5
-        - 92
-      - - 125/16
-        - 3/16
+        - 119
+      - - 9/2
+        - ticks: 576
         - Bb4
-        - 97
+        - 109
+      - - 18019/3840
+        - ticks: 912
+        - B4
+        - 119
+      - - '6'
+        - ticks: 1181
+        - Bb4
+        - 114
+      - - 127/20
+        - ticks: 1018
+        - E5
+        - 112
+      - - 25603/3840
+        - ticks: 461
+        - F5
+        - 110
+      - - 2617/384
+        - ticks: 490
+        - E5
+        - 113
+      - - 5927/768
+        - ticks: 816
+        - F5
+        - 112
+      automation:
+      - id: duel_the_false_triumph_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 933
+          - 109
+        - - ticks: 1995
+          - 101
+        - - ticks: 2580
+          - 88
+        - - ticks: 2726
+          - 77
+        - - ticks: 3043
+          - 109
+        - - ticks: 3405
+          - 101
+        - - ticks: 3597
+          - 88
+        - - ticks: 7680
+          - 77
+        - - ticks: 8450
+          - 109
+        - - ticks: 9328
+          - 101
+        - - ticks: 9809
+          - 88
+        - - ticks: 10138
+          - 77
+        - - ticks: 10321
+          - 109
+        - - ticks: 10529
+          - 101
+        - - ticks: 10635
+          - 88
+        - - ticks: 10781
+          - 77
+        - - ticks: 10998
+          - 109
+        - - ticks: 11246
+          - 101
+        - - ticks: 11374
+          - 88
+        - - ticks: 15360
+          - 77
+        - - ticks: 15982
+          - 109
+        - - ticks: 16690
+          - 101
+        - - ticks: 17076
+          - 88
+        - - ticks: 17280
+          - 77
+        - - ticks: 17487
+          - 109
+        - - ticks: 17723
+          - 101
+        - - ticks: 17844
+          - 88
+        - - ticks: 18019
+          - 77
+        - - ticks: 18347
+          - 109
+        - - ticks: 18721
+          - 101
+        - - ticks: 18919
+          - 88
+        - - ticks: 23040
+          - 77
+        - - ticks: 23465
+          - 109
+        - - ticks: 23949
+          - 101
+        - - ticks: 24209
+          - 88
+        - - ticks: 24384
+          - 77
+        - - ticks: 24750
+          - 109
+        - - ticks: 25167
+          - 101
+        - - ticks: 25390
+          - 88
+        - - ticks: 25603
+          - 77
+        - - ticks: 25768
+          - 109
+        - - ticks: 25957
+          - 101
+        - - ticks: 26052
+          - 88
+        - - ticks: 26170
+          - 77
+        - - ticks: 26346
+          - 109
+        - - ticks: 26547
+          - 101
+        - - ticks: 26648
+          - 88
+        - - ticks: 29635
+          - 77
+        - - ticks: 29928
+          - 109
+        - - ticks: 30263
+          - 101
+        - - ticks: 30439
+          - 88
+    - id: solo_violin_breaking_the_columns
+      at:
+        bar: 49
+        beat: 1
+      events:
+      - - 41/40
+        - ticks: 211
+        - B4
+        - 104
+      - - 87/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 23/20
+        - ticks: 211
+        - E5
+        - 110
+      - - 97/80
+        - ticks: 211
+        - F5
+        - 113
+      - - 51/40
+        - ticks: 211
+        - G5
+        - 104
+      - - 107/80
+        - ticks: 211
+        - A5
+        - 107
+      - - 7/5
+        - ticks: 211
+        - G5
+        - 110
+      - - 117/80
+        - ticks: 211
+        - F5
+        - 113
+      - - 61/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 127/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 649/384
+        - ticks: 1066
+        - E5
+        - 119
+      - - 121/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 247/80
+        - ticks: 211
+        - F5
+        - 107
+      - - 63/20
+        - ticks: 211
+        - G5
+        - 110
+      - - 257/80
+        - ticks: 211
+        - F5
+        - 113
+      - - 131/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 267/80
+        - ticks: 211
+        - D5
+        - 107
+      - - 17/5
+        - ticks: 211
+        - B4
+        - 110
+      - - 277/80
+        - ticks: 211
+        - D5
+        - 113
+      - - 141/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 287/80
+        - ticks: 211
+        - G5
+        - 107
+      - - 1417/384
+        - ticks: 1066
+        - E5
+        - 119
+      - - 201/40
+        - ticks: 211
+        - G5
+        - 104
+      - - 407/80
+        - ticks: 211
+        - F5
+        - 107
+      - - 103/20
+        - ticks: 211
+        - E5
+        - 110
+      - - 417/80
+        - ticks: 211
+        - D5
+        - 113
+      - - 211/40
+        - ticks: 211
+        - B4
+        - 104
+      - - 427/80
+        - ticks: 211
+        - Bb4
+        - 107
+      - - 27/5
+        - ticks: 211
+        - B4
+        - 110
+      - - 437/80
+        - ticks: 211
+        - D5
+        - 113
+      - - 221/40
+        - ticks: 211
+        - E5
+        - 104
+      - - 447/80
+        - ticks: 211
+        - F5
+        - 107
+      - - 2185/384
+        - ticks: 1066
+        - E5
+        - 119
+      - - 269/40
+        - ticks: 691
+        - E5
+        - 114
+      - - '7'
+        - ticks: 2592
+        - G5
+        - 118
+      - - 14803/1920
+        - ticks: 883
+        - F5
+        - 115
+      automation:
+      - id: duel_breaking_the_columns_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3936
+          - 92
+        - - ticks: 4142
+          - 92
+        - - ticks: 4176
+          - 92
+        - - ticks: 4382
+          - 92
+        - - ticks: 4416
+          - 92
+        - - ticks: 4622
+          - 92
+        - - ticks: 4656
+          - 92
+        - - ticks: 4862
+          - 92
+        - - ticks: 4896
+          - 92
+        - - ticks: 5102
+          - 92
+        - - ticks: 5136
+          - 92
+        - - ticks: 5342
+          - 92
+        - - ticks: 5376
+          - 92
+        - - ticks: 5582
+          - 92
+        - - ticks: 5616
+          - 92
+        - - ticks: 5822
+          - 92
+        - - ticks: 5856
+          - 92
+        - - ticks: 6062
+          - 92
+        - - ticks: 6096
+          - 92
+        - - ticks: 6302
+          - 92
+        - - ticks: 6490
+          - 77
+        - - ticks: 6873
+          - 109
+        - - ticks: 7310
+          - 101
+        - - ticks: 7544
+          - 88
+        - - ticks: 11616
+          - 92
+        - - ticks: 11822
+          - 92
+        - - ticks: 11856
+          - 92
+        - - ticks: 12062
+          - 92
+        - - ticks: 12096
+          - 92
+        - - ticks: 12302
+          - 92
+        - - ticks: 12336
+          - 92
+        - - ticks: 12542
+          - 92
+        - - ticks: 12576
+          - 92
+        - - ticks: 12782
+          - 92
+        - - ticks: 12816
+          - 92
+        - - ticks: 13022
+          - 92
+        - - ticks: 13056
+          - 92
+        - - ticks: 13262
+          - 92
+        - - ticks: 13296
+          - 92
+        - - ticks: 13502
+          - 92
+        - - ticks: 13536
+          - 92
+        - - ticks: 13742
+          - 92
+        - - ticks: 13776
+          - 92
+        - - ticks: 13982
+          - 92
+        - - ticks: 14170
+          - 77
+        - - ticks: 14553
+          - 109
+        - - ticks: 14990
+          - 101
+        - - ticks: 15224
+          - 88
+        - - ticks: 19296
+          - 92
+        - - ticks: 19502
+          - 92
+        - - ticks: 19536
+          - 92
+        - - ticks: 19742
+          - 92
+        - - ticks: 19776
+          - 92
+        - - ticks: 19982
+          - 92
+        - - ticks: 20016
+          - 92
+        - - ticks: 20222
+          - 92
+        - - ticks: 20256
+          - 92
+        - - ticks: 20462
+          - 92
+        - - ticks: 20496
+          - 92
+        - - ticks: 20702
+          - 92
+        - - ticks: 20736
+          - 92
+        - - ticks: 20942
+          - 92
+        - - ticks: 20976
+          - 92
+        - - ticks: 21182
+          - 92
+        - - ticks: 21216
+          - 92
+        - - ticks: 21422
+          - 92
+        - - ticks: 21456
+          - 92
+        - - ticks: 21662
+          - 92
+        - - ticks: 21850
+          - 77
+        - - ticks: 22233
+          - 109
+        - - ticks: 22670
+          - 101
+        - - ticks: 22904
+          - 88
+        - - ticks: 25824
+          - 77
+        - - ticks: 26072
+          - 109
+        - - ticks: 26356
+          - 101
+        - - ticks: 26503
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27813
+          - 109
+        - - ticks: 28875
+          - 101
+        - - ticks: 29460
+          - 88
+        - - ticks: 29606
+          - 77
+        - - ticks: 29923
+          - 109
+        - - ticks: 30285
+          - 101
+        - - ticks: 30477
+          - 88
     - id: solo_violin_no_throne
       at:
         bar: 57
         beat: 1
       events:
-      - - 3/2
-        - 1/8
-        - F5
-        - 94
-      - - 13/8
-        - 1/8
-        - E5
-        - 92
-      - - 7/2
-        - 1/8
-        - F5
-        - 94
-      - - 29/8
-        - 1/8
-        - E5
-        - 92
-      - - 11/2
-        - 1/8
-        - F5
-        - 94
-      - - 45/8
-        - 1/8
-        - E5
-        - 92
-      - - 15/2
-        - 1/8
-        - F5
-        - 94
-      - - 61/8
-        - 1/8
-        - E5
-        - 92
-      - - 125/16
-        - 3/16
+      - - '1'
+        - ticks: 1181
         - Bb4
-        - 97
+        - 114
+      - - 27/20
+        - ticks: 1018
+        - E5
+        - 112
+      - - 6403/3840
+        - ticks: 461
+        - F5
+        - 110
+      - - 697/384
+        - ticks: 490
+        - E5
+        - 113
+      - - '3'
+        - ticks: 1248
+        - F5
+        - 108
+      - - 12989/3840
+        - ticks: 864
+        - E5
+        - 108
+      - - 13987/3840
+        - ticks: 547
+        - G5
+        - 111
+      - - 7349/1920
+        - ticks: 490
+        - F5
+        - 104
+      - - '5'
+        - ticks: 461
+        - G5
+        - 112
+      - - 9869/1920
+        - ticks: 432
+        - F5
+        - 107
+      - - 4055/768
+        - ticks: 403
+        - E5
+        - 109
+      - - 10387/1920
+        - ticks: 403
+        - D5
+        - 108
+      - - 111/20
+        - ticks: 384
+        - B4
+        - 106
+      - - 21821/3840
+        - ticks: 979
+        - E5
+        - 117
+      - - 12907/1920
+        - ticks: 835
+        - F5
+        - 114
+      - - '7'
+        - ticks: 2141
+        - E5
+        - 118
+      - - 14669/1920
+        - ticks: 509
+        - F5
+        - 112
+      - - 29981/3840
+        - ticks: 605
+        - E5
+        - 110
+      automation:
+      - id: duel_no_throne_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3840
+          - 77
+        - - ticks: 4265
+          - 109
+        - - ticks: 4749
+          - 101
+        - - ticks: 5009
+          - 88
+        - - ticks: 5184
+          - 77
+        - - ticks: 5550
+          - 109
+        - - ticks: 5967
+          - 101
+        - - ticks: 6190
+          - 88
+        - - ticks: 6403
+          - 77
+        - - ticks: 6568
+          - 109
+        - - ticks: 6757
+          - 101
+        - - ticks: 6852
+          - 88
+        - - ticks: 6970
+          - 77
+        - - ticks: 7146
+          - 109
+        - - ticks: 7347
+          - 101
+        - - ticks: 7448
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 11969
+          - 109
+        - - ticks: 12480
+          - 101
+        - - ticks: 12756
+          - 88
+        - - ticks: 12989
+          - 77
+        - - ticks: 13300
+          - 109
+        - - ticks: 13654
+          - 101
+        - - ticks: 13841
+          - 88
+        - - ticks: 13987
+          - 77
+        - - ticks: 14183
+          - 109
+        - - ticks: 14408
+          - 101
+        - - ticks: 14522
+          - 88
+        - - ticks: 14698
+          - 77
+        - - ticks: 14874
+          - 109
+        - - ticks: 15075
+          - 101
+        - - ticks: 15176
+          - 88
+        - - ticks: 19200
+          - 77
+        - - ticks: 19365
+          - 109
+        - - ticks: 19554
+          - 101
+        - - ticks: 19649
+          - 88
+        - - ticks: 19738
+          - 77
+        - - ticks: 19893
+          - 109
+        - - ticks: 20070
+          - 101
+        - - ticks: 20158
+          - 88
+        - - ticks: 20275
+          - 77
+        - - ticks: 20420
+          - 109
+        - - ticks: 20585
+          - 101
+        - - ticks: 20666
+          - 88
+        - - ticks: 20774
+          - 77
+        - - ticks: 20919
+          - 109
+        - - ticks: 21084
+          - 101
+        - - ticks: 21165
+          - 88
+        - - ticks: 21312
+          - 77
+        - - ticks: 21450
+          - 109
+        - - ticks: 21607
+          - 101
+        - - ticks: 21684
+          - 88
+        - - ticks: 21821
+          - 77
+        - - ticks: 22173
+          - 109
+        - - ticks: 22574
+          - 101
+        - - ticks: 22788
+          - 88
+        - - ticks: 25814
+          - 77
+        - - ticks: 26114
+          - 109
+        - - ticks: 26456
+          - 101
+        - - ticks: 26637
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27650
+          - 109
+        - - ticks: 28528
+          - 101
+        - - ticks: 29009
+          - 88
+        - - ticks: 29338
+          - 77
+        - - ticks: 29521
+          - 109
+        - - ticks: 29729
+          - 101
+        - - ticks: 29835
+          - 88
+        - - ticks: 29981
+          - 77
+        - - ticks: 30198
+          - 109
+        - - ticks: 30446
+          - 101
+        - - ticks: 30574
+          - 88
     - id: solo_violin_iron_sky_falls
       at:
         bar: 65
         beat: 1
       events:
-      - - 3/2
-        - 1/8
-        - F5
-        - 94
-      - - 13/8
-        - 1/8
+      - - '1'
+        - ticks: 2141
         - E5
-        - 92
-      - - 7/2
-        - 1/8
+        - 118
+      - - 3149/1920
+        - ticks: 509
         - F5
-        - 94
-      - - 29/8
-        - 1/8
+        - 112
+      - - 6941/3840
+        - ticks: 605
         - E5
-        - 92
-      - - 11/2
-        - 1/8
-        - F5
-        - 94
-      - - 45/8
-        - 1/8
-        - E5
-        - 92
-      - - 15/2
-        - 1/8
-        - F5
-        - 94
-      - - 61/8
-        - 1/8
-        - E5
-        - 92
-      - - 125/16
-        - 3/16
+        - 110
+      - - '3'
+        - ticks: 1190
         - Bb4
-        - 97
+        - 116
+      - - 12931/3840
+        - ticks: 538
+        - B4
+        - 111
+      - - 283/80
+        - ticks: 634
+        - D5
+        - 108
+      - - 1439/384
+        - ticks: 797
+        - E5
+        - 115
+      - - '5'
+        - ticks: 1728
+        - F5
+        - 119
+      - - 11/2
+        - ticks: 576
+        - Bb4
+        - 109
+      - - 21859/3840
+        - ticks: 912
+        - B4
+        - 119
+      - - 67/10
+        - ticks: 874
+        - F5
+        - 114
+      - - '7'
+        - ticks: 461
+        - B4
+        - 103
+      - - 13723/1920
+        - ticks: 451
+        - D5
+        - 110
+      - - 14011/1920
+        - ticks: 451
+        - E5
+        - 114
+      - - 14333/1920
+        - ticks: 768
+        - F5
+        - 118
+      - - 14803/1920
+        - ticks: 902
+        - E5
+        - 111
+      automation:
+      - id: duel_iron_sky_falls_bow_dynamics
+        cc: 1
+        interpolation: linear
+        resolution:
+          ticks: 80
+        points:
+        - - ticks: 0
+          - 88
+        - - ticks: 3840
+          - 77
+        - - ticks: 4610
+          - 109
+        - - ticks: 5488
+          - 101
+        - - ticks: 5969
+          - 88
+        - - ticks: 6298
+          - 77
+        - - ticks: 6481
+          - 109
+        - - ticks: 6689
+          - 101
+        - - ticks: 6795
+          - 88
+        - - ticks: 6941
+          - 77
+        - - ticks: 7158
+          - 109
+        - - ticks: 7406
+          - 101
+        - - ticks: 7534
+          - 88
+        - - ticks: 11520
+          - 77
+        - - ticks: 11948
+          - 109
+        - - ticks: 12436
+          - 101
+        - - ticks: 12698
+          - 88
+        - - ticks: 12931
+          - 77
+        - - ticks: 13124
+          - 109
+        - - ticks: 13345
+          - 101
+        - - ticks: 13457
+          - 88
+        - - ticks: 13584
+          - 77
+        - - ticks: 13812
+          - 109
+        - - ticks: 14072
+          - 101
+        - - ticks: 14206
+          - 88
+        - - ticks: 14390
+          - 77
+        - - ticks: 14676
+          - 109
+        - - ticks: 15003
+          - 101
+        - - ticks: 15175
+          - 88
+        - - ticks: 19200
+          - 77
+        - - ticks: 19822
+          - 109
+        - - ticks: 20530
+          - 101
+        - - ticks: 20916
+          - 88
+        - - ticks: 21120
+          - 77
+        - - ticks: 21327
+          - 109
+        - - ticks: 21563
+          - 101
+        - - ticks: 21684
+          - 88
+        - - ticks: 21859
+          - 77
+        - - ticks: 22187
+          - 109
+        - - ticks: 22561
+          - 101
+        - - ticks: 22759
+          - 88
+        - - ticks: 25728
+          - 77
+        - - ticks: 26042
+          - 109
+        - - ticks: 26400
+          - 101
+        - - ticks: 26590
+          - 88
+        - - ticks: 26880
+          - 77
+        - - ticks: 27045
+          - 109
+        - - ticks: 27234
+          - 101
+        - - ticks: 27329
+          - 88
+        - - ticks: 27446
+          - 77
+        - - ticks: 27608
+          - 109
+        - - ticks: 27793
+          - 101
+        - - ticks: 27885
+          - 88
+        - - ticks: 28022
+          - 77
+        - - ticks: 28184
+          - 109
+        - - ticks: 28369
+          - 101
+        - - ticks: 28461
+          - 88
+        - - ticks: 28666
+          - 77
+        - - ticks: 28942
+          - 109
+        - - ticks: 29257
+          - 101
+        - - ticks: 29422
+          - 88
+        - - ticks: 29606
+          - 77
+        - - ticks: 29930
+          - 109
+        - - ticks: 30300
+          - 101
+        - - ticks: 30496
+          - 88
 - id: timpani_part
   instrument: timpani
   voices:
