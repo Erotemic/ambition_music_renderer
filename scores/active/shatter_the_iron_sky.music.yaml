@@ -212,6 +212,8 @@ instruments:
   volume: 109
   pan: 98
   expression: 110
+  controls:
+    100: 100  # Shinyguitar acoustic.sfz: microphone amplitude / pickup blend
   mix_gain_db: 0
   instrument_backend:
     kind: sfz
@@ -297,6 +299,8 @@ instruments:
   pan: 60
   expression: 110
   modulation: 100
+  controls:
+    72: 100  # War Tuba dbl_legato/sustain_cnd.sfz: second amplitude gate
   mix_gain_db: -2.5
   instrument_backend:
     kind: sfz
@@ -345,6 +349,8 @@ instruments:
   volume: 104
   pan: 74
   expression: 110
+  controls:
+    100: 100  # Shinyguitar acoustic.sfz: microphone amplitude / pickup blend
   mix_gain_db: -1
   instrument_backend:
     kind: sfz
