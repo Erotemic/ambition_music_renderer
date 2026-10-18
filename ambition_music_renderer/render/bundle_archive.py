@@ -123,7 +123,12 @@ def make_zip(src_dir: Path, zip_path: Path, *, report_only: bool = False) -> Pat
     zip_path.parent.mkdir(parents=True, exist_ok=True)
     if zip_path.exists():
         zip_path.unlink()
-    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+    # Rendered or imported assets can retain epoch/other pre-1980 mtimes.
+    # ZIP cannot represent them, so clamp only the timestamp stored in the
+    # archive instead of altering the source files on disk.
+    with zipfile.ZipFile(
+        zip_path, "w", compression=zipfile.ZIP_DEFLATED, strict_timestamps=False
+    ) as zf:
         for path in sorted(src_dir.rglob("*")):
             if path == zip_path or path.is_dir():
                 continue
