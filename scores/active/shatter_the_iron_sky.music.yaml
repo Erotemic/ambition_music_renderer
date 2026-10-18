@@ -1,13 +1,9 @@
-# Shatter the Iron Sky - Devil Duel arrangement.
-# Rebuilt Emilyguitar and distorted VPO solo-violin parts as traded phrases.
-# Metal rhythm section and both choir parts retain their note events.
-# Eight-bar render-only preroll mirrors the final eight bars, including solos.
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
-title: Shatter the Iron Sky (Devil Duel)
-description: E-minor heavy-metal combat loop with a distorted fiddle versus Emilyguitar solo duel, traded calls, bowed swells,
-  restrained pitch bends, and two escalating shred contests. The choir and metal rhythm bed are preserved; an eight-bar preroll
-  mirrors the final loop bars.
+title: Shatter the Iron Sky (Ashen Viola Duel)
+description: E-minor metal combat theme with a centered, singing guitar lead and a lower, distorted solo viola responding
+  in longer phrases. The final B7 turnaround resolves into E before the riff restarts. Choir and rhythm section remain
+  the foundation.
 seed: 17001987
 timebase:
   ppq: 960
@@ -27,7 +23,7 @@ form:
     beat: 1
   energy: 0.95
   density: 0.86
-  role: Render-only copy of final eight bars, including guitar-fiddle duel, for loop FX-state warmup
+  role: Last-eight-bar FX warmup with a restrained B7-to-E cadence
 - id: iron_gate
   from:
     bar: 9
@@ -48,8 +44,8 @@ form:
     beat: 1
   energy: 0.92
   density: 0.74
-  role: 'Pursuit: displaced syncopation, riff/bass responses and gaps for lead; guitar/fiddle antiphony and selective climactic
-    overlap'
+  role: 'Pursuit: displaced syncopation, riff/bass responses and gaps for lead; guitar/fiddle antiphony and selective
+    climactic overlap'
 - id: war_machine
   from:
     bar: 25
@@ -81,8 +77,8 @@ form:
     beat: 1
   energy: 0.78
   density: 0.51
-  role: 'Ritual: halftime drums, long minor-second tension and wailing guitar; guitar/fiddle antiphony and selective climactic
-    overlap'
+  role: 'Ritual: halftime drums, long minor-second tension and wailing guitar; guitar/fiddle antiphony and selective
+    climactic overlap'
 - id: breaking_the_columns
   from:
     bar: 49
@@ -102,7 +98,8 @@ form:
     beat: 1
   energy: 0.98
   density: 0.82
-  role: 'Return: verdict riff answered by the now-established choir; guitar/fiddle antiphony and selective climactic overlap'
+  role: 'Return: verdict riff answered by the now-established choir; guitar/fiddle antiphony and selective climactic
+    overlap'
 - id: iron_sky_falls
   from:
     bar: 65
@@ -112,7 +109,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.89
-  role: 'Sky falls: slower blows, choir, and B7(b9) into the looped E; guitar/fiddle antiphony and selective climactic overlap'
+  role: Return the duel theme, close on E minor, then turn cleanly back to the riff
 harmony:
   every_bars: 1
   cycle: false
@@ -257,10 +254,10 @@ instruments:
 - name: lead_guitar
   group: lead_guitar
   program: clean_guitar
-  volume: 105
+  volume: 110
   pan: 64
-  expression: 113
-  mix_gain_db: 8.2
+  expression: 117
+  mix_gain_db: 14.0
   instrument_backend:
     kind: sfz
     sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
@@ -354,19 +351,19 @@ instruments:
     sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
     settings:
       fold_to_range: false
-- name: solo_violin
-  group: violins
-  program: violin
-  volume: 105
-  pan: 73
-  expression: 110
-  mix_gain_db: 8.0
+- name: solo_viola
+  group: viola_lead
+  program: viola
+  volume: 106
+  pan: 76
+  expression: 112
+  mix_gain_db: 3.5
   instrument_backend:
     kind: sfz
-    library_ref: vpo.violin_solo_perf
+    sfz_glob: '**/Strings/viola-SOLO-PERF.sfz'
     settings:
       fold_to_range: false
-  modulation: 88
+  modulation: 93
 - name: timpani
   group: timpani
   program: timpani
@@ -428,7 +425,7 @@ processing:
         - type: peak
           hz: 2200
           q: 0.85
-          db: -1.3
+          db: -2.5
       - processor: lowpass
         cutoff_hz: 9800
       - processor: compressor
@@ -485,7 +482,7 @@ processing:
         - type: peak
           hz: 2200
           q: 0.85
-          db: -1.3
+          db: -2.5
       - processor: lowpass
         cutoff_hz: 9800
       - processor: compressor
@@ -500,10 +497,10 @@ processing:
       - processor: pedalboard
         effects:
         - effect: gain
-          gain_db: 12.5
+          gain_db: 11.0
         - effect: compressor
-          threshold_db: -29.0
-          ratio: 3.2
+          threshold_db: -27.5
+          ratio: 2.8
           attack_ms: 7.0
           release_ms: 175.0
       - processor: lv2
@@ -519,7 +516,7 @@ processing:
       - processor: lv2
         plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
         binary: lv2apply
-        wet_mix: 0.86
+        wet_mix: 0.89
         params:
           P6v: 0.84
           Middle: 0.78
@@ -528,7 +525,7 @@ processing:
           WET_DRY: 82.0
           GAIN: -1.0
       - processor: highpass
-        cutoff_hz: 86
+        cutoff_hz: 90
       - processor: parametric_eq
         bands:
         - type: peak
@@ -538,11 +535,11 @@ processing:
         - type: peak
           hz: 720
           q: 0.85
-          db: 1.5
+          db: 2.2
         - type: peak
           hz: 1750
           q: 0.9
-          db: 3.3
+          db: 4.0
         - type: peak
           hz: 4150
           q: 2.7
@@ -565,7 +562,9 @@ processing:
           feedback: 0.2
           mix: 0.13
       - processor: balance
-        position: -0.2
+        position: -0.07
+      - processor: gain
+        gain_db: 3.0
     counter_guitar:
       chain:
       - processor: pedalboard
@@ -702,56 +701,60 @@ processing:
         cutoff_hz: 6100
       - processor: gain
         gain_db: -2.0
-    violins:
-      chain:
-      - processor: highpass
-        cutoff_hz: 145
-      - processor: pedalboard
-        effects:
-        - effect: gain
-          gain_db: 5.0
-        - effect: compressor
-          threshold_db: -26.0
-          ratio: 2.8
-          attack_ms: 14.0
-          release_ms: 155.0
-        - effect: distortion
-          drive_db: 9.0
-      - processor: parametric_eq
-        bands:
-        - type: peak
-          hz: 460
-          q: 1.0
-          db: -2.2
-        - type: peak
-          hz: 1700
-          q: 0.9
-          db: 2.6
-        - type: peak
-          hz: 3300
-          q: 1.1
-          db: 1.4
-      - processor: lowpass
-        cutoff_hz: 7900
-      - processor: compressor
-        threshold_db: -22.0
-        ratio: 2.3
-        attack_ms: 18.0
-        release_ms: 135.0
-      - processor: pedalboard
-        effects:
-        - effect: delay
-          delay_ms: 175
-          feedback: 0.13
-          mix: 0.08
-      - processor: balance
-        position: 0.27
     timpani:
       chain:
       - processor: highpass
         cutoff_hz: 42
       - processor: lowpass
         cutoff_hz: 3500
+    viola_lead:
+      chain:
+      - processor: highpass
+        cutoff_hz: 135
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 4.2
+        - effect: compressor
+          threshold_db: -25.0
+          ratio: 2.5
+          attack_ms: 17
+          release_ms: 195
+        - effect: distortion
+          drive_db: 5.7
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 320
+          q: 0.9
+          db: -1.3
+        - type: peak
+          hz: 920
+          q: 0.85
+          db: 1.7
+        - type: peak
+          hz: 1900
+          q: 0.9
+          db: 2.1
+        - type: peak
+          hz: 3900
+          q: 1.0
+          db: -1.5
+      - processor: lowpass
+        cutoff_hz: 7100
+      - processor: compressor
+        threshold_db: -23.0
+        ratio: 2.1
+        attack_ms: 18
+        release_ms: 155
+      - processor: pedalboard
+        effects:
+        - effect: delay
+          delay_ms: 175
+          feedback: 0.1
+          mix: 0.055
+      - processor: balance
+        position: 0.26
   master:
     chain:
     - processor: highpass
@@ -8701,146 +8704,216 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1968
+        - ticks: 2131
         - E4
         - 119
-      - - 23/40
-        - ticks: 586
-        - Bb3
-        - 111
-      - - 61/80
-        - ticks: 816
-        - F3
-        - 110
-      - - '2'
-        - ticks: 1536
-        - F4
-        - 114
-      - - 1897/768
-        - ticks: 461
-        - E4
-        - 100
-      - - 211/80
-        - ticks: 624
-        - Bb3
-        - 111
-      - - 113/40
-        - ticks: 528
-        - G3
-        - 104
-      - - '4'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 373/80
-        - ticks: 432
+      - - 2467/3840
+        - ticks: 576
         - G4
-        - 105
-      - - 24/5
-        - ticks: 595
+        - 109
+      - - 1589/1920
+        - ticks: 432
+        - B4
+        - 109
+      - - '1'
+        - ticks: 2179
         - F4
-        - 111
+        - 116
+      - - 17/10
+        - ticks: 605
+        - C5
+        - 106
+      - - '2'
+        - ticks: 2323
+        - E4
+        - 119
+      - - 10387/3840
+        - ticks: 624
+        - G4
+        - 108
+      - - '3'
+        - ticks: 1536
+        - Bb4
+        - 119
+      - - 13373/3840
+        - ticks: 1363
+        - F4
+        - 113
+      - - '4'
+        - ticks: 2717
+        - E4
+        - 121
+      - - 3671/768
+        - ticks: 547
+        - G4
+        - 103
+      - - '5'
+        - ticks: 1680
+        - F4
+        - 117
+      - - 10637/1920
+        - ticks: 1114
+        - C4
+        - 108
       - - '6'
-        - ticks: 1181
-        - B3
+        - ticks: 1056
+        - D#4
+        - 112
+      - - 24461/3840
+        - ticks: 979
+        - F#4
         - 115
-      - - 24403/3840
-        - ticks: 816
+      - - 12907/1920
+        - ticks: 682
+        - B3
+        - 110
+      - - '7'
+        - ticks: 1478
+        - B3
+        - 114
+      - - 5737/768
+        - ticks: 1056
         - D#4
         - 113
-      - - 25411/3840
-        - ticks: 624
+      - - 39/5
+        - ticks: 490
         - F4
-        - 104
-      - - 26189/3840
-        - ticks: 509
-        - E4
-        - 112
-      - - 29587/3840
-        - ticks: 797
-        - B3
-        - 117
+        - 111
       automation:
-      - id: duel_preroll_g_3
+      - id: preroll_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 618
+          value: 0
+        - at:
+            ticks: 1321
+          value: 239
+        - at:
+            ticks: 1662
+          value: 264
+        - at:
+            ticks: 1875
+          value: 214
+        - at:
+            ticks: 2131
+          value: 239
+        - at:
+            ticks: 2165
+          value: 0
+      - id: preroll_guitar_wail_03
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4472
+          value: 0
+        - at:
+            ticks: 5191
+          value: 205
+        - at:
+            ticks: 5540
+          value: 230
+        - at:
+            ticks: 5758
+          value: 180
+        - at:
+            ticks: 6019
+          value: 205
+        - at:
+            ticks: 6053
+          value: 0
+      - id: preroll_guitar_wail_05
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 7680
           value: 0
         - at:
-            ticks: 7864
+            ticks: 8354
           value: 0
         - at:
-            ticks: 8448
-          value: -683
+            ticks: 9120
+          value: 307
         - at:
-            ticks: 8632
-          value: -643
+            ticks: 9492
+          value: 332
         - at:
-            ticks: 8785
-          value: -715
+            ticks: 9724
+          value: 282
         - at:
-            ticks: 9178
-          value: -683
+            ticks: 10003
+          value: 307
         - at:
-            ticks: 9218
+            ticks: 10037
           value: 0
-      - id: duel_preroll_g_7
+      - id: preroll_guitar_wail_09
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15634
+            ticks: 16148
           value: 0
         - at:
-            ticks: 16502
-          value: 683
+            ticks: 17045
+          value: 307
         - at:
-            ticks: 16776
-          value: 723
+            ticks: 17479
+          value: 332
         - at:
-            ticks: 17004
-          value: 651
+            ticks: 17751
+          value: 282
         - at:
-            ticks: 17607
-          value: 683
+            ticks: 18077
+          value: 307
         - at:
-            ticks: 17647
+            ticks: 18111
           value: 0
-      - id: duel_preroll_g_11
+      - id: preroll_guitar_wail_11
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 24403
+            ticks: 19200
           value: 0
         - at:
-            ticks: 24500
+            ticks: 19687
           value: 0
         - at:
-            ticks: 24811
-          value: 683
+            ticks: 20242
+          value: 239
         - at:
-            ticks: 24908
-          value: 723
+            ticks: 20510
+          value: 264
         - at:
-            ticks: 24990
-          value: 651
+            ticks: 20678
+          value: 214
         - at:
-            ticks: 25181
-          value: 683
+            ticks: 20880
+          value: 239
         - at:
-            ticks: 25221
+            ticks: 20914
           value: 0
     - id: lead_guitar_iron_gate
       at:
@@ -8848,270 +8921,361 @@ parts:
         beat: 1
       events:
       - - '0'
+        - ticks: 1488
+        - E4
+        - 118
+      - - 37/80
+        - ticks: 528
+        - G4
+        - 107
+      - - 53/80
+        - ticks: 1056
+        - B4
+        - 115
+      - - '1'
         - ticks: 1584
         - E4
-        - 115
-      - - 19/40
-        - ticks: 480
-        - G3
-        - 100
-      - - 5/8
-        - ticks: 864
-        - Bb3
-        - 116
-      - - 3379/3840
-        - ticks: 365
-        - E4
-        - 104
-      - - '2'
-        - ticks: 1344
-        - B3
         - 113
-      - - 12/5
+      - - 119/80
         - ticks: 528
-        - G3
+        - G4
         - 103
-      - - 9811/3840
-        - ticks: 768
-        - F3
-        - 108
-      - - 10733/3840
-        - ticks: 624
-        - E3
-        - 114
-      - - '4'
-        - ticks: 1536
-        - F4
-        - 114
-      - - 3433/768
-        - ticks: 461
+      - - 27/16
+        - ticks: 912
         - E4
-        - 100
-      - - 371/80
-        - ticks: 624
-        - Bb3
-        - 111
-      - - 193/40
-        - ticks: 528
-        - G3
-        - 104
-      - - '6'
-        - ticks: 1181
-        - B3
         - 115
-      - - 24403/3840
-        - ticks: 816
-        - D#4
-        - 113
-      - - 25411/3840
-        - ticks: 624
-        - F4
-        - 104
-      - - 26189/3840
-        - ticks: 509
+      - - '2'
+        - ticks: 787
         - E4
         - 112
+      - - 181/80
+        - ticks: 624
+        - G4
+        - 106
+      - - 9581/3840
+        - ticks: 1584
+        - C5
+        - 120
+      - - '3'
+        - ticks: 1008
+        - B4
+        - 113
+      - - 12883/3840
+        - ticks: 787
+        - F4
+        - 109
+      - - 2807/768
+        - ticks: 989
+        - D4
+        - 111
+      - - '4'
+        - ticks: 2352
+        - E4
+        - 120
+      - - 18067/3840
+        - ticks: 701
+        - G4
+        - 108
+      - - '5'
+        - ticks: 1037
+        - F4
+        - 112
+      - - 20563/3840
+        - ticks: 816
+        - E4
+        - 116
+      - - 21773/3840
+        - ticks: 1008
+        - F4
+        - 109
+      - - '6'
+        - ticks: 653
+        - B3
+        - 108
+      - - 23933/3840
+        - ticks: 787
+        - D#4
+        - 112
+      - - 25037/3840
+        - ticks: 672
+        - F4
+        - 113
+      - - 25939/3840
+        - ticks: 710
+        - D#4
+        - 108
+      - - '7'
+        - ticks: 1296
+        - B3
+        - 112
+      - - 28493/3840
+        - ticks: 768
+        - F4
+        - 112
+      - - 29549/3840
+        - ticks: 826
+        - D#4
+        - 114
       automation:
-      - id: duel_iron_gate_g_2
+      - id: iron_gate_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 2400
+            ticks: 0
           value: 0
         - at:
-            ticks: 2503
+            ticks: 432
           value: 0
         - at:
-            ticks: 2832
-          value: 683
+            ticks: 923
+          value: 342
         - at:
-            ticks: 2935
-          value: 723
+            ticks: 1161
+          value: 367
         - at:
-            ticks: 3022
-          value: 651
+            ticks: 1309
+          value: 317
         - at:
-            ticks: 3226
-          value: 683
+            ticks: 1488
+          value: 342
         - at:
-            ticks: 3266
+            ticks: 1522
           value: 0
-      - id: duel_iron_gate_g_8
+      - id: iron_gate_guitar_wail_08
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 9581
+          value: 0
+        - at:
+            ticks: 10040
+          value: 0
+        - at:
+            ticks: 10563
+          value: 273
+        - at:
+            ticks: 10817
+          value: 298
+        - at:
+            ticks: 10975
+          value: 248
+        - at:
+            ticks: 11165
+          value: 273
+        - at:
+            ticks: 11199
+          value: 0
+      - id: iron_gate_guitar_wail_12
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15544
+            ticks: 16042
           value: 0
         - at:
-            ticks: 16128
-          value: -683
+            ticks: 16818
+          value: 444
         - at:
-            ticks: 16312
-          value: -643
+            ticks: 17195
+          value: 469
         - at:
-            ticks: 16465
-          value: -715
+            ticks: 17430
+          value: 419
         - at:
-            ticks: 16858
-          value: -683
+            ticks: 17712
+          value: 444
         - at:
-            ticks: 16898
-          value: 0
-      - id: duel_iron_gate_g_13
-        pitch_bend: 0
-        interpolation: linear
-        resolution:
-          ticks: 40
-        points:
-        - at:
-            ticks: 24403
-          value: 0
-        - at:
-            ticks: 24500
-          value: 0
-        - at:
-            ticks: 24811
-          value: 683
-        - at:
-            ticks: 24908
-          value: 723
-        - at:
-            ticks: 24990
-          value: 651
-        - at:
-            ticks: 25181
-          value: 683
-        - at:
-            ticks: 25221
+            ticks: 17746
           value: 0
     - id: lead_guitar_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
-      - - '1'
-        - ticks: 528
-        - E3
-        - 112
-      - - 47/40
-        - ticks: 384
+      - - '0'
+        - ticks: 1171
         - E4
-        - 106
-      - - 13/10
-        - ticks: 422
-        - F4
-        - 118
-      - - 5549/3840
-        - ticks: 403
-        - G4
-        - 106
-      - - 1225/768
-        - ticks: 1373
-        - Bb3
-        - 118
-      - - '3'
-        - ticks: 1344
-        - B3
-        - 113
-      - - 17/5
-        - ticks: 528
-        - G3
-        - 103
-      - - 13651/3840
-        - ticks: 768
-        - F3
-        - 108
-      - - 14573/3840
-        - ticks: 624
-        - E3
         - 114
-      - - '5'
-        - ticks: 2285
-        - D#4
+      - - 3/8
+        - ticks: 480
+        - G4
+        - 107
+      - - 2141/3840
+        - ticks: 595
+        - A4
+        - 109
+      - - 599/768
+        - ticks: 662
+        - G4
+        - 107
+      - - '1'
+        - ticks: 2381
+        - E4
+        - 116
+      - - 6643/3840
+        - ticks: 672
+        - B4
+        - 112
+      - - '2'
+        - ticks: 1248
+        - E4
+        - 112
+      - - 9197/3840
+        - ticks: 816
+        - E4
+        - 111
+      - - 43/16
+        - ticks: 922
+        - G4
+        - 114
+      - - 49/16
+        - ticks: 1296
+        - F4
+        - 115
+      - - 2665/768
+        - ticks: 1536
+        - C5
         - 119
-      - - 453/80
-        - ticks: 432
+      - - '4'
+        - ticks: 1459
+        - E4
+        - 115
+      - - 179/40
+        - ticks: 595
+        - D4
+        - 104
+      - - 377/80
+        - ticks: 845
+        - B3
+        - 112
+      - - '5'
+        - ticks: 1104
+        - Bb4
+        - 116
+      - - 429/80
+        - ticks: 672
+        - A4
+        - 111
+      - - 4297/768
+        - ticks: 1286
+        - F4
+        - 111
+      - - '6'
+        - ticks: 691
+        - B3
+        - 107
+      - - 23933/3840
+        - ticks: 672
+        - D#4
+        - 110
+      - - 12413/1920
+        - ticks: 672
+        - F4
+        - 115
+      - - 12893/1920
+        - ticks: 874
+        - A4
+        - 112
+      - - '7'
+        - ticks: 2784
+        - D#4
+        - 120
+      - - 39/5
+        - ticks: 528
         - G4
         - 105
-      - - 29/5
-        - ticks: 595
-        - F4
-        - 111
-      - - '7'
-        - ticks: 1968
-        - E4
-        - 119
-      - - 303/40
-        - ticks: 586
-        - Bb3
-        - 111
-      - - 621/80
-        - ticks: 816
-        - F3
-        - 110
       automation:
-      - id: duel_shattered_orders_g_4
+      - id: shattered_orders_guitar_wail_04
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 6125
+            ticks: 3840
           value: 0
         - at:
-            ticks: 6289
+            ticks: 4530
           value: 0
         - at:
-            ticks: 6811
-          value: 683
+            ticks: 5316
+          value: 205
         - at:
-            ticks: 6975
-          value: 723
+            ticks: 5697
+          value: 230
         - at:
-            ticks: 7113
-          value: 651
+            ticks: 5935
+          value: 180
         - at:
-            ticks: 7460
-          value: 683
+            ticks: 6221
+          value: 205
         - at:
-            ticks: 7500
+            ticks: 6255
           value: 0
-      - id: duel_shattered_orders_g_9
+      - id: shattered_orders_guitar_wail_10
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 19200
+            ticks: 13325
           value: 0
         - at:
-            ticks: 19474
+            ticks: 13770
           value: 0
         - at:
-            ticks: 20342
-          value: 683
+            ticks: 14277
+          value: 342
         - at:
-            ticks: 20616
-          value: 723
+            ticks: 14523
+          value: 367
         - at:
-            ticks: 20844
-          value: 651
+            ticks: 14677
+          value: 317
         - at:
-            ticks: 21447
-          value: 683
+            ticks: 14861
+          value: 342
         - at:
-            ticks: 21487
+            ticks: 14895
+          value: 0
+      - id: shattered_orders_guitar_wail_21
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 26880
+          value: 0
+        - at:
+            ticks: 27687
+          value: 0
+        - at:
+            ticks: 28606
+          value: 342
+        - at:
+            ticks: 29052
+          value: 367
+        - at:
+            ticks: 29330
+          value: 317
+        - at:
+            ticks: 29664
+          value: 342
+        - at:
+            ticks: 29698
           value: 0
     - id: lead_guitar_war_machine
       at:
@@ -9119,521 +9283,580 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1968
+        - ticks: 5568
         - E4
-        - 119
-      - - 23/40
-        - ticks: 586
-        - Bb3
-        - 111
-      - - 61/80
-        - ticks: 816
-        - F3
-        - 110
+        - 120
+      - - 2971/1920
+        - ticks: 1334
+        - B4
+        - 117
       - - '2'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 213/80
-        - ticks: 432
+        - ticks: 2784
+        - F4
+        - 120
+      - - 49/16
+        - ticks: 2342
+        - E4
+        - 115
+      - - 14419/3840
+        - ticks: 720
+        - E4
+        - 106
+      - - '4'
+        - ticks: 1296
+        - F4
+        - 110
+      - - 3383/768
+        - ticks: 2074
+        - Bb4
+        - 118
+      - - '5'
+        - ticks: 1584
         - G4
-        - 105
-      - - 14/5
-        - ticks: 595
+        - 115
+      - - 441/80
+        - ticks: 1267
+        - B4
+        - 118
+      - - '6'
+        - ticks: 1440
+        - Bb4
+        - 116
+      - - 4967/768
+        - ticks: 1517
         - F4
         - 111
-      - - '4'
-        - ticks: 2189
-        - E3
-        - 118
-      - - 37/8
-        - ticks: 499
-        - F3
-        - 107
-      - - 3671/768
-        - ticks: 720
-        - Bb3
-        - 119
-      - - '6'
-        - ticks: 1181
-        - B3
-        - 115
-      - - 24403/3840
-        - ticks: 816
+      - - '7'
+        - ticks: 1363
         - D#4
         - 113
-      - - 25411/3840
-        - ticks: 624
-        - F4
-        - 104
-      - - 26189/3840
-        - ticks: 509
-        - E4
-        - 112
-      - - 613/80
-        - ticks: 883
-        - E4
-        - 113
+      - - 597/80
+        - ticks: 1008
+        - F#4
+        - 110
+      - - 5975/768
+        - ticks: 576
+        - B3
+        - 107
       automation:
-      - id: duel_war_machine_g_3
+      - id: war_machine_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 1615
+          value: 0
+        - at:
+            ticks: 3452
+          value: 444
+        - at:
+            ticks: 4343
+          value: 469
+        - at:
+            ticks: 4900
+          value: 419
+        - at:
+            ticks: 5568
+          value: 444
+        - at:
+            ticks: 5602
+          value: 0
+      - id: war_machine_guitar_wail_02
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 7680
           value: 0
         - at:
-            ticks: 7954
+            ticks: 8487
           value: 0
         - at:
-            ticks: 8822
-          value: 683
+            ticks: 9406
+          value: 478
         - at:
-            ticks: 9096
-          value: 723
+            ticks: 9852
+          value: 503
         - at:
-            ticks: 9324
-          value: 651
+            ticks: 10130
+          value: 453
         - at:
-            ticks: 9927
-          value: 683
+            ticks: 10464
+          value: 478
         - at:
-            ticks: 9967
+            ticks: 10498
           value: 0
-      - id: duel_war_machine_g_8
+      - id: war_machine_guitar_wail_03
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 18355
+            ticks: 11760
           value: 0
         - at:
-            ticks: 18441
+            ticks: 12439
           value: 0
         - at:
-            ticks: 18715
-          value: 683
+            ticks: 13212
+          value: 342
         - at:
-            ticks: 18801
-          value: 723
+            ticks: 13587
+          value: 367
         - at:
-            ticks: 18875
-          value: 651
+            ticks: 13821
+          value: 317
         - at:
-            ticks: 19037
-          value: 683
+            ticks: 14102
+          value: 342
         - at:
-            ticks: 19077
+            ticks: 14136
           value: 0
-      - id: duel_war_machine_g_10
+      - id: war_machine_guitar_wail_06
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 24403
+            ticks: 16915
           value: 0
         - at:
-            ticks: 24500
+            ticks: 17516
           value: 0
         - at:
-            ticks: 24811
-          value: 683
+            ticks: 18201
+          value: 239
         - at:
-            ticks: 24908
-          value: 723
+            ticks: 18533
+          value: 264
         - at:
-            ticks: 24990
-          value: 651
+            ticks: 18740
+          value: 214
         - at:
-            ticks: 25181
-          value: 683
+            ticks: 18989
+          value: 239
         - at:
-            ticks: 25221
+            ticks: 19023
           value: 0
     - id: lead_guitar_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - 1/40
-        - ticks: 206
-        - E4
-        - 104
-      - - 7/80
-        - ticks: 206
-        - G4
-        - 107
-      - - 3/20
-        - ticks: 206
-        - A4
-        - 110
-      - - 17/80
-        - ticks: 206
-        - Bb4
-        - 113
-      - - 11/40
-        - ticks: 206
-        - B4
-        - 104
-      - - 27/80
-        - ticks: 206
-        - Bb4
-        - 107
-      - - 2/5
-        - ticks: 206
-        - A4
-        - 110
-      - - 37/80
-        - ticks: 206
-        - G4
-        - 113
-      - - 21/40
-        - ticks: 206
-        - E4
-        - 104
-      - - 47/80
-        - ticks: 206
-        - D4
-        - 107
-      - - 13/20
-        - ticks: 206
-        - B3
-        - 110
-      - - 57/80
-        - ticks: 206
-        - G3
-        - 113
-      - - 313/384
-        - ticks: 586
-        - E4
-        - 119
-      - - '2'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 213/80
+      - - 67/3840
         - ticks: 432
-        - G4
-        - 105
-      - - 14/5
-        - ticks: 595
-        - F4
-        - 111
-      - - 161/40
-        - ticks: 206
         - E4
-        - 104
-      - - 327/80
-        - ticks: 206
-        - F4
-        - 107
-      - - 83/20
-        - ticks: 206
-        - G4
         - 110
-      - - 337/80
-        - ticks: 206
+      - - 643/3840
+        - ticks: 384
+        - G4
+        - 107
+      - - 3/10
+        - ticks: 403
         - A4
-        - 113
-      - - 171/40
-        - ticks: 206
-        - Bb4
-        - 104
-      - - 347/80
-        - ticks: 206
+        - 109
+      - - 169/384
+        - ticks: 432
         - B4
-        - 107
-      - - 22/5
-        - ticks: 206
+        - 112
+      - - 1133/1920
+        - ticks: 384
         - D5
-        - 110
-      - - 357/80
-        - ticks: 206
+        - 111
+      - - 1411/1920
+        - ticks: 826
         - E5
-        - 113
-      - - 181/40
-        - ticks: 206
+        - 121
+      - - '1'
+        - ticks: 2544
+        - F5
+        - 120
+      - - 3379/1920
+        - ticks: 710
         - D5
-        - 104
-      - - 367/80
-        - ticks: 206
+        - 110
+      - - '2'
+        - ticks: 1584
+        - E4
+        - 115
+      - - 9581/3840
+        - ticks: 576
+        - G4
+        - 107
+      - - 10387/3840
+        - ticks: 864
+        - F4
+        - 109
+      - - '3'
+        - ticks: 2342
+        - E4
+        - 120
+      - - 14189/3840
+        - ticks: 787
         - B4
-        - 107
-      - - 93/20
-        - ticks: 206
-        - Bb4
-        - 110
-      - - 377/80
-        - ticks: 206
-        - G4
-        - 113
-      - - 1849/384
-        - ticks: 586
-        - E4
-        - 119
-      - - 241/40
-        - ticks: 206
-        - B3
-        - 104
-      - - 487/80
-        - ticks: 206
-        - D4
-        - 107
-      - - 123/20
-        - ticks: 206
-        - E4
-        - 110
-      - - 497/80
-        - ticks: 206
-        - F4
-        - 113
-      - - 251/40
-        - ticks: 206
-        - G4
-        - 104
-      - - 507/80
-        - ticks: 206
-        - F4
-        - 107
-      - - 32/5
-        - ticks: 206
-        - E4
-        - 110
-      - - 517/80
-        - ticks: 206
-        - D4
-        - 113
-      - - 261/40
-        - ticks: 206
-        - B3
-        - 104
-      - - 527/80
-        - ticks: 206
-        - Bb3
-        - 107
-      - - 133/20
-        - ticks: 206
-        - G3
-        - 110
-      - - 537/80
-        - ticks: 206
-        - E3
-        - 113
-      - - 2617/384
-        - ticks: 586
-        - E4
-        - 119
-      - - 3001/384
-        - ticks: 528
-        - B3
         - 114
+      - - '4'
+        - ticks: 595
+        - Bb4
+        - 115
+      - - 16147/3840
+        - ticks: 528
+        - D5
+        - 112
+      - - 351/80
+        - ticks: 614
+        - F5
+        - 117
+      - - 17683/3840
+        - ticks: 1190
+        - D5
+        - 116
+      - - '5'
+        - ticks: 2131
+        - F5
+        - 122
+      - - 453/80
+        - ticks: 912
+        - C5
+        - 113
+      - - 241/40
+        - ticks: 336
+        - G4
+        - 110
+      - - 11813/1920
+        - ticks: 336
+        - Bb4
+        - 112
+      - - 4823/768
+        - ticks: 336
+        - D5
+        - 113
+      - - 4921/768
+        - ticks: 326
+        - E5
+        - 114
+      - - 5017/768
+        - ticks: 528
+        - D5
+        - 109
+      - - 12917/1920
+        - ticks: 826
+        - Bb4
+        - 115
+      - - '7'
+        - ticks: 787
+        - B3
+        - 111
+      - - 581/80
+        - ticks: 691
+        - D#4
+        - 113
+      - - 28771/3840
+        - ticks: 624
+        - F4
+        - 116
+      - - 29587/3840
+        - ticks: 864
+        - A4
+        - 116
       automation:
-      - id: duel_counterattack_g_13
+      - id: counterattack_guitar_wail_06
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 7680
+            ticks: 3840
           value: 0
         - at:
-            ticks: 7954
+            ticks: 4578
           value: 0
         - at:
-            ticks: 8822
-          value: 683
+            ticks: 5417
+          value: 546
         - at:
-            ticks: 9096
-          value: 723
+            ticks: 5824
+          value: 571
         - at:
-            ticks: 9324
-          value: 651
+            ticks: 6079
+          value: 521
         - at:
-            ticks: 9927
-          value: 683
+            ticks: 6384
+          value: 546
         - at:
-            ticks: 9967
+            ticks: 6418
+          value: 0
+      - id: counterattack_guitar_wail_11
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 12199
+          value: 0
+        - at:
+            ticks: 12972
+          value: 376
+        - at:
+            ticks: 13347
+          value: 401
+        - at:
+            ticks: 13581
+          value: 351
+        - at:
+            ticks: 13862
+          value: 376
+        - at:
+            ticks: 13896
+          value: 0
+      - id: counterattack_guitar_wail_17
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 19200
+          value: 0
+        - at:
+            ticks: 19818
+          value: 0
+        - at:
+            ticks: 20521
+          value: 342
+        - at:
+            ticks: 20862
+          value: 367
+        - at:
+            ticks: 21075
+          value: 317
+        - at:
+            ticks: 21331
+          value: 342
+        - at:
+            ticks: 21365
           value: 0
     - id: lead_guitar_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - '1'
-        - ticks: 2189
-        - E3
-        - 118
-      - - 13/8
-        - ticks: 499
-        - F3
-        - 107
-      - - 1367/768
-        - ticks: 720
-        - Bb3
-        - 119
-      - - '3'
-        - ticks: 1536
-        - F4
-        - 114
-      - - 2665/768
-        - ticks: 461
+      - - '0'
+        - ticks: 3312
         - E4
-        - 100
-      - - 291/80
-        - ticks: 624
-        - Bb3
-        - 111
-      - - 153/40
-        - ticks: 528
-        - G3
-        - 104
-      - - '5'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 453/80
-        - ticks: 432
+        - 121
+      - - 2021/1920
+        - ticks: 2832
         - G4
-        - 105
-      - - 29/5
-        - ticks: 595
+        - 117
+      - - '2'
+        - ticks: 6000
         - F4
-        - 111
-      - - 2569/384
-        - ticks: 845
-        - E3
-        - 114
-      - - '7'
-        - ticks: 1181
-        - B3
-        - 115
-      - - 28243/3840
-        - ticks: 816
-        - D#4
-        - 113
-      - - 29251/3840
-        - ticks: 624
-        - F4
-        - 104
-      - - 30029/3840
-        - ticks: 509
+        - 120
+      - - 6979/1920
+        - ticks: 1075
+        - G4
+        - 116
+      - - '4'
+        - ticks: 3245
         - E4
-        - 112
+        - 120
+      - - '5'
+        - ticks: 2602
+        - Bb4
+        - 116
+      - - '6'
+        - ticks: 2957
+        - E4
+        - 121
+      - - '7'
+        - ticks: 1325
+        - D#4
+        - 110
+      - - 28589/3840
+        - ticks: 1037
+        - F#4
+        - 114
+      - - 311/40
+        - ticks: 595
+        - B3
+        - 108
       automation:
-      - id: duel_the_false_triumph_g_2
+      - id: the_false_triumph_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 6835
+            ticks: 0
           value: 0
         - at:
-            ticks: 6921
+            ticks: 960
           value: 0
         - at:
-            ticks: 7195
-          value: 683
+            ticks: 2053
+          value: 478
         - at:
-            ticks: 7281
-          value: 723
+            ticks: 2583
+          value: 503
         - at:
-            ticks: 7355
-          value: 651
+            ticks: 2915
+          value: 453
         - at:
-            ticks: 7517
-          value: 683
+            ticks: 3312
+          value: 478
         - at:
-            ticks: 7557
+            ticks: 3346
           value: 0
-      - id: duel_the_false_triumph_g_3
+      - id: the_false_triumph_guitar_wail_01
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 11520
+            ticks: 4042
           value: 0
         - at:
-            ticks: 11704
+            ticks: 4863
           value: 0
         - at:
-            ticks: 12288
-          value: -683
+            ticks: 5798
+          value: 410
         - at:
-            ticks: 12472
-          value: -643
+            ticks: 6251
+          value: 435
         - at:
-            ticks: 12625
-          value: -715
+            ticks: 6534
+          value: 385
         - at:
-            ticks: 13018
-          value: -683
+            ticks: 6874
+          value: 410
         - at:
-            ticks: 13058
+            ticks: 6908
           value: 0
-      - id: duel_the_false_triumph_g_7
+      - id: the_false_triumph_guitar_wail_02
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 7680
+          value: 0
+        - at:
+            ticks: 9420
+          value: 0
+        - at:
+            ticks: 11400
+          value: 512
+        - at:
+            ticks: 12360
+          value: 537
+        - at:
+            ticks: 12960
+          value: 487
+        - at:
+            ticks: 13680
+          value: 512
+        - at:
+            ticks: 13714
+          value: 0
+      - id: the_false_triumph_guitar_wail_04
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 15360
+          value: 0
+        - at:
+            ticks: 16301
+          value: 0
+        - at:
+            ticks: 17372
+          value: 478
+        - at:
+            ticks: 17891
+          value: 503
+        - at:
+            ticks: 18216
+          value: 453
+        - at:
+            ticks: 18605
+          value: 478
+        - at:
+            ticks: 18639
+          value: 0
+      - id: the_false_triumph_guitar_wail_05
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 19200
           value: 0
         - at:
-            ticks: 19474
+            ticks: 19955
           value: 0
         - at:
-            ticks: 20342
-          value: 683
+            ticks: 20813
+          value: 307
         - at:
-            ticks: 20616
-          value: 723
+            ticks: 21230
+          value: 332
         - at:
-            ticks: 20844
-          value: 651
+            ticks: 21490
+          value: 282
         - at:
-            ticks: 21447
-          value: 683
+            ticks: 21802
+          value: 307
         - at:
-            ticks: 21487
+            ticks: 21836
           value: 0
-      - id: duel_the_false_triumph_g_12
+      - id: the_false_triumph_guitar_wail_06
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 28243
+            ticks: 23040
           value: 0
         - at:
-            ticks: 28340
+            ticks: 23898
           value: 0
         - at:
-            ticks: 28651
-          value: 683
+            ticks: 24873
+          value: 478
         - at:
-            ticks: 28748
-          value: 723
+            ticks: 25346
+          value: 503
         - at:
-            ticks: 28830
-          value: 651
+            ticks: 25642
+          value: 453
         - at:
-            ticks: 29021
-          value: 683
+            ticks: 25997
+          value: 478
         - at:
-            ticks: 29061
+            ticks: 26031
           value: 0
     - id: lead_guitar_breaking_the_columns
       at:
@@ -9641,204 +9864,194 @@ parts:
         beat: 1
       events:
       - - 1/40
-        - ticks: 206
+        - ticks: 384
         - E4
-        - 104
-      - - 7/80
-        - ticks: 206
-        - F4
-        - 107
-      - - 3/20
-        - ticks: 206
-        - G4
         - 110
-      - - 17/80
-        - ticks: 206
+      - - 121/768
+        - ticks: 355
+        - G4
+        - 112
+      - - 547/1920
+        - ticks: 355
         - A4
-        - 113
-      - - 11/40
-        - ticks: 206
+        - 109
+      - - 33/80
+        - ticks: 317
         - Bb4
-        - 104
-      - - 27/80
-        - ticks: 206
-        - B4
-        - 107
-      - - 2/5
-        - ticks: 206
-        - D5
-        - 110
-      - - 37/80
-        - ticks: 206
-        - E5
-        - 113
-      - - 21/40
-        - ticks: 206
-        - D5
-        - 104
-      - - 47/80
-        - ticks: 206
-        - B4
-        - 107
-      - - 13/20
-        - ticks: 206
-        - Bb4
-        - 110
-      - - 57/80
-        - ticks: 206
-        - G4
-        - 113
-      - - 313/384
-        - ticks: 586
-        - E4
-        - 119
-      - - 81/40
-        - ticks: 206
-        - B3
-        - 104
-      - - 167/80
-        - ticks: 206
-        - D4
-        - 107
-      - - 43/20
-        - ticks: 206
-        - E4
-        - 110
-      - - 177/80
-        - ticks: 206
-        - F4
-        - 113
-      - - 91/40
-        - ticks: 206
-        - G4
-        - 104
-      - - 187/80
-        - ticks: 206
-        - F4
-        - 107
-      - - 12/5
-        - ticks: 206
-        - E4
-        - 110
-      - - 197/80
-        - ticks: 206
-        - D4
-        - 113
-      - - 101/40
-        - ticks: 206
-        - B3
-        - 104
-      - - 207/80
-        - ticks: 206
-        - Bb3
-        - 107
-      - - 53/20
-        - ticks: 206
-        - G3
-        - 110
-      - - 217/80
-        - ticks: 206
-        - E3
-        - 113
-      - - 1081/384
-        - ticks: 586
-        - E4
-        - 119
-      - - 161/40
-        - ticks: 206
-        - E4
-        - 104
-      - - 327/80
-        - ticks: 206
-        - G4
-        - 107
-      - - 83/20
-        - ticks: 206
-        - A4
-        - 110
-      - - 337/80
-        - ticks: 206
-        - Bb4
-        - 113
-      - - 171/40
-        - ticks: 206
-        - B4
-        - 104
-      - - 347/80
-        - ticks: 206
-        - Bb4
-        - 107
-      - - 22/5
-        - ticks: 206
-        - A4
-        - 110
-      - - 357/80
-        - ticks: 206
-        - G4
-        - 113
-      - - 181/40
-        - ticks: 206
-        - E4
-        - 104
-      - - 367/80
-        - ticks: 206
-        - D4
-        - 107
-      - - 93/20
-        - ticks: 206
-        - B3
-        - 110
-      - - 377/80
-        - ticks: 206
-        - G3
-        - 113
-      - - 1849/384
-        - ticks: 586
-        - E4
-        - 119
-      - - '6'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 533/80
-        - ticks: 432
-        - G4
-        - 105
-      - - 34/5
-        - ticks: 595
-        - F4
         - 111
-      - - 307/40
-        - ticks: 864
+      - - 21/40
+        - ticks: 413
+        - B4
+        - 117
+      - - 27/40
+        - ticks: 413
+        - D5
+        - 116
+      - - 3139/3840
+        - ticks: 547
+        - E5
+        - 121
+      - - '1'
+        - ticks: 2717
+        - F5
+        - 122
+      - - 3427/1920
+        - ticks: 528
+        - B4
+        - 109
+      - - '2'
+        - ticks: 1488
         - E4
-        - 118
+        - 114
+      - - 4733/1920
+        - ticks: 528
+        - G4
+        - 110
+      - - 5117/1920
+        - ticks: 1066
+        - E4
+        - 115
+      - - '3'
+        - ticks: 2438
+        - E4
+        - 120
+      - - 299/80
+        - ticks: 701
+        - B4
+        - 113
+      - - 7699/1920
+        - ticks: 355
+        - E4
+        - 109
+      - - 7939/1920
+        - ticks: 346
+        - G4
+        - 112
+      - - 341/80
+        - ticks: 355
+        - A4
+        - 111
+      - - 8429/1920
+        - ticks: 336
+        - B4
+        - 116
+      - - 8669/1920
+        - ticks: 432
+        - D5
+        - 112
+      - - 75/16
+        - ticks: 970
+        - D5
+        - 123
+      - - '5'
+        - ticks: 1536
+        - Bb4
+        - 116
+      - - 21091/3840
+        - ticks: 1334
+        - F4
+        - 110
+      - - '6'
+        - ticks: 2688
+        - E5
+        - 121
+      - - 5209/768
+        - ticks: 595
+        - B4
+        - 107
+      - - '7'
+        - ticks: 1229
+        - D#4
+        - 112
+      - - 37/5
+        - ticks: 1133
+        - F#4
+        - 115
+      - - 29779/3840
+        - ticks: 624
+        - B3
+        - 110
       automation:
-      - id: duel_breaking_the_columns_g_39
+      - id: breaking_the_columns_guitar_wail_07
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4628
+          value: 0
+        - at:
+            ticks: 5525
+          value: 581
+        - at:
+            ticks: 5959
+          value: 606
+        - at:
+            ticks: 6231
+          value: 556
+        - at:
+            ticks: 6557
+          value: 581
+        - at:
+            ticks: 6591
+          value: 0
+      - id: breaking_the_columns_guitar_wail_12
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 11520
+          value: 0
+        - at:
+            ticks: 12227
+          value: 0
+        - at:
+            ticks: 13032
+          value: 342
+        - at:
+            ticks: 13422
+          value: 367
+        - at:
+            ticks: 13665
+          value: 317
+        - at:
+            ticks: 13958
+          value: 342
+        - at:
+            ticks: 13992
+          value: 0
+      - id: breaking_the_columns_guitar_wail_22
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 23040
           value: 0
         - at:
-            ticks: 23314
+            ticks: 23820
           value: 0
         - at:
-            ticks: 24182
-          value: 683
+            ticks: 24707
+          value: 410
         - at:
-            ticks: 24456
-          value: 723
+            ticks: 25137
+          value: 435
         - at:
-            ticks: 24684
-          value: 651
+            ticks: 25405
+          value: 385
         - at:
-            ticks: 25287
-          value: 683
+            ticks: 25728
+          value: 410
         - at:
-            ticks: 25327
+            ticks: 25762
           value: 0
     - id: lead_guitar_no_throne
       at:
@@ -9846,127 +10059,162 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1584
-        - E4
-        - 115
-      - - 19/40
-        - ticks: 480
-        - G3
-        - 100
-      - - 5/8
-        - ticks: 864
-        - Bb3
-        - 116
-      - - 3379/3840
-        - ticks: 365
-        - E4
-        - 104
-      - - '2'
-        - ticks: 1968
+        - ticks: 1565
         - E4
         - 119
-      - - 103/40
+      - - 39/80
         - ticks: 586
-        - Bb3
-        - 111
-      - - 221/80
+        - G4
+        - 109
+      - - 57/80
         - ticks: 816
-        - F3
-        - 110
-      - - '4'
-        - ticks: 1536
-        - F4
-        - 114
-      - - 3433/768
-        - ticks: 461
+        - B4
+        - 117
+      - - '1'
+        - ticks: 1651
         - E4
-        - 100
-      - - 371/80
-        - ticks: 624
-        - Bb3
-        - 111
-      - - 193/40
-        - ticks: 528
-        - G3
-        - 104
-      - - '6'
+        - 116
+      - - 61/40
         - ticks: 557
-        - G3
-        - 102
-      - - 247/40
-        - ticks: 490
-        - A3
-        - 106
-      - - 24307/3840
-        - ticks: 499
-        - B3
-        - 107
-      - - 13/2
-        - ticks: 490
-        - D4
-        - 110
-      - - 25613/3840
-        - ticks: 1075
+        - G4
+        - 104
+      - - 3307/1920
+        - ticks: 797
         - E4
         - 117
-      - - 617/80
-        - ticks: 787
-        - B3
+      - - '2'
+        - ticks: 778
+        - E4
         - 113
+      - - 4339/1920
+        - ticks: 701
+        - G4
+        - 110
+      - - 9667/3840
+        - ticks: 5117
+        - C5
+        - 121
+      - - '4'
+        - ticks: 1027
+        - G4
+        - 112
+      - - 8347/1920
+        - ticks: 730
+        - Bb4
+        - 113
+      - - 37/8
+        - ticks: 1046
+        - D5
+        - 121
+      - - '5'
+        - ticks: 1450
+        - Bb4
+        - 119
+      - - 20957/3840
+        - ticks: 1248
+        - F4
+        - 114
+      - - '6'
+        - ticks: 2525
+        - D#4
+        - 122
+      - - 25901/3840
+        - ticks: 672
+        - G4
+        - 112
+      - - '7'
+        - ticks: 1373
+        - E4
+        - 112
+      - - 28579/3840
+        - ticks: 912
+        - E4
+        - 113
+      - - 29827/3840
+        - ticks: 605
+        - B3
+        - 107
       automation:
-      - id: duel_no_throne_g_2
+      - id: no_throne_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 2400
+            ticks: 0
           value: 0
         - at:
-            ticks: 2503
+            ticks: 454
           value: 0
         - at:
-            ticks: 2832
-          value: 683
+            ticks: 970
+          value: 342
         - at:
-            ticks: 2935
-          value: 723
+            ticks: 1221
+          value: 367
         - at:
-            ticks: 3022
-          value: 651
+            ticks: 1377
+          value: 317
         - at:
-            ticks: 3226
-          value: 683
+            ticks: 1565
+          value: 342
         - at:
-            ticks: 3266
+            ticks: 1599
           value: 0
-      - id: duel_no_throne_g_7
+      - id: no_throne_guitar_wail_08
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 15360
+            ticks: 9667
           value: 0
         - at:
-            ticks: 15544
+            ticks: 11151
           value: 0
         - at:
-            ticks: 16128
-          value: -683
+            ticks: 12840
+          value: 444
         - at:
-            ticks: 16312
-          value: -643
+            ticks: 13658
+          value: 469
         - at:
-            ticks: 16465
-          value: -715
+            ticks: 14170
+          value: 419
         - at:
-            ticks: 16858
-          value: -683
+            ticks: 14784
+          value: 444
         - at:
-            ticks: 16898
+            ticks: 14818
+          value: 0
+      - id: no_throne_guitar_wail_14
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 23040
+          value: 0
+        - at:
+            ticks: 23772
+          value: 0
+        - at:
+            ticks: 24606
+          value: 444
+        - at:
+            ticks: 25010
+          value: 469
+        - at:
+            ticks: 25262
+          value: 419
+        - at:
+            ticks: 25565
+          value: 444
+        - at:
+            ticks: 25599
           value: 0
     - id: lead_guitar_iron_sky_falls
       at:
@@ -9974,146 +10222,216 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1968
+        - ticks: 2131
         - E4
         - 119
-      - - 23/40
-        - ticks: 586
-        - Bb3
-        - 111
-      - - 61/80
-        - ticks: 816
-        - F3
-        - 110
-      - - '2'
-        - ticks: 1536
-        - F4
-        - 114
-      - - 1897/768
-        - ticks: 461
-        - E4
-        - 100
-      - - 211/80
-        - ticks: 624
-        - Bb3
-        - 111
-      - - 113/40
-        - ticks: 528
-        - G3
-        - 104
-      - - '4'
-        - ticks: 2285
-        - D#4
-        - 119
-      - - 373/80
-        - ticks: 432
+      - - 2467/3840
+        - ticks: 576
         - G4
-        - 105
-      - - 24/5
-        - ticks: 595
+        - 109
+      - - 1589/1920
+        - ticks: 432
+        - B4
+        - 109
+      - - '1'
+        - ticks: 2179
         - F4
-        - 111
+        - 116
+      - - 17/10
+        - ticks: 605
+        - C5
+        - 106
+      - - '2'
+        - ticks: 2323
+        - E4
+        - 119
+      - - 10387/3840
+        - ticks: 624
+        - G4
+        - 108
+      - - '3'
+        - ticks: 1536
+        - Bb4
+        - 119
+      - - 13373/3840
+        - ticks: 1363
+        - F4
+        - 113
+      - - '4'
+        - ticks: 2717
+        - E4
+        - 121
+      - - 3671/768
+        - ticks: 547
+        - G4
+        - 103
+      - - '5'
+        - ticks: 1680
+        - F4
+        - 117
+      - - 10637/1920
+        - ticks: 1114
+        - C4
+        - 108
       - - '6'
-        - ticks: 1181
-        - B3
+        - ticks: 1056
+        - D#4
+        - 112
+      - - 24461/3840
+        - ticks: 979
+        - F#4
         - 115
-      - - 24403/3840
-        - ticks: 816
+      - - 12907/1920
+        - ticks: 682
+        - B3
+        - 110
+      - - '7'
+        - ticks: 1478
+        - B3
+        - 114
+      - - 5737/768
+        - ticks: 1056
         - D#4
         - 113
-      - - 25411/3840
-        - ticks: 624
+      - - 39/5
+        - ticks: 490
         - F4
-        - 104
-      - - 26189/3840
-        - ticks: 509
-        - E4
-        - 112
-      - - 29587/3840
-        - ticks: 797
-        - B3
-        - 117
+        - 111
       automation:
-      - id: duel_iron_sky_falls_g_3
+      - id: iron_sky_falls_guitar_wail_00
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
+        points:
+        - at:
+            ticks: 0
+          value: 0
+        - at:
+            ticks: 618
+          value: 0
+        - at:
+            ticks: 1321
+          value: 239
+        - at:
+            ticks: 1662
+          value: 264
+        - at:
+            ticks: 1875
+          value: 214
+        - at:
+            ticks: 2131
+          value: 239
+        - at:
+            ticks: 2165
+          value: 0
+      - id: iron_sky_falls_guitar_wail_03
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
+        points:
+        - at:
+            ticks: 3840
+          value: 0
+        - at:
+            ticks: 4472
+          value: 0
+        - at:
+            ticks: 5191
+          value: 205
+        - at:
+            ticks: 5540
+          value: 230
+        - at:
+            ticks: 5758
+          value: 180
+        - at:
+            ticks: 6019
+          value: 205
+        - at:
+            ticks: 6053
+          value: 0
+      - id: iron_sky_falls_guitar_wail_05
+        pitch_bend: 0
+        interpolation: linear
+        resolution:
+          ticks: 48
         points:
         - at:
             ticks: 7680
           value: 0
         - at:
-            ticks: 7864
+            ticks: 8354
           value: 0
         - at:
-            ticks: 8448
-          value: -683
+            ticks: 9120
+          value: 307
         - at:
-            ticks: 8632
-          value: -643
+            ticks: 9492
+          value: 332
         - at:
-            ticks: 8785
-          value: -715
+            ticks: 9724
+          value: 282
         - at:
-            ticks: 9178
-          value: -683
+            ticks: 10003
+          value: 307
         - at:
-            ticks: 9218
+            ticks: 10037
           value: 0
-      - id: duel_iron_sky_falls_g_7
+      - id: iron_sky_falls_guitar_wail_09
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
             ticks: 15360
           value: 0
         - at:
-            ticks: 15634
+            ticks: 16148
           value: 0
         - at:
-            ticks: 16502
-          value: 683
+            ticks: 17045
+          value: 307
         - at:
-            ticks: 16776
-          value: 723
+            ticks: 17479
+          value: 332
         - at:
-            ticks: 17004
-          value: 651
+            ticks: 17751
+          value: 282
         - at:
-            ticks: 17607
-          value: 683
+            ticks: 18077
+          value: 307
         - at:
-            ticks: 17647
+            ticks: 18111
           value: 0
-      - id: duel_iron_sky_falls_g_11
+      - id: iron_sky_falls_guitar_wail_11
         pitch_bend: 0
         interpolation: linear
         resolution:
-          ticks: 40
+          ticks: 48
         points:
         - at:
-            ticks: 24403
+            ticks: 19200
           value: 0
         - at:
-            ticks: 24500
+            ticks: 19687
           value: 0
         - at:
-            ticks: 24811
-          value: 683
+            ticks: 20242
+          value: 239
         - at:
-            ticks: 24908
-          value: 723
+            ticks: 20510
+          value: 264
         - at:
-            ticks: 24990
-          value: 651
+            ticks: 20678
+          value: 214
         - at:
-            ticks: 25181
-          value: 683
+            ticks: 20880
+          value: 239
         - at:
-            ticks: 25221
+            ticks: 20914
           value: 0
 - id: drum_ornaments_part
   instrument: kit_ornaments
@@ -12527,2117 +12845,1597 @@ parts:
         - 9/32
         - C4
         - 101
-- id: violins_part
-  instrument: solo_violin
+- id: viola_lead_part
+  instrument: solo_viola
   voices:
-  - id: violins_voice
+  - id: solo_viola_voice
     clips:
-    - id: solo_violin_preroll
+    - id: solo_viola_preroll
       at:
         bar: 1
         beat: 1
       events:
-      - - '1'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 3149/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 6941/3840
-        - ticks: 605
-        - E5
-        - 110
-      - - '3'
-        - ticks: 1190
-        - Bb4
-        - 116
-      - - 12931/3840
-        - ticks: 538
-        - B4
-        - 111
-      - - 283/80
-        - ticks: 634
-        - D5
+      - - 2093/1920
+        - ticks: 1354
+        - F3
+        - 106
+      - - 5779/3840
+        - ticks: 1382
+        - C4
         - 108
-      - - 1439/384
-        - ticks: 797
-        - E5
-        - 115
-      - - '5'
-        - ticks: 1728
-        - F5
-        - 119
-      - - 11/2
-        - ticks: 576
-        - Bb4
-        - 109
-      - - 21859/3840
-        - ticks: 912
-        - B4
-        - 119
-      - - 67/10
-        - ticks: 874
-        - F5
-        - 114
-      - - '7'
-        - ticks: 461
-        - B4
-        - 103
-      - - 13723/1920
-        - ticks: 451
-        - D5
-        - 110
-      - - 14011/1920
-        - ticks: 451
-        - E5
-        - 114
-      - - 14333/1920
-        - ticks: 768
-        - F5
-        - 118
-      - - 14803/1920
-        - ticks: 902
-        - E5
+      - - 4013/1920
+        - ticks: 1421
+        - G3
+        - 107
+      - - 1945/768
+        - ticks: 1306
+        - E4
+        - 108
+      - - 5981/1920
+        - ticks: 1469
+        - Bb3
+        - 108
+      - - 13699/3840
+        - ticks: 1142
+        - F4
+        - 106
+      - - 83/20
+        - ticks: 1824
+        - B3
+        - 107
+      - - 9739/1920
+        - ticks: 1402
+        - C4
+        - 108
+      - - 4247/768
+        - ticks: 1200
+        - F4
         - 111
+      - - 11741/1920
+        - ticks: 1200
+        - A3
+        - 107
+      - - 521/80
+        - ticks: 1219
+        - D#4
+        - 109
+      - - 27187/3840
+        - ticks: 1190
+        - F#4
+        - 107
+      - - 15/2
+        - ticks: 1229
+        - D#4
+        - 112
       automation:
-      - id: duel_preroll_bow_dynamics
+      - id: preroll_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3840
-          - 77
-        - - ticks: 4610
-          - 109
-        - - ticks: 5488
-          - 101
-        - - ticks: 5969
-          - 88
-        - - ticks: 6298
-          - 77
-        - - ticks: 6481
-          - 109
-        - - ticks: 6689
-          - 101
-        - - ticks: 6795
-          - 88
-        - - ticks: 6941
-          - 77
-        - - ticks: 7158
-          - 109
-        - - ticks: 7406
-          - 101
-        - - ticks: 7534
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 11948
-          - 109
-        - - ticks: 12436
-          - 101
-        - - ticks: 12698
-          - 88
-        - - ticks: 12931
-          - 77
-        - - ticks: 13124
-          - 109
-        - - ticks: 13345
-          - 101
-        - - ticks: 13457
-          - 88
-        - - ticks: 13584
-          - 77
-        - - ticks: 13812
-          - 109
-        - - ticks: 14072
-          - 101
-        - - ticks: 14206
-          - 88
-        - - ticks: 14390
-          - 77
-        - - ticks: 14676
-          - 109
-        - - ticks: 15003
-          - 101
-        - - ticks: 15175
-          - 88
-        - - ticks: 19200
-          - 77
-        - - ticks: 19822
-          - 109
-        - - ticks: 20530
-          - 101
-        - - ticks: 20916
-          - 88
-        - - ticks: 21120
-          - 77
-        - - ticks: 21327
-          - 109
-        - - ticks: 21563
-          - 101
-        - - ticks: 21684
-          - 88
-        - - ticks: 21859
-          - 77
-        - - ticks: 22187
-          - 109
-        - - ticks: 22561
-          - 101
-        - - ticks: 22759
-          - 88
-        - - ticks: 25728
-          - 77
-        - - ticks: 26042
-          - 109
-        - - ticks: 26400
-          - 101
-        - - ticks: 26590
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27045
-          - 109
-        - - ticks: 27234
-          - 101
-        - - ticks: 27329
-          - 88
-        - - ticks: 27446
-          - 77
-        - - ticks: 27608
-          - 109
-        - - ticks: 27793
-          - 101
-        - - ticks: 27885
-          - 88
-        - - ticks: 28022
-          - 77
-        - - ticks: 28184
-          - 109
-        - - ticks: 28369
-          - 101
-        - - ticks: 28461
-          - 88
-        - - ticks: 28666
-          - 77
-        - - ticks: 28942
-          - 109
-        - - ticks: 29257
-          - 101
-        - - ticks: 29422
-          - 88
-        - - ticks: 29606
-          - 77
-        - - ticks: 29930
-          - 109
-        - - ticks: 30300
-          - 101
-        - - ticks: 30496
-          - 88
-    - id: solo_violin_iron_gate
+          - 90
+        - - ticks: 4158
+          - 80
+        - - ticks: 4592
+          - 99
+        - - ticks: 5229
+          - 103
+        - - ticks: 5540
+          - 89
+        - - ticks: 5751
+          - 80
+        - - ticks: 6194
+          - 99
+        - - ticks: 6843
+          - 103
+        - - ticks: 7161
+          - 89
+        - - ticks: 7998
+          - 80
+        - - ticks: 8452
+          - 99
+        - - ticks: 9120
+          - 103
+        - - ticks: 9447
+          - 89
+        - - ticks: 9697
+          - 80
+        - - ticks: 10117
+          - 99
+        - - ticks: 10731
+          - 103
+        - - ticks: 11031
+          - 89
+        - - ticks: 11934
+          - 80
+        - - ticks: 12403
+          - 99
+        - - ticks: 13093
+          - 103
+        - - ticks: 13431
+          - 89
+        - - ticks: 13671
+          - 80
+        - - ticks: 14042
+          - 99
+        - - ticks: 14578
+          - 103
+        - - ticks: 14841
+          - 89
+        - - ticks: 15908
+          - 80
+        - - ticks: 16483
+          - 99
+        - - ticks: 17340
+          - 103
+        - - ticks: 17760
+          - 89
+        - - ticks: 19450
+          - 80
+        - - ticks: 19899
+          - 99
+        - - ticks: 20558
+          - 103
+        - - ticks: 20880
+          - 89
+        - - ticks: 21207
+          - 80
+        - - ticks: 21595
+          - 99
+        - - ticks: 22159
+          - 103
+        - - ticks: 22435
+          - 89
+        - - ticks: 23454
+          - 80
+        - - ticks: 23842
+          - 99
+        - - ticks: 24406
+          - 103
+        - - ticks: 24682
+          - 89
+        - - ticks: 24980
+          - 80
+        - - ticks: 25374
+          - 99
+        - - ticks: 25947
+          - 103
+        - - ticks: 26227
+          - 89
+        - - ticks: 27159
+          - 80
+        - - ticks: 27544
+          - 99
+        - - ticks: 28103
+          - 103
+        - - ticks: 28377
+          - 89
+        - - ticks: 28772
+          - 80
+        - - ticks: 29169
+          - 99
+        - - ticks: 29746
+          - 103
+        - - ticks: 30029
+          - 89
+    - id: solo_viola_iron_gate
       at:
         bar: 9
         beat: 1
       events:
-      - - '1'
-        - ticks: 1248
-        - F5
-        - 108
-      - - 5309/3840
-        - ticks: 864
-        - E5
-        - 108
-      - - 6307/3840
-        - ticks: 547
-        - G5
-        - 111
-      - - 3509/1920
-        - ticks: 490
-        - F5
+      - - 9/8
+        - ticks: 1555
+        - C4
+        - 107
+      - - 6259/3840
+        - ticks: 1133
+        - E4
         - 104
-      - - '3'
-        - ticks: 1190
-        - Bb4
-        - 116
-      - - 12931/3840
-        - ticks: 538
-        - B4
-        - 111
-      - - 283/80
-        - ticks: 634
-        - D5
+      - - 31/10
+        - ticks: 1210
+        - E4
         - 108
-      - - 1439/384
-        - ticks: 797
-        - E5
-        - 115
-      - - '5'
-        - ticks: 1181
-        - Bb4
-        - 114
-      - - 107/20
-        - ticks: 1018
-        - E5
-        - 112
-      - - 21763/3840
-        - ticks: 461
-        - F5
-        - 110
-      - - 2233/384
-        - ticks: 490
-        - E5
-        - 113
-      - - '7'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 14669/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 29981/3840
-        - ticks: 605
-        - E5
-        - 110
+      - - 13459/3840
+        - ticks: 1363
+        - B3
+        - 104
+      - - 347/80
+        - ticks: 1056
+        - G3
+        - 100
+      - - 18067/3840
+        - ticks: 768
+        - B3
+        - 104
+      - - 3863/768
+        - ticks: 1459
+        - Bb3
+        - 107
+      - - 21149/3840
+        - ticks: 1133
+        - F4
+        - 108
+      - - 23501/3840
+        - ticks: 1200
+        - A3
+        - 109
+      - - 5015/768
+        - ticks: 1267
+        - F#4
+        - 105
+      - - 5495/768
+        - ticks: 1008
+        - E4
+        - 109
+      - - 601/80
+        - ticks: 1488
+        - B3
+        - 108
       automation:
-      - id: duel_iron_gate_bow_dynamics
+      - id: iron_gate_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3840
-          - 77
-        - - ticks: 4289
-          - 109
-        - - ticks: 4800
-          - 101
-        - - ticks: 5076
-          - 88
-        - - ticks: 5309
-          - 77
-        - - ticks: 5620
-          - 109
-        - - ticks: 5974
-          - 101
-        - - ticks: 6161
-          - 88
-        - - ticks: 6307
-          - 77
-        - - ticks: 6503
-          - 109
-        - - ticks: 6728
-          - 101
-        - - ticks: 6842
-          - 88
-        - - ticks: 7018
-          - 77
-        - - ticks: 7194
-          - 109
-        - - ticks: 7395
-          - 101
-        - - ticks: 7496
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 11948
-          - 109
-        - - ticks: 12436
-          - 101
-        - - ticks: 12698
-          - 88
-        - - ticks: 12931
-          - 77
-        - - ticks: 13124
-          - 109
-        - - ticks: 13345
-          - 101
-        - - ticks: 13457
-          - 88
-        - - ticks: 13584
-          - 77
-        - - ticks: 13812
-          - 109
-        - - ticks: 14072
-          - 101
-        - - ticks: 14206
-          - 88
-        - - ticks: 14390
-          - 77
-        - - ticks: 14676
-          - 109
-        - - ticks: 15003
-          - 101
-        - - ticks: 15175
-          - 88
-        - - ticks: 19200
-          - 77
-        - - ticks: 19625
-          - 109
-        - - ticks: 20109
-          - 101
-        - - ticks: 20369
-          - 88
-        - - ticks: 20544
-          - 77
-        - - ticks: 20910
-          - 109
-        - - ticks: 21327
-          - 101
-        - - ticks: 21550
-          - 88
-        - - ticks: 21763
-          - 77
-        - - ticks: 21928
-          - 109
-        - - ticks: 22117
-          - 101
-        - - ticks: 22212
-          - 88
-        - - ticks: 22330
-          - 77
-        - - ticks: 22506
-          - 109
-        - - ticks: 22707
-          - 101
-        - - ticks: 22808
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27650
-          - 109
-        - - ticks: 28528
-          - 101
-        - - ticks: 29009
-          - 88
-        - - ticks: 29338
-          - 77
-        - - ticks: 29521
-          - 109
-        - - ticks: 29729
-          - 101
-        - - ticks: 29835
-          - 88
-        - - ticks: 29981
-          - 77
-        - - ticks: 30198
-          - 109
-        - - ticks: 30446
-          - 101
-        - - ticks: 30574
-          - 88
-    - id: solo_violin_shattered_orders
+          - 90
+        - - ticks: 4292
+          - 80
+        - - ticks: 4786
+          - 99
+        - - ticks: 5517
+          - 103
+        - - ticks: 5875
+          - 89
+        - - ticks: 6231
+          - 80
+        - - ticks: 6599
+          - 99
+        - - ticks: 7131
+          - 103
+        - - ticks: 7392
+          - 89
+        - - ticks: 11876
+          - 80
+        - - ticks: 12267
+          - 99
+        - - ticks: 12836
+          - 103
+        - - ticks: 13114
+          - 89
+        - - ticks: 13431
+          - 80
+        - - ticks: 13868
+          - 99
+        - - ticks: 14509
+          - 103
+        - - ticks: 14822
+          - 89
+        - - ticks: 16628
+          - 80
+        - - ticks: 16973
+          - 99
+        - - ticks: 17469
+          - 103
+        - - ticks: 17712
+          - 89
+        - - ticks: 18039
+          - 80
+        - - ticks: 18297
+          - 99
+        - - ticks: 18658
+          - 103
+        - - ticks: 18835
+          - 89
+        - - ticks: 19287
+          - 80
+        - - ticks: 19753
+          - 99
+        - - ticks: 20438
+          - 103
+        - - ticks: 20774
+          - 89
+        - - ticks: 21121
+          - 80
+        - - ticks: 21489
+          - 99
+        - - ticks: 22021
+          - 103
+        - - ticks: 22282
+          - 89
+        - - ticks: 23473
+          - 80
+        - - ticks: 23861
+          - 99
+        - - ticks: 24425
+          - 103
+        - - ticks: 24701
+          - 89
+        - - ticks: 25047
+          - 80
+        - - ticks: 25455
+          - 99
+        - - ticks: 26051
+          - 103
+        - - ticks: 26342
+          - 89
+        - - ticks: 27447
+          - 80
+        - - ticks: 27777
+          - 99
+        - - ticks: 28251
+          - 103
+        - - ticks: 28483
+          - 89
+        - - ticks: 28820
+          - 80
+        - - ticks: 29294
+          - 99
+        - - ticks: 29994
+          - 103
+        - - ticks: 30336
+          - 89
+    - id: solo_viola_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
-      - - '0'
-        - ticks: 1190
-        - Bb4
-        - 116
-      - - 1411/3840
-        - ticks: 538
-        - B4
-        - 111
-      - - 43/80
-        - ticks: 634
-        - D5
-        - 108
-      - - 287/384
-        - ticks: 797
-        - E5
-        - 115
-      - - '2'
-        - ticks: 1248
-        - F5
-        - 108
-      - - 9149/3840
-        - ticks: 864
-        - E5
-        - 108
-      - - 10147/3840
-        - ticks: 547
-        - G5
-        - 111
-      - - 5429/1920
-        - ticks: 490
-        - F5
-        - 104
-      - - '4'
-        - ticks: 442
-        - G4
+      - - 23/20
+        - ticks: 874
+        - B3
         - 105
-      - - 7949/1920
-        - ticks: 413
-        - A4
-        - 107
-      - - 8189/1920
-        - ticks: 413
-        - B4
-        - 109
-      - - 16877/3840
-        - ticks: 413
-        - D5
-        - 111
-      - - 3481/768
-        - ticks: 509
-        - E5
-        - 116
-      - - 9043/1920
-        - ticks: 941
-        - G5
-        - 120
-      - - '6'
-        - ticks: 461
-        - G5
-        - 112
-      - - 11789/1920
-        - ticks: 432
-        - F5
-        - 107
-      - - 4823/768
-        - ticks: 403
-        - E5
-        - 109
-      - - 12307/1920
-        - ticks: 403
-        - D5
-        - 108
-      - - 131/20
-        - ticks: 384
-        - B4
+      - - 5587/3840
+        - ticks: 595
+        - D4
         - 106
-      - - 25661/3840
+      - - 27/16
         - ticks: 979
-        - E5
-        - 117
+        - E4
+        - 108
+      - - 8083/3840
+        - ticks: 1373
+        - C4
+        - 106
+      - - 9859/3840
+        - ticks: 1056
+        - E4
+        - 107
+      - - 49/16
+        - ticks: 1325
+        - A3
+        - 102
+      - - 279/80
+        - ticks: 1296
+        - F4
+        - 111
+      - - 15571/3840
+        - ticks: 1296
+        - B3
+        - 109
+      - - 8621/1920
+        - ticks: 1421
+        - E4
+        - 110
+      - - 203/40
+        - ticks: 1152
+        - F4
+        - 113
+      - - 4199/768
+        - ticks: 739
+        - D4
+        - 104
+      - - 22013/3840
+        - ticks: 787
+        - Bb3
+        - 107
+      - - 4727/768
+        - ticks: 1296
+        - F4
+        - 108
+      - - 12629/1920
+        - ticks: 1171
+        - D4
+        - 109
+      - - 573/80
+        - ticks: 1008
+        - B3
+        - 103
+      - - 151/20
+        - ticks: 1392
+        - D#4
+        - 112
       automation:
-      - id: duel_shattered_orders_bow_dynamics
+      - id: shattered_orders_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 428
-          - 109
-        - - ticks: 916
-          - 101
-        - - ticks: 1178
-          - 88
-        - - ticks: 1411
-          - 77
-        - - ticks: 1604
-          - 109
-        - - ticks: 1825
-          - 101
-        - - ticks: 1937
-          - 88
-        - - ticks: 2064
-          - 77
-        - - ticks: 2292
-          - 109
-        - - ticks: 2552
-          - 101
-        - - ticks: 2686
-          - 88
-        - - ticks: 2870
-          - 77
-        - - ticks: 3156
-          - 109
-        - - ticks: 3483
-          - 101
-        - - ticks: 3655
-          - 88
-        - - ticks: 7680
-          - 77
-        - - ticks: 8129
-          - 109
-        - - ticks: 8640
-          - 101
-        - - ticks: 8916
-          - 88
-        - - ticks: 9149
-          - 77
-        - - ticks: 9460
-          - 109
-        - - ticks: 9814
-          - 101
-        - - ticks: 10001
-          - 88
-        - - ticks: 10147
-          - 77
-        - - ticks: 10343
-          - 109
-        - - ticks: 10568
-          - 101
-        - - ticks: 10682
-          - 88
-        - - ticks: 10858
-          - 77
-        - - ticks: 11034
-          - 109
-        - - ticks: 11235
-          - 101
-        - - ticks: 11336
-          - 88
-        - - ticks: 15360
-          - 77
-        - - ticks: 15519
-          - 109
-        - - ticks: 15700
-          - 101
-        - - ticks: 15790
-          - 88
-        - - ticks: 15898
-          - 77
-        - - ticks: 16046
-          - 109
-        - - ticks: 16216
-          - 101
-        - - ticks: 16299
-          - 88
-        - - ticks: 16378
-          - 77
-        - - ticks: 16526
-          - 109
-        - - ticks: 16696
-          - 101
-        - - ticks: 16779
-          - 88
-        - - ticks: 16877
-          - 77
-        - - ticks: 17025
-          - 109
-        - - ticks: 17195
-          - 101
-        - - ticks: 17278
-          - 88
-        - - ticks: 17405
-          - 77
-        - - ticks: 17588
-          - 109
-        - - ticks: 17796
-          - 101
-        - - ticks: 17902
-          - 88
-        - - ticks: 18086
-          - 77
-        - - ticks: 18424
-          - 109
-        - - ticks: 18810
-          - 101
-        - - ticks: 19015
-          - 88
-        - - ticks: 23040
-          - 77
-        - - ticks: 23205
-          - 109
-        - - ticks: 23394
-          - 101
-        - - ticks: 23489
-          - 88
-        - - ticks: 23578
-          - 77
-        - - ticks: 23733
-          - 109
-        - - ticks: 23910
-          - 101
-        - - ticks: 23998
-          - 88
-        - - ticks: 24115
-          - 77
-        - - ticks: 24260
-          - 109
-        - - ticks: 24425
-          - 101
-        - - ticks: 24506
-          - 88
-        - - ticks: 24614
-          - 77
-        - - ticks: 24759
-          - 109
-        - - ticks: 24924
-          - 101
-        - - ticks: 25005
-          - 88
-        - - ticks: 25152
-          - 77
-        - - ticks: 25290
-          - 109
-        - - ticks: 25447
-          - 101
-        - - ticks: 25524
-          - 88
-        - - ticks: 25661
-          - 77
-        - - ticks: 26013
-          - 109
-        - - ticks: 26414
-          - 101
-        - - ticks: 26628
-          - 88
-    - id: solo_violin_war_machine
+          - 90
+        - - ticks: 4388
+          - 80
+        - - ticks: 4678
+          - 99
+        - - ticks: 5089
+          - 103
+        - - ticks: 5290
+          - 89
+        - - ticks: 5563
+          - 91
+        - - ticks: 6182
+          - 86
+        - - ticks: 6452
+          - 80
+        - - ticks: 6774
+          - 99
+        - - ticks: 7234
+          - 103
+        - - ticks: 7459
+          - 89
+        - - ticks: 8055
+          - 80
+        - - ticks: 8495
+          - 99
+        - - ticks: 9140
+          - 103
+        - - ticks: 9456
+          - 89
+        - - ticks: 9831
+          - 80
+        - - ticks: 10176
+          - 99
+        - - ticks: 10672
+          - 103
+        - - ticks: 10915
+          - 89
+        - - ticks: 11732
+          - 80
+        - - ticks: 12158
+          - 99
+        - - ticks: 12780
+          - 103
+        - - ticks: 13085
+          - 89
+        - - ticks: 13364
+          - 80
+        - - ticks: 13781
+          - 99
+        - - ticks: 14390
+          - 103
+        - - ticks: 14688
+          - 89
+        - - ticks: 15543
+          - 80
+        - - ticks: 15960
+          - 99
+        - - ticks: 16569
+          - 103
+        - - ticks: 16867
+          - 89
+        - - ticks: 17214
+          - 80
+        - - ticks: 17668
+          - 99
+        - - ticks: 18336
+          - 103
+        - - ticks: 18663
+          - 89
+        - - ticks: 19460
+          - 80
+        - - ticks: 19834
+          - 99
+        - - ticks: 20375
+          - 103
+        - - ticks: 20640
+          - 89
+        - - ticks: 20967
+          - 80
+        - - ticks: 21217
+          - 99
+        - - ticks: 21564
+          - 103
+        - - ticks: 21734
+          - 89
+        - - ticks: 21985
+          - 80
+        - - ticks: 22249
+          - 99
+        - - ticks: 22619
+          - 103
+        - - ticks: 22800
+          - 89
+        - - ticks: 23607
+          - 80
+        - - ticks: 24024
+          - 99
+        - - ticks: 24633
+          - 103
+        - - ticks: 24931
+          - 89
+        - - ticks: 25230
+          - 80
+        - - ticks: 25609
+          - 99
+        - - ticks: 26160
+          - 103
+        - - ticks: 26429
+          - 89
+        - - ticks: 27476
+          - 80
+        - - ticks: 27806
+          - 99
+        - - ticks: 28280
+          - 103
+        - - ticks: 28512
+          - 89
+        - - ticks: 28964
+          - 80
+        - - ticks: 29410
+          - 99
+        - - ticks: 30064
+          - 103
+        - - ticks: 30384
+          - 89
+    - id: solo_viola_war_machine
       at:
         bar: 25
         beat: 1
       events:
-      - - '1'
-        - ticks: 2592
-        - G5
-        - 118
-      - - 3283/1920
-        - ticks: 883
-        - F5
-        - 115
-      - - '3'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 6989/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 14621/3840
-        - ticks: 605
-        - E5
-        - 110
-      - - '5'
-        - ticks: 1181
-        - Bb4
-        - 114
-      - - 107/20
-        - ticks: 1018
-        - E5
-        - 112
-      - - 21763/3840
-        - ticks: 461
-        - F5
-        - 110
-      - - 2233/384
-        - ticks: 490
-        - E5
-        - 113
-      - - 25709/3840
-        - ticks: 922
-        - E5
-        - 112
-      - - '7'
-        - ticks: 1728
-        - F5
-        - 119
-      - - 15/2
-        - ticks: 576
-        - Bb4
+      - - 17/16
+        - ticks: 1459
+        - E4
+        - 102
+      - - 5827/3840
+        - ticks: 1373
+        - D4
+        - 104
+      - - 4051/1920
+        - ticks: 2688
+        - C4
+        - 103
+      - - 49/16
+        - ticks: 1344
+        - C4
         - 109
-      - - 29539/3840
+      - - 7/2
+        - ticks: 1411
+        - E4
+        - 107
+      - - 3287/768
+        - ticks: 1181
+        - F3
+        - 103
+      - - 8957/1920
         - ticks: 912
-        - B4
-        - 119
+        - F4
+        - 111
+      - - 403/80
+        - ticks: 1584
+        - B3
+        - 108
+      - - 10627/1920
+        - ticks: 1363
+        - D4
+        - 110
+      - - 49/8
+        - ticks: 1277
+        - F4
+        - 106
+      - - 5017/768
+        - ticks: 1286
+        - D4
+        - 106
+      - - 5399/768
+        - ticks: 1488
+        - A3
+        - 108
+      - - 14419/1920
+        - ticks: 1440
+        - F#4
+        - 108
       automation:
-      - id: duel_war_machine_bow_dynamics
+      - id: war_machine_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3840
-          - 77
-        - - ticks: 4773
-          - 109
-        - - ticks: 5835
-          - 101
-        - - ticks: 6420
-          - 88
-        - - ticks: 6566
-          - 77
-        - - ticks: 6883
-          - 109
-        - - ticks: 7245
-          - 101
-        - - ticks: 7437
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 12290
-          - 109
-        - - ticks: 13168
-          - 101
-        - - ticks: 13649
-          - 88
-        - - ticks: 13978
-          - 77
-        - - ticks: 14161
-          - 109
-        - - ticks: 14369
-          - 101
-        - - ticks: 14475
-          - 88
-        - - ticks: 14621
-          - 77
-        - - ticks: 14838
-          - 109
-        - - ticks: 15086
-          - 101
-        - - ticks: 15214
-          - 88
-        - - ticks: 19200
-          - 77
-        - - ticks: 19625
-          - 109
-        - - ticks: 20109
-          - 101
-        - - ticks: 20369
-          - 88
-        - - ticks: 20544
-          - 77
-        - - ticks: 20910
-          - 109
-        - - ticks: 21327
-          - 101
-        - - ticks: 21550
-          - 88
-        - - ticks: 21763
-          - 77
-        - - ticks: 21928
-          - 109
-        - - ticks: 22117
-          - 101
-        - - ticks: 22212
-          - 88
-        - - ticks: 22330
-          - 77
-        - - ticks: 22506
-          - 109
-        - - ticks: 22707
-          - 101
-        - - ticks: 22808
-          - 88
-        - - ticks: 25709
-          - 77
-        - - ticks: 26040
-          - 109
-        - - ticks: 26418
-          - 101
-        - - ticks: 26619
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27502
-          - 109
-        - - ticks: 28210
-          - 101
-        - - ticks: 28596
-          - 88
-        - - ticks: 28800
-          - 77
-        - - ticks: 29007
-          - 109
-        - - ticks: 29243
-          - 101
-        - - ticks: 29364
-          - 88
-        - - ticks: 29539
-          - 77
-        - - ticks: 29867
-          - 109
-        - - ticks: 30241
-          - 101
-        - - ticks: 30439
-          - 88
-    - id: solo_violin_counterattack
+          - 90
+        - - ticks: 4052
+          - 80
+        - - ticks: 4518
+          - 99
+        - - ticks: 5203
+          - 103
+        - - ticks: 5539
+          - 89
+        - - ticks: 5799
+          - 80
+        - - ticks: 6239
+          - 99
+        - - ticks: 6884
+          - 103
+        - - ticks: 7200
+          - 89
+        - - ticks: 8074
+          - 80
+        - - ticks: 8908
+          - 99
+        - - ticks: 10172
+          - 103
+        - - ticks: 10790
+          - 89
+        - - ticks: 11732
+          - 80
+        - - ticks: 12163
+          - 99
+        - - ticks: 12795
+          - 103
+        - - ticks: 13104
+          - 89
+        - - ticks: 13412
+          - 80
+        - - ticks: 13863
+          - 99
+        - - ticks: 14526
+          - 103
+        - - ticks: 14851
+          - 89
+        - - ticks: 16407
+          - 80
+        - - ticks: 16789
+          - 99
+        - - ticks: 17344
+          - 103
+        - - ticks: 17616
+          - 89
+        - - ticks: 17886
+          - 80
+        - - ticks: 18188
+          - 99
+        - - ticks: 18616
+          - 103
+        - - ticks: 18826
+          - 89
+        - - ticks: 19316
+          - 80
+        - - ticks: 19819
+          - 99
+        - - ticks: 20564
+          - 103
+        - - ticks: 20928
+          - 89
+        - - ticks: 21226
+          - 80
+        - - ticks: 21663
+          - 99
+        - - ticks: 22304
+          - 103
+        - - ticks: 22617
+          - 89
+        - - ticks: 23492
+          - 80
+        - - ticks: 23903
+          - 99
+        - - ticks: 24503
+          - 103
+        - - ticks: 24797
+          - 89
+        - - ticks: 25057
+          - 80
+        - - ticks: 25471
+          - 99
+        - - ticks: 26075
+          - 103
+        - - ticks: 26371
+          - 89
+        - - ticks: 26967
+          - 80
+        - - ticks: 27441
+          - 99
+        - - ticks: 28141
+          - 103
+        - - ticks: 28483
+          - 89
+        - - ticks: 28810
+          - 80
+        - - ticks: 29270
+          - 99
+        - - ticks: 29947
+          - 103
+        - - ticks: 30278
+          - 89
+    - id: solo_viola_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - 41/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 87/80
-        - ticks: 211
-        - F5
-        - 107
-      - - 23/20
-        - ticks: 211
-        - G5
-        - 110
-      - - 97/80
-        - ticks: 211
-        - F5
-        - 113
-      - - 51/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 107/80
-        - ticks: 211
-        - D5
-        - 107
-      - - 7/5
-        - ticks: 211
-        - B4
-        - 110
-      - - 117/80
-        - ticks: 211
-        - D5
-        - 113
-      - - 61/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 127/80
-        - ticks: 211
-        - G5
-        - 107
-      - - 649/384
-        - ticks: 1066
-        - E5
-        - 119
-      - - '3'
-        - ticks: 442
-        - G4
-        - 105
-      - - 6029/1920
+      - - 3907/3840
         - ticks: 413
-        - A4
-        - 107
-      - - 6269/1920
-        - ticks: 413
-        - B4
-        - 109
-      - - 13037/3840
-        - ticks: 413
-        - D5
-        - 111
-      - - 2713/768
-        - ticks: 509
-        - E5
-        - 116
-      - - 7123/1920
-        - ticks: 941
-        - G5
-        - 120
-      - - 201/40
-        - ticks: 211
-        - B4
-        - 104
-      - - 407/80
-        - ticks: 211
-        - D5
-        - 107
-      - - 103/20
-        - ticks: 211
-        - E5
-        - 110
-      - - 417/80
-        - ticks: 211
-        - F5
-        - 113
-      - - 211/40
-        - ticks: 211
-        - G5
-        - 104
-      - - 427/80
-        - ticks: 211
-        - A5
-        - 107
-      - - 27/5
-        - ticks: 211
-        - G5
-        - 110
-      - - 437/80
-        - ticks: 211
-        - F5
-        - 113
-      - - 221/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 447/80
-        - ticks: 211
-        - D5
-        - 107
-      - - 2185/384
-        - ticks: 1066
-        - E5
-        - 119
-      - - 26131/3840
-        - ticks: 576
-        - Bb4
-        - 115
-      - - '7'
-        - ticks: 461
-        - G5
-        - 112
-      - - 13709/1920
-        - ticks: 432
-        - F5
-        - 107
-      - - 5591/768
-        - ticks: 403
-        - E5
-        - 109
-      - - 14227/1920
-        - ticks: 403
-        - D5
+        - E4
         - 108
-      - - 151/20
+      - - 2237/1920
+        - ticks: 355
+        - F4
+        - 107
+      - - 4963/3840
+        - ticks: 374
+        - G4
+        - 110
+      - - 2741/1920
+        - ticks: 365
+        - A4
+        - 111
+      - - 599/384
+        - ticks: 1200
+        - C5
+        - 114
+      - - 83/40
+        - ticks: 1181
+        - C4
+        - 108
+      - - 9523/3840
+        - ticks: 1411
+        - E4
+        - 113
+      - - 11741/3840
+        - ticks: 1162
+        - G3
+        - 104
+      - - 6619/1920
+        - ticks: 1085
+        - B3
+        - 111
+      - - 15437/3840
         - ticks: 384
-        - B4
-        - 106
-      - - 29501/3840
-        - ticks: 979
-        - E5
-        - 117
+        - Bb3
+        - 107
+      - - 3191/768
+        - ticks: 355
+        - D4
+        - 110
+      - - 8227/1920
+        - ticks: 336
+        - F4
+        - 113
+      - - 16973/3840
+        - ticks: 336
+        - G4
+        - 114
+      - - 1751/384
+        - ticks: 1325
+        - F4
+        - 113
+      - - 19603/3840
+        - ticks: 1392
+        - F4
+        - 111
+      - - 2137/384
+        - ticks: 1181
+        - C4
+        - 109
+      - - 23251/3840
+        - ticks: 1171
+        - D4
+        - 105
+      - - 24787/3840
+        - ticks: 1229
+        - G4
+        - 111
+      - - 27149/3840
+        - ticks: 1200
+        - D#4
+        - 112
+      - - 28781/3840
+        - ticks: 1421
+        - B3
+        - 108
       automation:
-      - id: duel_counterattack_bow_dynamics
+      - id: counterattack_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3936
-          - 92
-        - - ticks: 4142
-          - 92
-        - - ticks: 4176
-          - 92
-        - - ticks: 4382
-          - 92
-        - - ticks: 4416
-          - 92
-        - - ticks: 4622
-          - 92
-        - - ticks: 4656
-          - 92
-        - - ticks: 4862
-          - 92
-        - - ticks: 4896
-          - 92
-        - - ticks: 5102
-          - 92
-        - - ticks: 5136
-          - 92
-        - - ticks: 5342
-          - 92
-        - - ticks: 5376
-          - 92
-        - - ticks: 5582
-          - 92
-        - - ticks: 5616
-          - 92
-        - - ticks: 5822
-          - 92
-        - - ticks: 5856
-          - 92
-        - - ticks: 6062
-          - 92
-        - - ticks: 6096
-          - 92
-        - - ticks: 6302
-          - 92
-        - - ticks: 6490
-          - 77
-        - - ticks: 6873
-          - 109
-        - - ticks: 7310
-          - 101
-        - - ticks: 7544
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 11679
-          - 109
-        - - ticks: 11860
-          - 101
-        - - ticks: 11950
-          - 88
-        - - ticks: 12058
-          - 77
-        - - ticks: 12206
-          - 109
-        - - ticks: 12376
-          - 101
-        - - ticks: 12459
-          - 88
-        - - ticks: 12538
-          - 77
-        - - ticks: 12686
-          - 109
-        - - ticks: 12856
-          - 101
-        - - ticks: 12939
-          - 88
-        - - ticks: 13037
-          - 77
-        - - ticks: 13185
-          - 109
-        - - ticks: 13355
-          - 101
-        - - ticks: 13438
-          - 88
-        - - ticks: 13565
-          - 77
-        - - ticks: 13748
-          - 109
-        - - ticks: 13956
-          - 101
-        - - ticks: 14062
-          - 88
-        - - ticks: 14246
-          - 77
-        - - ticks: 14584
-          - 109
-        - - ticks: 14970
-          - 101
-        - - ticks: 15175
-          - 88
-        - - ticks: 19296
-          - 92
-        - - ticks: 19502
-          - 92
-        - - ticks: 19536
-          - 92
-        - - ticks: 19742
-          - 92
-        - - ticks: 19776
-          - 92
-        - - ticks: 19982
-          - 92
-        - - ticks: 20016
-          - 92
-        - - ticks: 20222
-          - 92
-        - - ticks: 20256
-          - 92
-        - - ticks: 20462
-          - 92
-        - - ticks: 20496
-          - 92
-        - - ticks: 20702
-          - 92
-        - - ticks: 20736
-          - 92
-        - - ticks: 20942
-          - 92
-        - - ticks: 20976
-          - 92
-        - - ticks: 21182
-          - 92
-        - - ticks: 21216
-          - 92
-        - - ticks: 21422
-          - 92
-        - - ticks: 21456
-          - 92
-        - - ticks: 21662
-          - 92
-        - - ticks: 21850
-          - 77
-        - - ticks: 22233
-          - 109
-        - - ticks: 22670
-          - 101
-        - - ticks: 22904
-          - 88
-        - - ticks: 26131
-          - 77
-        - - ticks: 26338
-          - 109
-        - - ticks: 26574
-          - 101
-        - - ticks: 26695
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27045
-          - 109
-        - - ticks: 27234
-          - 101
-        - - ticks: 27329
-          - 88
-        - - ticks: 27418
-          - 77
-        - - ticks: 27573
-          - 109
-        - - ticks: 27750
-          - 101
-        - - ticks: 27838
-          - 88
-        - - ticks: 27955
-          - 77
-        - - ticks: 28100
-          - 109
-        - - ticks: 28265
-          - 101
-        - - ticks: 28346
-          - 88
-        - - ticks: 28454
-          - 77
-        - - ticks: 28599
-          - 109
-        - - ticks: 28764
-          - 101
-        - - ticks: 28845
-          - 88
-        - - ticks: 28992
-          - 77
-        - - ticks: 29130
-          - 109
-        - - ticks: 29287
-          - 101
-        - - ticks: 29364
-          - 88
-        - - ticks: 29501
-          - 77
-        - - ticks: 29853
-          - 109
-        - - ticks: 30254
-          - 101
-        - - ticks: 30468
-          - 88
-    - id: solo_violin_the_false_triumph
+          - 90
+        - - ticks: 3883
+          - 91
+        - - ticks: 4320
+          - 86
+        - - ticks: 4450
+          - 91
+        - - ticks: 4829
+          - 86
+        - - ticks: 4939
+          - 91
+        - - ticks: 5337
+          - 86
+        - - ticks: 5458
+          - 91
+        - - ticks: 5847
+          - 86
+        - - ticks: 5962
+          - 80
+        - - ticks: 6350
+          - 99
+        - - ticks: 6914
+          - 103
+        - - ticks: 7190
+          - 89
+        - - ticks: 7940
+          - 80
+        - - ticks: 8322
+          - 99
+        - - ticks: 8877
+          - 103
+        - - ticks: 9149
+          - 89
+        - - ticks: 9495
+          - 80
+        - - ticks: 9946
+          - 99
+        - - ticks: 10609
+          - 103
+        - - ticks: 10934
+          - 89
+        - - ticks: 11713
+          - 80
+        - - ticks: 12090
+          - 99
+        - - ticks: 12636
+          - 103
+        - - ticks: 12903
+          - 89
+        - - ticks: 13210
+          - 80
+        - - ticks: 13564
+          - 99
+        - - ticks: 14073
+          - 103
+        - - ticks: 14323
+          - 89
+        - - ticks: 15413
+          - 91
+        - - ticks: 15821
+          - 86
+        - - ticks: 15931
+          - 91
+        - - ticks: 16310
+          - 86
+        - - ticks: 16430
+          - 91
+        - - ticks: 16790
+          - 86
+        - - ticks: 16949
+          - 91
+        - - ticks: 17309
+          - 86
+        - - ticks: 17482
+          - 80
+        - - ticks: 17908
+          - 99
+        - - ticks: 18530
+          - 103
+        - - ticks: 18835
+          - 89
+        - - ticks: 19575
+          - 80
+        - - ticks: 20021
+          - 99
+        - - ticks: 20675
+          - 103
+        - - ticks: 20995
+          - 89
+        - - ticks: 21342
+          - 80
+        - - ticks: 21724
+          - 99
+        - - ticks: 22279
+          - 103
+        - - ticks: 22551
+          - 89
+        - - ticks: 23223
+          - 80
+        - - ticks: 23602
+          - 99
+        - - ticks: 24153
+          - 103
+        - - ticks: 24422
+          - 89
+        - - ticks: 24759
+          - 80
+        - - ticks: 25156
+          - 99
+        - - ticks: 25733
+          - 103
+        - - ticks: 26016
+          - 89
+        - - ticks: 27121
+          - 80
+        - - ticks: 27509
+          - 99
+        - - ticks: 28073
+          - 103
+        - - ticks: 28349
+          - 89
+        - - ticks: 28753
+          - 80
+        - - ticks: 29207
+          - 99
+        - - ticks: 29875
+          - 103
+        - - ticks: 30202
+          - 89
+    - id: solo_viola_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - '0'
-        - ticks: 2592
-        - G5
-        - 118
-      - - 1363/1920
-        - ticks: 883
-        - F5
-        - 115
-      - - '2'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 5069/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 10781/3840
-        - ticks: 605
-        - E5
-        - 110
-      - - '4'
-        - ticks: 1728
-        - F5
-        - 119
-      - - 9/2
-        - ticks: 576
-        - Bb4
+      - - 317/1920
+        - ticks: 2323
+        - B3
         - 109
-      - - 18019/3840
-        - ticks: 912
-        - B4
-        - 119
-      - - '6'
-        - ticks: 1181
-        - Bb4
-        - 114
-      - - 127/20
-        - ticks: 1018
-        - E5
-        - 112
-      - - 25603/3840
-        - ticks: 461
-        - F5
+      - - 17/16
+        - ticks: 2630
+        - E4
+        - 111
+      - - 4099/1920
+        - ticks: 2515
+        - A3
+        - 105
+      - - 249/80
+        - ticks: 1536
+        - C4
+        - 108
+      - - 18/5
+        - ticks: 1171
+        - E4
         - 110
-      - - 2617/384
-        - ticks: 490
-        - E5
+      - - 15821/3840
+        - ticks: 2160
+        - B3
+        - 107
+      - - 19603/3840
+        - ticks: 2218
+        - F4
         - 113
-      - - 5927/768
-        - ticks: 816
-        - F5
+      - - 493/80
+        - ticks: 1824
+        - G3
+        - 108
+      - - 25747/3840
+        - ticks: 806
+        - E4
+        - 108
+      - - 27427/3840
+        - ticks: 1238
+        - A3
+        - 109
+      - - 303/40
+        - ticks: 1152
+        - D#4
         - 112
       automation:
-      - id: duel_the_false_triumph_bow_dynamics
+      - id: the_false_triumph_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 933
-          - 109
-        - - ticks: 1995
-          - 101
-        - - ticks: 2580
-          - 88
-        - - ticks: 2726
-          - 77
-        - - ticks: 3043
-          - 109
-        - - ticks: 3405
-          - 101
-        - - ticks: 3597
-          - 88
-        - - ticks: 7680
-          - 77
-        - - ticks: 8450
-          - 109
-        - - ticks: 9328
-          - 101
-        - - ticks: 9809
-          - 88
-        - - ticks: 10138
-          - 77
-        - - ticks: 10321
-          - 109
-        - - ticks: 10529
-          - 101
-        - - ticks: 10635
-          - 88
-        - - ticks: 10781
-          - 77
-        - - ticks: 10998
-          - 109
-        - - ticks: 11246
-          - 101
-        - - ticks: 11374
-          - 88
-        - - ticks: 15360
-          - 77
-        - - ticks: 15982
-          - 109
-        - - ticks: 16690
-          - 101
-        - - ticks: 17076
-          - 88
-        - - ticks: 17280
-          - 77
-        - - ticks: 17487
-          - 109
-        - - ticks: 17723
-          - 101
-        - - ticks: 17844
-          - 88
-        - - ticks: 18019
-          - 77
-        - - ticks: 18347
-          - 109
-        - - ticks: 18721
-          - 101
-        - - ticks: 18919
-          - 88
-        - - ticks: 23040
-          - 77
-        - - ticks: 23465
-          - 109
-        - - ticks: 23949
-          - 101
-        - - ticks: 24209
-          - 88
-        - - ticks: 24384
-          - 77
-        - - ticks: 24750
-          - 109
-        - - ticks: 25167
-          - 101
-        - - ticks: 25390
-          - 88
-        - - ticks: 25603
-          - 77
-        - - ticks: 25768
-          - 109
-        - - ticks: 25957
-          - 101
-        - - ticks: 26052
-          - 88
-        - - ticks: 26170
-          - 77
-        - - ticks: 26346
-          - 109
-        - - ticks: 26547
-          - 101
-        - - ticks: 26648
-          - 88
-        - - ticks: 29635
-          - 77
-        - - ticks: 29928
-          - 109
-        - - ticks: 30263
-          - 101
-        - - ticks: 30439
-          - 88
-    - id: solo_violin_breaking_the_columns
+          - 90
+        - - ticks: 606
+          - 80
+        - - ticks: 1331
+          - 99
+        - - ticks: 2423
+          - 103
+        - - ticks: 2957
+          - 89
+        - - ticks: 4052
+          - 80
+        - - ticks: 4869
+          - 99
+        - - ticks: 6105
+          - 103
+        - - ticks: 6710
+          - 89
+        - - ticks: 8170
+          - 80
+        - - ticks: 8952
+          - 99
+        - - ticks: 10135
+          - 103
+        - - ticks: 10713
+          - 89
+        - - ticks: 11924
+          - 80
+        - - ticks: 12413
+          - 99
+        - - ticks: 13135
+          - 103
+        - - ticks: 13488
+          - 89
+        - - ticks: 13796
+          - 80
+        - - ticks: 14175
+          - 99
+        - - ticks: 14726
+          - 103
+        - - ticks: 14995
+          - 89
+        - - ticks: 15793
+          - 80
+        - - ticks: 16469
+          - 99
+        - - ticks: 17484
+          - 103
+        - - ticks: 17981
+          - 89
+        - - ticks: 19575
+          - 80
+        - - ticks: 20268
+          - 99
+        - - ticks: 21311
+          - 103
+        - - ticks: 21821
+          - 89
+        - - ticks: 23636
+          - 80
+        - - ticks: 24211
+          - 99
+        - - ticks: 25068
+          - 103
+        - - ticks: 25488
+          - 89
+        - - ticks: 25719
+          - 80
+        - - ticks: 25989
+          - 99
+        - - ticks: 26368
+          - 103
+        - - ticks: 26553
+          - 89
+        - - ticks: 27399
+          - 80
+        - - ticks: 27798
+          - 99
+        - - ticks: 28380
+          - 103
+        - - ticks: 28665
+          - 89
+        - - ticks: 29060
+          - 80
+        - - ticks: 29434
+          - 99
+        - - ticks: 29975
+          - 103
+        - - ticks: 30240
+          - 89
+    - id: solo_viola_breaking_the_columns
       at:
         bar: 49
         beat: 1
       events:
-      - - 41/40
-        - ticks: 211
-        - B4
-        - 104
-      - - 87/80
-        - ticks: 211
-        - D5
-        - 107
-      - - 23/20
-        - ticks: 211
-        - E5
-        - 110
-      - - 97/80
-        - ticks: 211
-        - F5
+      - - 1987/1920
+        - ticks: 413
+        - G4
+        - 112
+      - - 2261/1920
+        - ticks: 403
+        - F4
         - 113
-      - - 51/40
-        - ticks: 211
-        - G5
-        - 104
-      - - 107/80
-        - ticks: 211
-        - A5
-        - 107
-      - - 7/5
-        - ticks: 211
-        - G5
+      - - 505/384
+        - ticks: 403
+        - E4
         - 110
-      - - 117/80
-        - ticks: 211
-        - F5
-        - 113
-      - - 61/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 127/80
-        - ticks: 211
-        - D5
+      - - 2803/1920
+        - ticks: 413
+        - D4
+        - 109
+      - - 3091/1920
+        - ticks: 1200
+        - C4
+        - 112
+      - - 167/80
+        - ticks: 1334
+        - E4
+        - 111
+      - - 101/40
+        - ticks: 1133
+        - C4
+        - 108
+      - - 11923/3840
+        - ticks: 1114
+        - B3
         - 107
-      - - 649/384
-        - ticks: 1066
-        - E5
-        - 119
-      - - 121/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 247/80
-        - ticks: 211
-        - F5
-        - 107
-      - - 63/20
-        - ticks: 211
-        - G5
-        - 110
-      - - 257/80
-        - ticks: 211
-        - F5
-        - 113
-      - - 131/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 267/80
-        - ticks: 211
-        - D5
-        - 107
-      - - 17/5
-        - ticks: 211
-        - B4
-        - 110
-      - - 277/80
-        - ticks: 211
-        - D5
-        - 113
-      - - 141/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 287/80
-        - ticks: 211
-        - G5
-        - 107
-      - - 1417/384
-        - ticks: 1066
-        - E5
-        - 119
-      - - 201/40
-        - ticks: 211
-        - G5
-        - 104
-      - - 407/80
-        - ticks: 211
-        - F5
-        - 107
-      - - 103/20
-        - ticks: 211
-        - E5
-        - 110
-      - - 417/80
-        - ticks: 211
-        - D5
-        - 113
-      - - 211/40
-        - ticks: 211
-        - B4
-        - 104
-      - - 427/80
-        - ticks: 211
-        - Bb4
-        - 107
-      - - 27/5
-        - ticks: 211
-        - B4
-        - 110
-      - - 437/80
-        - ticks: 211
-        - D5
-        - 113
-      - - 221/40
-        - ticks: 211
-        - E5
-        - 104
-      - - 447/80
-        - ticks: 211
-        - F5
-        - 107
-      - - 2185/384
-        - ticks: 1066
-        - E5
-        - 119
-      - - 269/40
-        - ticks: 691
-        - E5
+      - - 13363/3840
+        - ticks: 1450
+        - E4
         - 114
-      - - '7'
-        - ticks: 2592
-        - G5
-        - 118
-      - - 14803/1920
-        - ticks: 883
-        - F5
-        - 115
+      - - 19517/3840
+        - ticks: 1306
+        - Bb3
+        - 111
+      - - 21149/3840
+        - ticks: 1296
+        - D4
+        - 108
+      - - 121/20
+        - ticks: 1210
+        - E4
+        - 109
+      - - 24787/3840
+        - ticks: 1258
+        - G4
+        - 112
+      - - 13613/1920
+        - ticks: 1142
+        - F#4
+        - 112
+      - - 14357/1920
+        - ticks: 1459
+        - D#4
+        - 111
       automation:
-      - id: duel_breaking_the_columns_bow_dynamics
+      - id: breaking_the_columns_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3936
-          - 92
-        - - ticks: 4142
-          - 92
-        - - ticks: 4176
-          - 92
-        - - ticks: 4382
-          - 92
-        - - ticks: 4416
-          - 92
-        - - ticks: 4622
-          - 92
-        - - ticks: 4656
-          - 92
-        - - ticks: 4862
-          - 92
-        - - ticks: 4896
-          - 92
-        - - ticks: 5102
-          - 92
-        - - ticks: 5136
-          - 92
-        - - ticks: 5342
-          - 92
-        - - ticks: 5376
-          - 92
+          - 90
+        - - ticks: 3950
+          - 91
+        - - ticks: 4387
+          - 86
+        - - ticks: 4498
+          - 91
+        - - ticks: 4925
+          - 86
+        - - ticks: 5026
+          - 91
+        - - ticks: 5453
+          - 86
         - - ticks: 5582
-          - 92
-        - - ticks: 5616
-          - 92
-        - - ticks: 5822
-          - 92
-        - - ticks: 5856
-          - 92
-        - - ticks: 6062
-          - 92
-        - - ticks: 6096
-          - 92
-        - - ticks: 6302
-          - 92
-        - - ticks: 6490
-          - 77
-        - - ticks: 6873
-          - 109
-        - - ticks: 7310
-          - 101
-        - - ticks: 7544
-          - 88
-        - - ticks: 11616
-          - 92
-        - - ticks: 11822
-          - 92
-        - - ticks: 11856
-          - 92
-        - - ticks: 12062
-          - 92
-        - - ticks: 12096
-          - 92
-        - - ticks: 12302
-          - 92
-        - - ticks: 12336
-          - 92
-        - - ticks: 12542
-          - 92
-        - - ticks: 12576
-          - 92
-        - - ticks: 12782
-          - 92
-        - - ticks: 12816
-          - 92
-        - - ticks: 13022
-          - 92
-        - - ticks: 13056
-          - 92
-        - - ticks: 13262
-          - 92
-        - - ticks: 13296
-          - 92
-        - - ticks: 13502
-          - 92
-        - - ticks: 13536
-          - 92
-        - - ticks: 13742
-          - 92
-        - - ticks: 13776
-          - 92
-        - - ticks: 13982
-          - 92
-        - - ticks: 14170
-          - 77
-        - - ticks: 14553
-          - 109
-        - - ticks: 14990
-          - 101
-        - - ticks: 15224
-          - 88
-        - - ticks: 19296
-          - 92
-        - - ticks: 19502
-          - 92
-        - - ticks: 19536
-          - 92
-        - - ticks: 19742
-          - 92
-        - - ticks: 19776
-          - 92
-        - - ticks: 19982
-          - 92
-        - - ticks: 20016
-          - 92
-        - - ticks: 20222
-          - 92
-        - - ticks: 20256
-          - 92
-        - - ticks: 20462
-          - 92
-        - - ticks: 20496
-          - 92
-        - - ticks: 20702
-          - 92
-        - - ticks: 20736
-          - 92
-        - - ticks: 20942
-          - 92
-        - - ticks: 20976
-          - 92
-        - - ticks: 21182
-          - 92
-        - - ticks: 21216
-          - 92
-        - - ticks: 21422
-          - 92
-        - - ticks: 21456
-          - 92
-        - - ticks: 21662
-          - 92
-        - - ticks: 21850
-          - 77
-        - - ticks: 22233
-          - 109
-        - - ticks: 22670
-          - 101
-        - - ticks: 22904
-          - 88
-        - - ticks: 25824
-          - 77
-        - - ticks: 26072
-          - 109
-        - - ticks: 26356
-          - 101
-        - - ticks: 26503
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27813
-          - 109
-        - - ticks: 28875
-          - 101
-        - - ticks: 29460
-          - 88
-        - - ticks: 29606
-          - 77
-        - - ticks: 29923
-          - 109
-        - - ticks: 30285
-          - 101
-        - - ticks: 30477
-          - 88
-    - id: solo_violin_no_throne
+          - 91
+        - - ticks: 6019
+          - 86
+        - - ticks: 6154
+          - 80
+        - - ticks: 6542
+          - 99
+        - - ticks: 7106
+          - 103
+        - - ticks: 7382
+          - 89
+        - - ticks: 7988
+          - 80
+        - - ticks: 8416
+          - 99
+        - - ticks: 9043
+          - 103
+        - - ticks: 9350
+          - 89
+        - - ticks: 9668
+          - 80
+        - - ticks: 10036
+          - 99
+        - - ticks: 10568
+          - 103
+        - - ticks: 10829
+          - 89
+        - - ticks: 11895
+          - 80
+        - - ticks: 12257
+          - 99
+        - - ticks: 12781
+          - 103
+        - - ticks: 13037
+          - 89
+        - - ticks: 13335
+          - 80
+        - - ticks: 13798
+          - 99
+        - - ticks: 14479
+          - 103
+        - - ticks: 14813
+          - 89
+        - - ticks: 19489
+          - 80
+        - - ticks: 19909
+          - 99
+        - - ticks: 20523
+          - 103
+        - - ticks: 20823
+          - 89
+        - - ticks: 21121
+          - 80
+        - - ticks: 21538
+          - 99
+        - - ticks: 22147
+          - 103
+        - - ticks: 22445
+          - 89
+        - - ticks: 23204
+          - 80
+        - - ticks: 23595
+          - 99
+        - - ticks: 24164
+          - 103
+        - - ticks: 24442
+          - 89
+        - - ticks: 24759
+          - 80
+        - - ticks: 25164
+          - 99
+        - - ticks: 25756
+          - 103
+        - - ticks: 26045
+          - 89
+        - - ticks: 27198
+          - 80
+        - - ticks: 27569
+          - 99
+        - - ticks: 28105
+          - 103
+        - - ticks: 28368
+          - 89
+        - - ticks: 28686
+          - 80
+        - - ticks: 29152
+          - 99
+        - - ticks: 29837
+          - 103
+        - - ticks: 30173
+          - 89
+    - id: solo_viola_no_throne
       at:
         bar: 57
         beat: 1
       events:
-      - - '1'
-        - ticks: 1181
-        - Bb4
-        - 114
-      - - 27/20
-        - ticks: 1018
-        - E5
-        - 112
-      - - 6403/3840
-        - ticks: 461
-        - F5
-        - 110
-      - - 697/384
-        - ticks: 490
-        - E5
-        - 113
-      - - '3'
-        - ticks: 1248
-        - F5
-        - 108
-      - - 12989/3840
-        - ticks: 864
-        - E5
-        - 108
-      - - 13987/3840
-        - ticks: 547
-        - G5
-        - 111
-      - - 7349/1920
-        - ticks: 490
-        - F5
-        - 104
-      - - '5'
-        - ticks: 461
-        - G5
-        - 112
-      - - 9869/1920
-        - ticks: 432
-        - F5
+      - - 839/768
+        - ticks: 1296
+        - C4
         - 107
-      - - 4055/768
-        - ticks: 403
-        - E5
-        - 109
-      - - 10387/1920
-        - ticks: 403
-        - D5
+      - - 2923/1920
+        - ticks: 1229
+        - E4
         - 108
-      - - 111/20
-        - ticks: 384
-        - B4
+      - - 8179/3840
+        - ticks: 1056
+        - C4
         - 106
-      - - 21821/3840
-        - ticks: 979
-        - E5
-        - 117
-      - - 12907/1920
-        - ticks: 835
-        - F5
-        - 114
-      - - '7'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 14669/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 29981/3840
-        - ticks: 605
-        - E5
-        - 110
+      - - 9619/3840
+        - ticks: 1392
+        - F4
+        - 108
+      - - 2375/768
+        - ticks: 1478
+        - G3
+        - 108
+      - - 13613/3840
+        - ticks: 1171
+        - B3
+        - 105
+      - - 163/40
+        - ticks: 1354
+        - B3
+        - 108
+      - - 8659/1920
+        - ticks: 1344
+        - D4
+        - 109
+      - - 19507/3840
+        - ticks: 1306
+        - F4
+        - 111
+      - - 4249/768
+        - ticks: 1200
+        - Bb3
+        - 108
+      - - 11789/1920
+        - ticks: 2102
+        - D#4
+        - 113
+      - - 27331/3840
+        - ticks: 1066
+        - E4
+        - 108
+      - - 28829/3840
+        - ticks: 1411
+        - E4
+        - 108
       automation:
-      - id: duel_no_throne_bow_dynamics
+      - id: no_throne_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3840
-          - 77
-        - - ticks: 4265
-          - 109
-        - - ticks: 4749
-          - 101
-        - - ticks: 5009
-          - 88
-        - - ticks: 5184
-          - 77
-        - - ticks: 5550
-          - 109
-        - - ticks: 5967
-          - 101
-        - - ticks: 6190
-          - 88
-        - - ticks: 6403
-          - 77
-        - - ticks: 6568
-          - 109
-        - - ticks: 6757
-          - 101
-        - - ticks: 6852
-          - 88
-        - - ticks: 6970
-          - 77
-        - - ticks: 7146
-          - 109
-        - - ticks: 7347
-          - 101
-        - - ticks: 7448
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 11969
-          - 109
-        - - ticks: 12480
-          - 101
-        - - ticks: 12756
-          - 88
-        - - ticks: 12989
-          - 77
-        - - ticks: 13300
-          - 109
-        - - ticks: 13654
-          - 101
-        - - ticks: 13841
-          - 88
-        - - ticks: 13987
-          - 77
-        - - ticks: 14183
-          - 109
-        - - ticks: 14408
-          - 101
-        - - ticks: 14522
-          - 88
-        - - ticks: 14698
-          - 77
-        - - ticks: 14874
-          - 109
-        - - ticks: 15075
-          - 101
-        - - ticks: 15176
-          - 88
-        - - ticks: 19200
-          - 77
-        - - ticks: 19365
-          - 109
-        - - ticks: 19554
-          - 101
-        - - ticks: 19649
-          - 88
-        - - ticks: 19738
-          - 77
-        - - ticks: 19893
-          - 109
-        - - ticks: 20070
-          - 101
-        - - ticks: 20158
-          - 88
-        - - ticks: 20275
-          - 77
-        - - ticks: 20420
-          - 109
-        - - ticks: 20585
-          - 101
-        - - ticks: 20666
-          - 88
-        - - ticks: 20774
-          - 77
-        - - ticks: 20919
-          - 109
-        - - ticks: 21084
-          - 101
-        - - ticks: 21165
-          - 88
-        - - ticks: 21312
-          - 77
-        - - ticks: 21450
-          - 109
-        - - ticks: 21607
-          - 101
-        - - ticks: 21684
-          - 88
-        - - ticks: 21821
-          - 77
-        - - ticks: 22173
-          - 109
-        - - ticks: 22574
-          - 101
-        - - ticks: 22788
-          - 88
-        - - ticks: 25814
-          - 77
-        - - ticks: 26114
-          - 109
-        - - ticks: 26456
-          - 101
-        - - ticks: 26637
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27650
-          - 109
-        - - ticks: 28528
-          - 101
-        - - ticks: 29009
-          - 88
-        - - ticks: 29338
-          - 77
-        - - ticks: 29521
-          - 109
-        - - ticks: 29729
-          - 101
-        - - ticks: 29835
-          - 88
-        - - ticks: 29981
-          - 77
-        - - ticks: 30198
-          - 109
-        - - ticks: 30446
-          - 101
-        - - ticks: 30574
-          - 88
-    - id: solo_violin_iron_sky_falls
+          - 90
+        - - ticks: 4167
+          - 80
+        - - ticks: 4584
+          - 99
+        - - ticks: 5193
+          - 103
+        - - ticks: 5491
+          - 89
+        - - ticks: 5818
+          - 80
+        - - ticks: 6215
+          - 99
+        - - ticks: 6792
+          - 103
+        - - ticks: 7075
+          - 89
+        - - ticks: 8151
+          - 80
+        - - ticks: 8496
+          - 99
+        - - ticks: 8992
+          - 103
+        - - ticks: 9235
+          - 89
+        - - ticks: 9591
+          - 80
+        - - ticks: 10037
+          - 99
+        - - ticks: 10691
+          - 103
+        - - ticks: 11011
+          - 89
+        - - ticks: 11847
+          - 80
+        - - ticks: 12318
+          - 99
+        - - ticks: 13013
+          - 103
+        - - ticks: 13353
+          - 89
+        - - ticks: 13585
+          - 80
+        - - ticks: 13964
+          - 99
+        - - ticks: 14515
+          - 103
+        - - ticks: 14784
+          - 89
+        - - ticks: 15620
+          - 80
+        - - ticks: 16054
+          - 99
+        - - ticks: 16691
+          - 103
+        - - ticks: 17002
+          - 89
+        - - ticks: 17290
+          - 80
+        - - ticks: 17721
+          - 99
+        - - ticks: 18353
+          - 103
+        - - ticks: 18662
+          - 89
+        - - ticks: 19479
+          - 80
+        - - ticks: 19899
+          - 99
+        - - ticks: 20513
+          - 103
+        - - ticks: 20813
+          - 89
+        - - ticks: 21217
+          - 80
+        - - ticks: 21605
+          - 99
+        - - ticks: 22169
+          - 103
+        - - ticks: 22445
+          - 89
+        - - ticks: 23550
+          - 80
+        - - ticks: 24209
+          - 99
+        - - ticks: 25197
+          - 103
+        - - ticks: 25680
+          - 89
+        - - ticks: 27303
+          - 80
+        - - ticks: 27651
+          - 99
+        - - ticks: 28152
+          - 103
+        - - ticks: 28397
+          - 89
+        - - ticks: 28801
+          - 80
+        - - ticks: 29252
+          - 99
+        - - ticks: 29915
+          - 103
+        - - ticks: 30240
+          - 89
+    - id: solo_viola_iron_sky_falls
       at:
         bar: 65
         beat: 1
       events:
-      - - '1'
-        - ticks: 2141
-        - E5
-        - 118
-      - - 3149/1920
-        - ticks: 509
-        - F5
-        - 112
-      - - 6941/3840
-        - ticks: 605
-        - E5
-        - 110
-      - - '3'
-        - ticks: 1190
-        - Bb4
-        - 116
-      - - 12931/3840
-        - ticks: 538
-        - B4
-        - 111
-      - - 283/80
-        - ticks: 634
-        - D5
+      - - 2093/1920
+        - ticks: 1354
+        - F3
+        - 106
+      - - 5779/3840
+        - ticks: 1382
+        - C4
         - 108
-      - - 1439/384
-        - ticks: 797
-        - E5
-        - 115
-      - - '5'
-        - ticks: 1728
-        - F5
-        - 119
-      - - 11/2
-        - ticks: 576
-        - Bb4
-        - 109
-      - - 21859/3840
-        - ticks: 912
-        - B4
-        - 119
-      - - 67/10
-        - ticks: 874
-        - F5
-        - 114
-      - - '7'
-        - ticks: 461
-        - B4
-        - 103
-      - - 13723/1920
-        - ticks: 451
-        - D5
-        - 110
-      - - 14011/1920
-        - ticks: 451
-        - E5
-        - 114
-      - - 14333/1920
-        - ticks: 768
-        - F5
-        - 118
-      - - 14803/1920
-        - ticks: 902
-        - E5
+      - - 4013/1920
+        - ticks: 1421
+        - G3
+        - 107
+      - - 1945/768
+        - ticks: 1306
+        - E4
+        - 108
+      - - 5981/1920
+        - ticks: 1469
+        - Bb3
+        - 108
+      - - 13699/3840
+        - ticks: 1142
+        - F4
+        - 106
+      - - 83/20
+        - ticks: 1824
+        - B3
+        - 107
+      - - 9739/1920
+        - ticks: 1402
+        - C4
+        - 108
+      - - 4247/768
+        - ticks: 1200
+        - F4
         - 111
+      - - 11741/1920
+        - ticks: 1200
+        - A3
+        - 107
+      - - 521/80
+        - ticks: 1219
+        - D#4
+        - 109
+      - - 27187/3840
+        - ticks: 1190
+        - F#4
+        - 107
+      - - 15/2
+        - ticks: 1229
+        - D#4
+        - 112
       automation:
-      - id: duel_iron_sky_falls_bow_dynamics
+      - id: iron_sky_falls_viola_bow_swell
         cc: 1
         interpolation: linear
         resolution:
-          ticks: 80
+          ticks: 120
         points:
         - - ticks: 0
-          - 88
-        - - ticks: 3840
-          - 77
-        - - ticks: 4610
-          - 109
-        - - ticks: 5488
-          - 101
-        - - ticks: 5969
-          - 88
-        - - ticks: 6298
-          - 77
-        - - ticks: 6481
-          - 109
-        - - ticks: 6689
-          - 101
-        - - ticks: 6795
-          - 88
-        - - ticks: 6941
-          - 77
-        - - ticks: 7158
-          - 109
-        - - ticks: 7406
-          - 101
-        - - ticks: 7534
-          - 88
-        - - ticks: 11520
-          - 77
-        - - ticks: 11948
-          - 109
-        - - ticks: 12436
-          - 101
-        - - ticks: 12698
-          - 88
-        - - ticks: 12931
-          - 77
-        - - ticks: 13124
-          - 109
-        - - ticks: 13345
-          - 101
-        - - ticks: 13457
-          - 88
-        - - ticks: 13584
-          - 77
-        - - ticks: 13812
-          - 109
-        - - ticks: 14072
-          - 101
-        - - ticks: 14206
-          - 88
-        - - ticks: 14390
-          - 77
-        - - ticks: 14676
-          - 109
-        - - ticks: 15003
-          - 101
-        - - ticks: 15175
-          - 88
-        - - ticks: 19200
-          - 77
-        - - ticks: 19822
-          - 109
-        - - ticks: 20530
-          - 101
-        - - ticks: 20916
-          - 88
-        - - ticks: 21120
-          - 77
-        - - ticks: 21327
-          - 109
-        - - ticks: 21563
-          - 101
-        - - ticks: 21684
-          - 88
-        - - ticks: 21859
-          - 77
-        - - ticks: 22187
-          - 109
-        - - ticks: 22561
-          - 101
-        - - ticks: 22759
-          - 88
-        - - ticks: 25728
-          - 77
-        - - ticks: 26042
-          - 109
-        - - ticks: 26400
-          - 101
-        - - ticks: 26590
-          - 88
-        - - ticks: 26880
-          - 77
-        - - ticks: 27045
-          - 109
-        - - ticks: 27234
-          - 101
-        - - ticks: 27329
-          - 88
-        - - ticks: 27446
-          - 77
-        - - ticks: 27608
-          - 109
-        - - ticks: 27793
-          - 101
-        - - ticks: 27885
-          - 88
-        - - ticks: 28022
-          - 77
-        - - ticks: 28184
-          - 109
-        - - ticks: 28369
-          - 101
-        - - ticks: 28461
-          - 88
-        - - ticks: 28666
-          - 77
-        - - ticks: 28942
-          - 109
-        - - ticks: 29257
-          - 101
-        - - ticks: 29422
-          - 88
-        - - ticks: 29606
-          - 77
-        - - ticks: 29930
-          - 109
-        - - ticks: 30300
-          - 101
-        - - ticks: 30496
-          - 88
+          - 90
+        - - ticks: 4158
+          - 80
+        - - ticks: 4592
+          - 99
+        - - ticks: 5229
+          - 103
+        - - ticks: 5540
+          - 89
+        - - ticks: 5751
+          - 80
+        - - ticks: 6194
+          - 99
+        - - ticks: 6843
+          - 103
+        - - ticks: 7161
+          - 89
+        - - ticks: 7998
+          - 80
+        - - ticks: 8452
+          - 99
+        - - ticks: 9120
+          - 103
+        - - ticks: 9447
+          - 89
+        - - ticks: 9697
+          - 80
+        - - ticks: 10117
+          - 99
+        - - ticks: 10731
+          - 103
+        - - ticks: 11031
+          - 89
+        - - ticks: 11934
+          - 80
+        - - ticks: 12403
+          - 99
+        - - ticks: 13093
+          - 103
+        - - ticks: 13431
+          - 89
+        - - ticks: 13671
+          - 80
+        - - ticks: 14042
+          - 99
+        - - ticks: 14578
+          - 103
+        - - ticks: 14841
+          - 89
+        - - ticks: 15908
+          - 80
+        - - ticks: 16483
+          - 99
+        - - ticks: 17340
+          - 103
+        - - ticks: 17760
+          - 89
+        - - ticks: 19450
+          - 80
+        - - ticks: 19899
+          - 99
+        - - ticks: 20558
+          - 103
+        - - ticks: 20880
+          - 89
+        - - ticks: 21207
+          - 80
+        - - ticks: 21595
+          - 99
+        - - ticks: 22159
+          - 103
+        - - ticks: 22435
+          - 89
+        - - ticks: 23454
+          - 80
+        - - ticks: 23842
+          - 99
+        - - ticks: 24406
+          - 103
+        - - ticks: 24682
+          - 89
+        - - ticks: 24980
+          - 80
+        - - ticks: 25374
+          - 99
+        - - ticks: 25947
+          - 103
+        - - ticks: 26227
+          - 89
+        - - ticks: 27159
+          - 80
+        - - ticks: 27544
+          - 99
+        - - ticks: 28103
+          - 103
+        - - ticks: 28377
+          - 89
+        - - ticks: 28772
+          - 80
+        - - ticks: 29169
+          - 99
+        - - ticks: 29746
+          - 103
+        - - ticks: 30029
+          - 89
 - id: timpani_part
   instrument: timpani
   voices:
@@ -14889,7 +14687,7 @@ playback:
     - cyborg
     counterpoint:
     - counter_guitar
-    - violins
+    - viola_lead
   sections:
   - id: combat
     form:
