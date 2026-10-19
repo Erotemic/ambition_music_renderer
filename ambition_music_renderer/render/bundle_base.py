@@ -389,8 +389,8 @@ def adjacent_section_pairs(manifest: dict) -> list[tuple[str, str]]:
 def manifest_audio_entries(manifest: dict) -> list[dict[str, str]]:
     """Return audio files explicitly referenced by an adaptive manifest.
 
-    This intentionally ignores any extra files sitting in preview/ or adaptive/.
-    Bundles and reports must be hash/manifest scoped so stale renders do not
+    This intentionally ignores any extra files sitting in preview/, adaptive/,
+    or playback/. Bundles and reports must be hash/manifest scoped so stale renders do not
     contaminate diagnostics.
     """
     entries: list[dict[str, str]] = []
@@ -419,6 +419,25 @@ def manifest_audio_entries(manifest: dict) -> list[dict[str, str]]:
                             "kind": "adaptive_audio",
                             "section": section_id,
                             "group": group,
+                            "path": rel,
+                        }
+                    )
+    # Unlike adaptive per-form stems, these are the finished runtime mixes for
+    # e.g. intro -> combat (loop) -> outro. Include them in shareable bundles:
+    # the manifest references them and the game publisher installs them, but
+    # previously the bundle zip silently omitted all playback/ files.
+    playback = files.get("playback") or {}
+    if isinstance(playback, dict):
+        for section_id, section_files in sorted(playback.items()):
+            if not isinstance(section_files, dict):
+                continue
+            for layer_id, rel in sorted(section_files.items()):
+                if isinstance(rel, str):
+                    entries.append(
+                        {
+                            "kind": "playback_audio",
+                            "section": section_id,
+                            "group": layer_id,
                             "path": rel,
                         }
                     )

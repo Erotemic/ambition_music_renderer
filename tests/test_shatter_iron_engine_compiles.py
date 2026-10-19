@@ -24,10 +24,10 @@ def test_shatter_iron_engine_strict_compiles():
     score = _score()
     compiled = compile_score(score, strict_schema=True)
     assert len(compiled.pm.instruments) == 12
-    assert len(score['playback']['sections']) == 1
+    assert [x['id'] for x in score['playback']['sections']] == ['intro', 'combat', 'outro']
     assert score['tempo'] == 168
     assert score['timebase']['ppq'] == 960
-    assert score['form'][-1]['to']['bar'] == 73
+    assert score['form'][-1]['to']['bar'] == 121
     assert all(inst.name for inst in compiled.pm.instruments)
 
 
@@ -64,7 +64,11 @@ def test_no_inaudible_or_duplicate_stems_and_warmup_is_exact():
     for part in score['parts']:
         clips = part['voices'][0]['clips']
         assert len(clips) == len(score['form'])
-        assert clips[0]['events'] == clips[-1]['events'], part['instrument']
+        # Intro's final B7(b9) two-bar turnaround must exactly match the
+        # combat loop's last two bars before iron_gate's E5 downbeat.
+        assert [e for e in clips[0]['events'] if Fraction(str(e[0])) >= 6] == [
+            e for e in clips[-2]['events'] if Fraction(str(e[0])) >= 6
+        ], part['instrument']
 
 
 def test_guitar_tones_preserve_dark_minor_interpretation_of_power_chords():
@@ -75,7 +79,7 @@ def test_guitar_tones_preserve_dark_minor_interpretation_of_power_chords():
         for section_index,clip in enumerate(clips):
             for row in clip['events']:
                 t=Fraction(str(row[0]))
-                chord=progression[8*section_index+int(t)]
+                chord=progression[clip['at']['bar']-1+int(t)]
                 if chord == 'F5':
                     assert row[2] not in ('A4','A#4','D5','G5')
                 if chord == 'Bb5':

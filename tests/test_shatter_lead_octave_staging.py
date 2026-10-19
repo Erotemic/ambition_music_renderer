@@ -26,9 +26,9 @@ def test_shatter_lead_registers_are_intentionally_staged():
     part = next(p for p in score["parts"] if p["instrument"] == "lead_guitar")
     clips = part["voices"][0]["clips"]
     assert len(clips) == len(score["form"])
-    assert clips[0]["id"] == "lead_guitar_preroll"
-    assert clips[-1]["id"] == "lead_guitar_iron_sky_falls"
-    assert clips[0]["events"] == clips[-1]["events"]
+    assert clips[0]["id"] == "lead_guitar_intro"
+    assert clips[-1]["id"] == "lead_guitar_outro"
+    assert len(clips) == 15
     assert any(c["id"] == SOLO_CLIP for c in clips)
 
     for clip in clips:
@@ -45,8 +45,8 @@ def test_shatter_lead_registers_are_intentionally_staged():
     # Check the actual low -> high -> low sequence, not only the individual ranges.
     names = [c["id"] for c in clips]
     i = names.index(SOLO_CLIP)
-    assert names[i - 1] == "lead_guitar_the_false_triumph"
-    assert names[i + 1] == "lead_guitar_no_throne"
+    assert names[i - 1] == "lead_guitar_cathedral_of_ash"
+    assert names[i + 1] == "lead_guitar_iron_crown_ascent"
 
 
 def test_shatter_octave_staging_compiles_on_exact_musicir_grid():
