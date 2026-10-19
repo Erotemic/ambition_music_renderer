@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: carry_the_one
+  title: Carry the One - Overflow Boss Anthem
+  version_id: 5656644dfa551fbd:611a82364739
+  render_hash: 5656644dfa551fbd
+  preview_sha256: 611a82364739c1eddad47645adb1410222f17fd646e8406358114b0317d71440
+  preview_path: generated/carry_the_one/.versioned/5656644dfa551fbd/preview/carry_the_one_5656644dfa551fbd.full_soundtrack_preview.ogg
+  manifest_path: generated/carry_the_one/.versioned/5656644dfa551fbd/carry_the_one_5656644dfa551fbd.adaptive_manifest.json
+  manifest_sha256: 5317db689519f778b66df8b5bfe4656f14882f0fa4a6f4884738f9f21fca2881
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/carry_the_one.music.yaml
+  score_sha256_at_review: c02ab0371668ddac8cdc2789ca06828cba6bce2925536f811e06c0ab25459325
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.9
+  label: Standout
+  notes: ''
+  issues: []
+  furthest_played_seconds: 5.98
+  furthest_played_fraction: 0.0395
+  created_at: '2026-10-17T22:37:17Z'
+  updated_at: '2026-10-17T22:40:48Z'
+  reviewed_at: '2026-10-17T22:40:48Z'
+history: []

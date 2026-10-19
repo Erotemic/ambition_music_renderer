@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: castle_crash_override
+  title: Castle Crash Override
+  version_id: ddcac0ef0d6eba3b:4ef27809b4ed
+  render_hash: ddcac0ef0d6eba3b
+  preview_sha256: 4ef27809b4ede04c9cfe5b571d99fc933fdc911457de0e8c1e5d2a4e415ccfd3
+  preview_path: generated/castle_crash_override/.versioned/ddcac0ef0d6eba3b/preview/castle_crash_override_ddcac0ef0d6eba3b.full_soundtrack_preview.ogg
+  manifest_path: generated/castle_crash_override/.versioned/ddcac0ef0d6eba3b/castle_crash_override_ddcac0ef0d6eba3b.adaptive_manifest.json
+  manifest_sha256: fdc54abc79f0fdbab2affa33c5ba380fd02bbf87ab8b065ae77f31882eb09c18
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/castle_crash_override.music.yaml
+  score_sha256_at_review: 78037d37425a71631d7ced5235b79525f78e7f849a705cc22fc9c9894e8b9769
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.2
+  label: Standout
+  notes: ''
+  issues: []
+  furthest_played_seconds: 28.85
+  furthest_played_fraction: 0.3606
+  created_at: '2026-10-17T22:38:05Z'
+  updated_at: '2026-10-17T22:38:05Z'
+  reviewed_at: '2026-10-17T22:38:05Z'
+history: []

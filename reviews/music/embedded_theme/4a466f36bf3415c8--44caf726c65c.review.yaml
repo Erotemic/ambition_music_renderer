@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: embedded_theme
+  title: Embedded Theme
+  version_id: 4a466f36bf3415c8:44caf726c65c
+  render_hash: 4a466f36bf3415c8
+  preview_sha256: 44caf726c65c083cb1dba8844f75ffb91e07ea10212221cb6b5f2253731b4822
+  preview_path: generated/embedded_theme/.versioned/4a466f36bf3415c8/preview/embedded_theme_4a466f36bf3415c8.full_soundtrack_preview.ogg
+  manifest_path: generated/embedded_theme/.versioned/4a466f36bf3415c8/embedded_theme_4a466f36bf3415c8.adaptive_manifest.json
+  manifest_sha256: e94e882a722f54154913559b6af81c349d9a5daa20e9fb0fb20f3817f693822f
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/embedded_theme.music.yaml
+  score_sha256_at_review: f2c6457990c79343f14802c17131fd4bc26d12583473c38ed5a96ce3d77de343
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.8
+  label: Standout
+  notes: ''
+  issues: []
+  furthest_played_seconds: 6.985
+  furthest_played_fraction: 0.0541
+  created_at: '2026-10-17T22:38:31Z'
+  updated_at: '2026-10-17T22:38:31Z'
+  reviewed_at: '2026-10-17T22:38:31Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: shoulders_at_rest
+  title: Shoulders at Rest
+  version_id: cb8e6e01e359f162:7a3216464344
+  render_hash: cb8e6e01e359f162
+  preview_sha256: 7a321646434482882411d189954f8345e6dd6865671e163958ca1ca7151732e2
+  preview_path: generated/shoulders_at_rest/.versioned/cb8e6e01e359f162/preview/shoulders_at_rest_cb8e6e01e359f162.full_soundtrack_preview.ogg
+  manifest_path: generated/shoulders_at_rest/.versioned/cb8e6e01e359f162/shoulders_at_rest_cb8e6e01e359f162.adaptive_manifest.json
+  manifest_sha256: 45371e0923fbf35a76e5202f06c1de8719ddbca054de6e4e71cda8e3bab6310b
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/shoulders_at_rest.music.yaml
+  score_sha256_at_review: 5739303a31c4fe00efe7ba1f8e54f024f397319fe79a554da0eef9ad83bda096
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: ''
+  issues: []
+  furthest_played_seconds: 7.585
+  furthest_played_fraction: 0.0579
+  created_at: '2026-10-17T22:41:26Z'
+  updated_at: '2026-10-17T22:41:26Z'
+  reviewed_at: '2026-10-17T22:41:26Z'
+history: []

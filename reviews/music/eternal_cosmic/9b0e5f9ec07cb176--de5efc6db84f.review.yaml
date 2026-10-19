@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: eternal_cosmic
+  title: Eternal Cosmic
+  version_id: 9b0e5f9ec07cb176:de5efc6db84f
+  render_hash: 9b0e5f9ec07cb176
+  preview_sha256: de5efc6db84f54e6cfdf2e4a91ea450ba064903478fe8e0206b3297a165ba337
+  preview_path: generated/eternal_cosmic/.versioned/9b0e5f9ec07cb176/preview/eternal_cosmic_9b0e5f9ec07cb176.full_soundtrack_preview.ogg
+  manifest_path: generated/eternal_cosmic/.versioned/9b0e5f9ec07cb176/eternal_cosmic_9b0e5f9ec07cb176.adaptive_manifest.json
+  manifest_sha256: 87103210872583100fa07c546e200f3a7cded0f3c70c6c64d0a60b41950ac1fd
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/eternal_cosmic.music.yaml
+  score_sha256_at_review: a2ef8a5a4705d0e7a4d12532b29d4d40b5549d30ca85a1480e6b924de34121dd
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: ''
+  issues: []
+  furthest_played_seconds: 7.452
+  furthest_played_fraction: 0.1035
+  created_at: '2026-10-17T22:39:18Z'
+  updated_at: '2026-10-17T22:39:18Z'
+  reviewed_at: '2026-10-17T22:39:18Z'
+history: []
