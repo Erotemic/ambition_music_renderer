@@ -1,7 +1,11 @@
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
 title: Shatter the Iron Sky
-description: '168 BPM E-minor heavy-metal boss battle. FreePats Distorted #1 carries the sole foreground guitar melody; a separate upper-register Karoryfer Growlybass Dirty line supplies deliberately sparse chord-tone responses. Black And Blue anchors the deep rhythm bass; sampled Shinyguitar drives the riffs. The choral cathedral remains intact, with B7(b9) resolving back into E at the loop seam.'
+description: '168 BPM E-minor villain leitmotif: the music IS the evil presence, not a battle against it. A short E-F-E chromatic
+  decree, answered by B/G, recurs through an anvil-heavy thrash score. FSBS Distorted #1 leads; a synchronized Black And Green
+  guitar reinforces it in chord-aware harmony, and a separate mid-register Growlybass Dirty line forms the third voice. Black
+  And Blue, Shinyguitar, and VPO choir supply the crushing rhythmic/choral foundation; C-natural over B7(b9) gives the loop
+  its unresolved threat.'
 seed: 17001987
 timebase:
   ppq: 960
@@ -21,7 +25,7 @@ form:
     beat: 1
   energy: 0.95
   density: 0.86
-  role: Exact ending reprise as synth FX preroll; resolves at the E downbeat after the seam.
+  role: Exact final eight bars used for DSP warmup; evil hook returns without a bad B-to-F leap.
 - id: iron_gate
   from:
     bar: 9
@@ -31,7 +35,7 @@ form:
     beat: 1
   energy: 0.94
   density: 0.76
-  role: Opening anvil riff, fully guitar-driven, before introducing the melodic threat in bars five to eight.
+  role: Evil enters with its anvil riff; the chromatic E-F-E guitar signature arrives after two bars.
 - id: shattered_orders
   from:
     bar: 17
@@ -41,7 +45,7 @@ form:
     beat: 1
   energy: 0.92
   density: 0.74
-  role: Fast galloping second riff, with a descending lead phrase and a chromatic turnaround.
+  role: The dictator's signature becomes a galloping metal march, harmonized in two guitars over driving bass.
 - id: war_machine
   from:
     bar: 25
@@ -51,7 +55,7 @@ form:
     beat: 1
   energy: 0.97
   density: 0.85
-  role: 'Cathedral chorus: choral answers, powerful sustained chords and a restrained guitar statement.'
+  role: 'Imperious cathedral proclamation: sustained threats, synchronized guitar harmonies, and the VPO choir.'
 - id: counterattack
   from:
     bar: 33
@@ -61,7 +65,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.94
-  role: Tight thrash riff with short lead acceleration and an aggressive snare backbeat.
+  role: The emblem turns into fast, oppressive thrash rhythms with tight triple-voice accents.
 - id: the_false_triumph
   from:
     bar: 41
@@ -71,7 +75,7 @@ form:
     beat: 1
   energy: 0.78
   density: 0.51
-  role: 'Half-time ritual: ominous open spaces, lower strings, choir, and long guitar bends.'
+  role: 'Not false triumph: evil sits enthroned in half-time, choir and wailing guitar almost motionless.'
 - id: breaking_the_columns
   from:
     bar: 49
@@ -81,7 +85,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.94
-  role: Eight-bar developed virtuosic guitar solo, harmonics, E harmonic-minor arpeggios, and double kick.
+  role: Evil exults in a controlled shred solo; twin guitar doubles only accents while upper bass locks the harmony.
 - id: no_throne
   from:
     bar: 57
@@ -91,7 +95,7 @@ form:
     beat: 1
   energy: 0.98
   density: 0.82
-  role: Main riff and theme return, raised register with a harmonized counter-guitar.
+  role: 'Full proclamation: the E-F-E motif returns above the relentless riff, bigger than before.'
 - id: iron_sky_falls
   from:
     bar: 65
@@ -101,7 +105,7 @@ form:
     beat: 1
   energy: 1.0
   density: 0.89
-  role: Final acceleration into an unresolved B7(b9) dominant, leading into the E opening.
+  role: The evil decree closes on an unresolved dominant and repeats into itself; no heroic cadence.
 harmony:
   every_bars: 1
   cycle: false
@@ -225,7 +229,7 @@ instruments:
   volume: 114
   pan: 64
   expression: 110
-  mix_gain_db: 2.8
+  mix_gain_db: 3.5
   instrument_backend:
     kind: sfz
     library_ref: bass.black_and_blue
@@ -249,7 +253,7 @@ instruments:
   volume: 110
   pan: 64
   expression: 117
-  mix_gain_db: 6.8
+  mix_gain_db: 6.1
   instrument_backend:
     kind: sfz
     library_ref: guitar.fsbs_distorted_1
@@ -327,13 +331,29 @@ instruments:
     library_ref: strings.cyborg
     settings:
       fold_to_range: false
+- name: counter_guitar
+  group: counter_guitar
+  program: clean_guitar
+  volume: 108
+  pan: 64
+  expression: 114
+  controls:
+    111: 0
+    114: 52
+    116: 20
+  mix_gain_db: 5.5
+  instrument_backend:
+    kind: sfz
+    sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
+    settings:
+      fold_to_range: false
 - name: growly_counterbass
   group: growly_counterbass
   program: fingered_bass
   volume: 107
   pan: 64
   expression: 110
-  mix_gain_db: 5.2
+  mix_gain_db: 8.6
   instrument_backend:
     kind: sfz
     # Deliberately use Growlybass's sustained, release-sample articulation,
@@ -633,6 +653,75 @@ processing:
         decay_seconds: 1.7
       - processor: balance
         position: 0.45
+    counter_guitar:
+      chain:
+      - processor: pedalboard
+        effects:
+        - effect: gain
+          gain_db: 7.5
+        - effect: compressor
+          threshold_db: -26.0
+          ratio: 2.0
+          attack_ms: 12.0
+          release_ms: 145.0
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
+        binary: lv2apply
+        channel_mode: dual_mono
+        wet_mix: 0.7
+        params:
+          fslider0_: -4.0
+          fslider1_: 660.0
+          fslider2_: 0.7
+          BYPASS: 0.0
+      - processor: lv2
+        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
+        binary: lv2apply
+        wet_mix: 0.76
+        params:
+          P6v: 0.78
+          Middle: 0.72
+          Bass: 0.54
+          Treble: 0.52
+          WET_DRY: 78.0
+          GAIN: -2.0
+      - processor: highpass
+        cutoff_hz: 115
+      - processor: parametric_eq
+        bands:
+        - type: peak
+          hz: 450
+          q: 0.85
+          db: 0.8
+        - type: peak
+          hz: 1400
+          q: 0.9
+          db: 1.4
+        - type: peak
+          hz: 3750
+          q: 1.5
+          db: -2.8
+        - type: peak
+          hz: 5900
+          q: 2.0
+          db: -3.8
+      - processor: lowpass
+        cutoff_hz: 7000
+      - processor: compressor
+        threshold_db: -24.0
+        ratio: 2.1
+        attack_ms: 13.0
+        release_ms: 135.0
+      - processor: pedalboard
+        effects:
+        - effect: delay
+          delay_ms: 285
+          feedback: 0.11
+          mix: 0.045
+      - processor: balance
+        position: 0.23
+      - processor: gain
+        gain_db: -0.8
   master:
     chain:
     - processor: highpass
@@ -13559,103 +13648,119 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1200
+        - ticks: 816
         - E4
-        - 114
-      - - 3/8
-        - ticks: 480
-        - G4
         - 112
+      - - 1/4
+        - ticks: 192
+        - F4
+        - 93
+      - - 5/16
+        - ticks: 557
+        - E4
+        - 109
       - - 1/2
-        - ticks: 1200
+        - ticks: 768
         - B4
-        - 112
-      - - 7/8
-        - ticks: 360
-        - G4
         - 114
+      - - 3/4
+        - ticks: 730
+        - G4
+        - 107
       - - '1'
-        - ticks: 1200
+        - ticks: 816
         - B4
-        - 114
-      - - 11/8
-        - ticks: 480
-        - G4
-        - 112
+        - 113
+      - - 5/4
+        - ticks: 192
+        - C5
+        - 90
+      - - 21/16
+        - ticks: 557
+        - B4
+        - 109
       - - 3/2
-        - ticks: 960
+        - ticks: 768
+        - G4
+        - 109
+      - - 7/4
+        - ticks: 720
         - E4
         - 112
-      - - 29/16
-        - ticks: 600
-        - B4
-        - 114
       - - '2'
-        - ticks: 1200
-        - F5
-        - 114
-      - - 19/8
-        - ticks: 480
-        - C5
-        - 112
-      - - 5/2
-        - ticks: 480
-        - A4
-        - 112
-      - - 21/8
-        - ticks: 1200
+        - ticks: 912
         - F4
         - 114
+      - - 9/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 5/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 139/50
+        - ticks: 576
+        - A4
+        - 105
       - - 49/16
         - ticks: 3360
         - E4
-        - 114
+        - 108
       - - '4'
-        - ticks: 960
+        - ticks: 883
         - G4
-        - 114
+        - 113
       - - 17/4
-        - ticks: 480
+        - ticks: 624
         - B4
-        - 112
-      - - 35/8
-        - ticks: 480
+        - 107
+      - - 9/2
+        - ticks: 768
         - D5
         - 112
-      - - 9/2
-        - ticks: 1680
+      - - 19/4
+        - ticks: 749
         - G5
-        - 114
+        - 116
       - - '5'
-        - ticks: 2160
+        - ticks: 1200
         - F5
-        - 118
-      - - 45/8
-        - ticks: 960
-        - C5
-        - 112
-      - - '6'
-        - ticks: 960
-        - B4
-        - 117
-      - - 51/8
-        - ticks: 480
-        - A4
-        - 109
-      - - 13/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 53/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 27/4
+        - 114
+      - - 87/16
         - ticks: 720
+        - C5
+        - 107
+      - - 91/16
+        - ticks: 624
+        - A4
+        - 108
+      - - 47/8
+        - ticks: 355
+        - F4
+        - 101
+      - - '6'
+        - ticks: 864
         - B4
-        - 118
+        - 114
+      - - 25/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 103/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 13/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 27/4
+        - ticks: 691
+        - F#4
+        - 109
       - - 113/16
-        - ticks: 3360
+        - ticks: 3341
         - B4
         - 114
       automation:
@@ -13694,74 +13799,114 @@ parts:
         bar: 9
         beat: 1
       events:
-      - - '4'
-        - ticks: 1200
+      - - '2'
+        - ticks: 816
         - E4
         - 112
-      - - 35/8
-        - ticks: 480
-        - G4
-        - 110
-      - - 9/2
-        - ticks: 1200
+      - - 9/4
+        - ticks: 192
+        - F4
+        - 93
+      - - 37/16
+        - ticks: 557
+        - E4
+        - 109
+      - - 5/2
+        - ticks: 768
         - B4
-        - 110
-      - - 39/8
-        - ticks: 360
+        - 114
+      - - 11/4
+        - ticks: 730
         - G4
+        - 107
+      - - '3'
+        - ticks: 912
+        - F4
+        - 114
+      - - 13/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 7/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 189/50
+        - ticks: 576
+        - A4
+        - 105
+      - - '4'
+        - ticks: 816
+        - B4
+        - 113
+      - - 17/4
+        - ticks: 192
+        - C5
+        - 90
+      - - 69/16
+        - ticks: 557
+        - B4
+        - 109
+      - - 9/2
+        - ticks: 768
+        - G4
+        - 109
+      - - 19/4
+        - ticks: 720
+        - E4
         - 112
       - - '5'
-        - ticks: 960
+        - ticks: 883
         - G4
-        - 112
+        - 113
       - - 21/4
-        - ticks: 480
+        - ticks: 624
         - B4
-        - 110
-      - - 43/8
-        - ticks: 480
-        - D5
-        - 110
+        - 107
       - - 11/2
-        - ticks: 1680
-        - G5
+        - ticks: 768
+        - D5
         - 112
+      - - 23/4
+        - ticks: 749
+        - G5
+        - 116
       - - '6'
         - ticks: 1200
         - F5
-        - 112
-      - - 51/8
-        - ticks: 480
-        - C5
-        - 110
-      - - 13/2
-        - ticks: 480
-        - A4
-        - 110
-      - - 53/8
-        - ticks: 1200
-        - F4
-        - 112
-      - - '7'
-        - ticks: 960
-        - B4
-        - 117
-      - - 59/8
-        - ticks: 480
-        - A4
-        - 109
-      - - 15/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 31/4
+        - 114
+      - - 103/16
         - ticks: 720
+        - C5
+        - 107
+      - - 107/16
+        - ticks: 624
+        - A4
+        - 108
+      - - 55/8
+        - ticks: 355
+        - F4
+        - 101
+      - - '7'
+        - ticks: 864
         - B4
-        - 118
+        - 114
+      - - 29/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 119/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 15/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 31/4
+        - ticks: 691
+        - F#4
+        - 109
       automation: []
     - id: lead_guitar_shattered_orders
       at:
@@ -13769,113 +13914,141 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 720
+        - ticks: 816
         - E4
-        - 111
-      - - 3/16
-        - ticks: 240
-        - G4
-        - 109
+        - 112
       - - 1/4
-        - ticks: 480
-        - B4
-        - 109
-      - - 3/8
-        - ticks: 480
-        - G4
-        - 111
-      - - 1/2
-        - ticks: 1200
-        - E5
-        - 109
-      - - 7/8
-        - ticks: 360
-        - B4
-        - 109
-      - - '1'
-        - ticks: 1200
-        - D5
-        - 111
-      - - 11/8
-        - ticks: 480
-        - B4
-        - 109
-      - - 3/2
-        - ticks: 960
-        - G4
-        - 109
-      - - 29/16
-        - ticks: 600
-        - D5
-        - 111
-      - - '4'
-        - ticks: 1200
-        - E4
-        - 111
-      - - 35/8
-        - ticks: 480
-        - G4
-        - 109
-      - - 9/2
-        - ticks: 1200
-        - B4
-        - 109
-      - - 39/8
-        - ticks: 360
-        - G4
-        - 111
-      - - '5'
-        - ticks: 960
-        - G4
-        - 111
-      - - 21/4
-        - ticks: 480
-        - B4
-        - 109
-      - - 43/8
-        - ticks: 480
-        - D5
-        - 109
-      - - 11/2
-        - ticks: 1680
-        - G5
-        - 111
-      - - '6'
-        - ticks: 1200
-        - F5
-        - 111
-      - - 51/8
-        - ticks: 480
-        - C5
-        - 109
-      - - 13/2
-        - ticks: 480
-        - A4
-        - 109
-      - - 53/8
-        - ticks: 1200
+        - ticks: 192
         - F4
-        - 111
-      - - '7'
-        - ticks: 960
+        - 93
+      - - 5/16
+        - ticks: 557
+        - E4
+        - 109
+      - - 1/2
+        - ticks: 768
         - B4
-        - 117
-      - - 59/8
-        - ticks: 480
+        - 114
+      - - 3/4
+        - ticks: 730
+        - G4
+        - 107
+      - - '1'
+        - ticks: 883
+        - G4
+        - 113
+      - - 5/4
+        - ticks: 624
+        - B4
+        - 107
+      - - 3/2
+        - ticks: 768
+        - D5
+        - 112
+      - - 7/4
+        - ticks: 749
+        - G5
+        - 116
+      - - '2'
+        - ticks: 864
+        - D4
+        - 108
+      - - 9/4
+        - ticks: 672
+        - F#4
+        - 106
+      - - 5/2
+        - ticks: 816
         - A4
         - 109
-      - - 15/2
-        - ticks: 480
-        - F#4
+      - - 11/4
+        - ticks: 720
+        - D5
         - 111
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 31/4
+      - - '3'
+        - ticks: 1104
+        - C4
+        - 112
+      - - 27/8
+        - ticks: 672
+        - G4
+        - 108
+      - - 29/8
+        - ticks: 960
+        - E4
+        - 108
+      - - '4'
+        - ticks: 845
+        - E5
+        - 115
+      - - 17/4
+        - ticks: 192
+        - F5
+        - 94
+      - - 69/16
+        - ticks: 528
+        - E5
+        - 110
+      - - 9/2
         - ticks: 720
         - B4
-        - 118
+        - 113
+      - - 19/4
+        - ticks: 691
+        - G4
+        - 106
+      - - '5'
+        - ticks: 883
+        - G4
+        - 113
+      - - 21/4
+        - ticks: 624
+        - B4
+        - 107
+      - - 11/2
+        - ticks: 768
+        - D5
+        - 112
+      - - 23/4
+        - ticks: 749
+        - G5
+        - 116
+      - - '6'
+        - ticks: 912
+        - F4
+        - 114
+      - - 25/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 13/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 339/50
+        - ticks: 576
+        - A4
+        - 105
+      - - '7'
+        - ticks: 864
+        - B4
+        - 114
+      - - 29/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 119/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 15/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 31/4
+        - ticks: 691
+        - F#4
+        - 109
       automation: []
     - id: lead_guitar_war_machine
       at:
@@ -13887,23 +14060,35 @@ parts:
         - E4
         - 111
       - - '1'
-        - ticks: 1200
-        - G4
-        - 111
-      - - 11/8
-        - ticks: 480
-        - E4
-        - 109
-      - - 3/2
-        - ticks: 960
+        - ticks: 1104
         - C4
-        - 109
-      - - 29/16
-        - ticks: 600
+        - 112
+      - - 11/8
+        - ticks: 672
         - G4
-        - 111
+        - 108
+      - - 13/8
+        - ticks: 960
+        - E4
+        - 108
       - - 33/16
         - ticks: 3360
+        - D5
+        - 111
+      - - '3'
+        - ticks: 864
+        - D4
+        - 108
+      - - 13/4
+        - ticks: 672
+        - F#4
+        - 106
+      - - 7/2
+        - ticks: 816
+        - A4
+        - 109
+      - - 15/4
+        - ticks: 720
         - D5
         - 111
       - - '4'
@@ -13923,45 +14108,57 @@ parts:
         - G4
         - 111
       - - '5'
-        - ticks: 960
+        - ticks: 826
         - C4
-        - 111
+        - 109
       - - 21/4
-        - ticks: 480
+        - ticks: 739
         - E4
-        - 109
-      - - 43/8
-        - ticks: 480
-        - G4
-        - 109
+        - 105
       - - 11/2
-        - ticks: 1680
-        - C5
-        - 111
-      - - 97/16
-        - ticks: 3360
-        - C5
-        - 111
-      - - '7'
-        - ticks: 960
-        - B4
-        - 117
-      - - 59/8
-        - ticks: 480
-        - A4
-        - 109
-      - - 15/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 31/4
+        - ticks: 758
+        - G4
+        - 108
+      - - 23/4
         - ticks: 720
+        - C5
+        - 110
+      - - '6'
+        - ticks: 912
+        - F4
+        - 114
+      - - 25/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 13/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 339/50
+        - ticks: 576
+        - A4
+        - 105
+      - - '7'
+        - ticks: 864
         - B4
-        - 118
+        - 114
+      - - 29/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 119/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 15/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 31/4
+        - ticks: 691
+        - F#4
+        - 109
       automation:
       - id: war_machine_wail_0
         pitch_bend: 0
@@ -13999,145 +14196,149 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 480
+        - ticks: 816
         - E4
-        - 116
-      - - 1/8
-        - ticks: 240
-        - G4
-        - 114
-      - - 3/16
-        - ticks: 240
-        - B4
-        - 114
+        - 112
       - - 1/4
-        - ticks: 480
-        - G4
-        - 116
-      - - 3/8
-        - ticks: 480
+        - ticks: 192
+        - F4
+        - 93
+      - - 5/16
+        - ticks: 557
         - E4
-        - 114
+        - 109
       - - 1/2
-        - ticks: 1200
+        - ticks: 768
         - B4
         - 114
-      - - 7/8
-        - ticks: 360
-        - E4
-        - 116
-      - - '2'
+      - - 3/4
+        - ticks: 730
+        - G4
+        - 107
+      - - '1'
+        - ticks: 816
+        - B4
+        - 113
+      - - 5/4
+        - ticks: 192
+        - C5
+        - 90
+      - - 21/16
+        - ticks: 557
+        - B4
+        - 109
+      - - 3/2
+        - ticks: 768
+        - G4
+        - 109
+      - - 7/4
         - ticks: 720
+        - E4
+        - 112
+      - - '2'
+        - ticks: 912
         - F4
-        - 116
-      - - 35/16
-        - ticks: 240
-        - A4
         - 114
       - - 9/4
-        - ticks: 480
-        - C5
-        - 114
-      - - 19/8
-        - ticks: 480
+        - ticks: 653
         - A4
-        - 116
+        - 106
       - - 5/2
-        - ticks: 1200
-        - F5
-        - 114
-      - - 23/8
-        - ticks: 360
+        - ticks: 835
         - C5
         - 114
+      - - 139/50
+        - ticks: 576
+        - A4
+        - 105
+      - - '3'
+        - ticks: 1056
+        - E4
+        - 114
+      - - 27/8
+        - ticks: 442
+        - G4
+        - 106
+      - - 7/2
+        - ticks: 864
+        - B4
+        - 114
+      - - 61/16
+        - ticks: 432
+        - G4
+        - 107
       - - '4'
-        - ticks: 480
+        - ticks: 883
         - G4
-        - 116
-      - - 33/8
-        - ticks: 240
-        - B4
-        - 114
-      - - 67/16
-        - ticks: 240
-        - D5
-        - 114
+        - 113
       - - 17/4
-        - ticks: 480
+        - ticks: 624
         - B4
-        - 116
-      - - 35/8
-        - ticks: 480
-        - G4
-        - 114
+        - 107
       - - 9/2
-        - ticks: 1200
+        - ticks: 768
         - D5
-        - 114
-      - - 39/8
-        - ticks: 360
-        - G4
+        - 112
+      - - 19/4
+        - ticks: 749
+        - G5
         - 116
       - - '5'
-        - ticks: 960
-        - F4
-        - 116
-      - - 21/4
-        - ticks: 480
-        - A4
-        - 114
-      - - 43/8
-        - ticks: 480
-        - C5
-        - 114
-      - - 11/2
-        - ticks: 1680
-        - F5
-        - 116
-      - - '6'
-        - ticks: 720
-        - E4
-        - 116
-      - - 99/16
-        - ticks: 240
-        - G4
-        - 114
-      - - 25/4
-        - ticks: 480
-        - B4
-        - 114
-      - - 51/8
-        - ticks: 480
-        - G4
-        - 116
-      - - 13/2
         - ticks: 1200
-        - E5
+        - F5
         - 114
-      - - 55/8
-        - ticks: 360
-        - B4
-        - 114
-      - - '7'
-        - ticks: 960
-        - B4
-        - 117
-      - - 59/8
-        - ticks: 480
+      - - 87/16
+        - ticks: 720
+        - C5
+        - 107
+      - - 91/16
+        - ticks: 624
         - A4
-        - 109
-      - - 15/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 31/4
+        - 108
+      - - 47/8
+        - ticks: 355
+        - F4
+        - 101
+      - - '6'
+        - ticks: 845
+        - E5
+        - 115
+      - - 25/4
+        - ticks: 192
+        - F5
+        - 94
+      - - 101/16
+        - ticks: 528
+        - E5
+        - 110
+      - - 13/2
         - ticks: 720
         - B4
-        - 118
+        - 113
+      - - 27/4
+        - ticks: 691
+        - G4
+        - 106
+      - - '7'
+        - ticks: 864
+        - B4
+        - 114
+      - - 29/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 119/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 15/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 31/4
+        - ticks: 691
+        - F#4
+        - 109
       automation: []
     - id: lead_guitar_the_false_triumph
       at:
@@ -14459,49 +14660,61 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1200
+        - ticks: 816
         - E4
-        - 117
-      - - 3/8
-        - ticks: 480
-        - G4
-        - 115
+        - 112
+      - - 1/4
+        - ticks: 192
+        - F4
+        - 93
+      - - 5/16
+        - ticks: 557
+        - E4
+        - 109
       - - 1/2
-        - ticks: 1200
+        - ticks: 768
         - B4
-        - 115
-      - - 7/8
-        - ticks: 360
+        - 114
+      - - 3/4
+        - ticks: 730
         - G4
-        - 117
+        - 107
       - - '1'
-        - ticks: 1200
+        - ticks: 816
         - B4
-        - 117
-      - - 11/8
-        - ticks: 480
-        - G4
-        - 115
-      - - 3/2
-        - ticks: 960
-        - E4
-        - 115
-      - - 29/16
-        - ticks: 600
-        - B4
-        - 117
-      - - '2'
-        - ticks: 960
-        - E4
-        - 116
-      - - 9/4
-        - ticks: 480
-        - G4
         - 113
-      - - 5/2
-        - ticks: 1440
+      - - 5/4
+        - ticks: 192
         - C5
-        - 117
+        - 90
+      - - 21/16
+        - ticks: 557
+        - B4
+        - 109
+      - - 3/2
+        - ticks: 768
+        - G4
+        - 109
+      - - 7/4
+        - ticks: 720
+        - E4
+        - 112
+      - - '2'
+        - ticks: 826
+        - C4
+        - 109
+      - - 9/4
+        - ticks: 739
+        - E4
+        - 105
+      - - 5/2
+        - ticks: 758
+        - G4
+        - 108
+      - - 11/4
+        - ticks: 720
+        - C5
+        - 110
       - - '3'
         - ticks: 1200
         - G5
@@ -14519,69 +14732,77 @@ parts:
         - G4
         - 117
       - - '4'
-        - ticks: 1200
-        - E4
-        - 117
-      - - 35/8
-        - ticks: 480
-        - G4
+        - ticks: 845
+        - E5
         - 115
+      - - 17/4
+        - ticks: 192
+        - F5
+        - 94
+      - - 69/16
+        - ticks: 528
+        - E5
+        - 110
       - - 9/2
-        - ticks: 1200
-        - B4
-        - 115
-      - - 39/8
-        - ticks: 360
-        - G4
-        - 117
-      - - '5'
-        - ticks: 960
-        - C5
-        - 116
-      - - 43/8
-        - ticks: 480
-        - A4
-        - 111
-      - - 11/2
-        - ticks: 1200
-        - F4
-        - 116
-      - - 47/8
-        - ticks: 360
-        - C5
-        - 112
-      - - '6'
-        - ticks: 960
-        - F#4
-        - 114
-      - - 25/4
-        - ticks: 480
-        - A4
-        - 112
-      - - 13/2
-        - ticks: 1440
-        - D5
-        - 118
-      - - '7'
-        - ticks: 960
-        - B4
-        - 117
-      - - 59/8
-        - ticks: 480
-        - A4
-        - 109
-      - - 15/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 31/4
         - ticks: 720
         - B4
-        - 118
+        - 113
+      - - 19/4
+        - ticks: 691
+        - G4
+        - 106
+      - - '5'
+        - ticks: 912
+        - F4
+        - 114
+      - - 21/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 11/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 289/50
+        - ticks: 576
+        - A4
+        - 105
+      - - '6'
+        - ticks: 864
+        - D4
+        - 108
+      - - 25/4
+        - ticks: 672
+        - F#4
+        - 106
+      - - 13/2
+        - ticks: 816
+        - A4
+        - 109
+      - - 27/4
+        - ticks: 720
+        - D5
+        - 111
+      - - '7'
+        - ticks: 864
+        - B4
+        - 114
+      - - 29/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 119/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 15/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 31/4
+        - ticks: 691
+        - F#4
+        - 109
       automation:
       - id: no_throne_wail_0
         pitch_bend: 0
@@ -14619,103 +14840,119 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 1200
+        - ticks: 816
         - E4
-        - 114
-      - - 3/8
-        - ticks: 480
-        - G4
         - 112
+      - - 1/4
+        - ticks: 192
+        - F4
+        - 93
+      - - 5/16
+        - ticks: 557
+        - E4
+        - 109
       - - 1/2
-        - ticks: 1200
+        - ticks: 768
         - B4
-        - 112
-      - - 7/8
-        - ticks: 360
-        - G4
         - 114
+      - - 3/4
+        - ticks: 730
+        - G4
+        - 107
       - - '1'
-        - ticks: 1200
+        - ticks: 816
         - B4
-        - 114
-      - - 11/8
-        - ticks: 480
-        - G4
-        - 112
+        - 113
+      - - 5/4
+        - ticks: 192
+        - C5
+        - 90
+      - - 21/16
+        - ticks: 557
+        - B4
+        - 109
       - - 3/2
-        - ticks: 960
+        - ticks: 768
+        - G4
+        - 109
+      - - 7/4
+        - ticks: 720
         - E4
         - 112
-      - - 29/16
-        - ticks: 600
-        - B4
-        - 114
       - - '2'
-        - ticks: 1200
-        - F5
-        - 114
-      - - 19/8
-        - ticks: 480
-        - C5
-        - 112
-      - - 5/2
-        - ticks: 480
-        - A4
-        - 112
-      - - 21/8
-        - ticks: 1200
+        - ticks: 912
         - F4
         - 114
+      - - 9/4
+        - ticks: 653
+        - A4
+        - 106
+      - - 5/2
+        - ticks: 835
+        - C5
+        - 114
+      - - 139/50
+        - ticks: 576
+        - A4
+        - 105
       - - 49/16
         - ticks: 3360
         - E4
-        - 114
+        - 108
       - - '4'
-        - ticks: 960
+        - ticks: 883
         - G4
-        - 114
+        - 113
       - - 17/4
-        - ticks: 480
+        - ticks: 624
         - B4
-        - 112
-      - - 35/8
-        - ticks: 480
+        - 107
+      - - 9/2
+        - ticks: 768
         - D5
         - 112
-      - - 9/2
-        - ticks: 1680
+      - - 19/4
+        - ticks: 749
         - G5
-        - 114
+        - 116
       - - '5'
-        - ticks: 2160
+        - ticks: 1200
         - F5
-        - 118
-      - - 45/8
-        - ticks: 960
-        - C5
-        - 112
-      - - '6'
-        - ticks: 960
-        - B4
-        - 117
-      - - 51/8
-        - ticks: 480
-        - A4
-        - 109
-      - - 13/2
-        - ticks: 480
-        - F#4
-        - 111
-      - - 53/8
-        - ticks: 480
-        - D#4
-        - 111
-      - - 27/4
+        - 114
+      - - 87/16
         - ticks: 720
+        - C5
+        - 107
+      - - 91/16
+        - ticks: 624
+        - A4
+        - 108
+      - - 47/8
+        - ticks: 355
+        - F4
+        - 101
+      - - '6'
+        - ticks: 864
         - B4
-        - 118
+        - 114
+      - - 25/4
+        - ticks: 595
+        - D#5
+        - 111
+      - - 103/16
+        - ticks: 192
+        - C5
+        - 100
+      - - 13/2
+        - ticks: 730
+        - B4
+        - 114
+      - - 27/4
+        - ticks: 691
+        - F#4
+        - 109
       - - 113/16
-        - ticks: 3360
+        - ticks: 3341
         - B4
         - 114
       automation:
@@ -15881,6 +16118,1056 @@ parts:
         - ticks: 1536
         - B3
         - 67
+- id: counter_guitar_part
+  instrument: counter_guitar
+  voices:
+  - id: counter_guitar_voice
+    clips:
+    - id: counter_guitar_preroll
+      at:
+        bar: 1
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 751
+        - B3
+        - 100
+      - - 1/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 5/16
+        - ticks: 512
+        - B3
+        - 97
+      - - 1/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 3/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '1'
+        - ticks: 751
+        - G4
+        - 101
+      - - 5/4
+        - ticks: 177
+        - G4
+        - 80
+      - - 21/16
+        - ticks: 512
+        - G4
+        - 97
+      - - 3/2
+        - ticks: 707
+        - E4
+        - 97
+      - - 7/4
+        - ticks: 662
+        - B3
+        - 100
+      - - '2'
+        - ticks: 839
+        - C4
+        - 102
+      - - 9/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 5/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 139/50
+        - ticks: 530
+        - F4
+        - 93
+      - - 49/16
+        - ticks: 2016
+        - B3
+        - 96
+      - - '4'
+        - ticks: 812
+        - D4
+        - 101
+      - - 17/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 9/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 19/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '5'
+        - ticks: 1104
+        - C5
+        - 102
+      - - 87/16
+        - ticks: 662
+        - A4
+        - 95
+      - - 91/16
+        - ticks: 574
+        - F4
+        - 96
+      - - 47/8
+        - ticks: 327
+        - C4
+        - 89
+      - - '6'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 25/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 103/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 13/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 27/4
+        - ticks: 636
+        - D#4
+        - 97
+      - - 113/16
+        - ticks: 2016
+        - F#4
+        - 102
+    - id: counter_guitar_iron_gate
+      at:
+        bar: 9
+        beat: 1
+      events:
+      - - '2'
+        - ticks: 751
+        - B3
+        - 100
+      - - 9/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 37/16
+        - ticks: 512
+        - B3
+        - 97
+      - - 5/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 11/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '3'
+        - ticks: 839
+        - C4
+        - 102
+      - - 13/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 7/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 189/50
+        - ticks: 530
+        - F4
+        - 93
+      - - '4'
+        - ticks: 751
+        - G4
+        - 101
+      - - 17/4
+        - ticks: 177
+        - G4
+        - 80
+      - - 69/16
+        - ticks: 512
+        - G4
+        - 97
+      - - 9/2
+        - ticks: 707
+        - E4
+        - 97
+      - - 19/4
+        - ticks: 662
+        - B3
+        - 100
+      - - '5'
+        - ticks: 812
+        - D4
+        - 101
+      - - 21/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 11/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 23/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '6'
+        - ticks: 1104
+        - C5
+        - 102
+      - - 103/16
+        - ticks: 662
+        - A4
+        - 95
+      - - 107/16
+        - ticks: 574
+        - F4
+        - 96
+      - - 55/8
+        - ticks: 327
+        - C4
+        - 89
+      - - '7'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 29/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 119/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 15/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 31/4
+        - ticks: 636
+        - D#4
+        - 97
+    - id: counter_guitar_shattered_orders
+      at:
+        bar: 17
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 751
+        - B3
+        - 100
+      - - 1/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 5/16
+        - ticks: 512
+        - B3
+        - 97
+      - - 1/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 3/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '1'
+        - ticks: 812
+        - D4
+        - 101
+      - - 5/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 3/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 7/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '2'
+        - ticks: 795
+        - A3
+        - 96
+      - - 9/4
+        - ticks: 618
+        - D4
+        - 94
+      - - 5/2
+        - ticks: 751
+        - F#4
+        - 97
+      - - 11/4
+        - ticks: 662
+        - A4
+        - 99
+      - - '3'
+        - ticks: 1016
+        - G3
+        - 100
+      - - 27/8
+        - ticks: 618
+        - E4
+        - 96
+      - - 29/8
+        - ticks: 883
+        - C4
+        - 96
+      - - '4'
+        - ticks: 777
+        - B4
+        - 103
+      - - 17/4
+        - ticks: 177
+        - F5
+        - 82
+      - - 69/16
+        - ticks: 486
+        - B4
+        - 98
+      - - 9/2
+        - ticks: 662
+        - G4
+        - 101
+      - - 19/4
+        - ticks: 636
+        - E4
+        - 94
+      - - '5'
+        - ticks: 812
+        - D4
+        - 101
+      - - 21/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 11/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 23/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '6'
+        - ticks: 839
+        - C4
+        - 102
+      - - 25/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 13/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 339/50
+        - ticks: 530
+        - F4
+        - 93
+      - - '7'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 29/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 119/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 15/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 31/4
+        - ticks: 636
+        - D#4
+        - 97
+    - id: counter_guitar_war_machine
+      at:
+        bar: 25
+        beat: 1
+      events:
+      - - 1/16
+        - ticks: 2016
+        - B3
+        - 99
+      - - '1'
+        - ticks: 1016
+        - G3
+        - 100
+      - - 11/8
+        - ticks: 618
+        - E4
+        - 96
+      - - 13/8
+        - ticks: 883
+        - C4
+        - 96
+      - - 33/16
+        - ticks: 2016
+        - B4
+        - 99
+      - - '3'
+        - ticks: 795
+        - A3
+        - 96
+      - - 13/4
+        - ticks: 618
+        - D4
+        - 94
+      - - 7/2
+        - ticks: 751
+        - F#4
+        - 97
+      - - 15/4
+        - ticks: 662
+        - A4
+        - 99
+      - - '4'
+        - ticks: 1104
+        - B3
+        - 99
+      - - 35/8
+        - ticks: 442
+        - E4
+        - 97
+      - - '5'
+        - ticks: 760
+        - G3
+        - 97
+      - - 21/4
+        - ticks: 680
+        - C4
+        - 93
+      - - 11/2
+        - ticks: 697
+        - E4
+        - 96
+      - - 23/4
+        - ticks: 662
+        - G4
+        - 98
+      - - '6'
+        - ticks: 839
+        - C4
+        - 102
+      - - 25/4
+        - ticks: 601
+        - F4
+        - 94
+      - - '7'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 29/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 119/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 15/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 31/4
+        - ticks: 636
+        - D#4
+        - 97
+    - id: counter_guitar_counterattack
+      at:
+        bar: 33
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 751
+        - B3
+        - 100
+      - - 1/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 1/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 3/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '1'
+        - ticks: 751
+        - G4
+        - 101
+      - - 5/4
+        - ticks: 177
+        - G4
+        - 80
+      - - 3/2
+        - ticks: 707
+        - E4
+        - 97
+      - - 7/4
+        - ticks: 662
+        - B3
+        - 100
+      - - '2'
+        - ticks: 839
+        - C4
+        - 102
+      - - 9/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 5/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 139/50
+        - ticks: 530
+        - F4
+        - 93
+      - - '3'
+        - ticks: 972
+        - B3
+        - 102
+      - - 27/8
+        - ticks: 407
+        - E4
+        - 94
+      - - 7/2
+        - ticks: 795
+        - G4
+        - 102
+      - - 61/16
+        - ticks: 397
+        - E4
+        - 95
+      - - '4'
+        - ticks: 812
+        - D4
+        - 101
+      - - 17/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 9/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 19/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '5'
+        - ticks: 1104
+        - C5
+        - 102
+      - - 87/16
+        - ticks: 662
+        - A4
+        - 95
+      - - 47/8
+        - ticks: 327
+        - C4
+        - 89
+      - - '6'
+        - ticks: 777
+        - B4
+        - 103
+      - - 25/4
+        - ticks: 177
+        - F5
+        - 82
+      - - 13/2
+        - ticks: 662
+        - G4
+        - 101
+      - - 27/4
+        - ticks: 636
+        - E4
+        - 94
+      - - '7'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 29/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 15/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 31/4
+        - ticks: 636
+        - D#4
+        - 97
+    - id: counter_guitar_the_false_triumph
+      at:
+        bar: 41
+        beat: 1
+      events:
+      - - 1/16
+        - ticks: 2016
+        - B3
+        - 106
+      - - 33/16
+        - ticks: 2016
+        - E4
+        - 100
+      - - '4'
+        - ticks: 1987
+        - C4
+        - 105
+      - - '6'
+        - ticks: 1104
+        - F#4
+        - 98
+      - - 13/2
+        - ticks: 442
+        - B3
+        - 96
+      - - 113/16
+        - ticks: 2016
+        - D#4
+        - 105
+    - id: counter_guitar_breaking_the_columns
+      at:
+        bar: 49
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 221
+        - B3
+        - 107
+      - - 1/8
+        - ticks: 221
+        - G4
+        - 101
+      - - 3/16
+        - ticks: 221
+        - B4
+        - 107
+      - - 1/4
+        - ticks: 221
+        - G4
+        - 104
+      - - 3/8
+        - ticks: 221
+        - B3
+        - 107
+      - - 7/16
+        - ticks: 221
+        - E4
+        - 104
+      - - 1/2
+        - ticks: 883
+        - B4
+        - 101
+      - - 7/8
+        - ticks: 331
+        - E4
+        - 104
+      - - '1'
+        - ticks: 221
+        - D4
+        - 107
+      - - 9/8
+        - ticks: 221
+        - B4
+        - 101
+      - - 19/16
+        - ticks: 221
+        - D5
+        - 107
+      - - 5/4
+        - ticks: 221
+        - B4
+        - 104
+      - - 11/8
+        - ticks: 221
+        - D4
+        - 107
+      - - 23/16
+        - ticks: 221
+        - G4
+        - 104
+      - - 3/2
+        - ticks: 883
+        - D5
+        - 101
+      - - 15/8
+        - ticks: 331
+        - G4
+        - 104
+      - - 7/2
+        - ticks: 442
+        - B3
+        - 105
+      - - 29/8
+        - ticks: 442
+        - E4
+        - 103
+      - - 15/4
+        - ticks: 662
+        - G4
+        - 103
+      - - '4'
+        - ticks: 883
+        - C4
+        - 104
+      - - 17/4
+        - ticks: 442
+        - E4
+        - 101
+      - - 9/2
+        - ticks: 1325
+        - G4
+        - 105
+      - - '5'
+        - ticks: 883
+        - D4
+        - 102
+      - - 21/4
+        - ticks: 442
+        - F#4
+        - 100
+      - - 11/2
+        - ticks: 1325
+        - A4
+        - 106
+      - - '6'
+        - ticks: 442
+        - C4
+        - 105
+      - - 49/8
+        - ticks: 221
+        - F4
+        - 103
+      - - 25/4
+        - ticks: 442
+        - F4
+        - 105
+      - - 51/8
+        - ticks: 442
+        - C4
+        - 103
+      - - 13/2
+        - ticks: 1104
+        - A4
+        - 103
+      - - 55/8
+        - ticks: 331
+        - C4
+        - 105
+      - - '7'
+        - ticks: 883
+        - F#4
+        - 105
+      - - 59/8
+        - ticks: 442
+        - F#4
+        - 97
+      - - 15/2
+        - ticks: 442
+        - D#4
+        - 99
+      - - 61/8
+        - ticks: 442
+        - B3
+        - 99
+      - - 31/4
+        - ticks: 662
+        - F#4
+        - 106
+    - id: counter_guitar_no_throne
+      at:
+        bar: 57
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 751
+        - B3
+        - 100
+      - - 1/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 5/16
+        - ticks: 512
+        - B3
+        - 97
+      - - 1/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 3/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '1'
+        - ticks: 751
+        - G4
+        - 101
+      - - 5/4
+        - ticks: 177
+        - G4
+        - 80
+      - - 21/16
+        - ticks: 512
+        - G4
+        - 97
+      - - 3/2
+        - ticks: 707
+        - E4
+        - 97
+      - - 7/4
+        - ticks: 662
+        - B3
+        - 100
+      - - '2'
+        - ticks: 760
+        - G3
+        - 97
+      - - 9/4
+        - ticks: 680
+        - C4
+        - 93
+      - - 5/2
+        - ticks: 697
+        - E4
+        - 96
+      - - 11/4
+        - ticks: 662
+        - G4
+        - 98
+      - - '3'
+        - ticks: 1104
+        - D5
+        - 105
+      - - 27/8
+        - ticks: 442
+        - B4
+        - 103
+      - - 7/2
+        - ticks: 442
+        - G4
+        - 103
+      - - 29/8
+        - ticks: 1104
+        - D4
+        - 105
+      - - '4'
+        - ticks: 777
+        - B4
+        - 103
+      - - 17/4
+        - ticks: 177
+        - F5
+        - 82
+      - - 69/16
+        - ticks: 486
+        - B4
+        - 98
+      - - 9/2
+        - ticks: 662
+        - G4
+        - 101
+      - - 19/4
+        - ticks: 636
+        - E4
+        - 94
+      - - '5'
+        - ticks: 839
+        - C4
+        - 102
+      - - 21/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 11/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 289/50
+        - ticks: 530
+        - F4
+        - 93
+      - - '6'
+        - ticks: 795
+        - A3
+        - 96
+      - - 25/4
+        - ticks: 618
+        - D4
+        - 94
+      - - 13/2
+        - ticks: 751
+        - F#4
+        - 97
+      - - 27/4
+        - ticks: 662
+        - A4
+        - 99
+      - - '7'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 29/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 119/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 15/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 31/4
+        - ticks: 636
+        - D#4
+        - 97
+    - id: counter_guitar_iron_sky_falls
+      at:
+        bar: 65
+        beat: 1
+      events:
+      - - '0'
+        - ticks: 751
+        - B3
+        - 100
+      - - 1/4
+        - ticks: 177
+        - F4
+        - 81
+      - - 5/16
+        - ticks: 512
+        - B3
+        - 97
+      - - 1/2
+        - ticks: 707
+        - G4
+        - 102
+      - - 3/4
+        - ticks: 672
+        - E4
+        - 95
+      - - '1'
+        - ticks: 751
+        - G4
+        - 101
+      - - 5/4
+        - ticks: 177
+        - G4
+        - 80
+      - - 21/16
+        - ticks: 512
+        - G4
+        - 97
+      - - 3/2
+        - ticks: 707
+        - E4
+        - 97
+      - - 7/4
+        - ticks: 662
+        - B3
+        - 100
+      - - '2'
+        - ticks: 839
+        - C4
+        - 102
+      - - 9/4
+        - ticks: 601
+        - F4
+        - 94
+      - - 5/2
+        - ticks: 768
+        - A4
+        - 102
+      - - 139/50
+        - ticks: 530
+        - F4
+        - 93
+      - - 49/16
+        - ticks: 2016
+        - B3
+        - 96
+      - - '4'
+        - ticks: 812
+        - D4
+        - 101
+      - - 17/4
+        - ticks: 574
+        - G4
+        - 95
+      - - 9/2
+        - ticks: 707
+        - B4
+        - 100
+      - - 19/4
+        - ticks: 689
+        - D5
+        - 104
+      - - '5'
+        - ticks: 1104
+        - C5
+        - 102
+      - - 87/16
+        - ticks: 662
+        - A4
+        - 95
+      - - 91/16
+        - ticks: 574
+        - F4
+        - 96
+      - - 47/8
+        - ticks: 327
+        - C4
+        - 89
+      - - '6'
+        - ticks: 795
+        - F#4
+        - 102
+      - - 25/4
+        - ticks: 547
+        - B4
+        - 99
+      - - 103/16
+        - ticks: 177
+        - A4
+        - 88
+      - - 13/2
+        - ticks: 672
+        - F#4
+        - 102
+      - - 27/4
+        - ticks: 636
+        - D#4
+        - 97
+      - - 113/16
+        - ticks: 2016
+        - F#4
+        - 102
 - id: growly_counterbass_part
   instrument: growly_counterbass
   voices:
@@ -15891,310 +17178,542 @@ parts:
         bar: 1
         beat: 1
       events:
-      - - 1/80
-        - ticks: 1152
-        - B2
-        - 96
-      - - 81/80
-        - ticks: 1152
-        - G3
-        - 96
-      - - 73/40
-        - ticks: 597
-        - G3
-        - 96
-      - - 5/2
-        - ticks: 650
-        - F3
-        - 96
-      - - 49/16
-        - ticks: 3120
+      - - '0'
+        - ticks: 787
         - E3
-        - 98
-      - - 321/80
-        - ticks: 912
-        - D3
-        - 96
-      - - 41/8
-        - ticks: 960
-        - C4
-        - 100
-      - - 45/8
-        - ticks: 1200
+        - 108
+      - - 1/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 3/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '1'
+        - ticks: 787
+        - E3
+        - 108
+      - - 3/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 7/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '2'
+        - ticks: 816
         - F3
-        - 97
-      - - 49/8
-        - ticks: 960
+        - 109
+      - - 5/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 11/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '3'
+        - ticks: 787
+        - E3
+        - 108
+      - - 7/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 15/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '4'
+        - ticks: 816
+        - G3
+        - 108
+      - - 9/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 19/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '5'
+        - ticks: 816
+        - F3
+        - 109
+      - - 11/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 23/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '6'
+        - ticks: 797
+        - B2
+        - 109
+      - - 13/2
+        - ticks: 710
         - F#3
-        - 102
-      - - 53/8
-        - ticks: 1200
-        - A3
-        - 101
-      - - 113/16
-        - ticks: 3360
+        - 106
+      - - 27/4
+        - ticks: 557
         - D#3
-        - 96
+        - 104
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
+        - F#3
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
     - id: growly_counterbass_iron_gate
       at:
         bar: 9
         beat: 1
       events:
-      - - 9/2
-        - ticks: 650
+      - - 3/2
+        - ticks: 768
         - E3
-        - 90
-      - - 11/2
-        - ticks: 650
+        - 101
+      - - '2'
+        - ticks: 787
+        - E3
+        - 108
+      - - 5/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 11/4
+        - ticks: 634
         - G3
-        - 91
-      - - 23/4
-        - ticks: 720
-        - D4
-        - 89
-      - - 49/8
-        - ticks: 960
-        - C4
-        - 100
-      - - 53/8
-        - ticks: 1200
+        - 104
+      - - '3'
+        - ticks: 816
         - F3
-        - 97
+        - 109
+      - - 7/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 15/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '4'
+        - ticks: 787
+        - E3
+        - 108
+      - - 9/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 19/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '5'
+        - ticks: 816
+        - G3
+        - 108
+      - - 11/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 23/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '6'
+        - ticks: 816
+        - F3
+        - 109
+      - - 13/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 27/4
+        - ticks: 528
+        - F3
+        - 104
       - - '7'
-        - ticks: 1200
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
         - F#3
-        - 95
-      - - 125/16
-        - ticks: 645
-        - F#3
-        - 95
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
     - id: growly_counterbass_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
-      - - 3/2
-        - ticks: 960
-        - G3
-        - 90
-      - - '2'
-        - ticks: 720
-        - D3
-        - 101
-      - - 5/2
-        - ticks: 1200
-        - D4
-        - 99
-      - - 23/8
-        - ticks: 405
-        - A3
-        - 99
-      - - '3'
-        - ticks: 1200
-        - G3
-        - 101
-      - - 61/16
-        - ticks: 645
-        - G3
-        - 101
-      - - 321/80
-        - ticks: 1152
-        - B2
-        - 95
-      - - 391/80
-        - ticks: 357
+      - - '0'
+        - ticks: 787
         - E3
-        - 95
-      - - 401/80
-        - ticks: 912
-        - D3
-        - 95
-      - - 13/2
-        - ticks: 650
-        - F3
-        - 101
-      - - 27/4
-        - ticks: 720
-        - C4
-        - 99
-      - - 57/8
-        - ticks: 960
-        - F#3
-        - 103
-      - - 61/8
-        - ticks: 1200
+        - 108
+      - - 1/2
+        - ticks: 710
         - B2
-        - 99
+        - 105
+      - - 3/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '1'
+        - ticks: 816
+        - G3
+        - 108
+      - - 3/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 7/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '2'
+        - ticks: 816
+        - D3
+        - 106
+      - - 5/2
+        - ticks: 720
+        - A3
+        - 105
+      - - '3'
+        - ticks: 816
+        - C3
+        - 107
+      - - 7/2
+        - ticks: 816
+        - G3
+        - 104
+      - - '4'
+        - ticks: 787
+        - E3
+        - 108
+      - - 9/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 19/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '5'
+        - ticks: 816
+        - G3
+        - 108
+      - - 11/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 23/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '6'
+        - ticks: 816
+        - F3
+        - 109
+      - - 13/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 27/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
+        - F#3
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
     - id: growly_counterbass_war_machine
       at:
         bar: 25
         beat: 1
       events:
-      - - 1/2
-        - ticks: 650
+      - - '0'
+        - ticks: 787
         - E3
-        - 93
-      - - 17/8
-        - ticks: 960
-        - D3
-        - 93
-      - - 21/8
-        - ticks: 1200
-        - B3
-        - 91
-      - - '3'
-        - ticks: 960
-        - D3
-        - 93
-      - - 7/2
-        - ticks: 1680
-        - D4
-        - 93
-      - - 11/2
-        - ticks: 650
+        - 108
+      - - 1/2
+        - ticks: 710
+        - B2
+        - 105
+      - - '1'
+        - ticks: 816
         - C3
-        - 93
-      - - 23/4
-        - ticks: 720
+        - 107
+      - - 3/2
+        - ticks: 816
         - G3
-        - 91
-      - - 57/8
-        - ticks: 960
-        - F#2
-        - 93
-      - - 61/8
-        - ticks: 1200
+        - 104
+      - - '2'
+        - ticks: 816
+        - G3
+        - 108
+      - - 5/2
+        - ticks: 730
+        - D3
+        - 105
+      - - '3'
+        - ticks: 816
+        - D3
+        - 106
+      - - 7/2
+        - ticks: 720
+        - A3
+        - 105
+      - - '4'
+        - ticks: 787
+        - E3
+        - 108
+      - - 9/2
+        - ticks: 710
+        - B2
+        - 105
+      - - '5'
+        - ticks: 816
+        - C3
+        - 107
+      - - 11/2
+        - ticks: 816
+        - G3
+        - 104
+      - - '6'
+        - ticks: 816
+        - F3
+        - 109
+      - - 13/2
+        - ticks: 672
+        - C3
+        - 105
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
+        - F#3
+        - 106
+      - - 31/4
+        - ticks: 557
         - D#3
-        - 91
+        - 104
     - id: growly_counterbass_counterattack
       at:
         bar: 33
         beat: 1
       events:
-      - - '1'
-        - ticks: 480
+      - - '0'
+        - ticks: 787
         - E3
+        - 108
+      - - 1/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 3/4
+        - ticks: 634
+        - G3
         - 104
-      - - 15/8
-        - ticks: 405
+      - - '1'
+        - ticks: 787
         - E3
+        - 108
+      - - 3/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 7/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '2'
+        - ticks: 816
+        - F3
+        - 109
+      - - 5/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 11/4
+        - ticks: 528
+        - F3
         - 104
       - - '3'
-        - ticks: 720
+        - ticks: 787
         - E3
-        - 104
-      - - 31/8
-        - ticks: 405
-        - B3
-        - 102
-      - - '5'
-        - ticks: 1200
-        - C4
-        - 104
-      - - 93/16
-        - ticks: 600
-        - C4
-        - 104
-      - - 13/2
-        - ticks: 480
-        - E3
-        - 104
-      - - 27/4
-        - ticks: 720
-        - B3
-        - 102
-      - - 57/8
-        - ticks: 960
-        - F#3
-        - 103
-      - - 61/8
-        - ticks: 1200
+        - 108
+      - - 7/2
+        - ticks: 710
         - B2
-        - 99
+        - 105
+      - - 15/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '4'
+        - ticks: 816
+        - G3
+        - 108
+      - - 9/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 19/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '5'
+        - ticks: 816
+        - F3
+        - 109
+      - - 11/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 23/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '6'
+        - ticks: 787
+        - E3
+        - 108
+      - - 13/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 27/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
+        - F#3
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
     - id: growly_counterbass_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - 49/8
-        - ticks: 960
-        - F#3
-        - 99
-      - - 53/8
-        - ticks: 1200
+      - - 1/16
+        - ticks: 2544
+        - E3
+        - 101
+      - - 33/16
+        - ticks: 2544
+        - C3
+        - 101
+      - - 65/16
+        - ticks: 2544
+        - F3
+        - 101
+      - - 97/16
+        - ticks: 2544
         - B2
-        - 97
-      - - 15/2
-        - ticks: 650
+        - 101
+      - - 113/16
+        - ticks: 2544
         - B2
-        - 96
-      - - 31/4
-        - ticks: 720
-        - F#3
-        - 94
+        - 101
     - id: growly_counterbass_breaking_the_columns
       at:
         bar: 49
         beat: 1
       events:
-      - - 1/8
-        - ticks: 960
+      - - '0'
+        - ticks: 787
+        - E3
+        - 108
+      - - 1/2
+        - ticks: 710
         - B2
-        - 106
-      - - 3/2
-        - ticks: 480
+        - 105
+      - - '1'
+        - ticks: 816
         - G3
-        - 106
-      - - 7/4
-        - ticks: 720
-        - D4
-        - 104
+        - 108
+      - - 3/2
+        - ticks: 730
+        - D3
+        - 105
       - - '2'
-        - ticks: 470
+        - ticks: 816
         - F3
         - 109
       - - 5/2
-        - ticks: 960
-        - F4
-        - 103
-      - - 23/8
-        - ticks: 405
-        - A3
-        - 106
-      - - '3'
-        - ticks: 470
-        - E3
-        - 109
-      - - 31/8
-        - ticks: 405
-        - G3
-        - 106
-      - - 321/80
-        - ticks: 912
+        - ticks: 672
         - C3
-        - 98
-      - - 361/80
-        - ticks: 1392
+        - 105
+      - - '3'
+        - ticks: 787
+        - E3
+        - 108
+      - - 7/2
+        - ticks: 710
+        - B2
+        - 105
+      - - '4'
+        - ticks: 816
+        - C3
+        - 107
+      - - 9/2
+        - ticks: 816
         - G3
-        - 99
-      - - 401/80
-        - ticks: 912
-        - D3
-        - 96
-      - - 441/80
-        - ticks: 1392
-        - A3
-        - 100
-      - - 13/2
-        - ticks: 480
-        - F3
-        - 106
-      - - 27/4
-        - ticks: 720
-        - C4
         - 104
-      - - 113/16
-        - ticks: 3360
+      - - '5'
+        - ticks: 816
+        - D3
+        - 106
+      - - 11/2
+        - ticks: 720
+        - A3
+        - 105
+      - - '6'
+        - ticks: 816
+        - F3
+        - 109
+      - - 13/2
+        - ticks: 672
+        - C3
+        - 105
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
         - F#3
         - 106
     - id: growly_counterbass_no_throne
@@ -16202,107 +17721,195 @@ parts:
         bar: 57
         beat: 1
       events:
-      - - 1/80
-        - ticks: 1152
+      - - '0'
+        - ticks: 787
+        - E3
+        - 108
+      - - 1/2
+        - ticks: 710
         - B2
-        - 99
-      - - 81/80
-        - ticks: 1152
+        - 105
+      - - 3/4
+        - ticks: 634
         - G3
-        - 99
-      - - 73/40
-        - ticks: 597
+        - 104
+      - - '1'
+        - ticks: 787
+        - E3
+        - 108
+      - - 3/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 7/4
+        - ticks: 634
         - G3
-        - 99
-      - - 161/80
-        - ticks: 912
+        - 104
+      - - '2'
+        - ticks: 816
         - C3
-        - 98
-      - - 201/80
-        - ticks: 1392
+        - 107
+      - - 5/2
+        - ticks: 816
         - G3
-        - 99
+        - 104
+      - - '3'
+        - ticks: 816
+        - G3
+        - 108
       - - 7/2
-        - ticks: 650
-        - G3
-        - 97
-      - - '4'
-        - ticks: 720
-        - B3
-        - 100
-      - - 9/2
-        - ticks: 1200
-        - G3
-        - 101
-      - - 401/80
-        - ticks: 912
-        - A3
-        - 98
-      - - 471/80
-        - ticks: 357
-        - A3
-        - 94
-      - - 481/80
-        - ticks: 912
+        - ticks: 730
         - D3
-        - 96
+        - 105
+      - - 15/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '4'
+        - ticks: 787
+        - E3
+        - 108
+      - - 9/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 19/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '5'
+        - ticks: 816
+        - F3
+        - 109
+      - - 11/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 23/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '6'
+        - ticks: 816
+        - D3
+        - 106
+      - - 13/2
+        - ticks: 720
+        - A3
+        - 105
       - - '7'
-        - ticks: 1200
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
         - F#3
-        - 99
-      - - 125/16
-        - ticks: 645
-        - F#3
-        - 99
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
     - id: growly_counterbass_iron_sky_falls
       at:
         bar: 65
         beat: 1
       events:
-      - - 1/80
-        - ticks: 1152
-        - B2
-        - 96
-      - - 81/80
-        - ticks: 1152
-        - G3
-        - 96
-      - - 73/40
-        - ticks: 597
-        - G3
-        - 96
-      - - 5/2
-        - ticks: 650
-        - F3
-        - 96
-      - - 49/16
-        - ticks: 3120
+      - - '0'
+        - ticks: 787
         - E3
-        - 98
-      - - 321/80
-        - ticks: 912
-        - D3
-        - 96
-      - - 41/8
-        - ticks: 960
-        - C4
-        - 100
-      - - 45/8
-        - ticks: 1200
+        - 108
+      - - 1/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 3/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '1'
+        - ticks: 787
+        - E3
+        - 108
+      - - 3/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 7/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '2'
+        - ticks: 816
         - F3
-        - 97
-      - - 49/8
-        - ticks: 960
+        - 109
+      - - 5/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 11/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '3'
+        - ticks: 787
+        - E3
+        - 108
+      - - 7/2
+        - ticks: 710
+        - B2
+        - 105
+      - - 15/4
+        - ticks: 634
+        - G3
+        - 104
+      - - '4'
+        - ticks: 816
+        - G3
+        - 108
+      - - 9/2
+        - ticks: 730
+        - D3
+        - 105
+      - - 19/4
+        - ticks: 624
+        - G3
+        - 105
+      - - '5'
+        - ticks: 816
+        - F3
+        - 109
+      - - 11/2
+        - ticks: 672
+        - C3
+        - 105
+      - - 23/4
+        - ticks: 528
+        - F3
+        - 104
+      - - '6'
+        - ticks: 797
+        - B2
+        - 109
+      - - 13/2
+        - ticks: 710
         - F#3
-        - 102
-      - - 53/8
-        - ticks: 1200
-        - A3
-        - 101
-      - - 113/16
-        - ticks: 3360
+        - 106
+      - - 27/4
+        - ticks: 557
         - D#3
-        - 96
+        - 104
+      - - '7'
+        - ticks: 797
+        - B2
+        - 109
+      - - 15/2
+        - ticks: 710
+        - F#3
+        - 106
+      - - 31/4
+        - ticks: 557
+        - D#3
+        - 104
 - id: viola_lead_part
   instrument: solo_viola
   voices:
@@ -16500,6 +18107,7 @@ playback:
     - kit_core
     hook:
     - lead_guitar
+    - counter_guitar
     - growly_counterbass
     percussion:
     - kit_ornaments
@@ -16526,8 +18134,15 @@ playback:
     - iron_sky_falls
     loop: true
 notes:
-- 'Growly-counterbass audition (October 18, 2026): replace the high-gain Black And Green secondary guitar with the Dirty (sustain + release) Growlybass patch. One primary guitar soloist now carries the hook.'
-- 'Original second-guitar chord-tone responses are dropped an octave and reduced to slower phrases; the Black And Blue E1-D2 rhythmic bass stays intact.'
-- 'FreePats lead gain is reduced by 6 dB relative to the uploaded FSBS test, addressing the stem balance without changing its sampled tone.'
-- 'Growly counterbass uses a separately filtered upper-bass register to avoid masking the deep E1 riff bass and is active with the hook layer.'
-- 'All drum, rhythm, orchestral, choir and primary lead note events are unchanged. Preroll copies the revised ending counterbass phrase exactly.'
+- 'Evil Leitmotif / Trio revision (October 18, 2026): a recurrent E4-F4-E4 / B4-G4 chromatic signature, brief dissonances
+  resolved onto stable chord tones.'
+- At full-preview 0:02-0:03, replaced the old B4-to-F5 tritone leap into the F5 riff with a connected lower F4 
+  statement; the closing 8 bars are exactly the preroll.
+- Reintroduced Black And Green Guitar as a synced supportive harmony voice with controlled mid-forward JCM800 sound (not
+  an independent alternating solo).
+- Growlybass Dirty now joins principal guitar attacks as a midrange third voice, with +3.4 dB gain; the original Black 
+  And Blue foundation gets +0.7 dB.
+- 'Main FreePats Distorted #1 soloist is lowered 0.7 dB for trio headroom; VPO choirs, rhythm guitars, drums and orchestral
+  parts retain every authored event.'
+- Ritual long bends and the central technical guitar solo retain their original lead writing; no new samples or 
+  asset-install rules required.
