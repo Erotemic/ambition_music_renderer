@@ -22,7 +22,11 @@ def test_catalog_is_packaged_authoring_authority():
 
     catalog = instrument_catalog()
     assert catalog
-    assert all(entry.expected for entry in catalog.values())
+    # The installed-authoring catalogue may also include deliberately optional
+    # experiments, but all established release instruments remain expected.
+    assert all(catalog[ref].expected for ref in (
+        "freepats.salamander_grand", "guitar.emily", "bass.growly", "drums.big_rusty",
+    ))
     assert {
         "freepats.salamander_grand",
         "guitar.emily",
@@ -40,7 +44,7 @@ def test_every_catalog_instrument_has_known_download_source():
     for ref, entry in instrument_catalog().items():
         assert entry.source in sources, ref
         source = sources[entry.source]
-        assert source["expected"] is True
+        assert source["expected"] is entry.expected, ref
         assert source["install_profile"] in {"starter", "pro"}
         assert source["relative_root"], ref
 

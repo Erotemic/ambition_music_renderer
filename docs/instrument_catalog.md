@@ -18,10 +18,12 @@ be able to answer from a source archive alone:
 - curated usage notes and library-specific setup or articulation caveats;
 - the real-library smoke probes used to verify important patches.
 
-Every catalog entry is expected to be available after the normal audio-tools
-installer has completed successfully. A missing catalog instrument on a local
-machine is an installation/environment defect. It is not evidence that an agent
-should rewrite a score to avoid that instrument.
+Catalog entries marked `expected: true` are required after a successful
+normal audio-tools installation. Optional experimental sources may be
+registered as `expected: false`; the downloader still attempts them, but a
+transient failure does not block unrelated cues. An explicitly requested sampled
+instrument in a `strict_backends: true` score must still resolve to the real
+sample library; a General MIDI substitute is not an acceptable comparison.
 
 An agent does not need `/data/audio-tools` in order to compose against the
 catalog. Discover the vocabulary directly from the repository:
@@ -50,6 +52,34 @@ into scores when the catalog already identifies the desired role. A score may
 add a `prefer` override when it intentionally requests a different realization
 within that stable role.
 
+
+### FreePats FSBS Distorted #1 (experimental electric-guitar option)
+
+The normal `MODE=pro` audio-tools installation automatically downloads the
+[FreePats FSBS Distorted #1](https://freepats.zenvoid.org/ElectricGuitar/distorted-electric-guitar.html)
+SFZ/FLAC library under `sfz/FreePats/FSBSDistorted1`. The upstream release
+is CC0-1.0. Its 2022-09-11 release asset is SHA-256 verified; if the 7z release
+cannot be downloaded or extracted, setup tries a GitHub snapshot pinned to an
+upstream commit instead. The source is in the existing instrument catalog, so
+`instruments doctor` and instrument discovery use the normal APIs.
+
+```yaml
+instrument_backend:
+  kind: sfz
+  library_ref: guitar.fsbs_distorted_1
+```
+
+The 120 recorded FLACs are **already overdriven**. The recommended audition
+uses EQ/compression rather than re-amplifying the signal with an additional
+Guitarix preamp. The SFZ covers MIDI 35–86, has round-robin and velocity
+layers, but does not offer sampled legato or a long-loop articulation. Evaluate
+its lead sustain in audio before making it the default instrument.
+
+This catalog source is optional (`expected: false`) while we audition it:
+`MODE=pro` setup attempts the download and retries an alternate upstream
+archive, but a temporary FreePats failure does not block unrelated music.
+Scores explicitly selecting it must still provide the real samples. It does
+not introduce another hosting service or a manual permission step.
 
 ## Agent-facing musical guidance and canonical auditions
 

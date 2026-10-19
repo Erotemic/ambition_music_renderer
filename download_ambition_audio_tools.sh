@@ -203,6 +203,7 @@ download_and_extract() {
     local archive_name="$3"
     local dest_dir="$4"
     local archive="$ARCHIVES/$archive_name"
+    local expected_sha256="${5:-}"
     # An installed library must not force a re-download just because the
     # archive cache was pruned (VCSL alone is ~4 GB).
     if [[ "$DRY_RUN" != "1" ]] && already_extracted "$archive_name" "$dest_dir"; then
@@ -213,11 +214,30 @@ download_and_extract() {
     # ``set -e`` suppressed inside ``download_and_extract_optional``'s
     # conditional, the old form continued and could leave a misleading
     # per-archive extraction marker beside an empty destination.
+    if [[ "$DRY_RUN" != "1" && -n "$expected_sha256" && -s "$archive" ]]; then
+        # Preserve the existing retry behavior, but don't trust a corrupted
+        # archive cached by an interrupted earlier installation.
+        local actual_sha256
+        actual_sha256="$(sha256sum "$archive" | awk '{print $1}')"
+        if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+            log "cached archive checksum mismatch for $label; re-downloading"
+            rm -f "$archive"
+        fi
+    fi
     if ! download "$url" "$archive" "$label"; then
         return 1
     fi
     if [[ "$DRY_RUN" == "1" ]]; then
         return 0
+    fi
+    if [[ -n "$expected_sha256" ]]; then
+        local actual_sha256
+        actual_sha256="$(sha256sum "$archive" | awk '{print $1}')"
+        if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+            log "archive checksum mismatch for $label: expected=$expected_sha256 actual=$actual_sha256"
+            rm -f "$archive"
+            return 1
+        fi
     fi
     extract_archive "$archive" "$dest_dir" "$label"
 }
@@ -227,7 +247,7 @@ download_and_extract_optional() {
     local url="$2"
     local archive_name="$3"
     local dest_dir="$4"
-    if ! download_and_extract "$label" "$url" "$archive_name" "$dest_dir"; then
+    if ! download_and_extract "$label" "$url" "$archive_name" "$dest_dir" "${5:-}"; then
         log "optional download failed or could not be extracted: $label"
         log "manual fallback may be listed in $MANUAL"
         return 1
@@ -686,6 +706,7 @@ def count_files(base: Path, pattern: str) -> int:
     return sum(1 for _ in base.rglob(pattern))
 
 checks = []
+checks.append(("FreePats FSBS Distorted #1", count_files(sfz_root / "FreePats" / "FSBSDistorted1", "*.sfz"), count_files(sfz_root / "FreePats" / "FSBSDistorted1", "*.flac")))
 checks.append(("FreePats Salamander", count_files(sfz_root / "FreePats" / "SalamanderGrandPiano", "*.sfz"), count_files(sfz_root / "FreePats" / "SalamanderGrandPiano", "*.flac")))
 checks.append(("FreePats Upright Piano KW", count_files(sfz_root / "FreePats" / "UprightPianoKW", "*.sfz"), count_files(sfz_root / "FreePats" / "UprightPianoKW", "*.flac")))
 checks.append(("VPO", count_files(sfz_root / "Virtual-Playing-Orchestra3", "*.sfz"), count_files(sfz_root / "Virtual-Playing-Orchestra3", "*.wav")))
@@ -1090,6 +1111,59 @@ write_apt_hints
 log "install root: $ROOT"
 log "mode: $MODE"
 
+# Optional alternative-guitar source. The upstream release is already distorted;
+# download both SFZ and the FLAC recordings, not a soundfont stand-in. The
+# release digest is published in the GitHub Releases asset metadata. If the
+# release/7z path fails, fall back to a pinned snapshot of the same CC0 repo;
+# do not introduce a manual-download dependency into normal setup.
+install_freepats_fsbs_distorted_1() {
+    local label="FreePats FSBS Distorted #1 (CC0, SFZ/FLAC)"
+    local dest="$SFZ_ROOT/FreePats/FSBSDistorted1"
+    local release_sha256="86715a19fc8da8e9145203be9457d99476c0fe896a64f2adf21e184519302b14"
+    local release_archive="EGuitarFSBS-dist1-SFZ+FLAC-20220911.7z"
+    local source_archive="freepats-fsbs-dist1-bbae17f0.zip"
+    local source_ref="bbae17f0ad16f5edd7ec22178d181f3e3f6696fa"
+    if [[ "$DRY_RUN" != "1" ]] && freepats_fsbs_distorted_1_complete "$dest"; then
+        log "already installed: $label -> $dest"
+        return 0
+    fi
+    if download_and_extract_optional "$label" \
+      "https://github.com/freepats/electric-guitar-FSBS-dist1/releases/download/2022-09-11/EGuitarFSBS-dist1-SFZ%2BFLAC-20220911.7z" \
+      "$release_archive" "$dest" "$release_sha256"; then
+        if [[ "$DRY_RUN" == "1" ]] || freepats_fsbs_distorted_1_complete "$dest"; then
+            return 0
+        fi
+        log "incomplete FreePats FSBS Distorted #1 release extraction; trying pinned source tree"
+    fi
+    # A partial release extraction can leave a valid-looking .sfz whose
+    # sample paths point to missing FLACs. Clear only this dedicated library
+    # directory so the alternate archive cannot compete with stale files.
+    if [[ "$DRY_RUN" != "1" && -d "$dest" ]]; then
+        rm -rf -- "$dest"
+    fi
+    log "trying pinned FreePats FSBS Distorted #1 GitHub source-archive fallback"
+    if download_and_extract_optional "$label (source archive fallback)" \
+      "https://codeload.github.com/freepats/electric-guitar-FSBS-dist1/zip/$source_ref" \
+      "$source_archive" "$dest"; then
+        if [[ "$DRY_RUN" == "1" ]] || freepats_fsbs_distorted_1_complete "$dest"; then
+            return 0
+        fi
+    fi
+    log "WARNING: FreePats FSBS Distorted #1 was not completely installed; retry setup later"
+    return 1
+}
+
+freepats_fsbs_distorted_1_complete() {
+    local dest="$1"
+    [[ -d "$dest" ]] || return 1
+    # The published patch references 120 FLAC files. Incomplete downloads
+    # must not register an SFZ that renders silence due to missing samples.
+    find "$dest" -type f -name 'EGuitarFSBS-dist1 bridge 20220911.sfz' -print -quit | grep -q . || return 1
+    local sample_count
+    sample_count="$(find "$dest" -type f -name '*.flac' | wc -l | tr -d ' ')"
+    [[ "$sample_count" -ge 120 ]]
+}
+
 # Direct / robust SFZ downloads.
 download_and_extract "FreePats Upright Piano KW SFZ/FLAC" "https://freepats.zenvoid.org/Piano/UprightPianoKW/UprightPianoKW-SFZ%2BFLAC-20220221.7z" "UprightPianoKW-SFZ+FLAC-20220221.7z" "$SFZ_ROOT/FreePats/UprightPianoKW"
 
@@ -1140,6 +1214,7 @@ download_and_extract_optional "Ganjo guitar-banjo" "https://github.com/sfzinstru
 download_and_extract_optional "jRhodes3c Rhodes Mark I SFZ/FLAC" "https://github.com/sfzinstruments/jlearman.jRhodes3c/archive/refs/heads/master.zip" "sfzinstruments.jRhodes3c.master.zip" "$SFZ_ROOT/SFZInstruments/jRhodes3c" || download_and_extract_optional "jRhodes3c Rhodes Mark I SFZ/FLAC" "https://github.com/sfzinstruments/jlearman.jRhodes3c/archive/refs/heads/main.zip" "sfzinstruments.jRhodes3c.main.zip" "$SFZ_ROOT/SFZInstruments/jRhodes3c" || true
 
 if want_pro; then
+    install_freepats_fsbs_distorted_1 || true
     download_and_extract_optional "Karoryfer Black And Green Guitars" "https://github.com/sfzinstruments/karoryfer.black-and-green-guitars/releases/download/v1.000/Karoryfer_Black_And_Green_Guitars_1000.zip" "Karoryfer_Black_And_Green_Guitars_1000.zip" "$SFZ_ROOT/Karoryfer/BlackAndGreenGuitars" || true
     download_and_extract_optional "Karoryfer Swagbass" "https://github.com/sfzinstruments/karoryfer.swagbass/releases/download/v1.001/Karoryfer.Swagbass.v1.001.zip" "Karoryfer.Swagbass.v1.001.zip" "$SFZ_ROOT/Karoryfer/Swagbass" || true
     download_and_extract_optional "Etherealwinds Harp II CE" "https://versilian-studios.com/Distro/EWHarp2CE_SFZ-Raw.zip" "EWHarp2CE_SFZ-Raw.zip" "$SFZ_ROOT/Versilian/EtherealwindsHarpII_CE" || true

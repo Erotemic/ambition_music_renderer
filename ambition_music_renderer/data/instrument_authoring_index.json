@@ -1,5 +1,5 @@
 {
-  "catalog_semantic_sha256": "b5c6061527077952b863b2055019ac600a6fea8a809dfb5745f2c2c8cfd1d347",
+  "catalog_semantic_sha256": "ffa871abb4ccfc56b985e404210b1143bc947a328d9acdd66db0a72272bc2445",
   "family_profiles": {
     "bass": {
       "audition": {
@@ -517,7 +517,7 @@
     }
   },
   "generated_from": "instrument_catalog.yaml + instrument_family_profiles.json",
-  "instrument_count": 74,
+  "instrument_count": 75,
   "instruments": {
     "bass.black_and_blue": {
       "backend": {
@@ -3726,6 +3726,127 @@
           "The guitar has flatwound strings and is recorded direct. Without an amp it is dull: measured 2026-10-10, a clean arpeggio had almost no sound above 3 kHz. Use it through a high-gain chain; use another guitar for clean parts."
         ],
         "summary": "Emilyguitar chord-oriented electric guitar. Good for rhythm/power-chord writing; prefer a dedicated single-note program for lead melodies."
+      }
+    },
+    "guitar.fsbs_distorted_1": {
+      "backend": {
+        "kind": "sfz"
+      },
+      "expected": false,
+      "family": "guitar",
+      "family_profile": {
+        "audition": {
+          "base": "E3",
+          "chord": [
+            0,
+            7,
+            12,
+            15
+          ],
+          "durations": [
+            0.25,
+            0.25,
+            0.25,
+            0.25,
+            0.25,
+            0.75
+          ],
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10,
+            12
+          ]
+        },
+        "composition_techniques": [
+          "normal",
+          "sustain",
+          "staccato",
+          "palm_mute",
+          "legato"
+        ],
+        "recommended_midi_range": [
+          40,
+          84
+        ],
+        "summary": "Guitar-family sampled instruments; prefer guitar-aware generators for rhythm and lead phrasing.",
+        "technique_policy": "These are useful authoring intents for the family, not a claim that every resolved patch has a dedicated sampled articulation. Instrument/technique maps or synthesis gating determine realization.",
+        "writing_tips": [
+          "Use guitar.strum/chug/shape_pick for chordal rhythm instead of keyboard block voicings.",
+          "Use technique/articulation intent such as palm_mute or staccato when the realization supports it."
+        ]
+      },
+      "install_profile": "pro",
+      "is_drum": false,
+      "known_patch_profiles": [
+        {
+          "articulation": "pre-distorted-bridge",
+          "family": "guitar",
+          "library_ref": "guitar.fsbs_distorted_1",
+          "name": "freepats_fsbs_distorted_1",
+          "pitch_probe": false,
+          "probes": [
+            52,
+            64,
+            76
+          ],
+          "source": "freepats.fsbs_distorted_1"
+        }
+      ],
+      "musicir": {
+        "instrument_backend": {
+          "kind": "sfz",
+          "library_ref": "guitar.fsbs_distorted_1"
+        }
+      },
+      "program": null,
+      "ref": "guitar.fsbs_distorted_1",
+      "resolver": {
+        "avoid": [
+          "dist2",
+          "direct",
+          "clean"
+        ],
+        "prefer": [
+          "eguitarfsbs-dist1 bridge 20220911",
+          "dist1",
+          "bridge"
+        ],
+        "prefer_source": true,
+        "required_any": [
+          [
+            "eguitarfsbs dist1"
+          ],
+          [
+            "fsbs",
+            "dist1"
+          ]
+        ]
+      },
+      "role": "pre_distorted_electric_guitar",
+      "source": "freepats.fsbs_distorted_1",
+      "source_info": {
+        "expected": false,
+        "install_profile": "pro",
+        "label": "FreePats FSBS Electric Guitar Distorted #1 (bridge, SFZ/FLAC)",
+        "license": "CC0-1.0",
+        "notes": [
+          "Release 2022-09-11, public download. Distortion is already printed into the samples.",
+          "Use the bridge SFZ with its 120 FLAC samples; sampled range MIDI 35..86.",
+          "Do not run a full high-gain preamp/overdrive chain on top of the pre-distorted recordings by default.",
+          "The downloader first tries the checksum-verified GitHub release, then a pinned source archive if needed."
+        ],
+        "relative_root": "sfz/FreePats/FSBSDistorted1"
+      },
+      "usage": {
+        "nuances": [
+          "SFZ playable MIDI range 35..86, with soft and hard velocity layers and 4-way sample round robins.",
+          "The source has no authored sample loops, keyswitches, or specialized legato. Test sustained lead notes before relying on long wails.",
+          "Keep processing light for an initial A/B audition; avoid cascading the existing Guitarix TS9 and JCM800 preamp on top of these processed samples."
+        ],
+        "summary": "FreePats FSBS Distorted"
       }
     },
     "guitar.hollowbody": {

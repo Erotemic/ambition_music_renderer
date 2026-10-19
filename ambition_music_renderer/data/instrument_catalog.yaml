@@ -13,6 +13,17 @@ sources:
     expected: true
     install_profile: starter
     relative_root: sfz/FreePats/UprightPianoKW
+  freepats.fsbs_distorted_1:
+    label: "FreePats FSBS Electric Guitar Distorted #1 (bridge, SFZ/FLAC)"
+    expected: false
+    install_profile: pro
+    license: CC0-1.0
+    relative_root: sfz/FreePats/FSBSDistorted1
+    notes:
+    - Release 2022-09-11, public download. Distortion is already printed into the samples.
+    - Use the bridge SFZ with its 120 FLAC samples; sampled range MIDI 35..86.
+    - Do not run a full high-gain preamp/overdrive chain on top of the pre-distorted recordings by default.
+    - The downloader first tries the checksum-verified GitHub release, then a pinned source archive if needed.
   freepats.salamander_grand:
     label: FreePats Salamander Grand Piano
     expected: true
@@ -660,6 +671,31 @@ instruments:
     source: karoryfer.weresax
     expected: true
     install_profile: pro
+  guitar.fsbs_distorted_1:
+    family: guitar
+    role: pre_distorted_electric_guitar
+    resolver:
+      required_any:
+      - - eguitarfsbs dist1
+      - - fsbs
+        - dist1
+      prefer:
+      - eguitarfsbs-dist1 bridge 20220911
+      - dist1
+      - bridge
+      avoid:
+      - dist2
+      - direct
+      - clean
+    source: freepats.fsbs_distorted_1
+    expected: false
+    install_profile: pro
+    usage:
+      summary: FreePats FSBS Distorted #1; recorded Fender electric guitar already amplified and distorted, not a DI patch.
+      nuances:
+      - SFZ playable MIDI range 35..86, with soft and hard velocity layers and 4-way sample round robins.
+      - The source has no authored sample loops, keyswitches, or specialized legato. Test sustained lead notes before relying on long wails.
+      - Keep processing light for an initial A/B audition; avoid cascading the existing Guitarix TS9 and JCM800 preamp on top of these processed samples.
   guitar.clean:
     family: guitar
     role: clean
@@ -2252,6 +2288,16 @@ instruments:
       - The author notes SoundFont gain can vary by sampler, so measure/render before committing final mix gain.
       - Raw articulation recordings are downloaded separately for future Tsugaru strike, sukui, and hajiki support.
 smoke_profiles:
+- name: freepats_fsbs_distorted_1
+  library_ref: guitar.fsbs_distorted_1
+  source: freepats.fsbs_distorted_1
+  family: guitar
+  articulation: pre-distorted-bridge
+  probes:
+  - 52
+  - 64
+  - 76
+  pitch_probe: false
 - name: emily_basic
   path: Karoryfer/Emilyguitar/Emilyguitar/emily_basic.sfz
   source: karoryfer.emilyguitar

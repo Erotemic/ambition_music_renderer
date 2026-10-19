@@ -255,7 +255,7 @@ instruments:
   mix_gain_db: 12.8
   instrument_backend:
     kind: sfz
-    sfz_glob: '**/Emilyguitar/Emilyguitar/emily_basic.sfz'
+    library_ref: guitar.fsbs_distorted_1
     settings:
       fold_to_range: false
 - name: kit_ornaments
@@ -496,49 +496,24 @@ processing:
       - processor: balance
         position: 0.8
     lead_guitar:
+      # FreePats FSBS #1 is ALREADY distorted/amped in the source recordings.
+      # Audition its own tone without cascading another TS9/JCM800 preamp.
+      # The second lead remains Black And Green with its prior high-gain chain.
       chain:
-      # High-gain lead: retain the full-quality Emilyguitar DI samples.
-      # ``program: clean_guitar`` is GM metadata, not the SFZ timbre selector.
-      - processor: pedalboard
-        effects:
-        - {effect: gain, gain_db: 10.0}
-        - {effect: compressor, threshold_db: -27.0, ratio: 2.4, attack_ms: 10.0, release_ms: 155.0}
-      # Pushed overdrive, with enough direct attack for articulated shredding.
-      - processor: lv2
-        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
-        binary: lv2apply
-        channel_mode: dual_mono
-        wet_mix: 0.92
-        params: {fslider0_: -3.0, fslider1_: 700.0, fslider2_: 0.82, BYPASS: 0.0}
-      - processor: lv2
-        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
-        binary: lv2apply
-        wet_mix: 0.94
-        params: {P6v: 0.86, Middle: 0.81, Bass: 0.63, Treble: 0.55, WET_DRY: 94.0, GAIN: -1.0}
-      # Controlled parallel overdrive AFTER the modeled amp adds harmonic density
-      # without replacing the DI samples or requiring a General MIDI soundfont.
-      - processor: pedalboard
-        effects:
-        - {effect: distortion, drive_db: 7.0, wet_mix: 0.68}
-      - {processor: highpass, cutoff_hz: 82}
+      - {processor: highpass, cutoff_hz: 80}
       - processor: parametric_eq
         bands:
-        - {type: peak, hz: 300, q: 0.85, db: 1.0}
-        - {type: peak, hz: 690, q: 0.80, db: 2.8}
-        - {type: peak, hz: 1450, q: 0.90, db: 2.0}
-        - {type: peak, hz: 2700, q: 1.0, db: 1.0}
-        - {type: peak, hz: 4200, q: 2.6, db: -2.7}
-        - {type: peak, hz: 6200, q: 3.0, db: -3.0}
-      - {processor: lowpass, cutoff_hz: 8000}
-      # Softer compression AFTER saturation keeps sustain but leaves the pick attack.
-      - processor: pedalboard
-        effects:
-        - {effect: compressor, threshold_db: -18.0, ratio: 2.2, attack_ms: 10.0, release_ms: 145.0}
+        - {type: peak, hz: 275, q: 0.8, db: -1.4}
+        - {type: peak, hz: 830, q: 0.9, db: 1.8}
+        - {type: peak, hz: 1850, q: 1.0, db: 1.4}
+        - {type: peak, hz: 5200, q: 1.3, db: -1.6}
+      - {processor: lowpass, cutoff_hz: 9000}
+      - {processor: compressor, threshold_db: -22.0, ratio: 2.0, attack_ms: 16.0, release_ms: 135.0, makeup_db: 1.8}
       - processor: pedalboard
         effects:
         - {effect: delay, delay_ms: 300, feedback: 0.14, mix: 0.075}
-      - {processor: balance, position: -0.20}
-      - {processor: gain, gain_db: -3.0}
+      - {processor: balance, position: -0.2}
+      - {processor: gain, gain_db: 0.5}
     counter_guitar:
       chain:
       # Distinct, slightly darker high-gain harmony voice (Black And Green).
