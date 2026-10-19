@@ -1,10 +1,7 @@
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
 title: Shatter the Iron Sky
-description: 'Ash and lightning: a 168 BPM E-minor, riff-driven metal battle theme with a harmonically composed twin-guitar
-  lead. Emilyguitar sings the repeated thematic statement and takes the first solo; Black and Green answers it, then
-  both harmonize chord-tone thirds and sixths. The choral cathedral and crushing rhythm bed remain. Short F and Bb threats
-  resolve through B7(b9) into E. Final eight bars are copied note-for-note into the warm-up preroll.'
+description: '168 BPM E-minor heavy-metal boss battle. FreePats Distorted #1 carries the sole foreground guitar melody; a separate upper-register Karoryfer Growlybass Dirty line supplies deliberately sparse chord-tone responses. Black And Blue anchors the deep rhythm bass; sampled Shinyguitar drives the riffs. The choral cathedral remains intact, with B7(b9) resolving back into E at the loop seam.'
 seed: 17001987
 timebase:
   ppq: 960
@@ -252,7 +249,7 @@ instruments:
   volume: 110
   pan: 64
   expression: 117
-  mix_gain_db: 12.8
+  mix_gain_db: 6.8
   instrument_backend:
     kind: sfz
     library_ref: guitar.fsbs_distorted_1
@@ -330,20 +327,18 @@ instruments:
     library_ref: strings.cyborg
     settings:
       fold_to_range: false
-- name: counter_guitar
-  group: counter_guitar
-  program: clean_guitar
-  volume: 108
+- name: growly_counterbass
+  group: growly_counterbass
+  program: fingered_bass
+  volume: 107
   pan: 64
-  expression: 114
-  controls:
-    111: 0
-    114: 52
-    116: 20
-  mix_gain_db: 6.5
+  expression: 110
+  mix_gain_db: 5.2
   instrument_backend:
     kind: sfz
-    sfz_glob: '**/BlackAndGreenGuitars/Programs/02-black_keyswitch.sfz'
+    # Deliberately use Growlybass's sustained, release-sample articulation,
+    # not bass.growly's neutral clean program or its percussive staccato patch.
+    sfz_glob: '**/growlybass_dirty.sfz'
     settings:
       fold_to_range: false
 - name: solo_viola
@@ -514,44 +509,25 @@ processing:
         - {effect: delay, delay_ms: 300, feedback: 0.14, mix: 0.075}
       - {processor: balance, position: -0.2}
       - {processor: gain, gain_db: 0.5}
-    counter_guitar:
+    growly_counterbass:
       chain:
-      # Distinct, slightly darker high-gain harmony voice (Black And Green).
-      - processor: pedalboard
-        effects:
-        - {effect: gain, gain_db: 10.0}
-        - {effect: compressor, threshold_db: -25.0, ratio: 2.2, attack_ms: 10.0, release_ms: 145.0}
-      - processor: lv2
-        plugin_uri: http://guitarix.sourceforge.net/plugins/gxts9#ts9sim
-        binary: lv2apply
-        channel_mode: dual_mono
-        wet_mix: 0.87
-        params: {fslider0_: -4.0, fslider1_: 690.0, fslider2_: 0.76, BYPASS: 0.0}
-      - processor: lv2
-        plugin_uri: http://guitarix.sourceforge.net/plugins/gx_jcm800pre_st#_jcm800pre_st
-        binary: lv2apply
-        wet_mix: 0.90
-        params: {P6v: 0.80, Middle: 0.73, Bass: 0.57, Treble: 0.60, WET_DRY: 90.0, GAIN: -2.0}
-      - processor: pedalboard
-        effects:
-        - {effect: distortion, drive_db: 5.5, wet_mix: 0.55}
-      - {processor: highpass, cutoff_hz: 91}
+      # Melody bass occupies E2-F4 rather than the sub-bass octave of the
+      # Black And Blue rhythmic bass. Keep the lows out of the master bus.
+      - {processor: highpass, cutoff_hz: 84}
       - processor: parametric_eq
         bands:
-        - {type: peak, hz: 320, q: 0.85, db: 0.7}
-        - {type: peak, hz: 820, q: 0.85, db: 2.2}
-        - {type: peak, hz: 1680, q: 0.90, db: 1.5}
-        - {type: peak, hz: 4300, q: 2.6, db: -2.6}
-        - {type: peak, hz: 6100, q: 3.0, db: -2.5}
-      - {processor: lowpass, cutoff_hz: 8000}
+        - {type: peak, hz: 180, q: 0.85, db: -2.0}
+        - {type: peak, hz: 460, q: 0.90, db: 1.2}
+        - {type: peak, hz: 1050, q: 0.80, db: 2.2}
+        - {type: peak, hz: 2650, q: 1.0, db: -1.0}
+      # Mild controlled dirt: Growlybass recordings are direct bass samples,
+      # already different from the fully distorted FreePats electric guitar.
       - processor: pedalboard
         effects:
-        - {effect: compressor, threshold_db: -18.0, ratio: 2.2, attack_ms: 10.0, release_ms: 145.0}
-      - processor: pedalboard
-        effects:
-        - {effect: delay, delay_ms: 296, feedback: 0.16, mix: 0.10}
-      - {processor: balance, position: 0.27}
-      - {processor: gain, gain_db: -2.0}
+        - {effect: distortion, drive_db: 3.7, wet_mix: 0.30}
+      - {processor: compressor, threshold_db: -24.0, ratio: 2.6, attack_ms: 13.0, release_ms: 112.0, makeup_db: 1.8}
+      - {processor: lowpass, cutoff_hz: 6200}
+      - {processor: balance, position: 0.25}
     bass:
       chain:
       - processor: highpass
@@ -15905,868 +15881,428 @@ parts:
         - ticks: 1536
         - B3
         - 67
-- id: counter_guitar_part
-  instrument: counter_guitar
+- id: growly_counterbass_part
+  instrument: growly_counterbass
   voices:
-  - id: counter_guitar_voice
+  - id: growly_counterbass_voice
     clips:
-    - id: counter_guitar_preroll
+    - id: growly_counterbass_preroll
       at:
         bar: 1
         beat: 1
       events:
       - - 1/80
         - ticks: 1152
-        - B3
-        - 104
-      - - 31/80
-        - ticks: 432
-        - E4
-        - 102
-      - - 41/80
-        - ticks: 1152
-        - G4
-        - 102
-      - - 71/80
-        - ticks: 312
-        - E4
-        - 104
+        - B2
+        - 96
       - - 81/80
         - ticks: 1152
-        - G4
-        - 104
-      - - 111/80
-        - ticks: 432
-        - E4
-        - 102
-      - - 121/80
-        - ticks: 912
-        - B3
-        - 102
+        - G3
+        - 96
       - - 73/40
-        - ticks: 552
-        - G4
-        - 104
+        - ticks: 597
+        - G3
+        - 96
       - - 5/2
-        - ticks: 480
-        - F4
-        - 104
-      - - 21/8
-        - ticks: 480
-        - A4
-        - 102
-      - - 11/4
-        - ticks: 720
-        - C5
-        - 102
+        - ticks: 650
+        - F3
+        - 96
       - - 49/16
         - ticks: 3120
-        - E4
-        - 106
+        - E3
+        - 98
       - - 321/80
         - ticks: 912
-        - D4
-        - 104
-      - - 341/80
-        - ticks: 432
-        - G4
-        - 102
-      - - 351/80
-        - ticks: 432
-        - B4
-        - 102
-      - - 361/80
-        - ticks: 1632
-        - D5
-        - 104
+        - D3
+        - 96
       - - 41/8
         - ticks: 960
-        - C5
-        - 108
-      - - 11/2
-        - ticks: 480
-        - A4
-        - 103
+        - C4
+        - 100
       - - 45/8
         - ticks: 1200
-        - F4
-        - 105
+        - F3
+        - 97
       - - 49/8
         - ticks: 960
-        - F#4
-        - 110
-      - - 13/2
-        - ticks: 480
-        - D#4
-        - 104
+        - F#3
+        - 102
       - - 53/8
         - ticks: 1200
-        - A4
-        - 109
+        - A3
+        - 101
       - - 113/16
         - ticks: 3360
-        - D#4
-        - 104
-    - id: counter_guitar_iron_gate
+        - D#3
+        - 96
+    - id: growly_counterbass_iron_gate
       at:
         bar: 9
         beat: 1
       events:
       - - 9/2
-        - ticks: 480
-        - E4
-        - 98
-      - - 37/8
-        - ticks: 480
-        - G4
-        - 96
-      - - 19/4
-        - ticks: 720
-        - B4
-        - 96
+        - ticks: 650
+        - E3
+        - 90
       - - 11/2
-        - ticks: 480
-        - G4
-        - 99
-      - - 45/8
-        - ticks: 480
-        - B4
-        - 97
+        - ticks: 650
+        - G3
+        - 91
       - - 23/4
         - ticks: 720
-        - D5
-        - 97
+        - D4
+        - 89
       - - 49/8
         - ticks: 960
-        - C5
-        - 108
-      - - 13/2
-        - ticks: 480
-        - A4
-        - 103
+        - C4
+        - 100
       - - 53/8
         - ticks: 1200
-        - F4
-        - 105
+        - F3
+        - 97
       - - '7'
         - ticks: 1200
-        - F#4
-        - 103
-      - - 59/8
-        - ticks: 480
-        - D#4
-        - 101
-      - - 15/2
-        - ticks: 960
-        - B3
-        - 101
+        - F#3
+        - 95
       - - 125/16
-        - ticks: 600
-        - F#4
-        - 103
-    - id: counter_guitar_shattered_orders
+        - ticks: 645
+        - F#3
+        - 95
+    - id: growly_counterbass_shattered_orders
       at:
         bar: 17
         beat: 1
       events:
+      - - 3/2
+        - ticks: 960
+        - G3
+        - 90
       - - '2'
         - ticks: 720
-        - D4
-        - 109
-      - - 35/16
-        - ticks: 240
-        - F#4
-        - 107
-      - - 9/4
-        - ticks: 480
-        - A4
-        - 107
-      - - 19/8
-        - ticks: 480
-        - F#4
-        - 109
+        - D3
+        - 101
       - - 5/2
         - ticks: 1200
-        - D5
-        - 107
+        - D4
+        - 99
       - - 23/8
-        - ticks: 360
-        - A4
-        - 107
+        - ticks: 405
+        - A3
+        - 99
       - - '3'
         - ticks: 1200
-        - G4
-        - 109
-      - - 27/8
-        - ticks: 480
-        - E4
-        - 107
-      - - 7/2
-        - ticks: 960
-        - C4
-        - 107
+        - G3
+        - 101
       - - 61/16
-        - ticks: 600
-        - G4
-        - 109
+        - ticks: 645
+        - G3
+        - 101
       - - 321/80
         - ticks: 1152
-        - B3
-        - 103
-      - - 351/80
-        - ticks: 432
-        - E4
-        - 101
-      - - 361/80
-        - ticks: 1152
-        - G4
-        - 101
+        - B2
+        - 95
       - - 391/80
-        - ticks: 312
-        - E4
-        - 103
+        - ticks: 357
+        - E3
+        - 95
       - - 401/80
         - ticks: 912
-        - D4
-        - 103
-      - - 421/80
-        - ticks: 432
-        - G4
-        - 101
-      - - 431/80
-        - ticks: 432
-        - B4
-        - 101
-      - - 441/80
-        - ticks: 1632
-        - D5
-        - 103
+        - D3
+        - 95
       - - 13/2
-        - ticks: 480
-        - F4
-        - 109
-      - - 53/8
-        - ticks: 480
-        - A4
-        - 107
+        - ticks: 650
+        - F3
+        - 101
       - - 27/4
         - ticks: 720
-        - C5
-        - 107
+        - C4
+        - 99
       - - 57/8
         - ticks: 960
-        - F#4
-        - 111
-      - - 15/2
-        - ticks: 480
-        - D#4
-        - 105
+        - F#3
+        - 103
       - - 61/8
         - ticks: 1200
-        - B3
-        - 107
-    - id: counter_guitar_war_machine
+        - B2
+        - 99
+    - id: growly_counterbass_war_machine
       at:
         bar: 25
         beat: 1
       events:
       - - 1/2
-        - ticks: 480
-        - E4
-        - 101
-      - - 5/8
-        - ticks: 480
-        - G4
-        - 99
-      - - 3/4
-        - ticks: 720
-        - B4
-        - 99
+        - ticks: 650
+        - E3
+        - 93
       - - 17/8
         - ticks: 960
-        - D4
-        - 101
-      - - 5/2
-        - ticks: 480
-        - G4
-        - 99
+        - D3
+        - 93
       - - 21/8
         - ticks: 1200
-        - B4
-        - 99
+        - B3
+        - 91
       - - '3'
         - ticks: 960
-        - D4
-        - 101
-      - - 13/4
-        - ticks: 480
-        - F#4
-        - 99
-      - - 27/8
-        - ticks: 480
-        - A4
-        - 99
+        - D3
+        - 93
       - - 7/2
         - ticks: 1680
-        - D5
-        - 101
+        - D4
+        - 93
       - - 11/2
-        - ticks: 480
-        - C4
-        - 101
-      - - 45/8
-        - ticks: 480
-        - E4
-        - 99
+        - ticks: 650
+        - C3
+        - 93
       - - 23/4
         - ticks: 720
-        - G4
-        - 99
+        - G3
+        - 91
       - - 57/8
         - ticks: 960
-        - F#3
-        - 101
-      - - 15/2
-        - ticks: 480
-        - B3
-        - 99
+        - F#2
+        - 93
       - - 61/8
         - ticks: 1200
-        - D#4
-        - 99
-    - id: counter_guitar_counterattack
+        - D#3
+        - 91
+    - id: growly_counterbass_counterattack
       at:
         bar: 33
         beat: 1
       events:
       - - '1'
         - ticks: 480
-        - E4
-        - 112
-      - - 9/8
-        - ticks: 240
-        - G4
-        - 110
-      - - 19/16
-        - ticks: 240
-        - B4
-        - 110
-      - - 5/4
-        - ticks: 480
-        - G4
-        - 112
-      - - 11/8
-        - ticks: 480
-        - E4
-        - 110
-      - - 3/2
-        - ticks: 1200
-        - B4
-        - 110
+        - E3
+        - 104
       - - 15/8
-        - ticks: 360
-        - E4
-        - 112
+        - ticks: 405
+        - E3
+        - 104
       - - '3'
         - ticks: 720
-        - E4
-        - 112
-      - - 51/16
-        - ticks: 240
-        - G4
-        - 110
-      - - 13/4
-        - ticks: 480
-        - B4
-        - 110
-      - - 27/8
-        - ticks: 480
-        - G4
-        - 112
-      - - 7/2
-        - ticks: 1200
-        - E5
-        - 110
+        - E3
+        - 104
       - - 31/8
-        - ticks: 360
-        - B4
-        - 110
-      - - 9/2
-        - ticks: 480
-        - G4
-        - 112
-      - - 37/8
-        - ticks: 480
-        - B4
-        - 110
-      - - 19/4
-        - ticks: 720
-        - D5
-        - 110
+        - ticks: 405
+        - B3
+        - 102
       - - '5'
         - ticks: 1200
-        - C5
-        - 112
-      - - 43/8
-        - ticks: 480
-        - A4
-        - 110
-      - - 11/2
-        - ticks: 960
-        - F4
-        - 110
+        - C4
+        - 104
       - - 93/16
         - ticks: 600
-        - C5
-        - 112
+        - C4
+        - 104
       - - 13/2
         - ticks: 480
-        - E4
-        - 112
-      - - 53/8
-        - ticks: 480
-        - G4
-        - 110
+        - E3
+        - 104
       - - 27/4
         - ticks: 720
-        - B4
-        - 110
+        - B3
+        - 102
       - - 57/8
         - ticks: 960
-        - F#4
-        - 111
-      - - 15/2
-        - ticks: 480
-        - D#4
-        - 105
+        - F#3
+        - 103
       - - 61/8
         - ticks: 1200
-        - B3
-        - 107
-    - id: counter_guitar_the_false_triumph
+        - B2
+        - 99
+    - id: growly_counterbass_the_false_triumph
       at:
         bar: 41
         beat: 1
       events:
-      - - 9/8
-        - ticks: 1200
-        - B4
-        - 101
-      - - 3/2
-        - ticks: 1680
-        - G4
-        - 99
-      - - '3'
-        - ticks: 2160
-        - E4
-        - 105
-      - - 29/8
-        - ticks: 960
-        - B4
-        - 103
-      - - 41/8
-        - ticks: 1200
-        - B4
-        - 102
-      - - 11/2
-        - ticks: 1680
-        - G4
-        - 100
       - - 49/8
         - ticks: 960
-        - F#4
-        - 107
-      - - 13/2
-        - ticks: 480
-        - D#4
-        - 103
+        - F#3
+        - 99
       - - 53/8
         - ticks: 1200
-        - B3
-        - 105
+        - B2
+        - 97
       - - 15/2
-        - ticks: 480
-        - B3
-        - 104
-      - - 61/8
-        - ticks: 480
-        - D#4
-        - 102
+        - ticks: 650
+        - B2
+        - 96
       - - 31/4
         - ticks: 720
-        - F#4
-        - 102
-    - id: counter_guitar_breaking_the_columns
+        - F#3
+        - 94
+    - id: growly_counterbass_breaking_the_columns
       at:
         bar: 49
         beat: 1
       events:
       - - 1/8
         - ticks: 960
-        - B3
-        - 114
-      - - 1/2
-        - ticks: 480
-        - E4
-        - 112
-      - - 5/8
-        - ticks: 1200
-        - G4
-        - 112
+        - B2
+        - 106
       - - 3/2
         - ticks: 480
-        - G4
-        - 114
-      - - 13/8
-        - ticks: 480
-        - B4
-        - 112
+        - G3
+        - 106
       - - 7/4
         - ticks: 720
-        - D5
-        - 112
-      - - '2'
-        - ticks: 240
-        - F4
-        - 117
-      - - 33/16
-        - ticks: 240
-        - A4
-        - 114
-      - - 17/8
-        - ticks: 240
-        - C5
-        - 111
-      - - 35/16
-        - ticks: 240
-        - F5
-        - 117
-      - - 9/4
-        - ticks: 240
-        - C5
-        - 114
-      - - 37/16
-        - ticks: 240
-        - A4
-        - 111
-      - - 19/8
-        - ticks: 240
-        - F4
-        - 117
-      - - 39/16
-        - ticks: 240
-        - A4
-        - 114
-      - - 5/2
-        - ticks: 960
-        - F5
-        - 111
-      - - 45/16
-        - ticks: 240
-        - C5
-        - 117
-      - - 23/8
-        - ticks: 360
-        - A4
-        - 114
-      - - '3'
-        - ticks: 240
-        - E4
-        - 117
-      - - 49/16
-        - ticks: 240
-        - G4
-        - 114
-      - - 25/8
-        - ticks: 240
-        - B4
-        - 111
-      - - 51/16
-        - ticks: 240
-        - E5
-        - 117
-      - - 13/4
-        - ticks: 240
-        - B4
-        - 114
-      - - 53/16
-        - ticks: 240
-        - G4
-        - 111
-      - - 27/8
-        - ticks: 240
-        - E4
-        - 117
-      - - 55/16
-        - ticks: 240
-        - G4
-        - 114
-      - - 7/2
-        - ticks: 960
-        - E5
-        - 111
-      - - 61/16
-        - ticks: 240
-        - B4
-        - 117
-      - - 31/8
-        - ticks: 360
-        - G4
-        - 114
-      - - 321/80
-        - ticks: 912
-        - C4
-        - 106
-      - - 341/80
-        - ticks: 432
-        - E4
-        - 103
-      - - 361/80
-        - ticks: 1392
-        - G4
-        - 107
-      - - 401/80
-        - ticks: 912
         - D4
         - 104
-      - - 421/80
-        - ticks: 432
-        - F#4
-        - 102
+      - - '2'
+        - ticks: 470
+        - F3
+        - 109
+      - - 5/2
+        - ticks: 960
+        - F4
+        - 103
+      - - 23/8
+        - ticks: 405
+        - A3
+        - 106
+      - - '3'
+        - ticks: 470
+        - E3
+        - 109
+      - - 31/8
+        - ticks: 405
+        - G3
+        - 106
+      - - 321/80
+        - ticks: 912
+        - C3
+        - 98
+      - - 361/80
+        - ticks: 1392
+        - G3
+        - 99
+      - - 401/80
+        - ticks: 912
+        - D3
+        - 96
       - - 441/80
         - ticks: 1392
-        - A4
-        - 108
+        - A3
+        - 100
       - - 13/2
         - ticks: 480
-        - F4
-        - 114
-      - - 53/8
-        - ticks: 480
-        - A4
-        - 112
+        - F3
+        - 106
       - - 27/4
         - ticks: 720
-        - C5
-        - 112
+        - C4
+        - 104
       - - 113/16
         - ticks: 3360
-        - F#4
-        - 114
-    - id: counter_guitar_no_throne
+        - F#3
+        - 106
+    - id: growly_counterbass_no_throne
       at:
         bar: 57
         beat: 1
       events:
       - - 1/80
         - ticks: 1152
-        - B3
-        - 107
-      - - 31/80
-        - ticks: 432
-        - E4
-        - 105
-      - - 41/80
-        - ticks: 1152
-        - G4
-        - 105
-      - - 71/80
-        - ticks: 312
-        - E4
-        - 107
+        - B2
+        - 99
       - - 81/80
         - ticks: 1152
-        - G4
-        - 107
-      - - 111/80
-        - ticks: 432
-        - E4
-        - 105
-      - - 121/80
-        - ticks: 912
-        - B3
-        - 105
+        - G3
+        - 99
       - - 73/40
-        - ticks: 552
-        - G4
-        - 107
+        - ticks: 597
+        - G3
+        - 99
       - - 161/80
         - ticks: 912
-        - C4
-        - 106
-      - - 181/80
-        - ticks: 432
-        - E4
-        - 103
+        - C3
+        - 98
       - - 201/80
         - ticks: 1392
-        - G4
-        - 107
+        - G3
+        - 99
       - - 7/2
-        - ticks: 480
-        - G4
-        - 105
-      - - 29/8
-        - ticks: 480
-        - B4
-        - 103
-      - - 15/4
-        - ticks: 720
-        - D5
-        - 103
+        - ticks: 650
+        - G3
+        - 97
       - - '4'
         - ticks: 720
-        - B4
-        - 108
-      - - 35/8
-        - ticks: 480
-        - E4
-        - 104
+        - B3
+        - 100
       - - 9/2
         - ticks: 1200
-        - G4
-        - 109
+        - G3
+        - 101
       - - 401/80
         - ticks: 912
-        - A4
-        - 106
-      - - 431/80
-        - ticks: 432
-        - F4
-        - 101
-      - - 441/80
-        - ticks: 1152
-        - C4
-        - 106
+        - A3
+        - 98
       - - 471/80
-        - ticks: 312
-        - A4
-        - 102
+        - ticks: 357
+        - A3
+        - 94
       - - 481/80
         - ticks: 912
-        - D4
-        - 104
-      - - 501/80
-        - ticks: 432
-        - F#4
-        - 102
-      - - 521/80
-        - ticks: 1392
-        - A4
-        - 108
+        - D3
+        - 96
       - - '7'
         - ticks: 1200
-        - F#4
-        - 107
-      - - 59/8
-        - ticks: 480
-        - D#4
-        - 105
-      - - 15/2
-        - ticks: 960
-        - B3
-        - 105
+        - F#3
+        - 99
       - - 125/16
-        - ticks: 600
-        - F#4
-        - 107
-    - id: counter_guitar_iron_sky_falls
+        - ticks: 645
+        - F#3
+        - 99
+    - id: growly_counterbass_iron_sky_falls
       at:
         bar: 65
         beat: 1
       events:
       - - 1/80
         - ticks: 1152
-        - B3
-        - 104
-      - - 31/80
-        - ticks: 432
-        - E4
-        - 102
-      - - 41/80
-        - ticks: 1152
-        - G4
-        - 102
-      - - 71/80
-        - ticks: 312
-        - E4
-        - 104
+        - B2
+        - 96
       - - 81/80
         - ticks: 1152
-        - G4
-        - 104
-      - - 111/80
-        - ticks: 432
-        - E4
-        - 102
-      - - 121/80
-        - ticks: 912
-        - B3
-        - 102
+        - G3
+        - 96
       - - 73/40
-        - ticks: 552
-        - G4
-        - 104
+        - ticks: 597
+        - G3
+        - 96
       - - 5/2
-        - ticks: 480
-        - F4
-        - 104
-      - - 21/8
-        - ticks: 480
-        - A4
-        - 102
-      - - 11/4
-        - ticks: 720
-        - C5
-        - 102
+        - ticks: 650
+        - F3
+        - 96
       - - 49/16
         - ticks: 3120
-        - E4
-        - 106
+        - E3
+        - 98
       - - 321/80
         - ticks: 912
-        - D4
-        - 104
-      - - 341/80
-        - ticks: 432
-        - G4
-        - 102
-      - - 351/80
-        - ticks: 432
-        - B4
-        - 102
-      - - 361/80
-        - ticks: 1632
-        - D5
-        - 104
+        - D3
+        - 96
       - - 41/8
         - ticks: 960
-        - C5
-        - 108
-      - - 11/2
-        - ticks: 480
-        - A4
-        - 103
+        - C4
+        - 100
       - - 45/8
         - ticks: 1200
-        - F4
-        - 105
+        - F3
+        - 97
       - - 49/8
         - ticks: 960
-        - F#4
-        - 110
-      - - 13/2
-        - ticks: 480
-        - D#4
-        - 104
+        - F#3
+        - 102
       - - 53/8
         - ticks: 1200
-        - A4
-        - 109
+        - A3
+        - 101
       - - 113/16
         - ticks: 3360
-        - D#4
-        - 104
+        - D#3
+        - 96
 - id: viola_lead_part
   instrument: solo_viola
   voices:
@@ -16964,7 +16500,7 @@ playback:
     - kit_core
     hook:
     - lead_guitar
-    - counter_guitar
+    - growly_counterbass
     percussion:
     - kit_ornaments
     - celli
@@ -16990,15 +16526,8 @@ playback:
     - iron_sky_falls
     loop: true
 notes:
-- 'Twin guitar lead, October 18, 2026: recompose melody against the exact 72-bar chord map. No out-of-chord long solo
-  notes except intentional B7(b9) approach tones.'
-- Lead 1 (Emilyguitar) states a reusable three-tone threat motif. Lead 2 (Black And Green keyswitch) answers on alternating
-  phrases and harmonizes hand-picked chord tones in the reprise/solo.
-- 'Move counter_guitar to the hook playback layer with lead_guitar: both guitar soloists must be present in the same
-  game intensity state.'
-- Rhythm guitars, bass, drums, choir and orchestral pitches are preserved; only small lead-space EQ changes on rhythm
-  guitars.
-- Darker tonality comes from chord-specific melody, delayed resolutions and short F/Bb/B7(b9) tension—not sustained F
-  against E-minor pads.
-- The opening four bars are rhythm-only; the coda resolves B7 into the first combat E downbeat. Preroll is a deep copy
-  of the last eight bars, including lead pitch bends.
+- 'Growly-counterbass audition (October 18, 2026): replace the high-gain Black And Green secondary guitar with the Dirty (sustain + release) Growlybass patch. One primary guitar soloist now carries the hook.'
+- 'Original second-guitar chord-tone responses are dropped an octave and reduced to slower phrases; the Black And Blue E1-D2 rhythmic bass stays intact.'
+- 'FreePats lead gain is reduced by 6 dB relative to the uploaded FSBS test, addressing the stem balance without changing its sampled tone.'
+- 'Growly counterbass uses a separately filtered upper-bass register to avoid masking the deep E1 riff bass and is active with the hook layer.'
+- 'All drum, rhythm, orchestral, choir and primary lead note events are unchanged. Preroll copies the revised ending counterbass phrase exactly.'
