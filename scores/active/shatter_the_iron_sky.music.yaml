@@ -1,9 +1,9 @@
 schema: ambition.musicir.v3
 id: shatter_the_iron_sky
 title: Shatter the Iron Sky
-description: A 104-bar (2:28.571 at 168 BPM) cinematic evil thrash-metal combat loop with lower-register FSBS melodic
-  hook and elevated eight-bar shred solo. Dedicated 8-bar intro and outro can be spliced at the loop downbeat. E/F/B-flat
-  power chords, double-kick, Growlybass, dark choir.
+description: A 104-bar (2:28.571 at 168 BPM) cinematic evil thrash-metal combat loop with lower-register FSBS melodic hook
+  and elevated eight-bar shred solo. Dedicated 8-bar intro and outro can be spliced at the loop downbeat. E/F/B-flat power
+  chords, double-kick, Growlybass, dark choir.
 seed: 17001987
 timebase:
   ppq: 960
@@ -21,12 +21,13 @@ form:
   to:
     bar: 9
     beat: 1
-  energy: 0.34
-  density: 0.32
-  role: 'One-shot dark herald: distant choir and E-pedal emerge, then precisely match the combat turnaround.'
+  energy: 0.68
+  density: 0.69
+  role: 'A recognizable band groove from the opening: chug responses, a low F/E hook, snare backbeat, choir/brass punctuations;
+    intensifies into the exact two-bar combat turnaround.'
   stem_mix_db:
-    trombones: 1.0
-    timpani: 0.0
+    trombones: 2.0
+    timpani: 1.3
 - id: iron_gate
   from:
     bar: 9
@@ -39,6 +40,8 @@ form:
   role: Evil enters with its anvil riff; the chromatic E-F-E guitar signature arrives after two bars.
   stem_mix_db:
     counter_guitar: 1.0
+    trombones: 3.0
+    timpani: 2.0
 - id: shattered_orders
   from:
     bar: 17
@@ -51,6 +54,8 @@ form:
   role: The dictator's signature becomes a galloping metal march, harmonized in two guitars over driving bass.
   stem_mix_db:
     counter_guitar: 3.0
+    trombones: 3.0
+    timpani: 2.0
 - id: war_machine
   from:
     bar: 25
@@ -156,8 +161,7 @@ form:
     beat: 1
   energy: 0.93
   density: 0.82
-  role: 'New post-shred lower-octave answer: the ruler speaks again over locked bass, double-kick and galloping
-    guitar.'
+  role: 'New post-shred lower-octave answer: the ruler speaks again over locked bass, double-kick and galloping guitar.'
   stem_mix_db:
     counter_guitar: 2.5
 - id: no_throne
@@ -910,37 +914,85 @@ parts:
         - - E2
           - B2
           - E3
-        - 71
+        - 96
+      - - 1/4
+        - ticks: 240
+        - E2
+        - 81
+      - - 1/2
+        - ticks: 430
+        - - E2
+          - B2
+          - E3
+        - 90
+      - - 3/4
+        - ticks: 240
+        - E2
+        - 85
       - - '1'
         - ticks: 430
         - - E2
           - B2
           - E3
-        - 73
+        - 99
+      - - 5/4
+        - ticks: 240
+        - E2
+        - 85
+      - - 3/2
+        - ticks: 430
+        - - E2
+          - B2
+          - E3
+        - 94
+      - - 7/4
+        - ticks: 240
+        - E2
+        - 90
       - - '2'
         - ticks: 430
         - - A#2
           - F3
           - A#3
+        - 100
+      - - 9/4
+        - ticks: 220
+        - A#2
         - 85
       - - 5/2
         - ticks: 430
         - - A#2
           - F3
           - A#3
-        - 82
+        - 97
+      - - 11/4
+        - ticks: 430
+        - - A#2
+          - F3
+          - A#3
+        - 97
       - - '3'
         - ticks: 430
         - - E2
           - B2
           - E3
-        - 90
+        - 103
+      - - 13/4
+        - ticks: 220
+        - E2
+        - 88
       - - 7/2
         - ticks: 430
         - - E2
           - B2
           - E3
-        - 92
+        - 100
+      - - 15/4
+        - ticks: 430
+        - - E2
+          - B2
+          - E3
+        - 98
       - - '4'
         - ticks: 430
         - - F2
@@ -961,6 +1013,10 @@ parts:
         - ticks: 215
         - F2
         - 84
+      - - 39/8
+        - ticks: 160
+        - F2
+        - 92
       - - '5'
         - ticks: 430
         - - E2
@@ -981,6 +1037,10 @@ parts:
         - ticks: 215
         - E2
         - 93
+      - - 47/8
+        - ticks: 160
+        - E2
+        - 95
       - - '6'
         - ticks: 462
         - - B2
@@ -6071,6 +6131,58 @@ parts:
         bar: 1
         beat: 1
       events:
+      - - 13/3840
+        - ticks: 430
+        - &id001
+          - E2
+          - B2
+        - 84
+      - - 1933/3840
+        - ticks: 430
+        - *id001
+        - 89
+      - - 3373/3840
+        - ticks: 220
+        - E2
+        - 80
+      - - 3853/3840
+        - ticks: 430
+        - &id002
+          - E2
+          - B2
+        - 91
+      - - 5773/3840
+        - ticks: 430
+        - *id002
+        - 95
+      - - 6733/3840
+        - ticks: 220
+        - E2
+        - 84
+      - - 7693/3840
+        - ticks: 430
+        - &id003
+          - A#2
+          - F3
+        - 94
+      - - 9613/3840
+        - ticks: 430
+        - *id003
+        - 96
+      - - 11533/3840
+        - ticks: 430
+        - &id004
+          - E2
+          - B2
+        - 97
+      - - 13453/3840
+        - ticks: 430
+        - *id004
+        - 99
+      - - 14413/3840
+        - ticks: 220
+        - E2
+        - 88
       - - 15373/3840
         - ticks: 430
         - - F2
@@ -10679,27 +10791,59 @@ parts:
       - - '0'
         - ticks: 415
         - E1
-        - 83
+        - 101
+      - - 1/2
+        - ticks: 420
+        - E1
+        - 94
+      - - 3/4
+        - ticks: 420
+        - E1
+        - 88
       - - '1'
         - ticks: 415
         - E1
-        - 83
+        - 104
+      - - 3/2
+        - ticks: 420
+        - E1
+        - 98
+      - - 7/4
+        - ticks: 420
+        - E1
+        - 92
       - - '2'
         - ticks: 415
         - A#1
-        - 95
+        - 109
+      - - 9/4
+        - ticks: 420
+        - A#1
+        - 92
       - - 5/2
         - ticks: 415
         - A#1
-        - 83
+        - 101
+      - - 11/4
+        - ticks: 420
+        - A#1
+        - 93
       - - '3'
         - ticks: 415
         - E1
-        - 95
+        - 109
+      - - 13/4
+        - ticks: 420
+        - E1
+        - 96
       - - 7/2
         - ticks: 415
         - E1
-        - 83
+        - 102
+      - - 15/4
+        - ticks: 420
+        - E1
+        - 94
       - - '4'
         - ticks: 415
         - F1
@@ -10716,6 +10860,10 @@ parts:
         - ticks: 415
         - F1
         - 95
+      - - 39/8
+        - ticks: 270
+        - F1
+        - 95
       - - '5'
         - ticks: 415
         - E1
@@ -10730,6 +10878,10 @@ parts:
         - 95
       - - 23/4
         - ticks: 415
+        - E1
+        - 95
+      - - 47/8
+        - ticks: 270
         - E1
         - 95
       - - '6'
@@ -14363,27 +14515,63 @@ parts:
       - - '0'
         - ticks: 112
         - 36
-        - 87
+        - 103
+      - - 1/2
+        - ticks: 110
+        - 36
+        - 96
+      - - 3/4
+        - ticks: 110
+        - 36
+        - 92
       - - '1'
         - ticks: 112
         - 36
-        - 87
+        - 108
+      - - 5/4
+        - ticks: 110
+        - 36
+        - 94
+      - - 3/2
+        - ticks: 110
+        - 36
+        - 100
+      - - 7/4
+        - ticks: 110
+        - 36
+        - 98
       - - '2'
         - ticks: 112
         - 36
-        - 100
+        - 112
+      - - 9/4
+        - ticks: 110
+        - 36
+        - 97
       - - 5/2
         - ticks: 97
         - 36
-        - 87
+        - 98
+      - - 11/4
+        - ticks: 110
+        - 36
+        - 97
       - - '3'
         - ticks: 112
         - 36
-        - 100
+        - 112
+      - - 13/4
+        - ticks: 110
+        - 36
+        - 99
       - - 7/2
         - ticks: 97
         - 36
-        - 90
+        - 99
+      - - 15/4
+        - ticks: 110
+        - 36
+        - 100
       - - '4'
         - ticks: 112
         - 36
@@ -19243,31 +19431,175 @@ parts:
       - - '0'
         - ticks: 90
         - 42
-        - 60
+        - 72
+      - - '0'
+        - ticks: 220
+        - 49
+        - 84
+      - - 1/8
+        - ticks: 90
+        - 42
+        - 76
+      - - 1/4
+        - ticks: 90
+        - 42
+        - 79
+      - - 1/4
+        - ticks: 140
+        - 38
+        - 93
+      - - 3/8
+        - ticks: 90
+        - 42
+        - 73
+      - - 1/2
+        - ticks: 90
+        - 42
+        - 76
+      - - 5/8
+        - ticks: 90
+        - 42
+        - 80
+      - - 3/4
+        - ticks: 90
+        - 42
+        - 81
+      - - 3/4
+        - ticks: 140
+        - 38
+        - 98
+      - - 7/8
+        - ticks: 90
+        - 42
+        - 75
       - - '1'
         - ticks: 90
         - 42
-        - 63
+        - 75
+      - - 9/8
+        - ticks: 90
+        - 42
+        - 79
+      - - 5/4
+        - ticks: 90
+        - 42
+        - 82
+      - - 5/4
+        - ticks: 140
+        - 38
+        - 97
+      - - 11/8
+        - ticks: 90
+        - 42
+        - 76
+      - - 3/2
+        - ticks: 90
+        - 42
+        - 79
+      - - 13/8
+        - ticks: 90
+        - 42
+        - 83
+      - - 7/4
+        - ticks: 90
+        - 42
+        - 84
+      - - 7/4
+        - ticks: 140
+        - 38
+        - 102
+      - - 15/8
+        - ticks: 90
+        - 42
+        - 78
       - - '2'
         - ticks: 90
         - 42
-        - 75
+        - 78
+      - - 17/8
+        - ticks: 90
+        - 42
+        - 82
+      - - 9/4
+        - ticks: 90
+        - 42
+        - 85
+      - - 9/4
+        - ticks: 140
+        - 38
+        - 101
+      - - 19/8
+        - ticks: 90
+        - 42
+        - 79
       - - 5/2
         - ticks: 90
         - 42
-        - 75
+        - 82
+      - - 21/8
+        - ticks: 90
+        - 42
+        - 86
+      - - 11/4
+        - ticks: 90
+        - 42
+        - 87
+      - - 11/4
+        - ticks: 140
+        - 38
+        - 106
+      - - 23/8
+        - ticks: 90
+        - 42
+        - 81
       - - '3'
         - ticks: 90
         - 42
-        - 77
+        - 81
+      - - 25/8
+        - ticks: 90
+        - 42
+        - 85
+      - - 13/4
+        - ticks: 90
+        - 42
+        - 88
+      - - 13/4
+        - ticks: 140
+        - 38
+        - 105
+      - - 27/8
+        - ticks: 90
+        - 42
+        - 82
       - - 7/2
         - ticks: 90
         - 42
-        - 77
+        - 85
+      - - 29/8
+        - ticks: 90
+        - 42
+        - 89
+      - - 15/4
+        - ticks: 90
+        - 42
+        - 90
+      - - 15/4
+        - ticks: 140
+        - 38
+        - 110
+      - - 31/8
+        - ticks: 90
+        - 42
+        - 84
       - - '4'
         - ticks: 90
         - 42
         - 80
+      - - '4'
+        - ticks: 220
+        - 49
+        - 96
       - - 33/8
         - ticks: 90
         - 42
@@ -19340,10 +19672,18 @@ parts:
         - ticks: 132
         - 38
         - 113
+      - - 23/4
+        - ticks: 120
+        - 45
+        - 89
       - - 47/8
         - ticks: 90
         - 42
         - 80
+      - - 47/8
+        - ticks: 120
+        - 47
+        - 96
       - - '6'
         - ticks: 85
         - 42
@@ -24256,30 +24596,58 @@ parts:
         bar: 1
         beat: 1
       events:
+      - - 1/4
+        - ticks: 620
+        - E3
+        - 91
+      - - 1/2
+        - ticks: 380
+        - F3
+        - 84
+      - - 3/4
+        - ticks: 630
+        - E3
+        - 92
+      - - '1'
+        - ticks: 680
+        - E3
+        - 96
+      - - 5/4
+        - ticks: 460
+        - G3
+        - 88
+      - - 3/2
+        - ticks: 420
+        - F3
+        - 89
+      - - 7/4
+        - ticks: 650
+        - E3
+        - 97
       - - '2'
         - ticks: 720
         - A#3
-        - 91
+        - 101
       - - 9/4
         - ticks: 380
         - B3
-        - 81
+        - 92
       - - 5/2
         - ticks: 660
         - A#3
-        - 81
+        - 91
       - - '3'
         - ticks: 720
         - E3
-        - 91
+        - 104
       - - 13/4
         - ticks: 380
         - F3
-        - 81
+        - 92
       - - 7/2
         - ticks: 660
         - E3
-        - 81
+        - 92
       - - '4'
         - ticks: 720
         - F3
@@ -26456,10 +26824,18 @@ parts:
         - ticks: 360
         - E3
         - 110
+      - - '2'
+        - ticks: 360
+        - A#2
+        - 101
       - - '4'
         - ticks: 360
         - F3
         - 110
+      - - '5'
+        - ticks: 360
+        - E3
+        - 107
       - - '6'
         - ticks: 400
         - B2
@@ -26468,12 +26844,28 @@ parts:
       at:
         bar: 9
         beat: 1
-      events: []
+      events:
+      - - '0'
+        - ticks: 320
+        - E3
+        - 105
+      - - '4'
+        - ticks: 320
+        - A#2
+        - 104
     - id: brass_charges_shattered_orders
       at:
         bar: 17
         beat: 1
-      events: []
+      events:
+      - - '0'
+        - ticks: 320
+        - E3
+        - 105
+      - - '4'
+        - ticks: 320
+        - G3
+        - 104
     - id: brass_charges_war_machine
       at:
         bar: 25
@@ -26660,14 +27052,26 @@ parts:
         - ticks: 2640
         - E3
         - 96
+      - - '1'
+        - ticks: 2700
+        - B3
+        - 88
       - - '2'
         - ticks: 2640
         - A#2
         - 96
+      - - '3'
+        - ticks: 2700
+        - E3
+        - 90
       - - '4'
         - ticks: 2640
         - F3
         - 96
+      - - '5'
+        - ticks: 2700
+        - G3
+        - 89
       - - '6'
         - ticks: 6040
         - B3
@@ -26774,21 +27178,37 @@ parts:
         beat: 1
       events:
       - - '0'
-        - ticks: 6040
-        - B3
-        - 103
+        - ticks: 3150
+        - E3
+        - 96
+      - - '1'
+        - ticks: 3150
+        - F3
+        - 93
       - - '2'
-        - ticks: 6040
-        - C4
-        - 103
-      - - '4'
-        - ticks: 6040
-        - C3
-        - 103
-      - - '6'
-        - ticks: 6040
+        - ticks: 3150
         - A#3
-        - 103
+        - 96
+      - - '3'
+        - ticks: 3150
+        - E3
+        - 93
+      - - '4'
+        - ticks: 3150
+        - C4
+        - 96
+      - - '5'
+        - ticks: 3150
+        - F3
+        - 93
+      - - '6'
+        - ticks: 3150
+        - A#3
+        - 96
+      - - '7'
+        - ticks: 3150
+        - B3
+        - 93
     - id: choir_male_iron_crown_ascent
       at:
         bar: 81
@@ -26884,13 +27304,25 @@ parts:
         - ticks: 2250
         - B4
         - 89
+      - - 9/8
+        - ticks: 2200
+        - G4
+        - 85
       - - 17/8
         - ticks: 2250
         - F5
         - 89
+      - - 25/8
+        - ticks: 2200
+        - B4
+        - 89
       - - 33/8
         - ticks: 2250
         - C5
+        - 89
+      - - 41/8
+        - ticks: 2200
+        - G4
         - 89
       - - 49/8
         - ticks: 5200
@@ -26998,21 +27430,37 @@ parts:
         beat: 1
       events:
       - - 1/8
-        - ticks: 5200
+        - ticks: 3000
         - B4
-        - 95
-      - - 17/8
-        - ticks: 5200
+        - 90
+      - - 9/8
+        - ticks: 3000
         - C5
-        - 95
+        - 88
+      - - 17/8
+        - ticks: 3000
+        - A#4
+        - 90
+      - - 25/8
+        - ticks: 3000
+        - B4
+        - 88
       - - 33/8
-        - ticks: 5200
-        - F5
-        - 95
+        - ticks: 3000
+        - G4
+        - 90
+      - - 41/8
+        - ticks: 3000
+        - C5
+        - 88
       - - 49/8
-        - ticks: 5200
+        - ticks: 3000
+        - A#4
+        - 90
+      - - 57/8
+        - ticks: 3000
         - D#5
-        - 95
+        - 88
     - id: choir_female_iron_crown_ascent
       at:
         bar: 81
@@ -27104,14 +27552,26 @@ parts:
         bar: 1
         beat: 1
       events:
+      - - 3/4
+        - ticks: 650
+        - B3
+        - 88
+      - - 3/2
+        - ticks: 620
+        - G4
+        - 91
+      - - 7/4
+        - ticks: 600
+        - E4
+        - 86
       - - '2'
         - ticks: 680
         - F4
-        - 84
+        - 98
       - - '3'
         - ticks: 680
         - B3
-        - 84
+        - 97
       - - '4'
         - ticks: 680
         - C4
@@ -28452,22 +28912,30 @@ parts:
         bar: 1
         beat: 1
       events:
+      - - 1/2
+        - ticks: 680
+        - E3
+        - 83
+      - - 3/2
+        - ticks: 680
+        - E3
+        - 89
       - - '2'
         - ticks: 680
         - A#3
-        - 80
+        - 88
       - - 5/2
         - ticks: 680
         - A#3
-        - 74
+        - 82
       - - '3'
         - ticks: 680
         - E3
-        - 80
+        - 88
       - - 7/2
         - ticks: 680
         - E3
-        - 74
+        - 82
       - - '4'
         - ticks: 680
         - F3
@@ -29728,20 +30196,36 @@ parts:
         - ticks: 235
         - E2
         - 106
+      - - '2'
+        - ticks: 235
+        - A#2
+        - 99
       - - '4'
         - ticks: 235
         - F2
         - 106
+      - - '5'
+        - ticks: 235
+        - E2
+        - 103
     - id: timpani_iron_gate
       at:
         bar: 9
         beat: 1
-      events: []
+      events:
+      - - '0'
+        - ticks: 235
+        - E2
+        - 106
     - id: timpani_shattered_orders
       at:
         bar: 17
         beat: 1
-      events: []
+      events:
+      - - '0'
+        - ticks: 235
+        - E2
+        - 104
     - id: timpani_war_machine
       at:
         bar: 25
@@ -29942,18 +30426,19 @@ playback:
     - outro
     loop: false
 notes:
-- 'Level playback: intro (8 bars, one shot) -> combat (104 bars, loop) -> outro (8 bars, one shot). At 168 BPM combat
-  is 148.571 seconds; intro/outro are 11.429 seconds each.'
-- Original eight combat sections and low-melody/high-shred register are unchanged, except for absolute locations.
-  New five eight-bar variations supply rhythmic, choral and hook development; no additional sample libraries.
-- The final two bars of intro are exactly the final two bars of combat, across every instrument. B7(b9) turns into
-  the E minor opening on the loop downbeat for both intro->combat and combat->combat transitions.
-- Outro is a real separate coda entered only at combat bar 104. The final E5 chord is allowed to ring while drums
-  and lead stop; do not loop the outro.
-- Playback exports mixable bed/hook/war_machine/dread layers; game should crossfade at bar-quantized boundaries.
-  Composition-wide mastering is retained to prevent section normalization jumps.
-- No programmed pitch bends or off-grid fractional event timestamps. All sample ranges preserved; FSBS lead stays
-  low except the same original 8-bar shred solo.
-- 'Polish 2026-10-19: the intro is a staged sparse-to-full arrival; selective auxiliary gains and low-choir revoicing
-  are authored in this source score. Existing 104-bar fight and high-octave solo remain intact. Use --runtime-stem-gain-mode=shared
-  for headroom.'
+- 'Level playback: intro (8 bars, one shot) -> combat (104 bars, loop) -> outro (8 bars, one shot). At 168 BPM combat is 148.571
+  seconds; intro/outro are 11.429 seconds each.'
+- Original eight combat sections and low-melody/high-shred register are unchanged, except for absolute locations. New five
+  eight-bar variations supply rhythmic, choral and hook development; no additional sample libraries.
+- The final two bars of intro are exactly the final two bars of combat, across every instrument. B7(b9) turns into the E minor
+  opening on the loop downbeat for both intro->combat and combat->combat transitions.
+- Outro is a real separate coda entered only at combat bar 104. The final E5 chord is allowed to ring while drums and lead
+  stop; do not loop the outro.
+- Playback exports mixable bed/hook/war_machine/dread layers; game should crossfade at bar-quantized boundaries. Composition-wide
+  mastering is retained to prevent section normalization jumps.
+- No programmed pitch bends or off-grid fractional event timestamps. All sample ranges preserved; FSBS lead stays low except
+  the same original 8-bar shred solo.
+- 'Polish 2026-10-19: restored a band groove from the first bar of the intro, including both guitars, snare backbeat, rhythmic
+  bass/kick, and low lead motif. Kept intro bars 7-8 strictly equal to combat bars 111-112 for turnaround parity; the complete
+  combat lead and its high-octave solo are unchanged. Selective early brass and revoiced bar-by-bar choir in the shred passage.
+  Render with --runtime_stem_gain_mode=shared.'
