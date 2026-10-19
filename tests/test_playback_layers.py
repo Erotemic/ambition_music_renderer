@@ -10,6 +10,7 @@ from ambition_music_renderer import cli
 from ambition_music_renderer.render.playback_layers import (
     layer_section_audio,
     playback_layer_plan,
+    select_runtime_export_stems,
     write_playback_layers,
 )
 
@@ -115,3 +116,24 @@ def test_layer_files_are_written_for_each_section_and_published_to_stable_paths(
         "playback/loop/loop.bed.ogg",
         "playback/loop/loop.kit.ogg",
     ]
+
+
+def test_shared_runtime_gain_applies_equally_to_layer_groups_and_single_stems():
+    native = _stems()
+    shared = {group: audio * 0.33 for group, audio in native.items()}
+    assert select_runtime_export_stems(native, shared, "native") is native
+    assert select_runtime_export_stems(native, shared, "shared") is shared
+    with pytest.raises(ValueError, match="unknown runtime stem gain mode"):
+        select_runtime_export_stems(native, shared, "typo")
+
+    plan = playback_layer_plan(
+        _spec({"bed": ["bass", "lead"], "kit": ["drums"]},
+              [{"id": "loop", "form": ["verse", "chorus"], "loop": True}]),
+        FORM, GROUPS,
+    )
+    native_mix = sum(layer_section_audio(native, gs, SR, 1.0, 5.0)
+                     for gs in plan["layers"].values())
+    shared_mix = sum(layer_section_audio(
+        select_runtime_export_stems(native, shared, "shared"), gs, SR, 1.0, 5.0
+    ) for gs in plan["layers"].values())
+    np.testing.assert_allclose(shared_mix, native_mix * 0.33, atol=1e-7)

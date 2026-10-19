@@ -31,6 +31,26 @@ import numpy as np
 
 # A layer with this name would publish to the path of the mastered section mix.
 RESERVED_LAYER_IDS = {"full"}
+
+
+def select_runtime_export_stems(
+    native_stems: dict[str, np.ndarray],
+    shared_gain_stems: dict[str, np.ndarray],
+    gain_mode: str,
+) -> dict[str, np.ndarray]:
+    """Select one consistent gain domain for *all* exported runtime assets.
+
+    Adaptive single-stem assets and grouped playback layers must share the
+    same attenuation in ``shared`` mode. Otherwise decoding a layer group
+    can clip even when individual adaptive stems have adequate headroom.
+    """
+    if gain_mode == "shared":
+        return shared_gain_stems
+    if gain_mode == "native":
+        return native_stems
+    raise ValueError(f"unknown runtime stem gain mode: {gain_mode!r}")
+
+
 FADE_IN_SECONDS = 0.001
 FADE_OUT_SECONDS = 0.004
 

@@ -33,7 +33,7 @@ from .effects import post_process, soft_limit
 from .export import section_chapter_metadata, timeline_markers_from_spec, write_ogg_from_audio
 from .group import build_manifest, ensure_audio_length, slice_audio
 from .worker_failures import read_worker_failure, worker_failure_path
-from .playback_layers import playback_layer_plan, write_playback_layers
+from .playback_layers import playback_layer_plan, select_runtime_export_stems, write_playback_layers
 from .foreground_protection import apply_foreground_protection, foreground_protection_mode
 from ..audit.spectral_masking_audit import analyze_spectral_masking, write_reports as write_spectral_masking_reports
 from .score_core import choose_soundfont
@@ -1095,10 +1095,8 @@ def _render_main(ns) -> int:
     # the parent can know the shared reference gain; overwriting here preserves
     # the current worker isolation model while making runtime stem export useful.
     if not (ns.simple_mix or ns.full_mix_only):
-        export_stems = (
-            runtime_stem_audio
-            if ns.runtime_stem_gain_mode == "shared"
-            else stem_audio
+        export_stems = select_runtime_export_stems(
+            stem_audio, runtime_stem_audio, ns.runtime_stem_gain_mode
         )
         for group, audio in export_stems.items():
             for sec in meta:
@@ -1118,7 +1116,9 @@ def _render_main(ns) -> int:
     if playback_plan is not None:
         output_files["playback"] = write_playback_layers(
             playback_plan,
-            stem_audio,
+            select_runtime_export_stems(
+                stem_audio, runtime_stem_audio, ns.runtime_stem_gain_mode
+            ),
             sr,
             outdir,
             f"{spec['id']}_{cue_hash}",
