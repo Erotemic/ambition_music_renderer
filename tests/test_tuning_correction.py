@@ -6,6 +6,7 @@ from ambition_music_renderer.render.tuning import (
     build_tuning_lane_pms,
     correction_cents_for_pitch,
     normalize_tuning_correction,
+    sfz_pitch_bend_range_cents,
 )
 
 
@@ -169,3 +170,22 @@ def test_global_tuning_correction_spelling_is_canonical():
     assert scalar == mapping
     assert "interpolation" not in scalar
     assert normalize_tuning_correction({"mode": "global", "cents": 0.0}) is None
+
+
+def test_correction_scales_to_the_sfz_pitch_bend_range(tmp_path):
+    # Karoryfer instruments declare bend_up=1200 in an included file: a -12 cent
+    # correction must be 1/6 of the bend it would be at the default +/-200.
+    (tmp_path / "programs").mkdir()
+    (tmp_path / "programs" / "common.sfz").write_text("<group>\nbend_up=1200\nbend_down=-1200\n")
+    (tmp_path / "inst.sfz").write_text('#include "programs/common.sfz"\n<region> sample=a.wav\n')
+    (tmp_path / "plain.sfz").write_text("<region> sample=a.wav\n")
+    assert sfz_pitch_bend_range_cents(tmp_path / "inst.sfz") == 1200.0
+    assert sfz_pitch_bend_range_cents(tmp_path / "plain.sfz") == 200.0
+
+    spec = {"tuning_correction": {"mode": "global", "cents": -12.0}}
+    wide = build_tuning_lane_pms(_pm([(40, 0.0, 1.0)]), spec, bend_range_cents=1200.0)
+    narrow = build_tuning_lane_pms(_pm([(40, 0.0, 1.0)]), spec)
+    wide_bend = min(pb.pitch for pb in wide[0].instruments[0].pitch_bends)
+    narrow_bend = min(pb.pitch for pb in narrow[0].instruments[0].pitch_bends)
+    assert wide_bend == round(-12.0 / 1200.0 * 8192.0)
+    assert narrow_bend == round(-12.0 / 200.0 * 8192.0)

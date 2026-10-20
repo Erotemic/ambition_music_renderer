@@ -14,7 +14,9 @@ summed by :mod:`ambition_music_renderer.render.group`.
 from __future__ import annotations
 
 import copy
+import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Mapping
 
 import pretty_midi
@@ -24,9 +26,34 @@ from ..instrument_resolution import (
     tuning_correction_for_instrument,
 )
 
-# The renderer targets the conventional synth/SFZ pitch-bend range of +/-2
-# semitones. Tuning correction is intentionally bounded well inside that range.
+# The conventional synth/SFZ pitch-bend range is +/-2 semitones, but an SFZ can
+# set its own (`bend_up`; every Karoryfer instrument uses 1200). The correction
+# is scaled to the instrument's range, or it lands that many times too large.
 _PITCH_BEND_RANGE_CENTS = 200.0
+_BEND_UP = re.compile(r"\bbend_up\s*=\s*(-?\d+(?:\.\d+)?)")
+_INCLUDE = re.compile(r'#include\s+"([^"]+)"')
+
+
+def sfz_pitch_bend_range_cents(sfz_path: str | Path | None) -> float:
+    """The pitch-bend range an SFZ declares (largest `bend_up` in it or its
+    includes), or the conventional 200 cents when it declares none."""
+
+    if sfz_path is None:
+        return _PITCH_BEND_RANGE_CENTS
+    found: list[float] = []
+    seen: set[Path] = set()
+
+    def scan(path: Path, depth: int) -> None:
+        if depth > 8 or path in seen or not path.is_file():
+            return
+        seen.add(path)
+        text = path.read_text(encoding="utf8", errors="replace")
+        found.extend(abs(float(value)) for value in _BEND_UP.findall(text))
+        for include in _INCLUDE.findall(text):
+            scan((path.parent / include.replace("\\", "/")).resolve(), depth + 1)
+
+    scan(Path(sfz_path).resolve(), 0)
+    return max(found) if found and max(found) > 0 else _PITCH_BEND_RANGE_CENTS
 _BOUNDARY_EPSILON_S = 1e-5
 
 
@@ -55,11 +82,11 @@ def correction_cents_for_pitch(profile: Mapping[str, Any] | None, pitch: int) ->
     return points[lo] + alpha * (points[hi] - points[lo])
 
 
-def cents_to_pitch_bend(cents: float) -> int:
-    value = int(round(float(cents) / _PITCH_BEND_RANGE_CENTS * 8192.0))
+def cents_to_pitch_bend(cents: float, range_cents: float = _PITCH_BEND_RANGE_CENTS) -> int:
+    value = int(round(float(cents) / float(range_cents) * 8192.0))
     if not -8192 <= value <= 8191:
         raise ValueError(
-            f"tuning correction {cents:+.2f} cents exceeds the supported +/-2-semitone pitch-bend range"
+            f"tuning correction {cents:+.2f} cents exceeds the instrument's +/-{range_cents:g}-cent pitch-bend range"
         )
     return value
 
@@ -143,12 +170,13 @@ def _correction_at(intervals: list[tuple[float, float, float]], time_s: float) -
 def _lane_pitch_bends(
     base_events: list[pretty_midi.PitchBend],
     intervals: list[tuple[float, float, float]],
+    range_cents: float = _PITCH_BEND_RANGE_CENTS,
 ) -> list[pretty_midi.PitchBend]:
     base = sorted((copy.deepcopy(pb) for pb in base_events), key=lambda pb: float(pb.time))
     values: dict[float, int] = {}
     for pb in base:
         cents = _correction_at(intervals, float(pb.time))
-        combined = int(pb.pitch) + cents_to_pitch_bend(cents)
+        combined = int(pb.pitch) + cents_to_pitch_bend(cents, range_cents)
         if not -8192 <= combined <= 8191:
             raise ValueError(
                 "authored pitch bend plus tuning correction exceeds MIDI pitch-bend range; "
@@ -158,7 +186,7 @@ def _lane_pitch_bends(
 
     for index, (start, end, cents) in enumerate(intervals):
         set_time = max(0.0, float(start) - _BOUNDARY_EPSILON_S)
-        combined = _bend_at(base, set_time) + cents_to_pitch_bend(cents)
+        combined = _bend_at(base, set_time) + cents_to_pitch_bend(cents, range_cents)
         if not -8192 <= combined <= 8191:
             raise ValueError("authored pitch bend plus tuning correction exceeds MIDI range")
         values[set_time] = combined
@@ -180,6 +208,8 @@ def _lane_pitch_bends(
 def build_tuning_lane_pms(
     pm: pretty_midi.PrettyMIDI,
     instrument_spec: Mapping[str, Any],
+    *,
+    bend_range_cents: float = _PITCH_BEND_RANGE_CENTS,
 ) -> list[pretty_midi.PrettyMIDI]:
     """Return independent pitch-bend-safe render lanes for one instrument PM.
 
@@ -212,7 +242,7 @@ def build_tuning_lane_pms(
                 pass
             lane_inst.notes.append(note)
         intervals = _correction_intervals(notes)
-        lane_inst.pitch_bends = _lane_pitch_bends(inst.pitch_bends, intervals)
+        lane_inst.pitch_bends = _lane_pitch_bends(inst.pitch_bends, intervals, bend_range_cents)
         setattr(lane_pm, "_ambition_tuning_lane_index", lane_index)
         setattr(lane_pm, "_ambition_tuning_profile", copy.deepcopy(profile))
         lane_pms.append(lane_pm)

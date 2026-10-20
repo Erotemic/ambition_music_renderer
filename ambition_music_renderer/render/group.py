@@ -24,7 +24,7 @@ from ..audio_utils import coerce_stereo
 from .backend_notes import apply_backend_note_remap
 from .score_core import RENDERER_VERSION
 from .synth import render_procedural_fm, render_synth_audio
-from .tuning import build_tuning_lane_pms, tuning_correction_for_instrument
+from .tuning import build_tuning_lane_pms, sfz_pitch_bend_range_cents, tuning_correction_for_instrument
 from .foreground_protection import (
     apply_instrument_foreground_protection,
     foreground_protection_mode,
@@ -254,7 +254,8 @@ def render_group_audio(
             allow_fallback = plan.optional and not strict_backends
             fallback_backend_name = str(plan.fallback_backend or default_fallback_backend)
             inst_pm = copy_with_instruments(pm, [inst], bpm)
-            tuning_lanes = build_tuning_lane_pms(inst_pm, inst_spec)
+            bend_range = sfz_pitch_bend_range_cents(plan.resolved_sfz) if plan.wants_sfz else 200.0
+            tuning_lanes = build_tuning_lane_pms(inst_pm, inst_spec, bend_range_cents=bend_range)
 
             if plan.wants_procedural_fm:
                 if tuning_profile is not None:
