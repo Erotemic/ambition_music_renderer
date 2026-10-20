@@ -194,6 +194,10 @@ def render_group_audio(
         backend_prefers_procedural_fm(instrument_backend_spec(instrument_specs, inst.name))
         for inst in insts
     )
+    has_instrument_surge = any(
+        str(instrument_backend_spec(instrument_specs, inst.name).get("kind") or "") == "surge"
+        for inst in insts
+    )
     has_instrument_mix_gain = any(
         abs(_instrument_mix_gain_db(instrument_specs, inst.name)) > 1e-9
         for inst in insts
@@ -217,6 +221,7 @@ def render_group_audio(
         or has_instrument_sfizz
         or has_instrument_soundfont
         or has_instrument_procedural_fm
+        or has_instrument_surge
         or has_instrument_mix_gain
         or has_tuning_correction
         or has_instrument_register_protection
@@ -257,6 +262,24 @@ def render_group_audio(
             bend_range = sfz_pitch_bend_range_cents(plan.resolved_sfz) if plan.wants_sfz else 200.0
             tuning_lanes = build_tuning_lane_pms(inst_pm, inst_spec, bend_range_cents=bend_range)
 
+            if plan.kind == "surge":
+                from ..backends.surge_backend import render_surge
+
+                lane_audio = [render_surge(lane_pm, dict(inst_backend), sample_rate, minimum_duration) for lane_pm in tuning_lanes]
+                if _instrument_has_notes(inst_pm) and _is_effectively_silent(_sum_audio_buffers(lane_audio)):
+                    raise RuntimeError(f"instrument {inst.name!r} Surge XT patch {inst_backend.get('patch')!r} rendered SILENCE")
+                rendered.append(
+                    _finalize_instrument_mix_audio(
+                        _sum_audio_buffers(lane_audio),
+                        mix_gain_db=mix_gain_db,
+                        pm=pm,
+                        groups=groups,
+                        protection_spec=protection_spec,
+                        instrument_name=inst.name,
+                        sample_rate=sample_rate,
+                    )
+                )
+                continue
             if plan.wants_procedural_fm:
                 if tuning_profile is not None:
                     raise RuntimeError(

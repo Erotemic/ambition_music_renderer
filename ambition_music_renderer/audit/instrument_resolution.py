@@ -162,6 +162,22 @@ def audit_spec(spec: dict[str, Any], *, base_dir: Path | None = None) -> dict[st
                 row["status"] = "resolved"
             if row.get("performance_patch_cc1_driven"):
                 row["status"] += "; CC1 dynamics driven"
+        elif plan.kind == "surge":
+            from ..backends.surge_backend import resolve_surge_patch
+
+            patch = str(plan.backend.get("patch") or "")
+            try:
+                resolved = str(resolve_surge_patch(patch))
+            except (FileNotFoundError, ValueError):
+                resolved = None
+                warnings.append(f"{name!r}: Surge XT patch {patch!r} did not resolve; run download_ambition_audio_tools.sh.")
+            row.update({
+                "backend": "surge",
+                "requested": f"Surge XT patch {patch}",
+                "resolved": resolved,
+                "resolved_name": Path(resolved).name if resolved else None,
+                "status": "resolved Surge XT patch" if resolved else "UNRESOLVED Surge XT patch",
+            })
         elif plan.wants_soundfont:
             resolved = plan.resolved_soundfont
             row.update({
