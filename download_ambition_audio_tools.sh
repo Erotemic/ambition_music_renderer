@@ -857,6 +857,62 @@ PY_TOOL_NOTES
     } > "$PYTHON_TOOLS_REPORT"
 }
 
+# ⛔ A PLUGIN BUILT FOR ANOTHER ARCH INDEXES FINE AND THEN NO HOST LOADS IT.
+# The asset filter (github_latest_asset_url) keeps new installs right, but an
+# install made before it (2026-09-06: Surge XT arm64 on an x86_64 box) never
+# repaired itself: its marker said "extracted" and the next run left it alone.
+# A plugin dir whose ELF binaries all name another machine is moved aside, so
+# this run extracts the right one fresh. Nothing is deleted.
+quarantine_foreign_arch_plugins() {
+    [[ -d "$PLUGIN_UNPACKED" ]] || return 0
+    local dir verdict
+    for dir in "$PLUGIN_UNPACKED"/*/; do
+        dir="${dir%/}"
+        [[ "$dir" == *.foreign-arch* ]] && continue
+        verdict="$(python3 - "$dir" <<'PY'
+import os, platform, sys
+# ELF e_machine: 62 x86-64, 183 aarch64, 40 arm, 3 i386
+host = {"x86_64": 62, "amd64": 62, "aarch64": 183, "arm64": 183}.get(platform.machine().lower())
+seen = set()
+for root, _dirs, files in os.walk(sys.argv[1]):
+    for name in files:
+        if not name.endswith((".so", ".clap")):
+            continue
+        try:
+            with open(os.path.join(root, name), "rb") as f:
+                head = f.read(20)
+        except OSError:
+            continue
+        if head[:4] == b"\x7fELF":
+            seen.add(int.from_bytes(head[18:20], "little"))
+print("none" if not seen or host is None else ("host" if host in seen else "foreign"))
+PY
+)"
+        if [[ "$verdict" == "foreign" ]]; then
+            log "WRONG ARCH: $dir holds no $(uname -m) binaries; moving it to $dir.foreign-arch to re-extract"
+            mv "$dir" "$dir.foreign-arch.$(date +%Y%m%d%H%M%S)"
+        fi
+    done
+}
+
+# Surge XT finds its factory data (patches, wavetables, FX presets) only in a
+# system data dir: ~/.local/share/surge-xt, /usr/share/surge-xt or
+# /usr/local/share/surge-xt. The tarball unpacks it under $PLUGIN_UNPACKED, so
+# point the per-user location at it unless something real is already there
+# (an apt install, or a user's own copy).
+link_surge_factory_data() {
+    local data="$PLUGIN_UNPACKED/SurgeXT/share/surge-xt"
+    local link="${XDG_DATA_HOME:-$HOME/.local/share}/surge-xt"
+    [[ -d "$data" ]] || return 0
+    if [[ -e "$link" && ! -L "$link" ]]; then
+        log "Surge XT data: keeping existing $link"
+        return 0
+    fi
+    mkdir -p "$(dirname "$link")"
+    ln -sfn "$data" "$link"
+    log "Surge XT data: $link -> $data"
+}
+
 collect_plugin_bundles() {
     log "indexing CLAP/LV2/VST3 bundles under $PLUGIN_UNPACKED"
     find "$CLAP_ROOT" "$LV2_ROOT" "$VST3_ROOT" -type l -delete 2>/dev/null || true
@@ -950,11 +1006,15 @@ download_open_plugin_bundles() {
         write_environment_file
         return 0
     fi
+    quarantine_foreign_arch_plugins
     # Asset names vary between projects, so failures are non-fatal.  The manual
     # checklist names package-manager fallbacks for the same tools.
     # LSP publishes its Linux bundles only as .7z.
     download_github_release_asset "LSP Plugins Linux bundle" "lsp-plugins/lsp-plugins" "linux.*\.(7z|tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/LSP" || true
-    download_github_release_asset "Surge XT Linux plugin bundle" "surge-synthesizer/surge" "(linux|ubuntu|debian|x86_64|amd64).*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/SurgeXT" || true
+    # Surge XT: the STABLE release (releases-xt), not surge-synthesizer/surge,
+    # whose "latest" is a rolling nightly. The full tarball, not -pluginsonly:
+    # only the full one carries share/surge-xt (factory patches, wavetables).
+    download_github_release_asset "Surge XT Linux plugin bundle" "surge-synthesizer/releases-xt" "^surge-xt-linux-(x86_64|arm64|aarch64)-[0-9.]+\.tar\.gz$" "$PLUGIN_UNPACKED/SurgeXT" || true
     download_github_release_asset "Cardinal modular synth/effects" "DISTRHO/Cardinal" "linux.*x86_64.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Cardinal" || true
     download_github_release_asset "DISTRHO DPF plugin collection" "DISTRHO/DPF-Plugins" "linux.*x86_64.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/DPF-Plugins" || true
     download_github_release_asset "CHOW Tape Model" "jatinchowdhury18/AnalogTapeModel" "(linux|x86_64|amd64).*(clap|lv2|vst3)?.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/CHOWTapeModel" || true
@@ -966,6 +1026,7 @@ download_open_plugin_bundles() {
     download_github_release_asset "Airwindows consolidated plugins" "baconpaul/airwin2rack@DAWPlugin" "AirwindowsConsolidated-.*linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/Airwindows" || true
     download_github_release_asset "Wolf Shaper distortion" "wolf-plugins/wolf-shaper" "linux.*\.(tar\.gz|tar\.xz|zip|deb)$" "$PLUGIN_UNPACKED/WolfShaper" || true
     collect_plugin_bundles
+    link_surge_factory_data
     write_environment_file
 }
 
