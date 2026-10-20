@@ -129,6 +129,13 @@ extraction_marker() {
     printf '%s/.ambition_audio_tools_extracted.%s' "$dest" "$(basename "$archive_name")"
 }
 
+# The payload a marker vouches for: an SFZ library's .sfz programs, or a plugin
+# bundle's binaries (.so inside .vst3/.lv2, or a .clap). Plugin bundles hold no
+# .sfz, so an SFZ-only test re-extracted every plugin on every run.
+has_installed_payload() {
+    find "$1" -type f \( -name '*.sfz' -o -name '*.so' -o -name '*.clap' \) -size +0 -print -quit 2>/dev/null | grep -q .
+}
+
 already_extracted() {
     local archive_name="$1"
     local dest="$2"
@@ -136,12 +143,12 @@ already_extracted() {
         # A marker without a payload is stale (for example, an archive that
         # ran out of disk while downloading/extracting). Let the next run
         # repair it instead of treating an empty library as installed.
-        if find "$dest" -type f -name '*.sfz' -print -quit 2>/dev/null | grep -q .; then
+        if has_installed_payload "$dest"; then
             return 0
         fi
     fi
     if [[ -e "$dest/.ambition_audio_tools_extracted" && "$dest" != *Virtual-Playing-Orchestra* ]]; then
-        if find "$dest" -type f -name '*.sfz' -print -quit 2>/dev/null | grep -q .; then
+        if has_installed_payload "$dest"; then
             return 0
         fi
     fi
@@ -963,7 +970,7 @@ on your machine.
 ```bash
 sudo apt update
 sudo apt install \
-  curl unzip tar p7zip-full git file \
+  curl unzip tar p7zip-full unar git file \
   fluidsynth libfluidsynth3 fluid-soundfont-gm fluid-soundfont-gs \
   sfizz lv2proc jalv carla guitarix drumgizmo \
   calf-plugins mda-lv2 zam-plugins lsp-plugins \

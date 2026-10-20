@@ -124,6 +124,27 @@ logs do not belong in the live renderer documentation.
 
 Commands below assume the usual parent checkout at `~/code/ambition`.
 
+### First-time setup (and any time later)
+
+The sample libraries and plugins live outside the repo, under
+`/data/audio-tools`. One script installs them, and it is safe to re-run: a run
+on a complete install downloads and extracts nothing, then verifies every
+catalog source and exits non-zero naming anything missing.
+
+```bash
+sudo apt install curl unzip tar p7zip-full unar git file fluidsynth sfizz ffmpeg
+cd ~/code/ambition/tools/ambition_music_renderer
+./download_ambition_audio_tools.sh /data/audio-tools
+source /data/audio-tools/env.sh   # before rendering, in each shell
+```
+
+`/data/audio-tools/APT_AUDIO_PLUGIN_PACKAGES.md` (written by the script) has
+the full apt list. `unar` matters: the shamisen articulation archives are RARs,
+and without it they unpack as empty files. Re-running the script also repairs
+an install it made wrong: a plugin built for another CPU is moved aside and
+the right build extracted, and Surge XT's factory data is linked to
+`~/.local/share/surge-xt`, where Surge looks for it.
+
 ```bash
 cd ~/code/ambition
 source scripts/lib/asset_roots.sh
