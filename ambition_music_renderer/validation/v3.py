@@ -1055,7 +1055,7 @@ def _validate_playback_layers(
     """The render's own check of `playback.layers`, before a render is paid for."""
     playback = spec.get("playback")
     instruments, form = spec.get("instruments"), spec.get("form")
-    if not _mapping(playback) or not playback.get("layers") or not _list(instruments) or not _list(form):
+    if not _mapping(playback) or not (playback.get("layers") or playback.get("full")) or not _list(instruments) or not _list(form):
         return []
     from ..render.playback_layers import playback_layer_plan
 

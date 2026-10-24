@@ -695,10 +695,24 @@ playback:
   form section is one playback section.
 - The render writes `playback/<section>/<cue>_<hash>.<section>.<layer>.ogg`, and
   `cue publish` copies them to `playback/<section>/<section>.<layer>.ogg`.
-- Each file has a fade of a few milliseconds at its two ends. A note that rings
-  across the end of a looped section stops there.
+- `full: true` also writes the mastered mix of each section as its `full` file,
+  its share of one composition master (`layers` is then optional). The master
+  runs over a looped section after one pass of the same loop, so its compressor
+  and reverb are as they are when the loop comes round again.
+- A section's `tail` is the silent form section right after it: the section's
+  notes and reverb ring into it. A loop adds its tail onto its head; another
+  section plays it after its end. A loop's `lead_in` is the silent form section
+  right before it: the loop adds its last beat (the early, humanized starts of
+  its first notes) onto its end. A loop with either has no seam fades. Give the
+  tail the gains of the loop's first section and the lead-in the gains of its
+  last, so the gain ramps at its two ends are the ramp of its seam.
+- Otherwise each file has a fade of a few milliseconds at its two ends, and a
+  note that rings across the end of a looped section stops there.
 - Each layer must be complete in each state the game plays. A layer that is
   silent for one half of a loop adds nothing there.
 
 `cue validate` refuses a block that cannot give a complete mix. The first score
-that uses it is `scores/active/dinosaur_liberators_adaptive.music.yaml`.
+that uses it is `scores/active/dinosaur_liberators_adaptive.music.yaml`;
+`scores/active/standing_on_shoulders_v2_adaptive.music.yaml` uses `full`, tails
+and a lead-in. `dev/measure_section_joins.py` measures the joins of the files as
+a game plays them.

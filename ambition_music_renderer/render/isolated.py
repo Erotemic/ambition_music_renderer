@@ -1110,8 +1110,9 @@ def _render_main(ns) -> int:
                 write_ogg_from_audio(piece, sr, path, quality=quality, keep_wav=False)
 
     # Playback layers: sums of the native group stems over spans of the form,
-    # for a game that mixes the cue from layers. A score asks for them in its
-    # `playback` block, in each render mode.
+    # for a game that mixes the cue from layers, and with `playback.full` the
+    # mastered mix of each span. A score asks for them in its `playback`
+    # block, in each render mode.
     playback_plan = playback_layer_plan(spec, meta, list(group_names))
     if playback_plan is not None:
         output_files["playback"] = write_playback_layers(
@@ -1123,6 +1124,8 @@ def _render_main(ns) -> int:
             outdir,
             f"{spec['id']}_{cue_hash}",
             lambda audio, path: write_ogg_from_audio(audio, sr, path, quality=quality, keep_wav=False),
+            pre_master=raw_full,
+            master=lambda audio: master_composition(audio, sr, spec, base_dir=spec_path.parent)[0],
         )
 
     # Per-section full slices for horizontal adaptive playback.
