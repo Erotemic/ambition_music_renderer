@@ -1,0 +1,2106 @@
+# Standing on Shoulders - Extended Boss Battle, acoustic guitar quartet.
+# Independent alternative to standing_on_shoulders_extended_boss.music.yaml.
+# Four regular six-string guitars, standard E-A-D-G-B-E tuning, no capo.
+# The full 79-bar form is retained at 88 BPM in E minor.
+# Guitar I: main source themes, revoiced near A/D/G strings, mostly frets 7-10.
+# Guitar II: off-beat scholar/giant answers and diatonic countermelody.
+# Guitar III: playable open/compact power chords and occasional arpeggios.
+# Guitar IV: original song's bass drive, octave-displaced onto standard guitar.
+# Intended as an ensemble reimagining; it is not the original orchestration
+# or a duplicate of the four original guitar tracks.
+# No part requires notes above the twelfth fret; all pitches are written for
+# sounding pitch (guitars notated as concert pitch in MusicIR).
+
+schema: ambition.musicir.v3
+id: standing_on_shoulders_extended_boss_guitar_quartet
+title: Standing on Shoulders - Extended Boss, Acoustic Guitar Quartet
+seed: 2026102801
+timebase: {ppq: 960}
+meter: 4/4
+tempo: 88
+key: E minor
+end: {bar: 80, beat: 1}
+render:
+  sample_rate: 48000
+  backend: pretty-midi
+  ogg_quality: 6
+processing:
+  master:
+    chain:
+      - {processor: compressor, threshold_db: -22, ratio: 1.8, attack_ms: 18, release_ms: 115}
+      - {processor: reverb, wet: 0.06, decay_seconds: 1.3, damping_hz: 5600}
+      - {processor: limiter, target_peak_db: -1.8, drive: 1.0, normalize: true}
+  adaptive_sections: {mode: composition_master}
+form:
+  - {id: royal_approach, from: {bar: 1, beat: 1}, to: {bar: 2, beat: 1}}
+  - {id: royal_proclamation, from: {bar: 2, beat: 1}, to: {bar: 4, beat: 1}}
+  - {id: the_giant_takes_stage, from: {bar: 4, beat: 1}, to: {bar: 7, beat: 1}}
+  - {id: hands_of_gnu, from: {bar: 7, beat: 1}, to: {bar: 19, beat: 1}}
+  - {id: head_descends, from: {bar: 19, beat: 1}, to: {bar: 27, beat: 1}}
+  - {id: the_weight_of_knowledge, from: {bar: 27, beat: 1}, to: {bar: 39, beat: 1}}
+  - {id: recursive_duel_scholar_i, from: {bar: 39, beat: 1}, to: {bar: 41, beat: 1}}
+  - {id: recursive_duel_giant_i, from: {bar: 41, beat: 1}, to: {bar: 43, beat: 1}}
+  - {id: recursive_duel_scholar_ii, from: {bar: 43, beat: 1}, to: {bar: 45, beat: 1}}
+  - {id: recursive_duel_giant_ii, from: {bar: 45, beat: 1}, to: {bar: 47, beat: 1}}
+  - {id: the_giant_answers, from: {bar: 47, beat: 1}, to: {bar: 55, beat: 1}}
+  - {id: scholar_ascendant, from: {bar: 55, beat: 1}, to: {bar: 63, beat: 1}}
+  - {id: recursive_crescendo, from: {bar: 63, beat: 1}, to: {bar: 71, beat: 1}}
+  - {id: final_giant_solo, from: {bar: 71, beat: 1}, to: {bar: 77, beat: 1}}
+  - {id: final_royal_impacts, from: {bar: 77, beat: 1}, to: {bar: 79, beat: 1}}
+  - {id: loop_turnaround, from: {bar: 79, beat: 1}, to: {bar: 80, beat: 1}}
+harmony:
+  progression:
+    # royal_approach | bars 1-1
+    - Em
+    # royal_proclamation | bars 2-3
+    - Em
+    - Em
+    # the_giant_takes_stage | bars 4-6
+    - Em
+    - Em
+    - Em
+    # hands_of_gnu | bars 7-18
+    - Em
+    - G
+    - D
+    - Em
+    - Em
+    - G
+    - Bm
+    - Em
+    - Em
+    - G
+    - Am
+    - Em
+    # head_descends | bars 19-26
+    - Am
+    - G
+    - Em
+    - Bm
+    - C
+    - G
+    - D
+    - Em
+    # the_weight_of_knowledge | bars 27-38
+    - Em
+    - D
+    - G
+    - Bm
+    - Em
+    - D
+    - Am
+    - Em
+    - Em
+    - G
+    - D
+    - Em
+    # recursive_duel_scholar_i | bars 39-40
+    - Em
+    - G
+    # recursive_duel_giant_i | bars 41-42
+    - D
+    - Em
+    # recursive_duel_scholar_ii | bars 43-44
+    - C
+    - G
+    # recursive_duel_giant_ii | bars 45-46
+    - Bm
+    - Em
+    # the_giant_answers | bars 47-54
+    - Em
+    - D
+    - C
+    - Em
+    - Em
+    - G
+    - Am
+    - Em
+    # scholar_ascendant | bars 55-62
+    - Em
+    - G
+    - D
+    - Em
+    - C
+    - G
+    - D
+    - Em
+    # recursive_crescendo | bars 63-70
+    - Em
+    - Bm
+    - G
+    - Em
+    - C
+    - G
+    - D
+    - Em
+    # final_giant_solo | bars 71-76
+    - Em
+    - G
+    - D
+    - Em
+    - C
+    - G
+    # final_royal_impacts | bars 77-78
+    - Bm
+    - Em
+    # loop_turnaround | bars 79-79
+    - B7
+instruments:
+  - {name: guitar_1, group: guitar_quartet, program: steel_guitar, volume: 102, pan: 46}
+  - {name: guitar_2, group: guitar_quartet, program: nylon_guitar, volume: 94, pan: 82}
+  - {name: guitar_3, group: guitar_quartet, program: steel_guitar, volume: 96, pan: 22}
+  - {name: guitar_4, group: guitar_quartet, program: nylon_guitar, volume: 99, pan: 106}
+parts:
+  # Guitar 1: Motif lead - brass, scholar, giant
+  - id: guitar_1_part
+    instrument: guitar_1
+    voices:
+      - id: motif_lead
+        clips:
+          # royal_approach | bars 1-1
+          - id: guitar_1_royal_approach
+            at: {bar: 1, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 97]
+              - [{beats: 0.5}, {beats: 0.4375}, B3, 97]
+              - [{beats: 1}, {beats: 0.875}, E4, 97]
+              - [{beats: 2}, {beats: 0.4375}, D4, 97]
+              - [{beats: 2.5}, {beats: 0.4375}, E4, 97]
+              - [{beats: 3}, {beats: 0.4375}, B3, 97]
+              - [{beats: 3.5}, {beats: 0.4375}, E3, 97]
+          # royal_proclamation | bars 2-3
+          - id: guitar_1_royal_proclamation
+            at: {bar: 2, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 88]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 1}, {beats: 0.4375}, B3, 88]
+              - [{beats: 1.5}, {beats: 0.875}, E4, 88]
+              - [{beats: 2.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 3}, {beats: 0.4375}, G3, 88]
+              - [{beats: 3.5}, {beats: 0.4375}, F#3, 88]
+              - [{beats: 4}, {beats: 0.4375}, E3, 88]
+              - [{beats: 4.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 5.5}, {beats: 0.6875}, E4, 88]
+              - [{beats: 6.25}, {beats: 0.1875}, B3, 88]
+              - [{beats: 6.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 7}, {beats: 0.875}, E3, 88]
+          # the_giant_takes_stage | bars 4-6
+          - id: guitar_1_the_giant_takes_stage
+            at: {bar: 4, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 92]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 1}, {beats: 0.4375}, B3, 92]
+              - [{beats: 1.5}, {beats: 0.875}, E4, 92]
+              - [{beats: 2.5}, {beats: 0.4375}, B3, 92]
+              - [{beats: 3}, {beats: 0.4375}, G3, 92]
+              - [{beats: 3.5}, {beats: 0.4375}, F#3, 92]
+              - [{beats: 4}, {beats: 0.4375}, E3, 92]
+              - [{beats: 4.5}, {beats: 0.4375}, B3, 92]
+              - [{beats: 5}, {beats: 0.4375}, D4, 92]
+              - [{beats: 5.5}, {beats: 0.6875}, E4, 92]
+              - [{beats: 6.25}, {beats: 0.1875}, B3, 92]
+              - [{beats: 6.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 7}, {beats: 0.875}, E3, 92]
+              - [{beats: 8}, {beats: 0.4375}, B3, 92]
+              - [{beats: 8.5}, {beats: 0.4375}, D4, 92]
+              - [{beats: 9}, {beats: 0.4375}, E4, 92]
+              - [{beats: 9.5}, {beats: 0.4375}, D4, 92]
+              - [{beats: 10}, {beats: 0.4375}, A3, 92]
+              - [{beats: 10.5}, {beats: 0.4375}, F#3, 92]
+              - [{beats: 11}, {beats: 0.875}, E3, 92]
+          # hands_of_gnu | bars 7-18
+          - id: guitar_1_hands_of_gnu
+            at: {bar: 7, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 88]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 1}, {beats: 0.4375}, B3, 88]
+              - [{beats: 1.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 2}, {beats: 0.875}, E4, 88]
+              - [{beats: 3}, {beats: 0.4375}, D4, 88]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 4}, {beats: 0.1875}, A3, 88]
+              - [{beats: 4.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 4.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 4.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 5}, {beats: 0.4375}, D3, 88]
+              - [{beats: 5.5}, {beats: 1}, G3, 88]
+              - [{beats: 7}, {beats: 0.875}, E3, 88]
+              - [{beats: 8}, {beats: 0.6875}, E4, 88]
+              - [{beats: 8.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 9.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 10}, {beats: 0.4375}, E4, 88]
+              - [{beats: 10.5}, {beats: 1}, G4, 88]
+              - [{beats: 12}, {beats: 1}, B3, 92]
+              - [{beats: 13.5}, {beats: 0.4375}, A3, 92]
+              - [{beats: 14}, {beats: 0.4375}, B3, 92]
+              - [{beats: 14.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 15}, {beats: 0.875}, E3, 92]
+              - [{beats: 16}, {beats: 0.4375}, E3, 88]
+              - [{beats: 16.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 17}, {beats: 0.4375}, B3, 88]
+              - [{beats: 17.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 18}, {beats: 0.875}, E4, 88]
+              - [{beats: 19}, {beats: 0.4375}, D4, 88]
+              - [{beats: 19.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 20}, {beats: 0.1875}, A3, 88]
+              - [{beats: 20.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 20.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 20.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 21}, {beats: 0.4375}, D3, 88]
+              - [{beats: 21.5}, {beats: 1}, G3, 88]
+              - [{beats: 23}, {beats: 0.875}, E3, 88]
+              - [{beats: 24}, {beats: 0.6875}, E4, 88]
+              - [{beats: 24.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 25.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 26}, {beats: 0.4375}, E4, 88]
+              - [{beats: 26.5}, {beats: 1}, G4, 88]
+              - [{beats: 28}, {beats: 1}, B3, 92]
+              - [{beats: 29.5}, {beats: 0.4375}, A3, 92]
+              - [{beats: 30}, {beats: 0.4375}, B3, 92]
+              - [{beats: 30.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 31}, {beats: 0.875}, E3, 92]
+              - [{beats: 32}, {beats: 0.4375}, E3, 88]
+              - [{beats: 32.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 33}, {beats: 0.4375}, B3, 88]
+              - [{beats: 33.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 34}, {beats: 0.875}, E4, 88]
+              - [{beats: 35}, {beats: 0.4375}, D4, 88]
+              - [{beats: 35.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 36}, {beats: 0.1875}, A3, 88]
+              - [{beats: 36.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 36.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 36.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 37}, {beats: 0.4375}, D3, 88]
+              - [{beats: 37.5}, {beats: 1}, G3, 88]
+              - [{beats: 39}, {beats: 0.875}, E3, 88]
+              - [{beats: 40}, {beats: 0.6875}, E4, 88]
+              - [{beats: 40.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 41.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 42}, {beats: 0.4375}, E4, 88]
+              - [{beats: 42.5}, {beats: 1}, G4, 88]
+              - [{beats: 44}, {beats: 1}, B3, 92]
+              - [{beats: 45.5}, {beats: 0.4375}, A3, 92]
+              - [{beats: 46}, {beats: 0.4375}, B3, 92]
+              - [{beats: 46.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 47}, {beats: 0.875}, E3, 92]
+          # head_descends | bars 19-26
+          - id: guitar_1_head_descends
+            at: {bar: 19, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 97]
+              - [{beats: 0.5}, {beats: 0.4375}, E3, 97]
+              - [{beats: 1}, {beats: 0.875}, B3, 97]
+              - [{beats: 2}, {beats: 0.4375}, A3, 97]
+              - [{beats: 2.5}, {beats: 0.4375}, G3, 97]
+              - [{beats: 3}, {beats: 0.875}, E3, 97]
+              - [{beats: 4}, {beats: 0.875}, E4, 97]
+              - [{beats: 5}, {beats: 1}, B3, 97]
+              - [{beats: 16}, {beats: 0.4375}, E3, 97]
+              - [{beats: 16.5}, {beats: 0.4375}, E3, 97]
+              - [{beats: 17}, {beats: 0.875}, B3, 97]
+              - [{beats: 18}, {beats: 0.4375}, A3, 97]
+              - [{beats: 18.5}, {beats: 0.4375}, G3, 97]
+              - [{beats: 19}, {beats: 0.875}, E3, 97]
+              - [{beats: 20}, {beats: 0.875}, E4, 97]
+              - [{beats: 21}, {beats: 1}, B3, 97]
+              - [{beats: 24}, {beats: 0.4375}, D3, 88]
+              - [{beats: 24.5}, {beats: 0.4375}, F#3, 88]
+              - [{beats: 25}, {beats: 0.4375}, A3, 88]
+              - [{beats: 25.5}, {beats: 0.875}, D4, 88]
+              - [{beats: 26.5}, {beats: 0.4375}, A3, 88]
+              - [{beats: 27}, {beats: 0.875}, F#3, 88]
+          # the_weight_of_knowledge | bars 27-38
+          - id: guitar_1_the_weight_of_knowledge
+            at: {bar: 27, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 88]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 1}, {beats: 0.4375}, B3, 88]
+              - [{beats: 1.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 2}, {beats: 0.875}, E4, 88]
+              - [{beats: 3}, {beats: 0.4375}, D4, 88]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 4}, {beats: 0.1875}, A3, 88]
+              - [{beats: 4.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 4.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 4.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 5}, {beats: 0.4375}, D3, 88]
+              - [{beats: 5.5}, {beats: 1}, G3, 88]
+              - [{beats: 7}, {beats: 0.875}, E3, 88]
+              - [{beats: 8}, {beats: 0.6875}, E4, 88]
+              - [{beats: 8.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 9.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 10}, {beats: 0.4375}, E4, 88]
+              - [{beats: 10.5}, {beats: 1}, G4, 88]
+              - [{beats: 12}, {beats: 1}, B3, 92]
+              - [{beats: 13.5}, {beats: 0.875}, D4, 92]
+              - [{beats: 14.5}, {beats: 0.875}, F#4, 92]
+              - [{beats: 15.5}, {beats: 0.4375}, B3, 92]
+              - [{beats: 16}, {beats: 0.4375}, E3, 88]
+              - [{beats: 16.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 17}, {beats: 0.4375}, B3, 88]
+              - [{beats: 17.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 18}, {beats: 0.875}, E4, 88]
+              - [{beats: 19}, {beats: 0.4375}, D4, 88]
+              - [{beats: 19.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 20}, {beats: 0.1875}, A3, 88]
+              - [{beats: 20.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 20.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 20.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 21}, {beats: 0.4375}, D3, 88]
+              - [{beats: 21.5}, {beats: 1}, G3, 88]
+              - [{beats: 23}, {beats: 0.875}, E3, 88]
+              - [{beats: 24}, {beats: 0.6875}, E4, 88]
+              - [{beats: 24.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 25.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 26}, {beats: 0.4375}, E4, 88]
+              - [{beats: 26.5}, {beats: 1}, G4, 88]
+              - [{beats: 28}, {beats: 1}, B3, 92]
+              - [{beats: 29.5}, {beats: 0.4375}, A3, 92]
+              - [{beats: 30}, {beats: 0.4375}, B3, 92]
+              - [{beats: 30.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 31}, {beats: 0.875}, E3, 92]
+              - [{beats: 32}, {beats: 0.4375}, E3, 88]
+              - [{beats: 32.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 33}, {beats: 0.4375}, B3, 88]
+              - [{beats: 33.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 34}, {beats: 0.875}, E4, 88]
+              - [{beats: 35}, {beats: 0.4375}, D4, 88]
+              - [{beats: 35.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 36}, {beats: 0.1875}, A3, 88]
+              - [{beats: 36.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 36.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 36.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 37}, {beats: 0.4375}, D3, 88]
+              - [{beats: 37.5}, {beats: 1}, G3, 88]
+              - [{beats: 39}, {beats: 0.875}, E3, 88]
+              - [{beats: 40}, {beats: 0.6875}, E4, 88]
+              - [{beats: 40.75}, {beats: 0.6875}, B4, 88]
+              - [{beats: 41.5}, {beats: 0.4375}, G4, 88]
+              - [{beats: 42}, {beats: 0.4375}, E4, 88]
+              - [{beats: 42.5}, {beats: 1}, G4, 88]
+              - [{beats: 44}, {beats: 1}, B3, 92]
+              - [{beats: 45.5}, {beats: 0.4375}, A3, 92]
+              - [{beats: 46}, {beats: 0.4375}, B3, 92]
+              - [{beats: 46.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 47}, {beats: 0.875}, E3, 92]
+          # recursive_duel_scholar_i | bars 39-40
+          - id: guitar_1_recursive_duel_scholar_i
+            at: {bar: 39, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 91]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 91]
+              - [{beats: 1}, {beats: 0.4375}, B3, 91]
+              - [{beats: 1.5}, {beats: 0.4375}, D4, 91]
+              - [{beats: 2}, {beats: 0.875}, E4, 91]
+              - [{beats: 3}, {beats: 0.4375}, D4, 91]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 91]
+              - [{beats: 4}, {beats: 0.1875}, A3, 91]
+              - [{beats: 4.25}, {beats: 0.1875}, G3, 91]
+              - [{beats: 4.5}, {beats: 0.1875}, F#3, 91]
+              - [{beats: 4.75}, {beats: 0.1875}, E3, 91]
+              - [{beats: 5}, {beats: 0.4375}, D3, 91]
+              - [{beats: 5.5}, {beats: 1}, G3, 91]
+              - [{beats: 7}, {beats: 0.875}, E3, 91]
+          # recursive_duel_giant_i | bars 41-42
+          - id: guitar_1_recursive_duel_giant_i
+            at: {bar: 41, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.1875}, E3, 95]
+              - [{beats: 1}, {beats: 0.6875}, G3, 95]
+              - [{beats: 1.75}, {beats: 0.1875}, B3, 95]
+              - [{beats: 2}, {beats: 0.875}, A3, 95]
+              - [{beats: 3}, {beats: 0.4375}, G3, 95]
+              - [{beats: 3.5}, {beats: 0.1875}, E3, 95]
+              - [{beats: 3.75}, {beats: 0.1875}, D3, 95]
+              - [{beats: 4.5}, {beats: 0.1875}, E3, 95]
+              - [{beats: 4.75}, {beats: 0.4375}, D4, 95]
+              - [{beats: 5.25}, {beats: 0.6875}, B3, 95]
+              - [{beats: 6}, {beats: 0.1875}, A3, 95]
+              - [{beats: 6.25}, {beats: 1}, G3, 95]
+          # recursive_duel_scholar_ii | bars 43-44
+          - id: guitar_1_recursive_duel_scholar_ii
+            at: {bar: 43, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, C4, 91]
+              - [{beats: 0.5}, {beats: 0.4375}, E4, 91]
+              - [{beats: 1}, {beats: 0.875}, G3, 91]
+              - [{beats: 2}, {beats: 1}, G3, 91]
+              - [{beats: 4}, {beats: 0.4375}, G3, 91]
+              - [{beats: 4.5}, {beats: 0.4375}, B3, 91]
+              - [{beats: 5}, {beats: 0.875}, D4, 91]
+              - [{beats: 6}, {beats: 1}, G4, 91]
+          # recursive_duel_giant_ii | bars 45-46
+          - id: guitar_1_recursive_duel_giant_ii
+            at: {bar: 45, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.4375}, D4, 95]
+              - [{beats: 1.25}, {beats: 0.1875}, F#4, 95]
+              - [{beats: 1.5}, {beats: 0.6875}, B4, 95]
+              - [{beats: 2.25}, {beats: 0.1875}, F#4, 95]
+              - [{beats: 2.5}, {beats: 0.4375}, D4, 95]
+              - [{beats: 3}, {beats: 0.6875}, B3, 95]
+              - [{beats: 3.75}, {beats: 0.1875}, E4, 95]
+              - [{beats: 4.75}, {beats: 0.1875}, E3, 95]
+              - [{beats: 5}, {beats: 0.4375}, G3, 95]
+              - [{beats: 5.5}, {beats: 0.1875}, B3, 95]
+              - [{beats: 5.75}, {beats: 0.6875}, E4, 95]
+              - [{beats: 6.5}, {beats: 0.4375}, B3, 95]
+              - [{beats: 7}, {beats: 0.6875}, G3, 95]
+              - [{beats: 7.75}, {beats: 0.1875}, E3, 95]
+          # the_giant_answers | bars 47-54
+          - id: guitar_1_the_giant_answers
+            at: {bar: 47, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.875}, E3, 92]
+              - [{beats: 1}, {beats: 0.6875}, E4, 92]
+              - [{beats: 1.75}, {beats: 0.4375}, B3, 92]
+              - [{beats: 2.25}, {beats: 0.6875}, G3, 92]
+              - [{beats: 3}, {beats: 0.4375}, E3, 92]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 92]
+              - [{beats: 4}, {beats: 0.4375}, D3, 92]
+              - [{beats: 4.5}, {beats: 0.6875}, F#3, 92]
+              - [{beats: 5.25}, {beats: 0.1875}, A3, 92]
+              - [{beats: 5.5}, {beats: 0.6875}, D4, 92]
+              - [{beats: 6.25}, {beats: 0.4375}, A3, 92]
+              - [{beats: 6.75}, {beats: 0.6875}, F#3, 92]
+              - [{beats: 7.5}, {beats: 0.4375}, D3, 92]
+              - [{beats: 8}, {beats: 0.1875}, C4, 92]
+              - [{beats: 8.25}, {beats: 0.4375}, E4, 92]
+              - [{beats: 8.75}, {beats: 0.1875}, G4, 92]
+              - [{beats: 9}, {beats: 0.6875}, E4, 92]
+              - [{beats: 9.75}, {beats: 0.4375}, G4, 92]
+              - [{beats: 10.25}, {beats: 0.6875}, C4, 92]
+              - [{beats: 11}, {beats: 0.875}, E4, 92]
+              - [{beats: 12}, {beats: 0.4375}, E3, 92]
+              - [{beats: 12.5}, {beats: 0.1875}, G3, 92]
+              - [{beats: 12.75}, {beats: 0.4375}, B3, 92]
+              - [{beats: 13.25}, {beats: 0.6875}, G3, 92]
+              - [{beats: 14}, {beats: 1}, E3, 92]
+              - [{beats: 16}, {beats: 0.875}, E3, 92]
+              - [{beats: 17}, {beats: 0.6875}, E4, 92]
+              - [{beats: 17.75}, {beats: 0.4375}, B3, 92]
+              - [{beats: 18.25}, {beats: 0.6875}, G3, 92]
+              - [{beats: 19}, {beats: 0.4375}, E3, 92]
+              - [{beats: 19.5}, {beats: 0.4375}, B3, 92]
+              - [{beats: 20}, {beats: 0.4375}, G3, 92]
+              - [{beats: 20.5}, {beats: 0.6875}, B3, 92]
+              - [{beats: 21.25}, {beats: 0.1875}, D4, 92]
+              - [{beats: 21.5}, {beats: 0.6875}, G4, 92]
+              - [{beats: 22.25}, {beats: 0.4375}, D4, 92]
+              - [{beats: 22.75}, {beats: 0.6875}, B3, 92]
+              - [{beats: 23.5}, {beats: 0.4375}, G3, 92]
+              - [{beats: 24}, {beats: 0.875}, A3, 92]
+              - [{beats: 25}, {beats: 0.6875}, A4, 92]
+              - [{beats: 25.75}, {beats: 0.4375}, E4, 92]
+              - [{beats: 26.25}, {beats: 0.6875}, C4, 92]
+              - [{beats: 27}, {beats: 0.4375}, A3, 92]
+              - [{beats: 27.5}, {beats: 0.4375}, E3, 92]
+              - [{beats: 28}, {beats: 0.4375}, E3, 92]
+              - [{beats: 28.5}, {beats: 0.6875}, G3, 92]
+              - [{beats: 29.25}, {beats: 0.1875}, B3, 92]
+              - [{beats: 29.5}, {beats: 0.6875}, E4, 92]
+              - [{beats: 30.25}, {beats: 0.4375}, B3, 92]
+              - [{beats: 30.75}, {beats: 0.6875}, G3, 92]
+              - [{beats: 31.5}, {beats: 0.4375}, E3, 92]
+          # scholar_ascendant | bars 55-62
+          - id: guitar_1_scholar_ascendant
+            at: {bar: 55, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 88]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 1}, {beats: 0.4375}, B3, 88]
+              - [{beats: 1.5}, {beats: 0.4375}, D4, 88]
+              - [{beats: 2}, {beats: 0.875}, E4, 88]
+              - [{beats: 3}, {beats: 0.4375}, D4, 88]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 88]
+              - [{beats: 4}, {beats: 0.1875}, A3, 88]
+              - [{beats: 4.25}, {beats: 0.1875}, G3, 88]
+              - [{beats: 4.5}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 4.75}, {beats: 0.1875}, E3, 88]
+              - [{beats: 5}, {beats: 0.4375}, D3, 88]
+              - [{beats: 5.5}, {beats: 1}, G3, 88]
+              - [{beats: 7}, {beats: 0.875}, E3, 88]
+              - [{beats: 8}, {beats: 0.4375}, E3, 97]
+              - [{beats: 8.5}, {beats: 0.4375}, E3, 97]
+              - [{beats: 9}, {beats: 0.875}, B3, 97]
+              - [{beats: 10}, {beats: 0.4375}, A3, 97]
+              - [{beats: 10.5}, {beats: 0.4375}, G3, 97]
+              - [{beats: 11}, {beats: 0.875}, E3, 97]
+              - [{beats: 12}, {beats: 0.875}, E4, 97]
+              - [{beats: 13}, {beats: 1}, B3, 97]
+              - [{beats: 16}, {beats: 0.6875}, C4, 88]
+              - [{beats: 16.75}, {beats: 0.1875}, E4, 88]
+              - [{beats: 17}, {beats: 0.875}, G3, 88]
+              - [{beats: 18}, {beats: 1}, G3, 88]
+              - [{beats: 20}, {beats: 0.6875}, G3, 88]
+              - [{beats: 20.75}, {beats: 0.1875}, B3, 88]
+              - [{beats: 21}, {beats: 0.875}, D4, 88]
+              - [{beats: 22}, {beats: 1}, G4, 88]
+              - [{beats: 24}, {beats: 0.6875}, D3, 88]
+              - [{beats: 24.75}, {beats: 0.1875}, F#3, 88]
+              - [{beats: 25}, {beats: 0.875}, A3, 88]
+              - [{beats: 26}, {beats: 1}, D4, 88]
+              - [{beats: 28}, {beats: 0.6875}, E3, 88]
+              - [{beats: 28.75}, {beats: 0.1875}, G3, 88]
+              - [{beats: 29}, {beats: 0.875}, B3, 88]
+              - [{beats: 30}, {beats: 1}, E4, 88]
+          # recursive_crescendo | bars 63-70
+          - id: guitar_1_recursive_crescendo
+            at: {bar: 63, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 88]
+              - [{beats: 0.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 1}, {beats: 0.4375}, B3, 88]
+              - [{beats: 1.5}, {beats: 0.6875}, E4, 88]
+              - [{beats: 2.25}, {beats: 0.1875}, B3, 88]
+              - [{beats: 2.5}, {beats: 0.4375}, G3, 88]
+              - [{beats: 3}, {beats: 0.875}, E3, 88]
+              - [{beats: 4.75}, {beats: 0.1875}, D3, 92]
+              - [{beats: 5}, {beats: 0.4375}, F#3, 92]
+              - [{beats: 5.5}, {beats: 0.1875}, B3, 92]
+              - [{beats: 5.75}, {beats: 0.4375}, F#3, 92]
+              - [{beats: 6.25}, {beats: 0.6875}, D4, 92]
+              - [{beats: 7}, {beats: 0.1875}, B3, 92]
+              - [{beats: 7.25}, {beats: 0.6875}, F#4, 92]
+              - [{beats: 12.25}, {beats: 0.6875}, G3, 92]
+              - [{beats: 13}, {beats: 0.6875}, E4, 92]
+              - [{beats: 13.75}, {beats: 0.6875}, G3, 92]
+              - [{beats: 14.5}, {beats: 0.6875}, E3, 92]
+              - [{beats: 15.25}, {beats: 0.6875}, E3, 92]
+              - [{beats: 16}, {beats: 0.6875}, C4, 88]
+              - [{beats: 16.75}, {beats: 0.1875}, G4, 88]
+              - [{beats: 17}, {beats: 0.4375}, E4, 88]
+              - [{beats: 17.5}, {beats: 0.6875}, C5, 88]
+              - [{beats: 18.25}, {beats: 0.1875}, G4, 88]
+              - [{beats: 18.5}, {beats: 0.4375}, E4, 88]
+              - [{beats: 19}, {beats: 0.875}, C4, 88]
+              - [{beats: 20.5}, {beats: 0.6875}, B3, 92]
+              - [{beats: 21.25}, {beats: 0.6875}, G4, 92]
+              - [{beats: 22}, {beats: 0.875}, B3, 92]
+              - [{beats: 23}, {beats: 0.4375}, D4, 92]
+              - [{beats: 23.5}, {beats: 0.4375}, G4, 92]
+              - [{beats: 28.25}, {beats: 0.6875}, B3, 92]
+              - [{beats: 29}, {beats: 0.6875}, G4, 92]
+              - [{beats: 29.75}, {beats: 0.6875}, B3, 92]
+              - [{beats: 30.5}, {beats: 0.6875}, G3, 92]
+              - [{beats: 31.25}, {beats: 0.6875}, B3, 92]
+          # final_giant_solo | bars 71-76
+          - id: guitar_1_final_giant_solo
+            at: {bar: 71, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E3, 95]
+              - [{beats: 0.5}, {beats: 0.4375}, B3, 95]
+              - [{beats: 1}, {beats: 0.4375}, A3, 95]
+              - [{beats: 1.5}, {beats: 1}, G3, 95]
+              - [{beats: 3}, {beats: 0.4375}, D3, 95]
+              - [{beats: 3.5}, {beats: 0.4375}, B3, 95]
+              - [{beats: 4}, {beats: 0.875}, D4, 95]
+              - [{beats: 5}, {beats: 0.875}, D4, 95]
+              - [{beats: 6}, {beats: 0.4375}, B3, 95]
+              - [{beats: 6.5}, {beats: 0.4375}, A3, 95]
+              - [{beats: 7}, {beats: 0.4375}, E3, 95]
+              - [{beats: 7.5}, {beats: 0.4375}, G3, 95]
+              - [{beats: 8.5}, {beats: 1}, B3, 95]
+              - [{beats: 10}, {beats: 0.1875}, D4, 95]
+              - [{beats: 10.25}, {beats: 0.1875}, G4, 95]
+              - [{beats: 10.5}, {beats: 0.4375}, E4, 95]
+              - [{beats: 11}, {beats: 0.1875}, B3, 95]
+              - [{beats: 11.25}, {beats: 0.6875}, G3, 95]
+              - [{beats: 12}, {beats: 1}, E3, 95]
+              - [{beats: 16}, {beats: 0.4375}, E3, 95]
+              - [{beats: 16.5}, {beats: 0.4375}, G3, 95]
+              - [{beats: 17}, {beats: 0.875}, A3, 95]
+              - [{beats: 18}, {beats: 0.4375}, E3, 95]
+              - [{beats: 18.5}, {beats: 0.875}, D3, 95]
+              - [{beats: 19.5}, {beats: 0.4375}, E3, 95]
+              - [{beats: 20}, {beats: 0.4375}, B3, 95]
+              - [{beats: 20.5}, {beats: 0.4375}, E4, 95]
+              - [{beats: 21}, {beats: 0.4375}, D4, 95]
+              - [{beats: 21.5}, {beats: 0.875}, A3, 95]
+              - [{beats: 22.5}, {beats: 0.4375}, F#3, 95]
+              - [{beats: 23}, {beats: 0.875}, B3, 95]
+          # final_royal_impacts | bars 77-78
+          - id: guitar_1_final_royal_impacts
+            at: {bar: 77, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 1}, B3, 97]
+              - [{beats: 2}, {beats: 1}, B3, 97]
+              - [{beats: 4}, {beats: 0.875}, B3, 97]
+              - [{beats: 5}, {beats: 0.875}, B3, 97]
+              - [{beats: 6}, {beats: 0.875}, B3, 97]
+              - [{beats: 7}, {beats: 0.875}, B3, 97]
+          # loop_turnaround | bars 79-79
+          - id: guitar_1_loop_turnaround
+            at: {bar: 79, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.5}, B3, 96]
+              - [{beats: 0.75}, {beats: 0.5625}, F#4, 91]
+              - [{beats: 1.5}, {beats: 0.4375}, A4, 95]
+              - [{beats: 2.25}, {beats: 0.4375}, D#4, 99]
+              - [{beats: 3}, {beats: 0.875}, E4, 106]
+  # Guitar 2: Answering scholar / harmony guitar
+  - id: guitar_2_part
+    instrument: guitar_2
+    voices:
+      - id: answering_voice
+        clips:
+          # royal_approach | bars 1-1
+          - id: guitar_2_royal_approach
+            at: {bar: 1, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 1.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, B3, 78]
+          # royal_proclamation | bars 2-3
+          - id: guitar_2_royal_proclamation
+            at: {bar: 2, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 1.5}, {beats: 0.5}, G4, 78]
+              - [{beats: 2.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 3.25}, {beats: 0.625}, E4, 78]
+              - [{beats: 4.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 5.5}, {beats: 0.5}, G4, 78]
+              - [{beats: 6.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 7.25}, {beats: 0.625}, E4, 78]
+          # the_giant_takes_stage | bars 4-6
+          - id: guitar_2_the_giant_takes_stage
+            at: {bar: 4, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 1.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 4.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 5.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 8.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 9.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 10.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 11.5}, {beats: 0.375}, E4, 78]
+          # hands_of_gnu | bars 7-18
+          - id: guitar_2_hands_of_gnu
+            at: {bar: 7, beat: 1}
+            events:
+              - [{beats: 0.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 1.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 4.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 5.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 8.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 9.5}, {beats: 0.625}, F#4, 78]
+              - [{beats: 10.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 11.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 12.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 13.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 14.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 15.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 16.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 17.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 18.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 19.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 20.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 21.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 22.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 23.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 24.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 25.5}, {beats: 0.625}, F#3, 78]
+              - [{beats: 26.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 27.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 28.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 29.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 30.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 31.5}, {beats: 0.375}, G4, 78]
+              - [{beats: 32.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 33.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 34.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 35.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 36.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 37.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 38.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 39.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 40.5}, {beats: 0.625}, C4, 78]
+              - [{beats: 41.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 42.75}, {beats: 0.625}, C4, 81]
+              - [{beats: 43.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 44.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 45.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 46.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 47.5}, {beats: 0.375}, B3, 78]
+          # head_descends | bars 19-26
+          - id: guitar_2_head_descends
+            at: {bar: 19, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, C4, 78]
+              - [{beats: 1.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, C4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 4.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 5.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 8.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 9.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 10.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 11.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 12.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 13.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 14.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 15.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 16.75}, {beats: 0.625}, C4, 78]
+              - [{beats: 17.75}, {beats: 0.625}, G3, 78]
+              - [{beats: 18.75}, {beats: 0.625}, C4, 81]
+              - [{beats: 19.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 20.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 21.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 22.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 23.5}, {beats: 0.375}, G4, 78]
+              - [{beats: 24.75}, {beats: 0.625}, A3, 78]
+              - [{beats: 25.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 26.75}, {beats: 0.625}, A3, 81]
+              - [{beats: 27.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 28.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 29.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 30.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 31.5}, {beats: 0.375}, E4, 78]
+          # the_weight_of_knowledge | bars 27-38
+          - id: guitar_2_the_weight_of_knowledge
+            at: {bar: 27, beat: 1}
+            events:
+              - [{beats: 0.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 1.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 4.5}, {beats: 0.625}, A3, 78]
+              - [{beats: 5.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, F#4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 8.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 9.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 10.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 11.5}, {beats: 0.375}, B3, 78]
+              - [{beats: 12.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 13.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 14.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 15.5}, {beats: 0.375}, F#3, 78]
+              - [{beats: 16.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 17.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 18.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 19.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 20.5}, {beats: 0.625}, F#4, 78]
+              - [{beats: 21.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 22.75}, {beats: 0.625}, A3, 81]
+              - [{beats: 23.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 24.5}, {beats: 0.625}, C4, 78]
+              - [{beats: 25.5}, {beats: 0.625}, A3, 78]
+              - [{beats: 26.75}, {beats: 0.625}, C4, 81]
+              - [{beats: 27.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 28.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 29.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 30.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 31.5}, {beats: 0.375}, G4, 78]
+              - [{beats: 32.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 33.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 34.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 35.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 36.5}, {beats: 0.625}, B3, 78]
+              - [{beats: 37.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 38.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 39.5}, {beats: 0.375}, D4, 78]
+              - [{beats: 40.5}, {beats: 0.625}, D4, 78]
+              - [{beats: 41.5}, {beats: 0.625}, F#4, 78]
+              - [{beats: 42.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 43.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 44.5}, {beats: 0.625}, E4, 78]
+              - [{beats: 45.5}, {beats: 0.625}, G4, 78]
+              - [{beats: 46.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 47.5}, {beats: 0.375}, B3, 78]
+          # recursive_duel_scholar_i | bars 39-40
+          - id: guitar_2_recursive_duel_scholar_i
+            at: {bar: 39, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 1.5}, {beats: 0.5}, E4, 78]
+              - [{beats: 2.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 3.25}, {beats: 0.625}, E4, 78]
+              - [{beats: 4.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 5.5}, {beats: 0.5}, D4, 78]
+              - [{beats: 6.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 7.25}, {beats: 0.625}, D4, 78]
+          # recursive_duel_giant_i | bars 41-42
+          - id: guitar_2_recursive_duel_giant_i
+            at: {bar: 41, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 1.75}, {beats: 0.625}, F#4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 4.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 5.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, B3, 78]
+          # recursive_duel_scholar_ii | bars 43-44
+          - id: guitar_2_recursive_duel_scholar_ii
+            at: {bar: 43, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.5}, G3, 78]
+              - [{beats: 1.5}, {beats: 0.5}, C4, 78]
+              - [{beats: 2.25}, {beats: 0.5}, E4, 81]
+              - [{beats: 3.25}, {beats: 0.625}, C4, 78]
+              - [{beats: 4.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 5.5}, {beats: 0.5}, D4, 78]
+              - [{beats: 6.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 7.25}, {beats: 0.625}, D4, 78]
+          # recursive_duel_giant_ii | bars 45-46
+          - id: guitar_2_recursive_duel_giant_ii
+            at: {bar: 45, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 1.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 3.5}, {beats: 0.375}, F#3, 78]
+              - [{beats: 4.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 5.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, B3, 78]
+          # the_giant_answers | bars 47-54
+          - id: guitar_2_the_giant_answers
+            at: {bar: 47, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 1.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 3.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 4.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 5.75}, {beats: 0.625}, F#4, 78]
+              - [{beats: 6.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 7.5}, {beats: 0.375}, A3, 78]
+              - [{beats: 8.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 9.75}, {beats: 0.625}, C4, 78]
+              - [{beats: 10.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 11.5}, {beats: 0.375}, C4, 78]
+              - [{beats: 12.75}, {beats: 0.625}, G4, 78]
+              - [{beats: 13.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 14.75}, {beats: 0.625}, G4, 81]
+              - [{beats: 15.5}, {beats: 0.375}, E4, 78]
+              - [{beats: 16.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 17.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 18.75}, {beats: 0.625}, E4, 81]
+              - [{beats: 19.5}, {beats: 0.375}, G4, 78]
+              - [{beats: 20.75}, {beats: 0.625}, D4, 78]
+              - [{beats: 21.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 22.75}, {beats: 0.625}, D4, 81]
+              - [{beats: 23.5}, {beats: 0.375}, G4, 78]
+              - [{beats: 24.75}, {beats: 0.625}, A3, 78]
+              - [{beats: 25.75}, {beats: 0.625}, C4, 78]
+              - [{beats: 26.75}, {beats: 0.625}, A3, 81]
+              - [{beats: 27.5}, {beats: 0.375}, C4, 78]
+              - [{beats: 28.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 29.75}, {beats: 0.625}, E4, 78]
+              - [{beats: 30.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 31.5}, {beats: 0.375}, E4, 78]
+          # scholar_ascendant | bars 55-62
+          - id: guitar_2_scholar_ascendant
+            at: {bar: 55, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 1.5}, {beats: 0.5}, E4, 78]
+              - [{beats: 2.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 3.25}, {beats: 0.625}, E4, 78]
+              - [{beats: 4.75}, {beats: 0.5}, B3, 78]
+              - [{beats: 5.5}, {beats: 0.5}, D4, 78]
+              - [{beats: 6.25}, {beats: 0.5}, G4, 81]
+              - [{beats: 7.25}, {beats: 0.625}, D4, 78]
+              - [{beats: 8.75}, {beats: 0.5}, D4, 78]
+              - [{beats: 9.5}, {beats: 0.5}, F#4, 78]
+              - [{beats: 10.25}, {beats: 0.5}, D4, 81]
+              - [{beats: 11.25}, {beats: 0.625}, A3, 78]
+              - [{beats: 12.75}, {beats: 0.5}, E4, 78]
+              - [{beats: 13.5}, {beats: 0.5}, G4, 78]
+              - [{beats: 14.25}, {beats: 0.5}, E4, 81]
+              - [{beats: 15.25}, {beats: 0.625}, B3, 78]
+              - [{beats: 16.75}, {beats: 0.5}, C4, 78]
+              - [{beats: 17.5}, {beats: 0.5}, C4, 78]
+              - [{beats: 18.25}, {beats: 0.5}, G3, 81]
+              - [{beats: 19.25}, {beats: 0.625}, C4, 78]
+              - [{beats: 20.75}, {beats: 0.5}, G4, 78]
+              - [{beats: 21.5}, {beats: 0.5}, D4, 78]
+              - [{beats: 22.25}, {beats: 0.5}, B3, 81]
+              - [{beats: 23.25}, {beats: 0.625}, D4, 78]
+              - [{beats: 24.75}, {beats: 0.5}, D4, 78]
+              - [{beats: 25.5}, {beats: 0.5}, A3, 78]
+              - [{beats: 26.25}, {beats: 0.5}, D4, 81]
+              - [{beats: 27.25}, {beats: 0.625}, F#4, 78]
+              - [{beats: 28.75}, {beats: 0.5}, E4, 78]
+              - [{beats: 29.5}, {beats: 0.5}, B3, 78]
+              - [{beats: 30.25}, {beats: 0.5}, E4, 81]
+              - [{beats: 31.25}, {beats: 0.625}, G4, 78]
+          # recursive_crescendo | bars 63-70
+          - id: guitar_2_recursive_crescendo
+            at: {bar: 63, beat: 1}
+            events:
+              - [{beats: 0.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 1}, {beats: 0.375}, E4, 82]
+              - [{beats: 1.5}, {beats: 0.375}, G4, 85]
+              - [{beats: 2.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 3.5}, {beats: 0.375}, G4, 82]
+              - [{beats: 4.5}, {beats: 0.375}, F#3, 82]
+              - [{beats: 5}, {beats: 0.375}, B3, 82]
+              - [{beats: 5.5}, {beats: 0.375}, D4, 85]
+              - [{beats: 6.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 7.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 8.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 9}, {beats: 0.375}, G4, 82]
+              - [{beats: 9.5}, {beats: 0.375}, D4, 85]
+              - [{beats: 10.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 11.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 12.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 13}, {beats: 0.375}, G4, 82]
+              - [{beats: 13.5}, {beats: 0.375}, E4, 85]
+              - [{beats: 14.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 15.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 16.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 17}, {beats: 0.375}, C4, 82]
+              - [{beats: 17.5}, {beats: 0.375}, G3, 85]
+              - [{beats: 18.5}, {beats: 0.375}, C4, 82]
+              - [{beats: 19.5}, {beats: 0.375}, G3, 82]
+              - [{beats: 20.5}, {beats: 0.375}, G4, 82]
+              - [{beats: 21}, {beats: 0.375}, D4, 82]
+              - [{beats: 21.5}, {beats: 0.375}, B3, 85]
+              - [{beats: 22.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 23.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 24.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 25}, {beats: 0.375}, A3, 82]
+              - [{beats: 25.5}, {beats: 0.375}, D4, 85]
+              - [{beats: 26.5}, {beats: 0.375}, F#4, 82]
+              - [{beats: 27.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 28.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 29}, {beats: 0.375}, B3, 82]
+              - [{beats: 29.5}, {beats: 0.375}, E4, 85]
+              - [{beats: 30.5}, {beats: 0.375}, G4, 82]
+              - [{beats: 31.5}, {beats: 0.375}, E4, 82]
+          # final_giant_solo | bars 71-76
+          - id: guitar_2_final_giant_solo
+            at: {bar: 71, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.6875}, G4, 78]
+              - [{beats: 2.75}, {beats: 0.6875}, E4, 78]
+              - [{beats: 3.5}, {beats: 0.6875}, E4, 81]
+              - [{beats: 4.75}, {beats: 0.6875}, G4, 78]
+              - [{beats: 6.75}, {beats: 0.6875}, D4, 78]
+              - [{beats: 7.5}, {beats: 0.6875}, B3, 81]
+              - [{beats: 8.75}, {beats: 0.6875}, D4, 78]
+              - [{beats: 10.75}, {beats: 0.6875}, F#4, 78]
+              - [{beats: 11.5}, {beats: 0.6875}, D4, 81]
+              - [{beats: 12.75}, {beats: 0.6875}, E4, 78]
+              - [{beats: 14.75}, {beats: 0.6875}, G4, 78]
+              - [{beats: 15.5}, {beats: 0.6875}, E4, 81]
+              - [{beats: 16.75}, {beats: 0.6875}, G3, 78]
+              - [{beats: 18.75}, {beats: 0.6875}, C4, 78]
+              - [{beats: 19.5}, {beats: 0.6875}, E4, 81]
+              - [{beats: 20.75}, {beats: 0.6875}, B3, 78]
+              - [{beats: 22.75}, {beats: 0.6875}, D4, 78]
+              - [{beats: 23.5}, {beats: 0.6875}, G4, 81]
+          # final_royal_impacts | bars 77-78
+          - id: guitar_2_final_royal_impacts
+            at: {bar: 77, beat: 1}
+            events:
+              - [{beats: 0.5}, {beats: 0.375}, F#3, 82]
+              - [{beats: 1}, {beats: 0.375}, B3, 82]
+              - [{beats: 1.5}, {beats: 0.375}, D4, 85]
+              - [{beats: 2.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 3.5}, {beats: 0.375}, D4, 82]
+              - [{beats: 4.5}, {beats: 0.375}, B3, 82]
+              - [{beats: 5}, {beats: 0.375}, E4, 82]
+              - [{beats: 5.5}, {beats: 0.375}, G4, 85]
+              - [{beats: 6.5}, {beats: 0.375}, E4, 82]
+              - [{beats: 7.5}, {beats: 0.375}, G4, 82]
+          # loop_turnaround | bars 79-79
+          - id: guitar_2_loop_turnaround
+            at: {bar: 79, beat: 1}
+            events:
+              - [{beats: 0.75}, {beats: 0.625}, B3, 78]
+              - [{beats: 1.75}, {beats: 0.625}, D#4, 78]
+              - [{beats: 2.75}, {beats: 0.625}, B3, 81]
+              - [{beats: 3.5}, {beats: 0.375}, A3, 78]
+  # Guitar 3: Chords and weight of the giant
+  - id: guitar_3_part
+    instrument: guitar_3
+    voices:
+      - id: riff_and_chords
+        clips:
+          # royal_approach | bars 1-1
+          - id: guitar_3_royal_approach
+            at: {bar: 1, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.8125}, [E2, B2, E3], 94]
+              - [{beats: 2.5}, {beats: 0.5}, [E2, B2, E3], 91]
+          # royal_proclamation | bars 2-3
+          - id: guitar_3_royal_proclamation
+            at: {bar: 2, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, E2, 81]
+              - [{beats: 1}, {beats: 0.75}, B2, 75]
+              - [{beats: 2}, {beats: 0.75}, E3, 81]
+              - [{beats: 3}, {beats: 0.75}, B2, 75]
+              - [{beats: 4}, {beats: 0.75}, B2, 81]
+              - [{beats: 5}, {beats: 0.75}, E3, 75]
+              - [{beats: 6}, {beats: 0.75}, B2, 81]
+              - [{beats: 7}, {beats: 0.75}, E2, 75]
+          # the_giant_takes_stage | bars 4-6
+          - id: guitar_3_the_giant_takes_stage
+            at: {bar: 4, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.6875}, [E2, B2, E3], 101]
+              - [{beats: 0.75}, {beats: 0.25}, E2, 75]
+              - [{beats: 1.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 2}, {beats: 0.6875}, [E2, B2, E3], 99]
+              - [{beats: 3.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 4}, {beats: 0.6875}, [E2, B2, E3], 101]
+              - [{beats: 4.75}, {beats: 0.25}, E2, 75]
+              - [{beats: 5.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 6}, {beats: 0.6875}, [E2, B2, E3], 99]
+              - [{beats: 7.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 8}, {beats: 0.6875}, [E2, B2, E3], 101]
+              - [{beats: 8.75}, {beats: 0.25}, E2, 75]
+              - [{beats: 9.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 10}, {beats: 0.6875}, [E2, B2, E3], 99]
+              - [{beats: 11.5}, {beats: 0.3125}, E2, 82]
+          # hands_of_gnu | bars 7-18
+          - id: guitar_3_hands_of_gnu
+            at: {bar: 7, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 1.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 2}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 3.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 4}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 5.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 6}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 7.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 8}, {beats: 0.75}, [D3, A3, D4], 93]
+              - [{beats: 9.5}, {beats: 0.3125}, A3, 78]
+              - [{beats: 10}, {beats: 0.6875}, [D3, A3, D4], 94]
+              - [{beats: 11.5}, {beats: 0.3125}, A3, 82]
+              - [{beats: 12}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 13.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 14}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 15.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 16}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 17.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 18}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 19.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 20}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 21.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 22}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 23.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 24}, {beats: 0.75}, [B2, F#3, B3], 93]
+              - [{beats: 25.5}, {beats: 0.3125}, F#3, 78]
+              - [{beats: 26}, {beats: 0.6875}, [B2, F#3, B3], 94]
+              - [{beats: 27.5}, {beats: 0.3125}, F#3, 82]
+              - [{beats: 28}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 29.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 30}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 31.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 32}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 33.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 34}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 35.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 36}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 37.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 38}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 39.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 40}, {beats: 0.75}, [A2, E3, A3], 93]
+              - [{beats: 41.5}, {beats: 0.3125}, E3, 78]
+              - [{beats: 42}, {beats: 0.6875}, [A2, E3, A3], 94]
+              - [{beats: 43.5}, {beats: 0.3125}, E3, 82]
+              - [{beats: 44}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 45.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 46}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 47.5}, {beats: 0.3125}, B2, 82]
+          # head_descends | bars 19-26
+          - id: guitar_3_head_descends
+            at: {bar: 19, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, [A2, E3, A3], 96]
+              - [{beats: 1.75}, {beats: 0.5}, [A2, E3, A3], 88]
+              - [{beats: 3.5}, {beats: 0.25}, A2, 84]
+              - [{beats: 4}, {beats: 0.75}, [G2, D3, G3], 96]
+              - [{beats: 5.75}, {beats: 0.5}, [G2, D3, G3], 88]
+              - [{beats: 7.5}, {beats: 0.25}, G2, 84]
+              - [{beats: 8}, {beats: 0.75}, [E2, B2, E3], 96]
+              - [{beats: 9.75}, {beats: 0.5}, [E2, B2, E3], 88]
+              - [{beats: 11.5}, {beats: 0.25}, E2, 84]
+              - [{beats: 12}, {beats: 0.75}, [B2, F#3, B3], 96]
+              - [{beats: 13.75}, {beats: 0.5}, [B2, F#3, B3], 88]
+              - [{beats: 15.5}, {beats: 0.25}, B2, 84]
+              - [{beats: 16}, {beats: 0.75}, [C3, G3, C4], 96]
+              - [{beats: 17.75}, {beats: 0.5}, [C3, G3, C4], 88]
+              - [{beats: 19.5}, {beats: 0.25}, C3, 84]
+              - [{beats: 20}, {beats: 0.75}, [G2, D3, G3], 96]
+              - [{beats: 21.75}, {beats: 0.5}, [G2, D3, G3], 88]
+              - [{beats: 23.5}, {beats: 0.25}, G2, 84]
+              - [{beats: 24}, {beats: 0.75}, [D3, A3, D4], 96]
+              - [{beats: 25.75}, {beats: 0.5}, [D3, A3, D4], 88]
+              - [{beats: 27.5}, {beats: 0.25}, D3, 84]
+              - [{beats: 28}, {beats: 0.75}, [E2, B2, E3], 96]
+              - [{beats: 29.75}, {beats: 0.5}, [E2, B2, E3], 88]
+              - [{beats: 31.5}, {beats: 0.25}, E2, 84]
+          # the_weight_of_knowledge | bars 27-38
+          - id: guitar_3_the_weight_of_knowledge
+            at: {bar: 27, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 1.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 2}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 3.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 4}, {beats: 0.75}, [D3, A3, D4], 93]
+              - [{beats: 5.5}, {beats: 0.3125}, A3, 78]
+              - [{beats: 6}, {beats: 0.6875}, [D3, A3, D4], 94]
+              - [{beats: 7.5}, {beats: 0.3125}, A3, 82]
+              - [{beats: 8}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 9.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 10}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 11.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 12}, {beats: 0.75}, [B2, F#3, B3], 93]
+              - [{beats: 13.5}, {beats: 0.3125}, F#3, 78]
+              - [{beats: 14}, {beats: 0.6875}, [B2, F#3, B3], 94]
+              - [{beats: 15.5}, {beats: 0.3125}, F#3, 82]
+              - [{beats: 16}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 17.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 18}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 19.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 20}, {beats: 0.75}, [D3, A3, D4], 93]
+              - [{beats: 21.5}, {beats: 0.3125}, A3, 78]
+              - [{beats: 22}, {beats: 0.6875}, [D3, A3, D4], 94]
+              - [{beats: 23.5}, {beats: 0.3125}, A3, 82]
+              - [{beats: 24}, {beats: 0.75}, [A2, E3, A3], 93]
+              - [{beats: 25.5}, {beats: 0.3125}, E3, 78]
+              - [{beats: 26}, {beats: 0.6875}, [A2, E3, A3], 94]
+              - [{beats: 27.5}, {beats: 0.3125}, E3, 82]
+              - [{beats: 28}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 29.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 30}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 31.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 32}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 33.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 34}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 35.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 36}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 37.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 38}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 39.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 40}, {beats: 0.75}, [D3, A3, D4], 93]
+              - [{beats: 41.5}, {beats: 0.3125}, A3, 78]
+              - [{beats: 42}, {beats: 0.6875}, [D3, A3, D4], 94]
+              - [{beats: 43.5}, {beats: 0.3125}, A3, 82]
+              - [{beats: 44}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 45.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 46}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 47.5}, {beats: 0.3125}, B2, 82]
+          # recursive_duel_scholar_i | bars 39-40
+          - id: guitar_3_recursive_duel_scholar_i
+            at: {bar: 39, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, B2, 81]
+              - [{beats: 1}, {beats: 0.75}, E3, 75]
+              - [{beats: 2}, {beats: 0.75}, B2, 81]
+              - [{beats: 3}, {beats: 0.75}, E2, 75]
+              - [{beats: 4}, {beats: 0.75}, G2, 81]
+              - [{beats: 5}, {beats: 0.75}, D3, 75]
+              - [{beats: 6}, {beats: 0.75}, G3, 81]
+              - [{beats: 7}, {beats: 0.75}, D3, 75]
+          # recursive_duel_giant_i | bars 41-42
+          - id: guitar_3_recursive_duel_giant_i
+            at: {bar: 41, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.6875}, [D3, A3, D4], 101]
+              - [{beats: 0.75}, {beats: 0.25}, D3, 75]
+              - [{beats: 1.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 2}, {beats: 0.6875}, [D3, A3, D4], 99]
+              - [{beats: 3.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 4}, {beats: 0.6875}, [E2, B2, E3], 101]
+              - [{beats: 4.75}, {beats: 0.25}, E2, 75]
+              - [{beats: 5.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 6}, {beats: 0.6875}, [E2, B2, E3], 99]
+              - [{beats: 7.5}, {beats: 0.3125}, E2, 82]
+          # recursive_duel_scholar_ii | bars 43-44
+          - id: guitar_3_recursive_duel_scholar_ii
+            at: {bar: 43, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, G3, 81]
+              - [{beats: 1}, {beats: 0.75}, C4, 75]
+              - [{beats: 2}, {beats: 0.75}, G3, 81]
+              - [{beats: 3}, {beats: 0.75}, C3, 75]
+              - [{beats: 4}, {beats: 0.75}, G2, 81]
+              - [{beats: 5}, {beats: 0.75}, D3, 75]
+              - [{beats: 6}, {beats: 0.75}, G3, 81]
+              - [{beats: 7}, {beats: 0.75}, D3, 75]
+          # recursive_duel_giant_ii | bars 45-46
+          - id: guitar_3_recursive_duel_giant_ii
+            at: {bar: 45, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.6875}, [B2, F#3, B3], 101]
+              - [{beats: 0.75}, {beats: 0.25}, B2, 75]
+              - [{beats: 1.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 2}, {beats: 0.6875}, [B2, F#3, B3], 99]
+              - [{beats: 3.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 4}, {beats: 0.6875}, [E2, B2, E3], 101]
+              - [{beats: 4.75}, {beats: 0.25}, E2, 75]
+              - [{beats: 5.5}, {beats: 0.3125}, E2, 82]
+              - [{beats: 6}, {beats: 0.6875}, [E2, B2, E3], 99]
+              - [{beats: 7.5}, {beats: 0.3125}, E2, 82]
+          # the_giant_answers | bars 47-54
+          - id: guitar_3_the_giant_answers
+            at: {bar: 47, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 1.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 2}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 3.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 4}, {beats: 0.75}, [D3, A3, D4], 93]
+              - [{beats: 5.5}, {beats: 0.3125}, A3, 78]
+              - [{beats: 6}, {beats: 0.6875}, [D3, A3, D4], 94]
+              - [{beats: 7.5}, {beats: 0.3125}, A3, 82]
+              - [{beats: 8}, {beats: 0.75}, [C3, G3, C4], 93]
+              - [{beats: 9.5}, {beats: 0.3125}, G3, 78]
+              - [{beats: 10}, {beats: 0.6875}, [C3, G3, C4], 94]
+              - [{beats: 11.5}, {beats: 0.3125}, G3, 82]
+              - [{beats: 12}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 13.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 14}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 15.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 16}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 17.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 18}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 19.5}, {beats: 0.3125}, B2, 82]
+              - [{beats: 20}, {beats: 0.75}, [G2, D3, G3], 93]
+              - [{beats: 21.5}, {beats: 0.3125}, D3, 78]
+              - [{beats: 22}, {beats: 0.6875}, [G2, D3, G3], 94]
+              - [{beats: 23.5}, {beats: 0.3125}, D3, 82]
+              - [{beats: 24}, {beats: 0.75}, [A2, E3, A3], 93]
+              - [{beats: 25.5}, {beats: 0.3125}, E3, 78]
+              - [{beats: 26}, {beats: 0.6875}, [A2, E3, A3], 94]
+              - [{beats: 27.5}, {beats: 0.3125}, E3, 82]
+              - [{beats: 28}, {beats: 0.75}, [E2, B2, E3], 93]
+              - [{beats: 29.5}, {beats: 0.3125}, B2, 78]
+              - [{beats: 30}, {beats: 0.6875}, [E2, B2, E3], 94]
+              - [{beats: 31.5}, {beats: 0.3125}, B2, 82]
+          # scholar_ascendant | bars 55-62
+          - id: guitar_3_scholar_ascendant
+            at: {bar: 55, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, B2, 81]
+              - [{beats: 1}, {beats: 0.75}, E3, 75]
+              - [{beats: 2}, {beats: 0.75}, B2, 81]
+              - [{beats: 3}, {beats: 0.75}, E2, 75]
+              - [{beats: 4}, {beats: 0.75}, G2, 81]
+              - [{beats: 5}, {beats: 0.75}, D3, 75]
+              - [{beats: 6}, {beats: 0.75}, G3, 81]
+              - [{beats: 7}, {beats: 0.75}, D3, 75]
+              - [{beats: 8}, {beats: 0.75}, A3, 81]
+              - [{beats: 9}, {beats: 0.75}, D4, 75]
+              - [{beats: 10}, {beats: 0.75}, A3, 81]
+              - [{beats: 11}, {beats: 0.75}, D3, 75]
+              - [{beats: 12}, {beats: 0.75}, E2, 81]
+              - [{beats: 13}, {beats: 0.75}, B2, 75]
+              - [{beats: 14}, {beats: 0.75}, E3, 81]
+              - [{beats: 15}, {beats: 0.75}, B2, 75]
+              - [{beats: 16}, {beats: 0.75}, G3, 81]
+              - [{beats: 17}, {beats: 0.75}, C4, 75]
+              - [{beats: 18}, {beats: 0.75}, G3, 81]
+              - [{beats: 19}, {beats: 0.75}, C3, 75]
+              - [{beats: 20}, {beats: 0.75}, G2, 81]
+              - [{beats: 21}, {beats: 0.75}, D3, 75]
+              - [{beats: 22}, {beats: 0.75}, G3, 81]
+              - [{beats: 23}, {beats: 0.75}, D3, 75]
+              - [{beats: 24}, {beats: 0.75}, A3, 81]
+              - [{beats: 25}, {beats: 0.75}, D4, 75]
+              - [{beats: 26}, {beats: 0.75}, A3, 81]
+              - [{beats: 27}, {beats: 0.75}, D3, 75]
+              - [{beats: 28}, {beats: 0.75}, E2, 81]
+              - [{beats: 29}, {beats: 0.75}, B2, 75]
+              - [{beats: 30}, {beats: 0.75}, E3, 81]
+              - [{beats: 31}, {beats: 0.75}, B2, 75]
+          # recursive_crescendo | bars 63-70
+          - id: guitar_3_recursive_crescendo
+            at: {bar: 63, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.5625}, [E2, B2, E3], 98]
+              - [{beats: 1}, {beats: 0.4375}, [E2, B2, E3], 87]
+              - [{beats: 2}, {beats: 0.625}, [E2, B2, E3], 102]
+              - [{beats: 3.25}, {beats: 0.5625}, [E2, B2, E3], 96]
+              - [{beats: 4}, {beats: 0.5625}, [B2, F#3, B3], 98]
+              - [{beats: 5}, {beats: 0.4375}, [B2, F#3, B3], 87]
+              - [{beats: 6}, {beats: 0.625}, [B2, F#3, B3], 102]
+              - [{beats: 7.25}, {beats: 0.5625}, [B2, F#3, B3], 96]
+              - [{beats: 8}, {beats: 0.5625}, [G2, D3, G3], 98]
+              - [{beats: 9}, {beats: 0.4375}, [G2, D3, G3], 87]
+              - [{beats: 10}, {beats: 0.625}, [G2, D3, G3], 102]
+              - [{beats: 11.25}, {beats: 0.5625}, [G2, D3, G3], 96]
+              - [{beats: 12}, {beats: 0.5625}, [E2, B2, E3], 98]
+              - [{beats: 13}, {beats: 0.4375}, [E2, B2, E3], 87]
+              - [{beats: 14}, {beats: 0.625}, [E2, B2, E3], 102]
+              - [{beats: 15.25}, {beats: 0.5625}, [E2, B2, E3], 96]
+              - [{beats: 16}, {beats: 0.5625}, [C3, G3, C4], 98]
+              - [{beats: 17}, {beats: 0.4375}, [C3, G3, C4], 87]
+              - [{beats: 18}, {beats: 0.625}, [C3, G3, C4], 102]
+              - [{beats: 19.25}, {beats: 0.5625}, [C3, G3, C4], 96]
+              - [{beats: 20}, {beats: 0.5625}, [G2, D3, G3], 98]
+              - [{beats: 21}, {beats: 0.4375}, [G2, D3, G3], 87]
+              - [{beats: 22}, {beats: 0.625}, [G2, D3, G3], 102]
+              - [{beats: 23.25}, {beats: 0.5625}, [G2, D3, G3], 96]
+              - [{beats: 24}, {beats: 0.5625}, [D3, A3, D4], 98]
+              - [{beats: 25}, {beats: 0.4375}, [D3, A3, D4], 87]
+              - [{beats: 26}, {beats: 0.625}, [D3, A3, D4], 102]
+              - [{beats: 27.25}, {beats: 0.5625}, [D3, A3, D4], 96]
+              - [{beats: 28}, {beats: 0.5625}, [E2, B2, E3], 98]
+              - [{beats: 29}, {beats: 0.4375}, [E2, B2, E3], 87]
+              - [{beats: 30}, {beats: 0.625}, [E2, B2, E3], 102]
+              - [{beats: 31.25}, {beats: 0.5625}, [E2, B2, E3], 96]
+          # final_giant_solo | bars 71-76
+          - id: guitar_3_final_giant_solo
+            at: {bar: 71, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.75}, [E2, B2, E3], 92]
+              - [{beats: 1.5}, {beats: 0.3125}, E2, 75]
+              - [{beats: 2}, {beats: 0.6875}, [E2, B2, E3], 89]
+              - [{beats: 4}, {beats: 0.75}, [G2, D3, G3], 92]
+              - [{beats: 5.5}, {beats: 0.3125}, G2, 75]
+              - [{beats: 6}, {beats: 0.6875}, [G2, D3, G3], 89]
+              - [{beats: 8}, {beats: 0.75}, [D3, A3, D4], 92]
+              - [{beats: 9.5}, {beats: 0.3125}, D3, 75]
+              - [{beats: 10}, {beats: 0.6875}, [D3, A3, D4], 89]
+              - [{beats: 12}, {beats: 0.75}, [E2, B2, E3], 92]
+              - [{beats: 13.5}, {beats: 0.3125}, E2, 75]
+              - [{beats: 14}, {beats: 0.6875}, [E2, B2, E3], 89]
+              - [{beats: 16}, {beats: 0.75}, [C3, G3, C4], 92]
+              - [{beats: 17.5}, {beats: 0.3125}, C3, 75]
+              - [{beats: 18}, {beats: 0.6875}, [C3, G3, C4], 89]
+              - [{beats: 20}, {beats: 0.75}, [G2, D3, G3], 92]
+              - [{beats: 21.5}, {beats: 0.3125}, G2, 75]
+              - [{beats: 22}, {beats: 0.6875}, [G2, D3, G3], 89]
+          # final_royal_impacts | bars 77-78
+          - id: guitar_3_final_royal_impacts
+            at: {bar: 77, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.8125}, [B2, F#3, B3], 94]
+              - [{beats: 2.5}, {beats: 0.5}, [B2, F#3, B3], 91]
+              - [{beats: 4}, {beats: 0.8125}, [E2, B2, E3], 94]
+              - [{beats: 6.5}, {beats: 0.5}, [E2, B2, E3], 91]
+          # loop_turnaround | bars 79-79
+          - id: guitar_3_loop_turnaround
+            at: {bar: 79, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.5}, [B2, F#3, A3, D#4], 95]
+              - [{beats: 1.5}, {beats: 0.5}, [B2, F#3, A3, D#4], 97]
+              - [{beats: 2.5}, {beats: 0.5}, [B2, F#3, A3, D#4], 100]
+              - [{beats: 3.5}, {beats: 0.5}, [E2, B2, E3], 104]
+  # Guitar 4: Driving bass - six-string acoustic
+  - id: guitar_4_part
+    instrument: guitar_4
+    voices:
+      - id: six_string_bass
+        clips:
+          # royal_approach | bars 1-1
+          - id: guitar_4_royal_approach
+            at: {bar: 1, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 1}, {beats: 0.4375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 2}, {beats: 0.4375}, E3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 3}, {beats: 0.4375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, B2, 73]
+          # royal_proclamation | bars 2-3
+          - id: guitar_4_royal_proclamation
+            at: {bar: 2, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E2, 84]
+              - [{beats: 1}, {beats: 0.4375}, E2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 2}, {beats: 0.4375}, E2, 84]
+              - [{beats: 3}, {beats: 0.4375}, B2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, E3, 73]
+              - [{beats: 4}, {beats: 0.4375}, E2, 84]
+              - [{beats: 5}, {beats: 0.4375}, E2, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 6}, {beats: 0.4375}, E2, 84]
+              - [{beats: 7}, {beats: 0.4375}, B2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, E3, 73]
+          # the_giant_takes_stage | bars 4-6
+          - id: guitar_4_the_giant_takes_stage
+            at: {bar: 4, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 2}, {beats: 0.375}, E3, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, E2, 84]
+              - [{beats: 4.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 5}, {beats: 0.375}, B2, 84]
+              - [{beats: 5.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 6}, {beats: 0.375}, E3, 84]
+              - [{beats: 6.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 7}, {beats: 0.375}, E2, 84]
+              - [{beats: 7.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 8}, {beats: 0.375}, E2, 84]
+              - [{beats: 8.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 9}, {beats: 0.375}, B2, 84]
+              - [{beats: 9.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 10}, {beats: 0.375}, E3, 84]
+              - [{beats: 10.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 11}, {beats: 0.375}, E2, 84]
+              - [{beats: 11.5}, {beats: 0.375}, B2, 73]
+          # hands_of_gnu | bars 7-18
+          - id: guitar_4_hands_of_gnu
+            at: {bar: 7, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 2}, {beats: 0.375}, E3, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 5}, {beats: 0.375}, D3, 84]
+              - [{beats: 5.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 6}, {beats: 0.375}, G3, 84]
+              - [{beats: 6.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 7}, {beats: 0.375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 8}, {beats: 0.375}, D3, 84]
+              - [{beats: 8.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 9}, {beats: 0.375}, A2, 84]
+              - [{beats: 9.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 10}, {beats: 0.375}, D3, 84]
+              - [{beats: 10.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 11}, {beats: 0.375}, D3, 84]
+              - [{beats: 11.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 12}, {beats: 0.375}, E2, 84]
+              - [{beats: 12.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 13}, {beats: 0.375}, B2, 84]
+              - [{beats: 13.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 14}, {beats: 0.375}, E3, 84]
+              - [{beats: 14.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 15}, {beats: 0.375}, E2, 84]
+              - [{beats: 15.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 16}, {beats: 0.375}, E2, 84]
+              - [{beats: 16.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 17}, {beats: 0.375}, B2, 84]
+              - [{beats: 17.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 18}, {beats: 0.375}, E3, 84]
+              - [{beats: 18.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 19}, {beats: 0.375}, E2, 84]
+              - [{beats: 19.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 20}, {beats: 0.375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 21}, {beats: 0.375}, D3, 84]
+              - [{beats: 21.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 22}, {beats: 0.375}, G3, 84]
+              - [{beats: 22.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 23}, {beats: 0.375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 24}, {beats: 0.375}, B2, 84]
+              - [{beats: 24.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 25}, {beats: 0.375}, F#3, 84]
+              - [{beats: 25.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 26}, {beats: 0.375}, B3, 84]
+              - [{beats: 26.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 27}, {beats: 0.375}, B2, 84]
+              - [{beats: 27.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 28}, {beats: 0.375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 29}, {beats: 0.375}, B2, 84]
+              - [{beats: 29.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 30}, {beats: 0.375}, E3, 84]
+              - [{beats: 30.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 31}, {beats: 0.375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 32}, {beats: 0.375}, E2, 84]
+              - [{beats: 32.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 33}, {beats: 0.375}, B2, 84]
+              - [{beats: 33.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 34}, {beats: 0.375}, E3, 84]
+              - [{beats: 34.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 35}, {beats: 0.375}, E2, 84]
+              - [{beats: 35.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 36}, {beats: 0.375}, G2, 84]
+              - [{beats: 36.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 37}, {beats: 0.375}, D3, 84]
+              - [{beats: 37.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 38}, {beats: 0.375}, G3, 84]
+              - [{beats: 38.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 39}, {beats: 0.375}, G2, 84]
+              - [{beats: 39.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 40}, {beats: 0.375}, A2, 84]
+              - [{beats: 40.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 41}, {beats: 0.375}, E3, 84]
+              - [{beats: 41.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 42}, {beats: 0.375}, A3, 84]
+              - [{beats: 42.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 43}, {beats: 0.375}, A2, 84]
+              - [{beats: 43.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 44}, {beats: 0.375}, E2, 84]
+              - [{beats: 44.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 45}, {beats: 0.375}, B2, 84]
+              - [{beats: 45.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 46}, {beats: 0.375}, E3, 84]
+              - [{beats: 46.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 47}, {beats: 0.375}, E2, 84]
+              - [{beats: 47.5}, {beats: 0.375}, B2, 73]
+          # head_descends | bars 19-26
+          - id: guitar_4_head_descends
+            at: {bar: 19, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, A2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, A2, 73]
+              - [{beats: 1}, {beats: 0.4375}, E3, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, A2, 73]
+              - [{beats: 2}, {beats: 0.4375}, A3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, E3, 73]
+              - [{beats: 3}, {beats: 0.4375}, A2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, E3, 73]
+              - [{beats: 4}, {beats: 0.4375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 5}, {beats: 0.4375}, D3, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 6}, {beats: 0.4375}, G3, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 7}, {beats: 0.4375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 8}, {beats: 0.4375}, E2, 84]
+              - [{beats: 8.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 9}, {beats: 0.4375}, B2, 84]
+              - [{beats: 9.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 10}, {beats: 0.4375}, E3, 84]
+              - [{beats: 10.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 11}, {beats: 0.4375}, E2, 84]
+              - [{beats: 11.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 12}, {beats: 0.4375}, B2, 84]
+              - [{beats: 12.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 13}, {beats: 0.4375}, F#3, 84]
+              - [{beats: 13.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 14}, {beats: 0.4375}, B3, 84]
+              - [{beats: 14.5}, {beats: 0.4375}, F#3, 73]
+              - [{beats: 15}, {beats: 0.4375}, B2, 84]
+              - [{beats: 15.5}, {beats: 0.4375}, F#3, 73]
+              - [{beats: 16}, {beats: 0.4375}, C3, 84]
+              - [{beats: 16.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 17}, {beats: 0.4375}, G3, 84]
+              - [{beats: 17.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 18}, {beats: 0.4375}, C3, 84]
+              - [{beats: 18.5}, {beats: 0.4375}, G3, 73]
+              - [{beats: 19}, {beats: 0.4375}, C3, 84]
+              - [{beats: 19.5}, {beats: 0.4375}, G3, 73]
+              - [{beats: 20}, {beats: 0.4375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 21}, {beats: 0.4375}, D3, 84]
+              - [{beats: 21.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 22}, {beats: 0.4375}, G3, 84]
+              - [{beats: 22.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 23}, {beats: 0.4375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 24}, {beats: 0.4375}, D3, 84]
+              - [{beats: 24.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 25}, {beats: 0.4375}, A2, 84]
+              - [{beats: 25.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 26}, {beats: 0.4375}, D3, 84]
+              - [{beats: 26.5}, {beats: 0.4375}, A2, 73]
+              - [{beats: 27}, {beats: 0.4375}, D3, 84]
+              - [{beats: 27.5}, {beats: 0.4375}, A2, 73]
+              - [{beats: 28}, {beats: 0.4375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 29}, {beats: 0.4375}, B2, 84]
+              - [{beats: 29.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 30}, {beats: 0.4375}, E3, 84]
+              - [{beats: 30.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 31}, {beats: 0.4375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.4375}, B2, 73]
+          # the_weight_of_knowledge | bars 27-38
+          - id: guitar_4_the_weight_of_knowledge
+            at: {bar: 27, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 2}, {beats: 0.375}, E3, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, D3, 84]
+              - [{beats: 4.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 5}, {beats: 0.375}, A2, 84]
+              - [{beats: 5.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 6}, {beats: 0.375}, D3, 84]
+              - [{beats: 6.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 7}, {beats: 0.375}, D3, 84]
+              - [{beats: 7.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 8}, {beats: 0.375}, G2, 84]
+              - [{beats: 8.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 9}, {beats: 0.375}, D3, 84]
+              - [{beats: 9.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 10}, {beats: 0.375}, G3, 84]
+              - [{beats: 10.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 11}, {beats: 0.375}, G2, 84]
+              - [{beats: 11.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 12}, {beats: 0.375}, B2, 84]
+              - [{beats: 12.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 13}, {beats: 0.375}, F#3, 84]
+              - [{beats: 13.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 14}, {beats: 0.375}, B3, 84]
+              - [{beats: 14.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 15}, {beats: 0.375}, B2, 84]
+              - [{beats: 15.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 16}, {beats: 0.375}, E2, 84]
+              - [{beats: 16.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 17}, {beats: 0.375}, B2, 84]
+              - [{beats: 17.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 18}, {beats: 0.375}, E3, 84]
+              - [{beats: 18.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 19}, {beats: 0.375}, E2, 84]
+              - [{beats: 19.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 20}, {beats: 0.375}, D3, 84]
+              - [{beats: 20.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 21}, {beats: 0.375}, A2, 84]
+              - [{beats: 21.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 22}, {beats: 0.375}, D3, 84]
+              - [{beats: 22.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 23}, {beats: 0.375}, D3, 84]
+              - [{beats: 23.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 24}, {beats: 0.375}, A2, 84]
+              - [{beats: 24.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 25}, {beats: 0.375}, E3, 84]
+              - [{beats: 25.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 26}, {beats: 0.375}, A3, 84]
+              - [{beats: 26.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 27}, {beats: 0.375}, A2, 84]
+              - [{beats: 27.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 28}, {beats: 0.375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 29}, {beats: 0.375}, B2, 84]
+              - [{beats: 29.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 30}, {beats: 0.375}, E3, 84]
+              - [{beats: 30.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 31}, {beats: 0.375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 32}, {beats: 0.375}, E2, 84]
+              - [{beats: 32.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 33}, {beats: 0.375}, B2, 84]
+              - [{beats: 33.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 34}, {beats: 0.375}, E3, 84]
+              - [{beats: 34.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 35}, {beats: 0.375}, E2, 84]
+              - [{beats: 35.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 36}, {beats: 0.375}, G2, 84]
+              - [{beats: 36.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 37}, {beats: 0.375}, D3, 84]
+              - [{beats: 37.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 38}, {beats: 0.375}, G3, 84]
+              - [{beats: 38.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 39}, {beats: 0.375}, G2, 84]
+              - [{beats: 39.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 40}, {beats: 0.375}, D3, 84]
+              - [{beats: 40.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 41}, {beats: 0.375}, A2, 84]
+              - [{beats: 41.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 42}, {beats: 0.375}, D3, 84]
+              - [{beats: 42.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 43}, {beats: 0.375}, D3, 84]
+              - [{beats: 43.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 44}, {beats: 0.375}, E2, 84]
+              - [{beats: 44.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 45}, {beats: 0.375}, B2, 84]
+              - [{beats: 45.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 46}, {beats: 0.375}, E3, 84]
+              - [{beats: 46.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 47}, {beats: 0.375}, E2, 84]
+              - [{beats: 47.5}, {beats: 0.375}, B2, 73]
+          # recursive_duel_scholar_i | bars 39-40
+          - id: guitar_4_recursive_duel_scholar_i
+            at: {bar: 39, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 1}, {beats: 0.4375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 2}, {beats: 0.4375}, E3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 3}, {beats: 0.4375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 4}, {beats: 0.4375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 5}, {beats: 0.4375}, D3, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 6}, {beats: 0.4375}, G3, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 7}, {beats: 0.4375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, D3, 73]
+          # recursive_duel_giant_i | bars 41-42
+          - id: guitar_4_recursive_duel_giant_i
+            at: {bar: 41, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, D3, 84]
+              - [{beats: 0.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 1}, {beats: 0.375}, D3, 84]
+              - [{beats: 1.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 2}, {beats: 0.375}, D3, 84]
+              - [{beats: 2.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 3}, {beats: 0.375}, D3, 84]
+              - [{beats: 3.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 4}, {beats: 0.375}, E2, 84]
+              - [{beats: 4.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 5}, {beats: 0.375}, E2, 84]
+              - [{beats: 5.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 6}, {beats: 0.375}, E2, 84]
+              - [{beats: 6.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 7}, {beats: 0.375}, E2, 84]
+              - [{beats: 7.5}, {beats: 0.375}, E2, 73]
+          # recursive_duel_scholar_ii | bars 43-44
+          - id: guitar_4_recursive_duel_scholar_ii
+            at: {bar: 43, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, C3, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 1}, {beats: 0.4375}, G2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 2}, {beats: 0.4375}, C3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 3}, {beats: 0.4375}, C3, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 4}, {beats: 0.4375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 5}, {beats: 0.4375}, D3, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 6}, {beats: 0.4375}, G3, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 7}, {beats: 0.4375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, D3, 73]
+          # recursive_duel_giant_ii | bars 45-46
+          - id: guitar_4_recursive_duel_giant_ii
+            at: {bar: 45, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, B2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 2}, {beats: 0.375}, B2, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, B2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, E2, 84]
+              - [{beats: 4.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 5}, {beats: 0.375}, E2, 84]
+              - [{beats: 5.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 6}, {beats: 0.375}, E2, 84]
+              - [{beats: 6.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 7}, {beats: 0.375}, E2, 84]
+              - [{beats: 7.5}, {beats: 0.375}, E2, 73]
+          # the_giant_answers | bars 47-54
+          - id: guitar_4_the_giant_answers
+            at: {bar: 47, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 2}, {beats: 0.375}, E2, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, D3, 84]
+              - [{beats: 4.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 5}, {beats: 0.375}, A2, 84]
+              - [{beats: 5.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 6}, {beats: 0.375}, D3, 84]
+              - [{beats: 6.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 7}, {beats: 0.375}, D3, 84]
+              - [{beats: 7.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 8}, {beats: 0.375}, C3, 84]
+              - [{beats: 8.5}, {beats: 0.375}, C3, 73]
+              - [{beats: 9}, {beats: 0.375}, G2, 84]
+              - [{beats: 9.5}, {beats: 0.375}, C3, 73]
+              - [{beats: 10}, {beats: 0.375}, C3, 84]
+              - [{beats: 10.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 11}, {beats: 0.375}, C3, 84]
+              - [{beats: 11.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 12}, {beats: 0.375}, E2, 84]
+              - [{beats: 12.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 13}, {beats: 0.375}, B2, 84]
+              - [{beats: 13.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 14}, {beats: 0.375}, E2, 84]
+              - [{beats: 14.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 15}, {beats: 0.375}, E2, 84]
+              - [{beats: 15.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 16}, {beats: 0.375}, E2, 84]
+              - [{beats: 16.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 17}, {beats: 0.375}, B2, 84]
+              - [{beats: 17.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 18}, {beats: 0.375}, E2, 84]
+              - [{beats: 18.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 19}, {beats: 0.375}, E2, 84]
+              - [{beats: 19.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 20}, {beats: 0.375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 21}, {beats: 0.375}, D3, 84]
+              - [{beats: 21.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 22}, {beats: 0.375}, G2, 84]
+              - [{beats: 22.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 23}, {beats: 0.375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 24}, {beats: 0.375}, A2, 84]
+              - [{beats: 24.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 25}, {beats: 0.375}, E3, 84]
+              - [{beats: 25.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 26}, {beats: 0.375}, A2, 84]
+              - [{beats: 26.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 27}, {beats: 0.375}, A2, 84]
+              - [{beats: 27.5}, {beats: 0.375}, E3, 73]
+              - [{beats: 28}, {beats: 0.375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 29}, {beats: 0.375}, B2, 84]
+              - [{beats: 29.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 30}, {beats: 0.375}, E2, 84]
+              - [{beats: 30.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 31}, {beats: 0.375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.375}, B2, 73]
+          # scholar_ascendant | bars 55-62
+          - id: guitar_4_scholar_ascendant
+            at: {bar: 55, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 1}, {beats: 0.4375}, E2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 2}, {beats: 0.4375}, E2, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 3}, {beats: 0.4375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 4}, {beats: 0.4375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 5}, {beats: 0.4375}, G2, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 6}, {beats: 0.4375}, G2, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 7}, {beats: 0.4375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 8}, {beats: 0.4375}, D3, 84]
+              - [{beats: 8.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 9}, {beats: 0.4375}, D3, 84]
+              - [{beats: 9.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 10}, {beats: 0.4375}, D3, 84]
+              - [{beats: 10.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 11}, {beats: 0.4375}, D3, 84]
+              - [{beats: 11.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 12}, {beats: 0.4375}, E2, 84]
+              - [{beats: 12.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 13}, {beats: 0.4375}, E2, 84]
+              - [{beats: 13.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 14}, {beats: 0.4375}, E2, 84]
+              - [{beats: 14.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 15}, {beats: 0.4375}, E2, 84]
+              - [{beats: 15.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 16}, {beats: 0.4375}, C3, 84]
+              - [{beats: 16.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 17}, {beats: 0.4375}, C3, 84]
+              - [{beats: 17.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 18}, {beats: 0.4375}, C3, 84]
+              - [{beats: 18.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 19}, {beats: 0.4375}, C3, 84]
+              - [{beats: 19.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 20}, {beats: 0.4375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 21}, {beats: 0.4375}, G2, 84]
+              - [{beats: 21.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 22}, {beats: 0.4375}, G2, 84]
+              - [{beats: 22.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 23}, {beats: 0.4375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 24}, {beats: 0.4375}, D3, 84]
+              - [{beats: 24.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 25}, {beats: 0.4375}, D3, 84]
+              - [{beats: 25.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 26}, {beats: 0.4375}, D3, 84]
+              - [{beats: 26.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 27}, {beats: 0.4375}, D3, 84]
+              - [{beats: 27.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 28}, {beats: 0.4375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 29}, {beats: 0.4375}, E2, 84]
+              - [{beats: 29.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 30}, {beats: 0.4375}, E2, 84]
+              - [{beats: 30.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 31}, {beats: 0.4375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.4375}, E2, 73]
+          # recursive_crescendo | bars 63-70
+          - id: guitar_4_recursive_crescendo
+            at: {bar: 63, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 1}, {beats: 0.375}, B2, 84]
+              - [{beats: 1.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 2}, {beats: 0.375}, E2, 84]
+              - [{beats: 2.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 3}, {beats: 0.375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 4}, {beats: 0.375}, B2, 84]
+              - [{beats: 4.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 5}, {beats: 0.375}, F#3, 84]
+              - [{beats: 5.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 6}, {beats: 0.375}, B2, 84]
+              - [{beats: 6.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 7}, {beats: 0.375}, B2, 84]
+              - [{beats: 7.5}, {beats: 0.375}, F#3, 73]
+              - [{beats: 8}, {beats: 0.375}, G2, 84]
+              - [{beats: 8.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 9}, {beats: 0.375}, D3, 84]
+              - [{beats: 9.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 10}, {beats: 0.375}, G2, 84]
+              - [{beats: 10.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 11}, {beats: 0.375}, G2, 84]
+              - [{beats: 11.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 12}, {beats: 0.375}, E2, 84]
+              - [{beats: 12.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 13}, {beats: 0.375}, B2, 84]
+              - [{beats: 13.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 14}, {beats: 0.375}, E2, 84]
+              - [{beats: 14.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 15}, {beats: 0.375}, E2, 84]
+              - [{beats: 15.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 16}, {beats: 0.375}, C3, 84]
+              - [{beats: 16.5}, {beats: 0.375}, C3, 73]
+              - [{beats: 17}, {beats: 0.375}, G2, 84]
+              - [{beats: 17.5}, {beats: 0.375}, C3, 73]
+              - [{beats: 18}, {beats: 0.375}, C3, 84]
+              - [{beats: 18.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 19}, {beats: 0.375}, C3, 84]
+              - [{beats: 19.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 20}, {beats: 0.375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 21}, {beats: 0.375}, D3, 84]
+              - [{beats: 21.5}, {beats: 0.375}, G2, 73]
+              - [{beats: 22}, {beats: 0.375}, G2, 84]
+              - [{beats: 22.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 23}, {beats: 0.375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 24}, {beats: 0.375}, D3, 84]
+              - [{beats: 24.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 25}, {beats: 0.375}, A2, 84]
+              - [{beats: 25.5}, {beats: 0.375}, D3, 73]
+              - [{beats: 26}, {beats: 0.375}, D3, 84]
+              - [{beats: 26.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 27}, {beats: 0.375}, D3, 84]
+              - [{beats: 27.5}, {beats: 0.375}, A2, 73]
+              - [{beats: 28}, {beats: 0.375}, E2, 84]
+              - [{beats: 28.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 29}, {beats: 0.375}, B2, 84]
+              - [{beats: 29.5}, {beats: 0.375}, E2, 73]
+              - [{beats: 30}, {beats: 0.375}, E2, 84]
+              - [{beats: 30.5}, {beats: 0.375}, B2, 73]
+              - [{beats: 31}, {beats: 0.375}, E2, 84]
+              - [{beats: 31.5}, {beats: 0.375}, B2, 73]
+          # final_giant_solo | bars 71-76
+          - id: guitar_4_final_giant_solo
+            at: {bar: 71, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, E2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 1}, {beats: 0.4375}, E2, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 2}, {beats: 0.4375}, E2, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 3}, {beats: 0.4375}, E2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 4}, {beats: 0.4375}, G2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 5}, {beats: 0.4375}, G2, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 6}, {beats: 0.4375}, G2, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 7}, {beats: 0.4375}, G2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 8}, {beats: 0.4375}, D3, 84]
+              - [{beats: 8.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 9}, {beats: 0.4375}, D3, 84]
+              - [{beats: 9.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 10}, {beats: 0.4375}, D3, 84]
+              - [{beats: 10.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 11}, {beats: 0.4375}, D3, 84]
+              - [{beats: 11.5}, {beats: 0.4375}, D3, 73]
+              - [{beats: 12}, {beats: 0.4375}, E2, 84]
+              - [{beats: 12.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 13}, {beats: 0.4375}, E2, 84]
+              - [{beats: 13.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 14}, {beats: 0.4375}, E2, 84]
+              - [{beats: 14.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 15}, {beats: 0.4375}, E2, 84]
+              - [{beats: 15.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 16}, {beats: 0.4375}, C3, 84]
+              - [{beats: 16.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 17}, {beats: 0.4375}, C3, 84]
+              - [{beats: 17.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 18}, {beats: 0.4375}, C3, 84]
+              - [{beats: 18.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 19}, {beats: 0.4375}, C3, 84]
+              - [{beats: 19.5}, {beats: 0.4375}, C3, 73]
+              - [{beats: 20}, {beats: 0.4375}, G2, 84]
+              - [{beats: 20.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 21}, {beats: 0.4375}, G2, 84]
+              - [{beats: 21.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 22}, {beats: 0.4375}, G2, 84]
+              - [{beats: 22.5}, {beats: 0.4375}, G2, 73]
+              - [{beats: 23}, {beats: 0.4375}, G2, 84]
+              - [{beats: 23.5}, {beats: 0.4375}, G2, 73]
+          # final_royal_impacts | bars 77-78
+          - id: guitar_4_final_royal_impacts
+            at: {bar: 77, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, B2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 1}, {beats: 0.4375}, F#3, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 2}, {beats: 0.4375}, B3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, F#3, 73]
+              - [{beats: 3}, {beats: 0.4375}, B2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, F#3, 73]
+              - [{beats: 4}, {beats: 0.4375}, E2, 84]
+              - [{beats: 4.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 5}, {beats: 0.4375}, B2, 84]
+              - [{beats: 5.5}, {beats: 0.4375}, E2, 73]
+              - [{beats: 6}, {beats: 0.4375}, E3, 84]
+              - [{beats: 6.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 7}, {beats: 0.4375}, E2, 84]
+              - [{beats: 7.5}, {beats: 0.4375}, B2, 73]
+          # loop_turnaround | bars 79-79
+          - id: guitar_4_loop_turnaround
+            at: {bar: 79, beat: 1}
+            events:
+              - [{beats: 0}, {beats: 0.4375}, B2, 84]
+              - [{beats: 0.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 1}, {beats: 0.4375}, F#3, 84]
+              - [{beats: 1.5}, {beats: 0.4375}, B2, 73]
+              - [{beats: 2}, {beats: 0.4375}, B3, 84]
+              - [{beats: 2.5}, {beats: 0.4375}, F#3, 73]
+              - [{beats: 3}, {beats: 0.4375}, B2, 84]
+              - [{beats: 3.5}, {beats: 0.4375}, F#3, 73]
