@@ -864,18 +864,13 @@ PY_TOOL_NOTES
     } > "$PYTHON_TOOLS_REPORT"
 }
 
-# ⛔ A PLUGIN BUILT FOR ANOTHER ARCH INDEXES FINE AND THEN NO HOST LOADS IT.
-# The asset filter (github_latest_asset_url) keeps new installs right, but an
-# install made before it (2026-09-06: Surge XT arm64 on an x86_64 box) never
-# repaired itself: its marker said "extracted" and the next run left it alone.
-# A plugin dir whose ELF binaries all name another machine is moved aside, so
-# this run extracts the right one fresh. Nothing is deleted.
+# Keep foreign binaries outside the active plugin scan root. The index must
+# not select them after a new download. Keep the old files for inspection.
 quarantine_foreign_arch_plugins() {
     [[ -d "$PLUGIN_UNPACKED" ]] || return 0
-    local dir verdict
+    local dir verdict quarantine
     for dir in "$PLUGIN_UNPACKED"/*/; do
         dir="${dir%/}"
-        [[ "$dir" == *.foreign-arch* ]] && continue
         verdict="$(python3 - "$dir" <<'PY'
 import os, platform, sys
 # ELF e_machine: 62 x86-64, 183 aarch64, 40 arm, 3 i386
@@ -896,8 +891,10 @@ print("none" if not seen or host is None else ("host" if host in seen else "fore
 PY
 )"
         if [[ "$verdict" == "foreign" ]]; then
-            log "WRONG ARCH: $dir holds no $(uname -m) binaries; moving it to $dir.foreign-arch to re-extract"
-            mv "$dir" "$dir.foreign-arch.$(date +%Y%m%d%H%M%S)"
+            quarantine="$PLUGIN_ROOT/quarantine/$(basename "$dir").$(date +%Y%m%d%H%M%S)"
+            mkdir -p "$(dirname "$quarantine")"
+            log "WRONG ARCH: $dir holds no $(uname -m) binaries; moving it to $quarantine to re-extract"
+            mv "$dir" "$quarantine"
         fi
     done
 }
