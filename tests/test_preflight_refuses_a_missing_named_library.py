@@ -26,7 +26,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from ambition_music_renderer import cli
+from ambition_music_renderer import cli, instrument_libraries
 
 
 NAMED_LIBRARY = "freepats.salamander_grand"
@@ -62,7 +62,7 @@ def _wire(monkeypatch, score, *, resolves: bool):
     monkeypatch.setattr(cli, "find_score", lambda cue: score)
     monkeypatch.setattr(cli, "needs_render", lambda cue, yaml_path, outdir: True)
     monkeypatch.setattr(
-        cli, "_sfz_reference_resolves", lambda *a, **k: resolves
+        instrument_libraries, "resolve_sfz_reference", lambda *a, **k: score if resolves else None
     )
     rendered: list[str] = []
     monkeypatch.setattr(
@@ -118,7 +118,7 @@ def test_optional_true_does_not_excuse_a_missing_library(monkeypatch, tmp_path, 
 
     spec = yaml.safe_load(score.read_text())
     assert spec["tracks"][0]["instrument_backend"]["optional"] is True
-    assert cli._unresolvable_sfz_references(spec, base_dir=score.parent) == [
+    assert cli._unresolvable_instrument_references(spec, base_dir=score.parent) == [
         NAMED_LIBRARY
     ]
 
@@ -155,3 +155,15 @@ def test_the_walk_finds_a_backend_nested_at_any_depth():
         for backend in cli._walk_instrument_backends(spec)
     }
     assert len(found) == 2
+
+
+def test_a_soundfont_reference_uses_the_soundfont_resolver(monkeypatch, tmp_path):
+    font = tmp_path / "shamisen.sf2"
+    font.write_bytes(b"fixture font")
+    monkeypatch.setattr(instrument_libraries, "resolve_soundfont_reference", lambda *a, **k: font)
+    monkeypatch.setattr(instrument_libraries, "resolve_sfz_reference", lambda *a, **k: None)
+    spec = {"instruments": [{"instrument_backend": {
+        "kind": "soundfont", "library_ref": "japan.shamisen"}}]}
+    assert cli._unresolvable_instrument_references(spec, base_dir=tmp_path) == []
+    monkeypatch.setattr(instrument_libraries, "resolve_soundfont_reference", lambda *a, **k: None)
+    assert cli._unresolvable_instrument_references(spec, base_dir=tmp_path) == ["japan.shamisen"]
