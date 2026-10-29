@@ -750,17 +750,56 @@ def test_publish_adaptive_cue_fails_without_section_fulls():
         assert not (dest / "first_goblin_tune_v2" / "adaptive").exists()
 
 
-def test_top_level_adaptive_render_defaults_to_full_mix_sections():
-    from ambition_music_renderer.cli import render_mode_for_cue
+def test_authored_single_loop_exports_and_publishes_without_render_preroll(tmp_path, monkeypatch):
+    import yaml
+    from ambition_music_renderer import cli
 
-    args = RenderCommand.cli(argv=["first_goblin_tune_v2"])
-    assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, True)
-
-    args = RenderCommand.cli(argv=["first_goblin_tune_v2", "--no-simple_mix"])
-    assert render_mode_for_cue("first_goblin_tune_v2", args) == (False, False)
-
-    args = RenderCommand.cli(argv=["lofi_study_loop"])
-    assert render_mode_for_cue("lofi_study_loop", args) == (True, False)
+    cue = "loop_fixture"
+    score = tmp_path / "score.music.yaml"
+    score.write_text(yaml.safe_dump({
+        "schema": "ambition.musicir.v3", "id": cue,
+        "timebase": {"ppq": 480}, "meter": "4/4", "tempo": 120,
+        "form": [
+            {"id": "preroll", "role": "intro", "from": {"bar": 1, "beat": 1}, "to": {"bar": 2, "beat": 1}},
+            {"id": "cycle", "role": "loop_component", "loopable": True, "from": {"bar": 2, "beat": 1}, "to": {"bar": 3, "beat": 1}},
+        ],
+        "end": {"bar": 3, "beat": 1},
+        "playback": {"mode": "section_stem_matrix", "loop_components": ["cycle"]},
+        "instruments": [{"name": "keys", "group": "lead", "program": "acoustic_grand_piano"}],
+        "parts": [{"id": "part", "instrument": "keys", "voices": [{"id": "voice", "clips": [{
+            "id": "phrase", "at": {"bar": 1, "beat": 1}, "events": [[0, "1/4", "C4", 80]],
+        }]}]}],
+    }))
+    monkeypatch.setattr(cli, "find_score", lambda name: score)
+    assert cli.render_mode_for_cue(cue) == (False, True)
+    args = RenderCommand.cli(argv=[cue, "--no-simple_mix"])
+    assert cli.render_mode_for_cue(cue, args) == (False, False)
+    source = yaml.safe_load(score.read_text())
+    playback = source.pop("playback")
+    score.write_text(yaml.safe_dump(source))
+    assert cli.render_mode_for_cue(cue) == (True, False)
+    source["playback"] = playback
+    score.write_text(yaml.safe_dump(source))
+    for have_loop in [False, True]:
+        outdir = tmp_path / str(have_loop) / "render"
+        (outdir / "preview").mkdir(parents=True)
+        (outdir / "preview" / f"{cue}_hash.full_soundtrack_preview.ogg").write_bytes(b"render-preroll-and-loop")
+        (outdir / "preroll.ogg").write_bytes(b"render-only")
+        adaptive = {"preroll": {"full": "preroll.ogg"}}
+        if have_loop:
+            (outdir / "cycle.ogg").write_bytes(b"loop-body")
+            adaptive["cycle"] = {"full": "cycle.ogg"}
+        (outdir / f"{cue}_hash.adaptive_manifest.json").write_text(json.dumps({
+            "playback": {"mode": "section_stem_matrix", "loop_components": ["cycle"]},
+            "files": {"adaptive": adaptive},
+        }))
+        dest = tmp_path / str(have_loop) / "published"
+        assert cli.publish_cue(cue, outdir, dest) == have_loop
+        full = dest / cue / "full.ogg"
+        if have_loop:
+            assert full.read_bytes() == b"loop-body"
+        else:
+            assert not full.exists()
 
 
 def test_reference_audio_audit_reports_surface_features():

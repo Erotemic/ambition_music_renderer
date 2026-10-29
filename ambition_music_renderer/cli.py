@@ -18,7 +18,7 @@ Subcommands:
     cue trace_event <cue>   Trace one stable compiled event id to its source.
     cue quality <cue>       Report composition-level review evidence.
     cue determinism <cue>   Verify repeated compilation is identical.
-    cue publish <cue>       Publish newest preview into the sandbox asset tree.
+    cue publish <cue>       Publish rendered playback assets into the game asset tree.
     cue bundle <cue>...     Render+debug+package one or more cues. For one cue,
                             -j/--jobs N parallelizes stem groups. For several,
                             it parallelizes cue subprocesses.
@@ -115,15 +115,12 @@ def _progress(iterable, *, total, desc):
 # These render with --simple-mix and publish the mastered preview.
 SANDBOX_CUES = ("lofi_study_loop", "long_lofi_drift", "pulse_drift_voyage")
 
-# Adaptive (multi-section) cues. Marked so the general render/publish path
-# renders them full-mix-only and publishes each adaptive/<section>/<section>.full.ogg
-# (see `render_mode_for_cue` / `publish_adaptive_full_sections`). They ride the
-# normal bulk `radio` pass now — there is no dedicated per-cue installer.
-ADAPTIVE_CUES = ("first_goblin_tune_v2",)
-
-
 def is_adaptive_cue(cue: str) -> bool:
-    return cue in ADAPTIVE_CUES
+    if not Path(cue).expanduser().is_file() and find_score(cue) is None:
+        return False
+    _, compiled = _load_compiled_for_inspection(cue)
+    playback = compiled.normalized_spec.get("playback") or {}
+    return playback.get("mode") == "section_stem_matrix"
 
 
 # Curated extras drawn from scores/examples that we expose on the radio.
@@ -530,6 +527,20 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
             file=sys.stderr,
         )
         return False
+
+    manifest_path = find_latest_manifest(outdir, cue)
+    manifest = json.loads(manifest_path.read_text(encoding="utf8")) if manifest_path else {}
+    playback = manifest.get("playback") or {}
+    loops = playback.get("loop_components") or []
+    # The review mix can contain a render-only lead-in. A single loop with
+    # no playback intro starts at its own section.
+    if len(loops) == 1 and not playback.get("intro"):
+        section = str(loops[0])
+        loop = dest_dir / "adaptive" / section / f"{section}.full.ogg"
+        if not loop.is_file():
+            print(f"error: publish {cue}: missing authored loop section {section}", file=sys.stderr)
+            return False
+        src = loop
 
     dest = dest_dir / "full.ogg"
     publish_copy(src, dest)
