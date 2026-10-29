@@ -2534,11 +2534,11 @@ parts:
         beat: 1
       events:
       - - beats: 1.5
-        - beats: 0.5625
+        - beats: 0.5
         - G4
         - 72
       - - beats: 2.75
-        - beats: 0.5
+        - beats: 0.4375
         - B4
         - 72
       - - beats: 3.5
@@ -2551,23 +2551,23 @@ parts:
         beat: 1
       events:
       - - beats: 1.25
-        - beats: 0.75
+        - beats: 0.6875
         - B4
         - 65
       - - beats: 2.5
-        - beats: 0.5625
+        - beats: 0.5
         - G4
         - 65
       - - beats: 3.25
-        - beats: 0.6875
+        - beats: 0.5625
         - F#4
         - 65
       - - beats: 5.25
-        - beats: 0.75
+        - beats: 0.6875
         - B4
         - 65
       - - beats: 7.25
-        - beats: 0.6875
+        - beats: 0.5625
         - F#4
         - 65
     - id: duel_answer_the_giant_takes_stage
@@ -2576,35 +2576,35 @@ parts:
         beat: 1
       events:
       - - beats: 2
-        - beats: 0.4375
+        - beats: 0.3125
         - E5
         - 69
       - - beats: 2.75
-        - beats: 0.3125
+        - beats: 0.25
         - G5
         - 69
       - - beats: 3.25
-        - beats: 0.4375
+        - beats: 0.3125
         - F#5
         - 69
       - - beats: 4.75
-        - beats: 0.75
+        - beats: 0.625
         - B4
         - 65
       - - beats: 6.5
-        - beats: 0.75
+        - beats: 0.625
         - G4
         - 65
       - - beats: 10
-        - beats: 0.4375
+        - beats: 0.3125
         - E5
         - 69
       - - beats: 10.75
-        - beats: 0.3125
+        - beats: 0.25
         - G5
         - 69
       - - beats: 11.25
-        - beats: 0.4375
+        - beats: 0.3125
         - F#5
         - 69
     - id: duel_answer_hands_of_gnu
@@ -2613,99 +2613,99 @@ parts:
         beat: 1
       events:
       - - beats: 1.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 3.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 5.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 7.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 9.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 11.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 13.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 15.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 17.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 19.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 21.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 23.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 25.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 27.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 29.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 31.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 33.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 35.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 37.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 39.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 41.5
-        - beats: 0.625
+        - beats: 0.5625
         - C5
         - 66
       - - beats: 43.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 45.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 47.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
     - id: duel_answer_head_descends
@@ -2714,7 +2714,7 @@ parts:
         beat: 1
       events:
       - - beats: 0.25
-        - beats: 0.1875
+        - beats: 0.125
         - F#4
         - 65
       - - beats: 0.5
@@ -2722,7 +2722,7 @@ parts:
         - G4
         - 69
       - - beats: 0.75
-        - beats: 0.3125
+        - beats: 0.25
         - A4
         - 77
       - - beats: 1.5
@@ -2750,7 +2750,7 @@ parts:
         - G4
         - 65
       - - beats: 4.5
-        - beats: 0.1875
+        - beats: 0.125
         - F#4
         - 65
       - - beats: 4.75
@@ -2762,71 +2762,71 @@ parts:
         - D4
         - 77
       - - beats: 5.5
-        - beats: 0.5625
+        - beats: 0.4375
         - G4
         - 73
       - - beats: 7
-        - beats: 1.125
+        - beats: 0.9375
         - E4
         - 65
       - - beats: 9.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 11.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 13.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 15.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 17.5
-        - beats: 0.625
+        - beats: 0.5
         - C5
         - 66
       - - beats: 19.25
-        - beats: 0.625
+        - beats: 0.5
         - G4
         - 66
       - - beats: 20
-        - beats: 0.4375
+        - beats: 0.375
         - G4
         - 67
       - - beats: 20.5
-        - beats: 0.4375
+        - beats: 0.375
         - B4
         - 77
       - - beats: 21
-        - beats: 0.4375
+        - beats: 0.375
         - D5
         - 78
       - - beats: 21.5
-        - beats: 0.5
+        - beats: 0.375
         - G5
         - 79
       - - beats: 22.5
-        - beats: 0.4375
+        - beats: 0.375
         - D5
         - 74
       - - beats: 23
-        - beats: 0.5
+        - beats: 0.375
         - B4
         - 71
       - - beats: 27.25
-        - beats: 0.625
+        - beats: 0.5
         - A4
         - 66
       - - beats: 29.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 31.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
     - id: duel_answer_the_weight_of_knowledge
@@ -2835,99 +2835,99 @@ parts:
         beat: 1
       events:
       - - beats: 1.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 3.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 5.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 7.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 9.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 11.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 13.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 15.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 17.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 19.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 21.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 23.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 25.5
-        - beats: 0.625
+        - beats: 0.5625
         - C5
         - 66
       - - beats: 27.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 29.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 31.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 33.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 35.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 37.5
-        - beats: 0.625
+        - beats: 0.5625
         - D5
         - 66
       - - beats: 39.25
-        - beats: 0.625
+        - beats: 0.5625
         - B4
         - 66
       - - beats: 41.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 43.25
-        - beats: 0.625
+        - beats: 0.5625
         - A4
         - 66
       - - beats: 45.5
-        - beats: 0.625
+        - beats: 0.5625
         - E5
         - 66
       - - beats: 47.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
     - id: duel_answer_recursive_duel_scholar_i
@@ -2936,19 +2936,19 @@ parts:
         beat: 1
       events:
       - - beats: 1.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 3.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 5.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 7.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
     - id: duel_answer_recursive_duel
@@ -2957,7 +2957,7 @@ parts:
         beat: 1
       events:
       - - beats: 16
-        - beats: 1.4375
+        - beats: 1.3125
         - F#4
         - 85
       - - beats: 17.5
@@ -2973,11 +2973,11 @@ parts:
         - D4
         - 85
       - - beats: 19
-        - beats: 0.9375
+        - beats: 0.875
         - B3
         - 85
       - - beats: 20
-        - beats: 1.4375
+        - beats: 1.3125
         - B3
         - 85
       - - beats: 21.5
@@ -2993,7 +2993,7 @@ parts:
         - G3
         - 85
       - - beats: 23
-        - beats: 0.9375
+        - beats: 0.875
         - E3
         - 85
     - id: duel_answer_the_giant_answers
@@ -3002,67 +3002,67 @@ parts:
         beat: 1
       events:
       - - beats: 0.75
-        - beats: 1.0625
+        - beats: 0.875
         - B4
         - 65
       - - beats: 5.5
-        - beats: 0.4375
+        - beats: 0.3125
         - D5
         - 72
       - - beats: 6.25
-        - beats: 0.4375
+        - beats: 0.3125
         - F#5
         - 72
       - - beats: 7
-        - beats: 0.5
+        - beats: 0.375
         - E5
         - 72
       - - beats: 8.75
-        - beats: 1.0625
+        - beats: 0.875
         - G4
         - 65
       - - beats: 13.5
-        - beats: 0.4375
+        - beats: 0.3125
         - E5
         - 72
       - - beats: 14.25
-        - beats: 0.4375
+        - beats: 0.3125
         - G5
         - 72
       - - beats: 15
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 72
       - - beats: 16.75
-        - beats: 1.0625
+        - beats: 0.875
         - B4
         - 65
       - - beats: 21.5
-        - beats: 0.4375
+        - beats: 0.3125
         - D5
         - 72
       - - beats: 22.25
-        - beats: 0.4375
+        - beats: 0.3125
         - G5
         - 72
       - - beats: 23
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 72
       - - beats: 24.75
-        - beats: 1.0625
+        - beats: 0.875
         - A4
         - 65
       - - beats: 29.5
-        - beats: 0.4375
+        - beats: 0.3125
         - E5
         - 72
       - - beats: 30.25
-        - beats: 0.4375
+        - beats: 0.3125
         - G5
         - 72
       - - beats: 31
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 72
     - id: duel_answer_scholar_ascendant
@@ -3071,35 +3071,35 @@ parts:
         beat: 1
       events:
       - - beats: 1.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 3.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 5.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 7.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 9.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 11.25
-        - beats: 0.625
+        - beats: 0.5
         - A4
         - 66
       - - beats: 13.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 15.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 17.5
@@ -3107,35 +3107,35 @@ parts:
         - C5
         - 66
       - - beats: 18
-        - beats: 1.1875
+        - beats: 1.0625
         - C5
         - 85
       - - beats: 19.25
-        - beats: 0.625
+        - beats: 0.5
         - G4
         - 66
       - - beats: 21.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 23.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
       - - beats: 25.5
-        - beats: 0.625
+        - beats: 0.5
         - D5
         - 66
       - - beats: 27.25
-        - beats: 0.625
+        - beats: 0.5
         - A4
         - 66
       - - beats: 29.5
-        - beats: 0.625
+        - beats: 0.5
         - E5
         - 66
       - - beats: 31.25
-        - beats: 0.625
+        - beats: 0.5
         - B4
         - 66
     - id: duel_answer_recursive_crescendo
@@ -3144,51 +3144,51 @@ parts:
         beat: 1
       events:
       - - beats: 9
-        - beats: 0.4375
+        - beats: 0.3125
         - D5
         - 75
       - - beats: 9.75
-        - beats: 0.5
+        - beats: 0.375
         - G5
         - 75
       - - beats: 10.5
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 75
       - - beats: 11.25
-        - beats: 0.5
+        - beats: 0.375
         - D5
         - 75
       - - beats: 17
-        - beats: 0.4375
+        - beats: 0.3125
         - C5
         - 75
       - - beats: 17.75
-        - beats: 0.5
+        - beats: 0.375
         - E5
         - 75
       - - beats: 18.5
-        - beats: 0.5
+        - beats: 0.375
         - G5
         - 75
       - - beats: 19.25
-        - beats: 0.5
+        - beats: 0.375
         - E5
         - 75
       - - beats: 25
-        - beats: 0.4375
+        - beats: 0.3125
         - D5
         - 75
       - - beats: 25.75
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 75
       - - beats: 26.5
-        - beats: 0.5
+        - beats: 0.375
         - E5
         - 75
       - - beats: 27.25
-        - beats: 0.5
+        - beats: 0.375
         - D5
         - 75
     - id: duel_answer_final_giant_solo
@@ -3197,59 +3197,59 @@ parts:
         beat: 1
       events:
       - - beats: 1
-        - beats: 1.0
+        - beats: 0.8125
         - B4
         - 63
       - - beats: 3
-        - beats: 1.0
+        - beats: 0.8125
         - G5
         - 63
       - - beats: 5
-        - beats: 1.0
+        - beats: 0.8125
         - B4
         - 63
       - - beats: 7
-        - beats: 1.0
+        - beats: 0.8125
         - G5
         - 63
       - - beats: 10
-        - beats: 0.4375
+        - beats: 0.3125
         - D5
         - 70
       - - beats: 10.75
-        - beats: 0.3125
+        - beats: 0.25
         - F#5
         - 70
       - - beats: 11.25
-        - beats: 0.4375
-        - E5
-        - 70
-      - - beats: 18
-        - beats: 0.4375
-        - C5
-        - 70
-      - - beats: 18.75
         - beats: 0.3125
         - E5
         - 70
+      - - beats: 18
+        - beats: 0.3125
+        - C5
+        - 70
+      - - beats: 18.75
+        - beats: 0.25
+        - E5
+        - 70
       - - beats: 19.25
-        - beats: 0.4375
+        - beats: 0.3125
         - G5
         - 70
       - - beats: 21
-        - beats: 0.4375
+        - beats: 0.3125
         - B4
         - 77
       - - beats: 21.75
-        - beats: 0.5
+        - beats: 0.375
         - G5
         - 77
       - - beats: 22.5
-        - beats: 0.5
+        - beats: 0.375
         - F#5
         - 77
       - - beats: 23.25
-        - beats: 0.5
+        - beats: 0.375
         - D5
         - 77
     - id: duel_answer_final_royal_impacts
@@ -3258,27 +3258,27 @@ parts:
         beat: 1
       events:
       - - beats: 0
-        - beats: 0.8125
+        - beats: 0.6875
         - B4
         - 79
       - - beats: 1.5
-        - beats: 0.6875
+        - beats: 0.5625
         - D5
         - 79
       - - beats: 3
-        - beats: 0.8125
+        - beats: 0.6875
         - F#5
         - 79
       - - beats: 4
-        - beats: 0.8125
+        - beats: 0.6875
         - B4
         - 79
       - - beats: 5.5
-        - beats: 0.6875
+        - beats: 0.5625
         - E5
         - 79
       - - beats: 7
-        - beats: 0.8125
+        - beats: 0.6875
         - G5
         - 79
     - id: duel_answer_loop_turnaround
@@ -3287,23 +3287,23 @@ parts:
         beat: 1
       events:
       - - beats: 0
-        - beats: 0.6875
+        - beats: 0.5625
         - A4
         - 70
       - - beats: 0.75
-        - beats: 0.5625
+        - beats: 0.4375
         - D#5
         - 70
       - - beats: 1.5
-        - beats: 0.6875
+        - beats: 0.5625
         - F#5
         - 70
       - - beats: 2.5
-        - beats: 0.625
+        - beats: 0.5
         - A5
         - 70
       - - beats: 3.25
-        - beats: 0.625
+        - beats: 0.5
         - D#5
         - 70
 - id: sync_riff_part
