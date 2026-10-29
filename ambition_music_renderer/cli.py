@@ -836,29 +836,33 @@ def _preflight_bulk_render(
 
     failures: list[str] = []
     missing_libraries: dict[str, list[str]] = {}
-    for cue in cues:
-        yaml_path = find_score(cue)
-        if yaml_path is None:
-            failures.append(f"{cue}: missing YAML")
-            continue
-        outdir = generated_root() / cue
-        coarse_refresh = needs_render(cue, yaml_path, outdir)
-        dependency_refresh = False
-        if not force_render and not coarse_refresh:
-            dependency_refresh, _reason = render_dependencies_need_refresh(
-                yaml_path, outdir, backend
-            )
-        if not force_render and not coarse_refresh and not dependency_refresh:
-            continue
-        try:
-            spec = load_yaml(yaml_path)
-            generated_run_layout(outdir, yaml_path, backend, spec=spec)
-            build_score(spec)
-        except Exception as ex:
-            failures.append(f"{cue}: {ex}")
-            continue
-        for reference in _unresolvable_sfz_references(spec, base_dir=yaml_path.parent):
-            missing_libraries.setdefault(reference, []).append(cue)
+    from .render.dependencies import dependency_scan
+
+    with dependency_scan():
+        for cue in cues:
+            print(f"music preflight: {cue}", flush=True)
+            yaml_path = find_score(cue)
+            if yaml_path is None:
+                failures.append(f"{cue}: missing YAML")
+                continue
+            outdir = generated_root() / cue
+            coarse_refresh = needs_render(cue, yaml_path, outdir)
+            dependency_refresh = False
+            if not force_render and not coarse_refresh:
+                dependency_refresh, _reason = render_dependencies_need_refresh(
+                    yaml_path, outdir, backend
+                )
+            if not force_render and not coarse_refresh and not dependency_refresh:
+                continue
+            try:
+                spec = load_yaml(yaml_path)
+                generated_run_layout(outdir, yaml_path, backend, spec=spec)
+                build_score(spec)
+            except Exception as ex:
+                failures.append(f"{cue}: {ex}")
+                continue
+            for reference in _unresolvable_sfz_references(spec, base_dir=yaml_path.parent):
+                missing_libraries.setdefault(reference, []).append(cue)
 
     if missing_libraries:
         print(
