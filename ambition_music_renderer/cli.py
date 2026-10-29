@@ -298,10 +298,7 @@ def render_dependencies_need_refresh(
 
 
 def python_exe() -> str:
-    """Prefer the package venv if it exists, else current interpreter."""
-    venv_python = package_dir() / ".venv" / "bin" / "python"
-    if venv_python.exists():
-        return str(venv_python)
+    """Use the interpreter that the caller selected."""
     return sys.executable
 
 
