@@ -22,6 +22,8 @@ use the full SHA-256 fingerprint recorded in the manifest.
 from __future__ import annotations
 
 import copy
+from contextlib import contextmanager
+from contextvars import ContextVar
 import functools
 import hashlib
 import importlib.metadata
@@ -282,16 +284,40 @@ def _resolve_sample_reference(sfz_file: Path, raw: str, default_path: str) -> Pa
     # Search the same useful ancestor space as the existing SFZ audits.
     for parent in (sfz_file.parent, *sfz_file.parents):
         for candidate in (parent / default / rel, parent / rel):
+            if not candidate.is_file():
+                continue
             try:
                 resolved = candidate.resolve(strict=False)
             except OSError:
                 resolved = candidate
-            if resolved.is_file():
-                return resolved
+            return resolved
     return None
 
 
+_scan_sfz: ContextVar[dict | None] = ContextVar("music_dependency_scan_sfz", default=None)
+
+
+@contextmanager
+def dependency_scan():
+    """Reuse SFZ resolution within one scan of a fixed input set."""
+    token = _scan_sfz.set({})
+    try:
+        yield
+    finally:
+        _scan_sfz.reset(token)
+
+
 def sfz_dependency_identity(path: str | Path) -> dict[str, Any]:
+    root = Path(path).expanduser().resolve(strict=False)
+    cache = _scan_sfz.get()
+    if cache is None:
+        return _sfz_dependency_identity(root)
+    if root not in cache:
+        cache[root] = _sfz_dependency_identity(root)
+    return copy.deepcopy(cache[root])
+
+
+def _sfz_dependency_identity(path: str | Path) -> dict[str, Any]:
     """Fingerprint one SFZ program and the sample files it can reference.
 
     Program/include text is content-hashed.  Referenced sample files are reduced
@@ -311,6 +337,7 @@ def sfz_dependency_identity(path: str | Path) -> dict[str, Any]:
     top_base = root.parent
 
     macros: dict[str, str] = {}
+    sample_references: dict[tuple[Path, str, str], Path | None] = {}
 
     def visit(current: Path) -> None:
         current = current.resolve(strict=False)
@@ -343,7 +370,10 @@ def sfz_dependency_identity(path: str | Path) -> dict[str, Any]:
             token = _expand_sfz_macros(_clean_sfz_token(raw), macros)
             if not token or token.startswith("*"):
                 continue
-            resolved = _resolve_sample_reference(current, token, default_path)
+            reference = (current, token, default_path)
+            if reference not in sample_references:
+                sample_references[reference] = _resolve_sample_reference(current, token, default_path)
+            resolved = sample_references[reference]
             if resolved is None:
                 unresolved_samples.add(token)
             else:
