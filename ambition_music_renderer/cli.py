@@ -645,8 +645,13 @@ def _process_simple_mix_cue(
     force_render: bool,
     dest_root: Path,
     render_jobs: int = 1,
+    decision: tuple[bool, bool, str] | None = None,
 ) -> str | None:
     """Run render/publish/render-publish for one simple-mix cue.
+
+    ``decision`` is the bulk preflight's answer for this cue (coarse refresh,
+    dependency refresh, reason), so the render fingerprint is not computed a
+    second time to decide the same thing.
 
     Returns ``None`` on success, otherwise a short failure-stage label
     (``"resolve"`` / ``"render"`` / ``"publish"``) for the caller to
@@ -666,13 +671,16 @@ def _process_simple_mix_cue(
         return "resolve"
     outdir = generated_root() / cue
     if action in ("render", "render-publish"):
-        coarse_refresh = needs_render(cue, yaml_path, outdir)
-        dependency_refresh = False
-        dependency_reason = ""
-        if not force_render and not coarse_refresh:
-            dependency_refresh, dependency_reason = render_dependencies_need_refresh(
-                yaml_path, outdir, backend
-            )
+        if decision is not None:
+            coarse_refresh, dependency_refresh, dependency_reason = decision
+        else:
+            coarse_refresh = needs_render(cue, yaml_path, outdir)
+            dependency_refresh = False
+            dependency_reason = ""
+            if not force_render and not coarse_refresh:
+                dependency_refresh, dependency_reason = render_dependencies_need_refresh(
+                    yaml_path, outdir, backend
+                )
         if force_render or coarse_refresh or dependency_refresh:
             if dependency_refresh and not coarse_refresh and not force_render:
                 print(f"refresh render {cue}: {dependency_reason}")
@@ -773,7 +781,11 @@ def _unresolvable_instrument_references(
 
 
 def _preflight_bulk_render(
-    cues: tuple[str, ...], *, backend: str, force_render: bool
+    cues: tuple[str, ...],
+    *,
+    backend: str,
+    force_render: bool,
+    decisions: dict[str, tuple[bool, bool, str]] | None = None,
 ) -> bool:
     """Resolve every render that this bulk invocation will actually need.
 
@@ -807,10 +819,14 @@ def _preflight_bulk_render(
             outdir = generated_root() / cue
             coarse_refresh = needs_render(cue, yaml_path, outdir)
             dependency_refresh = False
+            reason = ""
             if not force_render and not coarse_refresh:
-                dependency_refresh, _reason = render_dependencies_need_refresh(
+                dependency_refresh, reason = render_dependencies_need_refresh(
                     yaml_path, outdir, backend
                 )
+            if decisions is not None:
+                # The bulk loop acts on this answer instead of asking again.
+                decisions[cue] = (coarse_refresh, dependency_refresh, reason)
             if not force_render and not coarse_refresh and not dependency_refresh:
                 continue
             try:
@@ -879,7 +895,12 @@ def _bulk_job_plan(n_cues: int, requested: int) -> tuple[int, int]:
     return cue_jobs, group_jobs
 
 
-def _run_bulk(args, cues: tuple[str, ...], action: str) -> int:
+def _run_bulk(
+    args,
+    cues: tuple[str, ...],
+    action: str,
+    decisions: dict[str, tuple[bool, bool, str]] | None = None,
+) -> int:
     failed: list[str] = []
     desc = f"music {action}"
     cue_jobs, group_jobs = _bulk_job_plan(len(cues), int(getattr(args, "jobs", 0) or 0))
@@ -892,6 +913,7 @@ def _run_bulk(args, cues: tuple[str, ...], action: str) -> int:
             force_render=args.force_render,
             dest_root=args.dest_root,
             render_jobs=group_jobs,
+            decision=(decisions or {}).get(cue),
         )
 
     if cue_jobs <= 1:
@@ -978,11 +1000,12 @@ def run_bulk_cues(config, *, cues_factory, action: str) -> int:
         if not os.environ.get("AMBITION_MUSIC_ALLOW_GM_FALLBACK"):
             return 1
         print("  AMBITION_MUSIC_ALLOW_GM_FALLBACK set; continuing with fallback audio", file=sys.stderr)
+    decisions: dict[str, tuple[bool, bool, str]] = {}
     if action in ("render", "render-publish") and not _preflight_bulk_render(
-        cues, backend=config.backend, force_render=config.force_render
+        cues, backend=config.backend, force_render=config.force_render, decisions=decisions
     ):
         return 1
-    return _run_bulk(config, cues, action)
+    return _run_bulk(config, cues, action, decisions)
 
 
 def _single_bundle_render_jobs(args) -> int:

@@ -408,3 +408,22 @@ def test_non_generated_hidden_sfz_is_not_filtered(tmp_path: Path):
     path = tmp_path / ".legitimate.sfz"
     path.write_text("<group>\n", encoding="utf8")
     assert discover_sfz_files([tmp_path]) == [path.resolve()]
+
+
+def test_a_glob_reference_matches_as_path_glob_does(tmp_path: Path):
+    """Glob references are answered from one walk of the root, not a walk per
+    pattern; the answer is the one `Path.glob` gives."""
+    from ambition_music_renderer.instrument_libraries import _glob_parts_match
+
+    root = tmp_path / "sfz"
+    for rel in ("VSCO/Strings/Violin Sus.sfz", "VSCO/Strings/deep/Viola Sus.SFZ", "Other/Violin.sfz", "VSCO/readme.txt"):
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<group>\n", encoding="utf8")
+    files = [p.relative_to(root) for p in root.rglob("*") if p.is_file()]
+    for pattern in ("**/*Violin*.sfz", "VSCO/**/*.sfz", "VSCO/*/*.sfz", "*/Strings/Vio?a*", "**/*.SFZ", "Other/*"):
+        walked = {p.relative_to(root) for p in root.glob(pattern) if p.is_file()}
+        matched = {rel for rel in files if _glob_parts_match(rel.parts, Path(pattern).parts)}
+        assert matched == walked, pattern
+    resolved = resolve_sfz_reference("**/*Violin*.sfz", prefer=["vsco"], roots=[root])
+    assert resolved == (root / "VSCO/Strings/Violin Sus.sfz").resolve()

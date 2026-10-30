@@ -107,7 +107,9 @@ def compute_score_render_dependencies(
     from .dependencies import render_dependency_fingerprint_for_score
 
     if spec is None:
-        spec = yaml.safe_load(Path(score_path).read_text(encoding="utf8")) or {}
+        # libyaml when installed: the same document, and the pure-Python
+        # parser was most of a fingerprint once instruments were cached.
+        spec = yaml.load(Path(score_path).read_text(encoding="utf8"), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}
     return render_dependency_fingerprint_for_score(
         Path(score_path), backend, spec=spec
     )

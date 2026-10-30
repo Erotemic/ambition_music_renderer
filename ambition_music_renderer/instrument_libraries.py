@@ -8,10 +8,11 @@ evidence about that machine, not authoring vocabulary.
 
 from __future__ import annotations
 
+import fnmatch
 import functools
 import os
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 from .instrument_catalog import (
@@ -140,6 +141,13 @@ def _discover_sfz_files_cached(root_keys: tuple[str, ...]) -> tuple[Path, ...]:
         except OSError:
             continue
     return tuple(sorted(set(out), key=lambda p: str(p).lower()))
+
+
+@functools.lru_cache(maxsize=8)
+def _sfz_candidate_texts(root_keys: tuple[str, ...]) -> tuple[tuple[Path, str], ...]:
+    """Each discovered program with its library-relative text, once."""
+    roots = [Path(key) for key in root_keys]
+    return tuple((path, _candidate_text(path, roots)) for path in discover_sfz_files(roots))
 
 
 def discover_sfz_files(roots: Iterable[str | Path] | None = None) -> list[Path]:
@@ -304,36 +312,101 @@ def resolve_sfz_reference(
                 return candidate
         # Treat explicit strings containing glob metacharacters as a search pattern.
         if any(ch in explicit for ch in "*?["):
-            glob_candidates: list[Path] = []
-            for root in search_roots:
-                if root.exists():
-                    glob_candidates.extend(path.resolve() for path in root.glob(explicit))
-            glob_candidates = [
-                p for p in glob_candidates
-                if p.is_file() and p.suffix.lower() == ".sfz"
-                and not is_transient_sfz_wrapper(p)
-            ]
-            if glob_candidates:
-                return sorted(
-                    glob_candidates,
-                    key=lambda p: (
-                        -_score_candidate(p, alias=None, prefer=prefer, roots=search_roots),
-                        str(p),
-                    ),
-                )[0]
+            found = _resolve_sfz_glob_cached(
+                explicit, tuple(prefer), tuple(str(root) for root in search_roots)
+            )
+            if found is not None:
+                return found
     if not library_ref:
         return None
+    return _resolve_sfz_library_ref_cached(
+        library_ref, tuple(prefer), tuple(str(root) for root in search_roots)
+    )
+
+
+# Resolution against the installed libraries is a pure function of the
+# libraries, which do not change mid-process (`_discover_sfz_files_cached`):
+# one answer per question, per process. A glob or a catalog reference walks or
+# scores the whole ~1800-program tree, and every instrument of every cue asks;
+# uncached, one cue's render fingerprint took up to 30 s, most of it here
+# (2026-10-30), and a publish asks for every cue's fingerprint several times.
+
+
+@functools.lru_cache(maxsize=8)
+def _sfz_tree(root_key: str) -> tuple[str, ...]:
+    """Every file under `root_key` whose suffix is `.sfz` (any case), as a
+    path relative to it, from one walk that follows links as `Path.glob`
+    does."""
+    root = Path(root_key)
+    if not root.is_dir():
+        return ()
+    out: list[str] = []
+    for directory, _dirs, files in os.walk(root, followlinks=True):
+        for name in files:
+            if name.lower().endswith(".sfz"):
+                out.append(os.path.relpath(os.path.join(directory, name), root))
+    return tuple(sorted(out))
+
+
+def _glob_parts_match(parts: tuple[str, ...], pattern: tuple[str, ...]) -> bool:
+    """`Path.glob` matching of a relative path's parts: `**` is any number of
+    directories, any other part an `fnmatch` pattern of one name."""
+    if not pattern:
+        return not parts
+    if pattern[0] == "**":
+        return any(_glob_parts_match(parts[index:], pattern[1:]) for index in range(len(parts) + 1))
+    if not parts:
+        return False
+    return fnmatch.fnmatchcase(parts[0], pattern[0]) and _glob_parts_match(parts[1:], pattern[1:])
+
+
+@functools.lru_cache(maxsize=4096)
+def _resolve_sfz_glob_cached(
+    pattern: str, prefer: tuple[str, ...], root_keys: tuple[str, ...]
+) -> Path | None:
+    search_roots = [Path(key) for key in root_keys]
+    glob_candidates: list[Path] = []
+    pattern_parts = tuple(part for part in PurePosixPath(pattern).parts if part not in ("", "."))
+    for root in search_roots:
+        # Matched against the root's one walk (`_sfz_tree`), not a walk per
+        # pattern: `root.glob` walked the 24 GB tree for each.
+        glob_candidates.extend(
+            (root / rel).resolve()
+            for rel in _sfz_tree(str(root))
+            if _glob_parts_match(PurePosixPath(rel).parts, pattern_parts)
+        )
+    glob_candidates = [
+        p for p in glob_candidates
+        if p.is_file() and p.suffix.lower() == ".sfz"
+        and not is_transient_sfz_wrapper(p)
+    ]
+    if not glob_candidates:
+        return None
+    return sorted(
+        glob_candidates,
+        key=lambda p: (
+            -_score_candidate(p, alias=None, prefer=prefer, roots=search_roots),
+            str(p),
+        ),
+    )[0]
+
+
+@functools.lru_cache(maxsize=4096)
+def _resolve_sfz_library_ref_cached(
+    library_ref: str, prefer: tuple[str, ...], root_keys: tuple[str, ...]
+) -> Path | None:
+    search_roots = [Path(key) for key in root_keys]
     entry = get_instrument_catalog_entry(library_ref)
     alias = (
         entry.resolver
         if entry is not None
         else ResolverHints(required_any=(tuple(_normalize_text(library_ref).split()),))
     )
-    candidates = []
-    for path in discover_sfz_files(search_roots):
-        text = _candidate_text(path, search_roots)
-        if _matches_required(text, alias):
-            candidates.append(path)
+    candidates = [
+        path
+        for path, text in _sfz_candidate_texts(root_keys)
+        if _matches_required(text, alias)
+    ]
     if not candidates:
         return None
     candidates = _prefer_catalog_source(candidates, entry)

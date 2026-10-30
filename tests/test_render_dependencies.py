@@ -299,3 +299,25 @@ def test_per_instrument_soundfont_identity_invalidates_render(tmp_path):
     row = before.payload["instrument_resolution"]["instruments"]["lead"]
     assert row["wants_soundfont"] is True
     assert row["resolved_soundfont"]["path"].endswith("shamisen.sf2")
+
+
+def test_orchestration_edits_do_not_mark_every_render_stale(tmp_path):
+    """Editing how a publish runs, or how the fingerprint is computed, keeps
+    the renderer code's identity; editing synthesis code changes it."""
+    import shutil
+
+    from ambition_music_renderer.render import dependencies
+
+    root = tmp_path / "pkg"
+    (root / "render").mkdir(parents=True)
+    (root / "data").mkdir()
+    for rel in ("cli.py", "instrument_libraries.py", "render/dependencies.py", "render/synth.py"):
+        (root / rel).write_text("# v1\n", encoding="utf8")
+    before = renderer_implementation_identity(root)
+    for rel in ("cli.py", "instrument_libraries.py", "render/dependencies.py"):
+        (root / rel).write_text("# v2\n", encoding="utf8")
+    assert renderer_implementation_identity(root) == before
+    (root / "render/synth.py").write_text("# v2\n", encoding="utf8")
+    assert renderer_implementation_identity(root) != before
+    assert "render/generated_layout.py" in dependencies._NON_AUDIO_MODULES
+    shutil.rmtree(root)

@@ -66,7 +66,7 @@ def _wire(monkeypatch, score, *, resolves: bool):
     )
     rendered: list[str] = []
     monkeypatch.setattr(
-        cli, "_run_bulk", lambda config, cues, action: rendered.append(action) or 0
+        cli, "_run_bulk", lambda config, cues, action, decisions=None: rendered.append(action) or 0
     )
     return rendered
 

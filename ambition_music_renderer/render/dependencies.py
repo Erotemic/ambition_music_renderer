@@ -190,13 +190,36 @@ def _renderer_package_root() -> Path:
 # module here after checking nothing outside it imports it.
 _NON_AUDIO_MODULE_PREFIXES = ("music_review",)
 
+# Modules a render path does import, but that cannot change a render's bytes:
+# what they decide is already in the fingerprint by its own entry, or is not
+# audio. ⛔ Hashing them made every edit to how a publish runs, or to how the
+# fingerprint itself is computed, mark the WHOLE catalogue stale: tonight's
+# (2026-10-29) "one new song" publish followed a run that re-rendered 125 cues
+# after such edits. A module belongs here only with its reason.
+_NON_AUDIO_MODULES = frozenset({
+    # Orchestration: which cues, in what order, where they publish. (Its
+    # `render_mode_for_cue` picks full-mix-only for adaptive cues; a change
+    # there is deliberate and re-renders with `--force`.)
+    "cli.py",
+    # Copying finished files into a publish root.
+    "publish_safely.py",
+    # Which installed program a reference names: the program it resolves to is
+    # in the fingerprint (`instrument_resolution`'s resolved SFZ, by content).
+    "instrument_libraries.py",
+    # The fingerprint itself and the versioned output directory it names.
+    "render/dependencies.py",
+    "render/generated_layout.py",
+})
+
 
 def _compute_renderer_implementation_identity(root: Path) -> dict[str, Any]:
     files = sorted(
         [
             path
             for path in root.rglob("*.py")
-            if "__pycache__" not in path.parts and not path.name.startswith(_NON_AUDIO_MODULE_PREFIXES)
+            if "__pycache__" not in path.parts
+            and not path.name.startswith(_NON_AUDIO_MODULE_PREFIXES)
+            and path.relative_to(root).as_posix() not in _NON_AUDIO_MODULES
         ]
         + list((root / "data").glob("*.yaml"))
     )
@@ -779,7 +802,7 @@ def render_dependency_fingerprint_for_score(
 
     spec_path = Path(spec_path)
     if spec is None:
-        spec = yaml.safe_load(spec_path.read_text(encoding="utf8")) or {}
+        spec = yaml.load(spec_path.read_text(encoding="utf8"), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}
     # Preserve the historical preflight ordering: explicit render resources are
     # resolved before score construction, so a broken SoundFont path is reported
     # directly even when the score also has a structural error.
