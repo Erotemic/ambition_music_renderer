@@ -13,8 +13,9 @@ stem, twice for each sixteenth note, as note name and cents. The third form
 prints, for each held note of one stem, the level of its last quarter minus the
 level of its first quarter.
 
-The stems are the audio after group processing and before the master chain. The
-score must have one tempo and a 4/4 meter.
+The stems are the audio after group processing and before the master chain. Bars
+are placed with the score's own meter and tempo map (``ScoreClock`` and
+``ExactTempoMap``), so a ritardando or a meter change moves them correctly.
 
 What this found on carry_the_one (2026-10-10):
 
@@ -37,9 +38,33 @@ import argparse
 import glob
 import json
 import os
+import sys
 
 import numpy as np
 import yaml
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from ambition_music_renderer.musicir.v3 import normalize_v3_score_graph  # noqa: E402
+from ambition_music_renderer.render.exact_score import ExactTempoMap, ScoreClock  # noqa: E402
+
+
+def bar_clock(spec: dict):
+    """Return ``seconds(bar)`` for a MusicIR v3 score: the time of a bar's first beat.
+
+    A fractional bar is placed by linear interpolation inside its bar."""
+    timing = normalize_v3_score_graph(spec).timing_score()
+    clock = ScoreClock(timing)
+    tempo = ExactTempoMap(timing, clock).bind_ppq(clock.ppq)
+
+    def seconds(bar: float) -> float:
+        whole = int(bar)
+        t0 = tempo.tick_to_time(clock.position_to_tick({"bar": whole, "beat": 1}))
+        if bar == whole:
+            return t0
+        t1 = tempo.tick_to_time(clock.position_to_tick({"bar": whole + 1, "beat": 1}))
+        return t0 + (bar - whole) * (t1 - t0)
+
+    return seconds
 
 NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split()
 
@@ -60,19 +85,20 @@ def load_stems(render_dir: str) -> dict[str, np.ndarray]:
     return stems
 
 
-def print_levels(stems: dict[str, np.ndarray], sections: list[tuple[str, int, int]], bar_seconds: float, sr: int) -> None:
+def print_levels(stems: dict[str, np.ndarray], sections: list[tuple[str, int, int]], seconds, sr: int) -> None:
     names = list(stems)
     print("section".ljust(12) + " ".join(n.rjust(11) for n in names) + "         sum")
     for name, first, last in sections:
-        lo, hi = int((first - 1) * bar_seconds * sr), int((last - 1) * bar_seconds * sr)
+        lo, hi = int(seconds(first) * sr), int(seconds(last) * sr)
         row = [rms_db(stems[n][lo:hi]) for n in names]
         total = sum(stems[n][lo:hi][: hi - lo] for n in names if len(stems[n]) >= hi)
         print(name.ljust(12) + " ".join(f"{v:11.1f}" for v in row) + f" {rms_db(total):11.1f}")
     print("left minus right (dB): " + " ".join(f"{n}={rms_db(stems[n][:, 0]) - rms_db(stems[n][:, 1]):+.1f}" for n in names))
 
 
-def print_pitch(audio: np.ndarray, first: float, last: float, bar_seconds: float, sr: int, floor_hz: float = 150.0) -> None:
-    mono = audio.mean(axis=1)[int((first - 1) * bar_seconds * sr): int((last - 1) * bar_seconds * sr)]
+def print_pitch(audio: np.ndarray, first: float, last: float, seconds, sr: int, floor_hz: float = 150.0) -> None:
+    mono = audio.mean(axis=1)[int(seconds(first) * sr): int(seconds(last) * sr)]
+    bar_seconds = (seconds(last) - seconds(first)) / max(last - first, 1e-9)
     win, hop = 4096, 1024
     track: list[float | None] = []
     for i in range(0, len(mono) - win, hop):
@@ -125,16 +151,16 @@ def main() -> None:
     parser.add_argument("--sample_rate", type=int, default=48000)
     args = parser.parse_args()
     spec = yaml.safe_load(open(args.score, encoding="utf8"))
-    bar_seconds = 4 * 60.0 / float(spec["tempo"])
+    seconds = bar_clock(spec)
     stems = load_stems(args.render_dir)
     if args.held:
         print_held(args.render_dir, args.held, stems[args.held], args.held_seconds, args.sample_rate)
     elif args.pitch:
         group, first, last = args.pitch
-        print_pitch(stems[group], float(first), float(last), bar_seconds, args.sample_rate, args.pitch_floor_hz)
+        print_pitch(stems[group], float(first), float(last), seconds, args.sample_rate, args.pitch_floor_hz)
     else:
         sections = [(str(f["id"]), int(f["from"]["bar"]), int(f["to"]["bar"])) for f in spec["form"]]
-        print_levels(stems, sections, bar_seconds, args.sample_rate)
+        print_levels(stems, sections, seconds, args.sample_rate)
 
 
 if __name__ == "__main__":

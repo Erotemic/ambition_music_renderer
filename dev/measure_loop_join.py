@@ -14,7 +14,8 @@ It prints:
 - with ``--notes``, for each group the highest note and the highest note that is held, each note
   that sounds across the end of the form, and the notes of the last bar and of the first bar.
 
-The score must have one tempo and a 4/4 meter.
+Bars are placed with the score's meter and tempo map (see ``bar_clock`` in
+``measure_stems.py``).
 """
 from __future__ import annotations
 
@@ -22,10 +23,14 @@ import argparse
 import glob
 import json
 import os
+import sys
 
 import numpy as np
 import soundfile as sf
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from measure_stems import bar_clock  # noqa: E402
 
 NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split()
 
@@ -89,11 +94,12 @@ def main() -> None:
     parser.add_argument("--held_beats", type=float, default=0.75, help="shortest note that counts as held")
     args = parser.parse_args()
     spec = yaml.safe_load(open(args.score, encoding="utf8"))
-    bar_seconds = 4 * 60.0 / float(spec["tempo"])
+    seconds = bar_clock(spec)
     bars = int(spec["end"]["bar"]) - 1
     audio, sr = sf.read(args.audio, always_2d=True)
     mono = audio.mean(axis=1)
-    form_seconds = bars * bar_seconds
+    form_seconds = seconds(bars + 1)
+    bar_seconds = seconds(bars + 1) - seconds(bars)  # the last bar; the first bar is measured with it too
     print(f"file {len(mono) / sr:.3f} s, form {form_seconds:.3f} s ({bars} bars), difference {(len(mono) / sr - form_seconds) * 1000:+.1f} ms")
     print(f"file peak {20 * np.log10(np.abs(audio).max() + 1e-9):.2f} dBFS, rms {rms_db(mono):.1f} dBFS")
     bar, beat, short = int(bar_seconds * sr), int(bar_seconds * sr / 4), int(0.05 * sr)
