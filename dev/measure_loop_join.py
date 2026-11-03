@@ -30,7 +30,7 @@ import soundfile as sf
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from measure_stems import bar_clock  # noqa: E402
+from measure_stems import bar_clock, quarter_clock  # noqa: E402
 
 NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split()
 
@@ -102,7 +102,11 @@ def main() -> None:
     bar_seconds = seconds(bars + 1) - seconds(bars)  # the last bar; the first bar is measured with it too
     print(f"file {len(mono) / sr:.3f} s, form {form_seconds:.3f} s ({bars} bars), difference {(len(mono) / sr - form_seconds) * 1000:+.1f} ms")
     print(f"file peak {20 * np.log10(np.abs(audio).max() + 1e-9):.2f} dBFS, rms {rms_db(mono):.1f} dBFS")
-    bar, beat, short = int(bar_seconds * sr), int(bar_seconds * sr / 4), int(0.05 * sr)
+    quarters = quarter_clock(spec)
+    end_quarter = quarters(bars + 1)
+    last_bar_quarters = end_quarter - quarters(bars)
+    # "beat" is one quarter note of the last bar, whatever the meter.
+    bar, beat, short = int(bar_seconds * sr), int(bar_seconds * sr / last_bar_quarters), int(0.05 * sr)
     print("level (dBFS)      bar    beat   50 ms")
     print(f"  end of file  {rms_db(mono[-bar:]):6.1f}  {rms_db(mono[-beat:]):6.1f}  {rms_db(mono[-short:]):6.1f}")
     print(f"  start        {rms_db(mono[:bar]):6.1f}  {rms_db(mono[:beat]):6.1f}  {rms_db(mono[:short]):6.1f}")
@@ -116,7 +120,7 @@ def main() -> None:
     print(f"pitch classes, first bar: {top(first)}")
     print(f"first bar and last bar alike: {alike:.2f}")
     if args.notes:
-        print_notes(args.notes, 4.0, bars * 4.0, args.held_beats)
+        print_notes(args.notes, last_bar_quarters, end_quarter, args.held_beats)
 
 
 if __name__ == "__main__":

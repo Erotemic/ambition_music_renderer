@@ -66,6 +66,20 @@ def bar_clock(spec: dict):
 
     return seconds
 
+def quarter_clock(spec: dict):
+    """Return ``quarters(bar)``: the quarter notes from the start of bar 1 to the
+    first beat of ``bar``. The note timeline counts in quarter notes, whatever
+    the meter (a bar of 7/4 is 7, a bar of 6/8 is 3)."""
+    timing = normalize_v3_score_graph(spec).timing_score()
+    clock = ScoreClock(timing)
+    origin = clock.position_to_tick({"bar": 1, "beat": 1})
+
+    def quarters(bar: int) -> float:
+        return (clock.position_to_tick({"bar": int(bar), "beat": 1}) - origin) / clock.ppq
+
+    return quarters
+
+
 NOTE_NAMES = "C C# D D# E F F# G G# A A# B".split()
 
 

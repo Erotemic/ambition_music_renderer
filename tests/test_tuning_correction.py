@@ -79,6 +79,42 @@ def test_global_correction_keeps_chord_in_one_lane():
     assert len(lanes[0].instruments[0].notes) == 3
 
 
+def _bend_after(inst, time_s):
+    value = 0
+    for pb in sorted(inst.pitch_bends, key=lambda pb: pb.time):
+        if pb.time <= time_s:
+            value = pb.pitch
+    return value
+
+
+def test_a_correction_holds_while_the_note_rings_after_note_off():
+    # A plucked sample rings after note-off. The bend must stay on the
+    # correction through the gap, and change only for the next note.
+    pm = _pm([(60, 0.0, 0.25), (67, 2.0, 2.25)])
+    spec = {"name": "test", "tuning_correction": {"mode": "curve", "points": {"C4": -40.0, "G4": 30.0}}}
+    (lane,) = build_tuning_lane_pms(pm, spec)
+    inst = lane.instruments[0]
+    assert _bend_after(inst, 0.1) < 0
+    assert _bend_after(inst, 1.5) == _bend_after(inst, 0.1), "the C ring went back to its raw pitch"
+    assert _bend_after(inst, 2.1) > 0
+    assert _bend_after(inst, 9.0) == _bend_after(inst, 2.1), "the last note's ring went back to its raw pitch"
+
+
+def test_a_global_correction_is_one_constant_bend():
+    pm = _pm([(60, 0.0, 0.25), (64, 1.0, 1.25), (67, 3.0, 3.25)])
+    (lane,) = build_tuning_lane_pms(pm, {"name": "test", "tuning_correction": -12.0})
+    bends = lane.instruments[0].pitch_bends
+    assert len(bends) == 1 and bends[0].pitch < 0
+
+
+def test_an_authored_bend_in_a_gap_keeps_the_held_correction():
+    pm = _pm([(60, 0.0, 0.25), (60, 2.0, 2.25)])
+    pm.instruments[0].pitch_bends = [pretty_midi.PitchBend(pitch=1000, time=1.0)]
+    (lane,) = build_tuning_lane_pms(pm, {"name": "test", "tuning_correction": -25.0})
+    inst = lane.instruments[0]
+    assert _bend_after(inst, 1.5) == 1000 + _bend_after(inst, 0.1)
+
+
 def test_group_renderer_uses_polyphony_safe_tuning_lanes(monkeypatch, tmp_path):
     import numpy as np
     from ambition_music_renderer.render import group as group_mod

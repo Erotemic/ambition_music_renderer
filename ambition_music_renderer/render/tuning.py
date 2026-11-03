@@ -161,10 +161,20 @@ def _correction_intervals(notes: list[pretty_midi.Note]) -> list[tuple[float, fl
 
 
 def _correction_at(intervals: list[tuple[float, float, float]], time_s: float) -> float:
-    for start, end, cents in intervals:
-        if start - 1e-9 <= time_s < end - 1e-9:
-            return cents
-    return 0.0
+    """The correction that holds at `time_s`.
+
+    A correction holds after its note ends, until the next interval of the
+    lane starts. A plucked or struck sample rings after its note-off; if the
+    bend went back to zero at note-off, the ringing tail would go back to
+    the raw sample pitch.
+    """
+    held = 0.0
+    for start, _end, cents in intervals:
+        if start - _BOUNDARY_EPSILON_S - 1e-9 <= time_s:
+            held = cents
+        else:
+            break
+    return held
 
 
 def _lane_pitch_bends(
@@ -184,16 +194,14 @@ def _lane_pitch_bends(
             )
         values[float(pb.time)] = combined
 
-    for index, (start, end, cents) in enumerate(intervals):
+    # Each correction is set just before its interval starts and holds until
+    # the next one is set. There is no reset at note-off (see `_correction_at`).
+    for start, _end, cents in intervals:
         set_time = max(0.0, float(start) - _BOUNDARY_EPSILON_S)
         combined = _bend_at(base, set_time) + cents_to_pitch_bend(cents, range_cents)
         if not -8192 <= combined <= 8191:
             raise ValueError("authored pitch bend plus tuning correction exceeds MIDI range")
         values[set_time] = combined
-        next_start = intervals[index + 1][0] if index + 1 < len(intervals) else None
-        if next_start is None or float(next_start) > float(end) + 2 * _BOUNDARY_EPSILON_S:
-            reset_time = float(end) + _BOUNDARY_EPSILON_S
-            values[reset_time] = _bend_at(base, reset_time)
 
     out: list[pretty_midi.PitchBend] = []
     previous: int | None = None

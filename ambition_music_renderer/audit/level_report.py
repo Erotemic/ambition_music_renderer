@@ -195,6 +195,14 @@ class LevelReportConfig(kwconf.Config):
 
 @profile
 def run(args: LevelReportConfig) -> int:
+    if args.root is None:
+        print(
+            "audit levels: no music root. Pass --root <dir>, or set AMBITION_MUSIC_PUBLISH_ROOT "
+            "to the game's published music directory. To compare unpublished renders, pass "
+            "--root generated --glob '*/latest/preview/*.full_soundtrack_preview.ogg'.",
+            file=sys.stderr,
+        )
+        return 2
     paths = sorted(args.root.glob(args.glob))
     if not paths:
         print(f"no audio matched {args.root}/{args.glob}", file=sys.stderr)
