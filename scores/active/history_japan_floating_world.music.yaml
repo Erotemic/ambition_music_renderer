@@ -30,13 +30,13 @@ harmony:
   cycle: false
   progression: [Emaj7, C#m7, Amaj7, B11, Emaj7, C#m7, Amaj7, B11, Emaj7, C#m7, Amaj7, B11, Amaj7, G#m7, F#m7, B11, Amaj7, G#m7, C#m7, B11, C#m7, C#m7, Amaj7, Amaj7, F#m7, F#m7, B11, B11, Amaj7, G#m7, F#m7, B11, Amaj7, G#m7, C#m7, B11, Emaj7, C#m7, Amaj7, B11]
 instruments:
-  - {name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 72, expression: 106, instrument_backend: {kind: sfz, library_ref: epiano.rhodes}}
-  - {name: guitar, group: guitar, program: clean_guitar, volume: 98, pan: 50, expression: 102, instrument_backend: {kind: sfz, library_ref: guitar.clean}}
-  - {name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, library_ref: bass.swag}}
+  - {name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 72, expression: 106, instrument_backend: {kind: sfz, optional: false, library_ref: epiano.rhodes}}
+  - {name: guitar, group: guitar, program: clean_guitar, volume: 98, pan: 50, expression: 102, controls: {100: 126}, instrument_backend: {kind: sfz, optional: false, library_ref: guitar.clean}}
+  - {name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, optional: false, library_ref: bass.swag}}
   - {name: lead, group: lead, program: lead_square, volume: 100, pan: 64, expression: 104, tuning_correction: {mode: global, cents: 9.8}, instrument_backend: {kind: surge, patch: 'Leads/Classic Lead 2'}}
-  - {name: brass, group: brass, program: brass_section, volume: 104, pan: 76, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, library_ref: orchestra.trumpets_staccato}}
+  - {name: brass, group: brass, program: brass_section, volume: 104, pan: 76, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.trumpets_staccato}}
   - {name: shamisen, group: shamisen, program: shamisen, volume: 108, pan: 54, expression: 110, instrument_backend: {kind: soundfont, renderer: fluidsynth-cli, library_ref: japan.shamisen}}
-  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, library_ref: drums.muldjord}}
+  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, optional: false, library_ref: drums.muldjord}}
 parts:
   - id: keys_part
     instrument: keys
@@ -1381,7 +1381,7 @@ processing:
     guitar:
       chain:
         - {processor: highpass, cutoff_hz: 240}
-        - {processor: gain, gain_db: -3.0}
+        - {processor: gain, gain_db: 5.5}
     bass:
       chain:
         - {processor: highpass, cutoff_hz: 35}

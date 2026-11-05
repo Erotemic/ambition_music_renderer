@@ -30,12 +30,12 @@ harmony:
   cycle: false
   progression: [C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F, C, F, G, F]
 instruments:
-  - {name: rhythm, group: rhythm, program: clean_guitar, volume: 100, pan: 48, expression: 104, instrument_backend: {kind: sfz, library_ref: guitar.clean}}
-  - {name: lead, group: lead, program: clean_guitar, volume: 104, pan: 80, expression: 108, instrument_backend: {kind: sfz, library_ref: guitar.clean}}
-  - {name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, library_ref: bass.swag}}
-  - {name: likembe, group: likembe, program: kalimba, volume: 104, pan: 64, expression: 106, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {59: 9, 60: 9, 61: 10, 62: 10, 63: 0, 72: 0, 73: -19, 74: -19, 75: -27, 76: -27, 77: 0, 84: 0}}, instrument_backend: {kind: sfz, sfz_glob: '**/VCSL-1.2.2-RC/Idiophones/Plucked Idiophones/Kalimba, Kenya.sfz', settings: {fold_to_range: false}}}
-  - {name: brass, group: brass, program: brass_section, volume: 104, pan: 70, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, library_ref: orchestra.trumpets_staccato}}
-  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, library_ref: drums.muldjord}}
+  - {name: rhythm, group: rhythm, program: clean_guitar, volume: 100, pan: 48, expression: 104, controls: {100: 126}, instrument_backend: {kind: sfz, optional: false, library_ref: guitar.clean}}
+  - {name: lead, group: lead, program: clean_guitar, volume: 104, pan: 80, expression: 108, controls: {100: 126}, instrument_backend: {kind: sfz, optional: false, library_ref: guitar.clean}}
+  - {name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, optional: false, library_ref: bass.swag}}
+  - {name: likembe, group: likembe, program: kalimba, volume: 104, pan: 64, expression: 106, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {59: 9, 60: 9, 61: 10, 62: 10, 63: 0, 72: 0, 73: -19, 74: -19, 75: -27, 76: -27, 77: 0, 84: 0}}, instrument_backend: {kind: sfz, optional: false, sfz_glob: '**/VCSL-1.2.2-RC/Idiophones/Plucked Idiophones/Kalimba, Kenya.sfz', settings: {fold_to_range: false}}}
+  - {name: brass, group: brass, program: brass_section, volume: 104, pan: 70, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.trumpets_staccato}}
+  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, optional: false, library_ref: drums.muldjord}}
 parts:
   - id: rhythm_part
     instrument: rhythm
@@ -2694,12 +2694,12 @@ processing:
       chain:
         - {processor: highpass, cutoff_hz: 200}
         - {processor: reverb, wet: 0.12, decay_seconds: 1.0}
-        - {processor: gain, gain_db: 0.0}
+        - {processor: gain, gain_db: 7.5}
     lead:
       chain:
         - {processor: highpass, cutoff_hz: 220}
         - {processor: reverb, wet: 0.18, decay_seconds: 1.4}
-        - {processor: gain, gain_db: 0.0}
+        - {processor: gain, gain_db: 8.5}
     bass:
       chain:
         - {processor: highpass, cutoff_hz: 35}

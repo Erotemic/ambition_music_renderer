@@ -232,11 +232,11 @@ BONES_TUNING = {52: 0, 54: 21, 55: 0}
 
 
 def sfz(ref: str) -> str:
-    return f"instrument_backend: {{kind: sfz, library_ref: {ref}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, library_ref: {ref}}}"
 
 
 def vcsl(path: str) -> str:
-    return f"instrument_backend: {{kind: sfz, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
 
 
 def surge(patch: str) -> str:
@@ -245,7 +245,10 @@ def surge(patch: str) -> str:
 
 #: The Surge lead measures 9.8 cents flat (`cue tuning_audit`, 2026-11-05).
 #: group gains in dB, set from the section levels that dev/measure_stems.py reads.
-GAIN = {"keys": 0.0, "guitar": -3.0, "bass": 4.0, "lead": -13.0, "brass": 6.0, "shamisen": -5.0, "drums": 0.0}
+GAIN = {"keys": 0.0, "guitar": 5.5, "bass": 4.0, "lead": -13.0, "brass": 6.0, "shamisen": -5.0, "drums": 0.0}
+#: Shinyguitar's acoustic programs are silent while CC100 (pickup to microphone
+#: blend) is 0. The guitars set it, and every sampled backend here is not
+#: optional, so a silent one stops the render instead of falling back to General MIDI.
 score = f"""schema: ambition.musicir.v3
 id: history_japan_floating_world
 title: Floating World
@@ -279,7 +282,7 @@ harmony:
   progression: [{", ".join(PROG)}]
 instruments:
   - {{name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 72, expression: 106, {sfz("epiano.rhodes")}}}
-  - {{name: guitar, group: guitar, program: clean_guitar, volume: 98, pan: 50, expression: 102, {sfz("guitar.clean")}}}
+  - {{name: guitar, group: guitar, program: clean_guitar, volume: 98, pan: 50, expression: 102, controls: {{100: 126}}, {sfz("guitar.clean")}}}
   - {{name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, {SWAG_TUNING}{sfz("bass.swag")}}}
   - {{name: lead, group: lead, program: lead_square, volume: 100, pan: 64, expression: 104, tuning_correction: {{mode: global, cents: 9.8}}, {surge("Leads/Classic Lead 2")}}}
   - {{name: brass, group: brass, program: brass_section, volume: 104, pan: 76, expression: 108, {curve(TRUMPET_TUNING)}{sfz("orchestra.trumpets_staccato")}}}

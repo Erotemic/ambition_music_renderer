@@ -233,11 +233,11 @@ BONES_TUNING = {52: 0, 54: 21, 55: 0}
 
 
 def sfz(ref: str) -> str:
-    return f"instrument_backend: {{kind: sfz, library_ref: {ref}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, library_ref: {ref}}}"
 
 
 def vcsl(path: str) -> str:
-    return f"instrument_backend: {{kind: sfz, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
 
 
 def surge(patch: str) -> str:
@@ -247,7 +247,10 @@ def surge(patch: str) -> str:
 #: The Kenyan kalimba's own tuning, measured for `history_atlantic_no_return`.
 KALIMBA_TUNING = {59: 9, 60: 9, 61: 10, 62: 10, 63: 0, 72: 0, 73: -19, 74: -19, 75: -27, 76: -27, 77: 0, 84: 0}
 #: group gains in dB, set from the section levels that dev/measure_stems.py reads.
-GAIN = {"rhythm": 0.0, "lead": 0.0, "bass": 3.0, "likembe": 10.0, "brass": 8.0, "drums": 0.0}
+GAIN = {"rhythm": 7.5, "lead": 8.5, "bass": 3.0, "likembe": 10.0, "brass": 8.0, "drums": 0.0}
+#: Shinyguitar's acoustic programs are silent while CC100 (pickup to microphone
+#: blend) is 0. The guitars set it, and every sampled backend here is not
+#: optional, so a silent one stops the render instead of falling back to General MIDI.
 score = f"""schema: ambition.musicir.v3
 id: history_central_africa_sebene
 title: Sebene
@@ -280,8 +283,8 @@ harmony:
   cycle: false
   progression: [{", ".join(PROG)}]
 instruments:
-  - {{name: rhythm, group: rhythm, program: clean_guitar, volume: 100, pan: 48, expression: 104, {sfz("guitar.clean")}}}
-  - {{name: lead, group: lead, program: clean_guitar, volume: 104, pan: 80, expression: 108, {sfz("guitar.clean")}}}
+  - {{name: rhythm, group: rhythm, program: clean_guitar, volume: 100, pan: 48, expression: 104, controls: {{100: 126}}, {sfz("guitar.clean")}}}
+  - {{name: lead, group: lead, program: clean_guitar, volume: 104, pan: 80, expression: 108, controls: {{100: 126}}, {sfz("guitar.clean")}}}
   - {{name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, {SWAG_TUNING}{sfz("bass.swag")}}}
   - {{name: likembe, group: likembe, program: kalimba, volume: 104, pan: 64, expression: 106, {curve(KALIMBA_TUNING)}{vcsl("Idiophones/Plucked Idiophones/Kalimba, Kenya")}}}
   - {{name: brass, group: brass, program: brass_section, volume: 104, pan: 70, expression: 108, {curve(TRUMPET_TUNING)}{sfz("orchestra.trumpets_staccato")}}}

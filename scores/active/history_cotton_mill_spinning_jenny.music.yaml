@@ -30,13 +30,13 @@ harmony:
   cycle: false
   progression: [Am7, Am7, Am7, E7#9, Am7, Am7, D9, D9, Am7, Am7, D9, D9, Am7, Am7, D9, D9, Fmaj7, Em7, Dm7, E7#9, Am7, Am7, Am7, Am7, Am7, Am7, D9, E7#9, Am7, Am7, D9, D9, Fmaj7, Em7, Dm7, E7#9, Am7, D9, Am7, E7#9]
 instruments:
-  - {name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 76, expression: 108, instrument_backend: {kind: sfz, library_ref: epiano.rhodes}}
-  - {name: guitar, group: guitar, program: muted_guitar, volume: 100, pan: 50, expression: 104, instrument_backend: {kind: sfz, library_ref: guitar.clean}}
-  - {name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, library_ref: bass.swag}}
+  - {name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 76, expression: 108, instrument_backend: {kind: sfz, optional: false, library_ref: epiano.rhodes}}
+  - {name: guitar, group: guitar, program: muted_guitar, volume: 100, pan: 50, expression: 104, controls: {100: 126}, instrument_backend: {kind: sfz, optional: false, library_ref: guitar.clean}}
+  - {name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, optional: false, library_ref: bass.swag}}
   - {name: lead, group: lead, program: lead_square, volume: 100, pan: 64, expression: 104, instrument_backend: {kind: surge, patch: 'Leads/Classic Lead 1'}}
-  - {name: trumpet, group: brass, program: brass_section, volume: 106, pan: 70, expression: 110, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, library_ref: orchestra.trumpets_staccato}}
-  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, library_ref: drums.muldjord}}
-  - {name: shuttle, group: shuttle, is_drum: true, volume: 100, pan: 88, expression: 104, instrument_backend: {kind: sfz, sfz_glob: '**/VCSL-1.2.2-RC/Idiophones/Struck Idiophones/Woodblock.sfz', settings: {fold_to_range: false}}}
+  - {name: trumpet, group: brass, program: brass_section, volume: 106, pan: 70, expression: 110, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.trumpets_staccato}}
+  - {name: kit, group: drums, is_drum: true, volume: 116, pan: 64, expression: 114, instrument_backend: {kind: sfz, optional: false, library_ref: drums.muldjord}}
+  - {name: shuttle, group: shuttle, is_drum: true, volume: 100, pan: 88, expression: 104, instrument_backend: {kind: sfz, optional: false, sfz_glob: '**/VCSL-1.2.2-RC/Idiophones/Struck Idiophones/Woodblock.sfz', settings: {fold_to_range: false}}}
 parts:
   - id: keys_part
     instrument: keys
@@ -2093,7 +2093,7 @@ processing:
     guitar:
       chain:
         - {processor: highpass, cutoff_hz: 220}
-        - {processor: gain, gain_db: -4.0}
+        - {processor: gain, gain_db: 3.5}
     bass:
       chain:
         - {processor: highpass, cutoff_hz: 35}

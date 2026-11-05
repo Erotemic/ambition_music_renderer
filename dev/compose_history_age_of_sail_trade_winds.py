@@ -250,7 +250,7 @@ BONES_TUNING = {52: 0, 54: 21, 55: 0}
 
 
 def sfz(ref: str) -> str:
-    return f"instrument_backend: {{kind: sfz, library_ref: {ref}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, library_ref: {ref}}}"
 
 
 def surge(patch: str) -> str:
@@ -258,7 +258,10 @@ def surge(patch: str) -> str:
 
 
 #: group gains in dB, set from the section levels that dev/measure_stems.py reads.
-GAIN = {"guitar": -5.0, "organ": -14.0, "bass": 4.0, "brass": 7.0, "sax": 5.0, "drums": 1.0}
+GAIN = {"guitar": 5.5, "organ": -14.0, "bass": 4.0, "brass": 7.0, "sax": 5.0, "drums": 1.0}
+#: Shinyguitar's acoustic programs are silent while CC100 (pickup to microphone
+#: blend) is 0. The guitars set it, and every sampled backend here is not
+#: optional, so a silent one stops the render instead of falling back to General MIDI.
 score = f"""schema: ambition.musicir.v3
 id: history_age_of_sail_trade_winds
 title: Trade Winds, Bad Intentions
@@ -290,7 +293,7 @@ harmony:
   cycle: false
   progression: [{", ".join(PROG)}]
 instruments:
-  - {{name: guitar, group: guitar, program: clean_guitar, volume: 104, pan: 50, expression: 108, {sfz("guitar.clean")}}}
+  - {{name: guitar, group: guitar, program: clean_guitar, volume: 104, pan: 50, expression: 108, controls: {{100: 126}}, {sfz("guitar.clean")}}}
   - {{name: organ, group: organ, program: drawbar_organ, volume: 100, pan: 88, expression: 104, {surge("Keys/Organ 1")}}}
   - {{name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, {SWAG_TUNING}{sfz("bass.swag")}}}
   - {{name: trumpet, group: brass, program: trumpet, volume: 108, pan: 72, expression: 112, {curve(TRUMPET_TUNING)}{sfz("orchestra.trumpets_staccato")}}}

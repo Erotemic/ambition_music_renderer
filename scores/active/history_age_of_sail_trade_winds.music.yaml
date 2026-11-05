@@ -29,14 +29,14 @@ harmony:
   cycle: false
   progression: [D, D, G, A, D, A, Bm, G, D, A, G, A, D, A, Bm, G, D, A, G, A, Bm, Bm, G, F#, Bm, Bm, G, A, D, A, Bm, G, D, A, G, A, D, A, Bm, G, D, A, G, A, D, G, D, A]
 instruments:
-  - {name: guitar, group: guitar, program: clean_guitar, volume: 104, pan: 50, expression: 108, instrument_backend: {kind: sfz, library_ref: guitar.clean}}
+  - {name: guitar, group: guitar, program: clean_guitar, volume: 104, pan: 50, expression: 108, controls: {100: 126}, instrument_backend: {kind: sfz, optional: false, library_ref: guitar.clean}}
   - {name: organ, group: organ, program: drawbar_organ, volume: 100, pan: 88, expression: 104, instrument_backend: {kind: surge, patch: 'Keys/Organ 1'}}
-  - {name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, library_ref: bass.swag}}
-  - {name: trumpet, group: brass, program: trumpet, volume: 108, pan: 72, expression: 112, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, library_ref: orchestra.trumpets_staccato}}
-  - {name: bones, group: brass, program: trombone, volume: 104, pan: 56, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {52: 0, 54: 21, 55: 0}}, instrument_backend: {kind: sfz, library_ref: orchestra.trombones_staccato}}
-  - {name: sax, group: sax, program: tenor_sax, volume: 104, pan: 64, expression: 108, instrument_backend: {kind: sfz, library_ref: winds.tenor_sax}}
-  - {name: kit, group: drums, is_drum: true, volume: 118, pan: 64, expression: 116, instrument_backend: {kind: sfz, library_ref: drums.muldjord}}
-  - {name: timpani, group: drums, is_drum: true, volume: 108, pan: 64, expression: 110, instrument_backend: {kind: sfz, library_ref: orchestra.timpani}}
+  - {name: bass, group: bass, program: fingered_bass, volume: 114, pan: 64, expression: 114, tuning_correction: {mode: global, cents: -9.0}, instrument_backend: {kind: sfz, optional: false, library_ref: bass.swag}}
+  - {name: trumpet, group: brass, program: trumpet, volume: 108, pan: 72, expression: 112, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {55: 0, 60: 10, 61: 10, 62: 10, 63: 6, 64: 8, 65: 9, 67: 4, 74: 7, 79: 0}}, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.trumpets_staccato}}
+  - {name: bones, group: brass, program: trombone, volume: 104, pan: 56, expression: 108, tuning_correction: {mode: curve, interpolation: linear, max_abs_cents: 50, points: {52: 0, 54: 21, 55: 0}}, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.trombones_staccato}}
+  - {name: sax, group: sax, program: tenor_sax, volume: 104, pan: 64, expression: 108, instrument_backend: {kind: sfz, optional: false, library_ref: winds.tenor_sax}}
+  - {name: kit, group: drums, is_drum: true, volume: 118, pan: 64, expression: 116, instrument_backend: {kind: sfz, optional: false, library_ref: drums.muldjord}}
+  - {name: timpani, group: drums, is_drum: true, volume: 108, pan: 64, expression: 110, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.timpani}}
 parts:
   - id: guitar_part
     instrument: guitar
@@ -1605,7 +1605,7 @@ processing:
       chain:
         - {processor: highpass, cutoff_hz: 150}
         - {processor: reverb, wet: 0.14, decay_seconds: 1.2}
-        - {processor: gain, gain_db: -5.0}
+        - {processor: gain, gain_db: 5.5}
     organ:
       chain:
         - {processor: highpass, cutoff_hz: 120}

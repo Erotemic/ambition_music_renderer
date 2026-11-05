@@ -228,11 +228,11 @@ BONES_TUNING = {52: 0, 54: 21, 55: 0}
 
 
 def sfz(ref: str) -> str:
-    return f"instrument_backend: {{kind: sfz, library_ref: {ref}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, library_ref: {ref}}}"
 
 
 def vcsl(path: str) -> str:
-    return f"instrument_backend: {{kind: sfz, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
+    return f"instrument_backend: {{kind: sfz, optional: false, sfz_glob: '**/VCSL-1.2.2-RC/{path}.sfz', settings: {{fold_to_range: false}}}}"
 
 
 def surge(patch: str) -> str:
@@ -240,7 +240,10 @@ def surge(patch: str) -> str:
 
 
 #: group gains in dB, set from the section levels that dev/measure_stems.py reads.
-GAIN = {"keys": 0.0, "guitar": -4.0, "bass": 3.0, "lead": -16.0, "brass": 8.0, "drums": 0.0, "shuttle": 15.0}
+GAIN = {"keys": 0.0, "guitar": 3.5, "bass": 3.0, "lead": -16.0, "brass": 8.0, "drums": 0.0, "shuttle": 15.0}
+#: Shinyguitar's acoustic programs are silent while CC100 (pickup to microphone
+#: blend) is 0. The guitars set it, and every sampled backend here is not
+#: optional, so a silent one stops the render instead of falling back to General MIDI.
 score = f"""schema: ambition.musicir.v3
 id: history_cotton_mill_spinning_jenny
 title: Spinning Jenny
@@ -274,7 +277,7 @@ harmony:
   progression: [{", ".join(PROG)}]
 instruments:
   - {{name: keys, group: keys, program: electric_piano_1, volume: 104, pan: 76, expression: 108, {sfz("epiano.rhodes")}}}
-  - {{name: guitar, group: guitar, program: muted_guitar, volume: 100, pan: 50, expression: 104, {sfz("guitar.clean")}}}
+  - {{name: guitar, group: guitar, program: muted_guitar, volume: 100, pan: 50, expression: 104, controls: {{100: 126}}, {sfz("guitar.clean")}}}
   - {{name: bass, group: bass, program: slap_bass_1, volume: 114, pan: 64, expression: 114, {SWAG_TUNING}{sfz("bass.swag")}}}
   - {{name: lead, group: lead, program: lead_square, volume: 100, pan: 64, expression: 104, {surge("Leads/Classic Lead 1")}}}
   - {{name: trumpet, group: brass, program: brass_section, volume: 106, pan: 70, expression: 110, {curve(TRUMPET_TUNING)}{sfz("orchestra.trumpets_staccato")}}}
