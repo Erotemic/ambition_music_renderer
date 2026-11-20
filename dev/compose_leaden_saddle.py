@@ -17,10 +17,13 @@ THE TWO MOTIFS (both original):
   the saddle: A C D E, G E D C D: a rise of a fourth and a fall back, the
       shape of a pass seen from the road. Every section of the town cue
       says it.
-  the crow: E E B, A G E: two short calls, a leap of a fifth, and a fall
-      to the tonic: a rooster's call in four notes and a gunfighter's
-      signature. The boss cue is built on it, and its last section turns
-      it into the saddle.
+  the strut: B G F# G, A D C A F#: from the fifth up a minor sixth to the
+      third, a semitone dip and back, then a fall through D7: a rooster
+      lifting his chest and walking the yard. The boss cue is built on it;
+      its last section turns the minor sixth major and falls into the
+      saddle. (Jon, 2026-11-20: the first boss theme, "the crow", leaned on
+      familiar western calls; the strut replaced it, written from its own
+      intervals.)
 
 LEADEN SADDLE (96 BPM, A minor), sections:
   dry_dock        1-32   the town: a boom-chick acoustic guitar, upright
@@ -36,14 +39,18 @@ LEADEN SADDLE (96 BPM, A minor), sections:
 
 MARSHAL GALLUS SHOWDOWN (132 BPM, E minor), sections:
   standoff        1-8    the corral before the draw: tremolo strings, the
-                         crow on a lone trumpet, low piano tolls.     (one time)
+                         strut's opening on a lone trumpet, hanging on the
+                         minor sixth; low piano tolls.                (one time)
   duel            9-40   the fight: a gallop on the snare, a twang
-                         ostinato, the crow in the trumpets, effected
-                         strings for his machinery, a male choir.         (loop)
-  high_noon      41-56   enraged: up a semitone to F minor, the choir and
-                         the trumpets in octaves, timpani.                (loop)
-  sundown        57-66   his defeat: the crow slowed on the guitar, falling
-                         into the saddle, ending on E major.          (one time)
+                         ostinato; the strut in the trumpets, its bridge
+                         (the relative major's colours, a Dorian C# rising
+                         to D#) on the solo trumpet; effected strings for
+                         his machinery, a male choir.                     (loop)
+  high_noon      41-56   enraged: up a semitone to F minor, the strut in
+                         the trumpets with the solo above, timpani.       (loop)
+  sundown        57-66   his defeat: the strut slowed on the guitar, its
+                         minor sixth turned major, falling into the
+                         saddle, ending on E major.                   (one time)
 """
 
 from __future__ import annotations
@@ -78,6 +85,7 @@ CHORD = {
     "B7": ["B", "D#", "F#", "A"], "Fm": ["F", "Ab", "C"], "Db": ["Db", "F", "Ab"], "Eb": ["Eb", "G", "Bb"],
     "C7": ["C", "E", "G", "Bb"], "Bbm": ["Bb", "Db", "F"], "Fmaj7": ["F", "A", "C", "E"], "Am7": ["A", "C", "E", "G"],
     "Cmaj7": ["C", "E", "G", "B"], "Em7": ["E", "G", "B", "D"],
+    "Eb7": ["Eb", "G", "Bb", "Db"], "Dbmaj7": ["Db", "F", "Ab", "C"],
 }
 
 
@@ -175,9 +183,32 @@ SADDLE = [0, 3, 5, 7, 10, 7, 5, 3, 5]
 SADDLE_RHYTHM = [1.0, 0.5, 0.5, 2.0, 1.0, 0.5, 0.5, 1.0, 1.0]
 # Turned major for the saloon, from C: C E F G, A G F E F.
 SADDLE_MAJOR = [0, 4, 5, 7, 9, 7, 5, 4, 5]
-# The crow, from E: E E B, A G E.
-CROW = [0, 0, 7, 5, 3, 0]
-CROW_RHYTHM = [0.25, 0.25, 1.0, 0.5, 0.5, 1.5]
+# The strut (the boss theme), in E minor: two phrases of four bars and a
+# bridge, as (note, beats) per bar; `None` is a rest.
+STRUT_A = [
+    [("B3", 1.5), ("G4", 1.5), ("F#4", 0.5), ("G4", 0.5)],
+    [("A4", 0.5), ("D5", 1.0), ("C5", 0.5), ("A4", 0.5), ("F#4", 1.5)],
+    [("G4", 1.0), ("E4", 0.5), ("D#4", 0.5), ("E4", 1.0), ("B4", 1.0)],
+    [("C5", 2.0), ("B4", 2.0)],
+    [("B3", 1.5), ("G4", 1.5), ("F#4", 0.5), ("G4", 0.5)],
+    [("A4", 0.5), ("C5", 1.0), ("D5", 0.5), ("E5", 0.5), ("D5", 1.0), ("C5", 0.5)],
+    [("B4", 1.0), ("G4", 0.5), ("A4", 0.5), ("F#4", 1.0), ("D#4", 1.0)],
+    [("E4", 3.0), (None, 1.0)],
+]
+STRUT_A_HARMONY = ["Em", "D7", "Em", "Cmaj7", "Em", "Am", "B7", "Em"]
+STRUT_B = [
+    [("E5", 1.0), ("D5", 0.5), ("B4", 0.5), ("D5", 1.0), ("E5", 1.0)],
+    [("G5", 1.5), ("F#5", 0.5), ("E5", 1.0), ("D5", 1.0)],
+    [("C5", 0.5), ("D5", 0.5), ("E5", 1.0), ("B4", 1.0), ("G4", 1.0)],
+    [("A4", 1.5), ("B4", 0.5), ("C#5", 1.0), ("D#5", 1.0)],
+    [("B4", 1.5), ("G5", 1.5), ("F#5", 0.5), ("G5", 0.5)],
+    [("E5", 1.0), ("C5", 0.5), ("B4", 0.5), ("A4", 1.0), ("C5", 1.0)],
+    [("B4", 1.0), ("A4", 0.5), ("G4", 0.5), ("F#4", 1.0), ("A4", 1.0)],
+    [("B4", 4.0)],
+]
+STRUT_B_HARMONY = ["C", "D", "Am", "B7", "Em", "Am", "B7", "B7"]
+for _bar in STRUT_A + STRUT_B:
+    assert sum(beats for _, beats in _bar) == 4, _bar
 
 # GM drum notes of the kits (Big Rusty Drums and Naked Drums map like GM).
 KICK, SNARE, RIM, SIDESTICK, HAT, HAT_OPEN, RIDE, RIDE_BELL, CRASH, TOM_LO, TOM_HI = 36, 38, 37, 37, 42, 46, 51, 53, 49, 45, 50
@@ -576,20 +607,33 @@ def tim(pitch: int) -> int:
     return pitch
 
 
+def phrase(clip: Clip, bar: int, bars, vel: int, *, transpose: int = 0, legato: float = 0.92, accent: int = 6) -> None:
+    """Play `bars` (lists of (note, beats)) from `bar`, `transpose` semitones up;
+    the first note of each bar takes `accent`."""
+    for k, notes in enumerate(bars):
+        at = t(bar + k)
+        for i, (name, beats) in enumerate(notes):
+            if name is not None:
+                clip.note(at, beats * legato, midi(name) + transpose, vel + (accent if i == 0 else 0))
+            at += beats
+
+
 # ---- STANDOFF (1-8) -----------------------------------------------------
 for bar in range(1, 9):
     duel.harmony[bar] = "Em"
     d_tremolo.note(t(bar), 3.95, [midi("E4"), midi("B4")] if bar < 7 else [midi("D#4"), midi("B4")], 40 + 4 * bar)
     if bar % 2 == 1:
         d_piano.note(t(bar), 3.8, [midi("E1"), midi("E2")], 76)
-cell(d_trumpet, t(2), midi("E4"), CROW, [x * 2 for x in CROW_RHYTHM], 88, legato=0.95)
-cell(d_trumpet, t(5), midi("E4"), CROW[:3] + [8, 7], [0.5, 0.5, 2, 1, 3], 90, legato=0.95)
+# The strut's opening, slowed and alone: asked once, then again, hanging on
+# the minor sixth (C) over the leading tone.
+phrase(d_trumpet, 2, [[("B3", 2.0), ("G4", 2.0)], [("G4", 1.0), ("F#4", 1.0), ("G4", 2.0)]], 86, legato=0.96)
+phrase(d_trumpet, 5, [[("B3", 2.0), ("G4", 2.0)], [("A4", 1.0), ("C5", 3.0)], [("B4", 4.0)]], 88, legato=0.97)
 d_timpani.note(t(8), 0.5, tim(midi("B2")), 80)
 for k in range(8):
     d_timpani.note(t(8, 2 + 0.25 * k), 0.2, tim(midi("E3")), 60 + 6 * k)
 
 # ---- DUEL (9-40) ----------------------------------------------------------
-DUEL = ["Em", "Em", "C", "B7", "Em", "Em", "Am", "B7", "Em", "D", "C", "B7", "Am", "C", "B7", "B7"]
+DUEL = STRUT_A_HARMONY + STRUT_B_HARMONY
 
 
 def gallop_bar(bar: int, chord: str, hot: bool = False):
@@ -628,37 +672,37 @@ for half in (0, 16):
         gallop_bar(bar, chord)
         if half:
             d_strings.note(t(bar), 3.9, tones(chord, 4)[:3], 60)
-# The crow, called and answered.
-for bar, base in ((9, midi("E4")), (13, midi("E4")), (25, midi("E4")), (29, midi("A4"))):
-    cell(d_trumpets, t(bar), base, CROW, [x * 2 for x in CROW_RHYTHM], 96, legato=0.9)
-    cell(d_trumpets, t(bar + 2), base + 7, [0, -2, -4, -5, -7], [0.5, 0.5, 1, 1, 5], 92, legato=0.92)
-# The trumpet solo in the middle: the crow turned into a line.
-cell(d_trumpet, t(17), midi("B4"), [0, 1, 3, 5, 3, 1, 0, -2, 0], [1, 0.5, 0.5, 2, 1, 0.5, 0.5, 1, 1], 94, legato=0.93)
-cell(d_trumpet, t(19), midi("E5"), [0, -2, -4, -5, -7, -5, -4], [1, 1, 1, 1, 2, 1, 1], 92, legato=0.93)
-cell(d_trumpet, t(21), midi("A4"), [0, 3, 7, 3, 0, -2, -5], [1, 0.5, 2.5, 1, 1, 1, 1], 92, legato=0.93)
-cell(d_trumpet, t(23), midi("F#4"), [0, 1, 3, 5, 6], [1, 1, 1, 1, 4], 96, legato=0.95)
-# The choir in the second half: the crow, slow, on "ah".
-for bar in (33, 37):
-    cell(d_choir, t(bar), midi("E3"), CROW, [x * 4 for x in CROW_RHYTHM][:5] + [4.0], 90, legato=0.97)
+# The strut in the trumpets; its bridge on the solo trumpet. The second time
+# the solo takes the strut over the section, and the choir holds under the
+# bridge.
+phrase(d_trumpets, 9, STRUT_A, 94, legato=0.9)
+phrase(d_trumpet, 17, STRUT_B, 92, legato=0.93)
+phrase(d_trumpet, 25, STRUT_A, 94, legato=0.92)
+phrase(d_trumpets, 25, STRUT_A, 84, legato=0.9, accent=0)
+phrase(d_trumpet, 33, STRUT_B, 94, legato=0.93)
+for k, chord in enumerate(STRUT_B_HARMONY):
+    if k % 2 == 0:
+        d_choir.note(t(33 + k), 7.6, [p for p in tones(chord, 3)][:3], 84)
 d_timpani.note(t(40, 3), 0.8, tim(midi("B2")), 104)
 
 # ---- HIGH NOON (41-56): enraged, up a semitone -----------------------------
-NOON = ["Fm", "Fm", "Db", "C7", "Fm", "Fm", "Bbm", "C7"]
-for half in (0, 8):
-    for i, chord in enumerate(NOON):
-        bar = 41 + half + i
-        duel.harmony[bar] = chord
-        gallop_bar(bar, chord, hot=True)
-        d_strings.note(t(bar), 3.9, tones(chord, 4), 76)
-        d_timpani.note(t(bar), 0.6, tim(root(chord, 2)), 100)
-        d_timpani.note(t(bar, 2), 0.6, tim(root(chord, 2) + 7), 90)
-        if i % 2 == 0:
-            d_choir.note(t(bar), 7.6, [p for p in tones(chord, 3)][1:] + [tones(chord, 3)[0] + 12], 96)
-for bar in (41, 45, 49, 53):
-    base = midi("F4") if bar < 49 else midi("C5")
-    cell(d_trumpets, t(bar), base, CROW, [x * 2 for x in CROW_RHYTHM], 104, legato=0.9)
-    cell(d_trumpet, t(bar), base + 12 if base + 12 <= midi("C6") else base, CROW, [x * 2 for x in CROW_RHYTHM], 100, legato=0.9)
-    cell(d_trumpets, t(bar + 2), base + 7, [0, -1, -3, -5, -7], [0.5, 0.5, 1, 1, 5], 100, legato=0.92)
+NOON = ["Fm", "Eb7", "Fm", "Dbmaj7", "Fm", "Bbm", "C7", "Fm",
+        "Fm", "Eb7", "Fm", "Dbmaj7", "Fm", "Bbm", "C7", "C7"]
+for i, chord in enumerate(NOON):
+    bar = 41 + i
+    duel.harmony[bar] = chord
+    gallop_bar(bar, chord, hot=True)
+    d_strings.note(t(bar), 3.9, tones(chord, 4), 76)
+    d_timpani.note(t(bar), 0.6, tim(root(chord, 2)), 100)
+    d_timpani.note(t(bar, 2), 0.6, tim(root(chord, 2) + 7), 90)
+    if i % 2 == 0:
+        d_choir.note(t(bar), 7.6, [p for p in tones(chord, 3)][1:] + [tones(chord, 3)[0] + 12], 96)
+# The strut a semitone up, then its opening again and the bridge's high close,
+# which ends on the dominant for the loop.
+NOON_LINE = STRUT_A + STRUT_A[:4] + STRUT_B[4:]
+phrase(d_trumpets, 41, NOON_LINE, 102, transpose=1, legato=0.9)
+phrase(d_trumpet, 41, NOON_LINE[:8], 98, transpose=13, legato=0.9)
+phrase(d_trumpet, 49, NOON_LINE[8:], 100, transpose=1, legato=0.92)
 d_kit.note(t(56, 3), 0.6, CRASH, 110)
 
 # ---- SUNDOWN (57-66): his defeat --------------------------------------------
@@ -668,19 +712,21 @@ for i, chord in enumerate(SUN):
     duel.harmony[bar] = chord
     d_strings.note(t(bar), 3.95, tones(chord, 4)[:3], 50 if bar < 65 else 44)
     d_bass.note(t(bar), 3.8, root(chord, 1) if root(chord, 1) >= midi("E1") else root(chord, 2), 66)
-# The crow slowed on the guitar, and where it fell it now rises: into the saddle.
-cell(d_guitar, t(57), midi("E4"), CROW, [1, 1, 3, 1, 1, 1], 80, legato=0.98)
-cell(d_guitar, t(59), midi("E4"), [0, 3, 5, 7], [1, 1, 1, 5], 76, legato=0.98)
+# The strut slowed on the guitar; then the town's saddle; then the strut once
+# more with its minor sixth turned major, at rest on E major.
+phrase(d_guitar, 57, [[("B3", 2.0), ("G4", 2.0)], [("F#4", 1.0), ("G4", 3.0)],
+                      [("A4", 1.0), ("D5", 2.0), ("C5", 1.0)], [("A4", 2.0), ("G4", 2.0)]], 80, legato=0.98, accent=0)
 cell(d_guitar, t(61), midi("A3"), SADDLE, [1, 0.5, 0.5, 2, 1, 0.5, 0.5, 1, 1], 74, legato=0.98)
-cell(d_guitar, t(63), midi("F#4"), [0, -2, -3, -5], [1, 1, 2, 4], 72, legato=0.98)
-d_guitar.note(t(65), 7.5, [midi("E3"), midi("B3"), midi("E4"), midi("G#4")], 70)
-d_trumpet.note(t(65), 7.0, midi("B4"), 52)
+phrase(d_guitar, 63, [[("F#4", 2.0), ("D#4", 2.0)], [("B3", 4.0)]], 72, legato=0.98, accent=0)
+d_guitar.note(t(65), 1.9, midi("B3"), 72)
+d_guitar.note(t(65, 2), 5.5, [midi("E3"), midi("B3"), midi("E4"), midi("G#4")], 70)
+d_trumpet.note(t(65, 2), 5.0, midi("G#4"), 36)
 
 duel_shapes = {
-    "standoff": "energy: 0.4, density: 0.25, role: 'the corral before the draw: tremolo strings, the crow on a lone trumpet'",
-    "duel": "energy: 0.85, density: 0.75, loopable: true, role: 'the fight: the gallop, the twang ostinato, the crow in the trumpets'",
-    "high_noon": "energy: 0.95, density: 0.85, loopable: true, role: 'enraged: F minor, choir and trumpets, timpani'",
-    "sundown": "energy: 0.2, density: 0.25, role: 'his defeat: the crow slowed on the guitar into the saddle, E major'",
+    "standoff": "energy: 0.4, density: 0.25, role: 'the corral before the draw: tremolo strings, the strut on a lone trumpet'",
+    "duel": "energy: 0.85, density: 0.75, loopable: true, role: 'the fight: the gallop, the twang ostinato, the strut in the trumpets'",
+    "high_noon": "energy: 0.95, density: 0.85, loopable: true, role: 'enraged: F minor, the strut in the trumpets, choir, timpani'",
+    "sundown": "energy: 0.2, density: 0.25, role: 'his defeat: the strut slowed on the guitar, its sixth turned major, into the saddle'",
 }
 duel_form, duel_play = form_and_playback(duel, duel_shapes, {"duel", "high_noon"})
 
@@ -689,12 +735,13 @@ id: marshal_gallus_showdown
 title: Cock of the Walk
 description: >-
   Marshal Gallus's fight in the Ore Corral: a standoff on a lone trumpet, the
-  duel on a galloping snare and a twang ostinato, high noon a semitone up with
-  a choir, and his fall, the crow slowed into the town's saddle motif.
+  duel on a galloping snare and a twang ostinato under the strut, high noon a
+  semitone up with a choir, and his fall, the strut slowed into the town's
+  saddle motif.
   Generated by dev/compose_leaden_saddle.py: edit that, not this file.
 notes:
   - 'Jon, 2026-11-20: a boss theme for the robot rooster marshal of the western biome. The references were mood only.'
-  - 'The crow: E E B, A G E: a rooster call in four notes. The sundown section ends it on the saddle (A C D E) and E major.'
+  - 'The strut: B G F# G, A D C A F#: up a minor sixth from the fifth, a semitone dip, a fall through D7. Original (Jon, 2026-11-20, replacing the crow, which leaned on familiar western calls). The sundown section turns its sixth major and ends on E major.'
   - 'The game plays standoff as the intro, duel for phases 1 and 2, high_noon for the enrage, sundown at the defeat.'
 seed: {duel.seed}
 timebase: {{ppq: 960}}
@@ -736,13 +783,13 @@ processing:
         - {{processor: highpass, cutoff_hz: 80}}
         - {{processor: lowpass, cutoff_hz: 8000}}
         - {{processor: reverb, wet: 0.22, decay_seconds: 2.0}}
-        - {{processor: gain, gain_db: 3.0}}
+        - {{processor: gain, gain_db: 13.0}}
         - {{processor: balance, position: -0.15}}
     twang:
       chain:
         - {{processor: highpass, cutoff_hz: 90}}
         - {{processor: reverb, wet: 0.2, decay_seconds: 1.4}}
-        - {{processor: gain, gain_db: 6.0}}
+        - {{processor: gain, gain_db: 3.0}}
         - {{processor: balance, position: 0.3}}
     bass:
       chain:
@@ -766,7 +813,7 @@ processing:
         - {{processor: highpass, cutoff_hz: 80}}
         - {{processor: lowpass, cutoff_hz: 7000}}
         - {{processor: reverb, wet: 0.3, decay_seconds: 2.6}}
-        - {{processor: gain, gain_db: 3.0}}
+        - {{processor: gain, gain_db: -1.0}}
     piano:
       chain:
         - {{processor: highpass, cutoff_hz: 30}}
@@ -784,7 +831,7 @@ processing:
       chain:
         - {{processor: highpass, cutoff_hz: 80}}
         - {{processor: reverb, wet: 0.24, decay_seconds: 2.4}}
-        - {{processor: gain, gain_db: 5.0}}
+        - {{processor: gain, gain_db: 10.0}}
 {COMMON_MASTER}
 playback:
   full: true
