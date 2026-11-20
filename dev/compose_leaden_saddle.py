@@ -48,6 +48,7 @@ MARSHAL GALLUS SHOWDOWN (132 BPM, E minor), sections:
 
 from __future__ import annotations
 
+import math
 import random
 import sys
 from fractions import Fraction as F
@@ -94,17 +95,27 @@ def root(chord: str, octave: int) -> int:
     return midi(f"{CHORD[chord][0]}{octave}")
 
 
+# The longest group reverb here decays within this, so a gap of it holds a ring.
+RING_SECONDS = 2.5
+
+
 class Cue:
     """One score: its tempo, its sections and its clips."""
 
     def __init__(self, cue_id: str, bpm: int, seed: int, segments):
         self.id, self.bpm, self.rng = cue_id, bpm, random.Random(seed)
         self.seed = seed
-        # (id, first logical bar, last logical bar, first score bar): each
-        # section has two silent bars before and after it, for its ring and
-        # its lead-in.
-        self.segments = segments
-        self.end_bar = segments[-1][3] + segments[-1][2] - segments[-1][1] + 3
+        # (id, first logical bar, last logical bar, first score bar). The
+        # first section starts the score: a silent opening is dead air in the
+        # radio mix and the inspector's preview. Between sections, and after
+        # the last, a gap long enough for the ring (the tail of the one
+        # before, the lead-in of the one after).
+        gap = max(1, math.ceil(RING_SECONDS * bpm / 240))
+        at, self.segments = 1, []
+        for sid, first, last in segments:
+            self.segments.append((sid, first, last, at))
+            at += last - first + 1 + gap
+        self.end_bar = at
         self.harmony: dict[int, str] = {}
         self.clips: dict[str, Clip] = {}
 
@@ -198,7 +209,9 @@ def form_and_playback(cue: Cue, shapes: dict, loops: set) -> tuple[str, str]:
     for i, (sid, *_rest) in enumerate(cue.segments):
         fields = [f"id: {sid}", f"form: [{sid}]"]
         if sid in loops:
-            fields += ["loop: true", f"lead_in: before_{sid}"]
+            fields.append("loop: true")
+            if i > 0:
+                fields.append(f"lead_in: before_{sid}")
         fields.append(f"tail: before_{cue.segments[i + 1][0]}" if i + 1 < len(cue.segments) else "tail: after_all")
         play.append("    - {" + ", ".join(fields) + "}")
     return "\n".join(rows), "\n".join(play)
@@ -221,10 +234,10 @@ def harmony_list(cue: Cue, default: str) -> str:
 # LEADEN SADDLE
 # ===========================================================================
 town = Cue("leaden_saddle", 96, 1120, [
-    ("dry_dock", 1, 32, 3),
-    ("wet_whistle", 33, 56, 37),
-    ("refinery_shift", 57, 80, 63),
-    ("mesa_top", 81, 96, 89),
+    ("dry_dock", 1, 32),
+    ("wet_whistle", 33, 56),
+    ("refinery_shift", 57, 80),
+    ("mesa_top", 81, 96),
 ])
 t = town.t
 guitar = town.clip("guitar", 6, 6)
@@ -534,10 +547,10 @@ playback:
 # MARSHAL GALLUS SHOWDOWN
 # ===========================================================================
 duel = Cue("marshal_gallus_showdown", 132, 1121, [
-    ("standoff", 1, 8, 3),
-    ("duel", 9, 40, 13),
-    ("high_noon", 41, 56, 47),
-    ("sundown", 57, 66, 65),
+    ("standoff", 1, 8),
+    ("duel", 9, 40),
+    ("high_noon", 41, 56),
+    ("sundown", 57, 66),
 ])
 t = duel.t
 d_trumpet = duel.clip("trumpet", 5, 4)

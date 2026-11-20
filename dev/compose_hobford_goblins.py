@@ -34,6 +34,7 @@ One cue, one tempo (120), six playback sections the game moves between:
 
 from __future__ import annotations
 
+import math
 import random
 import sys
 from fractions import Fraction as F
@@ -90,15 +91,27 @@ class Clip:
 # section's notes and reverb sound into, which a loop adds back onto its head
 # (its tail), and the early starts of a loop's first notes, which it adds onto
 # its end (its lead-in).
-SEGMENTS = [  # (id, first logical bar, last logical bar, first score bar)
-    ("lurking", 1, 32, 3),
-    ("shadowed", 33, 56, 37),
-    ("break_in", 57, 64, 63),
-    ("raid", 65, 80, 73),
-    ("brute", 81, 96, 91),
-    ("aftermath", 97, 110, 109),
+# The longest group reverb here decays within this, so a gap of it holds a ring.
+RING_SECONDS = 2.5
+_GAP = max(1, math.ceil(RING_SECONDS * BPM / 240))
+_LOGICAL = [  # (id, first logical bar, last logical bar)
+    ("lurking", 1, 32),
+    ("shadowed", 33, 56),
+    ("break_in", 57, 64),
+    ("raid", 65, 80),
+    ("brute", 81, 96),
+    ("aftermath", 97, 110),
 ]
-END_BAR = 123
+# (id, first, last, first score bar). The first section starts the score: a
+# silent opening is dead air in the radio mix and the inspector's preview.
+# Between sections, a gap long enough for the ring (the tail of the one
+# before, the lead-in of the one after). The aftermath ends the cue.
+SEGMENTS = []
+_at = 1
+for _sid, _first, _last in _LOGICAL:
+    SEGMENTS.append((_sid, _first, _last, _at))
+    _at += _last - _first + 1 + _GAP
+END_BAR = SEGMENTS[-1][3] + SEGMENTS[-1][2] - SEGMENTS[-1][1] + 1
 
 
 def score_bar(bar: int) -> int:
@@ -466,7 +479,9 @@ def playback_rows() -> str:
     for i, (sid, *_rest) in enumerate(SEGMENTS):
         fields = [f"id: {sid}", f"form: [{sid}]"]
         if sid in ("lurking", "shadowed", "raid", "brute"):
-            fields += ["loop: true", f"lead_in: before_{sid}"]
+            fields.append("loop: true")
+            if i > 0:
+                fields.append(f"lead_in: before_{sid}")
         if i + 1 < len(SEGMENTS):
             fields.append(f"tail: before_{SEGMENTS[i + 1][0]}")
         rows.append("    - {" + ", ".join(fields) + "}")
