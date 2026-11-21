@@ -543,6 +543,16 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
             print(f"error: publish {cue}: missing authored loop section {section}", file=sys.stderr)
             return False
         src = loop
+    elif manifest and src.name.endswith(".full_soundtrack_preview.ogg"):
+        # The radio plays full.ogg as one piece: publish the soundtrack, the
+        # preview with no silent gaps between its sections (`soundtrack.py`).
+        from .soundtrack import write_soundtrack
+
+        soundtrack = write_soundtrack(
+            src, manifest, src.with_name(src.name.replace(".full_soundtrack_preview.ogg", ".soundtrack.ogg"))
+        )
+        if soundtrack is not None:
+            src = soundtrack
 
     dest = dest_dir / "full.ogg"
     publish_copy(src, dest)

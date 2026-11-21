@@ -209,6 +209,9 @@ _NON_AUDIO_MODULES = frozenset({
     # The fingerprint itself and the versioned output directory it names.
     "render/dependencies.py",
     "render/generated_layout.py",
+    # The listening version of a cue, made at publish from its mastered
+    # preview: no render reads it.
+    "soundtrack.py",
 })
 
 

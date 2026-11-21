@@ -676,7 +676,7 @@ for bar in (37, 45, 53):
 r_timpani.note(t(56, 3), 0.8, tim(midi("B2")), 108)
 
 train_text = score_text(
-    train, title="The Rustler", key="E", mode="minor", default_chord="Em",
+    train, title="Coq on the Walk", key="E", mode="minor", default_chord="Em",
     description="The Frontier's train robbery: the Number 9 ore freight running down the gulch with an outlaw engine at its head. A snare like wheels on rail joints, a galloping bass and a banjo, the rustler on the fiddle; at the engine the big kit, the trombones and timpani.",
     notes=["Jon, 2026-11-20: a driving cue for the train stage. The references were mood only. His first review: good structure, not balanced; it must loop.",
            "The rustler: E G A B, D B A G E.",
