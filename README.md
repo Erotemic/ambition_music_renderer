@@ -412,8 +412,17 @@ Validate compilation without synthesizing audio with:
 python -m ambition_music_renderer cue validate <cue_id>
 python -m ambition_music_renderer cue validate <cue_id> --strict-schema
 python -m ambition_music_renderer cue validate <cue_id> --json
+python -m ambition_music_renderer cue inventory --json
 python -m ambition_music_renderer cue playback <cue_id> --sample-rate 48000 --json
 ```
+
+`cue inventory` exports source identities and score-level one-shot policy.
+It does not infer that policy from section loops. The same metadata owner
+supplies `cue playback`. For a source-only export that needs only Python and
+PyYAML, use `python -m ambition_music_renderer.score_inventory`.
+Use `--scores-dir PATH` to inspect another source directory. The export
+rejects missing identities, duplicate identities, and non-boolean policy.
+Game display names, radio inclusion, and retirement policy remain separate.
 
 `cue playback` reports the compiler clock, section bodies, file spans, legal
 bar exits, and product roles without synthesis. Frame plans use the same global

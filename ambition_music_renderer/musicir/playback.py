@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .model import CompiledScore, compiled_score_fingerprint
+from ..score_inventory import score_metadata
 from ..render.playback_layers import _frame, playback_layer_plan, runtime_product_path
 
 PLAYBACK_SCHEMA = "ambition.music_playback.v1"
@@ -135,13 +136,9 @@ def score_playback_description(compiled: CompiledScore, *, sample_rate: int | No
                             for marker in section["markers"]],
             }
         sections.append(section)
-    one_shot = compiled.normalized_spec.get("one_shot", False)
-    if not isinstance(one_shot, bool):
-        raise ValueError("score one_shot must be true or false")
     return {
         "schema": PLAYBACK_SCHEMA, "evidence": "score_plan",
-        "cue_id": str(compiled.normalized_spec["id"]),
-        "score_one_shot": one_shot,
+        **score_metadata(compiled.normalized_spec),
         "compiled_score_fingerprint": compiled_score_fingerprint(compiled),
         "score_clock": clock.as_dict(), "product_family": family,
         "layer_groups": copy.deepcopy(plan["layers"]), "sections": sections,

@@ -3,6 +3,7 @@
 Subcommands:
 
     cue list                List every cue id discovered under scores/.
+    cue inventory          Export active score identities and one-shot policy.
     cue new <name>          Create a new MusicIR v3 score from the starter.
     cue render <cue>        Render a single cue YAML to local generated/<cue>/.
                             Add --publish to also install full.ogg into the
@@ -1836,6 +1837,30 @@ def _load_compiled_for_inspection(cue: str):
     return score, compile_score(load_yaml(score))
 
 
+class InventoryCommand(kwconf.Config):
+    """Export source score identities and score-level one-shot policy."""
+
+    scores_dir: str | None = kwconf.Value(None, help="source directory; defaults to scores/active")
+    json: bool = kwconf.Flag(False, help="emit the versioned source inventory as JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        from .score_inventory import score_inventory
+
+        try:
+            report = score_inventory(None if config.scores_dir is None else Path(config.scores_dir))
+        except (OSError, ValueError) as error:
+            print(str(error), file=sys.stderr)
+            return 1
+        if config.json:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        else:
+            for score in report["scores"]:
+                print(f"{score['cue_id']}: one_shot={score['score_one_shot']} source={score['source']}")
+        return 0
+
+
 class PlaybackCommand(kwconf.Config):
     """Inspect compiler clocks, playback products and legal exits without synthesis."""
 
@@ -2322,6 +2347,7 @@ class CueModal(kwconf.ModalCLI):
     daw_reconcile = DawReconcileCommand
     daw_apply = DawApplyCommand
     validate = ValidateCommand
+    inventory = InventoryCommand
     playback = PlaybackCommand
     expand = ExpandCommand
     graph = GraphCommand

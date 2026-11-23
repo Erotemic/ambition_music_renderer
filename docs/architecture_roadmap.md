@@ -109,6 +109,12 @@ compatibility surfaces, not new extension points.
 
 ### Playback preparation
 
+`score_inventory` owns source identities and score-level one-shot policy.
+It exports `ambition.music_inventory.v1` without compiler, synthesis, or sample
+dependencies. `cue inventory` exposes the same export. Playback preparation
+uses the same metadata validator. Section loop flags do not set score policy.
+Consumers keep their display and selection policy outside this export.
+
 `CompiledScore.clock` projects the existing procedural or exact compiler clock.
 It uses quarter-note beats and zero-based bars. `musicir.playback` prepares
 section bodies, bar boundaries, typed entry and exit markers, and frame plans.
