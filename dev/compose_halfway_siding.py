@@ -180,22 +180,31 @@ class Clip:
         self.jitter = jitter_ms / 1000.0 * cue.bpm / 60.0
         self.vel_jitter = vel_jitter
 
+    def form_region(self, beat):
+        return next((sid for sid, first, last, start in self.cue.segments
+                     if (start - 1) * 4 <= beat < (start + last - first) * 4), None)
+
     def note(self, at, dur, pitches, vel):
         rng = self.cue.rng
         at = F(at).limit_denominator(960)
+        owner = self.form_region(at)
         if self.jitter and at > 0:
             at += F(rng.uniform(-self.jitter, self.jitter)).limit_denominator(960)
         vel = max(1, min(127, int(vel + (rng.randint(-self.vel_jitter, self.vel_jitter) if self.vel_jitter else 0))))
         if isinstance(pitches, (int, str)):
             pitches = [pitches]
         pitches = [p if isinstance(p, int) else midi(p) for p in pitches]
-        self.events.append((at, F(dur).limit_denominator(960), pitches, vel))
+        self.events.append((at, F(dur).limit_denominator(960), pitches, vel, owner if owner != self.form_region(at) else None))
 
     def yaml(self, clip_id: str, indent: str) -> str:
         lines = [f"{indent}- id: {clip_id}", f"{indent}  at: {{bar: 1, beat: 1}}", f"{indent}  events:"]
-        for at, dur, pitches, vel in sorted(self.events, key=lambda e: (e[0], e[2])):
+        for at, dur, pitches, vel, owner in sorted(self.events, key=lambda e: (e[0], e[2])):
             pitch = pitches[0] if len(pitches) == 1 else "[" + ", ".join(str(p) for p in pitches) + "]"
-            lines.append(f"{indent}    - [{frac(at)}, {frac(dur)}, {pitch}, {vel}]")
+            if owner is None:
+                lines.append(f"{indent}    - [{frac(at)}, {frac(dur)}, {pitch}, {vel}]")
+            else:
+                field = "pitch" if len(pitches) == 1 else "pitches"
+                lines.append(f"{indent}    - {{at: {frac(at)}, dur: {frac(dur)}, {field}: {pitch}, velocity: {vel}, form_region: {owner}}}")
         return "\n".join(lines)
 
 

@@ -52,8 +52,14 @@ from typing import Any, Callable
 
 import numpy as np
 
+from ..musicir.model import CompiledScore
+
 # A layer with this name would publish to the path of the mastered section mix.
 RESERVED_LAYER_IDS = {"full"}
+
+
+def runtime_product_path(family: str, section: str, layer: str) -> Path:
+    return Path(family) / section / f"{section}.{layer}.ogg"
 
 
 def select_runtime_export_stems(
@@ -78,8 +84,8 @@ FADE_IN_SECONDS = 0.001
 FADE_OUT_SECONDS = 0.004
 
 
-def playback_layer_plan(
-    spec: dict[str, Any], section_meta: list[dict[str, Any]], group_names: list[str]
+def playback_layout(
+    spec: dict[str, Any], form_ids: list[str], group_names: list[str]
 ) -> dict[str, Any] | None:
     """The layers and sections that ``spec`` asks for, or ``None`` if it asks for none.
 
@@ -87,19 +93,25 @@ def playback_layer_plan(
     two layers or in no layer, an unknown group, or a section that is not a
     span of consecutive form sections.
     """
-    playback = spec.get("playback") or {}
-    authored_layers = playback.get("layers") or {}
-    full = bool(playback.get("full", False))
-    if not authored_layers and not full:
-        return None
+    playback = spec.get("playback", {})
+    if not isinstance(playback, dict):
+        raise ValueError("playback must be a mapping")
+    authored_layers = playback.get("layers", {})
     if not isinstance(authored_layers, dict):
         raise ValueError("playback.layers must map each layer id to a list of groups")
+    full = playback.get("full", False)
+    if not isinstance(full, bool):
+        raise ValueError("playback.full must be true or false")
+    if not authored_layers and not full:
+        return None
 
     known = set(group_names)
     owner: dict[str, str] = {}
     layers: dict[str, list[str]] = {}
     for layer_id, groups in authored_layers.items():
         layer_id = str(layer_id)
+        if not layer_id.strip():
+            raise ValueError("playback.layers: layer ids must not be empty")
         if layer_id in RESERVED_LAYER_IDS:
             raise ValueError(f"playback.layers: the layer id {layer_id!r} is reserved")
         if not isinstance(groups, list) or not groups:
@@ -119,20 +131,31 @@ def playback_layer_plan(
     if layers and missing:
         raise ValueError(f"playback.layers: these groups are in no layer: {missing}")
 
-    form_ids = [str(sec["id"]) for sec in section_meta]
-    by_id = {str(sec["id"]): sec for sec in section_meta}
-    authored_sections = playback.get("sections") or [{"id": fid, "form": [fid]} for fid in form_ids]
+    if len(form_ids) != len(set(form_ids)):
+        raise ValueError("playback: duplicate form section ids")
+    authored_sections = playback.get("sections")
+    if authored_sections is None:
+        authored_sections = [{"id": fid, "form": [fid]} for fid in form_ids]
+    if not isinstance(authored_sections, list) or not authored_sections:
+        raise ValueError("playback.sections must be a non-empty list")
     sections: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in authored_sections:
         if not isinstance(row, dict) or "id" not in row:
             raise ValueError("playback.sections: each row needs an id")
         section_id = str(row["id"])
+        if not section_id.strip():
+            raise ValueError("playback.sections: section ids must not be empty")
+        if not isinstance(row.get("loop", False), bool):
+            raise ValueError(f"playback.sections.{section_id}.loop must be true or false")
         if section_id in seen:
             raise ValueError(f"playback.sections: the id {section_id!r} is there two times")
         seen.add(section_id)
-        span = [str(fid) for fid in (row.get("form") or [section_id])]
-        unknown = [fid for fid in span if fid not in by_id]
+        span = row.get("form", [section_id])
+        if not isinstance(span, list) or not span:
+            raise ValueError(f"playback.sections.{section_id}.form must be a non-empty list")
+        span = [str(fid) for fid in span]
+        unknown = [fid for fid in span if fid not in form_ids]
         if unknown:
             raise ValueError(
                 f"playback.sections.{section_id}: unknown form sections {unknown}; the form is {form_ids}"
@@ -142,9 +165,7 @@ def playback_layer_plan(
             raise ValueError(
                 f"playback.sections.{section_id}: {span} is not a span of consecutive form sections; the form is {form_ids}"
             )
-        head, last = by_id[span[0]], by_id[span[-1]]
         lead_in = row.get("lead_in")
-        lead_in_start_seconds = None
         if lead_in is not None:
             lead_in = str(lead_in)
             if not row.get("loop", False):
@@ -154,13 +175,7 @@ def playback_layer_plan(
                     f"playback.sections.{section_id}: the lead_in {lead_in!r} is not the form section right "
                     f"before {span[0]!r}; the form is {form_ids}"
                 )
-            before = by_id[lead_in]
-            beat_seconds = (float(before["end_seconds"]) - float(before["start_seconds"])) / max(
-                1e-9, float(before["end_beat"]) - float(before["start_beat"])
-            )
-            lead_in_start_seconds = max(float(before["start_seconds"]), float(before["end_seconds"]) - beat_seconds)
         ring = row.get("tail")
-        ring_end_seconds = None
         if ring is not None:
             ring = str(ring)
             after = first + len(span)
@@ -169,22 +184,71 @@ def playback_layer_plan(
                     f"playback.sections.{section_id}: the tail {ring!r} is not the form section right after "
                     f"{span[-1]!r}; the form is {form_ids}"
                 )
-            ring_end_seconds = float(by_id[ring]["end_seconds"])
         sections.append({
             "id": section_id,
             "form": span,
             "loop": bool(row.get("loop", False)),
             "tail": ring,
             "lead_in": lead_in,
-            "lead_in_start_seconds": lead_in_start_seconds,
-            "start_seconds": float(head["start_seconds"]),
-            "end_seconds": float(last["end_seconds"]),
-            "tail_end_seconds": ring_end_seconds,
-            "start_beat": float(head["start_beat"]),
-            "end_beat": float(last["end_beat"]),
-            "duration_beats": float(last["end_beat"]) - float(head["start_beat"]),
         })
     return {"layers": layers, "full": full, "sections": sections}
+
+
+def playback_layer_plan(compiled: CompiledScore) -> dict[str, Any] | None:
+    """Resolve playback layout through the clock and events of one compiled score."""
+    layout = playback_layout(compiled.normalized_spec,
+                             [str(row["id"]) for row in compiled.sections],
+                             list(compiled.group_names))
+    if layout is None:
+        return None
+    by_id = {str(row["id"]): row for row in compiled.sections}
+    clock = compiled.clock
+    for row in layout["sections"]:
+        head, last = by_id[row["form"][0]], by_id[row["form"][-1]]
+        start, end = float(head["start_beat"]), float(last["end_beat"])
+        if end <= start:
+            raise ValueError(f"playback.sections.{row['id']}: musical span must be positive")
+        lead = by_id.get(row["lead_in"])
+        tail = by_id.get(row["tail"])
+        row.update({
+            "start_seconds": clock.time_at_beat(start),
+            "end_seconds": clock.time_at_beat(end),
+            "start_beat": start,
+            "end_beat": end,
+            "duration_beats": end - start,
+            "lead_in_start_seconds": None if lead is None else clock.time_at_beat(max(float(lead["start_beat"]), start - 1.0)),
+            "tail_end_seconds": None if tail is None else clock.time_at_beat(float(tail["end_beat"])),
+        })
+    pickups: dict[str, list[float]] = {}
+    attacks = [event for event in compiled.note_events if event.get("event_type", "note") == "note"]
+    for entry in layout["sections"]:
+        ring = entry["lead_in"]
+        if ring is None:
+            continue
+        for event in attacks:
+            at = float(event["start_time"])
+            if (event.get("section") in entry["form"]
+                    and entry["lead_in_start_seconds"] <= at < entry["start_seconds"]):
+                pickups.setdefault(ring, []).append(at)
+    for row in layout["sections"]:
+        for role in ("lead_in", "tail"):
+            ring = row[role]
+            if ring is None:
+                continue
+            for event in attacks:
+                if event.get("section") != ring:
+                    continue
+                raise ValueError(f"playback.sections.{row['id']}: {role} {ring!r} owns note attacks")
+    for row in layout["sections"]:
+        # A shared spacer can hold an outgoing ring and an incoming pickup.
+        # Keep the file span, but exclude the pickup from the outgoing tail.
+        tail = by_id.get(row["tail"])
+        foreign = [] if tail is None else [float(event["start_time"]) for event in attacks
+            if event.get("section") not in [row["tail"], *row["form"]]
+            and float(tail["start_seconds"]) <= float(event["start_time"]) < float(tail["end_seconds"])]
+        exclusions = [*pickups.get(row["tail"], []), *foreign]
+        row["tail_audio_end_seconds"] = min(exclusions) if exclusions else row["tail_end_seconds"]
+    return layout
 
 
 def _frame(seconds: float, sample_rate: int) -> int:
@@ -199,9 +263,16 @@ def _cut(
     loop: bool,
     sample_rate: int,
     lead_first: int | None = None,
+    ring_audio_last: int | None = None,
 ) -> np.ndarray:
     piece = np.array(timeline[first:last], dtype=np.float32, copy=True)
-    ring = np.asarray(timeline[last:max(last, ring_last)], dtype=np.float32)
+    stop = ring_last if ring_audio_last is None else min(ring_last, ring_audio_last)
+    ring = np.array(timeline[last:max(last, stop)], dtype=np.float32, copy=True)
+    if stop < ring_last:
+        fade = min(len(ring), int(round(FADE_OUT_SECONDS * sample_rate)))
+        if fade:
+            ring[-fade:] *= np.linspace(1.0, 0.0, fade, dtype=np.float32).reshape((-1,) + (1,) * (ring.ndim - 1))
+        ring = np.pad(ring, ((0, ring_last - max(last, stop)),) + ((0, 0),) * (ring.ndim - 1))
     lead = np.asarray(timeline[min(first, first if lead_first is None else lead_first):first], dtype=np.float32)
     if loop and len(piece) and (len(ring) or len(lead)):
         n = min(len(lead), len(piece))
@@ -231,6 +302,7 @@ def cut_section(
     *,
     tail_end_seconds: float | None = None,
     lead_in_start_seconds: float | None = None,
+    tail_audio_end_seconds: float | None = None,
     loop: bool = False,
 ) -> np.ndarray:
     """The audio of one playback section from ``timeline``, with its tail and its seam fades.
@@ -245,7 +317,8 @@ def cut_section(
     last = max(first, _frame(end_seconds, sample_rate))
     ring_last = last if tail_end_seconds is None else _frame(tail_end_seconds, sample_rate)
     lead_first = None if lead_in_start_seconds is None else _frame(lead_in_start_seconds, sample_rate)
-    return _cut(timeline, first, last, ring_last, loop, sample_rate, lead_first)
+    ring_audio_last = None if tail_audio_end_seconds is None else _frame(tail_audio_end_seconds, sample_rate)
+    return _cut(timeline, first, last, ring_last, loop, sample_rate, lead_first, ring_audio_last)
 
 
 def layer_section_audio(
@@ -257,6 +330,7 @@ def layer_section_audio(
     *,
     tail_end_seconds: float | None = None,
     lead_in_start_seconds: float | None = None,
+    tail_audio_end_seconds: float | None = None,
     loop: bool = False,
 ) -> np.ndarray:
     """The sum of ``groups`` over one section (see :func:`cut_section`)."""
@@ -267,7 +341,8 @@ def layer_section_audio(
     window = sum(
         np.asarray(stem_audio[group][lead_first:max(last, ring_last)], dtype=np.float32) for group in groups
     )
-    return _cut(window, first - lead_first, last - lead_first, ring_last - lead_first, loop, sample_rate, 0)
+    ring_audio_last = None if tail_audio_end_seconds is None else _frame(tail_audio_end_seconds, sample_rate) - lead_first
+    return _cut(window, first - lead_first, last - lead_first, ring_last - lead_first, loop, sample_rate, 0, ring_audio_last)
 
 
 def mastered_section_audio(
@@ -294,6 +369,7 @@ def mastered_section_audio(
         one_pass = cut_section(
             timeline, sample_rate, section["start_seconds"], section["end_seconds"],
             tail_end_seconds=section.get("tail_end_seconds"),
+            tail_audio_end_seconds=section.get("tail_audio_end_seconds"),
             lead_in_start_seconds=section.get("lead_in_start_seconds"), loop=True,
         )
         second_pass[section["id"]] = (at + len(one_pass), len(one_pass))
@@ -312,6 +388,7 @@ def mastered_section_audio(
             out[section["id"]] = cut_section(
                 mastered[: len(timeline)], sample_rate, section["start_seconds"], section["end_seconds"],
                 tail_end_seconds=section.get("tail_end_seconds"),
+                tail_audio_end_seconds=section.get("tail_audio_end_seconds"),
             )
     return out
 
@@ -345,6 +422,7 @@ def write_playback_layers(
             piece = layer_section_audio(
                 stem_audio, groups, sample_rate, section["start_seconds"], section["end_seconds"],
                 tail_end_seconds=section.get("tail_end_seconds"),
+                tail_audio_end_seconds=section.get("tail_audio_end_seconds"),
                 lead_in_start_seconds=section.get("lead_in_start_seconds"), loop=section["loop"],
             )
             put(section["id"], layer_id, piece)

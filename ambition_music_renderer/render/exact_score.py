@@ -24,6 +24,7 @@ import pretty_midi
 
 from ..musicir.midi import add_initial_controls, create_midi_instrument
 from ..musicir.model import CompiledScore
+from ..musicir.clock import ExactClock
 from ..musicir.normalize import MUSICIR_V2_SCHEMA
 from .score_core import CC_NUMBERS, velocity_to_cc_value
 from .score_theory import clamp, fit_midi_pitch, midi_to_note, note_to_midi
@@ -689,6 +690,8 @@ def compile_exact_score(
                         "nominal_beat": float(position["beat"]) - 1.0,
                         "position": position,
                     }
+                    if "form_region" in row:
+                        event_row["form_region"] = row["form_region"]
                     if source_ref is not None:
                         ref = copy.deepcopy(source_ref)
                         ref["pitch_index"] = pitch_index
@@ -709,12 +712,19 @@ def compile_exact_score(
         (int(item["start_tick"]), int(item["end_tick"]), str(item["id"]))
         for item in meta
     ]
+    form_ids = {section_id for _, _, section_id in form_ranges}
     for event in note_events:
         tick = int(event["start_tick"])
-        event["section"] = next(
+        inferred = next(
             (section_id for start_tick, stop_tick, section_id in form_ranges if start_tick <= tick < stop_tick),
             None,
         )
+        owner = event.get("form_region", inferred)
+        if "form_region" in event and (not isinstance(owner, str) or owner not in form_ids):
+            raise ValueError(f"note form_region references unknown form region {owner!r}")
+        if owner == inferred:
+            event.pop("form_region", None)
+        event["section"] = owner
     for event in controller_events:
         tick = int(event["tick"])
         event["section"] = next(
@@ -739,6 +749,7 @@ def compile_exact_score(
         sections=meta,
         instrument_specs=instrument_specs,
         note_events=note_events,
+        clock=ExactClock(clock, tempo),
         controller_events=controller_events,
         exact_metadata=exact_metadata,
         normalization_warnings=tuple(normalization_warnings),

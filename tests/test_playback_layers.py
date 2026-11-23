@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from ambition_music_renderer import cli
+from ambition_music_renderer.musicir.compile import compile_score
 from ambition_music_renderer.render.playback_layers import (
     cut_section,
     layer_section_audio,
@@ -25,6 +26,17 @@ FORM = [
 GROUPS = ["bass", "drums", "lead"]
 
 
+def _plan(spec, rows, groups):
+    score = {
+        "id": "playback_fixture", "schema": "ambition.musicir.v1",
+        "tempo": {"bpm": 240}, "meter": {"beats_per_bar": 4},
+        "instruments": [{"name": group, "group": group, "program": "acoustic_grand_piano"} for group in groups],
+        "sections": [{"id": row["id"], "bars": int((row["end_beat"] - row["start_beat"]) / 4), "layers": []} for row in rows],
+        **spec,
+    }
+    return playback_layer_plan(compile_score(score))
+
+
 def _spec(layers, sections=None):
     playback = {"layers": layers}
     if sections is not None:
@@ -33,12 +45,12 @@ def _spec(layers, sections=None):
 
 
 def test_a_score_with_no_layers_asks_for_no_playback_files():
-    assert playback_layer_plan({}, FORM, GROUPS) is None
-    assert playback_layer_plan({"playback": {"exit_policy": {}}}, FORM, GROUPS) is None
+    assert _plan({}, FORM, GROUPS) is None
+    assert _plan({"playback": {"exit_policy": {}}}, FORM, GROUPS) is None
 
 
 def test_a_playback_section_is_a_span_of_the_form():
-    plan = playback_layer_plan(
+    plan = _plan(
         _spec(
             {"bed": ["bass", "lead"], "kit": ["drums"]},
             [{"id": "intro"}, {"id": "loop", "form": ["verse", "chorus"], "loop": True}],
@@ -53,7 +65,7 @@ def test_a_playback_section_is_a_span_of_the_form():
 
 
 def test_without_sections_each_form_section_is_a_playback_section():
-    plan = playback_layer_plan(_spec({"all": GROUPS}), FORM, GROUPS)
+    plan = _plan(_spec({"all": GROUPS}), FORM, GROUPS)
     assert [section["id"] for section in plan["sections"]] == ["intro", "verse", "chorus"]
 
 
@@ -71,7 +83,7 @@ def test_without_sections_each_form_section_is_a_playback_section():
 )
 def test_a_block_that_cannot_give_a_complete_mix_is_refused(layers, sections, problem):
     with pytest.raises(ValueError, match=problem):
-        playback_layer_plan(_spec(layers, sections), FORM, GROUPS)
+        _plan(_spec(layers, sections), FORM, GROUPS)
 
 
 def _stems():
@@ -92,7 +104,7 @@ def test_the_layers_of_a_section_sum_to_its_stems_and_close_at_the_seam():
 
 
 def test_layer_files_are_written_for_each_section_and_published_to_stable_paths(tmp_path, monkeypatch):
-    plan = playback_layer_plan(
+    plan = _plan(
         _spec({"bed": ["bass", "lead"], "kit": ["drums"]}, [{"id": "loop", "form": ["verse", "chorus"], "loop": True}]),
         FORM,
         GROUPS,
@@ -128,7 +140,7 @@ def test_shared_runtime_gain_applies_equally_to_layer_groups_and_single_stems():
     with pytest.raises(ValueError, match="unknown runtime stem gain mode"):
         select_runtime_export_stems(native, shared, "typo")
 
-    plan = playback_layer_plan(
+    plan = _plan(
         _spec({"bed": ["bass", "lead"], "kit": ["drums"]},
               [{"id": "loop", "form": ["verse", "chorus"], "loop": True}]),
         FORM, GROUPS,
@@ -160,10 +172,10 @@ def _ringing_timeline():
 
 def test_a_tail_must_be_the_form_section_after_the_span():
     with pytest.raises(ValueError, match="right after"):
-        playback_layer_plan(
+        _plan(
             _spec({"bed": GROUPS}, [{"id": "loop", "form": ["verse"], "loop": True, "tail": "ring"}]), RING_FORM, GROUPS
         )
-    plan = playback_layer_plan(
+    plan = _plan(
         _spec({"bed": GROUPS}, [{"id": "loop", "form": ["verse", "chorus"], "loop": True, "tail": "ring"}]),
         RING_FORM,
         GROUPS,
@@ -201,7 +213,7 @@ def _leaky_master(audio: np.ndarray) -> np.ndarray:
 
 def test_the_full_mix_of_a_loop_is_mastered_as_it_sounds_when_it_comes_round_again():
     audio, _, _ = _ringing_timeline()
-    plan = playback_layer_plan(
+    plan = _plan(
         {"playback": {"full": True, "sections": [
             {"id": "intro"},
             {"id": "loop", "form": ["verse", "chorus"], "loop": True, "tail": "ring"},
@@ -232,7 +244,7 @@ def test_a_looped_section_sounds_as_the_loop_does_when_it_comes_round_again():
     # silent lead-in; its last note rings past its end into the silent tail.
     in_loop = (-0.01, 1.5, 3.6)
     timeline = _notes([1.0 + r for r in in_loop], 6.0)
-    plan = playback_layer_plan(
+    plan = _plan(
         _spec({"bed": GROUPS}, [{"id": "loop", "form": ["verse", "chorus"], "loop": True,
                                  "lead_in": "intro", "tail": "ring"}]),
         RING_FORM,
@@ -246,7 +258,7 @@ def test_a_looped_section_sounds_as_the_loop_does_when_it_comes_round_again():
     played_on = _notes([4.0 * k + r for k in range(4) for r in in_loop], 16.0)
     np.testing.assert_allclose(piece, played_on[4 * SR:8 * SR], atol=1e-5)
     with pytest.raises(ValueError, match="right before"):
-        playback_layer_plan(
+        _plan(
             _spec({"bed": GROUPS}, [{"id": "loop", "form": ["chorus"], "loop": True, "lead_in": "intro"}]),
             RING_FORM, GROUPS,
         )

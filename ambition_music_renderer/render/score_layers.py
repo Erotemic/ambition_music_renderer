@@ -11,6 +11,7 @@ import numpy as np
 import pretty_midi
 
 from ..musicir.model import CompiledScore
+from ..musicir.clock import ProceduralClock
 from ..musicir.normalize import MUSICIR_V1_SCHEMA
 from ..profiler import profile
 from .score_core import ARTICULATION_GATE, RenderContext, TempoMap
@@ -1455,7 +1456,8 @@ def compile_procedural_score(
         add_instrument(ctx, inst_spec)
     starts = section_starts(spec["sections"])
     ctx.section_starts = starts
-    section_meta = section_metadata_from_spec(spec)
+    section_tempo = tempo_map or TempoMap.constant(bpm)
+    section_meta = section_metadata_from_spec(spec, tempo=section_tempo)
     for section in spec["sections"]:
         for layer in merged_layers(spec, section):
             ctx.active_section_id = str(section.get("id", ""))
@@ -1474,6 +1476,7 @@ def compile_procedural_score(
         sections=section_meta,
         instrument_specs=copy.deepcopy(ctx.instrument_specs),
         note_events=list(ctx.note_events),
+        clock=ProceduralClock(section_tempo, beats_per_bar),
         exact_metadata=None,
         normalization_warnings=tuple(normalization_warnings),
     )
@@ -1492,9 +1495,9 @@ def build_score(
     return compile_score(spec).legacy_tuple()
 
 
-def section_metadata_from_spec(spec: dict[str, Any]) -> list[dict[str, Any]]:
+def section_metadata_from_spec(spec: dict[str, Any], *, tempo: TempoMap | None = None) -> list[dict[str, Any]]:
     beats_per_bar = float(spec.get("meter", {}).get("beats_per_bar", 4))
-    tempo = TempoMap.from_spec(spec)
+    tempo = tempo or TempoMap.from_spec(spec)
     cursor = 0
     out = []
     for section in spec["sections"]:

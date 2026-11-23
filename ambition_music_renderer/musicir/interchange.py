@@ -498,6 +498,8 @@ def build_interchange_manifest(compiled: CompiledScore, *, midi_filename: str) -
             if source and source.get("event_id"):
                 row["event_id"] = str(source["event_id"])
                 row["source_ref"] = copy.deepcopy(source.get("source_ref"))
+                if "form_region" in source:
+                    row["form_region"] = source["form_region"]
             else:
                 all_source_mapped = False
                 row["event_id"] = f"compiled/{inst.name}/{ordinal:06d}"

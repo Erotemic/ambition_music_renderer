@@ -107,6 +107,28 @@ an internal synthesis representation during the migration. Its private
 `_ambition_*` attributes and the tuple-returning `build_score()` API are
 compatibility surfaces, not new extension points.
 
+### Playback preparation
+
+`CompiledScore.clock` projects the existing procedural or exact compiler clock.
+It uses quarter-note beats and zero-based bars. `musicir.playback` prepares
+section bodies, bar boundaries, typed entry and exit markers, and frame plans.
+`cue playback` exposes this preparation without synthesis or sample libraries.
+Constant sections keep an arithmetic grid. Variable sections keep ordered bar
+boundaries. V3 generator clips still have the clock limits enforced by their
+compiler bridge; exact clips support the full exact clock.
+
+Exact events can carry `form_region` ownership across a performed boundary.
+This changes material ownership, not MIDI timing. Playback preparation checks
+note-free regions against those owners. A shared tail and lead-in excludes
+incoming attacks from the outgoing ring and retains the declared file span.
+
+The render manifest separates `score_plan` from `encoded_products` evidence.
+Encoded products retain their render dependency identity, file hash, decoded
+frame count, gain basis, and ring construction. Publication checks the copied
+files and changes only their paths and evidence level. These facts do not prove
+native admission, synchronized starts, or speaker output. A selected product
+must retain its own playback facts when source changes.
+
 ### V3 authoring graph
 
 `musicir.graph.NormalizedScoreGraph` is the semantic source representation for

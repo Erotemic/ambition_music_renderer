@@ -77,6 +77,13 @@ def validate_musicir_spec(
                 source=source,
             ) from ex
         raise
+    from ..musicir.playback import score_playback_description
+    try:
+        score_playback_description(compiled)
+    except ValueError as ex:
+        raise MusicIRValidationError([
+            diagnostic("PLAYBACK_PREPARATION", str(ex), path=("playback",), locations=source_locations or {})
+        ], source=source) from ex
     musical_events = [
         event
         for event in compiled.note_events

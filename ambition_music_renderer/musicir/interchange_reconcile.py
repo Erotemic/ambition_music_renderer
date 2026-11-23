@@ -613,7 +613,10 @@ def lower_reconciled_clips(
             if not ref.get("clip_id"):
                 continue
             key = _clip_key(ref)
-            final_by_clip.setdefault(key, []).append(copy.deepcopy(match["edited"]))
+            note = copy.deepcopy(match["edited"])
+            if "form_region" in match["baseline"]:
+                note["form_region"] = match["baseline"]["form_region"]
+            final_by_clip.setdefault(key, []).append(note)
             if match["status"] == "modified":
                 affected.add(key)
         for deleted in track["notes"]["deleted"]:
@@ -695,6 +698,8 @@ def lower_reconciled_clips(
                     "gate": 1.0,
                 }
             )
+            if "form_region" in note:
+                events[-1]["form_region"] = note["form_region"]
 
         preserved = {
             key_name: copy.deepcopy(clip[key_name])

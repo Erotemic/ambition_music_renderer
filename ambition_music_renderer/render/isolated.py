@@ -624,6 +624,8 @@ def _render_main(ns) -> int:
         sr = int(render_cfg.get("sample_rate", 48000))
         soundfont = choose_soundfont(render_cfg.get("soundfont"))
         compiled = compile_score(spec)
+        from ..musicir.playback import score_playback_description
+        score_playback_description(compiled, sample_rate=sr)
         render_dependencies = build_render_dependency_fingerprint(
             spec_path=spec_path,
             spec=spec,
@@ -1113,7 +1115,7 @@ def _render_main(ns) -> int:
     # for a game that mixes the cue from layers, and with `playback.full` the
     # mastered mix of each span. A score asks for them in its `playback`
     # block, in each render mode.
-    playback_plan = playback_layer_plan(spec, meta, list(group_names))
+    playback_plan = playback_layer_plan(compiled)
     if playback_plan is not None:
         output_files["playback"] = write_playback_layers(
             playback_plan,
@@ -1283,6 +1285,13 @@ def _render_main(ns) -> int:
     }
     manifest["playback_layers"] = playback_plan
     manifest["runtime_stem_gain_mode"] = ns.runtime_stem_gain_mode
+    from ..musicir.playback import rendered_playback_description
+    manifest["music_playback"] = rendered_playback_description(
+        compiled, root=outdir, files=output_files, sample_rate=sr,
+        render_fingerprint=render_dependencies.fingerprint,
+        runtime_stem_gain_mode=ns.runtime_stem_gain_mode, runtime_gain_db=runtime_gain_db,
+        adaptive_mastering_mode=mastering_policy_obj.mode,
+    )
     manifest["runtime_stem_max_gain_db"] = runtime_max_gain_db if ns.runtime_stem_gain_mode == "shared" else None
     manifest["section_mix_gains_db"] = section_mix_gains_db
     manifest["section_stem_mix_gains_db"] = section_stem_mix_gains_db

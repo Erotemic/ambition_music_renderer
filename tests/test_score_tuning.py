@@ -10,6 +10,8 @@ from ambition_music_renderer.audit.score_tuning import (
     format_score_tuning_report,
 )
 from ambition_music_renderer.musicir.model import CompiledScore
+from ambition_music_renderer.musicir.clock import ProceduralClock
+from ambition_music_renderer.render.score_core import TempoMap
 
 
 def _compiled_fixture() -> CompiledScore:
@@ -42,6 +44,7 @@ def _compiled_fixture() -> CompiledScore:
         sections=[],
         instrument_specs=specs,
         note_events=events,
+        clock=ProceduralClock(TempoMap.constant(120.0), 4.0),
     )
 
 

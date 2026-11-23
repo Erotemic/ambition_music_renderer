@@ -412,7 +412,27 @@ Validate compilation without synthesizing audio with:
 python -m ambition_music_renderer cue validate <cue_id>
 python -m ambition_music_renderer cue validate <cue_id> --strict-schema
 python -m ambition_music_renderer cue validate <cue_id> --json
+python -m ambition_music_renderer cue playback <cue_id> --sample-rate 48000 --json
 ```
+
+`cue playback` reports the compiler clock, section bodies, file spans, legal
+bar exits, and product roles without synthesis. Frame plans use the same global
+rounding as the renderer. They do not prove that media exists or that a device
+can start several voices together. Folded ring material is marked as folded;
+it is not an independent release tail or a scheduled pickup.
+
+An exact event can name its owning form with `form_region`. Use this field
+when performance timing puts an onset across a form boundary. It does not
+change the note's time, pitch, duration or velocity. A shared spacer can hold
+an outgoing ring and an incoming pickup. Export excludes the incoming attack
+from the outgoing tail and pads the remaining file span with silence. The
+description reports this cut and any pickup that the selected product omits.
+
+Fresh render manifests contain `music_playback` facts for the encoded products.
+They include frame counts, file hashes, gain bases and the render dependency
+identity. Publication checks the copied media and records its runtime paths.
+Keep these facts with their selected media. A new score plan must not supply
+timing for an older render.
 
 V3 validation reports source-oriented diagnostics with YAML paths, line/column
 coordinates, stable error codes, and typo/repair hints before compilation where

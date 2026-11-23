@@ -41,7 +41,7 @@ def test_shatter_compiles_and_playback_section_spans():
     compiled = compile_score(score, strict_schema=True)
     assert len(compiled.pm.instruments) == 12
     assert len(compiled.sections) == len(score["form"]) == 15
-    plan = playback_layer_plan(score, compiled.sections, [i["group"] for i in score["instruments"]])
+    plan = playback_layer_plan(compiled)
     assert plan is not None
     sections = plan["sections"]
     assert [s["id"] for s in sections] == ["intro", "combat", "outro"]

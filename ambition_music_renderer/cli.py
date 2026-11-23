@@ -444,7 +444,8 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
         if not rel:
             continue
         src = manifest_root / str(rel)
-        dest = dest_dir / "adaptive" / str(section_id) / f"{section_id}.full.ogg"
+        from .render.playback_layers import runtime_product_path
+        dest = dest_dir / runtime_product_path("adaptive", str(section_id), "full")
         if src.exists():
             to_copy.append((src, dest))
         else:
@@ -463,7 +464,7 @@ def publish_adaptive_full_sections(cue: str, outdir: Path, dest_dir: Path) -> li
     # Keep the manifest next to the runtime files as a debugging breadcrumb.
     # The game does not load it today, but it makes it obvious which render hash
     # produced the shipped adaptive sections.
-    if copied:
+    if copied and "music_playback" not in manifest:
         publish_copy(manifest_path, dest_dir / f"{cue}.adaptive_manifest.json")
     return copied
 
@@ -493,13 +494,14 @@ def publish_playback_layers(cue: str, outdir: Path, dest_dir: Path) -> list[Path
             if not src.exists():
                 print(f"skip playback publish {cue}: missing {src}", file=sys.stderr)
                 return []
-            to_copy.append((src, dest_dir / "playback" / str(section_id) / f"{section_id}.{layer_id}.ogg"))
+            from .render.playback_layers import runtime_product_path
+            to_copy.append((src, dest_dir / runtime_product_path("playback", str(section_id), str(layer_id))))
     copied: list[Path] = []
     for src, dest in to_copy:
         dest.parent.mkdir(parents=True, exist_ok=True)
         publish_copy(src, dest)
         copied.append(dest)
-    if copied:
+    if copied and "music_playback" not in manifest:
         publish_copy(manifest_path, dest_dir / f"{cue}.adaptive_manifest.json")
     return copied
 
@@ -564,6 +566,16 @@ def publish_cue(cue: str, outdir: Path, dest_root: Path | None) -> bool:
         print(f"publish {cue}: adaptive section -> {_display_path(adaptive_dest)}")
     if adaptive_copied:
         print(f"publish {cue}: {len(adaptive_copied)} adaptive full-section assets")
+    if "music_playback" in manifest:
+        import tempfile
+        from .musicir.playback import published_playback_description
+
+        runtime_manifest = dict(manifest)
+        runtime_manifest["music_playback"] = published_playback_description(manifest["music_playback"], dest_dir)
+        with tempfile.NamedTemporaryFile(mode="w+", encoding="utf8", dir=dest_dir, suffix=".json") as temporary:
+            json.dump(runtime_manifest, temporary, indent=2)
+            temporary.flush()
+            publish_copy(Path(temporary.name), dest_dir / f"{cue}.adaptive_manifest.json")
     return True
 
 
@@ -1824,6 +1836,36 @@ def _load_compiled_for_inspection(cue: str):
     return score, compile_score(load_yaml(score))
 
 
+class PlaybackCommand(kwconf.Config):
+    """Inspect compiler clocks, playback products and legal exits without synthesis."""
+
+    cue: str = kwconf.Value(None, position=1, help="cue id or .music.yaml path")
+    sample_rate: int | None = kwconf.Value(None, help="also calculate planned file frames at this rate")
+    json: bool = kwconf.Flag(False, help="emit the playback description as JSON")
+
+    @classmethod
+    def main(cls, argv: list[str] | str | bool | None = True, **kwargs: object) -> int:
+        config = cls.cli(argv=argv, data=kwargs)
+        from .musicir.playback import score_playback_description
+
+        try:
+            _, compiled = _load_compiled_for_inspection(str(config.cue))
+            report = score_playback_description(compiled, sample_rate=config.sample_rate)
+        except (FileNotFoundError, ValueError, KeyError) as ex:
+            print(str(ex), file=sys.stderr)
+            return 1
+        if config.json:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        else:
+            print(f"{report['cue_id']}: score plan; media and native start are not verified")
+            for section in report["sections"]:
+                exits = [marker["seconds"] for marker in section["markers"] if marker["role"] == "exit"]
+                print(f"  {section['id']}: body={section['musical_end_seconds']:.6f}s "
+                      f"file={section['file_duration_seconds']:.6f}s loop={section['loop']} "
+                      f"clock={section['clock']['kind']} exits={exits} material={section['material']}")
+        return 0
+
+
 class ExpandCommand(kwconf.Config):
     """Explain authored v3 clips and the exact events they compile into."""
 
@@ -2280,6 +2322,7 @@ class CueModal(kwconf.ModalCLI):
     daw_reconcile = DawReconcileCommand
     daw_apply = DawApplyCommand
     validate = ValidateCommand
+    playback = PlaybackCommand
     expand = ExpandCommand
     graph = GraphCommand
     trace_event = TraceEventCommand
@@ -2937,7 +2980,7 @@ def main(argv: list[str] | None = None) -> int:
         return int(AmbitionMusicRendererCLI.main(argv=argv))
     finally:
         elapsed = _time.perf_counter() - total_start
-        print(f"[ambition_music_renderer] command={command_name} total_elapsed_s={elapsed:.3f}", flush=True)
+        print(f"[ambition_music_renderer] command={command_name} total_elapsed_s={elapsed:.3f}", file=sys.stderr, flush=True)
         if _FINAL_BUNDLE_REPORT is not None:
             from .render.bundle_archive import print_bundle_summary
 

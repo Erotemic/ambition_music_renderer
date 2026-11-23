@@ -133,6 +133,19 @@ Local time values are deliberately exact and DAW-friendly:
 - `{ticks: 240}` is explicit tick addressing;
 - `{beats: 1.5}` means quarter-note beats.
 
+An event mapping can set `form_region` to the id of its owning form region.
+Use it when performance timing moves an onset across a form boundary. The
+field changes ownership, not note timing. Unknown region ids fail validation.
+For example:
+
+```yaml
+- {at: "399/400", dur: "1/4", pitch: C4, velocity: 80, form_region: chorus}
+```
+
+Playback preparation uses this owner when a spacer holds an outgoing ring
+and an incoming pickup. It excludes the incoming attack from the outgoing
+tail, keeps the declared file span, and reports unretained pickup material.
+
 A clip can apply common transforms without modifying its source material:
 
 ```yaml

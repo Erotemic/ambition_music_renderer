@@ -95,6 +95,7 @@ EVENT_FIELDS = {
     "technique",
     "articulation",
     "instrument",
+    "form_region",
 }
 AUTOMATION_FIELDS = {
     "id", "at", "cc", "controller", "value", "pitch_bend", "bend", "instrument",
@@ -120,7 +121,7 @@ MATERIAL_MOTIF_FIELDS = MATERIAL_COMMON_FIELDS | {
 }
 FORM_FIELDS = {
     "id", "from", "to", "bars", "start_tick", "end_tick", "label",
-    "energy", "intensity", "density", "variation", "role", "loopable", "notes",
+    "energy", "intensity", "density", "variation", "role", "loopable", "notes", "valid_exit_local_bars",
 }
 HARMONY_FIELDS = {"progression", "events", "start_bar", "every_bars", "cycle"}
 HARMONY_EVENT_FIELDS = {"at", "bar", "beat", "tick", "chord", "harmony"}
@@ -494,6 +495,7 @@ def _validate_event(
     path: SourcePath,
     locations: Mapping[SourcePath, SourceLocation],
     has_harmony: bool,
+    form_regions: Iterable[str],
     custom_techniques: Iterable[str] = (),
 ) -> list[Diagnostic]:
     if isinstance(raw, (list, tuple)):
@@ -536,6 +538,9 @@ def _validate_event(
         )
     if "at" not in row:
         result.append(diagnostic("V3_EVENT_AT", "event requires `at`", path=path, locations=locations))
+    if "form_region" in row and (not isinstance(row["form_region"], str) or row["form_region"] not in form_regions):
+        result.append(diagnostic("V3_EVENT_FORM_REGION", f"unknown form region {row['form_region']!r}",
+                                 path=(*path, "form_region"), locations=locations))
     dur_key = "dur" if "dur" in row else "duration" if "duration" in row else None
     if dur_key is None:
         result.append(diagnostic("V3_EVENT_DURATION", "event requires `dur`/`duration`", path=path, locations=locations))
@@ -1057,17 +1062,12 @@ def _validate_playback_layers(
     instruments, form = spec.get("instruments"), spec.get("form")
     if not _mapping(playback) or not (playback.get("layers") or playback.get("full")) or not _list(instruments) or not _list(form):
         return []
-    from ..render.playback_layers import playback_layer_plan
+    from ..render.playback_layers import playback_layout
 
     groups = sorted({str(item.get("group", item.get("name"))) for item in instruments if _mapping(item)})
-    # Only the ids and the order of the form matter to the check.
-    rows = [
-        {"id": item.get("id"), "start_seconds": i, "end_seconds": i + 1, "start_beat": i, "end_beat": i + 1}
-        for i, item in enumerate(form)
-        if _mapping(item)
-    ]
+    form_ids = [str(item.get("id")) for item in form if _mapping(item)]
     try:
-        playback_layer_plan(dict(spec), rows, groups)
+        playback_layout(dict(spec), form_ids, groups)
     except ValueError as ex:
         return [diagnostic("V3_PLAYBACK_LAYERS", str(ex), path=("playback",), locations=locations)]
     return []
@@ -1082,6 +1082,10 @@ def diagnose_v3_spec(
 
     locations = locations or {}
     result: list[Diagnostic] = []
+    authored_form = spec.get("form") or []
+    form_regions = {str(row["id"]) for row in authored_form if _mapping(row) and "id" in row} if _list(authored_form) else set()
+    if not authored_form:
+        form_regions = {"complete_work"}
     result.extend(
         _unknown_fields(
             spec,
@@ -1231,7 +1235,7 @@ def diagnose_v3_spec(
                     result.append(diagnostic("V3_MATERIAL_EVENTS", "event material requires an events list", path=("materials", str(key), "events"), locations=locations))
                 else:
                     for event_idx, event in enumerate(events):
-                        result.extend(_validate_event(event, ppq=ppq, path=("materials", str(key), "events", event_idx), locations=locations, has_harmony=has_harmony))
+                        result.extend(_validate_event(event, ppq=ppq, path=("materials", str(key), "events", event_idx), locations=locations, has_harmony=has_harmony, form_regions=form_regions))
             elif kind == "sequence":
                 items = row.get("items") or []
                 if not _list(items):
@@ -1384,7 +1388,7 @@ def diagnose_v3_spec(
                         for event_idx, event in enumerate(events):
                             event_path = (*clip_path, "events", event_idx)
                             result.extend(_validate_event(
-                                event, ppq=ppq, path=event_path, locations=locations,
+                                event, ppq=ppq, form_regions=form_regions, path=event_path, locations=locations,
                                 has_harmony=has_harmony,
                                 custom_techniques=(part.get("technique_map") or {}).keys(),
                             ))

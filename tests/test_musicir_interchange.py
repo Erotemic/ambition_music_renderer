@@ -297,6 +297,32 @@ def test_daw_reconcile_rescales_ppq_and_lowers_only_edited_material_clip(tmp_pat
     assert verify_compiled_matches_edited_midi(compile_score(updated), manifest, snapshot)["ok"] is True
 
 
+def test_a_daw_velocity_edit_keeps_the_form_owner_of_an_early_attack(tmp_path: Path):
+    source = _v3_score()
+    source["form"].append({"id": "next", "from": {"bar": 2}, "to": {"bar": 3}})
+    source["end"] = {"bar": 3}
+    event = source["materials"]["hook"]["events"][0]
+    event.update(at="1919/1920", form_region="next")
+    compiled = compile_score(source)
+    paths = export_interchange_bundle(compiled, tmp_path / "baseline")
+    manifest = json.loads(paths["manifest"].read_text())
+    edited_path = tmp_path / "edited.mid"
+    midi = mido.MidiFile(paths["midi"])
+    for track in midi.tracks:
+        for message in track:
+            if message.type == "note_on" and message.note == 60 and message.velocity:
+                message.velocity += 1
+    midi.save(edited_path)
+    snapshot = read_midi_snapshot(edited_path)
+    report = reconcile_edited_midi(compiled, manifest, snapshot)
+    updated, _ = lower_reconciled_clips(source, manifest, report)
+    edited = compile_score(updated)
+    attack = next(event for event in edited.note_events if event["pitch"] == 60)
+    assert attack["velocity"] == 81
+    assert attack["section"] == "next"
+    assert verify_compiled_matches_edited_midi(edited, manifest, snapshot)["ok"] is True
+
+
 def test_daw_apply_can_lower_one_generated_clip_after_performance_edit(tmp_path: Path):
     source = _generator_v3_score()
     compiled = compile_score(source)

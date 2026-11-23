@@ -10,6 +10,8 @@ from typing import Any, Iterable, Mapping
 
 import pretty_midi
 
+from .clock import CompiledClock
+
 
 COMPILED_SCORE_SCHEMA = "ambition.compiled_score.v1"
 
@@ -21,7 +23,7 @@ class CompiledScore:
     ``PrettyMIDI`` remains the synthesis representation during the migration,
     but it no longer has to be the semantic message bus.  New consumers should
     read ``note_events``, ``instrument_specs``, ``groups``, ``sections``, and
-    ``exact_metadata`` from this object.  Legacy private PrettyMIDI attributes
+    ``clock`` and ``exact_metadata`` from this object.  Legacy private PrettyMIDI attributes
     remain attached until downstream callers have migrated and tests prove that
     removing them is safe.
     """
@@ -34,6 +36,7 @@ class CompiledScore:
     sections: list[dict[str, Any]]
     instrument_specs: dict[str, dict[str, Any]]
     note_events: list[dict[str, Any]]
+    clock: CompiledClock
     # Canonical controller/pitch-bend provenance.  PrettyMIDI remains the
     # audio-semantic authority for these events; this list gives v2/v3 and
     # interchange tooling stable score/source coordinates without overloading
@@ -180,7 +183,7 @@ def _canonical_event(event: Mapping[str, Any]) -> dict[str, Any]:
 def compiled_score_payload(compiled: CompiledScore) -> dict[str, Any]:
     """Return a deterministic semantic snapshot suitable for migration checks."""
 
-    return {
+    payload = {
         "schema": COMPILED_SCORE_SCHEMA,
         "midi_resolution": int(compiled.pm.resolution),
         "instruments": [_midi_instrument_payload(inst) for inst in compiled.pm.instruments],
@@ -188,7 +191,13 @@ def compiled_score_payload(compiled: CompiledScore) -> dict[str, Any]:
         "instrument_specs": copy.deepcopy(compiled.instrument_specs),
         "sections": copy.deepcopy(compiled.sections),
         "exact_metadata": copy.deepcopy(compiled.exact_metadata),
+        "clock": compiled.clock.as_dict(),
     }
+    owners = sorted((str(event["instrument"]), float(event["start_time"]), int(event["pitch"]), str(event["form_region"]))
+                    for event in compiled.note_events if "form_region" in event)
+    if owners:
+        payload["note_form_regions"] = owners
+    return payload
 
 
 def compiled_score_fingerprint(compiled: CompiledScore) -> str:
@@ -196,7 +205,7 @@ def compiled_score_fingerprint(compiled: CompiledScore) -> str:
 
     ``note_events`` are diagnostic/provenance mirrors of the MIDI data and are
     intentionally excluded. The actual MIDI notes/controllers/bends, groups,
-    instrument specs, sections, and exact clock metadata are the authorities
+    instrument specs, sections, compiler clocks and explicit form ownership are the authorities
     that can affect rendered audio/form.
     """
 

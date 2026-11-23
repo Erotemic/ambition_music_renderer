@@ -411,6 +411,8 @@ def _lower_exact_clips(
                             "_source_ref": source_ref.as_dict(),
                             "_event_id_base": source_ref.event_id(pitch_index=0).rsplit("/p00", 1)[0],
                         }
+                        if "form_region" in row:
+                            out["form_region"] = row["form_region"]
                         if len(pitches) == 1:
                             out["pitch"] = pitches[0]
                         else:
