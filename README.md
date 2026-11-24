@@ -126,6 +126,14 @@ Commands below assume the usual parent checkout at `~/code/ambition`.
 
 ### First-time setup (and any time later)
 
+From the parent Ambition checkout, `./scripts/regen/music.sh --setup` checks
+this submodule out at the commit the parent pins and creates or repairs the
+renderer's venv (`~/.cache/ambition-tool-venvs/ambition_music_renderer`) with
+uv; `./scripts/regen/music.sh` then renders and publishes. That venv directory
+is not a project: to install by hand, run
+`uv pip install --python ~/.cache/ambition-tool-venvs/ambition_music_renderer/bin/python -e '.[all]'`
+from THIS directory.
+
 The sample libraries and plugins live outside the repo, under
 `/data/audio-tools`. One script installs them, and it is safe to re-run: a run
 on a complete install downloads and extracts nothing, then verifies every
