@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_oceania_sahul
+  title: Sahul
+  version_id: 8b2d422949c661b5:40078bf6f08f
+  render_hash: 8b2d422949c661b5
+  preview_sha256: 40078bf6f08f98d6f0e960dd40b2f2ec26c665d1fd77295236b9a899a806fe03
+  preview_path: generated/history_oceania_sahul/.versioned/8b2d422949c661b5/preview/history_oceania_sahul_8b2d422949c661b5.full_soundtrack_preview.ogg
+  manifest_path: generated/history_oceania_sahul/.versioned/8b2d422949c661b5/history_oceania_sahul_8b2d422949c661b5.adaptive_manifest.json
+  manifest_sha256: 19698c3fccb9e65c851da60b42f77739943250a4940da894f46749a82c8436dd
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_oceania_sahul.music.yaml
+  score_sha256_at_review: cae014d10c4c9199328f5be8d853b37bf601414355d0886ec58a604960dd6b89
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Too self-serious. Doesn't feel like a game tune.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:03:41Z'
+  updated_at: '2026-11-25T03:03:41Z'
+  reviewed_at: '2026-11-25T03:03:41Z'
+history: []

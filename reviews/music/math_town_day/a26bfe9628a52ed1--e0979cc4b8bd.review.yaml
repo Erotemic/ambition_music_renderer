@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: math_town_day
+  title: Euclid Street
+  version_id: a26bfe9628a52ed1:e0979cc4b8bd
+  render_hash: a26bfe9628a52ed1
+  preview_sha256: e0979cc4b8bde15febf465cfb971e571ad45e6960137b24960c120203e16ecf8
+  preview_path: generated/math_town_day/.versioned/a26bfe9628a52ed1/preview/math_town_day_a26bfe9628a52ed1.full_soundtrack_preview.ogg
+  manifest_path: generated/math_town_day/.versioned/a26bfe9628a52ed1/math_town_day_a26bfe9628a52ed1.adaptive_manifest.json
+  manifest_sha256: a53abaeaba40c117ddf672ddf2d6738c3302d24f2c3bb60abe6ace501b2b58e3
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/math_town_day.music.yaml
+  score_sha256_at_review: f158283ee68d960023577ac161f3ccb620159a1aed90a93254c82e49a68beb17
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: It works. Not special. But it works.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:42:47Z'
+  updated_at: '2026-11-25T02:42:47Z'
+  reviewed_at: '2026-11-25T02:42:47Z'
+history: []

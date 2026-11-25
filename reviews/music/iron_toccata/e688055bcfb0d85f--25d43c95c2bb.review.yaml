@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: iron_toccata
+  title: The Iron Toccata
+  version_id: e688055bcfb0d85f:25d43c95c2bb
+  render_hash: e688055bcfb0d85f
+  preview_sha256: 25d43c95c2bbb3bde0516823a0f3fda9068060cda88a61ebc209107b82b0aceb
+  preview_path: generated/iron_toccata/.versioned/e688055bcfb0d85f/preview/iron_toccata_e688055bcfb0d85f.full_soundtrack_preview.ogg
+  manifest_path: generated/iron_toccata/.versioned/e688055bcfb0d85f/iron_toccata_e688055bcfb0d85f.adaptive_manifest.json
+  manifest_sha256: 4944afa07d59883e503716b585614a8d4f57b6aef85fbf7c3f297852b3d4b68c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/iron_toccata.music.yaml
+  score_sha256_at_review: 67f953dbe830768d5d6698c6fd2ffb97453e31324f8fb5f8ca120127142b4a97
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.7
+  label: Standout
+  notes: Absolute standout. It works amazing for the Inugami Wolfenstein chase and fight. The transition at 0:38
+    *chef's kiss*. Absolutely what I want to listen to in a boss fight.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:29:48Z'
+  updated_at: '2026-11-25T02:29:48Z'
+  reviewed_at: '2026-11-25T02:29:48Z'
+history: []

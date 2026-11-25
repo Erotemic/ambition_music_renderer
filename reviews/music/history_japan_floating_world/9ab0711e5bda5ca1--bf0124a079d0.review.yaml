@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_japan_floating_world
+  title: Floating World
+  version_id: 9ab0711e5bda5ca1:bf0124a079d0
+  render_hash: 9ab0711e5bda5ca1
+  preview_sha256: bf0124a079d0a22a9703f9337d7c88cc65452e52596b22962aca0156f8ae59fe
+  preview_path: generated/history_japan_floating_world/.versioned/9ab0711e5bda5ca1/preview/history_japan_floating_world_9ab0711e5bda5ca1.full_soundtrack_preview.ogg
+  manifest_path: generated/history_japan_floating_world/.versioned/9ab0711e5bda5ca1/history_japan_floating_world_9ab0711e5bda5ca1.adaptive_manifest.json
+  manifest_sha256: 18e1f3c0b43217f48519c67284be4fb8fa21f4d85943b6d11e3360c384d15d30
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_japan_floating_world.music.yaml
+  score_sha256_at_review: 4a98f92eb1463d59b400720c5c5e5259d2d43dc64aabc05eae05961c7542b4d0
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: I kinda like it. It's spiffy. Could it be better? Yeah, but it's not self-serious, which is good.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:25:13Z'
+  updated_at: '2026-11-25T02:25:13Z'
+  reviewed_at: '2026-11-25T02:25:13Z'
+history: []

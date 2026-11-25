@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: hobford_goblins
+  title: Hobford Goblins
+  version_id: 06d1eecdcc9c6570:2a487e89fff0
+  render_hash: 06d1eecdcc9c6570
+  preview_sha256: 2a487e89fff067daeb98d7c2109d2cfd45149dd7fa789a88424fe213e1878ea3
+  preview_path: generated/hobford_goblins/.versioned/06d1eecdcc9c6570/preview/hobford_goblins_06d1eecdcc9c6570.full_soundtrack_preview.ogg
+  manifest_path: generated/hobford_goblins/.versioned/06d1eecdcc9c6570/hobford_goblins_06d1eecdcc9c6570.adaptive_manifest.json
+  manifest_sha256: 7264def34f98f28d37b1721d85524dd60fc3eacb38c290b0c7b5d97390e2c31e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/hobford_goblins.music.yaml
+  score_sha256_at_review: c6f3410b4f8d0a061807704b60c3651635ffe95839d66eb8d14fc1661aaa5a20
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.6
+  label: Acceptable
+  notes: Too sappy? The dissonance goblin motif works, but it doesn't make me mourne for Dennis. Nor do I want to
+    spend much of the game doing that. It sort of works where it's used, but we will need to revisit, 2:00 starts
+    to get good.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:59:25Z'
+  updated_at: '2026-11-25T02:59:46Z'
+  reviewed_at: '2026-11-25T02:59:46Z'
+history: []

@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: billions_and_billions
+  title: Billions and Billions
+  version_id: bceedde326103131:0fa2210bc036
+  render_hash: bceedde326103131
+  preview_sha256: 0fa2210bc03628ab067acd5ab2e8d0d1e797594f17022ae39a1539f45824114e
+  preview_path: generated/billions_and_billions/.versioned/bceedde326103131/preview/billions_and_billions_bceedde326103131.full_soundtrack_preview.ogg
+  manifest_path: generated/billions_and_billions/.versioned/bceedde326103131/billions_and_billions_bceedde326103131.adaptive_manifest.json
+  manifest_sha256: c99fb035527e4dbe02127c902a96049519e0d9d3db3907ca0d61a6cc8360bcf8
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/billions_and_billions.music.yaml
+  score_sha256_at_review: 0e2e8f53cbb99844826c0248e9283e0fe9ee7a698ce0608a266a32c2ed6003fb
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.8
+  label: Acceptable
+  notes: I want to like this song. But its sooooo sappy. When it picks up its a little better, but it just feels
+    like this sappy broadway musical love song. 0:55ish is a little better, but it's not giving me awe of the universe
+    that I wanted from this. 1:22 is ok. But man, it feels like sagan is in a soap opera.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:52:12Z'
+  updated_at: '2026-11-25T02:52:12Z'
+  reviewed_at: '2026-11-25T02:52:12Z'
+history: []

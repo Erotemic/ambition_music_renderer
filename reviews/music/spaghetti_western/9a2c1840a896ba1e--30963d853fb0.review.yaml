@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: spaghetti_western
+  title: Spaghetti Western
+  version_id: 9a2c1840a896ba1e:30963d853fb0
+  render_hash: 9a2c1840a896ba1e
+  preview_sha256: 30963d853fb045147fcdaeda2c96eae143a57b39f09fb5a40fdeab1f9d0e3693
+  preview_path: generated/spaghetti_western/.versioned/9a2c1840a896ba1e/preview/spaghetti_western_9a2c1840a896ba1e.full_soundtrack_preview.ogg
+  manifest_path: generated/spaghetti_western/.versioned/9a2c1840a896ba1e/spaghetti_western_9a2c1840a896ba1e.adaptive_manifest.json
+  manifest_sha256: 0ddfda6ae63c46a695f302756bf80cf233fc5b076aee0f3dc83bb35f4ebdc19e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/spaghetti_western.music.yaml
+  score_sha256_at_review: d693ba151432a51aedeadde411e119057994c30c4102a03405c9509b72ca29bc
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.5
+  label: Strong
+  notes: ''
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:17:45Z'
+  updated_at: '2026-11-25T02:17:45Z'
+  reviewed_at: '2026-11-25T02:17:45Z'
+history: []

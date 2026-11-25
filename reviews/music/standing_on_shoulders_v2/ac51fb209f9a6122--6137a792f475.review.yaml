@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: standing_on_shoulders_v2
+  title: Standing on Shoulders v2
+  version_id: ac51fb209f9a6122:6137a792f475
+  render_hash: ac51fb209f9a6122
+  preview_sha256: 6137a792f475741ac5b65b374d5c22b30a7a449283441a244a6818224d3cf914
+  preview_path: generated/standing_on_shoulders_v2/.versioned/ac51fb209f9a6122/preview/standing_on_shoulders_v2_ac51fb209f9a6122.full_soundtrack_preview.ogg
+  manifest_path: generated/standing_on_shoulders_v2/.versioned/ac51fb209f9a6122/standing_on_shoulders_v2_ac51fb209f9a6122.adaptive_manifest.json
+  manifest_sha256: 1513bd725f5c9262e24f245de6a117d3e5146d4f9c5fc15d2c909b68cda122f6
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/standing_on_shoulders_v2.music.yaml
+  score_sha256_at_review: 06beb8da953d462a5cd9ca75510e77c55a88e1700e7fd0d2a24f70d0dcc29c95
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.9
+  label: Standout
+  notes: This song gets stuck in my head in a great way
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:22:01Z'
+  updated_at: '2026-11-25T02:22:01Z'
+  reviewed_at: '2026-11-25T02:22:01Z'
+history: []

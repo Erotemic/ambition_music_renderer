@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: leaden_saddle
+  title: The Leaden Saddle
+  version_id: f5fce53aa919d16d:181ecee710db
+  render_hash: f5fce53aa919d16d
+  preview_sha256: 181ecee710db2cdb1bd602bd81a96bad1b77252b6c144cae8c722de4c0cb3b80
+  preview_path: generated/leaden_saddle/.versioned/f5fce53aa919d16d/preview/leaden_saddle_f5fce53aa919d16d.full_soundtrack_preview.ogg
+  manifest_path: generated/leaden_saddle/.versioned/f5fce53aa919d16d/leaden_saddle_f5fce53aa919d16d.adaptive_manifest.json
+  manifest_sha256: 457ab4c9b7e67cf944f620bbdea6068986cd5dbcae2549a0b73b61facac7d951
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/leaden_saddle.music.yaml
+  score_sha256_at_review: 43ce4531fbc3a654b8893feae0561f9a386cbdd9a188ded30c57876d3de239f6
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: simple and fine
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:04:14Z'
+  updated_at: '2026-11-25T03:04:14Z'
+  reviewed_at: '2026-11-25T03:04:14Z'
+history: []

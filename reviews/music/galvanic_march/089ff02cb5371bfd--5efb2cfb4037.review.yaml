@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: galvanic_march
+  title: Galvanic March (Wolfenstein)
+  version_id: 089ff02cb5371bfd:5efb2cfb4037
+  render_hash: 089ff02cb5371bfd
+  preview_sha256: 5efb2cfb4037908e89bb4de9160bea3188873671392a2949792055e476f40396
+  preview_path: generated/galvanic_march/.versioned/089ff02cb5371bfd/preview/galvanic_march_089ff02cb5371bfd.full_soundtrack_preview.ogg
+  manifest_path: generated/galvanic_march/.versioned/089ff02cb5371bfd/galvanic_march_089ff02cb5371bfd.adaptive_manifest.json
+  manifest_sha256: 0f6c498fa67cbceb6a2f287bd5e7b722183bedae311ad96a9ca5dd55f1827ee4
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/galvanic_march.music.yaml
+  score_sha256_at_review: cd9d4bc0b90e22ae8570acdff3936f203f3070b9ac7fbe307d637be99907a892
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.5
+  label: Strong
+  notes: This is actually a great boss tune. Score raised.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:15:59Z'
+  updated_at: '2026-11-25T03:15:59Z'
+  reviewed_at: '2026-11-25T03:15:59Z'
+history: []

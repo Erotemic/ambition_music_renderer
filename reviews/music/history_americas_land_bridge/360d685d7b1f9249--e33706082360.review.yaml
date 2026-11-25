@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_americas_land_bridge
+  title: Over the Land Bridge
+  version_id: 360d685d7b1f9249:e33706082360
+  render_hash: 360d685d7b1f9249
+  preview_sha256: e33706082360f49fb80b0003438b2a26eed35f53720bf11b4eb241f7e060a128
+  preview_path: generated/history_americas_land_bridge/.versioned/360d685d7b1f9249/preview/history_americas_land_bridge_360d685d7b1f9249.full_soundtrack_preview.ogg
+  manifest_path: generated/history_americas_land_bridge/.versioned/360d685d7b1f9249/history_americas_land_bridge_360d685d7b1f9249.adaptive_manifest.json
+  manifest_sha256: 9d7e25806c791a60ae127802daa3ec8d89c043830b018f3a9bce59bd2eb1665a
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_americas_land_bridge.music.yaml
+  score_sha256_at_review: 4f5804d0b20fff2d1689ab9978f4e17b29912bfd2ed6c3ab274a112d66c8f74f
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Way too self-serious.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:02:34Z'
+  updated_at: '2026-11-25T03:02:34Z'
+  reviewed_at: '2026-11-25T03:02:34Z'
+history: []

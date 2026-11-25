@@ -1,0 +1,35 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: spur_of_the_moment
+  title: Spur of the Moment
+  version_id: e961f57e6ceb4e1a:ed56f1d7ca8c
+  render_hash: e961f57e6ceb4e1a
+  preview_sha256: ed56f1d7ca8ce03f2ba4ad6f9bc5d8554201bf9b23b87e5e23bad375ce7a5bd2
+  preview_path: generated/spur_of_the_moment/.versioned/e961f57e6ceb4e1a/preview/spur_of_the_moment_e961f57e6ceb4e1a.full_soundtrack_preview.ogg
+  manifest_path: generated/spur_of_the_moment/.versioned/e961f57e6ceb4e1a/spur_of_the_moment_e961f57e6ceb4e1a.adaptive_manifest.json
+  manifest_sha256: 10fc5000c2ed6df4e11adf5c2a63a1cdd17f2bb46f1d6767b5b156e667065d6b
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/spur_of_the_moment.music.yaml
+  score_sha256_at_review: ecf217de1690a2ff31d153615de77c149e4a51db56cf198a8e37f9e5bc9bbf80
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.6
+  label: Strong
+  notes: This actually feels pretty good. I kinda dig it. Possible I raise the score of this as I listen to it more,
+    I like the pace pickup. Probably better than a lot of the songs actually used in game right now. There are some
+    pauses, which maybe that is intentional for gameplay? Probably shouldn't be in the sound track version. I hear
+    Iron Tocata in it at the end, which is a great song, but it probably should avoid quoting it so literally, that's
+    the most concrete change.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:38:06Z'
+  updated_at: '2026-11-25T02:38:06Z'
+  reviewed_at: '2026-11-25T02:38:06Z'
+history: []

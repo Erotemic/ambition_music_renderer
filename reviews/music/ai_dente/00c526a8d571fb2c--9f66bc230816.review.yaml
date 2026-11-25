@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: ai_dente
+  title: AI Dente
+  version_id: 00c526a8d571fb2c:9f66bc230816
+  render_hash: 00c526a8d571fb2c
+  preview_sha256: 9f66bc230816f12816031e1464e0054c0e291edfe2b118ab2e2c58cf9ed2273f
+  preview_path: generated/ai_dente/.versioned/00c526a8d571fb2c/preview/ai_dente_00c526a8d571fb2c.full_soundtrack_preview.ogg
+  manifest_path: generated/ai_dente/.versioned/00c526a8d571fb2c/ai_dente_00c526a8d571fb2c.adaptive_manifest.json
+  manifest_sha256: ca7f1437d5633cb38d30d3ebdb110151550f122359e29575992401064067ce53
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/ai_dente.music.yaml
+  score_sha256_at_review: cc0f3b6b2a53c610d462e713519d50e302e2849e0cd51d79f062d53adb66da9e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.2
+  label: Standout
+  notes: ''
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-24T22:59:35Z'
+  updated_at: '2026-11-24T22:59:35Z'
+  reviewed_at: '2026-11-24T22:59:35Z'
+history: []

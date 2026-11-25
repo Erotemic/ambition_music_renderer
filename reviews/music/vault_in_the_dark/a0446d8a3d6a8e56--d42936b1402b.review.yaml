@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: vault_in_the_dark
+  title: Vault in the Dark
+  version_id: a0446d8a3d6a8e56:d42936b1402b
+  render_hash: a0446d8a3d6a8e56
+  preview_sha256: d42936b1402b8f1fcc149a5d3a64d2018d5c4d84a76889fb8131ac228ab7cdc1
+  preview_path: generated/vault_in_the_dark/.versioned/a0446d8a3d6a8e56/preview/vault_in_the_dark_a0446d8a3d6a8e56.full_soundtrack_preview.ogg
+  manifest_path: generated/vault_in_the_dark/.versioned/a0446d8a3d6a8e56/vault_in_the_dark_a0446d8a3d6a8e56.adaptive_manifest.json
+  manifest_sha256: 66bffb595d4b224711792304ad27a5a86c3e013a9d82e9a524d76f5a33d62c0e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/vault_in_the_dark.music.yaml
+  score_sha256_at_review: 9d42a5b17f81c7f626def0cc91e1dba827cf96cd75110494e62c4e198c521f9e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: It's pleasant when this song starts, and it feels like I want to explore or fight. It's good.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:04:53Z'
+  updated_at: '2026-11-25T03:04:53Z'
+  reviewed_at: '2026-11-25T03:04:53Z'
+history: []

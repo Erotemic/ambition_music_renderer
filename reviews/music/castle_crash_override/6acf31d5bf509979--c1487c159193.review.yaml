@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: castle_crash_override
+  title: Castle Crash Override
+  version_id: 6acf31d5bf509979:c1487c159193
+  render_hash: 6acf31d5bf509979
+  preview_sha256: c1487c15919340cace4b20b49d2e0e2752779431411276d1fdb6c7cb510bb20d
+  preview_path: generated/castle_crash_override/.versioned/6acf31d5bf509979/preview/castle_crash_override_6acf31d5bf509979.full_soundtrack_preview.ogg
+  manifest_path: generated/castle_crash_override/.versioned/6acf31d5bf509979/castle_crash_override_6acf31d5bf509979.adaptive_manifest.json
+  manifest_sha256: 4fad7df33993b201fd271e8af9ab1f5f707e6f1fe85271ed7956029372496818
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/castle_crash_override.music.yaml
+  score_sha256_at_review: 78037d37425a71631d7ced5235b79525f78e7f849a705cc22fc9c9894e8b9769
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.5
+  label: Standout
+  notes: Every time I listen to this I love it more. Absolute banger. I can't wait for it to get to the 0:25 section
+    every time. That's the kind of anticipation that keeps me coming back.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:36:19Z'
+  updated_at: '2026-11-25T02:36:19Z'
+  reviewed_at: '2026-11-25T02:36:19Z'
+history: []

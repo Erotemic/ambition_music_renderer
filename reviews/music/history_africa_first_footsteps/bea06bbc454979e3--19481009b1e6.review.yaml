@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_africa_first_footsteps
+  title: First Footsteps
+  version_id: bea06bbc454979e3:19481009b1e6
+  render_hash: bea06bbc454979e3
+  preview_sha256: 19481009b1e606f1298f6b31f8d7d15059e7f4398e1bce8477162984c6f6582a
+  preview_path: generated/history_africa_first_footsteps/.versioned/bea06bbc454979e3/preview/history_africa_first_footsteps_bea06bbc454979e3.full_soundtrack_preview.ogg
+  manifest_path: generated/history_africa_first_footsteps/.versioned/bea06bbc454979e3/history_africa_first_footsteps_bea06bbc454979e3.adaptive_manifest.json
+  manifest_sha256: 3e65f47703963e98967c1186023d03d1dc41b8838ad4431ccebea5715097375c
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_africa_first_footsteps.music.yaml
+  score_sha256_at_review: fd4becdfdc8575c41aca9cd12697860474e3f00db7a2ad79bff1c00627232c45
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.8
+  label: Acceptable
+  notes: For the history dimension tracks, this isn't bad. Doesn't feel like a downer, but it doesn't really groove.
+    Feels more like a documentary than a game.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:43:35Z'
+  updated_at: '2026-11-25T02:43:35Z'
+  reviewed_at: '2026-11-25T02:43:35Z'
+history: []

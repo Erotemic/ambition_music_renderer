@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: marshal_gallus_showdown
+  title: Cock of the Walk
+  version_id: 3fef0327513c96e2:7e93d425b3a4
+  render_hash: 3fef0327513c96e2
+  preview_sha256: 7e93d425b3a4f44d29463400354bd7ab16643116c38697671e1ef5f827ff899b
+  preview_path: generated/marshal_gallus_showdown/.versioned/3fef0327513c96e2/preview/marshal_gallus_showdown_3fef0327513c96e2.full_soundtrack_preview.ogg
+  manifest_path: generated/marshal_gallus_showdown/.versioned/3fef0327513c96e2/marshal_gallus_showdown_3fef0327513c96e2.adaptive_manifest.json
+  manifest_sha256: cdd631bb3ba281bc6a2cfe297cd6e3745d8339a593763b917be22e7276dbc669
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/marshal_gallus_showdown.music.yaml
+  score_sha256_at_review: e1d0c586e41a55103f0fc59f0f5fff324446dbdb77aad3e65bbd3c795059a329
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.8
+  label: Strong
+  notes: Similar to rustler. Good bones. Needs something more.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:57:27Z'
+  updated_at: '2026-11-25T02:57:27Z'
+  reviewed_at: '2026-11-25T02:57:27Z'
+history: []

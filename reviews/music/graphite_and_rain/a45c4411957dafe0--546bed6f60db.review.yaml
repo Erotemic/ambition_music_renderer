@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: graphite_and_rain
+  title: Graphite and Rain
+  version_id: a45c4411957dafe0:546bed6f60db
+  render_hash: a45c4411957dafe0
+  preview_sha256: 546bed6f60dba3639c4f2a56ff076456a7ee33e918f4c48430483180039f3b53
+  preview_path: generated/graphite_and_rain/.versioned/a45c4411957dafe0/preview/graphite_and_rain_a45c4411957dafe0.full_soundtrack_preview.ogg
+  manifest_path: generated/graphite_and_rain/.versioned/a45c4411957dafe0/graphite_and_rain_a45c4411957dafe0.adaptive_manifest.json
+  manifest_sha256: a2b5174e25ec1a7075dc4c257a9d9e356e3d8ed33e16aa32cc51b80857df30ba
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/graphite_and_rain.music.yaml
+  score_sha256_at_review: b1988ea1d00709d484b36c5d9f7fadb4b2ae347f1eb01a15c385140b218f8bdb
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: Solid lofi track, needs to find a scene that it fits, but it grooves.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:26:03Z'
+  updated_at: '2026-11-25T02:26:03Z'
+  reviewed_at: '2026-11-25T02:26:03Z'
+history: []

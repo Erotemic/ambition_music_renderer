@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: the_fire_escape
+  title: The Fire Escape
+  version_id: aadcbca565662110:6415f3d8d047
+  render_hash: aadcbca565662110
+  preview_sha256: 6415f3d8d0470668b4cf03ec0ea01c880a9194aaad0468efb338fba6d431075f
+  preview_path: generated/the_fire_escape/.versioned/aadcbca565662110/preview/the_fire_escape_aadcbca565662110.full_soundtrack_preview.ogg
+  manifest_path: generated/the_fire_escape/.versioned/aadcbca565662110/the_fire_escape_aadcbca565662110.adaptive_manifest.json
+  manifest_sha256: eb8fdfd1155c515524eb1c28766b2f1058150c466c4101d6e3fc6ec4e1cd499d
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/the_fire_escape.music.yaml
+  score_sha256_at_review: 24dc2d5ce4c309cda490108bf19b3aab913b43defffbaec72b12056657dd2b4c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: A solid lofi song. Not much to say. It works. In fact this might be a good night song for math town, or
+    a variant of this.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:30:31Z'
+  updated_at: '2026-11-25T02:30:31Z'
+  reviewed_at: '2026-11-25T02:30:31Z'
+history: []

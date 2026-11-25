@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_age_of_sail_trade_winds
+  title: Trade Winds, Bad Intentions
+  version_id: 1e3b9ab7c96e7262:e5f7945b72ba
+  render_hash: 1e3b9ab7c96e7262
+  preview_sha256: e5f7945b72bad1ebad1090c7c84cb62aa19164f2cf542afade5c674f6c20dd66
+  preview_path: generated/history_age_of_sail_trade_winds/.versioned/1e3b9ab7c96e7262/preview/history_age_of_sail_trade_winds_1e3b9ab7c96e7262.full_soundtrack_preview.ogg
+  manifest_path: generated/history_age_of_sail_trade_winds/.versioned/1e3b9ab7c96e7262/history_age_of_sail_trade_winds_1e3b9ab7c96e7262.adaptive_manifest.json
+  manifest_sha256: 4e91cb3e43236ef951399b159316ba1cf452d0743ae89f0bc79046a38a9a73f2
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_age_of_sail_trade_winds.music.yaml
+  score_sha256_at_review: 9551cb0520b7b0355cd407823f3f8b2fdb6d1ef75179156539a604e316a69f21
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.1
+  label: Acceptable
+  notes: I like that its upbeat, but its not as good as other ska we have. Balance is off, composition is off. It's
+    all off.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:06:32Z'
+  updated_at: '2026-11-25T03:06:32Z'
+  reviewed_at: '2026-11-25T03:06:32Z'
+history: []

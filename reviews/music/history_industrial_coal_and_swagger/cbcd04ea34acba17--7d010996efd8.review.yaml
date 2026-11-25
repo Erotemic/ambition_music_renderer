@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_industrial_coal_and_swagger
+  title: Coal and Swagger
+  version_id: cbcd04ea34acba17:7d010996efd8
+  render_hash: cbcd04ea34acba17
+  preview_sha256: 7d010996efd8f49c456846bd92ee4d3902eb247f8c34bdb7c6f26a91b8fa8691
+  preview_path: generated/history_industrial_coal_and_swagger/.versioned/cbcd04ea34acba17/preview/history_industrial_coal_and_swagger_cbcd04ea34acba17.full_soundtrack_preview.ogg
+  manifest_path: generated/history_industrial_coal_and_swagger/.versioned/cbcd04ea34acba17/history_industrial_coal_and_swagger_cbcd04ea34acba17.adaptive_manifest.json
+  manifest_sha256: d5c324d15fc244c3848eef97e0d74d27cdc061f72abbfe46be110dd96cc14fc2
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_industrial_coal_and_swagger.music.yaml
+  score_sha256_at_review: 207cf5fa8c35e801225f782d51fad2f359ce3f2a5eac2520f42e9934b892b327
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: Yeah, this grooves. I like the intro, it's hooking me and making feel something. Can't say the transition
+    at 0:39 is doing it for me, but we get back at around 0:59 we can shape this into something great. Make it more
+    loopable, and lean into swing
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:41:28Z'
+  updated_at: '2026-11-25T02:41:28Z'
+  reviewed_at: '2026-11-25T02:41:28Z'
+history: []

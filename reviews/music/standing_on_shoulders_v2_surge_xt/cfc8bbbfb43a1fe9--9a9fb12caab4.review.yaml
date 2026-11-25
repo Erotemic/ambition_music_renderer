@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: standing_on_shoulders_v2_surge_xt
+  title: Standing on Shoulders v2 - Synthesizer Cathedral
+  version_id: cfc8bbbfb43a1fe9:9a9fb12caab4
+  render_hash: cfc8bbbfb43a1fe9
+  preview_sha256: 9a9fb12caab4e81c36034cb11efae732a813937619cc57c419f6498d1f4f292c
+  preview_path: generated/standing_on_shoulders_v2_surge_xt/.versioned/cfc8bbbfb43a1fe9/preview/standing_on_shoulders_v2_surge_xt_cfc8bbbfb43a1fe9.full_soundtrack_preview.ogg
+  manifest_path: generated/standing_on_shoulders_v2_surge_xt/.versioned/cfc8bbbfb43a1fe9/standing_on_shoulders_v2_surge_xt_cfc8bbbfb43a1fe9.adaptive_manifest.json
+  manifest_sha256: 3132d74ac70d5817828bd7010e65e57662ebcbb7d7281baf67436fca2f4d6b99
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/standing_on_shoulders_v2_surge_xt.music.yaml
+  score_sha256_at_review: 1a89c019b2bf8aa4d799e658a2f94b5d6e5b0729421ab2494bc3a272d87fdb26
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: It takes one of the best songs in the game, and puts it into a different atmosphere, which kinda works,
+    maybe it just needs the right game match. It might grow on me not sure.
+  issues: []
+  furthest_played_seconds: 63.669
+  furthest_played_fraction: 0.3075
+  created_at: '2026-11-25T02:23:12Z'
+  updated_at: '2026-11-25T02:23:12Z'
+  reviewed_at: '2026-11-25T02:23:12Z'
+history: []

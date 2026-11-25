@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_east_asia_yellow_earth
+  title: Yellow Earth, Long Sky
+  version_id: 76289dbd396b465d:88d5a58971d5
+  render_hash: 76289dbd396b465d
+  preview_sha256: 88d5a58971d561c6b67e9c1a18e599c7dfd28bf6297750636275c8cca48437d6
+  preview_path: generated/history_east_asia_yellow_earth/.versioned/76289dbd396b465d/preview/history_east_asia_yellow_earth_76289dbd396b465d.full_soundtrack_preview.ogg
+  manifest_path: generated/history_east_asia_yellow_earth/.versioned/76289dbd396b465d/history_east_asia_yellow_earth_76289dbd396b465d.adaptive_manifest.json
+  manifest_sha256: 17c1a7dcaa9bea92739d9dd34566c2ce842af8deeabf8adf49784cbce446c701
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_east_asia_yellow_earth.music.yaml
+  score_sha256_at_review: 1297c57b5ddf1f40afb019ff5916bf58c1cdfd721178700685fe1e14880fb0bc
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Self serious and a downer.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:05:26Z'
+  updated_at: '2026-11-25T03:05:26Z'
+  reviewed_at: '2026-11-25T03:05:26Z'
+history: []

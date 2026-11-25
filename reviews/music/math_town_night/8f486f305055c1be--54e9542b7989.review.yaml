@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: math_town_night
+  title: Countably Many Stars
+  version_id: 8f486f305055c1be:54e9542b7989
+  render_hash: 8f486f305055c1be
+  preview_sha256: 54e9542b7989313e248fd01f745c2579b6fb6a7ab7072c42eea246f9fe87c3e1
+  preview_path: generated/math_town_night/.versioned/8f486f305055c1be/preview/math_town_night_8f486f305055c1be.full_soundtrack_preview.ogg
+  manifest_path: generated/math_town_night/.versioned/8f486f305055c1be/math_town_night_8f486f305055c1be.adaptive_manifest.json
+  manifest_sha256: 95de4caf7c067f04bfd28baeda34e896326bdc278e7f708e2676a37c2f6cd6b2
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/math_town_night.music.yaml
+  score_sha256_at_review: d9489bfef72d91294b40c3cb47d981704b3ad849d2e83c450a2eacbcd8744bd8
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.9
+  label: Acceptable
+  notes: way too dark and sombre, feels foreboding in a bad way that a tune in a peaceful zone should not feel.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:27:13Z'
+  updated_at: '2026-11-25T02:27:13Z'
+  reviewed_at: '2026-11-25T02:27:13Z'
+history: []

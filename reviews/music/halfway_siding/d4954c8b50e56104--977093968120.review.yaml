@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: halfway_siding
+  title: Halfway Siding
+  version_id: d4954c8b50e56104:977093968120
+  render_hash: d4954c8b50e56104
+  preview_sha256: 977093968120ebfac1d5d7077487ea140701ebcea6fdf4d05b3408188f75654b
+  preview_path: generated/halfway_siding/.versioned/d4954c8b50e56104/preview/halfway_siding_d4954c8b50e56104.full_soundtrack_preview.ogg
+  manifest_path: generated/halfway_siding/.versioned/d4954c8b50e56104/halfway_siding_d4954c8b50e56104.adaptive_manifest.json
+  manifest_sha256: 57c59eb304c1368b61b6463287fe3252fde0983eaa6a85f6cfed5a1173049e99
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/halfway_siding.music.yaml
+  score_sha256_at_review: e148075356ef3aff54195740ccda118cd378b9ec0cd230849f3d605a7afa4aec
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.1
+  label: Acceptable
+  notes: Harmonica is too piercing. And the song is fine but boring.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:46:02Z'
+  updated_at: '2026-11-25T02:46:02Z'
+  reviewed_at: '2026-11-25T02:46:02Z'
+history: []

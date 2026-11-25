@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_cotton_mill_spinning_jenny
+  title: Spinning Jenny
+  version_id: d0089e2a2b2cdfa6:1abd983ede14
+  render_hash: d0089e2a2b2cdfa6
+  preview_sha256: 1abd983ede14e131dbf7c93692500230859ea118f9e1d194611bf4b3f9153ccb
+  preview_path: generated/history_cotton_mill_spinning_jenny/.versioned/d0089e2a2b2cdfa6/preview/history_cotton_mill_spinning_jenny_d0089e2a2b2cdfa6.full_soundtrack_preview.ogg
+  manifest_path: generated/history_cotton_mill_spinning_jenny/.versioned/d0089e2a2b2cdfa6/history_cotton_mill_spinning_jenny_d0089e2a2b2cdfa6.adaptive_manifest.json
+  manifest_sha256: 81d8e31c87123b99e31258b77918df8488f39d35a7c54ca42433e647ce70aa16
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_cotton_mill_spinning_jenny.music.yaml
+  score_sha256_at_review: efcc3db15649613fb84077e1eac2b932bbc3f589b3d208c956210d56f5f9297f
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.1
+  label: Acceptable
+  notes: One of the better history dimension tunes. It feels video gamey, which is what we want, not quite at a
+    standout, not sure how to push it there, but it's not self-serious, which a lot of history songs suffer from.
+  issues: []
+  furthest_played_seconds: 54.114
+  furthest_played_fraction: 0.613
+  created_at: '2026-11-25T02:31:36Z'
+  updated_at: '2026-11-25T02:31:36Z'
+  reviewed_at: '2026-11-25T02:31:36Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: math_town_morning
+  title: Axioms at Dawn
+  version_id: 7702ec3ebf2dc88b:392033605796
+  render_hash: 7702ec3ebf2dc88b
+  preview_sha256: 3920336057968f9a2be853071588a8328a2a7e02545df2ac115794975fe4fb6b
+  preview_path: generated/math_town_morning/.versioned/7702ec3ebf2dc88b/preview/math_town_morning_7702ec3ebf2dc88b.full_soundtrack_preview.ogg
+  manifest_path: generated/math_town_morning/.versioned/7702ec3ebf2dc88b/math_town_morning_7702ec3ebf2dc88b.adaptive_manifest.json
+  manifest_sha256: 68e0cf87a11628b96964d3c8f2593619c669198d6b4b72c02c7f1c033d884303
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/math_town_morning.music.yaml
+  score_sha256_at_review: f38a2ec00ad83aac013108091b03e9816c56c409bb6d5eb30ed86e144588fcc8
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.3
+  label: Acceptable
+  notes: Ok, it works. Decent peaceful area music. Could be better, not the highest priority song to change.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:49:36Z'
+  updated_at: '2026-11-25T02:49:36Z'
+  reviewed_at: '2026-11-25T02:49:36Z'
+history: []

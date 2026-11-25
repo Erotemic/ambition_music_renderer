@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: liszt_hungarian_rhapsody_no2_piano
+  title: Liszt — Hungarian Rhapsody No. 2, S.244/2 — solo piano
+  version_id: a1dd7834290d419a:bedc8d57b654
+  render_hash: a1dd7834290d419a
+  preview_sha256: bedc8d57b6541e10fdb4049e6e814bad3076477d98d3ed63bd5a2c1a5813821b
+  preview_path: generated/liszt_hungarian_rhapsody_no2_piano/.versioned/a1dd7834290d419a/preview/liszt_hungarian_rhapsody_no2_piano_a1dd7834290d419a.full_soundtrack_preview.ogg
+  manifest_path: generated/liszt_hungarian_rhapsody_no2_piano/.versioned/a1dd7834290d419a/liszt_hungarian_rhapsody_no2_piano_a1dd7834290d419a.adaptive_manifest.json
+  manifest_sha256: 46b0901943f36e41894120552890b88dfcaa0ae9d9ab530b38743c010b984f0e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/liszt_hungarian_rhapsody_no2_piano.music.yaml
+  score_sha256_at_review: f07d2007e874a7f603470d4317387859ef3c236ce935e1d85c2bea170b5c2795
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 10.0
+  label: Standout
+  notes: I mean its not ours. But it's a damn good song, and public domain :) Do we use it in game? Maybe. idk.
+  issues: []
+  furthest_played_seconds: 35.51
+  furthest_played_fraction: 0.0806
+  created_at: '2026-11-25T03:02:11Z'
+  updated_at: '2026-11-25T03:02:11Z'
+  reviewed_at: '2026-11-25T03:02:11Z'
+history: []

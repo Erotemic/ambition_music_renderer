@@ -1,0 +1,34 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: standing_on_shoulders_v2_guitar_quartet
+  title: Standing on Shoulders v2 - Acoustic Quartet (Light Body)
+  version_id: a90adf95ed86ec2b:1c05fd7de04c
+  render_hash: a90adf95ed86ec2b
+  preview_sha256: 1c05fd7de04cbff274906d24320f4964bb3982370c36a08e41c330856adf8a57
+  preview_path: generated/standing_on_shoulders_v2_guitar_quartet/.versioned/a90adf95ed86ec2b/preview/standing_on_shoulders_v2_guitar_quartet_a90adf95ed86ec2b.full_soundtrack_preview.ogg
+  manifest_path: generated/standing_on_shoulders_v2_guitar_quartet/.versioned/a90adf95ed86ec2b/standing_on_shoulders_v2_guitar_quartet_a90adf95ed86ec2b.adaptive_manifest.json
+  manifest_sha256: 301ad581ba2fbea7d497e871553c70c2a4a4bdb68d188c0e6545267030b23df6
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/standing_on_shoulders_v2_guitar_quartet.music.yaml
+  score_sha256_at_review: 5b13d6eee7264e431b30b7c8f8d83e783e4b590ff51d47591ad321c09ecb6c35
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.0
+  label: Acceptable
+  notes: Feels like this wants polish before it goes into the game. It's too twany and high pitch peircing on the
+    ears when wearing headphones. Maybe a lowpass filter could make this great background. I mean, the melody is
+    not the problem, this is an arrangement of one of the best songs in the game, so there is a way to make this
+    work.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:39:46Z'
+  updated_at: '2026-11-25T02:39:46Z'
+  reviewed_at: '2026-11-25T02:39:46Z'
+history: []

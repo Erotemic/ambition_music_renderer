@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: ten_fathoms_and_a_grudge
+  title: Ten Fathoms and a Grudge
+  version_id: 47b7bc3e2a1abb46:74eb6e4adbc0
+  render_hash: 47b7bc3e2a1abb46
+  preview_sha256: 74eb6e4adbc09c6284e6dd59a7e88b36cca5326064521eb4b0cd91de157969dd
+  preview_path: generated/ten_fathoms_and_a_grudge/.versioned/47b7bc3e2a1abb46/preview/ten_fathoms_and_a_grudge_47b7bc3e2a1abb46.full_soundtrack_preview.ogg
+  manifest_path: generated/ten_fathoms_and_a_grudge/.versioned/47b7bc3e2a1abb46/ten_fathoms_and_a_grudge_47b7bc3e2a1abb46.adaptive_manifest.json
+  manifest_sha256: adb42609cfa43847ca8dfdfb3b970bed9367d2946c05398684ba649baeb9fa75
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/ten_fathoms_and_a_grudge.music.yaml
+  score_sha256_at_review: ef80ba4982b1bfebb22fc3a90b2c940c9ee9107514b6c9360dafd485e90f3ce7
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.0
+  label: Acceptable
+  notes: Another one of those self-serious songs, technically fine, but just doesn't feel like what I'm looking
+    for in the game. Maybe parts of it are there, but probably want to rework later in an interactive session.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:24:07Z'
+  updated_at: '2026-11-25T02:24:07Z'
+  reviewed_at: '2026-11-25T02:24:07Z'
+history: []

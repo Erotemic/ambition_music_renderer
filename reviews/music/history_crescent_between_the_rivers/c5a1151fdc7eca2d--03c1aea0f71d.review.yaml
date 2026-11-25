@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_crescent_between_the_rivers
+  title: Between the Rivers
+  version_id: c5a1151fdc7eca2d:03c1aea0f71d
+  render_hash: c5a1151fdc7eca2d
+  preview_sha256: 03c1aea0f71d19f0a03837be294b634fd3c73a72dff6f4c5777601d3f1a29645
+  preview_path: generated/history_crescent_between_the_rivers/.versioned/c5a1151fdc7eca2d/preview/history_crescent_between_the_rivers_c5a1151fdc7eca2d.full_soundtrack_preview.ogg
+  manifest_path: generated/history_crescent_between_the_rivers/.versioned/c5a1151fdc7eca2d/history_crescent_between_the_rivers_c5a1151fdc7eca2d.adaptive_manifest.json
+  manifest_sha256: 588eef663a56280e0e4394e1df52b0bb990bf1bb70d9ee0090a2aacbf614e6d9
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_crescent_between_the_rivers.music.yaml
+  score_sha256_at_review: a1af32fccc057ede4e56383e17c806aa8f018ff27299165c889c62a89ee997ca
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.5
+  label: Acceptable
+  notes: Too self-serious, common history dimension problem. Foreboding. Note good for a game atmosphere.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:48:47Z'
+  updated_at: '2026-11-25T02:48:47Z'
+  reviewed_at: '2026-11-25T02:48:47Z'
+history: []

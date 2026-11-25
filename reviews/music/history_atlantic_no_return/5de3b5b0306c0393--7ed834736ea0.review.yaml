@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_atlantic_no_return
+  title: No Return
+  version_id: 5de3b5b0306c0393:7ed834736ea0
+  render_hash: 5de3b5b0306c0393
+  preview_sha256: 7ed834736ea06d5e60886bffdf72276031817e01ec704d7d7a4d8be0a0191bbf
+  preview_path: generated/history_atlantic_no_return/.versioned/5de3b5b0306c0393/preview/history_atlantic_no_return_5de3b5b0306c0393.full_soundtrack_preview.ogg
+  manifest_path: generated/history_atlantic_no_return/.versioned/5de3b5b0306c0393/history_atlantic_no_return_5de3b5b0306c0393.adaptive_manifest.json
+  manifest_sha256: ac06501f42025b56df04f83e07363c3eb058bb6c980af7e4071788469bcc3a94
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_atlantic_no_return.music.yaml
+  score_sha256_at_review: 888f9c30d50e51da1fcc82fe2f86165741d3821a1bfa71aff7080802a8818bbc
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 3.0
+  label: Major polish
+  notes: Yeah, I don't know how to deal with the slave trade. Putting this in the game isn't going to work. This
+    feels a bit boo hoo and not enough rage for the heinousness of the act. Rage isn't even right. Revulsion, abhorrence,
+    repugnance. Can we do this right? The door of no return also isn't doing it justice.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:12:41Z'
+  updated_at: '2026-11-25T03:12:41Z'
+  reviewed_at: '2026-11-25T03:12:41Z'
+history: []

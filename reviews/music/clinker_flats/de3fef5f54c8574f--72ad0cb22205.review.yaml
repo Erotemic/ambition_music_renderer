@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: clinker_flats
+  title: Clinker Flats
+  version_id: de3fef5f54c8574f:72ad0cb22205
+  render_hash: de3fef5f54c8574f
+  preview_sha256: 72ad0cb22205eae1ac7848eb07a6f561163b3a1de3607a2252b837f4d02c492c
+  preview_path: generated/clinker_flats/.versioned/de3fef5f54c8574f/preview/clinker_flats_de3fef5f54c8574f.full_soundtrack_preview.ogg
+  manifest_path: generated/clinker_flats/.versioned/de3fef5f54c8574f/clinker_flats_de3fef5f54c8574f.adaptive_manifest.json
+  manifest_sha256: d13ace37054bac5818d8b68b2d7b6cbb65eefc23e4c201621bdc3226cb01af33
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/clinker_flats.music.yaml
+  score_sha256_at_review: b21ea8f81515174343e26572e97b2768d917912eaf84e332a3289563940b0e0b
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.5
+  label: Acceptable
+  notes: Far too slow. Too self-serious (choir isn't doing it here). Not good for a game.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:48:08Z'
+  updated_at: '2026-11-25T02:48:08Z'
+  reviewed_at: '2026-11-25T02:48:08Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pastafarian
+  title: Pastafarian
+  version_id: 8c629fa69ad06b27:cf01f704811b
+  render_hash: 8c629fa69ad06b27
+  preview_sha256: cf01f704811b4c45adb471b52adb61cfb2cfb5dd977daa726c7d353bde2b995b
+  preview_path: generated/pastafarian/.versioned/8c629fa69ad06b27/preview/pastafarian_8c629fa69ad06b27.full_soundtrack_preview.ogg
+  manifest_path: generated/pastafarian/.versioned/8c629fa69ad06b27/pastafarian_8c629fa69ad06b27.adaptive_manifest.json
+  manifest_sha256: a6e713070faf7e675a68e1c922ceaae73c0653f3ee59c8a3e61809e6fee71681
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/pastafarian.music.yaml
+  score_sha256_at_review: 255bc15f4434861a2d36ffe0372e2a22c6a972f6243f865740a157cc4f200247
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: Yeah, it's working. Not the best song we have, but what I wanted.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:03:03Z'
+  updated_at: '2026-11-25T03:03:03Z'
+  reviewed_at: '2026-11-25T03:03:03Z'
+history: []

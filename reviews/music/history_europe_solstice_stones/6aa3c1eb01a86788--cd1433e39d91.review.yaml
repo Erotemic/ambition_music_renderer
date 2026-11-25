@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_europe_solstice_stones
+  title: Solstice Stones
+  version_id: 6aa3c1eb01a86788:cd1433e39d91
+  render_hash: 6aa3c1eb01a86788
+  preview_sha256: cd1433e39d91db233ab3578c3d79a8a18095619c875869167f36bb4b9874c677
+  preview_path: generated/history_europe_solstice_stones/.versioned/6aa3c1eb01a86788/preview/history_europe_solstice_stones_6aa3c1eb01a86788.full_soundtrack_preview.ogg
+  manifest_path: generated/history_europe_solstice_stones/.versioned/6aa3c1eb01a86788/history_europe_solstice_stones_6aa3c1eb01a86788.adaptive_manifest.json
+  manifest_sha256: 517dd6d6b97684e0383be6c8589bb79e56d72da1f2d068563d64585fd573dfa0
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_europe_solstice_stones.music.yaml
+  score_sha256_at_review: eb117dfc4db487c65d9c68b972c44d960b02e2ff42c1bee9b3fdc6c2a014f740
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.1
+  label: Acceptable
+  notes: It's so heavy and such a downer. It feels so self-serious, and doesn't give me comfort of home feel much,
+    it just doesn't feel like a good fit for the game.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:21:13Z'
+  updated_at: '2026-11-25T02:21:13Z'
+  reviewed_at: '2026-11-25T02:21:13Z'
+history: []

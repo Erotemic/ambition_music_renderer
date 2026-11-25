@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_south_asia_monsoon_road
+  title: The Monsoon Road
+  version_id: 37f3f664d4400a0e:75e54459023f
+  render_hash: 37f3f664d4400a0e
+  preview_sha256: 75e54459023fb4af88fc0510568678b5a9b9c562f67871e5cc37efd3f449e5e7
+  preview_path: generated/history_south_asia_monsoon_road/.versioned/37f3f664d4400a0e/preview/history_south_asia_monsoon_road_37f3f664d4400a0e.full_soundtrack_preview.ogg
+  manifest_path: generated/history_south_asia_monsoon_road/.versioned/37f3f664d4400a0e/history_south_asia_monsoon_road_37f3f664d4400a0e.adaptive_manifest.json
+  manifest_sha256: d983977fa9523a6b1bb074bc1f40795b006ea1410f40563ae8f68e148f67cc31
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_south_asia_monsoon_road.music.yaml
+  score_sha256_at_review: e61ff6fe532e4f46e5949e04ef0c4c22daa7fe6f5106bd6e1f7f24da7a605508
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 4.0
+  label: Major polish
+  notes: Boring. Not even self serious, just boring. I don't like the low string hold. It's got a bad game fit.Oh
+    and at 1:22 its so shrill!
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:09:03Z'
+  updated_at: '2026-11-25T03:09:03Z'
+  reviewed_at: '2026-11-25T03:09:03Z'
+history: []

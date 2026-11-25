@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_painted_cave_hands_on_the_wall
+  title: Hands on the Wall
+  version_id: 8d4cd24803d5448c:92e98829f945
+  render_hash: 8d4cd24803d5448c
+  preview_sha256: 92e98829f94570922414d9b0db90b0cf923a0395235d84029dd0d8969da63cad
+  preview_path: generated/history_painted_cave_hands_on_the_wall/.versioned/8d4cd24803d5448c/preview/history_painted_cave_hands_on_the_wall_8d4cd24803d5448c.full_soundtrack_preview.ogg
+  manifest_path: generated/history_painted_cave_hands_on_the_wall/.versioned/8d4cd24803d5448c/history_painted_cave_hands_on_the_wall_8d4cd24803d5448c.adaptive_manifest.json
+  manifest_sha256: 38fd16bfc1dfb0bcdc7fa6b48637e0347b9bb2a18467dfa71b4105622092959e
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_painted_cave_hands_on_the_wall.music.yaml
+  score_sha256_at_review: 088e762e7652adae5a4b33343133541e295f6d35bb358334a2de9682d0f189f9
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.9
+  label: Acceptable
+  notes: Doesn't feel like enough of a game tune.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:47:09Z'
+  updated_at: '2026-11-25T02:47:09Z'
+  reviewed_at: '2026-11-25T02:47:09Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: tritone_decree
+  title: The Tritone Decree
+  version_id: af1b3ffeb63ee402:ea8a1d3d1db9
+  render_hash: af1b3ffeb63ee402
+  preview_sha256: ea8a1d3d1db90d724464f5d4d5dc55b30afa9a5281d5d728cffa0a0654876abd
+  preview_path: generated/tritone_decree/.versioned/af1b3ffeb63ee402/preview/tritone_decree_af1b3ffeb63ee402.full_soundtrack_preview.ogg
+  manifest_path: generated/tritone_decree/.versioned/af1b3ffeb63ee402/tritone_decree_af1b3ffeb63ee402.adaptive_manifest.json
+  manifest_sha256: 4ebdea724e2ee3c11085256817ffa3526c9b6a7c65e15554122033bca71e31a0
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/tritone_decree.music.yaml
+  score_sha256_at_review: 55561d27670a43ad33064a4aa8853d6ef12ae1552a990d35393dd1b4039b803e
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 9.2
+  label: Standout
+  notes: ''
+  issues: []
+  furthest_played_seconds: 18.817
+  furthest_played_fraction: 0.1525
+  created_at: '2026-11-24T23:11:33Z'
+  updated_at: '2026-11-24T23:11:33Z'
+  reviewed_at: '2026-11-24T23:11:33Z'
+history: []

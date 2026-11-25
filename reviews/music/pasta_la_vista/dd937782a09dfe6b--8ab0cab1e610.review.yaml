@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: pasta_la_vista
+  title: Pasta la Vista
+  version_id: dd937782a09dfe6b:8ab0cab1e610
+  render_hash: dd937782a09dfe6b
+  preview_sha256: 8ab0cab1e6109840e0ccc752624f34eb742fda629d0fcd5514aa5517e7bf0e62
+  preview_path: generated/pasta_la_vista/.versioned/dd937782a09dfe6b/preview/pasta_la_vista_dd937782a09dfe6b.full_soundtrack_preview.ogg
+  manifest_path: generated/pasta_la_vista/.versioned/dd937782a09dfe6b/pasta_la_vista_dd937782a09dfe6b.adaptive_manifest.json
+  manifest_sha256: 1f17d008f0fb74c6a2913286c2171843bb9cc622802e565af032098622ae1437
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/pasta_la_vista.music.yaml
+  score_sha256_at_review: fd05a53b23a26129f2cfa12298d63677a0cdbfbc309afd103804ed3ad9e734e7
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.2
+  label: Acceptable
+  notes: It does what it does, it's fine
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:18:48Z'
+  updated_at: '2026-11-25T02:19:14Z'
+  reviewed_at: '2026-11-25T02:19:14Z'
+history: []

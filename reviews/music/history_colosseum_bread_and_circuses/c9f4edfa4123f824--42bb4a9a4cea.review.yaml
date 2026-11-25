@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_colosseum_bread_and_circuses
+  title: Bread and Circuses
+  version_id: c9f4edfa4123f824:42bb4a9a4cea
+  render_hash: c9f4edfa4123f824
+  preview_sha256: 42bb4a9a4cea2a0d9ec0a36a9ef7d94c00e7413c76623202e529914db09e5337
+  preview_path: generated/history_colosseum_bread_and_circuses/.versioned/c9f4edfa4123f824/preview/history_colosseum_bread_and_circuses_c9f4edfa4123f824.full_soundtrack_preview.ogg
+  manifest_path: generated/history_colosseum_bread_and_circuses/.versioned/c9f4edfa4123f824/history_colosseum_bread_and_circuses_c9f4edfa4123f824.adaptive_manifest.json
+  manifest_sha256: 36cd2df667ef15a3a0a1fb0883f52f8ad9cc5db3745b04a78e13fbc276ac3133
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_colosseum_bread_and_circuses.music.yaml
+  score_sha256_at_review: a84eda39585967af7d86c5ce6ee32c52f5a44cb50d77b2f4e8c3fceb61a64ef5
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.4
+  label: Acceptable
+  notes: Yeah, I was nervous at the start, but yeah, this isn't so bad. Definite solid components, definite weak
+    spots. But it feels like it belongs in a game, which is good.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:54:01Z'
+  updated_at: '2026-11-25T02:54:01Z'
+  reviewed_at: '2026-11-25T02:54:01Z'
+history: []

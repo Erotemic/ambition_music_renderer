@@ -1,0 +1,33 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: the_rustler
+  title: Coq of the Walk
+  version_id: e9302d5d98b9e32f:ba3b6d4cad3e
+  render_hash: e9302d5d98b9e32f
+  preview_sha256: ba3b6d4cad3ebb5d9b2de2b4e0d418122f6a6522f79447a384f48d0dd8996962
+  preview_path: generated/the_rustler/.versioned/e9302d5d98b9e32f/preview/the_rustler_e9302d5d98b9e32f.full_soundtrack_preview.ogg
+  manifest_path: generated/the_rustler/.versioned/e9302d5d98b9e32f/the_rustler_e9302d5d98b9e32f.adaptive_manifest.json
+  manifest_sha256: afe54a93841e507560dca8a4569d4366070dd99931b4dccd664c5feb41e4ed26
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/the_rustler.music.yaml
+  score_sha256_at_review: 28ded1b254030b6e98d444138af1204b9eb99b5e04ec1caa78aee57b9d2e0586
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.8
+  label: Strong
+  notes: This is really close to a good song. I love the drum pattern. "snare like wheels on rail joints" it really
+    works. The banjo might be slightly out of tune? 0:52 gets very good. Feels like a real train battle. I think
+    if we do a bit of polish and rework we got a winner. Real good bones here.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:56:51Z'
+  updated_at: '2026-11-25T02:56:51Z'
+  reviewed_at: '2026-11-25T02:56:51Z'
+history: []

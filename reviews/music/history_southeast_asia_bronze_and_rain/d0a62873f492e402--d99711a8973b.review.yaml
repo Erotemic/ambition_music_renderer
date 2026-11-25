@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_southeast_asia_bronze_and_rain
+  title: Bronze and Rain
+  version_id: d0a62873f492e402:d99711a8973b
+  render_hash: d0a62873f492e402
+  preview_sha256: d99711a8973b42cf5e349c2ef9ab9392575d01ab8f0e37cdab6b321cd43f53f6
+  preview_path: generated/history_southeast_asia_bronze_and_rain/.versioned/d0a62873f492e402/preview/history_southeast_asia_bronze_and_rain_d0a62873f492e402.full_soundtrack_preview.ogg
+  manifest_path: generated/history_southeast_asia_bronze_and_rain/.versioned/d0a62873f492e402/history_southeast_asia_bronze_and_rain_d0a62873f492e402.adaptive_manifest.json
+  manifest_sha256: a25e530e1686f4b21602e9adc2fbaea3acad6af3e188e1ccf08b7b459f2ad2cf
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_southeast_asia_bronze_and_rain.music.yaml
+  score_sha256_at_review: e53e612c27a2886c20a0b476b86cee61a766408426d6887bca37d060db327a8c
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 5.1
+  label: Acceptable
+  notes: The standard self-serious history dimension music issue. It doesn't feel like game music.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:54:45Z'
+  updated_at: '2026-11-25T02:54:45Z'
+  reviewed_at: '2026-11-25T02:54:45Z'
+history: []

@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: it_was_revealed_to_me_in_a_dream
+  title: It Was Revealed to Me in a Dream
+  version_id: d8a2cb6711835ec2:2f18f7567ada
+  render_hash: d8a2cb6711835ec2
+  preview_sha256: 2f18f7567ada2c5bad09f1501a9d1fa77339e7f979005b5aa84f78254aa3497e
+  preview_path: generated/it_was_revealed_to_me_in_a_dream/.versioned/d8a2cb6711835ec2/preview/it_was_revealed_to_me_in_a_dream_d8a2cb6711835ec2.full_soundtrack_preview.ogg
+  manifest_path: generated/it_was_revealed_to_me_in_a_dream/.versioned/d8a2cb6711835ec2/it_was_revealed_to_me_in_a_dream_d8a2cb6711835ec2.adaptive_manifest.json
+  manifest_sha256: 17735a89841b992c2dc58cf72118461714a7cf52d5b2652c8e09ac24c4be97f9
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/it_was_revealed_to_me_in_a_dream.music.yaml
+  score_sha256_at_review: 98861c387e53911cbf0d87cd7536f13fe92df9ffa75a8cb6c5cb26974cb2a966
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 7.0
+  label: Strong
+  notes: Yeah, this is dreamy and noodly. Pretty much what I wanted.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:01:07Z'
+  updated_at: '2026-11-25T03:01:07Z'
+  reviewed_at: '2026-11-25T03:01:07Z'
+history: []

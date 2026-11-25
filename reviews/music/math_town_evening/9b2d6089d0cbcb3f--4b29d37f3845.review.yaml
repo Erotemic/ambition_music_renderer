@@ -1,0 +1,32 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: math_town_evening
+  title: Golden Ratio Hour
+  version_id: 9b2d6089d0cbcb3f:4b29d37f3845
+  render_hash: 9b2d6089d0cbcb3f
+  preview_sha256: 4b29d37f38454488ec7a5661042fbea0dd77c079b4799d0297bb180e2ed19257
+  preview_path: generated/math_town_evening/.versioned/9b2d6089d0cbcb3f/preview/math_town_evening_9b2d6089d0cbcb3f.full_soundtrack_preview.ogg
+  manifest_path: generated/math_town_evening/.versioned/9b2d6089d0cbcb3f/math_town_evening_9b2d6089d0cbcb3f.adaptive_manifest.json
+  manifest_sha256: 1dd82cd17c9781698e5d4df3e249bca9ecd04719f7563d009f44274976931b12
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/math_town_evening.music.yaml
+  score_sha256_at_review: 96273fc768c72429e77aef3d49c273b1111a927383961a68a73b81f8b597ede0
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.2
+  label: Acceptable
+  notes: Not bad. schmaltzy, but not bad. Maybe change the clarinet to something more interesting to make it less
+    sentimental? Probably needs melody change though. Like the fib sequence in it though.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T02:45:26Z'
+  updated_at: '2026-11-25T02:45:26Z'
+  reviewed_at: '2026-11-25T02:45:26Z'
+history: []

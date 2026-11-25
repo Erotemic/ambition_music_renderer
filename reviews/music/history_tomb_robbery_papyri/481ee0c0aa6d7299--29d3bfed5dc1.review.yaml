@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: history_tomb_robbery_papyri
+  title: The Tomb Robbery Papyri
+  version_id: 481ee0c0aa6d7299:29d3bfed5dc1
+  render_hash: 481ee0c0aa6d7299
+  preview_sha256: 29d3bfed5dc1de407f1e4b8a6cffda6226418c0bf91b56971705dd51007bf44e
+  preview_path: generated/history_tomb_robbery_papyri/.versioned/481ee0c0aa6d7299/preview/history_tomb_robbery_papyri_481ee0c0aa6d7299.full_soundtrack_preview.ogg
+  manifest_path: generated/history_tomb_robbery_papyri/.versioned/481ee0c0aa6d7299/history_tomb_robbery_papyri_481ee0c0aa6d7299.adaptive_manifest.json
+  manifest_sha256: 89cddee15ad4bc3dcc46822f6efd29ef0c98ab9ad2bc86ca857567187a36aec4
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/history_tomb_robbery_papyri.music.yaml
+  score_sha256_at_review: 4b8856150f2aac5eefb3d87607e1dbfac15b6402e740a427badd0d1600995926
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 6.0
+  label: Acceptable
+  notes: Maybe get into the beat a bit faster and it might feel better? Still the ceiling on this is low.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:07:27Z'
+  updated_at: '2026-11-25T03:07:27Z'
+  reviewed_at: '2026-11-25T03:07:27Z'
+history: []

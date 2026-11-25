@@ -7,6 +7,7 @@
 # Chord stabs: keep structural synth-brass accents, not repeated guitar slams.
 # Drums: remove snare and hats synthesizer instances; retain a light kick.
 # All music coordinates exact at 960 PPQ; no changed beat positions.
+# Subtle polish: bass -1.5 dB; remove 3 close-semitone pad tones
 schema: ambition.musicir.v3
 id: standing_on_shoulders_v2_surge_xt
 title: Standing on Shoulders v2 - Synthesizer Cathedral
@@ -279,7 +280,7 @@ instruments:
   volume: 98
   pan: 64
   expression: 108
-  mix_gain_db: -1.0
+  mix_gain_db: -2.5
   instrument_backend:
     kind: surge
     patch: Luna/Basses/Chonky Analog Bass 1
@@ -8257,7 +8258,6 @@ parts:
         - - G3
           - B3
           - E4
-          - G4
         - 60
       - - beats: 20.0
         - beats: 3.65
@@ -8459,7 +8459,6 @@ parts:
         - - G3
           - B3
           - D4
-          - G4
         - 62
       - - beats: 8.0
         - beats: 3.65
@@ -8487,7 +8486,6 @@ parts:
         - - G3
           - B3
           - D4
-          - G4
         - 62
     - id: evolving_string_pad_final_royal_impacts
       at:

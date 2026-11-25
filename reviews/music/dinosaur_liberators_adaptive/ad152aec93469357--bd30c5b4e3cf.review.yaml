@@ -1,0 +1,31 @@
+schema: ambition.music_review.v2
+score_scale:
+  min: 1.0
+  max: 10.0
+subject:
+  cue_id: dinosaur_liberators_adaptive
+  title: Dinosaur Liberators - the primeval trail (adaptive)
+  version_id: ad152aec93469357:bd30c5b4e3cf
+  render_hash: ad152aec93469357
+  preview_sha256: bd30c5b4e3cf47720827597b57baff246c4d5a50caa93d7fad637269f29fc533
+  preview_path: generated/dinosaur_liberators_adaptive/.versioned/ad152aec93469357/preview/dinosaur_liberators_adaptive_ad152aec93469357.full_soundtrack_preview.ogg
+  manifest_path: generated/dinosaur_liberators_adaptive/.versioned/ad152aec93469357/dinosaur_liberators_adaptive_ad152aec93469357.adaptive_manifest.json
+  manifest_sha256: 4a99b19fe7db37b2507b6088c9372f3c27fe39407ae4bb147af6ebadcd889680
+  backend: null
+  renderer_version: ambition-musicir-renderer-v0.10.11-sample-dynamics-v1
+  score_path: scores/active/dinosaur_liberators_adaptive.music.yaml
+  score_sha256_at_review: 11bb5c0b0374768b06bccd872272de54e6d514c3f587d659721e367b6d0c7d4f
+  score_scope: active
+  source_kind: generated
+  was_latest_render_at_review: true
+current:
+  score: 8.0
+  label: Strong
+  notes: The song has gotten a lot better, and works well.
+  issues: []
+  furthest_played_seconds: 0.0
+  furthest_played_fraction: 0.0
+  created_at: '2026-11-25T03:13:13Z'
+  updated_at: '2026-11-25T03:13:13Z'
+  reviewed_at: '2026-11-25T03:13:13Z'
+history: []
