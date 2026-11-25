@@ -30,8 +30,13 @@ SOUNDTRACK_OGG_QUALITY = 8.0
 SOUNDTRACK_FLOOR_DBFS = -60.0
 SOUNDTRACK_END_FADE_SECONDS = 0.05
 
+#: What a soundtrack carries beside its audio; a kept soundtrack of an older
+#: format is made again. 2: the preview's chapters, at their soundtrack times.
+SOUNDTRACK_FORMAT = 2
 
-def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_rate: int) -> np.ndarray | None:
+
+def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_rate: int,
+                     *, pieces: list[tuple[int, int, int]] | None = None) -> np.ndarray | None:
     """The listening version of the mastered composition: its sections back to
     back, or ``None`` when the timeline already is that.
 
@@ -48,8 +53,13 @@ def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_
     section before it or the lead-in of the one after it. Time between
     sections that is neither (a form section no playback section plays)
     stays as it is.
+
+    ``pieces``, when given, receives ``(first, end, at)`` frames for each run of
+    the timeline kept: frames ``first:end`` play from frame ``at`` of the
+    soundtrack (``soundtrack_seconds``).
     """
     timeline = np.asarray(master, dtype=np.float32)
+    pieces = [] if pieces is None else pieces
     # [start, end, beat, the end of the tail after it, the start of the lead-in before it]
     spans: list[list[Any]] = []
     for section in sorted(sections, key=lambda s: (s["start_seconds"], s["end_seconds"])):
@@ -80,6 +90,7 @@ def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_
     lead_first = max(0, first - _frame(spans[0][2], sample_rate))
     changed |= lead_first > 0
     out = np.concatenate([faded(timeline[lead_first:first], True), timeline[first:_frame(spans[0][1], sample_rate)]])
+    pieces.append((lead_first, lead_first + len(out), 0))
     for (_a0, a1, _beat, tail_end, _lead), (b0, b1, beat, _tail, lead_first_seconds) in zip(spans, spans[1:]):
         gap_first, gap_last = _frame(a1, sample_rate), _frame(b0, sample_rate)
         silent = (tail_end is not None and abs(tail_end - b0) < 1e-6) or (
@@ -98,6 +109,7 @@ def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_
                 out[len(out) - n:] += lead[len(lead) - n:]
             m = min(len(ring), len(body))
             body[:m] += ring[:m]
+        pieces.append((gap_last, gap_last + len(body), len(out)))
         out = np.concatenate([out, body])
     ring = np.asarray(timeline[_frame(spans[-1][1], sample_rate):], dtype=np.float32)
     if len(ring):
@@ -109,6 +121,7 @@ def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_
         fade = min(len(ring), int(round(SOUNDTRACK_END_FADE_SECONDS * sample_rate)))
         if fade:
             ring[-fade:] *= np.linspace(1.0, 0.0, fade, dtype=np.float32).reshape(shape)
+        pieces.append((_frame(spans[-1][1], sample_rate), _frame(spans[-1][1], sample_rate) + len(ring), len(out)))
         out = np.concatenate([out, ring])
     if not changed:
         return None
@@ -116,6 +129,40 @@ def soundtrack_audio(sections: list[dict[str, Any]], master: np.ndarray, sample_
     peak, master_peak = float(np.max(np.abs(out))) if len(out) else 0.0, float(np.max(np.abs(timeline)))
     if peak > master_peak > 0.0:
         out *= master_peak / peak
+    return out
+
+
+def soundtrack_seconds(seconds: float, pieces: list[tuple[int, int, int]], sample_rate: int) -> float | None:
+    """Where ``seconds`` of the composition timeline plays in its soundtrack, or
+    ``None`` when the soundtrack cut it (a joined gap, the cut end ring)."""
+    frame = int(round(seconds * sample_rate))
+    for first, end, at in pieces:
+        if first <= frame < end:
+            return (at + frame - first) / sample_rate
+    return None
+
+
+def soundtrack_chapters(metadata: dict[str, Any], pieces: list[tuple[int, int, int]], sample_rate: int) -> dict[str, Any]:
+    """The ``CHAPTERnnn`` comments of a preview (``render.export.section_chapter_metadata``)
+    at the times their sections play in the soundtrack, numbered again. A chapter
+    the soundtrack cut is left out: a lead-in that starts in a joined gap keeps
+    only its last beat, laid on the end of the section before it."""
+    from .render.export import format_ogg_timestamp
+
+    chapters = []
+    for key, value in metadata.items():
+        number = key[len("CHAPTER"):]
+        if key.startswith("CHAPTER") and number.isdigit():
+            hours, minutes, secs = (float(part) for part in str(value).split(":"))
+            at = soundtrack_seconds(hours * 3600 + minutes * 60 + secs, pieces, sample_rate)
+            if at is not None:
+                fields = {k[len(key):]: v for k, v in metadata.items() if k.startswith(key) and not k[len(key):][:1].isdigit()}
+                chapters.append((at, int(number), fields))
+    out: dict[str, Any] = {}
+    for index, (at, _number, fields) in enumerate(sorted(chapters, key=lambda row: row[:2]), start=1):
+        for suffix, value in fields.items():
+            out[f"CHAPTER{index:03d}{suffix}"] = format_ogg_timestamp(at) if not suffix else value
+    out["AMBITION_MARKER_COUNT"] = len(chapters)
     return out
 
 
@@ -139,14 +186,31 @@ def write_soundtrack(preview: Path, manifest: dict[str, Any], out: Path) -> Path
 
     from .render.export import write_ogg_from_audio
 
-    if out.is_file() and out.stat().st_mtime >= preview.stat().st_mtime:
+    if out.is_file() and out.stat().st_mtime >= preview.stat().st_mtime and _sidecar(out).get("AMBITION_SOUNDTRACK_FORMAT") == str(SOUNDTRACK_FORMAT):
         return out
     sections = soundtrack_sections(manifest)
     if not sections:
         return None
     audio, sample_rate = sf.read(preview, dtype="float32", always_2d=True)
-    soundtrack = soundtrack_audio(sections, audio, sample_rate)
+    pieces: list[tuple[int, int, int]] = []
+    soundtrack = soundtrack_audio(sections, audio, sample_rate, pieces=pieces)
     if soundtrack is None:
         return None
+    preview_tags = _sidecar(preview)
+    metadata = {key: preview_tags[key] for key in ("TITLE", "ARTIST", "ALBUM") if key in preview_tags}
+    metadata.update(soundtrack_chapters(preview_tags, pieces, sample_rate))
+    metadata.update({"PREVIEW_TYPE": "soundtrack", "CUE_ID": str(manifest.get("id") or ""),
+                     "AMBITION_SOUNDTRACK_FORMAT": str(SOUNDTRACK_FORMAT)})
     return write_ogg_from_audio(soundtrack, sample_rate, out, quality=SOUNDTRACK_OGG_QUALITY, keep_wav=False,
-                                metadata={"PREVIEW_TYPE": "soundtrack", "CUE_ID": str(manifest.get("id") or "")})
+                                metadata=metadata)
+
+
+def _sidecar(ogg: Path) -> dict[str, Any]:
+    """The comments written into ``ogg``, from the sidecar the encoder writes
+    beside it (``render.export.write_metadata_sidecar``); empty without one."""
+    import json
+
+    try:
+        return json.loads(ogg.with_name(ogg.name + ".metadata.json").read_text(encoding="utf8"))
+    except (OSError, ValueError):
+        return {}
