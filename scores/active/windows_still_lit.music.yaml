@@ -1,0 +1,437 @@
+schema: ambition.musicir.v3
+id: windows_still_lit
+title: Windows Still Lit
+description: >-
+  Harp and low violas under a flute melody. The harmony drifts under the same gentle three-beat span.
+seed: 120
+timebase: {ppq: 960}
+meter: 3/4
+tempo: 84
+key: {tonic: E, mode: major}
+end: {bar: 37, beat: 1}
+form:
+  - {id: windows, from: {bar: 1, beat: 1}, to: {bar: 10, beat: 1}, role: 'Harp and flute introduce the melody'}
+  - {id: upstairs, from: {bar: 10, beat: 1}, to: {bar: 19, beat: 1}, role: 'The flute reaches higher and the violas fill in'}
+  - {id: walkway, from: {bar: 19, beat: 1}, to: {bar: 28, beat: 1}, role: 'The harp holds the pace through borrowed chords'}
+  - {id: home, from: {bar: 28, beat: 1}, to: {bar: 37, beat: 1}, role: 'The opening phrase returns and thins to harp'}
+harmony:
+  every_bars: 1
+  cycle: false
+  progression: [
+    "Emaj9", "G#m7", "C#m9", "Amaj9", "Emaj9/G#", "F#m9", "Amaj9", "B7sus4", "Emaj9",
+    "C#m9", "C#m7/B", "Amaj9", "Emaj9/G#", "F#m9", "Amaj9", "B7sus4", "Badd9", "Emaj9",
+    "Amaj9", "Dmaj7", "Emaj9", "Fmaj7", "Amaj9", "C#m9", "F#m9", "Amaj9", "B7sus4",
+    "Emaj9", "G#m7", "C#m9", "Amaj9", "Emaj9/G#", "F#m9", "Amaj9", "B7sus4", "Emaj9",
+  ]
+instruments:
+  - name: harp
+    group: harp
+    program: orchestral_harp
+    volume: 108
+    expression: 112
+    pan: 52
+    mix_gain_db: 3.0
+    instrument_backend: {kind: sfz, optional: false, library_ref: folk.harp, settings: {fold_to_range: false}}
+  - name: viola_section
+    group: violas
+    program: viola
+    volume: 108
+    expression: 112
+    pan: 69
+    mix_gain_db: -3.0
+    instrument_backend: {kind: sfz, optional: false, library_ref: strings.violas, settings: {fold_to_range: false}}
+  - name: flute
+    group: flute
+    program: flute
+    volume: 108
+    expression: 112
+    pan: 71
+    mix_gain_db: 0.0
+    tuning_correction:
+      mode: curve
+      interpolation: linear
+      points: {E4: 1.2, F#4: 8.776, G#4: 9.457, A4: 0.667, B4: -0.858, C5: -7.226, C#5: -7.327, D#5: 1.286, E5: 3.696}
+    instrument_backend: {kind: sfz, optional: false, sfz: "**/Woodwinds - Notation/Flute Solo 2 Sustain Non-Vibrato.sfz", settings: {fold_to_range: false}}
+materials:
+  harp_windows:
+    events:
+      # Bar 1
+      - [0, 1066, E3, 67]
+      - [979, 1066, B3, 57]
+      - [1066, 1037, F#4, 54]
+      - [2083, 586, G#4, 57]
+      # Bar 2
+      - [2880, 1066, G#3, 63]
+      - [3706, 1066, B3, 57]
+      - [3792, 1037, D#4, 54]
+      - [4963, 586, F#4, 57]
+      # Bar 3
+      - [5760, 1066, C#3, 63]
+      - [6739, 1066, G#3, 57]
+      - [6826, 1037, D#4, 59]
+      # Bar 4
+      - [8640, 1066, A2, 67]
+      - [9619, 1066, E3, 57]
+      - [9706, 1037, G#3, 54]
+      - [10723, 586, C#4, 57]
+      # Bar 5
+      - [11520, 1066, G#3, 63]
+      - [12346, 1066, B3, 57]
+      - [12432, 1037, D#4, 54]
+      - [13603, 586, F#4, 57]
+      # Bar 6
+      - [14400, 1066, F#3, 63]
+      - [15379, 1066, A3, 57]
+      - [15466, 1037, E4, 59]
+      # Bar 7
+      - [17280, 1066, A2, 67]
+      - [18259, 1066, E3, 57]
+      - [18346, 1037, G#3, 54]
+      - [19363, 586, C#4, 57]
+      # Bar 8
+      - [20160, 1066, B2, 63]
+      - [20986, 1066, F#3, 57]
+      - [21072, 1037, A4, 54]
+      - [22243, 586, E4, 57]
+      # Bar 9
+      - [23040, 1066, E3, 63]
+      - [24019, 1066, B3, 57]
+      - [24106, 1037, F#4, 59]
+  violas_windows:
+    events:
+      # Bar 2
+      - [2976, 2611, G#3, 60]
+      # Bar 3
+      - [5856, 2611, B3, 60]
+      # Bar 4
+      - [8736, 2611, C#4, 60]
+      # Bar 5
+      - [11616, 2611, B3, 60]
+      - [11856, 2400, B3, 48]
+      # Bar 6
+      - [14496, 2611, C#4, 60]
+      # Bar 7
+      - [17376, 2611, C#4, 60]
+      # Bar 8
+      - [20256, 2611, B3, 60]
+      - [20496, 2400, F#3, 48]
+  flute_windows:
+    events:
+      # Bar 2
+      - [3331, 1066, G#4, 68]
+      - [4560, 893, B4, 75]
+      # Bar 3
+      - [5779, 1354, D#5, 75]
+      - [7219, 1219, C#5, 70]
+      # Bar 4
+      - [8890, 1795, B4, 68]
+      # Bar 6
+      - [15110, 1248, A4, 68]
+      - [16512, 557, G#4, 66]
+      # Bar 7
+      - [17395, 1402, E4, 65]
+      - [18979, 893, F#4, 67]
+      # Bar 8
+      - [20573, 1565, F#4, 68]
+      # Bar 9
+      - [23270, 1536, G#4, 67]
+  harp_upstairs:
+    events:
+      # Bar 10
+      - [0, 1066, C#3, 67]
+      - [979, 1066, G#3, 57]
+      - [1066, 1037, D#4, 54]
+      - [2083, 586, E4, 57]
+      # Bar 11
+      - [2880, 1066, B2, 63]
+      - [3706, 1066, G#3, 57]
+      - [3792, 1037, C#4, 54]
+      - [4963, 586, E4, 57]
+      # Bar 12
+      - [5760, 1066, A2, 63]
+      - [6739, 1066, E3, 57]
+      - [6826, 1037, G#3, 59]
+      # Bar 13
+      - [8640, 1066, G#3, 67]
+      - [9619, 1066, B3, 57]
+      - [9706, 1037, D#4, 54]
+      - [10723, 586, F#4, 57]
+      # Bar 14
+      - [11520, 1066, F#3, 63]
+      - [12346, 1066, A3, 57]
+      - [12432, 1037, E4, 54]
+      - [13603, 586, G#4, 57]
+      # Bar 15
+      - [14400, 1066, A2, 63]
+      - [15379, 1066, E3, 57]
+      - [15466, 1037, G#3, 59]
+      # Bar 16
+      - [17280, 1066, B2, 67]
+      - [18259, 1066, F#3, 57]
+      - [18346, 1037, A4, 54]
+      - [19363, 586, E4, 57]
+      # Bar 17
+      - [20160, 1066, B2, 63]
+      - [20986, 1066, F#3, 57]
+      - [21072, 1037, C#4, 54]
+      - [22243, 586, D#4, 57]
+      # Bar 18
+      - [23040, 1066, E3, 63]
+      - [24019, 1066, B3, 57]
+      - [24106, 1037, F#4, 59]
+  violas_upstairs:
+    events:
+      # Bar 10
+      - [96, 2611, B3, 60]
+      # Bar 11
+      - [2976, 2611, G#3, 60]
+      # Bar 12
+      - [5856, 2611, C#4, 60]
+      - [6096, 2400, E3, 48]
+      # Bar 13
+      - [8736, 2611, B3, 60]
+      - [8976, 2400, B3, 48]
+      # Bar 14
+      - [11616, 2611, C#4, 60]
+      - [11856, 2400, A3, 48]
+      # Bar 15
+      - [14496, 2611, C#4, 60]
+      # Bar 16
+      - [17376, 2611, B3, 60]
+      # Bar 17
+      - [20256, 2611, B3, 60]
+      - [20496, 2400, F#3, 48]
+      # Bar 18
+      - [23136, 2611, B3, 60]
+  flute_upstairs:
+    events:
+      # Bar 10
+      - [538, 1286, E5, 73]
+      - [1987, 595, D#5, 68]
+      # Bar 11
+      - [3091, 1642, C#5, 70]
+      # Bar 12
+      - [6461, 1104, B4, 67]
+      - [7747, 634, G#4, 66]
+      # Bar 13
+      - [9110, 1488, F#4, 68]
+      # Bar 15
+      - [14794, 1085, C#5, 71]
+      - [16128, 922, B4, 67]
+      # Bar 16
+      - [17568, 1469, A4, 67]
+      # Bar 17
+      - [20429, 1440, F#4, 66]
+      # Bar 18
+      - [23405, 1123, G#4, 68]
+  harp_walkway:
+    events:
+      # Bar 19
+      - [0, 1066, A2, 67]
+      - [979, 1066, E3, 57]
+      - [1066, 1037, G#3, 54]
+      - [2083, 586, G#4, 57]
+      # Bar 20
+      - [2880, 1066, D3, 63]
+      - [3706, 1066, A3, 57]
+      - [3792, 1037, C#4, 54]
+      - [4963, 586, F#4, 57]
+      # Bar 21
+      - [5760, 1066, E3, 63]
+      - [6739, 1066, B3, 57]
+      - [6826, 1037, F#4, 59]
+      # Bar 22
+      - [8640, 1066, F3, 67]
+      - [9619, 1066, C4, 57]
+      - [9706, 1037, E4, 54]
+      - [10723, 586, A4, 57]
+      # Bar 23
+      - [11520, 1066, A2, 63]
+      - [12346, 1066, E3, 57]
+      - [12432, 1037, G#3, 54]
+      - [13603, 586, G#4, 57]
+      # Bar 24
+      - [14400, 1066, C#3, 63]
+      - [15379, 1066, G#3, 57]
+      - [15466, 1037, D#4, 59]
+      # Bar 25
+      - [17280, 1066, F#3, 67]
+      - [18259, 1066, A3, 57]
+      - [18346, 1037, E4, 54]
+      - [19363, 586, G#4, 57]
+      # Bar 26
+      - [20160, 1066, A2, 63]
+      - [20986, 1066, E3, 57]
+      - [21072, 1037, G#3, 54]
+      - [22243, 586, C#4, 57]
+      # Bar 27
+      - [23040, 1066, B2, 63]
+      - [24019, 1066, F#3, 57]
+      - [24106, 1037, A4, 59]
+  violas_walkway:
+    events:
+      # Bar 20
+      - [2976, 2611, A3, 54]
+      # Bar 21
+      - [5856, 2611, B3, 54]
+      - [6096, 2400, B3, 48]
+      # Bar 22
+      - [8736, 2611, C4, 54]
+      # Bar 23
+      - [11616, 2611, C#4, 54]
+      # Bar 24
+      - [14496, 2611, B3, 54]
+      - [14736, 2400, G#3, 48]
+      # Bar 25
+      - [17376, 2611, C#4, 54]
+      # Bar 26
+      - [20256, 2611, C#4, 54]
+  flute_walkway:
+    events:
+      # Bar 20
+      - [3091, 1795, A4, 69]
+      # Bar 21
+      - [6278, 1517, B4, 68]
+      # Bar 22
+      - [9235, 1661, C5, 68]
+      # Bar 24
+      - [14870, 1363, B4, 68]
+      - [16310, 672, G#4, 65]
+      # Bar 25
+      - [17568, 1402, A4, 67]
+      # Bar 26
+      - [20803, 1142, E4, 65]
+      # Bar 27
+      - [23674, 1219, F#4, 68]
+  harp_home:
+    events:
+      # Bar 28
+      - [0, 1066, E3, 67]
+      - [979, 1066, B3, 57]
+      - [1066, 1037, F#4, 54]
+      - [2083, 586, G#4, 57]
+      # Bar 29
+      - [2880, 1066, G#3, 63]
+      - [3706, 1066, B3, 57]
+      - [3792, 1037, D#4, 54]
+      - [4963, 586, F#4, 57]
+      # Bar 30
+      - [5760, 1066, C#3, 63]
+      - [6739, 1066, G#3, 57]
+      - [6826, 1037, D#4, 59]
+      # Bar 31
+      - [8640, 1066, A2, 67]
+      - [9619, 1066, E3, 57]
+      - [9706, 1037, G#3, 54]
+      - [10723, 586, C#4, 57]
+      # Bar 32
+      - [11520, 1066, G#3, 63]
+      - [12346, 1066, B3, 57]
+      - [12432, 1037, D#4, 54]
+      - [13603, 586, F#4, 57]
+      # Bar 33
+      - [14400, 1066, F#3, 63]
+      - [15379, 1066, A3, 57]
+      - [15466, 1037, E4, 59]
+      # Bar 34
+      - [17280, 1066, A2, 67]
+      - [18259, 1066, E3, 57]
+      - [18346, 1037, G#3, 54]
+      - [19363, 586, C#4, 57]
+      # Bar 35
+      - [20160, 1066, B2, 63]
+      - [20986, 1066, F#3, 57]
+      - [21072, 1037, A4, 54]
+      - [22243, 586, E4, 57]
+      # Bar 36
+      - [23040, 1066, E3, 63]
+  violas_home:
+    events:
+      # Bar 28
+      - [96, 2611, B3, 60]
+      # Bar 29
+      - [2976, 2611, G#3, 60]
+      # Bar 30
+      - [5856, 2611, B3, 60]
+      - [6096, 2400, G#3, 48]
+      # Bar 31
+      - [8736, 2611, C#4, 60]
+      - [8976, 2400, E3, 48]
+      # Bar 32
+      - [11616, 2611, B3, 60]
+      - [11856, 2400, B3, 48]
+      # Bar 33
+      - [14496, 2611, C#4, 60]
+      # Bar 34
+      - [17376, 2611, C#4, 60]
+  flute_home:
+    events:
+      # Bar 29
+      - [3331, 1066, G#4, 68]
+      - [4560, 893, B4, 75]
+      # Bar 30
+      - [5779, 1354, D#5, 75]
+      - [7219, 1219, C#5, 70]
+      # Bar 31
+      - [8890, 1795, B4, 68]
+      # Bar 32
+      - [11962, 1286, G#4, 68]
+      # Bar 33
+      - [14995, 1565, A4, 69]
+      # Bar 34
+      - [17760, 1526, E4, 65]
+      # Bar 35
+      - [20515, 1613, F#4, 66]
+parts:
+  - id: harp_part
+    instrument: harp
+    voices:
+      - id: harp
+        clips:
+          - {id: harp_windows_clip, at: {bar: 1, beat: 1}, use: harp_windows}
+          - {id: harp_upstairs_clip, at: {bar: 10, beat: 1}, use: harp_upstairs}
+          - {id: harp_walkway_clip, at: {bar: 19, beat: 1}, use: harp_walkway}
+          - {id: harp_home_clip, at: {bar: 28, beat: 1}, use: harp_home}
+  - id: viola_section_part
+    instrument: viola_section
+    voices:
+      - id: violas
+        clips:
+          - {id: violas_windows_clip, at: {bar: 1, beat: 1}, use: violas_windows}
+          - {id: violas_upstairs_clip, at: {bar: 10, beat: 1}, use: violas_upstairs}
+          - {id: violas_walkway_clip, at: {bar: 19, beat: 1}, use: violas_walkway}
+          - {id: violas_home_clip, at: {bar: 28, beat: 1}, use: violas_home}
+  - id: flute_part
+    instrument: flute
+    voices:
+      - id: flute
+        clips:
+          - {id: flute_windows_clip, at: {bar: 1, beat: 1}, use: flute_windows}
+          - {id: flute_upstairs_clip, at: {bar: 10, beat: 1}, use: flute_upstairs}
+          - {id: flute_walkway_clip, at: {bar: 19, beat: 1}, use: flute_walkway}
+          - {id: flute_home_clip, at: {bar: 28, beat: 1}, use: flute_home}
+processing:
+  groups:
+    harp:
+      chain:
+        - {processor: highpass, cutoff_hz: 75}
+        - {processor: lowpass, cutoff_hz: 8500}
+    violas:
+      chain:
+        - {processor: highpass, cutoff_hz: 105}
+        - {processor: lowpass, cutoff_hz: 5500}
+    flute:
+      chain:
+        - {processor: highpass, cutoff_hz: 145}
+        - {processor: lowpass, cutoff_hz: 7200}
+  master:
+    chain:
+      - {processor: highpass, cutoff_hz: 34}
+      - {processor: compressor, threshold_db: -17.5, ratio: 1.45, attack_ms: 26.0, release_ms: 135.0, knee_db: 5.0}
+      - {processor: reverb, wet: 0.038, decay_seconds: 0.8}
+      - {processor: limiter, target_peak_db: -1.8, drive: 0.94, normalize: true}
+playback:
+  layers:
+    ensemble: [harp, violas, flute]
+  sections:
+    - {id: song, form: [windows, upstairs, walkway, home], loop: true}
