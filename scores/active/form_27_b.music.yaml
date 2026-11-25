@@ -21,11 +21,11 @@ harmony:
   every_bars: 1
   cycle: false
   progression: [
-    D6, Bm7, D6, Bm7, D6, Bm7, Gmaj7, A7,
-    D6, Bm7, Gmaj7, A7, D/F#, Em7, Gm6, A7,
-    Gmaj7, D/F#, Em7, Bm7, Cmaj7, G/B, Em7, A7,
-    D6, Bm7, Gmaj7, A7, D/F#, Em7, Gm6, A7,
-    D6, Bm7, Gmaj7, A7, D/F#, Em7, Gm6, A7,
+    D6, Bm9, D6, Bm9, D6, Bm9, Gmaj9, A7,
+    D6, Bm9, Gmaj9, A7, Dadd9/F#, Em7, Gm6/9, A7,
+    Gmaj9, Dadd9/F#, Em7, Bm9, Cmaj7, Gadd9/B, Em7, A7,
+    D6, Bm9, Gmaj9, A7, Dadd9/F#, Em7, Gm6/9, A7,
+    D6, Bm9, Gmaj9, A7, Dadd9/F#, Em7, Gm6/9, A7,
   ]
 instruments:
   - {name: upright, group: piano, program: acoustic_grand_piano, volume: 106, expression: 112, mix_gain_db: 0.0, instrument_backend: {kind: sfz, optional: false, library_ref: freepats.upright_piano_kw}}
@@ -149,7 +149,7 @@ materials:
       - [17760, 1182, F#5, 88]
       - [19692, 462, E5, 84]
       - [20871, 1182, D5, 85]
-      - [23532, 462, B4, 81]
+      - [23532, 462, Bb4, 81]
       - [24488, 702, G4, 78]
       - [25440, 942, E5, 85]
       - [27372, 462, C#5, 84]
