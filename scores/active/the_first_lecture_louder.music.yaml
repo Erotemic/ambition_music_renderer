@@ -1,0 +1,616 @@
+schema: ambition.musicir.v3
+id: the_first_lecture_louder
+title: The First Lecture, Louder
+description: >-
+  A brass march for the Business College. The trumpet gives the same lecture twice.
+  A horn, a trombone, and a snare join the repeat. The trombone takes the questions.
+seed: 2565
+timebase: {ppq: 960}
+meter: 6/8
+tempo: 148
+key: Eb major
+end: {bar: 49, beat: 1}
+form:
+  - {id: lecture_one, from: {bar: 1, beat: 1}, to: {bar: 9, beat: 1}, role: 'Trumpet and tuba', loopable: true}
+  - {id: lecture_two, from: {bar: 9, beat: 1}, to: {bar: 17, beat: 1}, role: 'Same melody with the band', loopable: true}
+  - {id: questions, from: {bar: 17, beat: 1}, to: {bar: 25, beat: 1}, role: 'Trombone in front', loopable: true}
+  - {id: examples, from: {bar: 25, beat: 1}, to: {bar: 33, beat: 1}, role: 'Trumpet answers', loopable: true}
+  - {id: exam, from: {bar: 33, beat: 1}, to: {bar: 41, beat: 1}, role: 'The whole band restates the lecture', loopable: true}
+  - {id: dismissal, from: {bar: 41, beat: 1}, to: {bar: 49, beat: 1}, role: 'A short tag leads back to class', loopable: true}
+harmony:
+  every_bars: 1
+  cycle: false
+  progression: [
+    Eb, Abadd9, Bbadd9, Eb, Cm11, Abmaj7, Bb9, Eb,
+    Eb, Abadd9, Bbadd9, Eb, Cm11, Abmaj7, Bb9, Eb,
+    Fm7, Ab, Eb/G, Bb7, Fm7, Cm7, Ab, Bb7,
+    Cm7, Fm7, Ab, Bb7, Cm7, Ab, Fm7, Bb7,
+    Eb, Abadd9, Bbadd9, Eb, Cm11, Abmaj7, Bb9, Eb,
+    Eb, Cm7, Ab, Eb/G, Fm7, Bb7, Eb, Bb7,
+  ]
+instruments:
+  - {name: trumpet, group: trumpet, program: trumpet, volume: 108, expression: 112, modulation: 0, pan: 59, mix_gain_db: 3, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Brass - Notation/Trumpet Solo Sustain.sfz", settings: {fold_to_range: false}}}
+  - {name: horn, group: horn, program: french_horn, volume: 108, expression: 112, modulation: 0, pan: 78, mix_gain_db: -2.0, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.horns_staccato, settings: {fold_to_range: false}}}
+  - {name: trombone, group: trombone, program: trombone, volume: 108, expression: 112, modulation: 0, pan: 49, mix_gain_db: 1.5, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Brass - Notation/Tenor Trombone Solo Sustain.sfz", settings: {fold_to_range: false}}}
+  - {name: tuba, group: tuba, program: tuba, volume: 108, expression: 112, modulation: 0, pan: 64, mix_gain_db: -0.5, instrument_backend: {kind: sfz, optional: false, library_ref: orchestra.tuba_sustain, settings: {fold_to_range: false}}}
+  - {name: snare, group: snare, is_drum: true, program: standard, volume: 102, expression: 110, mix_gain_db: -5.0, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Naked Drums/User/Naked Drums GM.sfz", settings: {fold_to_range: false}}}
+materials:
+  lecture_tune:
+    events:
+      - [0, 462, Bb4, 94]
+      - [728, 462, G4, 87]
+      - [1434, 702, Eb5, 100]
+      - [2400, 222, D5, 82]
+      - [2880, 942, C5, 94]
+      - [4314, 462, Ab4, 88]
+      - [5048, 462, Bb4, 94]
+      - [5760, 462, F5, 101]
+      - [6488, 462, D5, 95]
+      - [7194, 702, Bb4, 90]
+      - [8160, 222, C5, 86]
+      - [8640, 942, G4, 95]
+      - [10074, 462, Eb4, 84]
+      - [10808, 462, Bb4, 93]
+      - [11520, 702, Bb4, 92]
+      - [12480, 222, D5, 88]
+      - [12954, 462, F5, 99]
+      - [13688, 462, Eb5, 91]
+      - [14400, 702, C5, 91]
+      - [15360, 222, Eb5, 87]
+      - [15834, 702, G5, 102]
+      - [16800, 222, F5, 86]
+      - [17280, 702, F5, 98]
+      - [18240, 462, D5, 94]
+      - [18960, 222, C5, 89]
+      - [19448, 462, Ab4, 88]
+      - [20160, 1662, Eb5, 96]
+      - [22080, 222, Bb4, 74]
+  fanfare_questions:
+    events:
+      - [4314, 222, Eb5, 84]
+      - [5048, 462, C5, 81]
+      - [10074, 222, F5, 86]
+      - [10808, 462, D5, 83]
+      - [15834, 222, Eb5, 86]
+      - [16568, 462, Bb4, 84]
+      - [21594, 462, Ab4, 84]
+      - [22560, 222, Bb4, 86]
+  fanfare_examples:
+    events:
+      - [0, 462, G4, 90]
+      - [728, 462, Bb4, 95]
+      - [1434, 702, C5, 99]
+      - [2880, 942, Ab4, 91]
+      - [4314, 702, F4, 89]
+      - [5760, 702, C5, 92]
+      - [6720, 222, Eb5, 87]
+      - [7440, 702, Ab4, 89]
+      - [8640, 1182, Bb4, 92]
+      - [10560, 462, D5, 87]
+      - [11520, 462, G4, 90]
+      - [12248, 462, Bb4, 95]
+      - [12954, 702, Eb5, 101]
+      - [14400, 942, C5, 95]
+      - [15834, 702, Ab4, 89]
+      - [17280, 702, F4, 88]
+      - [18240, 222, Ab4, 89]
+      - [18714, 702, C5, 96]
+      - [20160, 1422, D5, 98]
+      - [22080, 462, F5, 96]
+  fanfare_dismissal:
+    events:
+      - [0, 462, Bb4, 97]
+      - [728, 462, G4, 91]
+      - [1434, 942, Eb5, 102]
+      - [2880, 942, G5, 105]
+      - [4314, 462, Eb5, 94]
+      - [5048, 462, C5, 89]
+      - [5760, 702, Ab4, 90]
+      - [6720, 222, C5, 96]
+      - [7194, 702, Eb5, 99]
+      - [8640, 942, G4, 91]
+      - [10074, 462, Bb4, 92]
+      - [10808, 462, Eb5, 98]
+      - [11520, 942, F5, 100]
+      - [12954, 462, C5, 91]
+      - [13688, 462, Ab4, 88]
+      - [14400, 702, Bb4, 91]
+      - [15360, 222, D5, 90]
+      - [15834, 702, F5, 97]
+      - [16800, 222, D5, 87]
+      - [17280, 1662, Eb5, 100]
+      - [19200, 462, Bb4, 86]
+      - [20160, 702, F4, 85]
+      - [21594, 462, Ab4, 83]
+      - [22328, 462, D5, 89]
+  replies_lecture_two:
+    events:
+      - [0, 462, G4, 86]
+      - [1445, 462, G4, 93]
+      - [2880, 462, C5, 86]
+      - [4325, 462, C5, 93]
+      - [5760, 462, D5, 86]
+      - [7205, 462, D5, 93]
+      - [8640, 462, G4, 86]
+      - [10085, 462, G4, 93]
+      - [11520, 462, Eb5, 86]
+      - [12965, 462, Eb5, 93]
+      - [14400, 462, C5, 86]
+      - [15845, 462, C5, 93]
+      - [17280, 462, Ab4, 86]
+      - [18725, 462, Ab4, 93]
+      - [20160, 1182, G4, 89]
+  replies_questions:
+    events:
+      - [1680, 702, Ab4, 78]
+      - [4560, 702, C5, 78]
+      - [7440, 702, G4, 78]
+      - [10320, 702, Ab4, 78]
+      - [13200, 702, Ab4, 78]
+      - [16080, 702, Bb4, 78]
+      - [18960, 702, C5, 78]
+      - [21840, 702, Ab4, 78]
+  replies_examples:
+    events:
+      - [0, 942, Bb4, 84]
+      - [2880, 942, Ab4, 84]
+      - [5760, 942, C5, 84]
+      - [8640, 942, Ab4, 84]
+      - [11520, 942, Bb4, 84]
+      - [14400, 942, C5, 84]
+      - [17280, 942, Ab4, 84]
+      - [20160, 942, Ab4, 84]
+  replies_exam:
+    events:
+      - [0, 462, G4, 86]
+      - [1445, 462, G4, 93]
+      - [2880, 462, C5, 86]
+      - [4325, 462, C5, 93]
+      - [5760, 462, D5, 86]
+      - [7205, 462, D5, 93]
+      - [8640, 462, G4, 86]
+      - [10085, 462, G4, 93]
+      - [11520, 462, Eb5, 86]
+      - [12965, 462, Eb5, 93]
+      - [14400, 462, C5, 86]
+      - [15845, 462, C5, 93]
+      - [17280, 462, Ab4, 86]
+      - [18725, 462, Ab4, 93]
+      - [20160, 462, G4, 86]
+      - [21605, 462, G4, 93]
+  replies_dismissal:
+    events:
+      - [0, 462, G4, 86]
+      - [1445, 462, G4, 93]
+      - [2880, 462, Bb4, 86]
+      - [4325, 462, Bb4, 93]
+      - [5760, 462, C5, 86]
+      - [7205, 462, C5, 93]
+      - [8640, 462, G4, 86]
+      - [10085, 462, G4, 93]
+      - [11520, 462, Ab4, 86]
+      - [12965, 462, Ab4, 93]
+      - [14400, 462, Ab4, 86]
+      - [15845, 462, Ab4, 93]
+      - [17280, 462, G4, 86]
+      - [18725, 462, G4, 93]
+      - [20160, 462, Ab4, 78]
+  counterline_lecture_one:
+    events:
+      - [4325, 462, Eb4, 65]
+      - [10085, 462, Bb3, 65]
+      - [15845, 462, Eb4, 65]
+      - [21605, 462, Bb3, 65]
+  counterline_lecture_two:
+    events:
+      - [731, 462, Bb3, 88]
+      - [1445, 462, Bb3, 83]
+      - [2169, 222, Bb3, 76]
+      - [3611, 462, Eb4, 88]
+      - [4325, 462, Eb4, 83]
+      - [5049, 222, Eb4, 76]
+      - [6491, 462, F3, 88]
+      - [7205, 462, F3, 83]
+      - [7929, 222, F3, 76]
+      - [9371, 462, Bb3, 88]
+      - [10085, 462, Bb3, 83]
+      - [10809, 222, Bb3, 76]
+      - [12251, 462, G3, 88]
+      - [12965, 462, G3, 83]
+      - [13689, 222, G3, 76]
+      - [15131, 462, Eb4, 88]
+      - [15845, 462, Eb4, 83]
+      - [16569, 222, Eb4, 76]
+      - [18011, 462, D4, 88]
+      - [18725, 462, D4, 83]
+      - [19449, 222, D4, 76]
+      - [20160, 1182, Bb3, 84]
+  counterline_questions:
+    events:
+      - [0, 702, F3, 96]
+      - [960, 222, Ab3, 88]
+      - [1445, 942, C4, 98]
+      - [2880, 942, Eb4, 98]
+      - [4560, 462, C4, 91]
+      - [5280, 462, Ab3, 86]
+      - [5760, 702, G3, 92]
+      - [6720, 222, Bb3, 86]
+      - [7205, 942, Eb4, 99]
+      - [8640, 1182, D4, 95]
+      - [10320, 462, C4, 86]
+      - [11040, 462, Bb3, 88]
+      - [11520, 702, Ab3, 93]
+      - [12480, 222, C4, 88]
+      - [12965, 942, F4, 100]
+      - [14400, 942, Eb4, 98]
+      - [16080, 462, C4, 89]
+      - [16800, 462, G3, 83]
+      - [17280, 942, Ab3, 94]
+      - [18960, 462, C4, 92]
+      - [19680, 462, Eb4, 96]
+      - [20160, 1182, D4, 96]
+      - [22080, 462, Bb3, 89]
+  counterline_examples:
+    events:
+      - [1445, 702, C4, 88]
+      - [4325, 942, F3, 85]
+      - [7205, 462, Eb4, 86]
+      - [7929, 462, C4, 79]
+      - [8640, 462, Bb3, 85]
+      - [12965, 702, G3, 90]
+      - [15845, 942, Ab3, 87]
+      - [17280, 462, F3, 79]
+      - [18725, 462, Ab3, 86]
+      - [19680, 222, C4, 87]
+      - [20160, 702, D4, 87]
+      - [21605, 702, F3, 82]
+  counterline_exam:
+    events:
+      - [731, 462, Bb3, 88]
+      - [1445, 462, Bb3, 83]
+      - [2169, 222, Bb3, 76]
+      - [3611, 462, Eb4, 88]
+      - [4325, 462, Eb4, 83]
+      - [5049, 222, Eb4, 76]
+      - [6491, 462, F3, 88]
+      - [7205, 462, F3, 83]
+      - [7929, 222, F3, 76]
+      - [9371, 462, Bb3, 88]
+      - [10085, 462, Bb3, 83]
+      - [10809, 222, Bb3, 76]
+      - [12251, 462, G3, 88]
+      - [12965, 462, G3, 83]
+      - [13689, 222, G3, 76]
+      - [15131, 462, Eb4, 88]
+      - [15845, 462, Eb4, 83]
+      - [16569, 222, Eb4, 76]
+      - [18011, 462, D4, 88]
+      - [18725, 462, D4, 83]
+      - [19449, 222, D4, 76]
+      - [20891, 462, Bb3, 88]
+      - [21605, 462, Bb3, 83]
+      - [22329, 222, Bb3, 76]
+  counterline_dismissal:
+    events:
+      - [731, 462, Bb3, 88]
+      - [1445, 462, Bb3, 83]
+      - [2169, 222, Bb3, 76]
+      - [3611, 462, Eb4, 88]
+      - [4325, 462, Eb4, 83]
+      - [5049, 222, Eb4, 76]
+      - [6491, 462, Eb4, 88]
+      - [7205, 462, Eb4, 83]
+      - [7929, 222, Eb4, 76]
+      - [9371, 462, Eb4, 88]
+      - [10085, 462, Eb4, 83]
+      - [10809, 222, Eb4, 76]
+      - [12251, 462, C4, 88]
+      - [12965, 462, C4, 83]
+      - [13689, 222, C4, 76]
+      - [15131, 462, D4, 88]
+      - [15845, 462, D4, 83]
+      - [16569, 222, D4, 76]
+      - [18011, 462, Bb3, 88]
+      - [18725, 462, Bb3, 83]
+      - [19449, 222, Bb3, 76]
+      - [20160, 702, D4, 80]
+  bass_lecture_one:
+    events:
+      - [0, 702, Eb2, 89]
+      - [1449, 702, Bb2, 76]
+      - [2880, 702, Ab2, 89]
+      - [4329, 702, Eb3, 76]
+      - [5760, 702, Bb1, 89]
+      - [7209, 702, F2, 76]
+      - [8160, 222, Bb1, 73]
+      - [8640, 702, Eb2, 89]
+      - [10089, 702, Bb2, 76]
+      - [11520, 702, C2, 89]
+      - [12969, 702, G2, 76]
+      - [14400, 702, Ab2, 89]
+      - [15849, 702, Eb3, 76]
+      - [17280, 702, Bb1, 89]
+      - [18729, 702, F2, 76]
+      - [19680, 222, Bb1, 73]
+      - [20160, 702, Eb2, 87]
+  bass_lecture_two:
+    events:
+      - [0, 702, Eb2, 89]
+      - [1449, 702, Bb2, 76]
+      - [2880, 702, Ab2, 89]
+      - [4329, 702, Eb3, 76]
+      - [5760, 702, Bb1, 89]
+      - [7209, 702, F2, 76]
+      - [8160, 222, Bb1, 73]
+      - [8640, 702, Eb2, 89]
+      - [10089, 702, Bb2, 76]
+      - [11520, 702, C2, 89]
+      - [12969, 702, G2, 76]
+      - [14400, 702, Ab2, 89]
+      - [15849, 702, Eb3, 76]
+      - [17280, 702, Bb1, 89]
+      - [18729, 702, F2, 76]
+      - [19680, 222, Bb1, 73]
+      - [20160, 702, Eb2, 94]
+  bass_questions:
+    events:
+      - [0, 942, F2, 84]
+      - [1920, 462, C3, 74]
+      - [2880, 942, Ab2, 84]
+      - [4800, 462, Eb3, 74]
+      - [5760, 942, G2, 84]
+      - [7680, 462, Bb2, 74]
+      - [8640, 942, Bb1, 84]
+      - [10560, 462, F2, 74]
+      - [11520, 942, F2, 84]
+      - [13440, 462, C3, 74]
+      - [14400, 942, C2, 84]
+      - [16320, 462, G2, 74]
+      - [17280, 942, Ab2, 84]
+      - [19200, 462, Eb3, 74]
+      - [20160, 942, Bb1, 84]
+      - [22080, 462, F2, 74]
+  bass_examples:
+    events:
+      - [0, 702, C2, 89]
+      - [1449, 702, G2, 76]
+      - [2880, 702, F2, 89]
+      - [4329, 702, C3, 76]
+      - [5760, 702, Ab2, 89]
+      - [7209, 702, Eb3, 76]
+      - [8160, 222, Ab2, 73]
+      - [8640, 702, Bb1, 89]
+      - [10089, 702, F2, 76]
+      - [11520, 702, C2, 89]
+      - [12969, 702, G2, 76]
+      - [14400, 702, Ab2, 89]
+      - [15849, 702, Eb3, 76]
+      - [17280, 702, F2, 89]
+      - [18729, 702, C3, 76]
+      - [19680, 222, F2, 73]
+      - [20160, 702, Bb1, 89]
+      - [21609, 702, F2, 76]
+  bass_exam:
+    events:
+      - [0, 702, Eb2, 89]
+      - [1449, 702, Bb2, 76]
+      - [2880, 702, Ab2, 89]
+      - [4329, 702, Eb3, 76]
+      - [5760, 702, Bb1, 89]
+      - [7209, 702, F2, 76]
+      - [8160, 222, Bb1, 73]
+      - [8640, 702, Eb2, 89]
+      - [10089, 702, Bb2, 76]
+      - [11520, 702, C2, 89]
+      - [12969, 702, G2, 76]
+      - [14400, 702, Ab2, 89]
+      - [15849, 702, Eb3, 76]
+      - [17280, 702, Bb1, 89]
+      - [18729, 702, F2, 76]
+      - [19680, 222, Bb1, 73]
+      - [20160, 702, Eb2, 89]
+      - [21609, 702, Bb2, 76]
+  bass_dismissal:
+    events:
+      - [0, 702, Eb2, 89]
+      - [1449, 702, Bb2, 76]
+      - [2880, 702, C2, 89]
+      - [4329, 702, G2, 76]
+      - [5760, 702, Ab2, 89]
+      - [7209, 702, Eb3, 76]
+      - [8160, 222, Ab2, 73]
+      - [8640, 702, G2, 89]
+      - [10089, 702, Bb2, 76]
+      - [11520, 702, F2, 89]
+      - [12969, 702, C3, 76]
+      - [14400, 702, Bb1, 89]
+      - [15849, 702, F2, 76]
+      - [17280, 702, Eb2, 89]
+      - [18729, 702, Bb2, 76]
+      - [19680, 222, Eb2, 73]
+      - [20160, 702, Bb1, 89]
+      - [21609, 702, F2, 76]
+  drum_lecture_two:
+    events:
+      - [0, 222, 38, 75]
+      - [1444, 222, 38, 93]
+      - [2406, 222, 38, 66]
+      - [2880, 222, 38, 75]
+      - [4324, 222, 38, 93]
+      - [5286, 222, 38, 66]
+      - [5760, 222, 38, 75]
+      - [7204, 222, 38, 93]
+      - [8166, 222, 38, 66]
+      - [8640, 222, 38, 75]
+      - [10084, 222, 38, 93]
+      - [11046, 222, 38, 66]
+      - [11285, 222, 38, 75]
+      - [11520, 222, 38, 75]
+      - [12964, 222, 38, 93]
+      - [13926, 222, 38, 66]
+      - [14400, 222, 38, 75]
+      - [15844, 222, 38, 93]
+      - [16806, 222, 38, 66]
+      - [17280, 222, 38, 75]
+      - [18724, 222, 38, 93]
+      - [19686, 222, 38, 66]
+      - [20160, 222, 38, 97]
+  drum_examples:
+    events:
+      - [1444, 222, 38, 78]
+      - [2160, 222, 38, 67]
+      - [4324, 222, 38, 78]
+      - [5040, 222, 38, 67]
+      - [7204, 222, 38, 78]
+      - [7920, 222, 38, 67]
+      - [10084, 222, 38, 78]
+      - [10800, 222, 38, 67]
+      - [12964, 222, 38, 78]
+      - [13680, 222, 38, 67]
+      - [15844, 222, 38, 78]
+      - [16560, 222, 38, 67]
+      - [18724, 222, 38, 78]
+      - [19440, 222, 38, 67]
+      - [21604, 222, 38, 78]
+      - [22320, 222, 38, 67]
+  drum_exam:
+    events:
+      - [0, 222, 38, 75]
+      - [1444, 222, 38, 93]
+      - [2406, 222, 38, 66]
+      - [2880, 222, 38, 75]
+      - [4324, 222, 38, 93]
+      - [5286, 222, 38, 66]
+      - [5760, 222, 38, 75]
+      - [7204, 222, 38, 93]
+      - [8166, 222, 38, 66]
+      - [8640, 222, 38, 75]
+      - [10084, 222, 38, 93]
+      - [11046, 222, 38, 66]
+      - [11285, 222, 38, 75]
+      - [11520, 222, 38, 75]
+      - [12964, 222, 38, 93]
+      - [13926, 222, 38, 66]
+      - [14400, 222, 38, 75]
+      - [15844, 222, 38, 93]
+      - [16806, 222, 38, 66]
+      - [17280, 222, 38, 75]
+      - [18724, 222, 38, 93]
+      - [19686, 222, 38, 66]
+      - [20160, 222, 38, 75]
+      - [21604, 222, 38, 93]
+      - [22566, 222, 38, 66]
+      - [22805, 222, 38, 75]
+  drum_dismissal:
+    events:
+      - [0, 222, 38, 75]
+      - [1444, 222, 38, 93]
+      - [2406, 222, 38, 66]
+      - [2880, 222, 38, 75]
+      - [4324, 222, 38, 93]
+      - [5286, 222, 38, 66]
+      - [5760, 222, 38, 75]
+      - [7204, 222, 38, 93]
+      - [8166, 222, 38, 66]
+      - [8640, 222, 38, 75]
+      - [10084, 222, 38, 93]
+      - [11046, 222, 38, 66]
+      - [11285, 222, 38, 75]
+      - [11520, 222, 38, 75]
+      - [12964, 222, 38, 93]
+      - [13926, 222, 38, 66]
+      - [14400, 222, 38, 75]
+      - [15844, 222, 38, 93]
+      - [16806, 222, 38, 66]
+      - [17280, 222, 38, 75]
+      - [18724, 222, 38, 93]
+      - [19686, 222, 38, 66]
+      - [20160, 222, 38, 69]
+      - [21604, 222, 38, 62]
+parts:
+  - id: trumpet_part
+    instrument: trumpet
+    voices:
+      - id: fanfare
+        clips:
+          - {id: fanfare_01, at: {bar: 1, beat: 1}, use: lecture_tune}
+          - {id: fanfare_09, at: {bar: 9, beat: 1}, use: lecture_tune}
+          - {id: fanfare_33, at: {bar: 33, beat: 1}, use: lecture_tune}
+          - {id: fanfare_17, at: {bar: 17, beat: 1}, use: fanfare_questions}
+          - {id: fanfare_25, at: {bar: 25, beat: 1}, use: fanfare_examples}
+          - {id: fanfare_41, at: {bar: 41, beat: 1}, use: fanfare_dismissal}
+  - id: horn_part
+    instrument: horn
+    voices:
+      - id: replies
+        clips:
+          - {id: replies_09, at: {bar: 9, beat: 1}, use: replies_lecture_two}
+          - {id: replies_17, at: {bar: 17, beat: 1}, use: replies_questions}
+          - {id: replies_25, at: {bar: 25, beat: 1}, use: replies_examples}
+          - {id: replies_33, at: {bar: 33, beat: 1}, use: replies_exam}
+          - {id: replies_41, at: {bar: 41, beat: 1}, use: replies_dismissal}
+  - id: trombone_part
+    instrument: trombone
+    voices:
+      - id: counterline
+        clips:
+          - {id: counterline_01, at: {bar: 1, beat: 1}, use: counterline_lecture_one}
+          - {id: counterline_09, at: {bar: 9, beat: 1}, use: counterline_lecture_two}
+          - {id: counterline_17, at: {bar: 17, beat: 1}, use: counterline_questions}
+          - {id: counterline_25, at: {bar: 25, beat: 1}, use: counterline_examples}
+          - {id: counterline_33, at: {bar: 33, beat: 1}, use: counterline_exam}
+          - {id: counterline_41, at: {bar: 41, beat: 1}, use: counterline_dismissal}
+  - id: tuba_part
+    instrument: tuba
+    voices:
+      - id: bass
+        clips:
+          - {id: bass_01, at: {bar: 1, beat: 1}, use: bass_lecture_one}
+          - {id: bass_09, at: {bar: 9, beat: 1}, use: bass_lecture_two}
+          - {id: bass_17, at: {bar: 17, beat: 1}, use: bass_questions}
+          - {id: bass_25, at: {bar: 25, beat: 1}, use: bass_examples}
+          - {id: bass_33, at: {bar: 33, beat: 1}, use: bass_exam}
+          - {id: bass_41, at: {bar: 41, beat: 1}, use: bass_dismissal}
+  - id: snare_part
+    instrument: snare
+    voices:
+      - id: drum
+        clips:
+          - {id: drum_09, at: {bar: 9, beat: 1}, use: drum_lecture_two}
+          - {id: drum_25, at: {bar: 25, beat: 1}, use: drum_examples}
+          - {id: drum_33, at: {bar: 33, beat: 1}, use: drum_exam}
+          - {id: drum_41, at: {bar: 41, beat: 1}, use: drum_dismissal}
+render:
+  sample_rate: 48000
+  ogg_quality: 6
+processing:
+  groups:
+    trumpet:
+      chain:
+        - {processor: highpass, cutoff_hz: 120}
+        - {processor: lowpass, cutoff_hz: 9000}
+    horn:
+      chain:
+        - {processor: highpass, cutoff_hz: 105}
+    trombone:
+      chain:
+        - {processor: highpass, cutoff_hz: 72}
+    tuba:
+      chain:
+        - {processor: highpass, cutoff_hz: 43}
+        - {processor: lowpass, cutoff_hz: 6300}
+    snare:
+      chain:
+        - {processor: highpass, cutoff_hz: 140}
+        - {processor: lowpass, cutoff_hz: 8900}
+  master:
+    chain:
+      - {processor: highpass, cutoff_hz: 35}
+      - {processor: compressor, threshold_db: -17, ratio: 1.6, attack_ms: 24, release_ms: 115, knee_db: 5}
+      - {processor: reverb, wet: 0.038, decay_seconds: 0.65}
+      - {processor: limiter, target_peak_db: -1.8, drive: 0.94, normalize: true}
+playback:
+  layers:
+    ensemble: [trumpet, horn, trombone, tuba, snare]
+  sections:
+    - {id: song, form: [lecture_one, lecture_two, questions, examples, exam, dismissal], loop: true}

@@ -2,7 +2,7 @@ schema: ambition.musicir.v3
 id: form_27_b
 title: Form 27-B
 description: >-
-  An exploration cue for Capital. The piano tries the same two bars twice.
+  An exploration cue for Capital. The grand piano starts alone and tries the same two bars twice.
   A stamp takes the place of the last note. On the third pass the bass
   clarinet finishes the phrase. The cello keeps the beat through both returns.
 seed: 27017
@@ -28,7 +28,7 @@ harmony:
     D6, Bm9, Gmaj9, A7, Dadd9/F#, Em7, Gm6/9, A7,
   ]
 instruments:
-  - {name: upright, group: piano, program: acoustic_grand_piano, volume: 106, expression: 112, mix_gain_db: 0.0, instrument_backend: {kind: sfz, optional: false, library_ref: freepats.upright_piano_kw}}
+  - {name: grand_piano, group: piano, program: acoustic_grand_piano, volume: 106, expression: 112, mix_gain_db: 6.0, instrument_backend: {kind: sfz, optional: false, library_ref: freepats.salamander_grand}}
   - {name: pizz_cello, group: cello, program: pizzicato_strings, volume: 111, expression: 114, mix_gain_db: 4.5, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Strings - Performance/Cello Solo Pizzicato.sfz", settings: {fold_to_range: false}}}
   - {name: bass_clarinet, group: clarinet, program: clarinet, volume: 108, expression: 115, modulation: 85, mix_gain_db: 2.5, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Woodwinds - Performance/Bass Clarinet Solo Sustain (looped).sfz", settings: {fold_to_range: false}}}
   - {name: stamp_click, group: stamp, is_drum: true, volume: 105, expression: 110, instrument_backend: {kind: sfz, optional: false, sfz_glob: "**/Struck Idiophones/Woodblock.sfz", settings: {fold_to_range: false}}}
@@ -276,8 +276,6 @@ materials:
       - [28811, 462, [G3, C#4], 58]
   bassline_01_notes:
     events:
-      - [0, 942, D2, 90]
-      - [1452, 462, A2, 70]
       - [2411, 702, D3, 83]
       - [3375, 462, F#2, 67]
       - [3840, 702, B2, 86]
@@ -547,7 +545,6 @@ materials:
       - [30000, 462, C#4, 88]
   stamp_hits_01_notes:
     events:
-      - [951, 222, C4, 47]
       - [6720, 222, C4, 112]
       - [8631, 222, C4, 47]
       - [14400, 222, C4, 112]
@@ -618,7 +615,6 @@ materials:
       - [29760, 222, C4, 51]
   desk_hits_01_notes:
     events:
-      - [0, 222, D4, 56]
       - [6732, 222, D4, 82]
       - [7680, 222, D4, 56]
       - [14412, 222, D4, 82]
@@ -687,8 +683,8 @@ materials:
       - [26880, 222, D4, 61]
       - [28800, 222, D4, 51]
 parts:
-  - id: upright_part
-    instrument: upright
+  - id: piano_part
+    instrument: grand_piano
     voices:
       - id: melody
         clips:
