@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+native_only=0
+case "${1:-}" in
+    --native-only) native_only=1 ;;
+    -h|--help) printf 'Usage: %s [--native-only]\n' "$0"; exit 0 ;;
+    '') ;;
+    *) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
+esac
+
 cd "$(dirname "$0")"
 
 # shellcheck source=apt_helpers.sh
@@ -136,7 +144,7 @@ install_sfizz_obs_repo(){
 
     # ⛔ ALWAYS ASKED, never "already have it": OBS keys expire and are replaced,
     # and a keyring downloaded once goes stale and then fails every `apt update`.
-    refresh_apt_keyring "$KEY_URL" "$KEYRING"
+    refresh_apt_keyring "$KEY_URL" "$KEYRING" || return 1
 
     DESIRED_LINE="deb [signed-by=$KEYRING] $REPO_URL /"
 
@@ -197,7 +205,8 @@ build_sfizz_from_source() {
         -DSFIZZ_RENDER=ON -DSFIZZ_JACK=OFF -DSFIZZ_TESTS=OFF \
         -DSFIZZ_DEMOS=OFF -DSFIZZ_BENCHMARKS=OFF \
         || { rm -rf "$workdir"; return 1; }
-    cmake --build "$workdir/build" -j "$(nproc)" || { rm -rf "$workdir"; return 1; }
+    cmake --build "$workdir/build" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-$(nproc)}" \
+        || { rm -rf "$workdir"; return 1; }
     ${_SUDO:+$_SUDO} cmake --install "$workdir/build" || { rm -rf "$workdir"; return 1; }
     ${_SUDO:+$_SUDO} ldconfig || true
     rm -rf "$workdir"
@@ -277,6 +286,10 @@ fi
 if ! command -v sfizz_render >/dev/null 2>&1; then
     echo "[setup] ERROR: could not obtain sfizz_render; sampled SFZ instruments cannot render." >&2
     exit 1
+fi
+
+if [ "$native_only" -eq 1 ]; then
+    exit 0
 fi
 
 # Local developer setup. Assumes uv is installed.
