@@ -101,11 +101,18 @@ download() {
         log "dry-run: would download to $dest"
         return 0
     fi
-    local tmp="$dest.partial"
-    rm -f "$tmp"
-    if ! curl --fail --location --retry 5 --retry-delay 2 --continue-at - --output "$tmp" "$url"; then
-        rm -f "$tmp"
-        log "download failed: $label"
+    local tmp="$dest.partial" status=0
+    local -a curl_args=(--fail --location --retry 5 --retry-delay 2
+                       --connect-timeout 30 --speed-time 120 --speed-limit 1024
+                       --output "$tmp")
+    curl "${curl_args[@]}" --continue-at - "$url" || status=$?
+    if [[ "$status" == "33" || "$status" == "36" ]]; then
+        log "server cannot resume this download. Starting again: $label"
+        status=0
+        curl "${curl_args[@]}" "$url" || status=$?
+    fi
+    if [[ "$status" != "0" ]]; then
+        log "download failed: $label. A later run can resume $tmp"
         return 1
     fi
     mv "$tmp" "$dest"
