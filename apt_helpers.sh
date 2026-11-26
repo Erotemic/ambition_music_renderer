@@ -59,23 +59,25 @@ apt_update_tolerant(){
 # the existing keyring is left as it was.
 #   refresh_apt_keyring KEY_URL KEYRING_PATH
 refresh_apt_keyring(){
-    local key_url="$1" keyring="$2" sudo_prefix tmp
+    local key_url="$1" keyring="$2" sudo_prefix tmp status=0
     sudo_prefix="$(_sudo_prefix)"
     tmp="$(mktemp)"
     if curl -fsSL "$key_url" | gpg --dearmor > "$tmp" 2>/dev/null && [ -s "$tmp" ]; then
         if [ ! -f "$keyring" ]; then
             echo "[setup] Installing apt keyring: $keyring"
-            ${sudo_prefix:+$sudo_prefix} install -m 644 "$tmp" "$keyring"
+            ${sudo_prefix:+$sudo_prefix} install -m 644 "$tmp" "$keyring" || status=$?
         elif ! cmp -s "$tmp" "$keyring"; then
             echo "[setup] Refreshing apt keyring (the vendor's key changed): $keyring"
-            ${sudo_prefix:+$sudo_prefix} install -m 644 "$tmp" "$keyring"
+            ${sudo_prefix:+$sudo_prefix} install -m 644 "$tmp" "$keyring" || status=$?
         else
             echo "[setup] apt keyring is current: $keyring"
         fi
     else
         echo "[setup] warning: could not download $key_url; keeping the existing keyring if any" >&2
+        status=1
     fi
     rm -f "$tmp"
+    return "$status"
 }
 
 # After `apt_update_tolerant`: if the repository whose failing lines match
